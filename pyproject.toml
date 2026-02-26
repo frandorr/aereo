@@ -1,45 +1,63 @@
 [build-system]
-requires = ["hatchling"]
 build-backend = "hatchling.build"
+requires = [ "hatchling" ]
 
 [project]
-name = "python-polylith-template-with-uv"
+name = "aer"
 version = "0.1.0"
 description = "A Python Polylith template code repo"
 readme = "README.md"
-requires-python = ">=3.13"
 license = "MIT"
-authors = [{ name = "Your Name" }]
-dependencies = []
+authors = [ { name = "Your Name" } ]
+requires-python = ">=3.13"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+  "attrs>=25.4,<26",
+  "returns[compatible-mypy]>=0.26,<0.27",
+]
+
+[dependency-groups]
+dev = [
+  "polylith-cli>=1.42.5,<2",
+  "pytest>=9.0.2,<10",
+]
+
+[tool.hatch]
+build.dev-mode-dirs = [ "components", "bases", "development", "." ]
+metadata.allow-direct-references = true
 
 [tool.uv]
 managed = true
+workspace.members = [ "projects/*" ]
 add-bounds = "major"
 
-[tool.uv.workspace]
-members = ["projects/*"]
-
-[tool.hatch.metadata]
-allow-direct-references = true
-
-[tool.hatch.build]
-dev-mode-dirs = ["components", "bases", "development", "."]
-
-[tool.ruff]
-exclude = [
-    ".git",
-    ".github",
-    "__pycache__",
-    ".mypy_cache",
-    ".ruff_cache",
-    "dist",
-    ".venv",
-    "./development/*.py",
+[tool.mypy]
+# The mypy configurations: http://bit.ly/2zEl9WI
+ignore_missing_imports = true
+strict = true
+local_partial_types = true
+warn_unreachable = true
+enable_error_code = [
+  "truthy-bool",
+  "truthy-iterable",
+  "redundant-expr",
+  "unused-awaitable",
+  # "ignore-without-code",
+  "possibly-undefined",
+  "redundant-self",
+  # "explicit-override",
+  # "mutable-override",
+  "unimported-reveal",
+  "deprecated",
+  "exhaustive-match",
 ]
-line-length = 120
+disable_error_code = [
+  "no-untyped-def", # TODO: fix
+]
 
-[tool.basedpyright]
-venvPath = "."
-venv = ".venv"
-extraPaths = ["components/", "bases/"]
-
+[tool.polylith]
+bricks."components/aer/spectral" = "aer/spectral"
