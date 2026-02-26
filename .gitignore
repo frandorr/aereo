@@ -1,4 +1,9 @@
-
+.vscode
+development/local
+.agents
+skills-lock.json
+.agent
+uv.lock
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
