@@ -1,6 +1,5 @@
 .vscode
 development/local
-.agents
 skills-lock.json
 .agent
 uv.lock

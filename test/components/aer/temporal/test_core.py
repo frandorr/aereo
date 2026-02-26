@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytest
 from returns.maybe import Nothing
 
-from aer.temporal.core import TimeRange
+from aer.temporal.core import TimeRange, round_to_next_t_minutes
 
 
 def test_time_range_creation():
@@ -61,3 +61,54 @@ def test_time_range_overlaps():
 
     assert tr1.overlaps(tr2) is True
     assert tr1.overlaps(tr3) is False
+
+
+def test_time_range_partition():
+    tr1 = TimeRange(start=datetime(2023, 1, 1, 10, 0), end=datetime(2023, 1, 1, 12, 0))
+
+    # Equal partitions
+    partitions = tr1.partition(timedelta(hours=1))
+    assert len(partitions) == 2
+    assert partitions[0] == TimeRange(
+        start=datetime(2023, 1, 1, 10, 0), end=datetime(2023, 1, 1, 11, 0)
+    )
+    assert partitions[1] == TimeRange(
+        start=datetime(2023, 1, 1, 11, 0), end=datetime(2023, 1, 1, 12, 0)
+    )
+
+    # Non-equal partitions (last step is truncated)
+    partitions2 = tr1.partition(timedelta(minutes=75))
+    assert len(partitions2) == 2
+    assert partitions2[0] == TimeRange(
+        start=datetime(2023, 1, 1, 10, 0), end=datetime(2023, 1, 1, 11, 15)
+    )
+    assert partitions2[1] == TimeRange(
+        start=datetime(2023, 1, 1, 11, 15), end=datetime(2023, 1, 1, 12, 0)
+    )
+
+    # Step larger than range
+    partitions3 = tr1.partition(timedelta(hours=3))
+    assert len(partitions3) == 1
+    assert partitions3[0] == tr1
+
+
+def test_time_range_partition_invalid_step():
+    tr1 = TimeRange(start=datetime(2023, 1, 1, 10, 0), end=datetime(2023, 1, 1, 12, 0))
+    with pytest.raises(ValueError, match="step \\(.*\\) must be positive"):
+        tr1.partition(timedelta(0))
+    with pytest.raises(ValueError, match="step \\(.*\\) must be positive"):
+        tr1.partition(timedelta(hours=-1))
+
+
+def test_round_to_next_t_minutes():
+    dt = datetime(2023, 1, 1, 10, 14)
+    rounded = round_to_next_t_minutes(dt, 15)
+    assert rounded == datetime(2023, 1, 1, 10, 15)
+
+    dt2 = datetime(2023, 1, 1, 10, 15)
+    rounded2 = round_to_next_t_minutes(dt2, 15)
+    assert rounded2 == datetime(2023, 1, 1, 10, 30)
+
+    dt3 = datetime(2023, 1, 1, 10, 0, 30)
+    rounded3 = round_to_next_t_minutes(dt3, 15)
+    assert rounded3 == datetime(2023, 1, 1, 10, 15, 30)
