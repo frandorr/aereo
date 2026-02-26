@@ -1,13 +1,13 @@
 # Python Polylith Template with `uv`
 
-A minimal template repository for Python projects using the [Polylith architecture](https://davidvujic.github.io/python-polylith-docs/setup/), powered by `uv` for lightning-fast dependency management, and `perk` for git hooks.
+A minimal template repository for Python projects using the [Polylith architecture](https://davidvujic.github.io/python-polylith-docs/setup/), powered by `uv` for lightning-fast dependency management, and `prek` for git hooks.
 
 ## Philosophy
 
 This repository is designed to be a clean, modern starting point for teams looking to use:
 * **Polylith** for a modular, monorepo-friendly and maintainable architecture.
 * **uv** for exceptionally fast and reliable Python packaging and virtual environments.
-* **perk** for lightweight, tool-managed git hooks instead of traditional pre-commit.
+* **prek** for lightweight, tool-managed git hooks instead of traditional pre-commit.
 
 ---
 
@@ -15,7 +15,7 @@ This repository is designed to be a clean, modern starting point for teams looki
 
 ### Prerequisites
 
-To get started, you don't need anything pre-installed if you use the provided setup script. The setup script will automatically install `uv` (if not present) and `perk`. If you prefer to set things up manually, ensure you have `uv` installed.
+To get started, you don't need anything pre-installed if you use the provided setup script. The setup script will automatically install `uv` (if not present) and `prek`. If you prefer to set things up manually, ensure you have `uv` installed.
 
 ### Automatic Setup
 
@@ -30,7 +30,7 @@ The script will automatically do the heavy lifting:
 2. Update the `name` in `pyproject.toml` and the `namespace` in `workspace.toml` automatically.
 3. Install `uv` (if it's not already installed on your system).
 4. Add `polylith-cli` as a development dependency and run `uv sync` to set up your virtual environment.
-5. Install `perk` globally via `uv tool install perk`.
+5. Install `prek` globally via `uv tool install prek`.
 
 ---
 
@@ -71,7 +71,7 @@ uv run poly info
 
 ## Development Workflow
 
-1. **Install dependencies:**  
+1. **Install dependencies:**
    If you need to manually sync your environment or add third-party dependencies, use `uv`:
    ```bash
    uv sync
@@ -79,14 +79,14 @@ uv run poly info
    uv add --group dev pytest
    ```
 
-2. **Run tests:**  
+2. **Run tests:**
    You can run your tests across the entire workspace easily using `pytest`. The template enables tests globally across components:
    ```bash
    uv run pytest
    ```
 
-3. **Hooks (perk):**  
-   We use `perk` for streamlined commit checks. The setup script installs it globally via `uv tool install perk`. You can use it to configure git workflows without heavy external dependencies.
+3. **Hooks (prek):**
+   We use `prek` for streamlined commit checks. The setup script installs it globally via `uv tool install prek`. You can use it to configure git workflows without heavy external dependencies.
 
 ---
 
