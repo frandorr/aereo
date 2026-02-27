@@ -84,9 +84,11 @@ class TimeRange:
             raise ValueError(f"start ({self.start}) must be before end ({self.end})")
 
 
-def round_to_next_t_minutes(dt: datetime, t: int) -> datetime:
+def ceil_to_next_t_minutes(dt: datetime, t: int) -> datetime:
     """
-    Rounds the given datetime to the next multiple of t minutes.
+    Rounds the given datetime up to the next multiple of t minutes.
+
+    Always advances to the next boundary, even if `dt` is already aligned.
 
     Args:
         dt: The datetime to round.
@@ -96,3 +98,7 @@ def round_to_next_t_minutes(dt: datetime, t: int) -> datetime:
         The rounded datetime.
     """
     return dt + timedelta(minutes=t - dt.minute % t)
+
+
+# Keep old name as alias for backwards compatibility
+round_to_next_t_minutes = ceil_to_next_t_minutes
