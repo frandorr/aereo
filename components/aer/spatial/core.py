@@ -32,6 +32,16 @@ def reproject_polygon(polygon: Polygon, src_epsg: str, dst_epsg: str) -> Polygon
 
 @attrs.frozen
 class GridCell:
+    """A spatial grid cell representation.
+
+    Attributes:
+        row (str): The row identifier of the grid cell.
+        col (str): The column identifier of the grid cell.
+        dist (int): The distance or resolution metric for the grid cell.
+        bounds (Polygon): The spatial boundary of the cell as a Shapely Polygon.
+        epsg (str): The EPSG spatial reference system code.
+    """
+
     row: str
     col: str
     dist: int
@@ -84,17 +94,46 @@ class GridCell:
 
 @attrs.frozen
 class GridSpatialExtent:
+    """A collection of grid cells representing a spatial area.
+
+    Attributes:
+        grid_cells (frozenset[GridCell]): An immutable set of GridCell objects.
+    """
+
     grid_cells: frozenset[GridCell]
 
     def intersects(self, other: "GridSpatialExtent") -> bool:
+        """Check if this grid spatial extent intersects with another.
+
+        Args:
+            other (GridSpatialExtent): The other grid spatial extent to check.
+
+        Returns:
+            bool: True if there is at least one overlapping grid cell, False otherwise.
+        """
         return not self.grid_cells.isdisjoint(other.grid_cells)
 
     def intersection(self, other: "GridSpatialExtent") -> "GridSpatialExtent":
+        """Get the intersection of this grid spatial extent with another.
+
+        Args:
+            other (GridSpatialExtent): The other grid spatial extent.
+
+        Returns:
+            GridSpatialExtent: A new GridSpatialExtent containing the common grid cells.
+        """
         return GridSpatialExtent(self.grid_cells & other.grid_cells)
 
 
 @attrs.frozen
 class GridDefinition:
+    """Definition of a spatial grid system.
+
+    Attributes:
+        name (str): The name of the grid definition.
+        dist (int): The grid cell size or distance metric (e.g., in kilometers).
+    """
+
     name: str
     dist: int
 
