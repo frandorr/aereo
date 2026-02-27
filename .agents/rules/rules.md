@@ -9,3 +9,7 @@ trigger: always_on
 2. **Polylith Architecture Test Paths**: This repository uses a Python Polylith architecture. The test path structure explicitly mimics the component paths.
    - For example, if a component is located at `components/aer/temporal/`, its tests must be placed in and run from `test/components/aer/temporal/`.
    - Always map the component path to the corresponding test path when debugging or executing tests for a specific component.
+
+3. **When asked to commit something**: you MUST use git-commit skill
+
+4. **Always use workflow poly-create to create components/bases/project for polylith**. Do NOT implement it in this step, just run the creation workflow.
