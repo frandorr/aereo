@@ -137,7 +137,7 @@ def test_grid_definition_grid_empty(monkeypatch):
     mock_empty_gdf = gpd.GeoDataFrame()
 
     with patch("geopandas.read_parquet", return_value=mock_empty_gdf):
-        with pytest.raises(ValueError, match="is cached_propertyempty"):
+        with pytest.raises(ValueError, match="is empty"):
             _ = grid_def.grid
 
 
