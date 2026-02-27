@@ -1,0 +1,12 @@
+[package]
+name = "codemap"
+version = "0.2.0"
+edition = "2021"
+
+[dependencies]
+walkdir = "2"
+toml = "0.8"
+serde = { version = "1", features = ["derive"] }
+
+[profile.release]
+opt-level = 3
