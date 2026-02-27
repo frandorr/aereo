@@ -4,7 +4,7 @@ from functools import cached_property
 from shapely.geometry import Polygon
 from pyresample.geometry import AreaDefinition
 from aer.settings import ENV_SETTINGS
-from pyproj import Proj, Transformer
+from pyproj import Transformer
 from shapely.ops import transform
 
 
@@ -18,15 +18,8 @@ def reproject_polygon(polygon: Polygon, src_epsg: str, dst_epsg: str) -> Polygon
     Returns:
         Polygon: Reprojected Shapely Polygon in destination coordinate system
     """
-    # Define a projection that converts lat/lon to a metric system (e.g., UTM)
-    proj = Proj(dst_epsg)
-
-    # Create a transformer to convert lat/lon to UTM
-    transformer = Transformer.from_crs(src_epsg, proj.to_proj4(), always_xy=True)
-
-    # Transform the polygon to the UTM coordinate system
+    transformer = Transformer.from_crs(src_epsg, dst_epsg, always_xy=True)
     projected_polygon = transform(transformer.transform, polygon)
-
     return projected_polygon
 
 
@@ -48,6 +41,9 @@ class GridCell:
     bounds: Polygon
     epsg: str
 
+    # NOTE: cached_property works with attrs.frozen because attrs does not use
+    # __slots__ by default. If slots=True is ever enabled, replace with
+    # functools.lru_cache or attrs.field(init=False).
     @cached_property
     def utm_bounds(self) -> Polygon:
         """Get the bounds of the grid cell in UTM coordinates.
@@ -152,7 +148,7 @@ class GridDefinition:
         )
         gdf = gpd.read_parquet(grid_path)  # pyright: ignore[reportUnknownMemberType]
         if gdf.empty:
-            raise ValueError(f"Grid file at {grid_path} is cached_propertyempty.")
+            raise ValueError(f"Grid file at {grid_path} is empty.")
         return gdf
 
     def intersecting_grid_spatial_extent(self, geometry: Polygon) -> GridSpatialExtent:
