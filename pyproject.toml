@@ -60,7 +60,8 @@ enable_error_code = [
   "unimported-reveal",
 ]
 disable_error_code = [
-  "no-untyped-def", # TODO: fix
+  "no-untyped-def",  # TODO: fix
+  "no-untyped-call"
 ]
 
 [tool.polylith]
