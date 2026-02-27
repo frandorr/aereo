@@ -5,13 +5,30 @@ from returns import maybe
 
 @attrs.frozen
 class TimeRange:
+    """A representation of a continuous period of time.
+
+    Attributes:
+        start (datetime): The starting datetime of the period.
+        end (datetime): The ending datetime of the period.
+    """
+
     start: datetime
     end: datetime
 
     def __str__(self) -> str:
+        """Get the string representation.
+
+        Returns:
+            str: Formatted period string 'start - end'.
+        """
         return f"{self.start} - {self.end}"
 
     def __repr__(self) -> str:
+        """Get the formal string representation.
+
+        Returns:
+            str: Formatted period string 'start - end'.
+        """
         return self.__str__()
 
     def intersection(self, other: "TimeRange") -> maybe.Maybe["TimeRange"]:
@@ -31,6 +48,14 @@ class TimeRange:
         return maybe.Some(TimeRange(start=start, end=end))
 
     def overlaps(self, other: "TimeRange") -> bool:
+        """Check if this time range overlaps with another time range.
+
+        Args:
+            other (TimeRange): The other time range to check.
+
+        Returns:
+            bool: True if there is an overlapping period, False otherwise.
+        """
         return self.intersection(other) != maybe.Nothing
 
     def partition(self, step: timedelta) -> list["TimeRange"]:
