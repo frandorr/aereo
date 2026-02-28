@@ -155,6 +155,10 @@ from aer.spectral.core import (
     MYDIS_02QKM,
     MYDIS_02HKM,
     MYDIS_021KM,
+    SENTINEL_3_OLCI_1_EFR_NRT,
+    SENTINEL_3_OLCI_1_EFR_NTC,
+    SENTINEL_3_SLSTR_1_RBT_NRT,
+    SENTINEL_3_SLSTR_1_RBT_NTC,
 )
 
 __all__ = [
@@ -308,4 +312,8 @@ __all__ = [
     "MYDIS_02QKM",
     "MYDIS_02HKM",
     "MYDIS_021KM",
+    "SENTINEL_3_OLCI_1_EFR_NRT",
+    "SENTINEL_3_OLCI_1_EFR_NTC",
+    "SENTINEL_3_SLSTR_1_RBT_NRT",
+    "SENTINEL_3_SLSTR_1_RBT_NTC",
 ]
