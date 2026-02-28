@@ -1633,3 +1633,32 @@ MYDIS_021KM = Product(
     supported_satellites=frozenset([Satellite.AQUA]),
     channels=MODIS_CHANNELS,
 )
+
+# Sentinel-3 Products
+SENTINEL_3_OLCI_1_EFR_NRT = Product(
+    name="sentinel-3-olci-1-efr-nrt",
+    instrument=Instrument.OLCI,
+    supported_satellites=frozenset([Satellite.SENTINEL_3A, Satellite.SENTINEL_3B]),
+    channels=OLCI_CHANNELS,
+)
+
+SENTINEL_3_OLCI_1_EFR_NTC = Product(
+    name="sentinel-3-olci-1-efr-ntc",
+    instrument=Instrument.OLCI,
+    supported_satellites=frozenset([Satellite.SENTINEL_3A, Satellite.SENTINEL_3B]),
+    channels=OLCI_CHANNELS,
+)
+
+SENTINEL_3_SLSTR_1_RBT_NRT = Product(
+    name="sentinel-3-slstr-1-rbt-nrt",
+    instrument=Instrument.SLSTR,
+    supported_satellites=frozenset([Satellite.SENTINEL_3A, Satellite.SENTINEL_3B]),
+    channels=SLSTR_CHANNELS,
+)
+
+SENTINEL_3_SLSTR_1_RBT_NTC = Product(
+    name="sentinel-3-slstr-1-rbt-ntc",
+    instrument=Instrument.SLSTR,
+    supported_satellites=frozenset([Satellite.SENTINEL_3A, Satellite.SENTINEL_3B]),
+    channels=SLSTR_CHANNELS,
+)
