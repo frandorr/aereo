@@ -1,5 +1,6 @@
 from enum import Enum
-from typing import Literal
+from typing import FrozenSet, Literal
+
 import attrs
 
 
@@ -70,6 +71,23 @@ class Channel:
     instrument: Instrument
     band: Band
     resolution: int
+
+
+@attrs.frozen
+class Product:
+    """A specific data product produced by an instrument, containing a subset of channels.
+
+    Attributes:
+        name: The canonical name or pattern of the product.
+        instrument: The instrument that generated this product.
+        supported_satellites: Satellites that emit this product.
+        channels: A tuple of specific Channels available in this product.
+    """
+
+    name: str
+    instrument: Instrument
+    supported_satellites: FrozenSet[Satellite]
+    channels: tuple[Channel, ...]
 
 
 # ==========================================
@@ -1343,4 +1361,275 @@ SLSTR_CHANNELS = (
     SLSTR_BAND_S9,
     SLSTR_BAND_F1,
     SLSTR_BAND_F2,
+)
+
+# ==========================================
+# Products (Module-level singletons)
+# ==========================================
+
+# ABI Products
+ABI_L1B_RADF = Product(
+    name="ABI-L1b-RadF",
+    instrument=Instrument.ABI,
+    supported_satellites=frozenset(
+        [Satellite.GOES_16, Satellite.GOES_18, Satellite.GOES_19]
+    ),
+    channels=ABI_CHANNELS,
+)
+
+ABI_L1B_RADC = Product(
+    name="ABI-L1b-RadC",
+    instrument=Instrument.ABI,
+    supported_satellites=frozenset(
+        [Satellite.GOES_16, Satellite.GOES_18, Satellite.GOES_19]
+    ),
+    channels=ABI_CHANNELS,
+)
+
+ABI_L1B_RADM = Product(
+    name="ABI-L1b-RadM",
+    instrument=Instrument.ABI,
+    supported_satellites=frozenset(
+        [Satellite.GOES_16, Satellite.GOES_18, Satellite.GOES_19]
+    ),
+    channels=ABI_CHANNELS,
+)
+
+# VIIRS S-NPP Products
+VNP02IMG = Product(
+    name="VNP02IMG",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.SNPP]),
+    channels=(VIIRS_I1, VIIRS_I2, VIIRS_I3, VIIRS_I4, VIIRS_I5),
+)
+
+VNP03IMG = Product(
+    name="VNP03IMG",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.SNPP]),
+    channels=(),
+)
+
+VNP02MOD = Product(
+    name="VNP02MOD",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.SNPP]),
+    channels=(
+        VIIRS_M1,
+        VIIRS_M2,
+        VIIRS_M3,
+        VIIRS_M4,
+        VIIRS_M5,
+        VIIRS_M6,
+        VIIRS_M7,
+        VIIRS_M8,
+        VIIRS_M9,
+        VIIRS_M10,
+        VIIRS_M11,
+        VIIRS_M12,
+        VIIRS_M13,
+        VIIRS_M14,
+        VIIRS_M15,
+        VIIRS_M16,
+    ),
+)
+
+VNP03MOD = Product(
+    name="VNP03MOD",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.SNPP]),
+    channels=(),
+)
+
+VNP02DNB = Product(
+    name="VNP02DNB",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.SNPP]),
+    channels=(VIIRS_DNB,),
+)
+
+VNP03DNB = Product(
+    name="VNP03DNB",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.SNPP]),
+    channels=(),
+)
+
+# VIIRS NOAA-20 Products
+VJ102IMG = Product(
+    name="VJ102IMG",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.NOAA_20]),
+    channels=(VIIRS_I1, VIIRS_I2, VIIRS_I3, VIIRS_I4, VIIRS_I5),
+)
+
+VJ103IMG = Product(
+    name="VJ103IMG",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.NOAA_20]),
+    channels=(),
+)
+
+VJ102MOD = Product(
+    name="VJ102MOD",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.NOAA_20]),
+    channels=(
+        VIIRS_M1,
+        VIIRS_M2,
+        VIIRS_M3,
+        VIIRS_M4,
+        VIIRS_M5,
+        VIIRS_M6,
+        VIIRS_M7,
+        VIIRS_M8,
+        VIIRS_M9,
+        VIIRS_M10,
+        VIIRS_M11,
+        VIIRS_M12,
+        VIIRS_M13,
+        VIIRS_M14,
+        VIIRS_M15,
+        VIIRS_M16,
+    ),
+)
+
+VJ103MOD = Product(
+    name="VJ103MOD",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.NOAA_20]),
+    channels=(),
+)
+
+VJ102DNB = Product(
+    name="VJ102DNB",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.NOAA_20]),
+    channels=(VIIRS_DNB,),
+)
+
+VJ103DNB = Product(
+    name="VJ103DNB",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.NOAA_20]),
+    channels=(),
+)
+
+# VIIRS NOAA-21 Products
+VJ202IMG = Product(
+    name="VJ202IMG",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.NOAA_21]),
+    channels=(VIIRS_I1, VIIRS_I2, VIIRS_I3, VIIRS_I4, VIIRS_I5),
+)
+
+VJ203IMG = Product(
+    name="VJ203IMG",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.NOAA_21]),
+    channels=(),
+)
+
+VJ202MOD = Product(
+    name="VJ202MOD",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.NOAA_21]),
+    channels=(
+        VIIRS_M1,
+        VIIRS_M2,
+        VIIRS_M3,
+        VIIRS_M4,
+        VIIRS_M5,
+        VIIRS_M6,
+        VIIRS_M7,
+        VIIRS_M8,
+        VIIRS_M9,
+        VIIRS_M10,
+        VIIRS_M11,
+        VIIRS_M12,
+        VIIRS_M13,
+        VIIRS_M14,
+        VIIRS_M15,
+        VIIRS_M16,
+    ),
+)
+
+VJ203MOD = Product(
+    name="VJ203MOD",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.NOAA_21]),
+    channels=(),
+)
+
+VJ202DNB = Product(
+    name="VJ202DNB",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.NOAA_21]),
+    channels=(VIIRS_DNB,),
+)
+
+VJ203DNB = Product(
+    name="VJ203DNB",
+    instrument=Instrument.VIIRS,
+    supported_satellites=frozenset([Satellite.NOAA_21]),
+    channels=(),
+)
+
+# MODIS Products
+MODIS_02QKM = Product(
+    name="MOD02QKM",
+    instrument=Instrument.MODIS,
+    supported_satellites=frozenset([Satellite.TERRA]),
+    channels=(MODIS_BAND_1, MODIS_BAND_2),
+)
+
+MODIS_02HKM = Product(
+    name="MOD02HKM",
+    instrument=Instrument.MODIS,
+    supported_satellites=frozenset([Satellite.TERRA]),
+    channels=(
+        MODIS_BAND_1,
+        MODIS_BAND_2,
+        MODIS_BAND_3,
+        MODIS_BAND_4,
+        MODIS_BAND_5,
+        MODIS_BAND_6,
+        MODIS_BAND_7,
+    ),
+)
+
+MODIS_021KM = Product(
+    name="MOD021KM",
+    instrument=Instrument.MODIS,
+    supported_satellites=frozenset([Satellite.TERRA]),
+    channels=MODIS_CHANNELS,
+)
+
+MYDIS_02QKM = Product(
+    name="MYD02QKM",
+    instrument=Instrument.MODIS,
+    supported_satellites=frozenset([Satellite.AQUA]),
+    channels=(MODIS_BAND_1, MODIS_BAND_2),
+)
+
+MYDIS_02HKM = Product(
+    name="MYD02HKM",
+    instrument=Instrument.MODIS,
+    supported_satellites=frozenset([Satellite.AQUA]),
+    channels=(
+        MODIS_BAND_1,
+        MODIS_BAND_2,
+        MODIS_BAND_3,
+        MODIS_BAND_4,
+        MODIS_BAND_5,
+        MODIS_BAND_6,
+        MODIS_BAND_7,
+    ),
+)
+
+MYDIS_021KM = Product(
+    name="MYD021KM",
+    instrument=Instrument.MODIS,
+    supported_satellites=frozenset([Satellite.AQUA]),
+    channels=MODIS_CHANNELS,
 )
