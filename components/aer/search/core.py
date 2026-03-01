@@ -1,66 +1,113 @@
+from typing import Any, Literal
+
 import earthaccess
 import pandas as pd
-from typing import Any
+from returns import result
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 
-from aer.temporal import TimeRange
-from aer.spectral import Product
 from aer.spatial import GridSpatialExtent
+from aer.spectral import Product
+from aer.temporal import TimeRange
+from structlog import get_logger
+
+logger = get_logger()
+
+CellOverlapMode = Literal["contains", "intersects"]
 
 
-def _parse_umm_polygon(umm_data: dict[str, Any]) -> Polygon:
-    """Helper to extract a Shapely Polygon representing the data extent from CMR UMM meta."""
+class NoSpatialMetadataError(Exception):
+    """Raised when a granule has no usable spatial metadata in UMM."""
+
+
+def _parse_umm_polygon(
+    umm_data: dict[str, Any],
+) -> result.Result[Polygon, NoSpatialMetadataError]:
+    """Extract a Shapely Polygon representing the granule footprint from CMR UMM metadata.
+
+    Handles multiple ``BoundingRectangles`` (e.g. descending passes split at the
+    antimeridian) by unioning them into a single geometry.  Also handles
+    ``GPolygons`` (the standard CMR key for granule-level polygon footprints,
+    used by VIIRS, MODIS, and most polar-orbiting products) and falls back to
+    the ``Polygons`` key.
+
+    Returns:
+        ``Success(polygon)`` on success, ``Failure(reason)`` when the granule
+        carries no usable spatial metadata.
+    """
     spatial = umm_data.get("SpatialExtent", {})
     horizontal = spatial.get("HorizontalSpatialDomain", {})
     geometry = horizontal.get("Geometry", {})
 
-    # Try BoundingRectangles (many polar products use this)
+    # Try BoundingRectangles — union all of them
     bboxes = geometry.get("BoundingRectangles", [])
     if bboxes:
-        bbox = bboxes[0]
-        # Bounding coordinates
-        w = bbox.get("WestBoundingCoordinate", 0)
-        s = bbox.get("SouthBoundingCoordinate", 0)
-        e = bbox.get("EastBoundingCoordinate", 0)
-        n = bbox.get("NorthBoundingCoordinate", 0)
-        return Polygon([(w, s), (e, s), (e, n), (w, n), (w, s)])
+        polys = []
+        for bbox in bboxes:
+            w = bbox.get("WestBoundingCoordinate", 0)
+            s = bbox.get("SouthBoundingCoordinate", 0)
+            e = bbox.get("EastBoundingCoordinate", 0)
+            n = bbox.get("NorthBoundingCoordinate", 0)
+            polys.append(Polygon([(w, s), (e, s), (e, n), (w, n)]))
+        return result.Success(unary_union(polys))
 
-    # Try Polygons (products with complex footprints)
+    # Try GPolygons — the standard CMR key for granule-level footprints
+    gpolygons = geometry.get("GPolygons", [])
+    if gpolygons:
+        boundary = gpolygons[0].get("Boundary", {})
+        points = boundary.get("Points", [])
+        if points:
+            coords = [(p.get("Longitude", 0), p.get("Latitude", 0)) for p in points]
+            return result.Success(Polygon(coords))
+
+    # Try Polygons (less common, kept as fallback)
     polygons = geometry.get("Polygons", [])
     if polygons:
         boundary = polygons[0].get("Boundary", {})
         points = boundary.get("Points", [])
         if points:
             coords = [(p.get("Longitude", 0), p.get("Latitude", 0)) for p in points]
-            return Polygon(coords)
+            return result.Success(Polygon(coords))
 
-    # Fallback to an empty polygon if CMR is missing spatial info
-    return Polygon()
+    return result.Failure(
+        NoSpatialMetadataError("Granule has no usable spatial metadata in UMM")
+    )
 
 
 def search_earthaccess(
     products: list[Product],
     time_range: TimeRange,
     spatial_extent: GridSpatialExtent | None = None,
+    cell_overlap_mode: CellOverlapMode = "contains",
     **kwargs: Any,
 ) -> pd.DataFrame:
-    """
-    Search for earthaccess data given a list of Products, a TimeRange, and an optional GridSpatialExtent.
-    Returns a pandas DataFrame with the search results.
+    """Search for earthaccess data given Products, a TimeRange, and an optional spatial extent.
 
     Args:
         products: A list of spectral Products to search for (uses product.name).
         time_range: The TimeRange representing start and end time.
-        spatial_extent: An optional GridSpatialExtent. If provided, filters CMR by its
-                        overall bounding box, and checks each returned granule to see
-                        which cells are fully contained within it.
-        **kwargs: Additional parameters passed directly to earthaccess.search_data.
+        spatial_extent: An optional GridSpatialExtent.  When provided the CMR
+            query is filtered by its overall bounding box, and each returned
+            granule is checked against the individual cells.
+        cell_overlap_mode: How to match cells against each granule footprint.
+            ``"contains"`` (default) keeps only cells *fully inside* the granule.
+            ``"intersects"`` keeps cells that *overlap at all* with the granule.
+        **kwargs: Additional parameters passed directly to ``earthaccess.search_data``.
 
     Returns:
-        A pd.DataFrame containing product name, start time, end time, s3 urls, sizes,
-        and optionally a 'grid_cells' column listing cell IDs fully contained by each file.
+        A ``pd.DataFrame`` with columns: product_name, granule_id, concept_id,
+        start_time, end_time, s3_url, https_url, size_mb, and (when
+        *spatial_extent* is given) grid_cells.
+
+    Raises:
+        ValueError: If both *spatial_extent* and *bounding_box* are specified.
     """
+    if spatial_extent and "bounding_box" in kwargs:
+        raise ValueError(
+            "Cannot specify both 'spatial_extent' and 'bounding_box'. "
+            "The spatial_extent automatically derives the bounding box."
+        )
+
     temporal = (
         time_range.start.strftime("%Y-%m-%d %H:%M:%S"),
         time_range.end.strftime("%Y-%m-%d %H:%M:%S"),
@@ -70,7 +117,6 @@ def search_earthaccess(
 
     # Apply bounding box filter if spatial_extent is provided
     if spatial_extent and spatial_extent.grid_cells:
-        # Aggregate all cell bounds to find the maximum WGS84 bounding box
         all_bounds = unary_union([cell.bounds for cell in spatial_extent.grid_cells])
         minx, miny, maxx, maxy = all_bounds.bounds
         kwargs["bounding_box"] = (minx, miny, maxx, maxy)
@@ -117,7 +163,7 @@ def search_earthaccess(
         coll_ref = umm.get("CollectionReference", {})
         extracted_product_name = coll_ref.get("ShortName")
 
-        row_data = {
+        row_data: dict[str, Any] = {
             "product_name": extracted_product_name,
             "granule_id": meta.get("native-id"),
             "concept_id": meta.get("concept-id"),
@@ -128,16 +174,30 @@ def search_earthaccess(
             "size_mb": granule.size(),
         }
 
-        # Check containment against cells if a spatial extent was requested
+        # Check cell overlap if a spatial extent was requested
         if spatial_extent:
-            granule_poly = _parse_umm_polygon(umm)
+            poly_result = _parse_umm_polygon(umm)
+            contained_cells: list[str] = []
 
-            contained_cells = []
-            for cell in spatial_extent.grid_cells:
-                # The user requested explicit cell IDs fully contained inside the asset.
-                # If you need intersecting rather than fully contained later, change to .intersects()
-                if granule_poly.contains(cell.bounds):
-                    contained_cells.append(f"{cell.row}_{cell.col}")
+            match poly_result:
+                case result.Success(granule_poly):
+                    overlap_fn = (
+                        granule_poly.contains
+                        if cell_overlap_mode == "contains"
+                        else granule_poly.intersects
+                    )
+                    contained_cells = [
+                        f"{cell.row}_{cell.col}"
+                        for cell in spatial_extent.grid_cells
+                        if overlap_fn(cell.bounds)
+                    ]
+                case result.Failure(e):
+                    # log warning with structlog
+                    logger.warning(
+                        "Failed to parse UMM polygon",
+                        error=e,
+                        granule_id=meta.get("native-id"),
+                    )
 
             row_data["grid_cells"] = contained_cells
 
