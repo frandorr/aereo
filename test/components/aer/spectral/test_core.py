@@ -83,7 +83,7 @@ def test_channel_instrument_consistency():
 
 
 def test_band_type_values():
-    """All band_type values should be valid BandType enum members."""
+    """All band_type values should be valid BandType instances."""
     all_channels = (
         ABI_CHANNELS + VIIRS_CHANNELS + MODIS_CHANNELS + OLCI_CHANNELS + SLSTR_CHANNELS
     )

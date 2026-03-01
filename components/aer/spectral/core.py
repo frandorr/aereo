@@ -1,49 +1,227 @@
-from enum import Enum
-from typing import FrozenSet, Literal
+from typing import FrozenSet, ClassVar, Dict, Optional
 
 import attrs
 
 
-class Instrument(Enum):
-    ABI = "ABI"  # https://space.oscar.wmo.int/instruments/view/abi
-    VIIRS = "VIIRS"  # https://space.oscar.wmo.int/instruments/view/viirs
-    MODIS = "MODIS"  # https://space.oscar.wmo.int/instruments/view/modis
-    OLCI = "OLCI"  # https://space.oscar.wmo.int/instruments/view/olci
-    SLSTR = "SLSTR"  # https://space.oscar.wmo.int/instruments/view/slstr
+@attrs.frozen
+class Instrument:
+    """An extensible registry of instruments.
+
+    Core instruments (ABI, VIIRS, MODIS, etc.) are pre-registered at module
+    load time.  Plugins can add new instruments via ``register()`` and should
+    capture the return value for type-safe usage::
+
+        OLI = Instrument.register("OLI", "https://...")
+        channel = Channel(c_id="B1", instrument=OLI, ...)
+    """
+
+    name: str
+    url: Optional[str] = None
+
+    _registry: ClassVar[Dict[str, "Instrument"]] = {}
+
+    # explicit type stub for mypy
+    ABI: ClassVar["Instrument"]
+    VIIRS: ClassVar["Instrument"]
+    MODIS: ClassVar["Instrument"]
+    OLCI: ClassVar["Instrument"]
+    SLSTR: ClassVar["Instrument"]
+
+    def __repr__(self) -> str:
+        return f"Instrument.{self.name.replace('-', '_').upper()}"
+
+    @classmethod
+    def register(cls, name: str, url: Optional[str] = None) -> "Instrument":
+        """Register a new instrument or return an existing one.
+
+        Plugin authors should capture the return value for full type safety::
+
+            OLI = Instrument.register("OLI")
+            # mypy knows OLI is Instrument — use it directly.
+
+        The instance is also attached as a class attribute (e.g.
+        ``Instrument.OLI``) for interactive convenience, but this is
+        invisible to static type checkers for dynamically-added entries.
+        """
+        if name in cls._registry:
+            return cls._registry[name]
+
+        instance = cls(name=name, url=url)
+        cls._registry[name] = instance
+
+        setattr(cls, name.replace("-", "_").upper(), instance)
+        return instance
+
+    @classmethod
+    def get(cls, name: str) -> "Instrument":
+        """Retrieve a registered instrument by name."""
+        if name not in cls._registry:
+            raise KeyError(
+                f"Instrument '{name}' is not registered. "
+                f"Available: {list(cls._registry.keys())}"
+            )
+        return cls._registry[name]
+
+    @classmethod
+    def all(cls) -> tuple["Instrument", ...]:
+        """Return all registered instruments."""
+        return tuple(cls._registry.values())
 
 
-class Satellite(Enum):
-    TERRA = "TERRA"  # https://space.oscar.wmo.int/satellites/view/terra
-    AQUA = "AQUA"  # https://space.oscar.wmo.int/satellites/view/aqua
-    NOAA_20 = "NOAA-20"  # https://space.oscar.wmo.int/satellites/view/noaa-20
-    NOAA_21 = "NOAA-21"  # https://space.oscar.wmo.int/satellites/view/noaa-21
-    SNPP = "SNPP"  # https://space.oscar.wmo.int/satellites/view/snpp
-    GOES_16 = "GOES-16"  # https://space.oscar.wmo.int/satellites/view/goes-16
-    GOES_18 = "GOES-18"  # https://space.oscar.wmo.int/satellites/view/goes-18
-    GOES_19 = "GOES-19"  # https://space.oscar.wmo.int/satellites/view/goes-19
-    SENTINEL_3A = (
-        "SENTINEL-3A"  # https://space.oscar.wmo.int/satellites/view/sentinel-3a
-    )
-    SENTINEL_3B = (
-        "SENTINEL-3B"  # https://space.oscar.wmo.int/satellites/view/sentinel-3b
-    )
+Instrument.register("ABI", "https://space.oscar.wmo.int/instruments/view/abi")
+Instrument.register("VIIRS", "https://space.oscar.wmo.int/instruments/view/viirs")
+Instrument.register("MODIS", "https://space.oscar.wmo.int/instruments/view/modis")
+Instrument.register("OLCI", "https://space.oscar.wmo.int/instruments/view/olci")
+Instrument.register("SLSTR", "https://space.oscar.wmo.int/instruments/view/slstr")
 
 
-# Type aliases for specific constellations:
-VIIRS_CONSTELLATION = Literal[Satellite.SNPP, Satellite.NOAA_20, Satellite.NOAA_21]
-MODIS_CONSTELLATION = Literal[Satellite.TERRA, Satellite.AQUA]
-GOES_CONSTELLATION = Literal[Satellite.GOES_16, Satellite.GOES_18, Satellite.GOES_19]
-SENTINEL_3_CONSTELLATION = Literal[Satellite.SENTINEL_3A, Satellite.SENTINEL_3B]
+@attrs.frozen
+class Satellite:
+    """An extensible registry of satellites.
+
+    Core satellites are pre-registered at module load time.  Plugins can
+    add new satellites via ``register()`` and should capture the return
+    value for type-safe usage::
+
+        LANDSAT_8 = Satellite.register("LANDSAT_8", "https://...")
+    """
+
+    name: str
+    url: Optional[str] = None
+
+    _registry: ClassVar[Dict[str, "Satellite"]] = {}
+
+    # explicit type stub for mypy
+    TERRA: ClassVar["Satellite"]
+    AQUA: ClassVar["Satellite"]
+    NOAA_20: ClassVar["Satellite"]
+    NOAA_21: ClassVar["Satellite"]
+    SNPP: ClassVar["Satellite"]
+    GOES_16: ClassVar["Satellite"]
+    GOES_18: ClassVar["Satellite"]
+    GOES_19: ClassVar["Satellite"]
+    SENTINEL_3A: ClassVar["Satellite"]
+    SENTINEL_3B: ClassVar["Satellite"]
+
+    def __repr__(self) -> str:
+        return f"Satellite.{self.name.replace('-', '_').upper()}"
+
+    @classmethod
+    def register(cls, name: str, url: Optional[str] = None) -> "Satellite":
+        """Register a new satellite or return an existing one.
+
+        Plugin authors should capture the return value for full type safety::
+
+            LANDSAT_8 = Satellite.register("LANDSAT_8")
+        """
+        if name in cls._registry:
+            return cls._registry[name]
+
+        instance = cls(name=name, url=url)
+        cls._registry[name] = instance
+
+        setattr(cls, name.replace("-", "_").upper(), instance)
+        return instance
+
+    @classmethod
+    def get(cls, name: str) -> "Satellite":
+        """Retrieve a registered satellite by name."""
+        if name not in cls._registry:
+            raise KeyError(
+                f"Satellite '{name}' is not registered. "
+                f"Available: {list(cls._registry.keys())}"
+            )
+        return cls._registry[name]
+
+    @classmethod
+    def all(cls) -> tuple["Satellite", ...]:
+        """Return all registered satellites."""
+        return tuple(cls._registry.values())
 
 
-class BandType(Enum):
-    """Categorization of spectral bands."""
+Satellite.register("TERRA", "https://space.oscar.wmo.int/satellites/view/terra")
+Satellite.register("AQUA", "https://space.oscar.wmo.int/satellites/view/aqua")
+Satellite.register("NOAA-20", "https://space.oscar.wmo.int/satellites/view/noaa-20")
+Satellite.register("NOAA-21", "https://space.oscar.wmo.int/satellites/view/noaa-21")
+Satellite.register("SNPP", "https://space.oscar.wmo.int/satellites/view/snpp")
+Satellite.register("GOES-16", "https://space.oscar.wmo.int/satellites/view/goes-16")
+Satellite.register("GOES-18", "https://space.oscar.wmo.int/satellites/view/goes-18")
+Satellite.register("GOES-19", "https://space.oscar.wmo.int/satellites/view/goes-19")
+Satellite.register(
+    "SENTINEL-3A", "https://space.oscar.wmo.int/satellites/view/sentinel-3a"
+)
+Satellite.register(
+    "SENTINEL-3B", "https://space.oscar.wmo.int/satellites/view/sentinel-3b"
+)
 
-    VISIBLE = "Visible"
-    NEAR_INFRARED = "Near-Infrared"
-    SHORTWAVE_INFRARED = "Shortwave Infrared"
-    INFRARED = "Infrared"
-    DAY_NIGHT = "Day/Night"
+
+# Collections (frozensets) for specific constellations:
+VIIRS_CONSTELLATION = frozenset([Satellite.SNPP, Satellite.NOAA_20, Satellite.NOAA_21])
+MODIS_CONSTELLATION = frozenset([Satellite.TERRA, Satellite.AQUA])
+GOES_CONSTELLATION = frozenset(
+    [Satellite.GOES_16, Satellite.GOES_18, Satellite.GOES_19]
+)
+SENTINEL_3_CONSTELLATION = frozenset([Satellite.SENTINEL_3A, Satellite.SENTINEL_3B])
+
+
+@attrs.frozen
+class BandType:
+    """An extensible categorization of spectral bands.
+
+    Plugins can register new band types::
+
+        THERMAL = BandType.register("Thermal")
+    """
+
+    name: str
+
+    _registry: ClassVar[Dict[str, "BandType"]] = {}
+
+    # explicit type stub for mypy
+    VISIBLE: ClassVar["BandType"]
+    NEAR_INFRARED: ClassVar["BandType"]
+    SHORTWAVE_INFRARED: ClassVar["BandType"]
+    INFRARED: ClassVar["BandType"]
+    DAY_NIGHT: ClassVar["BandType"]
+
+    def __repr__(self) -> str:
+        prop = self.name.replace(" ", "_").replace("/", "_").replace("-", "_").upper()
+        return f"BandType.{prop}"
+
+    @classmethod
+    def register(cls, name: str) -> "BandType":
+        """Register a new band type or return an existing one."""
+        if name in cls._registry:
+            return cls._registry[name]
+
+        instance = cls(name=name)
+        cls._registry[name] = instance
+
+        prop_name = name.replace(" ", "_").replace("/", "_").replace("-", "_").upper()
+        setattr(cls, prop_name, instance)
+        return instance
+
+    @classmethod
+    def get(cls, name: str) -> "BandType":
+        """Retrieve a registered band type by name."""
+        if name not in cls._registry:
+            raise KeyError(
+                f"BandType '{name}' is not registered. "
+                f"Available: {list(cls._registry.keys())}"
+            )
+        return cls._registry[name]
+
+    @classmethod
+    def all(cls) -> tuple["BandType", ...]:
+        """Return all registered band types."""
+        return tuple(cls._registry.values())
+
+
+BandType.register("Visible")
+BandType.register("Near-Infrared")
+BandType.register("Shortwave Infrared")
+BandType.register("Infrared")
+BandType.register("Day/Night")
 
 
 @attrs.frozen
@@ -77,6 +255,10 @@ class Channel:
 class Product:
     """A specific data product produced by an instrument, containing a subset of channels.
 
+    Products are automatically added to a central registry on creation.
+    Plugins can instantiate new products and they will be discoverable via
+    ``Product.get()`` and ``Product.all()``.
+
     Attributes:
         name: The canonical name or pattern of the product.
         instrument: The instrument that generated this product.
@@ -88,6 +270,29 @@ class Product:
     instrument: Instrument
     supported_satellites: FrozenSet[Satellite]
     channels: tuple[Channel, ...]
+
+    _registry: ClassVar[Dict[str, "Product"]] = {}
+
+    def __attrs_post_init__(self) -> None:
+        Product._registry[self.name] = self
+
+    def __repr__(self) -> str:
+        return f"Product({self.name!r})"
+
+    @classmethod
+    def get(cls, name: str) -> "Product":
+        """Retrieve a registered product by name."""
+        if name not in cls._registry:
+            raise KeyError(
+                f"Product '{name}' is not registered. "
+                f"Available: {list(cls._registry.keys())}"
+            )
+        return cls._registry[name]
+
+    @classmethod
+    def all(cls) -> tuple["Product", ...]:
+        """Return all registered products."""
+        return tuple(cls._registry.values())
 
 
 # ==========================================
