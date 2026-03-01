@@ -6,6 +6,14 @@ from pyresample.geometry import AreaDefinition
 from aer.settings import ENV_SETTINGS
 from pyproj import Transformer
 from shapely.ops import transform
+from returns import result
+from pathlib import Path
+
+
+class GridNotFoundError(Exception):
+    """Exception raised when a grid is not found."""
+
+    pass
 
 
 def reproject_polygon(polygon: Polygon, src_epsg: str, dst_epsg: str) -> Polygon:
@@ -133,6 +141,27 @@ class GridDefinition:
     name: str
     dist: int
 
+    def load_grid(self) -> result.Result[gpd.GeoDataFrame, GridNotFoundError]:
+        """Load grid points from a parquet file."""
+        # check if it is default grid
+        current_file_dir = Path(__file__).parent
+        grid_path = current_file_dir / f"grid_{self.name}_{self.dist}km.parquet"
+        if grid_path.exists():
+            gdf = gpd.read_parquet(grid_path)
+            return result.Success(gdf)
+
+        # try to load from grid store
+        grid_path = (
+            ENV_SETTINGS.GRID_STORE_PATH / f"grid_{self.name}_{self.dist}km.parquet"
+        )
+        try:
+            gdf = gpd.read_parquet(grid_path)  # pyright: ignore[reportUnknownMemberType]
+            return result.Success(gdf)
+        except Exception:
+            return result.Failure(
+                GridNotFoundError(f"Grid file at {grid_path} not found.")
+            )
+
     @cached_property
     def grid(self) -> gpd.GeoDataFrame:
         """Load grid points from a parquet file.
@@ -143,13 +172,14 @@ class GridDefinition:
             ValueError: If the grid file is empty.
         """
         # check path exists
-        grid_path = (
-            ENV_SETTINGS.GRID_STORE_PATH / f"grid_{self.name}_{self.dist}km.parquet"
-        )
-        gdf = gpd.read_parquet(grid_path)  # pyright: ignore[reportUnknownMemberType]
-        if gdf.empty:
-            raise ValueError(f"Grid file at {grid_path} is empty.")
-        return gdf
+        gdf_result = self.load_grid()
+        match gdf_result:
+            case result.Success(gdf):
+                if gdf.empty:
+                    raise ValueError("Grid is empty.")
+                return gdf
+            case result.Failure(_):
+                raise GridNotFoundError("Grid not found. Create grid first.")
 
     def intersecting_grid_spatial_extent(self, geometry: Polygon) -> GridSpatialExtent:
         """Get all grid cells that intersect with a given geometry.
