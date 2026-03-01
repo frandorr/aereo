@@ -1,12 +1,19 @@
 import pytest
+from datetime import datetime
+from pathlib import Path
 from unittest.mock import patch, MagicMock
+
+from shapely.geometry import Polygon
+
 from aer.search import search_earthaccess
+from aer.search.core import _parse_umm_polygon
 from aer.temporal import TimeRange
 from aer.spectral import VNP02IMG, MODIS_02QKM
 from aer.spatial import GridCell, GridSpatialExtent, GridDefinition
-from shapely.geometry import Polygon
-from datetime import datetime
-from pathlib import Path
+
+GRID_FIXTURE_PATH = (
+    Path(__file__).resolve().parents[4] / "components" / "aer" / "spatial"
+)
 
 
 def test_search_earthaccess_empty():
@@ -207,10 +214,180 @@ def test_search_earthaccess_with_spatial_extent():
         assert set(df.iloc[0]["grid_cells"]) == {"R1_C1", "R1_C2"}
 
 
+def test_search_earthaccess_spatial_extent_and_bounding_box_raises():
+    """Passing both spatial_extent and bounding_box should raise ValueError."""
+    time_range = TimeRange(
+        start=datetime(2023, 1, 1, 0, 0), end=datetime(2023, 1, 1, 1, 0)
+    )
+    cell = GridCell(
+        row="R1",
+        col="C1",
+        dist=10,
+        bounds=Polygon([(-9, 36), (-5, 36), (-5, 40), (-9, 40)]),
+        epsg="4326",
+    )
+    spatial_extent = GridSpatialExtent(frozenset([cell]))
+
+    with pytest.raises(ValueError, match="Cannot specify both"):
+        search_earthaccess(
+            products=[VNP02IMG],
+            time_range=time_range,
+            spatial_extent=spatial_extent,
+            bounding_box=(-10, 35, 0, 45),
+        )
+
+
+def test_search_earthaccess_intersects_mode():
+    """Using cell_overlap_mode='intersects' should include partially-overlapping cells."""
+    time_range = TimeRange(
+        start=datetime(2023, 1, 1, 0, 0), end=datetime(2023, 1, 1, 1, 0)
+    )
+
+    # Cell that partially overlaps a granule bounding box
+    cell = GridCell(
+        row="R1",
+        col="C1",
+        dist=10,
+        bounds=Polygon([(-6, 38), (-2, 38), (-2, 42), (-6, 42)]),
+        epsg="4326",
+    )
+    spatial_extent = GridSpatialExtent(frozenset([cell]))
+
+    with patch("aer.search.core.earthaccess.search_data") as mock_search:
+        granule = MagicMock()
+        granule.get.side_effect = lambda k, d=None: {
+            "meta": {"native-id": "456", "concept-id": "C456"},
+            "umm": {
+                "CollectionReference": {"ShortName": VNP02IMG.name},
+                "TemporalExtent": {
+                    "RangeDateTime": {
+                        "BeginningDateTime": "2023-01-01T00:05:00Z",
+                        "EndingDateTime": "2023-01-01T00:10:00Z",
+                    }
+                },
+                "SpatialExtent": {
+                    "HorizontalSpatialDomain": {
+                        "Geometry": {
+                            # Granule covers (-5, 37) to (0, 41) — partially overlaps cell
+                            "BoundingRectangles": [
+                                {
+                                    "WestBoundingCoordinate": -5.0,
+                                    "EastBoundingCoordinate": 0.0,
+                                    "SouthBoundingCoordinate": 37.0,
+                                    "NorthBoundingCoordinate": 41.0,
+                                }
+                            ]
+                        }
+                    }
+                },
+            },
+        }.get(k, d)
+        granule.data_links.side_effect = lambda access="direct": (
+            ["s3://x"] if access == "direct" else ["https://x"]
+        )
+        granule.size.return_value = 5.0
+        mock_search.return_value = [granule]
+
+        # "contains" mode should NOT match (cell extends beyond the granule)
+        df_contains = search_earthaccess(
+            products=[VNP02IMG],
+            time_range=time_range,
+            spatial_extent=spatial_extent,
+            cell_overlap_mode="contains",
+        )
+        assert df_contains.iloc[0]["grid_cells"] == []
+
+        # "intersects" mode SHOULD match (partial overlap)
+        df_intersects = search_earthaccess(
+            products=[VNP02IMG],
+            time_range=time_range,
+            spatial_extent=spatial_extent,
+            cell_overlap_mode="intersects",
+        )
+        assert df_intersects.iloc[0]["grid_cells"] == ["R1_C1"]
+
+
+def test_parse_umm_polygon_failure_on_missing_spatial():
+    """_parse_umm_polygon returns Failure when there is no spatial metadata."""
+    from returns.result import Failure as F
+
+    result = _parse_umm_polygon({})
+    assert isinstance(result, F)
+
+    result_empty = _parse_umm_polygon({"SpatialExtent": {}})
+    assert isinstance(result_empty, F)
+
+
+def test_parse_umm_polygon_multi_bounding_rectangles():
+    """_parse_umm_polygon unions multiple bounding rectangles into one polygon."""
+    from returns.result import Success as S
+
+    umm = {
+        "SpatialExtent": {
+            "HorizontalSpatialDomain": {
+                "Geometry": {
+                    "BoundingRectangles": [
+                        {
+                            "WestBoundingCoordinate": 170,
+                            "EastBoundingCoordinate": 180,
+                            "SouthBoundingCoordinate": -10,
+                            "NorthBoundingCoordinate": 10,
+                        },
+                        {
+                            "WestBoundingCoordinate": -180,
+                            "EastBoundingCoordinate": -170,
+                            "SouthBoundingCoordinate": -10,
+                            "NorthBoundingCoordinate": 10,
+                        },
+                    ]
+                }
+            }
+        }
+    }
+    result = _parse_umm_polygon(umm)
+    assert isinstance(result, S)
+    poly = result.unwrap()
+    # The union of two 10-degree-wide boxes should be wider than either alone
+    minx, _, maxx, _ = poly.bounds
+    assert maxx - minx > 10
+
+
+def test_parse_umm_polygon_gpolygons():
+    """_parse_umm_polygon correctly parses GPolygons — the real CMR key for VIIRS/MODIS."""
+    from returns.result import Success as S
+
+    umm = {
+        "SpatialExtent": {
+            "HorizontalSpatialDomain": {
+                "Geometry": {
+                    "GPolygons": [
+                        {
+                            "Boundary": {
+                                "Points": [
+                                    {"Longitude": -170.6, "Latitude": -60.6},
+                                    {"Longitude": -119.3, "Latitude": -52.9},
+                                    {"Longitude": -134.8, "Latitude": -34.7},
+                                    {"Longitude": -169.7, "Latitude": -40.0},
+                                    {"Longitude": -170.6, "Latitude": -60.6},
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+    result = _parse_umm_polygon(umm)
+    assert isinstance(result, S)
+    poly = result.unwrap()
+    assert not poly.is_empty
+    assert poly.area > 0
+
+
 @pytest.mark.slow
 @patch(
     "aer.spatial.core.ENV_SETTINGS.GRID_STORE_PATH",
-    new=Path("/root/repos/aer/components/aer/spatial"),
+    new=GRID_FIXTURE_PATH,
 )
 def test_search_earthaccess_real_spatial_extent():
     # Expand to 10 days to guarantee spatial coverage over this exact box
