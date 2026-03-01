@@ -26,6 +26,7 @@ dependencies = [
   "pyresample>=1.35,<2",
   "returns[compatible-mypy]>=0.26,<0.27",
   "shapely>=2.1.2,<3",
+  "structlog>=25.5,<26",
 ]
 
 [dependency-groups]
