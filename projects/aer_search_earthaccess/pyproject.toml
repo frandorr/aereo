@@ -25,13 +25,14 @@ dependencies = [
   "shapely>=2.1.2,<3",
   "structlog>=25.5,<26",
 ]
-entry-points."aer.plugins.search".earthaccess = "aer.search_earthaccess.core"
+entry-points."aer.plugins.search".earthaccess = "aer.search_earthaccess.core:SEARCH_EARTHACCESS"
 
 [tool.hatch]
 build.hooks.polylith-bricks = {}
 build.targets.wheel.packages = [ "aer" ]
 
 [tool.polylith]
+bricks."../../components/aer/plugins" = "aer/plugins"
 bricks."../../components/aer/search" = "aer/search"
 bricks."../../components/aer/search_earthaccess" = "aer/search_earthaccess"
 bricks."../../components/aer/settings" = "aer/settings"
