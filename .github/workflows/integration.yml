@@ -13,14 +13,17 @@ jobs:
       - name: Create venv
         run: uv venv
 
-      - name: Install core wheel
-        run: uv pip install ./projects/aer_core
-
-      - name: Install plugin wheel
-        run: uv pip install ./projects/aer_search_earthaccess
-
-      - name: Install pytest
+      - name: Install dependencies
         run: uv pip install pytest
 
-      - name: Run integration tests
-        run: uv run pytest test/integration
+      - name: Install aer-core
+        run: uv pip install ./projects/aer_core
+
+      - name: Run negative integration test (core only)
+        run: uv run pytest test/integration/test_core_only.py
+
+      - name: Install aer-search-earthaccess
+        run: uv pip install ./projects/aer_search_earthaccess
+
+      - name: Run positive integration test (with plugin)
+        run: uv run pytest test/integration/test_plugins.py
