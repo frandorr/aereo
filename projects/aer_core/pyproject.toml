@@ -30,8 +30,8 @@ build.hooks.polylith-bricks = {}
 build.targets.wheel.packages = [ "aer" ]
 
 [tool.polylith]
-bricks."components/aer/search" = "aer/search"
-bricks."components/aer/settings" = "aer/settings"
-bricks."components/aer/spatial" = "aer/spatial"
-bricks."components/aer/spectral" = "aer/spectral"
-bricks."components/aer/temporal" = "aer/temporal"
+bricks."../../components/aer/search" = "aer/search"
+bricks."../../components/aer/settings" = "aer/settings"
+bricks."../../components/aer/spatial" = "aer/spatial"
+bricks."../../components/aer/spectral" = "aer/spectral"
+bricks."../../components/aer/temporal" = "aer/temporal"
