@@ -6,7 +6,6 @@ import pandas as pd
 from aer.spatial import GridSpatialExtent
 from aer.spectral import Product
 from aer.temporal import TimeRange
-from aer.search_earthaccess import search_earthaccess
 
 CellOverlapMode = Literal["contains", "intersects"]
 
@@ -74,7 +73,3 @@ class SearchMethod:
     def __call__(self, *args: Any, **kwargs: Any) -> pd.DataFrame:
         """Allow calling the SearchMethod object directly just like a function."""
         return self.search_fn(*args, **kwargs)
-
-
-# Pre-register the earthaccess search method as a default capability
-EARTHACCESS = SearchMethod.register("earthaccess", search_earthaccess)
