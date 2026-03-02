@@ -13,7 +13,7 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
-dependencies = [
+entry-points."aer.plugins.search".dependencies = [
   "attrs>=25.4,<26",
   "earthaccess>=0.16,<0.17",
   "geopandas>=1.1.2,<2",
@@ -25,15 +25,16 @@ dependencies = [
   "shapely>=2.1.2,<3",
   "structlog>=25.5,<26",
 ]
+entry-points."aer.plugins.search".earthaccess = "aer.search_earthaccess.core"
 
 [tool.hatch]
 build.hooks.polylith-bricks = {}
 build.targets.wheel.packages = [ "aer" ]
 
 [tool.polylith]
-bricks."components/aer/search" = "aer/search"
-bricks."components/aer/search_earthaccess" = "aer/search_earthaccess"
-bricks."components/aer/settings" = "aer/settings"
-bricks."components/aer/spatial" = "aer/spatial"
-bricks."components/aer/spectral" = "aer/spectral"
-bricks."components/aer/temporal" = "aer/temporal"
+bricks."../../components/aer/search" = "aer/search"
+bricks."../../components/aer/search_earthaccess" = "aer/search_earthaccess"
+bricks."../../components/aer/settings" = "aer/settings"
+bricks."../../components/aer/spatial" = "aer/spatial"
+bricks."../../components/aer/spectral" = "aer/spectral"
+bricks."../../components/aer/temporal" = "aer/temporal"
