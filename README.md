@@ -1,95 +1,127 @@
-# Python Polylith Template with `uv`
+# aer 🪐
 
-A minimal template repository for Python projects using the [Polylith architecture](https://davidvujic.github.io/python-polylith-docs/setup/), powered by `uv` for lightning-fast dependency management, and `prek` for git hooks.
-
-## Philosophy
-
-This repository is designed to be a clean, modern starting point for teams looking to use:
-* **Polylith** for a modular, monorepo-friendly and maintainable architecture.
-* **uv** for exceptionally fast and reliable Python packaging and virtual environments.
-* **prek** for lightweight, tool-managed git hooks instead of traditional pre-commit.
+**aer** (from the Greek word for *air*) is a modular, high-performance Python framework designed for satellite data discovery, extraction, and processing. Built with the [Polylith architecture](https://davidvujic.github.io/python-polylith-docs/setup/) and powered by `uv`, it provides an extensible foundation for handling multi-sensor Earth observation data (GOES, VIIRS, MODIS, Sentinel-3) with a focus on type-safety and cloud-native workflows.
 
 ---
 
-## Getting Started
+## 🚀 Key Features
+
+*   **Modular Architecture**: Built using Python Polylith. Logic is decoupled into reusable `components`, while `projects` assemble them into deployable artifacts.
+*   **Instrument-Agnostic Domain Models**: Strongly typed definitions for `spectral` bands, `spatial` grids, and `temporal` ranges.
+*   **Extensible Plugin System**: A registry-based system that allows seamless addition of new search methods, instruments, and products via Python entry points.
+*   **Cloud-Native Search**: Native integration with NASA Earthdata via the `search-earthaccess` plugin.
+*   **Performance First**: Leverages `uv` for lightning-fast dependency management and `attrs` for efficient data modeling.
+
+---
+
+## 🏗 Project Structure (Polylith)
+
+The codebase is organized into interchangeable bricks:
+
+*   **`components/aer/`**: Reusable functional blocks (e.g., `spectral`, `spatial`, `temporal`, `search`).
+*   **`projects/`**: Deployable artifacts (e.g., `aer-search-earthaccess`). These assemble components and define plugin entry points.
+*   **`test/`**: Mirrors the component structure for unit testing, plus `test/integration` for cross-component validation.
+
+---
+
+## 🔌 The Plugin System
+
+`aer` is designed to be extended without modifying the core library. It uses a registry pattern discovered via `entry_points`.
+
+### Discovery & Registry
+Plugins register themselves into core registries (like `SearchMethod` or `Instrument`). To initialize all available plugins in your environment, use the bootstrap utility:
+
+```python
+from aer.bootstrap import bootstrap
+bootstrap()  # Automatically discovers and loads all registered aer plugins
+```
+
+### Extending search
+You can add new search implementations by registering them with `SearchMethod`. Projects define these in their `pyproject.toml`:
+
+```toml
+[project.entry-points."aer.plugins.search"]
+earthaccess = "aer.search_earthaccess.core:SEARCH_EARTHACCESS"
+```
+
+---
+
+## 🛠 Usage Example
+
+Search for VIIRS and MODIS data using the `earthaccess` plugin:
+
+```python
+from datetime import datetime
+from aer.bootstrap import bootstrap
+from aer.search import SearchMethod
+from aer.spectral import VNP02MOD, MODIS_021KM
+from aer.temporal import TimeRange
+
+# 1. Initialize the plugin system
+bootstrap()
+
+# 2. Define your search constraints
+time_range = TimeRange(
+    start=datetime(2024, 8, 1, 0, 0, 0),
+    end=datetime(2024, 8, 2, 0, 0, 0),
+)
+
+# 3. Use the registered search method
+search = SearchMethod.get("earthaccess")
+results = search(
+    products=[VNP02MOD, MODIS_021KM],
+    time_range=time_range
+)
+
+print(f"Found {len(results)} granules")
+print(results.head())
+```
+
+---
+
+## 📦 Installation & Setup
 
 ### Prerequisites
+*   [uv](https://github.com/astral-sh/uv) (required for dependency management)
 
-To get started, you don't need anything pre-installed if you use the provided setup script. The setup script will automatically install `uv` (if not present) and `prek`. If you prefer to set things up manually, ensure you have `uv` installed.
-
-### Automatic Setup
-
-Run the setup script:
+### Setup
+Clone the repository and sync the workspace:
 
 ```bash
-./setup.sh
-```
-
-The script will automatically do the heavy lifting:
-1. Prompt you for a simple project name.
-2. Update the `name` in `pyproject.toml` and the `namespace` in `workspace.toml` automatically.
-3. Install `uv` (if it's not already installed on your system).
-4. Add `polylith-cli` as a development dependency and run `uv sync` to set up your virtual environment.
-5. Install `prek` globally via `uv tool install prek`.
-
----
-
-## Project Structure
-
-Polylith organizes your codebase into interchangeable blocks, prioritizing composability:
-
-* `components/` – Reusable functional blocks (the core logic). They are the lego bricks of your application.
-* `bases/` – Application entry points (e.g., an API router, a CLI task, or an AWS Lambda handler), acting as the outer shell exposing features.
-* `projects/` – Deployable artifacts that compose one or more bases and components. They do not contain logic directly, just assembling the pieces.
-
-For more detailed information about Polylith and how its concepts apply in Python, check out the [official Python Polylith Documentation](https://davidvujic.github.io/python-polylith-docs/setup/).
-
-### Creating Blocks
-
-You can create components, bases, and projects effortlessly using the Polylith CLI (which is available via `uv run` once synced):
-
-```bash
-# Create a new component
-uv run poly create component --name my_component
-
-# Create a new base
-uv run poly create base --name my_base
-
-# Create a new project
-uv run poly create project --name my_project
-```
-
-### Inspecting the Workspace
-
-Polylith shines at giving you an overview of your monorepo. Check your projects, bases, and components with:
-
-```bash
-uv run poly info
+git clone https://github.com/frandorr/aer.git
+cd aer
+uv sync
 ```
 
 ---
 
-## Development Workflow
+## 🤝 How to Participate
 
-1. **Install dependencies:**
-   If you need to manually sync your environment or add third-party dependencies, use `uv`:
-   ```bash
-   uv sync
-   uv add requests
-   uv add --group dev pytest
-   ```
+We follow the Polylith development workflow.
 
-2. **Run tests:**
-   You can run your tests across the entire workspace easily using `pytest`. The template enables tests globally across components:
-   ```bash
-   uv run pytest
-   ```
+### Adding a New Component
+Use the Polylith CLI to create a new brick:
+```bash
+uv run poly create component --name my_feature
+```
 
-3. **Hooks (prek):**
-   We use `prek` for streamlined commit checks. The setup script installs it globally via `uv tool install prek`. You can use it to configure git workflows without heavy external dependencies.
+### Running Tests
+Always use `uv` to run tests:
+```bash
+# Run all tests
+uv run pytest
+
+# Run tests for a specific component
+uv run pytest test/components/aer/spectral/
+```
+
+### Core Conventions
+*   **Public API**: Only symbols exported in `__init__.py` via `__all__` should be imported by other components.
+*   **Type Hinting**: `aer` uses strict type checking (Pydantic, attrs, returns).
+*   **Plugin registration**: Follow the patterns in `aer.plugins` and `aer.bootstrap`.
 
 ---
 
-## License
+## 📄 License
 
 MIT
