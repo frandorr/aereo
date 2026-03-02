@@ -1,0 +1,26 @@
+name: Integration
+
+on: [push, pull_request]
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+
+      - name: Create venv
+        run: uv venv
+
+      - name: Install core wheel
+        run: uv pip install ./projects/aer_core
+
+      - name: Install plugin wheel
+        run: uv pip install ./projects/aer_search_earthaccess
+
+      - name: Install pytest
+        run: uv pip install pytest
+
+      - name: Run integration tests
+        run: uv run pytest test/integration

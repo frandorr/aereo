@@ -19,6 +19,19 @@ This will install the `aer` package with the base components:
 - `aer.spatial`: Grid and cell management
 - `aer.search`: Plugin registry for search capabilities
 - `aer.settings`: Environment configuration
+- `aer.plugins`: Plugin loading infrastructure
+- `aer.bootstrap`: Centralized initialization
+
+## Initializing the Plugin System
+
+While many components (like `SearchMethod`) handle discovery on-demand, you can also perform a centralized bootstrap:
+
+```python
+from aer.bootstrap import bootstrap
+
+# This loads all known plugin groups (search, ingest, export, etc.)
+bootstrap()
+```
 
 ## Installing a Plugin
 

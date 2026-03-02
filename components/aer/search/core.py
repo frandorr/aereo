@@ -1,29 +1,14 @@
 from typing import Any, ClassVar, Literal, Protocol
 
-import importlib.metadata
 import attrs
 import pandas as pd
 
+from aer.plugins.core import load_entrypoint_group
 from aer.spatial import GridSpatialExtent
 from aer.spectral import Product
 from aer.temporal import TimeRange
 
 CellOverlapMode = Literal["contains", "intersects"]
-
-
-def discover_plugins() -> None:
-    """Automatically discover and load all registered search plugins.
-
-    This searches for packages that have registered an entry point in the
-    'aer.plugins.search' group. Importing them triggers their module-level
-    self-registration.
-    """
-    for entry in importlib.metadata.entry_points(group="aer.plugins.search"):
-        try:
-            entry.load()
-        except Exception:
-            # Optionally log failures, but don't crash core search
-            pass
 
 
 class SearchFunction(Protocol):
@@ -58,12 +43,13 @@ class SearchMethod:
 
     _registry: ClassVar[dict[str, "SearchMethod"]] = {}
     _plugins_loaded: ClassVar[bool] = False
+    _ENTRYPOINT_GROUP: ClassVar[str] = "aer.plugins.search"
 
     @classmethod
     def _ensure_plugins_loaded(cls) -> None:
         """Helper to discover plugins once per runtime."""
         if not cls._plugins_loaded:
-            discover_plugins()
+            load_entrypoint_group(cls._ENTRYPOINT_GROUP)
             cls._plugins_loaded = True
 
     @classmethod
