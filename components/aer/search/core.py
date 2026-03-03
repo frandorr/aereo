@@ -1,12 +1,43 @@
 from typing import Any, ClassVar, Literal, Protocol
 
 import attrs
-import pandas as pd
+import geopandas as gpd
+import pandera.pandas as pa
+from pandera.typing import Series
+from pandera.typing.geopandas import GeoDataFrame, GeoSeries
 
 from aer.plugins.core import load_entrypoint_group
 from aer.spatial import GridSpatialExtent
 from aer.spectral import Product
 from aer.temporal import TimeRange
+
+
+class SearchResultSchema(pa.DataFrameModel):  # type: ignore[misc]
+    """Schema defining the minimum required columns for search results.
+
+    Extra columns (e.g. ``grid_cells``) are allowed thanks to
+    ``strict = False``.  Types are coerced so that, for example, a plugin
+    returning ``size_mb`` as an integer will have it automatically cast to
+    ``float``.
+
+    The ``geometry`` column holds the granule footprint polygon (nullable
+    because some products like GOES may not carry granule-level geometry).
+    """
+
+    product_name: Series[pa.String] = pa.Field(nullable=True)
+    granule_id: Series[pa.String] = pa.Field(nullable=True)
+    concept_id: Series[pa.String] = pa.Field(nullable=True)
+    start_time: Series[pa.DateTime] = pa.Field(nullable=True)
+    end_time: Series[pa.DateTime] = pa.Field(nullable=True)
+    s3_url: Series[pa.String] = pa.Field(nullable=True)
+    https_url: Series[pa.String] = pa.Field(nullable=True)
+    size_mb: Series[float] = pa.Field(nullable=True)
+    geometry: GeoSeries[Any] = pa.Field(nullable=True)
+
+    class Config:
+        strict = False
+        coerce = True
+
 
 CellOverlapMode = Literal["contains", "intersects"]
 
@@ -21,7 +52,7 @@ class SearchFunction(Protocol):
         spatial_extent: GridSpatialExtent | None = None,
         cell_overlap_mode: CellOverlapMode = "contains",
         **kwargs: Any,
-    ) -> pd.DataFrame: ...
+    ) -> gpd.GeoDataFrame: ...
 
 
 @attrs.define(frozen=True, slots=True)
@@ -33,7 +64,7 @@ class SearchMethod:
 
     Example:
         def my_custom_search(products, time_range, **kwargs):
-            return pd.DataFrame(...)
+            return gpd.GeoDataFrame(...)
 
         MY_SEARCH = SearchMethod.register("my_search", my_custom_search)
     """
@@ -53,20 +84,24 @@ class SearchMethod:
             cls._plugins_loaded = True
 
     @classmethod
-    def register(cls, name: str, search_fn: SearchFunction) -> "SearchMethod":
+    def register(cls, name: str, search_fn: SearchFunction | None = None) -> Any:
         """Register a new search method or return an existing one."""
-        if name in cls._registry:
-            if cls._registry[name].search_fn is not search_fn:
-                # If the name is already taken but the function is different, raise an error.
-                # However, if the function is the same, just return the existing method.
-                raise ValueError(
-                    f"Search method '{name}' is already registered with a different function."
-                )
-            return cls._registry[name]
 
-        method = cls(name=name, search_fn=search_fn)
-        cls._registry[name] = method
-        return method
+        def decorator(fn: SearchFunction) -> "SearchMethod":
+            if name in cls._registry:
+                if cls._registry[name].search_fn is not fn:
+                    raise ValueError(
+                        f"Search method '{name}' is already registered with a different function."
+                    )
+                return cls._registry[name]
+
+            method = cls(name=name, search_fn=fn)
+            cls._registry[name] = method
+            return method
+
+        if search_fn is None:
+            return decorator
+        return decorator(search_fn)
 
     @classmethod
     def get(cls, name: str) -> "SearchMethod":
@@ -82,6 +117,25 @@ class SearchMethod:
         cls._ensure_plugins_loaded()
         return list(cls._registry.values())
 
-    def __call__(self, *args: Any, **kwargs: Any) -> pd.DataFrame:
-        """Allow calling the SearchMethod object directly just like a function."""
-        return self.search_fn(*args, **kwargs)
+    def __call__(
+        self,
+        products: list[Product],
+        time_range: TimeRange,
+        spatial_extent: GridSpatialExtent | None = None,
+        cell_overlap_mode: CellOverlapMode = "contains",
+        **kwargs: Any,
+    ) -> GeoDataFrame[SearchResultSchema]:
+        """Allow calling the SearchMethod object directly just like a function.
+
+        The returned GeoDataFrame is validated against ``SearchResultSchema``.
+        Missing required columns or un-coercible types raise
+        ``pandera.errors.SchemaError``.
+        """
+        gdf = self.search_fn(
+            products=products,
+            time_range=time_range,
+            spatial_extent=spatial_extent,
+            cell_overlap_mode=cell_overlap_mode,
+            **kwargs,
+        )
+        return GeoDataFrame[SearchResultSchema](gdf)
