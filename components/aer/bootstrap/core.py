@@ -2,6 +2,7 @@ from aer.plugins import load_multiple_groups
 
 PLUGIN_GROUPS = [
     "aer.plugins.search",
+    "aer.plugins.download",
     "aer.plugins.ingest",
     "aer.plugins.export",
 ]
