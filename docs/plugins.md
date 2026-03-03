@@ -81,3 +81,32 @@ assert Product.get("LC08_L1TP") is my_custom_product
 | `Product` | `Product(name="P", ...)` | `Product.get("P")` | `Product.all()` |
 
 *Note: Registrations are **idempotent**. If your plugin script calls `Satellite.register("LANDSAT_8")` multiple times, it simply returns the identical, already-registered instance.*
+
+## Search Plugins & Discovery
+
+While `spectral` plugins are usually loaded via explicit module imports, `SearchMethod` plugins are discovered automatically via **Python Entry Points**.
+
+### The Bootstrap Mechanism
+
+To initialize the registry with all installed search plugins, call `bootstrap()`:
+
+```python
+from aer.bootstrap import bootstrap
+bootstrap()
+```
+
+This triggers `aer.plugins` to scan for entry points in the `aer.plugins.search` group and load the associated modules.
+
+### Plugin Discovery (Crucial for Dev)
+
+Plugins are declared in the `[project.entry-points]` section of your `pyproject.toml`.
+
+```toml
+[project.entry-points."aer.plugins.search"]
+earthaccess = "aer.search_earthaccess.core:SEARCH_EARTHACCESS"
+```
+
+> [!IMPORTANT]
+> **Workspace Discovery Root**: In a Polylith development environment, `importlib.metadata` reads discovery metadata from the package that is currently installed in the environment (the root `pyproject.toml` when using `uv sync` at the workspace root).
+>
+> If you add a new plugin to a `projects/` sub-package but **do not** add it to the root `pyproject.toml`, it will be missing from the registry during development, leading to `KeyError: "Search method '...' is not registered."`. Always mirror your plugin entry points in the root configuration during active development.

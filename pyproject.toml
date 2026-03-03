@@ -30,6 +30,7 @@ dependencies = [
   "structlog>=25.5,<26",
   "utm>=0.8.1,<0.9",
 ]
+entry-points."aer.plugins.search".earthaccess = "aer.search_earthaccess.core:SEARCH_EARTHACCESS"
 
 [dependency-groups]
 dev = [
