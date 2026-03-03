@@ -44,6 +44,9 @@ You can add new search implementations by registering them with `SearchMethod`. 
 earthaccess = "aer.search_earthaccess.core:SEARCH_EARTHACCESS"
 ```
 
+> [!TIP]
+> **Development Note**: When working in a Polylith workspace, plugins are discovered via Python entry points. Registering an entry point in a `project` sub-package makes it available for distribution, but for the plugin to be discoverable **during development** (i.e., when running `uv run`), you must also declare it in the root `pyproject.toml`. False discovery is often caused by missing these root-level entry point declarations.
+
 ---
 
 ## 🛠 Usage Example
