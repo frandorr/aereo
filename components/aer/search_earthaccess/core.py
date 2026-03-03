@@ -1,6 +1,7 @@
 from typing import Any
 
 import earthaccess
+import geopandas as gpd
 import pandas as pd
 from returns import result
 from shapely.geometry import Polygon
@@ -79,7 +80,7 @@ def search_earthaccess(
     spatial_extent: GridSpatialExtent | None = None,
     cell_overlap_mode: str = "contains",
     **kwargs: Any,
-) -> pd.DataFrame:
+) -> gpd.GeoDataFrame:
     """Search for earthaccess data given Products, a TimeRange, and an optional spatial extent.
 
     Args:
@@ -94,8 +95,8 @@ def search_earthaccess(
         **kwargs: Additional parameters passed directly to ``earthaccess.search_data``.
 
     Returns:
-        A ``pd.DataFrame`` with columns: product_name, granule_id, concept_id,
-        start_time, end_time, s3_url, https_url, size_mb, and (when
+        A ``gpd.GeoDataFrame`` with columns: product_name, granule_id, concept_id,
+        start_time, end_time, s3_url, https_url, size_mb, geometry, and (when
         *spatial_extent* is given) grid_cells.
 
     Raises:
@@ -138,9 +139,10 @@ def search_earthaccess(
         columns.append("grid_cells")
 
     if not results:
-        return pd.DataFrame(columns=columns)
+        return gpd.GeoDataFrame(columns=[*columns, "geometry"], geometry="geometry")
 
     rows = []
+    geometries = []
     for granule in results:
         meta = granule.get("meta", {})
         umm = granule.get("umm", {})
@@ -162,6 +164,19 @@ def search_earthaccess(
         coll_ref = umm.get("CollectionReference", {})
         extracted_product_name = coll_ref.get("ShortName")
 
+        # Parse the granule footprint geometry
+        poly_result = _parse_umm_polygon(umm)
+        granule_poly = None
+        match poly_result:
+            case result.Success(poly):
+                granule_poly = poly
+            case result.Failure(e):
+                logger.warning(
+                    "Failed to parse UMM polygon",
+                    error=e,
+                    granule_id=meta.get("native-id"),
+                )
+
         row_data: dict[str, Any] = {
             "product_name": extracted_product_name,
             "granule_id": meta.get("native-id"),
@@ -175,34 +190,24 @@ def search_earthaccess(
 
         # Check cell overlap if a spatial extent was requested
         if spatial_extent:
-            poly_result = _parse_umm_polygon(umm)
             contained_cells: list[str] = []
-
-            match poly_result:
-                case result.Success(granule_poly):
-                    overlap_fn = (
-                        granule_poly.contains
-                        if cell_overlap_mode == "contains"
-                        else granule_poly.intersects
-                    )
-                    contained_cells = [
-                        f"{cell.row}_{cell.col}"
-                        for cell in spatial_extent.grid_cells
-                        if overlap_fn(cell.bounds)
-                    ]
-                case result.Failure(e):
-                    # log warning with structlog
-                    logger.warning(
-                        "Failed to parse UMM polygon",
-                        error=e,
-                        granule_id=meta.get("native-id"),
-                    )
-
+            if granule_poly is not None:
+                overlap_fn = (
+                    granule_poly.contains
+                    if cell_overlap_mode == "contains"
+                    else granule_poly.intersects
+                )
+                contained_cells = [
+                    f"{cell.row}_{cell.col}"
+                    for cell in spatial_extent.grid_cells
+                    if overlap_fn(cell.bounds)
+                ]
             row_data["grid_cells"] = contained_cells
 
         rows.append(row_data)
+        geometries.append(granule_poly)
 
-    return pd.DataFrame(rows)
+    return gpd.GeoDataFrame(rows, geometry=geometries)
 
 
 SEARCH_EARTHACCESS = SearchMethod.register("earthaccess", search_earthaccess)

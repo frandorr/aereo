@@ -9,7 +9,7 @@
 *   **Modular Architecture**: Built using Python Polylith. Logic is decoupled into reusable `components`, while `projects` assemble them into deployable artifacts.
 *   **Instrument-Agnostic Domain Models**: Strongly typed definitions for `spectral` bands, `spatial` grids, and `temporal` ranges.
 *   **Extensible Plugin System**: A registry-based system that allows seamless addition of new search methods, instruments, and products via Python entry points.
-*   **Cloud-Native Search**: Native integration with NASA Earthdata via the `search-earthaccess` plugin.
+*   **Cloud-Native Search**: Native integration with NASA Earthdata via the `search-earthaccess` plugin, returning type-validated `GeoDataFrame` objects with granule footprints.
 *   **Performance First**: Leverages `uv` for lightning-fast dependency management and `attrs` for efficient data modeling.
 
 ---
@@ -74,7 +74,8 @@ results = search(
 )
 
 print(f"Found {len(results)} granules")
-print(results.head())
+# Search returns a validated GeoDataFrame
+print(results[["product_name", "start_time", "geometry"]].head())
 ```
 
 ---
