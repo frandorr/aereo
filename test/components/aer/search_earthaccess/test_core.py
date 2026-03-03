@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
+import geopandas as gpd
 from shapely.geometry import Polygon
 
 from aer.search_earthaccess import search_earthaccess
@@ -22,9 +23,11 @@ def test_search_earthaccess_empty():
     )
     with patch("aer.search_earthaccess.core.earthaccess.search_data") as mock_search:
         mock_search.return_value = []
-        df = search_earthaccess(products=[VNP02IMG], time_range=time_range)
-        assert df.empty
-        assert "product_name" in df.columns
+        gdf = search_earthaccess(products=[VNP02IMG], time_range=time_range)
+        assert isinstance(gdf, gpd.GeoDataFrame)
+        assert gdf.empty
+        assert "product_name" in gdf.columns
+        assert "geometry" in gdf.columns
         mock_search.assert_called_once()
         kwargs = mock_search.call_args.kwargs
         assert kwargs["short_name"] == [VNP02IMG.name]
@@ -58,13 +61,16 @@ def test_search_earthaccess_results():
 
         mock_search.return_value = [granule]
 
-        df = search_earthaccess(products=[VNP02IMG], time_range=time_range)
-        assert not df.empty
-        assert len(df) == 1
-        assert df.iloc[0]["product_name"] == VNP02IMG.name
-        assert df.iloc[0]["s3_url"] == "s3://bucket/test.nc"
-        assert df.iloc[0]["https_url"] == "https://bucket/test.nc"
-        assert df.iloc[0]["size_mb"] == 15.5
+        gdf = search_earthaccess(products=[VNP02IMG], time_range=time_range)
+        assert isinstance(gdf, gpd.GeoDataFrame)
+        assert not gdf.empty
+        assert len(gdf) == 1
+        assert gdf.iloc[0]["product_name"] == VNP02IMG.name
+        assert gdf.iloc[0]["s3_url"] == "s3://bucket/test.nc"
+        assert gdf.iloc[0]["https_url"] == "https://bucket/test.nc"
+        assert gdf.iloc[0]["size_mb"] == 15.5
+        # Geometry is None because mock has no SpatialExtent in UMM
+        assert gdf.iloc[0]["geometry"] is None
 
 
 @pytest.mark.slow
