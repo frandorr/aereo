@@ -34,8 +34,8 @@ dependencies = [
   "structlog>=25.5,<26",
   "utm>=0.8.1,<0.9",
 ]
-entry-points."aer.plugins.download".aria2 = "aer.downloader_aria2.core:download_aria2"
-entry-points."aer.plugins.search".earthaccess = "aer.search_earthaccess.core:search_earthaccess"
+entry-points."aer.plugins".aria2 = "aer.downloader_aria2.core:download_aria2"
+entry-points."aer.plugins".earthaccess = "aer.search_earthaccess.core:search_earthaccess"
 
 [dependency-groups]
 dev = [
@@ -93,3 +93,4 @@ bricks."components/aer/spatial" = "aer/spatial"
 bricks."components/aer/search" = "aer/search"
 bricks."components/aer/goes_fetcher" = "aer/goes_fetcher"
 bricks."components/aer/bootstrap" = "aer/bootstrap"
+bricks."components/aer/plugin" = "aer/plugin"

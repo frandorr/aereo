@@ -1,9 +1,9 @@
 import pytest
-from aer.search import SearchMethod
+from aer.plugin import plugin_registry
 
 
 @pytest.mark.integration
 def test_earthaccess_registered():
-    """Verify that the earthaccess search plugin is correctly registered."""
-    names = {m.name for m in SearchMethod.all()}
+    """Verify that the earthaccess plugin is correctly registered."""
+    names = {m.name for m in plugin_registry.all()}
     assert "earthaccess" in names

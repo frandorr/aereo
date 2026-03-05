@@ -1,8 +1,6 @@
-from aer.downloader import DownloadMethod
-from aer.search import SearchMethod
+from aer.plugin import plugin_registry
 
 
 def bootstrap() -> None:
     """Initialize the aer plugin system by loading all predefined groups."""
-    SearchMethod.all()
-    DownloadMethod.all()
+    plugin_registry.all()
