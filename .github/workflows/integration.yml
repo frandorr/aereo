@@ -10,6 +10,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
 
+      - name: Install system dependencies for pyhdf
+        run: sudo apt-get update && sudo apt-get install -y libhdf4-dev
+
       - name: Create venv
         run: uv venv
 
