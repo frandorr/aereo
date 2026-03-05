@@ -8,9 +8,8 @@ from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from structlog import get_logger
 
-from aer.spatial import GridSpatialExtent
-from aer.spectral import Product
-from aer.temporal import TimeRange
+from aer.plugin import plugin
+from aer.search import SearchQuery
 
 logger = get_logger()
 
@@ -73,14 +72,9 @@ def _parse_umm_polygon(
     )
 
 
-def search_earthaccess(
-    products: list[Product],
-    time_range: TimeRange,
-    spatial_extent: GridSpatialExtent | None = None,
-    cell_overlap_mode: str = "contains",
-    **kwargs: Any,
-) -> gpd.GeoDataFrame:
-    """Search for earthaccess data given Products, a TimeRange, and an optional spatial extent.
+@plugin(name="earthaccess", category="search")  # type: ignore[misc]
+def search_earthaccess(query: SearchQuery) -> gpd.GeoDataFrame:
+    """Search for earthaccess data given a SearchQuery.
 
     Args:
         products: A list of spectral Products to search for (uses product.name).
@@ -101,27 +95,30 @@ def search_earthaccess(
     Raises:
         ValueError: If both *spatial_extent* and *bounding_box* are specified.
     """
-    if spatial_extent and "bounding_box" in kwargs:
+    if query.spatial_extent and "bounding_box" in query.options:
         raise ValueError(
             "Cannot specify both 'spatial_extent' and 'bounding_box'. "
             "The spatial_extent automatically derives the bounding box."
         )
 
     temporal = (
-        time_range.start.strftime("%Y-%m-%d %H:%M:%S"),
-        time_range.end.strftime("%Y-%m-%d %H:%M:%S"),
+        query.time_range.start.strftime("%Y-%m-%d %H:%M:%S"),
+        query.time_range.end.strftime("%Y-%m-%d %H:%M:%S"),
     )
 
-    short_names = [p.name for p in products]
+    short_names = [p.name for p in query.products]
 
     # Apply bounding box filter if spatial_extent is provided
-    if spatial_extent and spatial_extent.grid_cells:
-        all_bounds = unary_union([cell.bounds for cell in spatial_extent.grid_cells])
+    kwargs_for_search = dict(query.options)
+    if query.spatial_extent and query.spatial_extent.grid_cells:
+        all_bounds = unary_union(
+            [cell.bounds for cell in query.spatial_extent.grid_cells]
+        )
         minx, miny, maxx, maxy = all_bounds.bounds
-        kwargs["bounding_box"] = (minx, miny, maxx, maxy)
+        kwargs_for_search["bounding_box"] = (minx, miny, maxx, maxy)
 
     results = earthaccess.search_data(
-        short_name=short_names, temporal=temporal, **kwargs
+        short_name=short_names, temporal=temporal, **kwargs_for_search
     )
 
     columns = [
@@ -134,7 +131,7 @@ def search_earthaccess(
         "https_url",
         "size_mb",
     ]
-    if spatial_extent:
+    if query.spatial_extent:
         columns.append("grid_cells")
 
     if not results:
@@ -188,17 +185,17 @@ def search_earthaccess(
         }
 
         # Check cell overlap if a spatial extent was requested
-        if spatial_extent:
+        if query.spatial_extent:
             contained_cells: list[str] = []
             if granule_poly is not None:
                 overlap_fn = (
                     granule_poly.contains
-                    if cell_overlap_mode == "contains"
+                    if query.cell_overlap_mode == "contains"
                     else granule_poly.intersects
                 )
                 contained_cells = [
                     f"{cell.row}_{cell.col}"
-                    for cell in spatial_extent.grid_cells
+                    for cell in query.spatial_extent.grid_cells
                     if overlap_fn(cell.bounds)
                 ]
             row_data["grid_cells"] = contained_cells

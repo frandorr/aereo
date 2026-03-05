@@ -27,7 +27,7 @@ dependencies = [
   "structlog>=25.5,<26",
   "utm>=0.8.1,<0.9",
 ]
-entry-points."aer.plugins.search".earthaccess = "aer.search_earthaccess.core:search_earthaccess"
+entry-points."aer.plugins".earthaccess = "aer.search_earthaccess.core:search_earthaccess"
 
 [tool.hatch]
 build.hooks.polylith-bricks = {}
@@ -40,3 +40,4 @@ bricks."../../components/aer/settings" = "aer/settings"
 bricks."../../components/aer/spatial" = "aer/spatial"
 bricks."../../components/aer/spectral" = "aer/spectral"
 bricks."../../components/aer/temporal" = "aer/temporal"
+bricks."../../components/aer/plugin" = "aer/plugin"

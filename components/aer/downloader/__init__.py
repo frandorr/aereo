@@ -5,8 +5,6 @@ download backend (aria2, wget, etc.).
 """
 
 from aer.downloader.core import (
-    DownloadFunction,
-    DownloadMethod,
     DownloadRequest,
     DownloadResult,
     DownloadStatus,
@@ -14,8 +12,6 @@ from aer.downloader.core import (
 )
 
 __all__ = [
-    "DownloadFunction",
-    "DownloadMethod",
     "DownloadRequest",
     "DownloadResult",
     "DownloadStatus",
