@@ -246,13 +246,13 @@ def test_search_earthaccess_spatial_extent_and_bounding_box_raises():
     )
     spatial_extent = GridSpatialExtent(frozenset([cell]))
 
+    query = SearchQuery(
+        products=[VNP02IMG],
+        time_range=time_range,
+        spatial_extent=spatial_extent,
+        options={"bounding_box": (-10, 35, 0, 45)},
+    )
     with pytest.raises(ValueError, match="Cannot specify both"):
-        query = SearchQuery(
-            products=[VNP02IMG],
-            time_range=time_range,
-            spatial_extent=spatial_extent,
-            options={"bounding_box": (-10, 35, 0, 45)},
-        )
         search_earthaccess(query)
 
 

@@ -13,9 +13,6 @@ import inspect
 from typing import (
     Any,
     Callable,
-    Dict,
-    List,
-    Type,
     TypeVar,
     get_type_hints,
 )
@@ -33,8 +30,8 @@ class PluginInfo:
         name: str,
         category: str,
         func: Callable[..., Any],
-        input_type: Type[Any],
-        return_type: Type[Any],
+        input_type: type[Any],
+        return_type: type[Any],
     ):
         self.name = name
         self.category = category
@@ -57,10 +54,10 @@ class PluginRegistry:
     _ENTRYPOINT_GROUP = "aer.plugins"
 
     def __init__(self) -> None:
-        self.plugins: Dict[str, PluginInfo] = {}
+        self.plugins: dict[str, PluginInfo] = {}
         self._plugins_loaded = False
         # Adjacency list: input_type -> list of (output_type, plugin_name)
-        self.graph: Dict[Type[Any], List[tuple[Type[Any], str]]] = (
+        self.graph: dict[type[Any], list[tuple[type[Any], str]]] = (
             collections.defaultdict(list)
         )
 
@@ -68,7 +65,6 @@ class PluginRegistry:
         if self._plugins_loaded:
             return
 
-        self._plugins_loaded = True
         try:
             entry_points = importlib.metadata.entry_points(group=self._ENTRYPOINT_GROUP)
         except Exception as exc:
@@ -81,6 +77,8 @@ class PluginRegistry:
                 entry.load()
             except Exception as exc:
                 logger.error("failed_to_load_plugin", plugin=entry.name, error=str(exc))
+
+        self._plugins_loaded = True
 
     def register(self, name: str, category: str, func: Callable[..., Any]) -> None:
         """Registers a function as a plugin in the capability graph.
@@ -139,20 +137,31 @@ class PluginRegistry:
             raise KeyError(f"Plugin '{name}' is not registered.")
         return self.plugins[name]
 
-    def all(self) -> List[PluginInfo]:
+    def all(self) -> list[PluginInfo]:
         """Return all registered plugins."""
         self._ensure_loaded()
         return list(self.plugins.values())
 
     def show_capabilities(
-        self, start_type: Type[Any], depth: int = 0, indent: str = ""
+        self,
+        start_type: type[Any],
+        depth: int = 0,
+        indent: str = "",
+        _visited: set[type[Any]] | None = None,
     ) -> None:
         """Print a textual tree of possible type transitions starting from start_type."""
         self._ensure_loaded()
 
+        if _visited is None:
+            _visited = set()
+
         type_name = getattr(start_type, "__name__", str(start_type))
         if depth == 0:
             print(f"[*] {type_name}")
+
+        if start_type in _visited:
+            return
+        _visited.add(start_type)
 
         edges = self.graph.get(start_type, [])
         for i, (out_type, plugin_name) in enumerate(edges):
@@ -163,7 +172,12 @@ class PluginRegistry:
             print(f"{indent} {marker} ({plugin_name}) -> {out_name}")
 
             next_indent = indent + ("     " if is_last else " │   ")
-            self.show_capabilities(out_type, depth=depth + 1, indent=next_indent)
+            self.show_capabilities(
+                out_type,
+                depth=depth + 1,
+                indent=next_indent,
+                _visited=_visited.copy(),
+            )
 
 
 # The global singleton instance
@@ -173,7 +187,14 @@ F = TypeVar("F", bound=Callable[..., Any])
 
 
 def plugin(name: str, category: str) -> Callable[[F], F]:
-    """Decorator to register a plugin."""
+    """Decorator to register a plugin.
+
+    Usage::
+
+        @plugin(name="my_plugin", category="search")
+        def my_search(query: SearchQuery) -> gpd.GeoDataFrame:
+            ...
+    """
 
     def decorator(func: F) -> F:
         plugin_registry.register(name, category, func)
@@ -182,12 +203,17 @@ def plugin(name: str, category: str) -> Callable[[F], F]:
     return decorator
 
 
+def _is_typed(tp: object) -> bool:
+    """Return True if *tp* is a concrete type (not ``typing.Any``)."""
+    return tp != Any
+
+
 class Pipeline:
     """A sequence of plugins forming a type-safe data transition path."""
 
     def __init__(self, *plugin_names: str) -> None:
         self.plugin_names = plugin_names
-        self.steps: List[PluginInfo] = []
+        self.steps: list[PluginInfo] = []
         self._validate()
 
     def _validate(self) -> None:
@@ -209,19 +235,12 @@ class Pipeline:
             curr_out = curr_step.return_type
             next_in = next_step.input_type
 
-            # Exact match or Any
-            if curr_out is not Any and next_in is not Any and curr_out != next_in:
-                # In Python's typing, strict equality is sometimes too harsh (e.g., subclasses)
-                # For simplicity in this graph, we start with strict equality where annotated,
-                # but an advanced version could use issubclass.
+            # Exact match or Any — skip check when either side is untyped
+            if _is_typed(curr_out) and _is_typed(next_in) and curr_out != next_in:
                 try:
-                    if not issubclass(curr_out, next_in):
-                        raise TypeError(
-                            f"Pipeline type mismatch! Plugin '{curr_step.name}' returns {curr_out}, "
-                            f"but plugin '{next_step.name}' expects {next_in}."
-                        )
-                except Exception:
-                    # In case they aren't classes (e.g., Union, list[...])
+                    is_sub = issubclass(curr_out, next_in)
+                except TypeError:
+                    # Not real classes (e.g., Union, list[...]) — warn rather than crash
                     if curr_out != next_in:
                         logger.warning(
                             "pipeline_type_check_uncertain",
@@ -229,6 +248,12 @@ class Pipeline:
                             next_step=next_step.name,
                             curr_out=str(curr_out),
                             next_in=str(next_in),
+                        )
+                else:
+                    if not is_sub:
+                        raise TypeError(
+                            f"Pipeline type mismatch! Plugin '{curr_step.name}' returns {curr_out}, "
+                            f"but plugin '{next_step.name}' expects {next_in}."
                         )
 
     def run(self, initial_input: Any, **kwargs: Any) -> Any:

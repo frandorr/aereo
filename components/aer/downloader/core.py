@@ -3,13 +3,11 @@
 Provides:
 - ``DownloadRequest``  — a typed description of *what* to download and *where* to put it.
 - ``DownloadResult``   — the outcome of a single download attempt.
-- ``DownloadMethod``   — a pluggable registry (mirroring ``SearchMethod``) that resolves
-  named download backends at runtime through entry-point plugins.
 - ``s3_uri_to_https``  — utility to convert ``s3://`` URIs to downloadable HTTPS URLs.
 
 The component is protocol-agnostic: it knows nothing about HTTP, S3, or aria2.
 Concrete backends (e.g. ``downloader_aria2``) register themselves via the
-``DownloadMethod.register`` decorator/function.
+``@plugin`` decorator from ``aer.plugin``.
 """
 
 from __future__ import annotations
