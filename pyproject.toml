@@ -41,6 +41,7 @@ entry-points."aer.plugins".earthaccess = "aer.search_earthaccess.core:search_ear
 dev = [
   "polylith-cli>=1.42.5,<2",
   "pytest>=9.0.2,<10",
+  "types-requests>=2.32.4.20260107,<3",
 ]
 
 [tool.hatch]
@@ -60,6 +61,7 @@ ini_options.markers = [
 
 [tool.mypy]
 # The mypy configurations: http://bit.ly/2zEl9WI
+mypy_path = "components:bases:development"
 ignore_missing_imports = true
 strict = true
 local_partial_types = true
