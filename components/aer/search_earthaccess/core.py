@@ -11,7 +11,6 @@ from structlog import get_logger
 from aer.spatial import GridSpatialExtent
 from aer.spectral import Product
 from aer.temporal import TimeRange
-from aer.search import SearchMethod
 
 logger = get_logger()
 
@@ -208,6 +207,3 @@ def search_earthaccess(
         geometries.append(granule_poly)
 
     return gpd.GeoDataFrame(rows, geometry=geometries)
-
-
-SEARCH_EARTHACCESS = SearchMethod.register("earthaccess", search_earthaccess)

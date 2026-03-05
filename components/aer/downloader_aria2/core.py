@@ -34,7 +34,6 @@ from typing import Any
 from structlog import get_logger
 
 from aer.downloader import (
-    DownloadMethod,
     DownloadRequest,
     DownloadResult,
     DownloadStatus,
@@ -265,7 +264,5 @@ def download_aria2(
 
 
 # ---------------------------------------------------------------------------
-# Register with the DownloadMethod registry
+# End of file
 # ---------------------------------------------------------------------------
-
-DOWNLOAD_ARIA2 = DownloadMethod.register("aria2", download_aria2)

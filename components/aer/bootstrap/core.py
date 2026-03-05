@@ -1,13 +1,8 @@
-from aer.plugins import load_multiple_groups
-
-PLUGIN_GROUPS = [
-    "aer.plugins.search",
-    "aer.plugins.download",
-    "aer.plugins.ingest",
-    "aer.plugins.export",
-]
+from aer.downloader import DownloadMethod
+from aer.search import SearchMethod
 
 
 def bootstrap() -> None:
     """Initialize the aer plugin system by loading all predefined groups."""
-    load_multiple_groups(PLUGIN_GROUPS)
+    SearchMethod.all()
+    DownloadMethod.all()

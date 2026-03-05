@@ -16,13 +16,12 @@ from __future__ import annotations
 
 import enum
 from pathlib import Path
+import importlib.metadata
 from typing import Any, ClassVar, Protocol
 from urllib.parse import quote
 
 import attrs
 from structlog import get_logger
-
-from aer.plugins.core import load_entrypoint_group
 
 logger = get_logger()
 
@@ -169,7 +168,17 @@ class DownloadMethod:
     def _ensure_plugins_loaded(cls) -> None:
         """Discover plugins once per process."""
         if not cls._plugins_loaded:
-            load_entrypoint_group(cls._ENTRYPOINT_GROUP)
+            entry_points = importlib.metadata.entry_points(group=cls._ENTRYPOINT_GROUP)
+
+            for entry in entry_points:
+                try:
+                    download_fn = entry.load()
+                    cls.register(name=entry.name, download_fn=download_fn)
+                except Exception as exc:
+                    logger.error(
+                        "Failed to load plugin", plugin=entry.name, error=str(exc)
+                    )
+
             cls._plugins_loaded = True
 
     # -- registration -------------------------------------------------------

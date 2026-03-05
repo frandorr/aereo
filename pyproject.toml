@@ -34,8 +34,8 @@ dependencies = [
   "structlog>=25.5,<26",
   "utm>=0.8.1,<0.9",
 ]
-entry-points."aer.plugins.download".aria2 = "aer.downloader_aria2.core:DOWNLOAD_ARIA2"
-entry-points."aer.plugins.search".earthaccess = "aer.search_earthaccess.core:SEARCH_EARTHACCESS"
+entry-points."aer.plugins.download".aria2 = "aer.downloader_aria2.core:download_aria2"
+entry-points."aer.plugins.search".earthaccess = "aer.search_earthaccess.core:search_earthaccess"
 
 [dependency-groups]
 dev = [
@@ -84,3 +84,12 @@ disable_error_code = [
 
 [tool.polylith]
 bricks."components/aer/spectral" = "aer/spectral"
+bricks."components/aer/temporal" = "aer/temporal"
+bricks."components/aer/downloader" = "aer/downloader"
+bricks."components/aer/search_earthaccess" = "aer/search_earthaccess"
+bricks."components/aer/downloader_aria2" = "aer/downloader_aria2"
+bricks."components/aer/settings" = "aer/settings"
+bricks."components/aer/spatial" = "aer/spatial"
+bricks."components/aer/search" = "aer/search"
+bricks."components/aer/goes_fetcher" = "aer/goes_fetcher"
+bricks."components/aer/bootstrap" = "aer/bootstrap"
