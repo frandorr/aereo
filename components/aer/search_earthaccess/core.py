@@ -72,20 +72,14 @@ def _parse_umm_polygon(
     )
 
 
-@plugin(name="earthaccess", category="search")  # type: ignore[misc]
+@plugin(name="earthaccess", category="search")
 def search_earthaccess(query: SearchQuery) -> gpd.GeoDataFrame:
     """Search for earthaccess data given a SearchQuery.
 
     Args:
-        products: A list of spectral Products to search for (uses product.name).
-        time_range: The TimeRange representing start and end time.
-        spatial_extent: An optional GridSpatialExtent.  When provided the CMR
-            query is filtered by its overall bounding box, and each returned
-            granule is checked against the individual cells.
-        cell_overlap_mode: How to match cells against each granule footprint.
-            ``"contains"`` (default) keeps only cells *fully inside* the granule.
-            ``"intersects"`` keeps cells that *overlap at all* with the granule.
-        **kwargs: Additional parameters passed directly to ``earthaccess.search_data``.
+        query: A ``SearchQuery`` containing products, time_range, and optionally
+            spatial_extent, cell_overlap_mode, and extra options passed
+            directly to ``earthaccess.search_data``.
 
     Returns:
         A ``gpd.GeoDataFrame`` with columns: product_name, granule_id, concept_id,

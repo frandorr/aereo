@@ -103,7 +103,7 @@ def _write_input_file(
 # ---------------------------------------------------------------------------
 
 
-@plugin(name="aria2", category="download")  # type: ignore[misc]
+@plugin(name="aria2", category="download")
 def download_aria2(
     requests: list[DownloadRequest],
     *,

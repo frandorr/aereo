@@ -1,77 +1,120 @@
 # aer Plugin System
 
-`aer.spectral` uses an **extensible open registry** model. This allows third-party developers (e.g., `aer_landsat` or `aer_sentinel2`) to define entirely custom satellite, sensor, and product taxonomies that seamlessly interact with `aer` pipelines, without requiring pull requests to the core `aer` repository.
+`aer` uses a **unified plugin registry** with a type-aware **Capability Graph**. This allows third-party developers to register new search backends, download backends, or data transformations using a single `@plugin` decorator — no base classes, no config files.
 
 ## How it Works
 
-The core concepts—`Instrument`, `Satellite`, `BandType`, and `Product`—are not strict `Enums`. Instead, they are immutable frozen dataclasses backed by class-level registries.
+The plugin system has two layers:
 
-When you dynamically call `.register()` on any of these bases, it:
-1. Instantiates your new element.
-2. Adds it to the global `aer` namespace.
-3. Automatically maps it for runtime validators, tests, and CLI tools via `.get()` and `.all()`.
+1. **Spectral Registry** — `Instrument`, `Satellite`, `BandType`, and `Product` are immutable frozen dataclasses backed by class-level registries. When you call `.register()`, it instantiates your new element and adds it to the global namespace.
+
+2. **Plugin Registry** — The `PluginRegistry` provides a unified registry for all functional plugins (search, download, transform, etc.). It automatically infers input/output types from function annotations, building a **Capability Graph** of all available data pipelines.
 
 ## Writing a Plugin
 
-To create a new `aer` extension, simply author a new pip-installable Python package or internal module.
+### The `@plugin` Decorator
+
+Creating a plugin is just decorating a typed function:
+
+```python
+from aer.plugin import plugin
+import geopandas as gpd
+
+@plugin(name="my_filter", category="transform")
+def filter_large_granules(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """Keep only granules above 50 MB."""
+    return gdf[gdf["size_mb"] > 50]
+```
+
+That's it. The registry automatically:
+1. Extracts the input type (`GeoDataFrame`) and return type (`GeoDataFrame`) from annotations.
+2. Registers the function in the global plugin registry.
+3. Adds an edge to the Capability Graph so the plugin can be discovered and chained.
+
+### Using Plugins
+
+```python
+from aer.plugin import plugin_registry
+
+# Discover all plugins
+for p in plugin_registry.all():
+    print(p)  # <Plugin 'earthaccess' (search): SearchQuery -> GeoDataFrame>
+
+# Use a plugin by name
+search = plugin_registry.get("earthaccess")
+gdf = search(query)
+
+# Visualise possible type transitions
+from aer.search import SearchQuery
+plugin_registry.show_capabilities(SearchQuery)
+# [*] SearchQuery
+#  └── (earthaccess) -> GeoDataFrame
+#       └── (my_filter) -> GeoDataFrame
+```
+
+### Chaining Plugins with Pipeline
+
+```python
+from aer.plugin import Pipeline
+
+# Type transitions are validated at construction time
+pipe = Pipeline("earthaccess", "my_filter")
+result = pipe.run(query)
+```
+
+## Spectral Plugins (Instruments, Satellites, Products)
+
+The spectral registry uses `.register()` on core types. This allows third-party packages (e.g., `aer_landsat`) to define entirely custom satellite, sensor, and product taxonomies.
 
 ### Best Practice: The Registry API
 
-Because plugins are extending the namespace dynamically, static type-checkers (like `mypy`) do not know what `Instrument.OLI` is at compile time.
-
-**The typed API contract is:**
-Always map the return value of `.register()` to a variable. The variable contains the fully-typed `Instrument`, `Satellite`, or `BandType` instance, making it fully transparent to your IDE.
-
-### Complete Example: Extrapolating `aer` for Landsat 8
-
-Here is a tested, fully functional example demonstrating how you would build a custom `aer` taxonomy in a downstream script or package.
+Because plugins extend the namespace dynamically, always capture the return value of `.register()` for type safety:
 
 ```python
 from aer.spectral import Instrument, Satellite, BandType, Band, Channel, Product
 
-def register_landsat_plugin():
-    # 1. Register entirely new Instruments and Satellites.
-    # We assign the outputs to variables for type safety later!
-    OLI = Instrument.register("OLI", "https://landsat.gsfc.nasa.gov/satellites/landsat-8/spacecraft-instruments/operational-land-imager/")
-    LANDSAT_8 = Satellite.register("LANDSAT_8")
+# Register new instruments and satellites
+OLI = Instrument.register("OLI", "https://landsat.gsfc.nasa.gov/...")
+LANDSAT_8 = Satellite.register("LANDSAT_8")
 
-    # 2. Define custom channels using standard aer interfaces
-    L8_BAND_1 = Channel(
-        c_id="B1",
-        instrument=OLI,        # Notice we use the typed 'OLI' variable
-        band=Band(
-            name="Coastal/Aerosol",
-            band_type=BandType.VISIBLE,  # Core types work perfectly with custom instruments
-            central_wavelength=0.443,
-            bandwidth=0.016,
-        ),
-        resolution=30,
-    )
+# Define channels using standard aer interfaces
+L8_BAND_1 = Channel(
+    c_id="B1",
+    instrument=OLI,
+    band=Band(
+        name="Coastal/Aerosol",
+        band_type=BandType.VISIBLE,
+        central_wavelength=0.443,
+        bandwidth=0.016,
+    ),
+    resolution=30,
+)
 
-    # 3. Define the data product
-    # Important: Product classes immediately, automatically register themselves
-    # into Product.all() and Product.get() upon initialization.
-    LC08_PRODUCT = Product(
-        name="LC08_L1TP",
-        instrument=OLI,
-        supported_satellites=frozenset([LANDSAT_8]),
-        channels=(L8_BAND_1,)
-    )
+# Products auto-register on creation
+LC08_PRODUCT = Product(
+    name="LC08_L1TP",
+    instrument=OLI,
+    supported_satellites=frozenset([LANDSAT_8]),
+    channels=(L8_BAND_1,),
+)
 
-    return LC08_PRODUCT
-
-# In your pipeline script:
-my_custom_product = register_landsat_plugin()
-
-# aer's core is now permanently aware of your custom products!
-assert Instrument.get("OLI").name == "OLI"
-assert Satellite.get("LANDSAT_8").name == "LANDSAT_8"
-assert Product.get("LC08_L1TP") is my_custom_product
-
-# You can now feed `LC08_L1TP` to native aer methods (like aer.search_earthaccess) safely!
+# Now discoverable globally
+assert Product.get("LC08_L1TP") is LC08_PRODUCT
 ```
 
 ## The API Surface
+
+### Plugin Registry
+
+| Operation | API |
+|---|---|
+| Register | `@plugin(name="...", category="...")` |
+| Get by name | `plugin_registry.get("name")` |
+| List all | `plugin_registry.all()` |
+| Show graph | `plugin_registry.show_capabilities(StartType)` |
+| Chain | `Pipeline("step1", "step2").run(input)` |
+
+### Spectral Registry
 
 | Class | Registration | Query | Iterator |
 |---|---|---|---|
@@ -80,33 +123,34 @@ assert Product.get("LC08_L1TP") is my_custom_product
 | `BandType` | `BandType.register("Name")` | `BandType.get("Name")` | `BandType.all()` |
 | `Product` | `Product(name="P", ...)` | `Product.get("P")` | `Product.all()` |
 
-*Note: Registrations are **idempotent**. If your plugin script calls `Satellite.register("LANDSAT_8")` multiple times, it simply returns the identical, already-registered instance.*
+*Note: Registrations are **idempotent**. Calling `.register()` with the same name returns the existing instance.*
 
-## Search Plugins & Discovery
+## Entry Points & Discovery
 
-While `spectral` plugins are usually loaded via explicit module imports, `SearchMethod` plugins are discovered automatically via **Python Entry Points**.
+Functional plugins (search, download, etc.) are discovered automatically via **Python Entry Points**. The `PluginRegistry` scans for entry points in the `aer.plugins` group.
 
 ### The Bootstrap Mechanism
 
-To initialize the registry with all installed search plugins, call `bootstrap()`:
+To eagerly load all installed plugins, call `bootstrap()`:
 
 ```python
 from aer.bootstrap import bootstrap
 bootstrap()
 ```
 
-This triggers `aer.plugins` to scan for entry points in the `aer.plugins.search` group and load the associated modules.
+Alternatively, `plugin_registry.get()` and `plugin_registry.all()` trigger lazy loading on first access.
 
-### Plugin Discovery (Crucial for Dev)
+### Plugin Discovery (Entry Points)
 
-Plugins are declared in the `[project.entry-points]` section of your `pyproject.toml`.
+Plugins are declared in the `[project.entry-points]` section of your `pyproject.toml`:
 
 ```toml
-[project.entry-points."aer.plugins.search"]
-earthaccess = "aer.search_earthaccess.core:SEARCH_EARTHACCESS"
+[project.entry-points."aer.plugins"]
+earthaccess = "aer.search_earthaccess.core:search_earthaccess"
+aria2 = "aer.downloader_aria2.core:download_aria2"
 ```
 
 > [!IMPORTANT]
-> **Workspace Discovery Root**: In a Polylith development environment, `importlib.metadata` reads discovery metadata from the package that is currently installed in the environment (the root `pyproject.toml` when using `uv sync` at the workspace root).
+> **Workspace Discovery Root**: In a Polylith development environment, `importlib.metadata` reads discovery metadata from the package currently installed in the environment (the root `pyproject.toml` when using `uv sync` at the workspace root).
 >
-> If you add a new plugin to a `projects/` sub-package but **do not** add it to the root `pyproject.toml`, it will be missing from the registry during development, leading to `KeyError: "Search method '...' is not registered."`. Always mirror your plugin entry points in the root configuration during active development.
+> If you add a new plugin to a `projects/` sub-package but **do not** add it to the root `pyproject.toml`, it will be missing from the registry during development, leading to `KeyError: "Plugin '...' is not registered."`. Always mirror your plugin entry points in the root configuration during active development.
