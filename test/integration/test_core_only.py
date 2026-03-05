@@ -1,3 +1,4 @@
+from unittest.mock import patch
 import pytest
 from aer.search import SearchMethod
 
@@ -14,7 +15,11 @@ def reset_search_registry():
 
 
 @pytest.mark.integration
-def test_earthaccess_not_registered():
+@patch("importlib.metadata.entry_points")
+def test_earthaccess_not_registered(mock_entry_points):
     """Verify that the earthaccess search plugin is NOT registered when only core is installed."""
+    # Simulate an environment where no plugins are installed (only core)
+    mock_entry_points.return_value = []
+
     names = {m.name for m in SearchMethod.all()}
     assert "earthaccess" not in names

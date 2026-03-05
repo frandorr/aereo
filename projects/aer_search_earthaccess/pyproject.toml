@@ -18,21 +18,22 @@ dependencies = [
   "earthaccess>=0.16,<0.17",
   "geopandas>=1.1.2,<2",
   "pandas>=3.0.1,<4",
+  "pandera[geopandas]>=0.24,<0.25",
   "pydantic-settings>=2.13.1,<3",
   "pyproj>=3.7.1,<4",
   "pyresample>=1.35,<2",
   "returns[compatible-mypy]>=0.26,<0.27",
   "shapely>=2.1.2,<3",
   "structlog>=25.5,<26",
+  "utm>=0.8.1,<0.9",
 ]
-entry-points."aer.plugins.search".earthaccess = "aer.search_earthaccess.core:SEARCH_EARTHACCESS"
+entry-points."aer.plugins.search".earthaccess = "aer.search_earthaccess.core:search_earthaccess"
 
 [tool.hatch]
 build.hooks.polylith-bricks = {}
 build.targets.wheel.packages = [ "aer" ]
 
 [tool.polylith]
-bricks."../../components/aer/plugins" = "aer/plugins"
 bricks."../../components/aer/search" = "aer/search"
 bricks."../../components/aer/search_earthaccess" = "aer/search_earthaccess"
 bricks."../../components/aer/settings" = "aer/settings"

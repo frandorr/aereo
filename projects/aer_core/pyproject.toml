@@ -17,12 +17,14 @@ dependencies = [
   "attrs>=25.4,<26",
   "geopandas>=1.1.2,<2",
   "pandas>=3.0.1,<4",
+  "pandera[geopandas]>=0.24,<0.25",
   "pydantic-settings>=2.13.1,<3",
   "pyproj>=3.7.1,<4",
   "pyresample>=1.35,<2",
   "returns[compatible-mypy]>=0.26,<0.27",
   "shapely>=2.1.2,<3",
   "structlog>=25.5,<26",
+  "utm>=0.8.1,<0.9",
 ]
 
 [tool.hatch]
@@ -31,7 +33,7 @@ build.targets.wheel.packages = [ "aer" ]
 
 [tool.polylith]
 bricks."../../components/aer/bootstrap" = "aer/bootstrap"
-bricks."../../components/aer/plugins" = "aer/plugins"
+bricks."../../components/aer/downloader" = "aer/downloader"
 bricks."../../components/aer/search" = "aer/search"
 bricks."../../components/aer/settings" = "aer/settings"
 bricks."../../components/aer/spatial" = "aer/spatial"
