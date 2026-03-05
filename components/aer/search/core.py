@@ -69,7 +69,6 @@ class SearchMethod:
         def my_custom_search(products, time_range, **kwargs):
             return gpd.GeoDataFrame(...)
 
-        MY_SEARCH = SearchMethod.register("my_search", my_custom_search)
     """
 
     name: str
