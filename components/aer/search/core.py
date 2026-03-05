@@ -1,3 +1,4 @@
+import importlib.metadata
 from typing import Any, ClassVar, Literal, Protocol
 
 import attrs
@@ -5,11 +6,13 @@ import geopandas as gpd
 import pandera.pandas as pa
 from pandera.typing import Series
 from pandera.typing.geopandas import GeoDataFrame, GeoSeries
+from structlog import get_logger
 
-from aer.plugins.core import load_entrypoint_group
 from aer.spatial import GridSpatialExtent
 from aer.spectral import Product
 from aer.temporal import TimeRange
+
+logger = get_logger()
 
 
 class SearchResultSchema(pa.DataFrameModel):  # type: ignore[misc]
@@ -78,9 +81,22 @@ class SearchMethod:
 
     @classmethod
     def _ensure_plugins_loaded(cls) -> None:
-        """Helper to discover plugins once per runtime."""
         if not cls._plugins_loaded:
-            load_entrypoint_group(cls._ENTRYPOINT_GROUP)
+            # Query entry points using the standard package metadata method!
+            entry_points = importlib.metadata.entry_points(group=cls._ENTRYPOINT_GROUP)
+
+            for entry in entry_points:
+                try:
+                    search_fn = (
+                        entry.load()
+                    )  # This now returns the search_earthaccess function
+                    # Use the entry.name ("earthaccess") from pyproject.toml as the source of truth
+                    cls.register(name=entry.name, search_fn=search_fn)
+                except Exception as exc:
+                    logger.error(
+                        "Failed to load plugin", plugin=entry.name, error=str(exc)
+                    )
+
             cls._plugins_loaded = True
 
     @classmethod
