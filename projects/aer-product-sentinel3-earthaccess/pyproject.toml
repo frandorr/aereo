@@ -1,0 +1,28 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatch-polylith-bricks", "hatchling" ]
+
+[project]
+name = "aer-product-sentinel3-earthaccess"
+version = "0.1.0"
+authors = [ { name = "Your Name" } ]
+requires-python = ">=3.13"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+  "aer-spectral-sentinel3",
+]
+entry-points."aer.plugins".product_sentinel3_earthaccess = "aer.product_sentinel3_earthaccess.core:sentinel3_earthaccess_plugin"
+
+[tool.hatch]
+build.hooks.polylith-bricks = {}
+build.targets.wheel.packages = [ "aer" ]
+
+[tool.uv]
+sources.aer-spectral-sentinel3 = { workspace = true }
+
+[tool.polylith]
+bricks = {}

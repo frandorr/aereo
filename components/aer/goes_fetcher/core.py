@@ -1,5 +1,6 @@
 from aer.temporal import TimeRange
-from aer.spectral import Instrument, Satellite, GOES_CONSTELLATION
+from aer.spectral import Instrument, Satellite
+from aer.spectral_goes import GOES_CONSTELLATION
 import attrs
 
 # ==========================================
@@ -15,4 +16,6 @@ class GOESSearchQuery:
     satellite: Satellite = attrs.field(
         validator=attrs.validators.in_(GOES_CONSTELLATION)
     )
-    instrument: Instrument = Instrument.ABI
+    instrument: Instrument = attrs.field(
+        default=attrs.Factory(lambda: Instrument.get("ABI"))
+    )

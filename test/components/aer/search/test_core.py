@@ -8,7 +8,7 @@ from shapely.geometry import Polygon
 
 from aer.search import SearchQuery, SearchResultSchema
 from aer.temporal import TimeRange
-from aer.spectral import VNP02IMG_EA
+from aer.product_viirs_earthaccess import VNP02IMG_EA
 
 
 def test_schema_rejects_missing_columns():
@@ -20,6 +20,25 @@ def test_schema_rejects_missing_columns():
 
     with pytest.raises(SchemaError):
         SearchResultSchema.validate(gdf)
+
+
+def test_schema_rejects_nulls_in_required_columns():
+    """Schema rejects a GeoDataFrame if required columns contain nulls."""
+    # Test each required column one by one
+    for null_col in ["product_name", "granule_id", "start_time", "end_time"]:
+        row = {
+            "product_name": "TEST",
+            "granule_id": "123",
+            "start_time": pd.to_datetime("2023-01-01"),
+            "end_time": pd.to_datetime("2023-01-02"),
+        }
+        # Set the one column to None (null)
+        row[null_col] = None
+
+        gdf = gpd.GeoDataFrame([row], geometry=[None])
+
+        with pytest.raises(SchemaError):
+            SearchResultSchema.validate(gdf)
 
 
 def test_schema_allows_extra_columns():

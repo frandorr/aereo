@@ -57,7 +57,8 @@ Search for VIIRS and MODIS data using the `earthaccess` plugin:
 from datetime import datetime
 from aer.bootstrap import bootstrap
 from aer.search import SearchMethod
-from aer.spectral import VNP02MOD, MODIS_021KM
+from aer.product_viirs_earthaccess import VNP02MOD_EA
+from aer.product_modis_earthaccess import MODIS_021KM_EA
 from aer.temporal import TimeRange
 
 # 1. Initialize the plugin system
@@ -72,7 +73,7 @@ time_range = TimeRange(
 # 3. Use the registered search method
 search = SearchMethod.get("earthaccess")
 results = search(
-    products=[VNP02MOD, MODIS_021KM],
+    products=[VNP02MOD_EA, MODIS_021KM_EA],
     time_range=time_range
 )
 

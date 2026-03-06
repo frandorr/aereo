@@ -1,9 +1,8 @@
+from aer.spectral_goes import ABI_CHANNELS
+from aer.spectral_viirs import VIIRS_CHANNELS
+from aer.spectral_modis import MODIS_CHANNELS
+from aer.spectral_sentinel3 import OLCI_CHANNELS, SLSTR_CHANNELS
 from aer.spectral import (
-    ABI_CHANNELS,
-    VIIRS_CHANNELS,
-    MODIS_CHANNELS,
-    OLCI_CHANNELS,
-    SLSTR_CHANNELS,
     Band,
     BandType,
     Channel,
