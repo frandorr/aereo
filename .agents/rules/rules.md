@@ -13,3 +13,5 @@ trigger: always_on
 3. **When asked to commit something**: you MUST use git-commit skill
 
 4. **Always use workflow poly-create to create components/bases/project for polylith**. Do NOT implement it in this step, just run the creation workflow.
+
+5. If user ask for advise how to modify code, or an explanation use codebase-intro skill

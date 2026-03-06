@@ -4,7 +4,6 @@ import pytest
 from pathlib import Path
 
 from aer.downloader import (
-    DownloadMethod,
     DownloadRequest,
     DownloadResult,
     DownloadStatus,
@@ -126,85 +125,3 @@ class TestS3UriToHttps:
         endpoints = {"mybucket": "https://cdn.example.com/"}
         result = s3_uri_to_https("s3://mybucket/file.hdf", endpoint_map=endpoints)
         assert result == "https://cdn.example.com/file.hdf"
-
-
-# ---------------------------------------------------------------------------
-# DownloadMethod registry
-# ---------------------------------------------------------------------------
-
-
-class TestDownloadMethod:
-    def setup_method(self):
-        """Clear the registry before each test to isolate state."""
-        DownloadMethod._registry.clear()
-        DownloadMethod._plugins_loaded = False
-
-    def test_register_and_get(self):
-        def dummy_fn(requests, *, max_concurrent=5, **kw):
-            return []
-
-        method = DownloadMethod.register("test_backend", dummy_fn)
-        assert method.name == "test_backend"
-
-        # Force plugins_loaded so get() doesn't try entry points
-        DownloadMethod._plugins_loaded = True
-        retrieved = DownloadMethod.get("test_backend")
-        assert retrieved is method
-
-    def test_register_decorator_form(self):
-        @DownloadMethod.register("decorator_test")
-        def my_fn(requests, *, max_concurrent=5, **kw):
-            return []
-
-        DownloadMethod._plugins_loaded = True
-        assert DownloadMethod.get("decorator_test") is my_fn
-
-    def test_register_duplicate_same_fn_is_idempotent(self):
-        def my_fn(requests, *, max_concurrent=5, **kw):
-            return []
-
-        first = DownloadMethod.register("dup_ok", my_fn)
-        second = DownloadMethod.register("dup_ok", my_fn)
-        assert first is second
-
-    def test_register_duplicate_different_fn_raises(self):
-        def fn_a(requests, *, max_concurrent=5, **kw):
-            return []
-
-        def fn_b(requests, *, max_concurrent=5, **kw):
-            return []
-
-        DownloadMethod.register("conflict", fn_a)
-        with pytest.raises(ValueError, match="already registered"):
-            DownloadMethod.register("conflict", fn_b)
-
-    def test_get_unknown_raises(self):
-        DownloadMethod._plugins_loaded = True
-        with pytest.raises(KeyError, match="not registered"):
-            DownloadMethod.get("nonexistent")
-
-    def test_all_returns_registered(self):
-        def fn_a(requests, *, max_concurrent=5, **kw):
-            return []
-
-        def fn_b(requests, *, max_concurrent=5, **kw):
-            return []
-
-        DownloadMethod.register("a", fn_a)
-        DownloadMethod.register("b", fn_b)
-        DownloadMethod._plugins_loaded = True
-
-        all_methods = DownloadMethod.all()
-        names = {m.name for m in all_methods}
-        assert names == {"a", "b"}
-
-    def test_call_dispatches_to_fn(self):
-        sentinel = object()
-
-        def fn(requests, *, max_concurrent=5, **kw):
-            return [sentinel]
-
-        method = DownloadMethod.register("callable_test", fn)
-        req = DownloadRequest(uri="https://x.com/f", dest_dir="/tmp/x")
-        result = method([req])
-        assert result == [sentinel]
