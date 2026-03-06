@@ -6,128 +6,63 @@ import pandas as pd
 from pandera.errors import SchemaError
 from shapely.geometry import Polygon
 
-from aer.search import SearchMethod, SearchResultSchema
+from aer.search import SearchQuery, SearchResultSchema
 from aer.temporal import TimeRange
-from aer.spectral import VNP02IMG
+from aer.product_viirs_earthaccess import VNP02IMG_EA, VNP02MOD_EA
+from aer.spectral_viirs import VIIRS_I1, VIIRS_M1
 
 
-def test_searchmethod_registry():
-    """Test the SearchMethod registry and basic plugin behavior."""
-
-    # Create a dummy search function
-    def dummy_search(
-        products,
-        time_range,
-        spatial_extent=None,
-        cell_overlap_mode="contains",
-        **kwargs,
-    ):
-        return gpd.GeoDataFrame(
-            [
-                {
-                    "product_name": products[0].name,
-                    "granule_id": "dummy_123",
-                    "concept_id": "C123",
-                    "start_time": pd.to_datetime("2023-01-01T00:00:00Z"),
-                    "end_time": pd.to_datetime("2023-01-01T01:00:00Z"),
-                    "s3_url": "s3://dummy",
-                    "https_url": "https://dummy",
-                    "size_mb": 1.0,
-                    "dummy_flag": True,
-                }
-            ],
-            geometry=[Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])],
-        )
-
-    # 1. Register a new plugin
-    dummy_plugin = SearchMethod.register("dummy_plugin", dummy_search)
-    assert dummy_plugin.name == "dummy_plugin"
-
-    # 2. Retrieve plugin
-    retrieved = SearchMethod.get("dummy_plugin")
-    assert retrieved is dummy_plugin
-
-    # 3. Double registering the exact same function returns the existing instance
-    dummy_plugin_2 = SearchMethod.register("dummy_plugin", dummy_search)
-    assert dummy_plugin_2 is dummy_plugin
-
-    # 4. Registering a different function with the same name raises ValueError
-    def dummy_search_other(*args, **kwargs):
-        pass
-
-    with pytest.raises(
-        ValueError, match="already registered with a different function"
-    ):
-        SearchMethod.register("dummy_plugin", dummy_search_other)
-
-    # 5. Check 'all' contains our new plugin
-    all_plugins = SearchMethod.all()
-    assert dummy_plugin in all_plugins
-
-    # Note: earthaccess is normally loaded as an entrypoint, but may not be
-    # present in purely isolated test environments unless specifically installed.
-
-    # 6. Verify missing plugin raises KeyError
-    with pytest.raises(KeyError, match="not registered"):
-        SearchMethod.get("non_existent_plugin")
-
-    # 7. Execution through the SearchMethod class (calls __call__)
-    time_range = TimeRange(
-        start=datetime(2023, 1, 1, 0, 0), end=datetime(2023, 1, 1, 1, 0)
-    )
-    gdf = dummy_plugin(products=[VNP02IMG], time_range=time_range)
-    assert not gdf.empty
-    assert gdf.iloc[0]["product_name"] == VNP02IMG.name
-    assert bool(gdf.iloc[0]["dummy_flag"])
-    assert isinstance(gdf, gpd.GeoDataFrame)
-    assert "geometry" in gdf.columns
-
-
-def test_searchmethod_validation_rejects_missing_columns():
-    """SearchMethod rejects a GeoDataFrame missing required schema columns."""
-
-    def invalid_search(*args, **kwargs):
-        # Missing most required columns
-        return gpd.GeoDataFrame(
-            [{"product_name": "TEST", "granule_id": "123", "size_mb": 1.0}],
-            geometry=[None],
-        )
-
-    invalid_plugin = SearchMethod.register("invalid_plugin", invalid_search)
-
-    time_range = TimeRange(
-        start=datetime(2023, 1, 1, 0, 0), end=datetime(2023, 1, 1, 1, 0)
+def test_schema_rejects_missing_columns():
+    """Schema rejects a GeoDataFrame missing required columns."""
+    gdf = gpd.GeoDataFrame(
+        [{"product_name": "TEST", "granule_id": "123", "size_mb": 1.0}],
+        geometry=[None],
     )
 
     with pytest.raises(SchemaError):
-        invalid_plugin(products=[VNP02IMG], time_range=time_range)
+        SearchResultSchema.validate(gdf)
+
+
+def test_schema_rejects_nulls_in_required_columns():
+    """Schema rejects a GeoDataFrame if required columns contain nulls."""
+    # Test each required column one by one
+    for null_col in ["product_name", "granule_id", "start_time", "end_time"]:
+        row = {
+            "product_name": "TEST",
+            "granule_id": "123",
+            "start_time": pd.to_datetime("2023-01-01"),
+            "end_time": pd.to_datetime("2023-01-02"),
+        }
+        # Set the one column to None (null)
+        row[null_col] = None
+
+        gdf = gpd.GeoDataFrame([row], geometry=[None])
+
+        with pytest.raises(SchemaError):
+            SearchResultSchema.validate(gdf)
 
 
 def test_schema_allows_extra_columns():
     """Extra columns beyond the schema are preserved (strict=False)."""
 
-    def search_with_extras(*args, **kwargs):
-        return gpd.GeoDataFrame(
-            [
-                {
-                    "product_name": "VNP02IMG",
-                    "granule_id": "G123",
-                    "concept_id": "C123",
-                    "start_time": pd.to_datetime("2023-01-01"),
-                    "end_time": pd.to_datetime("2023-01-02"),
-                    "s3_url": "s3://bucket/key",
-                    "https_url": "https://example.com/key",
-                    "size_mb": 42.0,
-                    "my_custom_column": "extra_value",
-                    "another_custom": 999,
-                }
-            ],
-            geometry=[Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])],
-        )
+    gdf = gpd.GeoDataFrame(
+        [
+            {
+                "product_name": "VNP02IMG",
+                "granule_id": "G123",
+                "start_time": pd.to_datetime("2023-01-01"),
+                "end_time": pd.to_datetime("2023-01-02"),
+                "s3_url": "s3://bucket/key",
+                "https_url": "https://example.com/key",
+                "size_mb": 42.0,
+                "my_custom_column": "extra_value",
+                "another_custom": 999,
+            }
+        ],
+        geometry=[Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])],
+    )
 
-    plugin = SearchMethod.register("extras_plugin", search_with_extras)
-    time_range = TimeRange(start=datetime(2023, 1, 1), end=datetime(2023, 1, 2))
-    gdf = plugin(products=[VNP02IMG], time_range=time_range)
+    gdf = SearchResultSchema.validate(gdf)
 
     # Required columns are present and validated
     assert "product_name" in gdf.columns
@@ -143,27 +78,21 @@ def test_schema_allows_extra_columns():
 def test_schema_allows_null_geometry():
     """Geometry column can be None (e.g. GOES products without granule-level footprints)."""
 
-    def search_no_geom(*args, **kwargs):
-        return gpd.GeoDataFrame(
-            [
-                {
-                    "product_name": "ABI-L1b-RadF",
-                    "granule_id": "G999",
-                    "concept_id": "C999",
-                    "start_time": pd.to_datetime("2023-06-01"),
-                    "end_time": pd.to_datetime("2023-06-02"),
-                    "s3_url": "s3://goes-bucket/key",
-                    "https_url": "https://example.com/goes",
-                    "size_mb": 100.0,
-                }
-            ],
-            geometry=[None],
-        )
-
-    plugin = SearchMethod.register("null_geom_plugin", search_no_geom)
-    time_range = TimeRange(start=datetime(2023, 6, 1), end=datetime(2023, 6, 2))
-    gdf = plugin(products=[VNP02IMG], time_range=time_range)
-
+    gdf = gpd.GeoDataFrame(
+        [
+            {
+                "product_name": "ABI-L1b-RadF",
+                "granule_id": "G999",
+                "start_time": pd.to_datetime("2023-06-01"),
+                "end_time": pd.to_datetime("2023-06-02"),
+                "s3_url": "s3://goes-bucket/key",
+                "https_url": "https://example.com/goes",
+                "size_mb": 100.0,
+            }
+        ],
+        geometry=[None],
+    )
+    gdf = SearchResultSchema.validate(gdf)
     assert not gdf.empty
     assert gdf.iloc[0]["geometry"] is None
     assert gdf.iloc[0]["product_name"] == "ABI-L1b-RadF"
@@ -179,7 +108,6 @@ def test_search_earthaccess_schema_validation():
     mock_granule.__getitem__ = lambda self, key: {
         "meta": {
             "native-id": "VIIRS_NRT.A2023001.1030.002.2023001123456",
-            "concept-id": "G1234567890-LPDAAC_ECS",
         },
         "umm": {
             "CollectionReference": {"ShortName": "VNP02IMG"},
@@ -220,23 +148,20 @@ def test_search_earthaccess_schema_validation():
         "aer.search_earthaccess.core.earthaccess.search_data",
         return_value=[mock_granule],
     ):
-        from aer.search_earthaccess.core import search_earthaccess
+        from aer.plugin import plugin_registry
 
-        # Register if not already
-        try:
-            plugin = SearchMethod.register(
-                "earthaccess_schema_test", search_earthaccess
-            )
-        except ValueError:
-            plugin = SearchMethod.get("earthaccess_schema_test")
+        # Load earthly plugins
+        plugin_registry._ensure_loaded()
+        plugin = plugin_registry.get("earthaccess")
 
         time_range = TimeRange(
             start=datetime(2023, 1, 1, 10, 0),
             end=datetime(2023, 1, 1, 12, 0),
         )
+        query = SearchQuery(products=[VNP02IMG_EA], time_range=time_range)
 
-        # This calls __call__ which wraps result in GeoDataFrame[SearchResultSchema]
-        gdf = plugin(products=[VNP02IMG], time_range=time_range)
+        # Call the plugin directly
+        gdf = plugin(query)
 
     # Validate the output structure
     assert isinstance(gdf, gpd.GeoDataFrame)
@@ -244,7 +169,6 @@ def test_search_earthaccess_schema_validation():
     assert len(gdf) == 1
     assert gdf.iloc[0]["product_name"] == "VNP02IMG"
     assert gdf.iloc[0]["granule_id"] == "VIIRS_NRT.A2023001.1030.002.2023001123456"
-    assert gdf.iloc[0]["concept_id"] == "G1234567890-LPDAAC_ECS"
     assert gdf.iloc[0]["s3_url"] == "s3://nrt-bucket/VNP02IMG.A2023001.1030.002.nc"
     assert gdf.iloc[0]["size_mb"] == pytest.approx(256.7)
 
@@ -253,3 +177,36 @@ def test_search_earthaccess_schema_validation():
 
     # Validate schema compliance explicitly too
     SearchResultSchema.validate(gdf)
+
+
+def test_search_query_channel_validation():
+    """Verify that SearchQuery validates requested channels against product capabilities."""
+    time_range = TimeRange(
+        start=datetime(2023, 1, 1, 10, 0),
+        end=datetime(2023, 1, 1, 12, 0),
+    )
+
+    # 1. Valid channel selection passes
+    SearchQuery(
+        products=[VNP02IMG_EA],
+        time_range=time_range,
+        channels=(VIIRS_I1,),
+    )
+
+    # 2. Invalid channel selection (M1 is not in VNP02IMG) raises ValueError
+    with pytest.raises(ValueError, match="Requested channels .* must be a subset"):
+        SearchQuery(
+            products=[VNP02IMG_EA],
+            time_range=time_range,
+            channels=(VIIRS_M1,),
+        )
+
+    # 3. Multiple products: union of channels is allowed
+    SearchQuery(
+        products=[VNP02IMG_EA, VNP02MOD_EA],
+        time_range=time_range,
+        channels=(VIIRS_I1, VIIRS_M1),
+    )
+
+    # 4. None channels (default) is valid
+    SearchQuery(products=[VNP02IMG_EA], time_range=time_range, channels=None)

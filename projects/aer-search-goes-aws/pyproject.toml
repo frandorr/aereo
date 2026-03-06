@@ -3,9 +3,8 @@ build-backend = "hatchling.build"
 requires = [ "hatch-polylith-bricks", "hatchling" ]
 
 [project]
-name = "aer-core"
+name = "aer-search-goes-aws"
 version = "0.1.0"
-description = "Core foundational components of the aer project"
 authors = [ { name = "Your Name" } ]
 requires-python = ">=3.13"
 classifiers = [
@@ -22,20 +21,22 @@ dependencies = [
   "pyproj>=3.7.1,<4",
   "pyresample>=1.35,<2",
   "returns[compatible-mypy]>=0.26,<0.27",
+  "s3fs>=2025.2,<2026",
   "shapely>=2.1.2,<3",
   "structlog>=25.5,<26",
   "utm>=0.8.1,<0.9",
 ]
+entry-points."aer.plugins".goes_aws = "aer.search_goes_aws.core:search_goes_aws"
 
 [tool.hatch]
 build.hooks.polylith-bricks = {}
 build.targets.wheel.packages = [ "aer" ]
 
 [tool.polylith]
-bricks."../../components/aer/bootstrap" = "aer/bootstrap"
-bricks."../../components/aer/downloader" = "aer/downloader"
 bricks."../../components/aer/search" = "aer/search"
+bricks."../../components/aer/search_goes_aws" = "aer/search_goes_aws"
 bricks."../../components/aer/settings" = "aer/settings"
 bricks."../../components/aer/spatial" = "aer/spatial"
 bricks."../../components/aer/spectral" = "aer/spectral"
 bricks."../../components/aer/temporal" = "aer/temporal"
+bricks."../../components/aer/plugin" = "aer/plugin"
