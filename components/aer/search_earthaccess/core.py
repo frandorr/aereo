@@ -9,7 +9,8 @@ from shapely.ops import unary_union
 from structlog import get_logger
 
 from aer.plugin import plugin
-from aer.search import SearchQuery
+from aer.search import SearchQuery, SearchResultSchema
+from pandera.typing.geopandas import GeoDataFrame
 
 logger = get_logger()
 
@@ -73,7 +74,7 @@ def _parse_umm_polygon(
 
 
 @plugin(name="earthaccess", category="search")
-def search_earthaccess(query: SearchQuery) -> gpd.GeoDataFrame:
+def search_earthaccess(query: SearchQuery) -> GeoDataFrame["SearchResultSchema"]:
     """Search for earthaccess data given a SearchQuery."""
     if query.spatial_extent and "bounding_box" in query.options:
         raise ValueError(

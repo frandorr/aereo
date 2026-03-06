@@ -7,8 +7,9 @@ import geopandas as gpd
 from structlog import get_logger
 
 from aer.plugin import plugin
-from aer.search import SearchQuery
+from aer.search import SearchQuery, SearchResultSchema
 from aer.spectral import Channel
+from pandera.typing.geopandas import GeoDataFrame
 
 logger = get_logger()
 
@@ -58,7 +59,7 @@ def _find_channel_by_id(
 
 
 @plugin(name="goes_aws", category="search")
-def search_goes_aws(query: SearchQuery) -> gpd.GeoDataFrame:
+def search_goes_aws(query: SearchQuery) -> GeoDataFrame["SearchResultSchema"]:
     """Search for GOES ABI products on AWS S3.
 
     This plugin traverses the NOAA GOES S3 buckets (noaa-goes16, noaa-goes17, etc.)
