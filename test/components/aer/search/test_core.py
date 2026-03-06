@@ -8,7 +8,8 @@ from shapely.geometry import Polygon
 
 from aer.search import SearchQuery, SearchResultSchema
 from aer.temporal import TimeRange
-from aer.product_viirs_earthaccess import VNP02IMG_EA
+from aer.product_viirs_earthaccess import VNP02IMG_EA, VNP02MOD_EA
+from aer.spectral_viirs import VIIRS_I1, VIIRS_M1
 
 
 def test_schema_rejects_missing_columns():
@@ -180,3 +181,36 @@ def test_search_earthaccess_schema_validation():
 
     # Validate schema compliance explicitly too
     SearchResultSchema.validate(gdf)
+
+
+def test_search_query_channel_validation():
+    """Verify that SearchQuery validates requested channels against product capabilities."""
+    time_range = TimeRange(
+        start=datetime(2023, 1, 1, 10, 0),
+        end=datetime(2023, 1, 1, 12, 0),
+    )
+
+    # 1. Valid channel selection passes
+    SearchQuery(
+        products=[VNP02IMG_EA],
+        time_range=time_range,
+        channels=(VIIRS_I1,),
+    )
+
+    # 2. Invalid channel selection (M1 is not in VNP02IMG) raises ValueError
+    with pytest.raises(ValueError, match="Requested channels .* must be a subset"):
+        SearchQuery(
+            products=[VNP02IMG_EA],
+            time_range=time_range,
+            channels=(VIIRS_M1,),
+        )
+
+    # 3. Multiple products: union of channels is allowed
+    SearchQuery(
+        products=[VNP02IMG_EA, VNP02MOD_EA],
+        time_range=time_range,
+        channels=(VIIRS_I1, VIIRS_M1),
+    )
+
+    # 4. None channels (default) is valid
+    SearchQuery(products=[VNP02IMG_EA], time_range=time_range, channels=None)
