@@ -10,7 +10,7 @@ To install the core package:
 
 ```bash
 # From the repository root
-pip install projects/aer_core
+pip install projects/aer-core
 ```
 
 This will install the `aer` package with the base components:
@@ -40,7 +40,7 @@ Plugins provide concrete implementations (e.g., search fetchers, download backen
 Using `aer-search-earthaccess` as an example:
 
 ```bash
-pip install projects/aer_search_earthaccess
+pip install projects/aer-search-earthaccess
 ```
 
 Once installed, the plugin automatically registers itself. You can verify this in a Python REPL:
