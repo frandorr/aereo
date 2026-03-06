@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import earthaccess
 import geopandas as gpd
@@ -74,50 +74,18 @@ def _parse_umm_polygon(
 
 @plugin(name="earthaccess", category="search")
 def search_earthaccess(query: SearchQuery) -> gpd.GeoDataFrame:
-    """Search for earthaccess data given a SearchQuery.
-
-    Args:
-        query: A ``SearchQuery`` containing products, time_range, and optionally
-            spatial_extent, cell_overlap_mode, and extra options passed
-            directly to ``earthaccess.search_data``.
-
-    Returns:
-        A ``gpd.GeoDataFrame`` with columns: product_name, granule_id, concept_id,
-        start_time, end_time, s3_url, https_url, size_mb, geometry, and (when
-        *spatial_extent* is given) grid_cells.
-
-    Raises:
-        ValueError: If both *spatial_extent* and *bounding_box* are specified.
-    """
+    """Search for earthaccess data given a SearchQuery."""
     if query.spatial_extent and "bounding_box" in query.options:
         raise ValueError(
             "Cannot specify both 'spatial_extent' and 'bounding_box'. "
             "The spatial_extent automatically derives the bounding box."
         )
 
-    temporal = (
-        query.time_range.start.strftime("%Y-%m-%d %H:%M:%S"),
-        query.time_range.end.strftime("%Y-%m-%d %H:%M:%S"),
-    )
+    search_params = _prepare_search_params(query)
+    results = earthaccess.search_data(**search_params)
 
-    short_names = [p.name for p in query.products]
-    # Build a lookup from product name to its Product object
-    product_by_name = {p.name: p for p in query.products}
-
-    # Apply bounding box filter if spatial_extent is provided
-    kwargs_for_search = dict(query.options)
-    if query.spatial_extent and query.spatial_extent.grid_cells:
-        all_bounds = unary_union(
-            [cell.bounds for cell in query.spatial_extent.grid_cells]
-        )
-        minx, miny, maxx, maxy = all_bounds.bounds
-        kwargs_for_search["bounding_box"] = (minx, miny, maxx, maxy)
-
-    results = earthaccess.search_data(
-        short_name=short_names, temporal=temporal, **kwargs_for_search
-    )
-
-    columns = [
+    # Columns to ensure in the result
+    base_columns = [
         "product_name",
         "granule_id",
         "concept_id",
@@ -127,85 +95,122 @@ def search_earthaccess(query: SearchQuery) -> gpd.GeoDataFrame:
         "https_url",
         "size_mb",
     ]
-    if query.spatial_extent:
-        columns.append("grid_cells")
+    columns = [*base_columns, "grid_cells"] if query.spatial_extent else base_columns
 
     if not results:
         return gpd.GeoDataFrame(columns=[*columns, "geometry"], geometry="geometry")
 
+    product_by_name = {p.name: p for p in query.products}
     rows = []
     geometries = []
+
     for granule in results:
-        meta = granule.get("meta", {})
-        umm = granule.get("umm", {})
-
-        # Get data links
-        direct_links = granule.data_links(access="direct")
-        external_links = granule.data_links(access="external")
-
-        s3_url = direct_links[0] if direct_links else None
-        https_url = external_links[0] if external_links else None
-
-        # Temporal extents
-        temporal_ext = umm.get("TemporalExtent", {})
-        range_dt = temporal_ext.get("RangeDateTime", {})
-        start_time = range_dt.get("BeginningDateTime")
-        end_time = range_dt.get("EndingDateTime")
-
-        # Determine exact product name from UMM metadata
-        coll_ref = umm.get("CollectionReference", {})
-        extracted_product_name = coll_ref.get("ShortName")
-
-        # Parse the granule footprint geometry
-        poly_result = _parse_umm_polygon(umm)
-        granule_poly = None
-        match poly_result:
-            case result.Success(poly):
-                granule_poly = poly
-            case result.Failure(e):
-                logger.warning(
-                    "Failed to parse UMM polygon",
-                    error=e,
-                    granule_id=meta.get("native-id"),
-                )
-
-        # Determine which channels this row covers
-        if query.channels is not None:
-            row_channels = query.channels
-        elif extracted_product_name and extracted_product_name in product_by_name:
-            row_channels = product_by_name[extracted_product_name].channels
-        else:
-            row_channels = ()
-
-        row_data: dict[str, Any] = {
-            "product_name": extracted_product_name,
-            "granule_id": meta.get("native-id"),
-            "concept_id": meta.get("concept-id"),
-            "start_time": pd.to_datetime(start_time) if start_time else None,
-            "end_time": pd.to_datetime(end_time) if end_time else None,
-            "s3_url": s3_url,
-            "https_url": https_url,
-            "size_mb": granule.size(),
-            "channels": row_channels,
-        }
-
-        # Check cell overlap if a spatial extent was requested
-        if query.spatial_extent:
-            contained_cells: list[str] = []
-            if granule_poly is not None:
-                overlap_fn = (
-                    granule_poly.contains
-                    if query.cell_overlap_mode == "contains"
-                    else granule_poly.intersects
-                )
-                contained_cells = [
-                    f"{cell.row}_{cell.col}"
-                    for cell in query.spatial_extent.grid_cells
-                    if overlap_fn(cell.bounds)
-                ]
-            row_data["grid_cells"] = contained_cells
-
+        row_data, granule_poly = _granule_to_row(granule, query, product_by_name)
         rows.append(row_data)
         geometries.append(granule_poly)
 
     return gpd.GeoDataFrame(rows, geometry=geometries)
+
+
+def _prepare_search_params(query: SearchQuery) -> dict[str, Any]:
+    """Prepare keyword arguments for earthaccess.search_data."""
+    temporal = (
+        query.time_range.start.strftime("%Y-%m-%d %H:%M:%S"),
+        query.time_range.end.strftime("%Y-%m-%d %H:%M:%S"),
+    )
+
+    kwargs = dict(query.options)
+    # Apply bounding box filter if spatial_extent is provided
+    if query.spatial_extent and query.spatial_extent.grid_cells:
+        all_bounds = unary_union(
+            [cell.bounds for cell in query.spatial_extent.grid_cells]
+        )
+        minx, miny, maxx, maxy = all_bounds.bounds
+        kwargs["bounding_box"] = (minx, miny, maxx, maxy)
+
+    return {
+        "short_name": [p.name for p in query.products],
+        "temporal": temporal,
+        **kwargs,
+    }
+
+
+def _granule_to_row(
+    granule: Any, query: SearchQuery, product_by_name: dict[str, Any]
+) -> tuple[dict[str, Any], Optional[Polygon]]:
+    """Map a single earthaccess granule to a GeoDataFrame row and its geometry."""
+    meta = granule.get("meta", {})
+    umm = granule.get("umm", {})
+
+    # Data links
+    direct_links = granule.data_links(access="direct")
+    external_links = granule.data_links(access="external")
+    s3_url = direct_links[0] if direct_links else None
+    https_url = external_links[0] if external_links else None
+
+    # Temporal extents
+    temporal_ext = umm.get("TemporalExtent", {})
+    range_dt = temporal_ext.get("RangeDateTime", {})
+    start_time = range_dt.get("BeginningDateTime")
+    end_time = range_dt.get("EndingDateTime")
+
+    # Short name and channels
+    coll_ref = umm.get("CollectionReference", {})
+    extracted_product_name = coll_ref.get("ShortName")
+
+    if query.channels is not None:
+        row_channels = query.channels
+    elif extracted_product_name and extracted_product_name in product_by_name:
+        row_channels = product_by_name[extracted_product_name].channels
+    else:
+        row_channels = ()
+
+    # Footprint geometry
+    poly_result = _parse_umm_polygon(umm)
+    granule_poly = None
+    match poly_result:
+        case result.Success(poly):
+            granule_poly = poly
+        case result.Failure(e):
+            logger.warning(
+                "Failed to parse UMM polygon",
+                error=e,
+                granule_id=meta.get("native-id"),
+            )
+
+    row_data: dict[str, Any] = {
+        "product_name": extracted_product_name,
+        "granule_id": meta.get("native-id"),
+        "concept_id": meta.get("concept-id"),
+        "start_time": pd.to_datetime(start_time),
+        "end_time": pd.to_datetime(end_time),
+        "s3_url": s3_url,
+        "https_url": https_url,
+        "size_mb": granule.size(),
+        "channels": row_channels,
+    }
+
+    if query.spatial_extent:
+        row_data["grid_cells"] = _calculate_grid_cells(
+            granule_poly, query.spatial_extent, query.cell_overlap_mode
+        )
+
+    return row_data, granule_poly
+
+
+def _calculate_grid_cells(
+    granule_poly: Optional[Polygon], spatial_extent: Any, overlap_mode: str
+) -> list[str]:
+    """Determine which grid cells overlap with the granule footprint."""
+    if granule_poly is None:
+        return []
+
+    overlap_fn = (
+        granule_poly.contains if overlap_mode == "contains" else granule_poly.intersects
+    )
+
+    return [
+        f"{cell.row}_{cell.col}"
+        for cell in spatial_extent.grid_cells
+        if overlap_fn(cell.bounds)
+    ]
