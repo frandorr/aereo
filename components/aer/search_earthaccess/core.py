@@ -101,6 +101,8 @@ def search_earthaccess(query: SearchQuery) -> gpd.GeoDataFrame:
     )
 
     short_names = [p.name for p in query.products]
+    # Build a lookup from product name to its Product object
+    product_by_name = {p.name: p for p in query.products}
 
     # Apply bounding box filter if spatial_extent is provided
     kwargs_for_search = dict(query.options)
@@ -167,6 +169,14 @@ def search_earthaccess(query: SearchQuery) -> gpd.GeoDataFrame:
                     granule_id=meta.get("native-id"),
                 )
 
+        # Determine which channels this row covers
+        if query.channels is not None:
+            row_channels = query.channels
+        elif extracted_product_name and extracted_product_name in product_by_name:
+            row_channels = product_by_name[extracted_product_name].channels
+        else:
+            row_channels = ()
+
         row_data: dict[str, Any] = {
             "product_name": extracted_product_name,
             "granule_id": meta.get("native-id"),
@@ -176,6 +186,7 @@ def search_earthaccess(query: SearchQuery) -> gpd.GeoDataFrame:
             "s3_url": s3_url,
             "https_url": https_url,
             "size_mb": granule.size(),
+            "channels": row_channels,
         }
 
         # Check cell overlap if a spatial extent was requested

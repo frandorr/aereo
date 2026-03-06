@@ -7,7 +7,7 @@ from pandera.typing.geopandas import GeoSeries
 from structlog import get_logger
 
 from aer.spatial import GridSpatialExtent
-from aer.spectral import Product
+from aer.spectral import Channel, Product
 from aer.temporal import TimeRange
 
 logger = get_logger()
@@ -16,13 +16,17 @@ logger = get_logger()
 class SearchResultSchema(pa.DataFrameModel):  # type: ignore[misc]
     """Schema defining the minimum required columns for search results.
 
-    Extra columns (e.g. ``grid_cells``) are allowed thanks to
+    Extra columns (e.g. ``grid_cells``, ``channels``) are allowed thanks to
     ``strict = False``.  Types are coerced so that, for example, a plugin
     returning ``size_mb`` as an integer will have it automatically cast to
     ``float``.
 
     The ``geometry`` column holds the granule footprint polygon (nullable
     because some products like GOES may not carry granule-level geometry).
+
+    The ``channels`` column holds a tuple of :class:`Channel` objects
+    indicating which spectral bands the row covers.  Downstream extraction
+    plugins use this to know which bands to read from the file.
     """
 
     product_name: Series[pa.String] = pa.Field(nullable=True)
@@ -49,6 +53,7 @@ class SearchQuery:
 
     products: list[Product]
     time_range: TimeRange
+    channels: tuple[Channel, ...] | None = None
     spatial_extent: GridSpatialExtent | None = None
     cell_overlap_mode: CellOverlapMode = "contains"
     options: dict[str, Any] = attrs.field(factory=dict)
