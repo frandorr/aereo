@@ -2,12 +2,11 @@ from typing import Any, Optional
 
 import earthaccess
 import geopandas as gpd
-import pandas as pd
 from returns import result
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from structlog import get_logger
-
+from datetime import datetime
 from aer.plugin import plugin
 from aer.search import SearchQuery, SearchResultSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -183,8 +182,8 @@ def _granule_to_row(
     row_data: dict[str, Any] = {
         "product_name": extracted_product_name,
         "granule_id": meta.get("native-id"),
-        "start_time": pd.to_datetime(start_time),
-        "end_time": pd.to_datetime(end_time),
+        "start_time": datetime.fromisoformat(start_time.replace("Z", "+00:00")),
+        "end_time": datetime.fromisoformat(end_time.replace("Z", "+00:00")),
         "s3_url": s3_url,
         "https_url": https_url,
         "size_mb": granule.size(),
