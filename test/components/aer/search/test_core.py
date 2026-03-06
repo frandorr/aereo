@@ -50,7 +50,6 @@ def test_schema_allows_extra_columns():
             {
                 "product_name": "VNP02IMG",
                 "granule_id": "G123",
-                "concept_id": "C123",
                 "start_time": pd.to_datetime("2023-01-01"),
                 "end_time": pd.to_datetime("2023-01-02"),
                 "s3_url": "s3://bucket/key",
@@ -84,7 +83,6 @@ def test_schema_allows_null_geometry():
             {
                 "product_name": "ABI-L1b-RadF",
                 "granule_id": "G999",
-                "concept_id": "C999",
                 "start_time": pd.to_datetime("2023-06-01"),
                 "end_time": pd.to_datetime("2023-06-02"),
                 "s3_url": "s3://goes-bucket/key",
@@ -110,7 +108,6 @@ def test_search_earthaccess_schema_validation():
     mock_granule.__getitem__ = lambda self, key: {
         "meta": {
             "native-id": "VIIRS_NRT.A2023001.1030.002.2023001123456",
-            "concept-id": "G1234567890-LPDAAC_ECS",
         },
         "umm": {
             "CollectionReference": {"ShortName": "VNP02IMG"},
@@ -172,7 +169,6 @@ def test_search_earthaccess_schema_validation():
     assert len(gdf) == 1
     assert gdf.iloc[0]["product_name"] == "VNP02IMG"
     assert gdf.iloc[0]["granule_id"] == "VIIRS_NRT.A2023001.1030.002.2023001123456"
-    assert gdf.iloc[0]["concept_id"] == "G1234567890-LPDAAC_ECS"
     assert gdf.iloc[0]["s3_url"] == "s3://nrt-bucket/VNP02IMG.A2023001.1030.002.nc"
     assert gdf.iloc[0]["size_mb"] == pytest.approx(256.7)
 
