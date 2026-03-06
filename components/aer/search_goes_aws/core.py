@@ -146,7 +146,6 @@ def search_goes_aws(query: SearchQuery) -> GeoDataFrame["SearchResultSchema"]:
                             {
                                 "product_name": product.name,
                                 "granule_id": filename,
-                                "concept_id": f"{satellite.name}_{product.name}",
                                 "start_time": meta["start_time"],
                                 "end_time": meta["end_time"],
                                 "s3_url": f"s3://{f_path}",
@@ -162,11 +161,10 @@ def search_goes_aws(query: SearchQuery) -> GeoDataFrame["SearchResultSchema"]:
                     )
 
     if not rows:
-        return gpd.GeoDataFrame(
+        gdf = gpd.GeoDataFrame(
             columns=[
                 "product_name",
                 "granule_id",
-                "concept_id",
                 "start_time",
                 "end_time",
                 "s3_url",
@@ -177,5 +175,7 @@ def search_goes_aws(query: SearchQuery) -> GeoDataFrame["SearchResultSchema"]:
             ],
             geometry="geometry",
         )
+        return SearchResultSchema.validate(gdf)
 
-    return gpd.GeoDataFrame(rows, geometry="geometry")
+    gdf = gpd.GeoDataFrame(rows, geometry="geometry")
+    return SearchResultSchema.validate(gdf)

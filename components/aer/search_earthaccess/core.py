@@ -89,7 +89,6 @@ def search_earthaccess(query: SearchQuery) -> GeoDataFrame["SearchResultSchema"]
     base_columns = [
         "product_name",
         "granule_id",
-        "concept_id",
         "start_time",
         "end_time",
         "s3_url",
@@ -99,7 +98,8 @@ def search_earthaccess(query: SearchQuery) -> GeoDataFrame["SearchResultSchema"]
     columns = [*base_columns, "grid_cells"] if query.spatial_extent else base_columns
 
     if not results:
-        return gpd.GeoDataFrame(columns=[*columns, "geometry"], geometry="geometry")
+        gdf = gpd.GeoDataFrame(columns=[*columns, "geometry"], geometry="geometry")
+        return SearchResultSchema.validate(gdf)
 
     product_by_name = {p.name: p for p in query.products}
     rows = []
@@ -110,7 +110,8 @@ def search_earthaccess(query: SearchQuery) -> GeoDataFrame["SearchResultSchema"]
         rows.append(row_data)
         geometries.append(granule_poly)
 
-    return gpd.GeoDataFrame(rows, geometry=geometries)
+    gdf = gpd.GeoDataFrame(rows, geometry=geometries)
+    return SearchResultSchema.validate(gdf)
 
 
 def _prepare_search_params(query: SearchQuery) -> dict[str, Any]:
@@ -182,7 +183,6 @@ def _granule_to_row(
     row_data: dict[str, Any] = {
         "product_name": extracted_product_name,
         "granule_id": meta.get("native-id"),
-        "concept_id": meta.get("concept-id"),
         "start_time": pd.to_datetime(start_time),
         "end_time": pd.to_datetime(end_time),
         "s3_url": s3_url,
