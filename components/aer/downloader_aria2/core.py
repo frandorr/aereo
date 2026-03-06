@@ -9,7 +9,8 @@ them. S3-to-HTTPS conversion is the caller's responsibility (see
 
 Usage::
 
-    from aer.downloader import DownloadRequest, DownloadMethod
+    from aer.downloader import DownloadRequest
+    from aer.plugin import plugin_registry
 
     reqs = [
         DownloadRequest(
@@ -19,7 +20,7 @@ Usage::
         ),
     ]
 
-    dl = DownloadMethod.get("aria2")
+    dl = plugin_registry.get("aria2")
     results = dl(reqs, max_concurrent=4)
 """
 
@@ -38,6 +39,7 @@ from aer.downloader import (
     DownloadResult,
     DownloadStatus,
 )
+from aer.plugin import plugin
 
 logger = get_logger()
 
@@ -101,6 +103,7 @@ def _write_input_file(
 # ---------------------------------------------------------------------------
 
 
+@plugin(name="aria2", category="download")
 def download_aria2(
     requests: list[DownloadRequest],
     *,
