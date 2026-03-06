@@ -1,0 +1,28 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatch-polylith-bricks", "hatchling" ]
+
+[project]
+name = "aer-product-goes-aws"
+version = "0.1.0"
+authors = [ { name = "Your Name" } ]
+requires-python = ">=3.13"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+  "aer-spectral-goes",
+]
+entry-points."aer.plugins".goes_aws = "aer.product_goes_aws.core:goes_aws_plugin"
+
+[tool.hatch]
+build.hooks.polylith-bricks = {}
+build.targets.wheel.packages = [ "aer" ]
+
+[tool.uv]
+sources.aer-spectral-goes = { workspace = true }
+
+[tool.polylith]
+bricks = {}

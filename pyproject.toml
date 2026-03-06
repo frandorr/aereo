@@ -38,6 +38,14 @@ dependencies = [
 entry-points."aer.plugins".aria2 = "aer.downloader_aria2.core:download_aria2"
 entry-points."aer.plugins".earthaccess = "aer.search_earthaccess.core:search_earthaccess"
 entry-points."aer.plugins".goes_aws = "aer.search_goes_aws.core:search_goes_aws"
+entry-points."aer.plugins".product_goes_aws = "aer.product_goes_aws.core:goes_aws_plugin"
+entry-points."aer.plugins".product_modis_earthaccess = "aer.product_modis_earthaccess.core:modis_earthaccess_plugin"
+entry-points."aer.plugins".product_sentinel3_earthaccess = "aer.product_sentinel3_earthaccess.core:sentinel3_earthaccess_plugin"
+entry-points."aer.plugins".product_viirs_earthaccess = "aer.product_viirs_earthaccess.core:viirs_earthaccess_plugin"
+entry-points."aer.plugins".spectral_goes = "aer.spectral_goes.core:goes_plugin"
+entry-points."aer.plugins".spectral_modis = "aer.spectral_modis.core:modis_plugin"
+entry-points."aer.plugins".spectral_sentinel3 = "aer.spectral_sentinel3.core:sentinel3_plugin"
+entry-points."aer.plugins".spectral_viirs = "aer.spectral_viirs.core:viirs_plugin"
 
 [dependency-groups]
 dev = [

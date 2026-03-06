@@ -29,11 +29,10 @@ class SearchResultSchema(pa.DataFrameModel):  # type: ignore[misc]
     plugins use this to know which bands to read from the file.
     """
 
-    product_name: Series[pa.String] = pa.Field(nullable=True)
-    granule_id: Series[pa.String] = pa.Field(nullable=True)
-    concept_id: Series[pa.String] = pa.Field(nullable=True)
-    start_time: Series[pa.DateTime] = pa.Field(nullable=True)
-    end_time: Series[pa.DateTime] = pa.Field(nullable=True)
+    product_name: Series[pa.String] = pa.Field(nullable=False)
+    granule_id: Series[pa.String] = pa.Field(nullable=False)
+    start_time: Series[pa.DateTime] = pa.Field(nullable=False)
+    end_time: Series[pa.DateTime] = pa.Field(nullable=False)
     s3_url: Series[pa.String] = pa.Field(nullable=True)
     https_url: Series[pa.String] = pa.Field(nullable=True)
     size_mb: Series[float] = pa.Field(nullable=True)

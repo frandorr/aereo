@@ -28,10 +28,7 @@ def main():
     category = args.category
     component_name = args.component or f"{category}_{name}"
     project_name = args.project or f"aer-{category}-{name}"
-    # Valid Python project directory will have dashes converted to underscores by poly
-    # BUT polylith CLI project directories might retain dashes? Wait, Poly CLI creates `projects/<name_with_underscores>` usually.
-    # We will let poly create the project, then determine the path.
-    project_dir = project_name.replace("-", "_")
+    project_dir = project_name
 
     print(f"Creating plugin '{name}' in category '{category}'")
     print(f"  Component: {component_name}")
@@ -71,7 +68,7 @@ __all__ = ["{name}_plugin"]
     )
 
     # 5. Add plugin entry points to pyproject files
-    entry_point_line = f'entry-points."aer.plugins".{name} = "aer.{component_name}.core:{name}_plugin"\\n'
+    entry_point_line = f'entry-points."aer.plugins".{component_name} = "aer.{component_name}.core:{name}_plugin"\n'
 
     print("Adding entry point to root pyproject.toml...")
     add_entry_point("pyproject.toml", entry_point_line)
@@ -137,7 +134,7 @@ def ensure_tool_polylith_brick(toml_path, component_name):
     # Find [tool.polylith] section
     for i, line in enumerate(lines):
         if line.startswith("[tool.polylith]"):
-            brick_line = f'{brick_attr} = "aer/{component_name}"\\n'
+            brick_line = f'{brick_attr} = "aer/{component_name}"\n'
             lines.insert(i + 1, brick_line)
             break
 
