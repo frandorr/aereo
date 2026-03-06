@@ -52,7 +52,19 @@ class SearchQuery:
 
     products: list[Product]
     time_range: TimeRange
-    channels: tuple[Channel, ...] | None = None
+    channels: tuple[Channel, ...] | None = attrs.field(default=None)
     spatial_extent: GridSpatialExtent | None = None
     cell_overlap_mode: CellOverlapMode = "contains"
     options: dict[str, Any] = attrs.field(factory=dict)
+
+    @channels.validator
+    def _validate_channels(
+        self, attribute: Any, value: tuple[Channel, ...] | None
+    ) -> None:
+        if value is not None:
+            allowed_channels = {c for p in self.products for c in p.channels}
+            if not set(value).issubset(allowed_channels):
+                raise ValueError(
+                    f"Requested channels {value} must be a subset of the channels available "
+                    f"in the provided products: {allowed_channels}"
+                )
