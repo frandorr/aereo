@@ -3,7 +3,7 @@ from typing import Any, Literal
 import attrs
 import pandera.pandas as pa
 from pandera.typing import Series
-from pandera.typing.geopandas import GeoSeries
+from pandera.typing.geopandas import GeoDataFrame, GeoSeries
 from structlog import get_logger
 
 from aer.spatial import GridSpatialExtent
@@ -17,7 +17,7 @@ logger = get_logger()
 class SearchPlugin(Protocol):
     """Protocol for search plugins."""
 
-    def search(self, query: "SearchQuery") -> pa.typing.DataFrame["SearchResultSchema"]:
+    def search(self, query: "SearchQuery") -> GeoDataFrame["SearchResultSchema"]:
         """Search for data given a SearchQuery."""
         ...
 
