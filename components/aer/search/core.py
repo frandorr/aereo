@@ -13,13 +13,7 @@ from typing import Protocol
 
 logger = get_logger()
 
-
-class SearchPlugin(Protocol):
-    """Protocol for search plugins."""
-
-    def search(self, query: "SearchQuery") -> GeoDataFrame["SearchResultSchema"]:
-        """Search for data given a SearchQuery."""
-        ...
+CellOverlapMode = Literal["contains", "intersects"]
 
 
 class SearchResultSchema(pa.DataFrameModel):  # type: ignore[misc]
@@ -52,7 +46,12 @@ class SearchResultSchema(pa.DataFrameModel):  # type: ignore[misc]
         coerce = True
 
 
-CellOverlapMode = Literal["contains", "intersects"]
+class SearchPlugin(Protocol):
+    """Protocol for search plugins."""
+
+    def search(self, query: "SearchQuery") -> GeoDataFrame["SearchResultSchema"]:
+        """Search for data given a SearchQuery."""
+        ...
 
 
 @attrs.define(frozen=True, slots=True, kw_only=True)
