@@ -9,8 +9,17 @@ from structlog import get_logger
 from aer.spatial import GridSpatialExtent
 from aer.spectral import Channel, Product
 from aer.temporal import TimeRange
+from typing import Protocol
 
 logger = get_logger()
+
+
+class SearchPlugin(Protocol):
+    """Protocol for search plugins."""
+
+    def search(self, query: "SearchQuery") -> pa.typing.DataFrame["SearchResultSchema"]:
+        """Search for data given a SearchQuery."""
+        ...
 
 
 class SearchResultSchema(pa.DataFrameModel):  # type: ignore[misc]
