@@ -8,7 +8,7 @@ from shapely.geometry import Polygon
 
 from aer.search import SearchQuery, SearchResultSchema
 from aer.temporal import TimeRange
-from aer.spectral import VNP02IMG
+from aer.spectral import VNP02IMG_EA
 
 
 def test_schema_rejects_missing_columns():
@@ -141,7 +141,7 @@ def test_search_earthaccess_schema_validation():
             start=datetime(2023, 1, 1, 10, 0),
             end=datetime(2023, 1, 1, 12, 0),
         )
-        query = SearchQuery(products=[VNP02IMG], time_range=time_range)
+        query = SearchQuery(products=[VNP02IMG_EA], time_range=time_range)
 
         # Call the plugin directly
         gdf = plugin(query)

@@ -1573,7 +1573,7 @@ SLSTR_CHANNELS = (
 # ==========================================
 
 # ABI Products
-ABI_L1B_RADF = Product(
+ABI_L1B_RADF_AWS = Product(
     name="ABI-L1b-RadF",
     instrument=Instrument.ABI,
     supported_satellites=frozenset(
@@ -1582,7 +1582,7 @@ ABI_L1B_RADF = Product(
     channels=ABI_CHANNELS,
 )
 
-ABI_L1B_RADC = Product(
+ABI_L1B_RADC_AWS = Product(
     name="ABI-L1b-RadC",
     instrument=Instrument.ABI,
     supported_satellites=frozenset(
@@ -1591,7 +1591,7 @@ ABI_L1B_RADC = Product(
     channels=ABI_CHANNELS,
 )
 
-ABI_L1B_RADM = Product(
+ABI_L1B_RADM_AWS = Product(
     name="ABI-L1b-RadM",
     instrument=Instrument.ABI,
     supported_satellites=frozenset(
@@ -1601,21 +1601,21 @@ ABI_L1B_RADM = Product(
 )
 
 # VIIRS S-NPP Products
-VNP02IMG = Product(
+VNP02IMG_EA = Product(
     name="VNP02IMG",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.SNPP]),
     channels=(VIIRS_I1, VIIRS_I2, VIIRS_I3, VIIRS_I4, VIIRS_I5),
 )
 
-VNP03IMG = Product(
+VNP03IMG_EA = Product(
     name="VNP03IMG",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.SNPP]),
     channels=(),
 )
 
-VNP02MOD = Product(
+VNP02MOD_EA = Product(
     name="VNP02MOD",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.SNPP]),
@@ -1639,21 +1639,21 @@ VNP02MOD = Product(
     ),
 )
 
-VNP03MOD = Product(
+VNP03MOD_EA = Product(
     name="VNP03MOD",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.SNPP]),
     channels=(),
 )
 
-VNP02DNB = Product(
+VNP02DNB_EA = Product(
     name="VNP02DNB",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.SNPP]),
     channels=(VIIRS_DNB,),
 )
 
-VNP03DNB = Product(
+VNP03DNB_EA = Product(
     name="VNP03DNB",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.SNPP]),
@@ -1661,21 +1661,21 @@ VNP03DNB = Product(
 )
 
 # VIIRS NOAA-20 Products
-VJ102IMG = Product(
+VJ102IMG_EA = Product(
     name="VJ102IMG",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.NOAA_20]),
     channels=(VIIRS_I1, VIIRS_I2, VIIRS_I3, VIIRS_I4, VIIRS_I5),
 )
 
-VJ103IMG = Product(
+VJ103IMG_EA = Product(
     name="VJ103IMG",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.NOAA_20]),
     channels=(),
 )
 
-VJ102MOD = Product(
+VJ102MOD_EA = Product(
     name="VJ102MOD",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.NOAA_20]),
@@ -1699,21 +1699,21 @@ VJ102MOD = Product(
     ),
 )
 
-VJ103MOD = Product(
+VJ103MOD_EA = Product(
     name="VJ103MOD",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.NOAA_20]),
     channels=(),
 )
 
-VJ102DNB = Product(
+VJ102DNB_EA = Product(
     name="VJ102DNB",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.NOAA_20]),
     channels=(VIIRS_DNB,),
 )
 
-VJ103DNB = Product(
+VJ103DNB_EA = Product(
     name="VJ103DNB",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.NOAA_20]),
@@ -1721,21 +1721,21 @@ VJ103DNB = Product(
 )
 
 # VIIRS NOAA-21 Products
-VJ202IMG = Product(
+VJ202IMG_EA = Product(
     name="VJ202IMG",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.NOAA_21]),
     channels=(VIIRS_I1, VIIRS_I2, VIIRS_I3, VIIRS_I4, VIIRS_I5),
 )
 
-VJ203IMG = Product(
+VJ203IMG_EA = Product(
     name="VJ203IMG",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.NOAA_21]),
     channels=(),
 )
 
-VJ202MOD = Product(
+VJ202MOD_EA = Product(
     name="VJ202MOD",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.NOAA_21]),
@@ -1759,21 +1759,21 @@ VJ202MOD = Product(
     ),
 )
 
-VJ203MOD = Product(
+VJ203MOD_EA = Product(
     name="VJ203MOD",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.NOAA_21]),
     channels=(),
 )
 
-VJ202DNB = Product(
+VJ202DNB_EA = Product(
     name="VJ202DNB",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.NOAA_21]),
     channels=(VIIRS_DNB,),
 )
 
-VJ203DNB = Product(
+VJ203DNB_EA = Product(
     name="VJ203DNB",
     instrument=Instrument.VIIRS,
     supported_satellites=frozenset([Satellite.NOAA_21]),
@@ -1781,14 +1781,14 @@ VJ203DNB = Product(
 )
 
 # MODIS Products
-MODIS_02QKM = Product(
+MODIS_02QKM_EA = Product(
     name="MOD02QKM",
     instrument=Instrument.MODIS,
     supported_satellites=frozenset([Satellite.TERRA]),
     channels=(MODIS_BAND_1, MODIS_BAND_2),
 )
 
-MODIS_02HKM = Product(
+MODIS_02HKM_EA = Product(
     name="MOD02HKM",
     instrument=Instrument.MODIS,
     supported_satellites=frozenset([Satellite.TERRA]),
@@ -1803,21 +1803,21 @@ MODIS_02HKM = Product(
     ),
 )
 
-MODIS_021KM = Product(
+MODIS_021KM_EA = Product(
     name="MOD021KM",
     instrument=Instrument.MODIS,
     supported_satellites=frozenset([Satellite.TERRA]),
     channels=MODIS_CHANNELS,
 )
 
-MYDIS_02QKM = Product(
+MYDIS_02QKM_EA = Product(
     name="MYD02QKM",
     instrument=Instrument.MODIS,
     supported_satellites=frozenset([Satellite.AQUA]),
     channels=(MODIS_BAND_1, MODIS_BAND_2),
 )
 
-MYDIS_02HKM = Product(
+MYDIS_02HKM_EA = Product(
     name="MYD02HKM",
     instrument=Instrument.MODIS,
     supported_satellites=frozenset([Satellite.AQUA]),
@@ -1832,7 +1832,7 @@ MYDIS_02HKM = Product(
     ),
 )
 
-MYDIS_021KM = Product(
+MYDIS_021KM_EA = Product(
     name="MYD021KM",
     instrument=Instrument.MODIS,
     supported_satellites=frozenset([Satellite.AQUA]),
@@ -1840,28 +1840,28 @@ MYDIS_021KM = Product(
 )
 
 # Sentinel-3 Products
-SENTINEL_3_OLCI_1_EFR_NRT = Product(
+SENTINEL_3_OLCI_1_EFR_NRT_EA = Product(
     name="sentinel-3-olci-1-efr-nrt",
     instrument=Instrument.OLCI,
     supported_satellites=frozenset([Satellite.SENTINEL_3A, Satellite.SENTINEL_3B]),
     channels=OLCI_CHANNELS,
 )
 
-SENTINEL_3_OLCI_1_EFR_NTC = Product(
+SENTINEL_3_OLCI_1_EFR_NTC_EA = Product(
     name="sentinel-3-olci-1-efr-ntc",
     instrument=Instrument.OLCI,
     supported_satellites=frozenset([Satellite.SENTINEL_3A, Satellite.SENTINEL_3B]),
     channels=OLCI_CHANNELS,
 )
 
-SENTINEL_3_SLSTR_1_RBT_NRT = Product(
+SENTINEL_3_SLSTR_1_RBT_NRT_EA = Product(
     name="sentinel-3-slstr-1-rbt-nrt",
     instrument=Instrument.SLSTR,
     supported_satellites=frozenset([Satellite.SENTINEL_3A, Satellite.SENTINEL_3B]),
     channels=SLSTR_CHANNELS,
 )
 
-SENTINEL_3_SLSTR_1_RBT_NTC = Product(
+SENTINEL_3_SLSTR_1_RBT_NTC_EA = Product(
     name="sentinel-3-slstr-1-rbt-ntc",
     instrument=Instrument.SLSTR,
     supported_satellites=frozenset([Satellite.SENTINEL_3A, Satellite.SENTINEL_3B]),

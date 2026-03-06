@@ -10,7 +10,7 @@ from aer.search import SearchQuery
 from aer.search_earthaccess import search_earthaccess
 from aer.search_earthaccess.core import _parse_umm_polygon
 from aer.temporal import TimeRange
-from aer.spectral import VNP02IMG, MODIS_02QKM
+from aer.spectral import VNP02IMG_EA, MODIS_02QKM_EA
 from aer.spatial import GridCell, GridSpatialExtent, GridDefinition
 
 GRID_FIXTURE_PATH = (
@@ -24,7 +24,7 @@ def test_search_earthaccess_empty():
     )
     with patch("aer.search_earthaccess.core.earthaccess.search_data") as mock_search:
         mock_search.return_value = []
-        query = SearchQuery(products=[VNP02IMG], time_range=time_range)
+        query = SearchQuery(products=[VNP02IMG_EA], time_range=time_range)
         gdf = search_earthaccess(query)
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert gdf.empty
@@ -32,7 +32,7 @@ def test_search_earthaccess_empty():
         assert "geometry" in gdf.columns
         mock_search.assert_called_once()
         kwargs = mock_search.call_args.kwargs
-        assert kwargs["short_name"] == [VNP02IMG.name]
+        assert kwargs["short_name"] == [VNP02IMG_EA.name]
         assert kwargs["temporal"] == ("2023-01-01 00:00:00", "2023-01-01 01:00:00")
 
 
@@ -45,7 +45,7 @@ def test_search_earthaccess_results():
         granule.get.side_effect = lambda k, d=None: {
             "meta": {"native-id": "123", "concept-id": "C123"},
             "umm": {
-                "CollectionReference": {"ShortName": VNP02IMG.name},
+                "CollectionReference": {"ShortName": VNP02IMG_EA.name},
                 "TemporalExtent": {
                     "RangeDateTime": {
                         "BeginningDateTime": "2023-01-01T00:05:00Z",
@@ -63,12 +63,12 @@ def test_search_earthaccess_results():
 
         mock_search.return_value = [granule]
 
-        query = SearchQuery(products=[VNP02IMG], time_range=time_range)
+        query = SearchQuery(products=[VNP02IMG_EA], time_range=time_range)
         gdf = search_earthaccess(query)
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert not gdf.empty
         assert len(gdf) == 1
-        assert gdf.iloc[0]["product_name"] == VNP02IMG.name
+        assert gdf.iloc[0]["product_name"] == VNP02IMG_EA.name
         assert gdf.iloc[0]["s3_url"] == "s3://bucket/test.nc"
         assert gdf.iloc[0]["https_url"] == "https://bucket/test.nc"
         assert gdf.iloc[0]["size_mb"] == 15.5
@@ -83,16 +83,16 @@ def test_search_earthaccess_real_vnp02img():
         start=datetime(2024, 1, 1, 0, 0), end=datetime(2024, 1, 1, 2, 0)
     )
     query = SearchQuery(
-        products=[VNP02IMG], time_range=time_range, options={"count": 10}
+        products=[VNP02IMG_EA], time_range=time_range, options={"count": 10}
     )
     df = search_earthaccess(query)
 
     assert not df.empty, (
-        f"Expected non-empty results for {VNP02IMG.name} over {time_range}"
+        f"Expected non-empty results for {VNP02IMG_EA.name} over {time_range}"
     )
     assert "product_name" in df.columns
     assert "s3_url" in df.columns
-    assert df.iloc[0]["product_name"] == VNP02IMG.name
+    assert df.iloc[0]["product_name"] == VNP02IMG_EA.name
 
 
 @pytest.mark.slow
@@ -101,27 +101,29 @@ def test_search_earthaccess_real_modis():
         start=datetime(2024, 1, 1, 0, 0), end=datetime(2024, 1, 1, 2, 0)
     )
     query = SearchQuery(
-        products=[MODIS_02QKM], time_range=time_range, options={"count": 10}
+        products=[MODIS_02QKM_EA], time_range=time_range, options={"count": 10}
     )
     df = search_earthaccess(query)
 
     assert not df.empty, (
-        f"Expected non-empty results for {MODIS_02QKM.name} over {time_range}"
+        f"Expected non-empty results for {MODIS_02QKM_EA.name} over {time_range}"
     )
     assert "product_name" in df.columns
     assert "s3_url" in df.columns
-    assert df.iloc[0]["product_name"] == MODIS_02QKM.name
+    assert df.iloc[0]["product_name"] == MODIS_02QKM_EA.name
 
 
 @pytest.mark.slow
 def test_search_earthaccess_real_multiple():
-    from aer.spectral import VNP03IMG
+    from aer.spectral import VNP03IMG_EA
 
     time_range = TimeRange(
         start=datetime(2024, 1, 1, 0, 0), end=datetime(2024, 1, 1, 1, 0)
     )
     query = SearchQuery(
-        products=[VNP02IMG, VNP03IMG], time_range=time_range, options={"count": 10}
+        products=[VNP02IMG_EA, VNP03IMG_EA],
+        time_range=time_range,
+        options={"count": 10},
     )
     df = search_earthaccess(query)
 
@@ -130,8 +132,8 @@ def test_search_earthaccess_real_multiple():
     )
     assert "product_name" in df.columns
     pnames = set(df["product_name"].unique())
-    assert VNP02IMG.name in pnames
-    assert VNP03IMG.name in pnames
+    assert VNP02IMG_EA.name in pnames
+    assert VNP03IMG_EA.name in pnames
 
 
 @pytest.mark.slow
@@ -139,9 +141,11 @@ def test_search_earthaccess_real_multiple_constellations():
     time_range = TimeRange(
         start=datetime(2024, 1, 1, 0, 0), end=datetime(2024, 1, 1, 1, 0)
     )
-    # Query across VIIRS (VNP02IMG) and MODIS (MODIS_02QKM)
+    # Query across VIIRS (VNP02IMG_EA) and MODIS (MODIS_02QKM_EA)
     query = SearchQuery(
-        products=[VNP02IMG, MODIS_02QKM], time_range=time_range, options={"count": 10}
+        products=[VNP02IMG_EA, MODIS_02QKM_EA],
+        time_range=time_range,
+        options={"count": 10},
     )
     df = search_earthaccess(query)
 
@@ -150,8 +154,10 @@ def test_search_earthaccess_real_multiple_constellations():
     )
     assert "product_name" in df.columns
     pnames = set(df["product_name"].unique())
-    assert VNP02IMG.name in pnames, f"Expected to find {VNP02IMG.name} in results"
-    assert MODIS_02QKM.name in pnames, f"Expected to find {MODIS_02QKM.name} in results"
+    assert VNP02IMG_EA.name in pnames, f"Expected to find {VNP02IMG_EA.name} in results"
+    assert MODIS_02QKM_EA.name in pnames, (
+        f"Expected to find {MODIS_02QKM_EA.name} in results"
+    )
 
 
 def test_search_earthaccess_with_spatial_extent():
@@ -182,7 +188,7 @@ def test_search_earthaccess_with_spatial_extent():
         granule.get.side_effect = lambda k, d=None: {
             "meta": {"native-id": "123", "concept-id": "C123"},
             "umm": {
-                "CollectionReference": {"ShortName": VNP02IMG.name},
+                "CollectionReference": {"ShortName": VNP02IMG_EA.name},
                 "TemporalExtent": {
                     "RangeDateTime": {
                         "BeginningDateTime": "2023-01-01T00:05:00Z",
@@ -214,7 +220,7 @@ def test_search_earthaccess_with_spatial_extent():
         mock_search.return_value = [granule]
 
         query = SearchQuery(
-            products=[VNP02IMG], time_range=time_range, spatial_extent=spatial_extent
+            products=[VNP02IMG_EA], time_range=time_range, spatial_extent=spatial_extent
         )
         df = search_earthaccess(query)
 
@@ -247,7 +253,7 @@ def test_search_earthaccess_spatial_extent_and_bounding_box_raises():
     spatial_extent = GridSpatialExtent(frozenset([cell]))
 
     query = SearchQuery(
-        products=[VNP02IMG],
+        products=[VNP02IMG_EA],
         time_range=time_range,
         spatial_extent=spatial_extent,
         options={"bounding_box": (-10, 35, 0, 45)},
@@ -277,7 +283,7 @@ def test_search_earthaccess_intersects_mode():
         granule.get.side_effect = lambda k, d=None: {
             "meta": {"native-id": "456", "concept-id": "C456"},
             "umm": {
-                "CollectionReference": {"ShortName": VNP02IMG.name},
+                "CollectionReference": {"ShortName": VNP02IMG_EA.name},
                 "TemporalExtent": {
                     "RangeDateTime": {
                         "BeginningDateTime": "2023-01-01T00:05:00Z",
@@ -309,7 +315,7 @@ def test_search_earthaccess_intersects_mode():
 
         # "contains" mode should NOT match (cell extends beyond the granule)
         query_contains = SearchQuery(
-            products=[VNP02IMG],
+            products=[VNP02IMG_EA],
             time_range=time_range,
             spatial_extent=spatial_extent,
             cell_overlap_mode="contains",
@@ -319,7 +325,7 @@ def test_search_earthaccess_intersects_mode():
 
         # "intersects" mode SHOULD match (partial overlap)
         query_intersects = SearchQuery(
-            products=[VNP02IMG],
+            products=[VNP02IMG_EA],
             time_range=time_range,
             spatial_extent=spatial_extent,
             cell_overlap_mode="intersects",
@@ -429,7 +435,7 @@ def test_search_earthaccess_real_spatial_extent():
     )
 
     query = SearchQuery(
-        products=[VNP02IMG],
+        products=[VNP02IMG_EA],
         time_range=time_range,
         spatial_extent=spatial_extent,
         options={"count": 5},
