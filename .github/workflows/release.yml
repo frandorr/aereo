@@ -11,7 +11,7 @@ jobs:
 
     permissions:
       id-token: write
-      contents: read
+      contents: write
 
     environment: pypi
 
@@ -48,3 +48,9 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
