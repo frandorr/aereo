@@ -5,10 +5,17 @@ requires = [ "hatch-polylith-bricks", "hatchling" ]
 [project]
 name = "aer-core"
 version = "1.0.1"
-description = "Core foundational components of the aer project"
+description = "A modular, high-performance capability-graph framework for processing Earth Observation sensor data."
 readme = "README.md"
+keywords = [
+  "earth-observation",
+  "gis",
+  "polylith",
+  "remote-sensing",
+  "satellite",
+]
 license = { text = "MIT" }
-authors = [ { name = "Fran Dorr" } ]
+authors = [ { name = "Francisco Dorr", email = "fran.dorr@gmail.com" } ]
 requires-python = ">=3.13"
 classifiers = [
   "License :: OSI Approved :: MIT License",
