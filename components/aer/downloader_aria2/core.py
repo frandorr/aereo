@@ -6,22 +6,6 @@ All requests run in parallel via a single ``aria2c -i input_file`` call.
 The module is **protocol-agnostic**: it receives HTTPS/HTTP URIs and downloads
 them. S3-to-HTTPS conversion is the caller's responsibility (see
 ``aer.downloader.s3_uri_to_https``).
-
-Usage::
-
-    from aer.downloader import DownloadRequest
-    from aer.plugin import plugin_registry
-
-    reqs = [
-        DownloadRequest(
-            uri="https://ladsweb.modaps.eosdis.nasa.gov/archive/file.hdf",
-            dest_dir="/data/downloads",
-            headers={"Authorization": "Bearer <token>"},
-        ),
-    ]
-
-    dl = plugin_registry.get("aria2")
-    results = dl(reqs, max_concurrent=4)
 """
 
 from __future__ import annotations
@@ -32,14 +16,12 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from pandera.typing.geopandas import GeoDataFrame
 from structlog import get_logger
 
-from aer.downloader import (
-    DownloadRequest,
-    DownloadResult,
-    DownloadStatus,
-)
+from aer.downloader import DownloadedResultSchema, DownloadStatus
 from aer.plugin import plugin
+from aer.search import SearchResultSchema
 
 logger = get_logger()
 
@@ -49,11 +31,9 @@ logger = get_logger()
 # ---------------------------------------------------------------------------
 
 
-def _resolve_filename(req: DownloadRequest) -> str:
-    """Derive a filename from the request or the URI's last path segment."""
-    if req.filename:
-        return str(req.filename)
-    return str(req.uri.rsplit("/", 1)[-1].split("?")[0] or "download")
+def _resolve_filename(uri: str) -> str:
+    """Derive a filename from the URI's last path segment."""
+    return uri.rsplit("/", 1)[-1].split("?")[0] or "download"
 
 
 def _ensure_aria2c() -> str:
@@ -69,29 +49,25 @@ def _ensure_aria2c() -> str:
 
 
 def _write_input_file(
-    requests: list[DownloadRequest],
+    uris: list[str],
     filenames: list[str],
+    dest_dir: Path,
     path: Path,
+    headers: dict[str, str] | None = None,
+    options: dict[str, Any] | None = None,
 ) -> None:
-    """Write an aria2c input file with per-URI options.
-
-    Format (from aria2c docs)::
-
-        URI
-          dir=/path/to/dir
-          out=filename
-          header=Authorization: Bearer xyz
-
-    Entries are separated by blank lines.
-    """
+    """Write an aria2c input file with per-URI options."""
+    headers = headers or {}
+    options = options or {}
     lines: list[str] = []
-    for req, filename in zip(requests, filenames):
-        lines.append(req.uri)
-        lines.append(f"  dir={req.dest_dir}")
+
+    for uri, filename in zip(uris, filenames):
+        lines.append(uri)
+        lines.append(f"  dir={dest_dir}")
         lines.append(f"  out={filename}")
-        for key, value in req.headers.items():
+        for key, value in headers.items():
             lines.append(f"  header={key}: {value}")
-        for opt_key, opt_val in req.options.items():
+        for opt_key, opt_val in options.items():
             lines.append(f"  {opt_key}={opt_val}")
         lines.append("")  # blank line separates entries
 
@@ -105,48 +81,68 @@ def _write_input_file(
 
 @plugin(name="aria2", category="download")
 def download_aria2(
-    requests: list[DownloadRequest],
+    gdf: GeoDataFrame["SearchResultSchema"],
+    dest_dir: Path | str,
     *,
     max_concurrent: int = 5,
     timeout: int = 600,
     verbose: bool = False,
+    headers: dict[str, str] | None = None,
+    options: dict[str, Any] | None = None,
     extra_args: list[str] | None = None,
     **kwargs: Any,
-) -> list[DownloadResult]:
+) -> GeoDataFrame["DownloadedResultSchema"]:
     """Download files in parallel using a single ``aria2c -i`` call.
 
     All requests are written to a temporary input file and processed
     by one ``aria2c`` invocation.  Aria2c handles parallelism natively
     via ``--max-concurrent-downloads``.
 
-    URIs must be HTTP/HTTPS.  For S3 URIs, convert them first with
-    ``aer.downloader.s3_uri_to_https`` before creating the requests.
-
     Args:
-        requests: Download requests to process.
+        gdf: DataFrame of search results to download.
+        dest_dir: Local directory where files should be saved.
         max_concurrent: Max number of parallel downloads (default 5).
         timeout: Overall timeout in seconds (default 600).
-        verbose: If ``True``, aria2c prints real-time download progress
-            (speed, ETA, percentage) directly to the console.
+        verbose: If ``True``, aria2c prints real-time download progress.
+        headers: Optional mapping of extra HTTP headers (e.g. ``Authorization: Bearer …``).
+        options: Backend-specific options forwarded as-is to aria2.
         extra_args: Additional CLI flags forwarded to ``aria2c``.
         **kwargs: Reserved for forward compatibility.
 
     Returns:
-        A list of ``DownloadResult`` in the same order as *requests*.
-
-    Raises:
-        FileNotFoundError: If ``aria2c`` is not installed.
+        A new GeoDataFrame conforming to DownloadedResultSchema.
     """
-    if not requests:
-        return []
+    dest_path = Path(dest_dir)
+    res_gdf = gdf.copy()
+
+    import pandas as pd
+
+    if len(res_gdf) == 0:
+        res_gdf["local_path"] = pd.Series([], dtype="string")
+        res_gdf["download_status"] = pd.Series([], dtype="string")
+        return DownloadedResultSchema.validate(res_gdf)
+
+    # Initialize new columns
+    res_gdf["local_path"] = pd.Series(
+        [None] * len(res_gdf), dtype="string", index=res_gdf.index
+    )
+    res_gdf["download_status"] = pd.Series(
+        ["skipped"] * len(res_gdf), dtype="string", index=res_gdf.index
+    )
+
+    valid_mask = res_gdf["https_url"].notna()
+    if not valid_mask.any():
+        return DownloadedResultSchema.validate(res_gdf)
+
+    # Filter valid URLs to download
+    to_download = res_gdf[valid_mask]
+    uris = to_download["https_url"].tolist()
 
     aria2c = _ensure_aria2c()
 
     # Resolve filenames and ensure dest dirs exist
-    filenames: list[str] = []
-    for req in requests:
-        filenames.append(_resolve_filename(req))
-        req.dest_dir.mkdir(parents=True, exist_ok=True)
+    filenames: list[str] = [_resolve_filename(uri) for uri in uris]
+    dest_path.mkdir(parents=True, exist_ok=True)
 
     # Write the input file
     with tempfile.NamedTemporaryFile(
@@ -157,11 +153,11 @@ def download_aria2(
     ) as tmp:
         input_file = Path(tmp.name)
 
-    _write_input_file(requests, filenames, input_file)
+    _write_input_file(uris, filenames, dest_path, input_file, headers, options)
 
     logger.info(
         "download_batch_started",
-        count=len(requests),
+        count=len(uris),
         input_file=str(input_file),
         max_concurrent=max_concurrent,
     )
@@ -179,7 +175,6 @@ def download_aria2(
         "--auto-file-renaming=false",
         "--max-tries=3",
         "--retry-wait=5",
-        # Console output level: verbose shows real-time progress
         f"--console-log-level={'notice' if verbose else 'warn'}",
         f"--summary-interval={'1' if verbose else '0'}",
     ]
@@ -199,73 +194,57 @@ def download_aria2(
         error_output = ""
         if not verbose and aria2_failed:
             error_output = (proc.stderr or "").strip() or (proc.stdout or "").strip()
+        batch_timed_out = False
     except subprocess.TimeoutExpired:
         logger.warning("download_batch_timeout", timeout=timeout)
-        # All requests timed out
-        return [
-            DownloadResult(
-                request=req,
-                status=DownloadStatus.FAILED,
-                error=f"Batch timed out after {timeout}s",
-            )
-            for req in requests
-        ]
+        aria2_failed = True
+        error_output = f"Batch timed out after {timeout}s"
+        batch_timed_out = True
     except Exception as exc:
         logger.error("download_batch_error", error=str(exc))
-        return [
-            DownloadResult(
-                request=req,
-                status=DownloadStatus.FAILED,
-                error=str(exc),
-            )
-            for req in requests
-        ]
+        aria2_failed = True
+        error_output = str(exc)
+        batch_timed_out = True
     finally:
         # Clean up the input file
         input_file.unlink(missing_ok=True)
 
-    # Build results by checking which files actually landed on disk
-    results: list[DownloadResult] = []
-    for req, filename in zip(requests, filenames):
-        dest_path = req.dest_dir / filename
-        if dest_path.exists():
-            size = dest_path.stat().st_size
+    # Build results array
+    local_paths: list[str | None] = []
+    statuses: list[str] = []
+
+    for uri, filename in zip(uris, filenames):
+        if batch_timed_out:
+            local_paths.append(None)
+            statuses.append(DownloadStatus.FAILED.value)
+            continue
+
+        dest_file = dest_path / filename
+        if dest_file.exists() and dest_file.stat().st_size > 0:
+            size_bytes = dest_file.stat().st_size
             logger.info(
                 "download_complete",
-                uri=req.uri,
-                path=str(dest_path),
-                bytes=size,
+                uri=uri,
+                path=str(dest_file),
+                bytes=size_bytes,
             )
-            results.append(
-                DownloadResult(
-                    request=req,
-                    status=DownloadStatus.COMPLETE,
-                    path=dest_path,
-                    bytes_downloaded=size,
-                )
-            )
+            local_paths.append(str(dest_file))
+            statuses.append(DownloadStatus.COMPLETE.value)
         else:
-            error_msg = (
-                error_output
-                if aria2_failed
-                else f"File not found after download: {dest_path}"
-            )
+            local_paths.append(None)
+            statuses.append(DownloadStatus.FAILED.value)
+            if not aria2_failed:
+                error_msg = f"File not found or empty after download: {dest_file}"
+            else:
+                error_msg = error_output
             logger.warning(
                 "download_failed",
-                uri=req.uri,
+                uri=uri,
                 error=error_msg,
             )
-            results.append(
-                DownloadResult(
-                    request=req,
-                    status=DownloadStatus.FAILED,
-                    error=error_msg,
-                )
-            )
 
-    return results
+    # Re-assign back to res_gdf using the valid index
+    res_gdf.loc[valid_mask, "local_path"] = local_paths
+    res_gdf.loc[valid_mask, "download_status"] = statuses
 
-
-# ---------------------------------------------------------------------------
-# End of file
-# ---------------------------------------------------------------------------
+    return DownloadedResultSchema.validate(res_gdf)
