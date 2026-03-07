@@ -5,12 +5,18 @@ requires = [ "hatch-polylith-bricks", "hatchling" ]
 [project]
 name = "aer-downloader-aria2"
 version = "1.0.1"
+description = "aria2-based downloader plugin for AER"
+readme = "README.md"
+license = { text = "MIT" }
 authors = [ { name = "Fran Dorr" } ]
 requires-python = ">=3.13"
 classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: GIS",
 ]
 dependencies = [
   "aer-core",
@@ -22,6 +28,9 @@ dependencies = [
   "structlog>=25.1,<26",
   "utm>=0.7",
 ]
+urls.Homepage = "https://github.com/frandorr/aer"
+urls.Issues = "https://github.com/frandorr/aer/issues"
+urls.Repository = "https://github.com/frandorr/aer"
 entry-points."aer.plugins".aria2 = "aer.downloader_aria2.core:download_aria2"
 
 [tool.hatch]
