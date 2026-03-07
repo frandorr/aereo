@@ -5,15 +5,13 @@ download backend (aria2, wget, etc.).
 """
 
 from aer.downloader.core import (
-    DownloadRequest,
-    DownloadResult,
+    DownloadedResultSchema,
     DownloadStatus,
     s3_uri_to_https,
 )
 
 __all__ = [
-    "DownloadRequest",
-    "DownloadResult",
+    "DownloadedResultSchema",
     "DownloadStatus",
     "s3_uri_to_https",
 ]

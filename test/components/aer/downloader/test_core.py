@@ -1,87 +1,38 @@
 """Tests for the downloader domain model (registry, value objects, URI utilities)."""
 
-import pytest
-from pathlib import Path
-
 from aer.downloader import (
-    DownloadRequest,
-    DownloadResult,
+    DownloadedResultSchema,
     DownloadStatus,
     s3_uri_to_https,
 )
 
 
-# ---------------------------------------------------------------------------
-# DownloadRequest
-# ---------------------------------------------------------------------------
+import geopandas as gpd
+import pandas as pd
+from shapely.geometry import Point
 
 
-class TestDownloadRequest:
-    def test_minimal_request(self):
-        req = DownloadRequest(uri="https://example.com/file.hdf", dest_dir="/tmp/dl")
-        assert req.uri == "https://example.com/file.hdf"
-        assert req.dest_dir == Path("/tmp/dl")
-        assert req.filename is None
-        assert req.headers == {}
-        assert req.options == {}
-
-    def test_full_request(self):
-        req = DownloadRequest(
-            uri="s3://bucket/key/file.nc",
-            dest_dir="/data/out",
-            filename="custom.nc",
-            headers={"Authorization": "Bearer tok123"},
-            options={"max-tries": "5"},
+class TestDownloadedResultSchema:
+    def test_validates_schema(self):
+        df = pd.DataFrame(
+            {
+                "product_name": ["VNP02IMG"],
+                "granule_id": ["G1"],
+                "start_time": [pd.Timestamp("2024-01-01T00:00:00")],
+                "end_time": [pd.Timestamp("2024-01-01T00:05:00")],
+                "s3_url": ["s3://bucket/data.nc"],
+                "https_url": ["https://example.com/data.nc"],
+                "size_mb": [10.5],
+                "local_path": ["/tmp/data.nc"],
+                "download_status": [DownloadStatus.COMPLETE.value],
+            }
         )
-        assert req.filename == "custom.nc"
-        assert req.headers["Authorization"] == "Bearer tok123"
-        assert req.options["max-tries"] == "5"
+        gdf = gpd.GeoDataFrame(df, geometry=[Point(0, 0)])
 
-    def test_dest_dir_converted_to_path(self):
-        req = DownloadRequest(uri="https://x.com/f", dest_dir="/tmp/x")
-        assert isinstance(req.dest_dir, Path)
-
-    def test_request_is_frozen(self):
-        req = DownloadRequest(uri="https://x.com/f", dest_dir="/tmp/x")
-        with pytest.raises(AttributeError):
-            req.uri = "new"
-
-
-# ---------------------------------------------------------------------------
-# DownloadResult
-# ---------------------------------------------------------------------------
-
-
-class TestDownloadResult:
-    def test_complete_result(self):
-        req = DownloadRequest(uri="https://x.com/f", dest_dir="/tmp/x")
-        res = DownloadResult(
-            request=req,
-            status=DownloadStatus.COMPLETE,
-            path=Path("/tmp/x/f"),
-            bytes_downloaded=1024,
-        )
-        assert res.status == DownloadStatus.COMPLETE
-        assert res.path == Path("/tmp/x/f")
-        assert res.error is None
-        assert res.bytes_downloaded == 1024
-
-    def test_failed_result(self):
-        req = DownloadRequest(uri="https://x.com/f", dest_dir="/tmp/x")
-        res = DownloadResult(
-            request=req,
-            status=DownloadStatus.FAILED,
-            error="Connection refused",
-        )
-        assert res.status == DownloadStatus.FAILED
-        assert res.path is None
-        assert res.error == "Connection refused"
-        assert res.bytes_downloaded == 0
-
-    def test_skipped_result(self):
-        req = DownloadRequest(uri="https://x.com/f", dest_dir="/tmp/x")
-        res = DownloadResult(request=req, status=DownloadStatus.SKIPPED)
-        assert res.status == DownloadStatus.SKIPPED
+        # Should pass validation
+        validated = DownloadedResultSchema.validate(gdf)
+        assert len(validated) == 1
+        assert validated.iloc[0]["download_status"] == "complete"
 
 
 # ---------------------------------------------------------------------------
