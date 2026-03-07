@@ -4,7 +4,7 @@ requires = [ "hatch-polylith-bricks", "hatchling" ]
 
 [project]
 name = "aer-core"
-version = "1.0.0"
+version = "1.0.1"
 description = "Core foundational components of the aer project"
 readme = "README.md"
 license = { text = "MIT" }
