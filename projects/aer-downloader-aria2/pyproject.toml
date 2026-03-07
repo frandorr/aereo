@@ -1,0 +1,38 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatch-polylith-bricks", "hatchling" ]
+
+[project]
+name = "aer-downloader-aria2"
+version = "0.1.0"
+authors = [ { name = "Your Name" } ]
+requires-python = ">=3.13"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+  "attrs>=24",
+  "pandera[geopandas]>=0.24,<0.25",
+  "pydantic-settings>=2",
+  "pyresample>=1.20",
+  "returns>=0.23",
+  "structlog>=25.1,<26",
+  "utm>=0.7"
+]
+entry-points."aer.plugins".aria2 = "aer.downloader_aria2.core:download_aria2"
+
+[tool.hatch]
+build.hooks.polylith-bricks = {}
+build.targets.wheel.packages = [ "aer" ]
+
+[tool.polylith]
+bricks."../../components/aer/downloader_aria2" = "aer/downloader_aria2"
+bricks."../../components/aer/downloader" = "aer/downloader"
+bricks."../../components/aer/plugin" = "aer/plugin"
+bricks."../../components/aer/search" = "aer/search"
+bricks."../../components/aer/spatial" = "aer/spatial"
+bricks."../../components/aer/spectral" = "aer/spectral"
+bricks."../../components/aer/temporal" = "aer/temporal"
+bricks."../../components/aer/settings" = "aer/settings"
