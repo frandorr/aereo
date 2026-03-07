@@ -6,12 +6,17 @@ requires = [ "hatch-polylith-bricks", "hatchling" ]
 name = "aer-core"
 version = "1.0.0"
 description = "Core foundational components of the aer project"
-authors = [ { name = "Your Name" } ]
+readme = "README.md"
+license = { text = "MIT" }
+authors = [ { name = "Fran Dorr" } ]
 requires-python = ">=3.13"
 classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: GIS",
 ]
 dependencies = [
   "attrs>=25.4,<26",
@@ -26,6 +31,9 @@ dependencies = [
   "structlog>=25.5,<26",
   "utm>=0.8.1,<0.9",
 ]
+urls.Homepage = "https://github.com/frandorr/aer"
+urls.Issues = "https://github.com/frandorr/aer/issues"
+urls.Repository = "https://github.com/frandorr/aer"
 
 [tool.hatch]
 build.hooks.polylith-bricks = {}
