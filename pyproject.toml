@@ -17,7 +17,6 @@ classifiers = [
 ]
 dependencies = [
   "attrs>=25.4,<26",
-  "earthaccess>=0.16,<0.17",
   "geopandas>=1.1.2,<2",
   "matplotlib>=3.10.8,<4",
   "pandas>=3.0.1,<4",
@@ -36,7 +35,6 @@ dependencies = [
   "utm>=0.8.1,<0.9",
 ]
 entry-points."aer.plugins".aria2 = "aer.downloader_aria2.core:download_aria2"
-entry-points."aer.plugins".earthaccess = "aer.search_earthaccess.core:search_earthaccess"
 entry-points."aer.plugins".goes_aws = "aer.search_goes_aws.core:search_goes_aws"
 entry-points."aer.plugins".product_goes_aws = "aer.product_goes_aws.core:goes_aws_plugin"
 entry-points."aer.plugins".product_modis_earthaccess = "aer.product_modis_earthaccess.core:modis_earthaccess_plugin"
@@ -100,7 +98,6 @@ disable_error_code = [
 bricks."components/aer/spectral" = "aer/spectral"
 bricks."components/aer/temporal" = "aer/temporal"
 bricks."components/aer/downloader" = "aer/downloader"
-bricks."components/aer/search_earthaccess" = "aer/search_earthaccess"
 bricks."components/aer/downloader_aria2" = "aer/downloader_aria2"
 bricks."components/aer/settings" = "aer/settings"
 bricks."components/aer/spatial" = "aer/spatial"
