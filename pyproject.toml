@@ -51,6 +51,7 @@ entry-points."aer.plugins".spectral_viirs = "aer.spectral_viirs.core:viirs_plugi
 dev = [
   "polylith-cli>=1.42.5,<2",
   "pytest>=9.0.2,<10",
+  "python-semantic-release>=10.5.3,<11",
   "types-requests>=2.32.4.20260107,<3",
 ]
 
