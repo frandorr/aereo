@@ -59,6 +59,7 @@ build.dev-mode-dirs = [ "components", "bases", "development", "." ]
 metadata.allow-direct-references = true
 
 [tool.uv]
+sources.aer-core = { workspace = true }
 managed = true
 workspace.members = [ "projects/*" ]
 add-bounds = "major"
@@ -91,7 +92,7 @@ enable_error_code = [
 ]
 disable_error_code = [
   "no-untyped-def",  # TODO: fix
-  "no-untyped-call"
+  "no-untyped-call",
 ]
 
 [tool.polylith]
