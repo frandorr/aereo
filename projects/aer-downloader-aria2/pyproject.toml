@@ -4,7 +4,7 @@ requires = [ "hatch-polylith-bricks", "hatchling" ]
 
 [project]
 name = "aer-downloader-aria2"
-version = "0.1.0"
+version = "1.0.0"
 authors = [ { name = "Your Name" } ]
 requires-python = ">=3.13"
 classifiers = [
