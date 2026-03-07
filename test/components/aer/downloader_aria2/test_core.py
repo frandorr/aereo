@@ -15,11 +15,6 @@ from aer.downloader_aria2.core import (
 )
 
 
-# ---------------------------------------------------------------------------
-# _resolve_filename
-# ---------------------------------------------------------------------------
-
-
 class TestResolveFilename:
     def test_explicit_filename(self):
         req = DownloadRequest(
@@ -203,7 +198,7 @@ class TestDownloadAria2:
 
         assert len(results) == 2
         assert all(r.status == DownloadStatus.FAILED for r in results)
-        assert all("timed out" in r.error.lower() for r in results)
+        assert all("timed out" in (r.error or "").lower() for r in results)
 
     @patch("aer.downloader_aria2.core.shutil.which", return_value="/usr/bin/aria2c")
     @patch("aer.downloader_aria2.core.subprocess.run")
