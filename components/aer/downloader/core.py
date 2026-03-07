@@ -1,11 +1,11 @@
 """Core domain model for the generic downloader component.
 
 Provides:
-- ``DownloadRequest``  — a typed description of *what* to download and *where* to put it.
-- ``DownloadResult``   — the outcome of a single download attempt.
+- ``DownloadedResultSchema``  — schema for tracking downloaded files.
+- ``DownloadStatus``   — terminal status for a download attempt.
 - ``s3_uri_to_https``  — utility to convert ``s3://`` URIs to downloadable HTTPS URLs.
 
-The component is protocol-agnostic: it knows nothing about HTTP, S3, or aria2.
+The component is protocol-agnostic.
 Concrete backends (e.g. ``downloader_aria2``) register themselves via the
 ``@plugin`` decorator from ``aer.plugin``.
 """
@@ -13,22 +13,23 @@ Concrete backends (e.g. ``downloader_aria2``) register themselves via the
 from __future__ import annotations
 
 import enum
-from pathlib import Path
-from typing import Any
 from urllib.parse import quote
 
-import attrs
+import pandera.pandas as pa
+from pandera.typing import Series
 from structlog import get_logger
+
+from aer.search import SearchResultSchema
 
 logger = get_logger()
 
 
 # ---------------------------------------------------------------------------
-# Value objects
+# Value objects / Schemas
 # ---------------------------------------------------------------------------
 
 
-class DownloadStatus(enum.Enum):
+class DownloadStatus(str, enum.Enum):
     """Terminal status for a download attempt."""
 
     COMPLETE = "complete"
@@ -36,46 +37,17 @@ class DownloadStatus(enum.Enum):
     SKIPPED = "skipped"
 
 
-@attrs.frozen
-class DownloadRequest:
-    """Describes a single file to download.
+class DownloadedResultSchema(SearchResultSchema):
+    """Schema for search results that have been processed by a downloader.
 
-    Attributes:
-        uri: The source URI (``https://…``, ``s3://…``, or any scheme the
-            backend understands).
-        dest_dir: Local directory where the file should be saved.
-        filename: Optional override for the saved file name.  When ``None``
-            the backend should derive it from the URI.
-        headers: Optional mapping of extra HTTP headers to send with the
-            request (e.g. ``Authorization: Bearer …``).
-        options: Backend-specific options forwarded as-is (e.g. aria2
-            ``max-connection-per-server``).
+    Inherits all columns from SearchResultSchema and adds local_path and
+    download_status.
     """
 
-    uri: str
-    dest_dir: Path = attrs.field(converter=Path)
-    filename: str | None = None
-    headers: dict[str, str] = attrs.Factory(dict)
-    options: dict[str, Any] = attrs.Factory(dict)
-
-
-@attrs.frozen
-class DownloadResult:
-    """Outcome of a download attempt.
-
-    Attributes:
-        request: The original request.
-        status: Terminal status.
-        path: Resolved filepath on disk (``None`` when *status* is ``FAILED``).
-        error: Human-readable reason when *status* is ``FAILED``.
-        bytes_downloaded: Number of bytes downloaded (0 when unknown).
-    """
-
-    request: DownloadRequest
-    status: DownloadStatus
-    path: Path | None = None
-    error: str | None = None
-    bytes_downloaded: int = 0
+    local_path: Series[pa.String] = pa.Field(nullable=True)
+    download_status: Series[pa.String] = pa.Field(
+        isin=["complete", "failed", "skipped"], nullable=False
+    )
 
 
 # ---------------------------------------------------------------------------
