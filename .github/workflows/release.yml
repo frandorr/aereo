@@ -32,9 +32,19 @@ jobs:
       - name: Build package
         run: |
           cd projects/${{ steps.tag.outputs.package }}
+
+          echo "Current dir:"
+          pwd
+
+          echo "Project files:"
+          ls -la
+
           uv build
+
+          echo "Dist contents in root:"
+          ls -la ../../dist || true
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: projects/${{ steps.tag.outputs.package }}/dist
+          packages-dir: dist/
