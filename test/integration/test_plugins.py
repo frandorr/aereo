@@ -6,4 +6,4 @@ from aer.plugin import plugin_registry
 def test_earthaccess_registered():
     """Verify that the earthaccess plugin is correctly registered."""
     names = {m.name for m in plugin_registry.all()}
-    assert "search_earthaccess" in names
+    assert "earthaccess" in names
