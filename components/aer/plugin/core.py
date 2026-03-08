@@ -54,9 +54,9 @@ class PluginRegistry:
     _ENTRYPOINT_GROUP = "aer.plugins"
 
     def __init__(self) -> None:
-        self.plugins: dict[str, PluginInfo] = {}
+        self.plugins: dict[tuple[str, str], PluginInfo] = {}
         self._plugins_loaded = False
-        # Adjacency list: input_type -> list of (output_type, plugin_name)
+        # Adjacency list: input_type -> list of (output_type, str)
         self.graph: dict[type[Any], list[tuple[type[Any], str]]] = (
             collections.defaultdict(list)
         )
@@ -85,10 +85,11 @@ class PluginRegistry:
 
         The function must have type hints for its first argument (input) and return type.
         """
-        if name in self.plugins:
-            if self.plugins[name].func is not func:
+        key = (name, category)
+        if key in self.plugins:
+            if self.plugins[key].func is not func:
                 raise ValueError(
-                    f"Plugin '{name}' is already registered with a different function."
+                    f"Plugin '{name}' (category '{category}') is already registered with a different function."
                 )
             return
 
@@ -120,7 +121,7 @@ class PluginRegistry:
             input_type=input_type,
             return_type=return_type,
         )
-        self.plugins[name] = info
+        self.plugins[(name, category)] = info
         self.graph[input_type].append((return_type, name))
 
         logger.debug(
@@ -130,12 +131,27 @@ class PluginRegistry:
             transition=f"{input_type} -> {return_type}",
         )
 
-    def get(self, name: str) -> PluginInfo:
-        """Retrieve a registered plugin by name."""
+    def get(self, name: str, category: str | None = None) -> PluginInfo:
+        """Retrieve a registered plugin by name and optionally category."""
         self._ensure_loaded()
-        if name not in self.plugins:
+
+        if category is not None:
+            if (name, category) not in self.plugins:
+                raise KeyError(
+                    f"Plugin '{name}' (category '{category}') is not registered."
+                )
+            return self.plugins[(name, category)]
+
+        matches = [p for (n, c), p in self.plugins.items() if n == name]
+        if not matches:
             raise KeyError(f"Plugin '{name}' is not registered.")
-        return self.plugins[name]
+        if len(matches) > 1:
+            categories = [p.category for p in matches]
+            raise KeyError(
+                f"Multiple plugins found with name '{name}' under categories {categories}. "
+                "Please specify a category."
+            )
+        return matches[0]
 
     def all(self) -> list[PluginInfo]:
         """Return all registered plugins."""
@@ -211,8 +227,8 @@ def _is_typed(tp: object) -> bool:
 class Pipeline:
     """A sequence of plugins forming a type-safe data transition path."""
 
-    def __init__(self, *plugin_names: str) -> None:
-        self.plugin_names = plugin_names
+    def __init__(self, *plugin_refs: str | tuple[str, str]) -> None:
+        self.plugin_refs = plugin_refs
         self.steps: list[PluginInfo] = []
         self._validate()
 
@@ -220,12 +236,15 @@ class Pipeline:
         # Load all plugins
         plugin_registry._ensure_loaded()
 
-        if not self.plugin_names:
+        if not self.plugin_refs:
             return
 
         # Fetch all step infos
-        for name in self.plugin_names:
-            self.steps.append(plugin_registry.get(name))
+        for ref in self.plugin_refs:
+            if isinstance(ref, tuple):
+                self.steps.append(plugin_registry.get(*ref))
+            else:
+                self.steps.append(plugin_registry.get(ref))
 
         # Validate type transitions between steps, allowing `Any` as a flexible fallback
         for i in range(len(self.steps) - 1):
