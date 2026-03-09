@@ -7,8 +7,17 @@ from shapely.geometry import Polygon
 
 from aer.search import SearchQuery, SearchResultSchema
 from aer.temporal import TimeRange
-from aer.product_viirs_earthaccess import VNP02IMG_EA, VNP02MOD_EA
-from aer.spectral_viirs import VIIRS_I1, VIIRS_M1
+from aer.spectral import Product
+
+
+def get_channel(pid, cid):
+    return next(c for c in Product.get(pid).channels if c.c_id == cid)
+
+
+VNP02IMG_EA = Product.get("VNP02IMG")
+VNP02MOD_EA = Product.get("VNP02MOD")
+VIIRS_I1 = get_channel("VNP02IMG", "I1")
+VIIRS_M1 = get_channel("VNP02MOD", "M1")
 
 
 def test_schema_rejects_missing_columns():
