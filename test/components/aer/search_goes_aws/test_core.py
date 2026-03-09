@@ -5,8 +5,16 @@ import geopandas as gpd
 from aer.search import SearchQuery
 from aer.search_goes_aws import search_goes_aws
 from aer.temporal import TimeRange
-from aer.product_goes_aws import ABI_L1B_RADF_AWS
-from aer.spectral_goes import ABI_BAND_1, ABI_BAND_13
+from aer.spectral import Product
+
+
+def get_channel(pid, cid):
+    return next(c for c in Product.get(pid).channels if c.c_id == cid)
+
+
+ABI_L1B_RADF_AWS = Product.get("ABI-L1b-RadF")
+ABI_BAND_1 = get_channel("ABI-L1b-RadF", "1")
+ABI_BAND_13 = get_channel("ABI-L1b-RadF", "13")
 
 
 @patch("s3fs.S3FileSystem")
