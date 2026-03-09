@@ -1,11 +1,11 @@
 import os
 import yaml  # type: ignore
-import logging
 from pathlib import Path
+from structlog import get_logger
 
 from aer.spectral.core import Instrument, Satellite, Band, BandType, Channel, Product
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
 
 
 def load_config_file(filepath: str) -> None:
