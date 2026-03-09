@@ -1,7 +1,10 @@
 from aer.temporal import TimeRange
 from aer.spectral import Instrument, Satellite
-from aer.spectral_goes import GOES_CONSTELLATION
 import attrs
+
+GOES_CONSTELLATION = frozenset(
+    [Satellite.get("GOES-16"), Satellite.get("GOES-18"), Satellite.get("GOES-19")]
+)
 
 # ==========================================
 # Domain Queries

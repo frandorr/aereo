@@ -21,3 +21,7 @@ __all__ = [
     "Satellite",
     "Product",
 ]
+
+from aer.spectral.config import auto_load
+
+auto_load()

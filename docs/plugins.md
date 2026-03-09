@@ -62,11 +62,47 @@ pipe = Pipeline("earthaccess", "my_filter")
 result = pipe.run(query)
 ```
 
-## Spectral Plugins (Instruments, Satellites, Products)
+## Spectral Definitions (Instruments, Satellites, Products)
 
-The spectral registry uses `.register()` on core types. This allows third-party packages (e.g., `aer_landsat`) to define entirely custom satellite, sensor, and product taxonomies.
+The spectral registry allows third-party packages to define entirely custom satellite, sensor, and product taxonomies. Because these taxonomies are pure metadata, `aer` supports an extensible **YAML Configuration System**.
 
-### Best Practice: The Registry API
+### 1. YAML Configuration (Recommended)
+
+You can define custom instruments, satellites, bands, and products in a `.yaml` file. The framework will parse and register these objects automatically at runtime.
+
+Create a file `custom_sensor.yaml`:
+```yaml
+instruments:
+  - name: "OLI"
+    url: "https://landsat.gsfc.nasa.gov/"
+
+satellites:
+  - name: "LANDSAT_8"
+
+products:
+  - name: "LC08_L1TP"
+    instrument: "OLI"
+    supported_satellites: ["LANDSAT_8"]
+    channels:
+      - c_id: "B1"
+        resolution: 30
+        band:
+          name: "Coastal/Aerosol"
+          type: "Visible"
+          central_wavelength: 0.443
+          bandwidth: 0.016
+```
+
+Then point the environment variable to your file or directory of files:
+```bash
+export AER_SPECTRAL_CONFIG_PATH=/path/to/custom_sensor.yaml
+```
+
+The config loader will instantly pre-register all objects globally in `Product.all()`, so components like search plugins can use it immediately without requiring code changes.
+
+### 2. Python API (Programmatic)
+
+If you must define elements programmatically, use `.register()` on the core typestate markers. Always capture the return value of `.register()` for type safety:
 
 Because plugins extend the namespace dynamically, always capture the return value of `.register()` for type safety:
 
