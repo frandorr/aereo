@@ -7,7 +7,7 @@ from pandera.typing.geopandas import GeoDataFrame, GeoSeries
 from structlog import get_logger
 
 from aer.spatial import GridSpatialExtent
-from aer.spectral import Channel, Product
+from aer.spectral import Channel, Product, Satellite
 from aer.temporal import TimeRange
 from typing import Protocol
 
@@ -61,6 +61,7 @@ class SearchQuery:
     products: list[Product]
     time_range: TimeRange
     channels: tuple[Channel, ...] | None = attrs.field(default=None)
+    satellites: tuple[Satellite, ...] | None = attrs.field(default=None)
     spatial_extent: GridSpatialExtent | None = None
     cell_overlap_mode: CellOverlapMode = "contains"
     options: dict[str, Any] = attrs.field(factory=dict)
@@ -75,4 +76,18 @@ class SearchQuery:
                 raise ValueError(
                     f"Requested channels {value} must be a subset of the channels available "
                     f"in the provided products: {allowed_channels}"
+                )
+
+    @satellites.validator
+    def _validate_satellites(
+        self, attribute: Any, value: tuple[Satellite, ...] | None
+    ) -> None:
+        if value is not None:
+            allowed_satellites = {
+                s for p in self.products for s in p.supported_satellites
+            }
+            if not set(value).issubset(allowed_satellites):
+                raise ValueError(
+                    f"Requested satellites {value} must be a subset of the satellites available "
+                    f"in the provided products: {allowed_satellites}"
                 )

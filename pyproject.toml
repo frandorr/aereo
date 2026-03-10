@@ -35,16 +35,10 @@ dependencies = [
   "structlog>=25.5,<26",
   "utm>=0.8.1,<0.9",
 ]
+optional-dependencies.aws-goes = [
+  "aer-search-aws-goes>=2,<3",
+]
 entry-points."aer.plugins".aria2 = "aer.downloader_aria2.core:download_aria2"
-entry-points."aer.plugins".goes_aws = "aer.search_goes_aws.core:search_goes_aws"
-entry-points."aer.plugins".product_goes_aws = "aer.product_goes_aws.core:goes_aws_plugin"
-entry-points."aer.plugins".product_modis_earthaccess = "aer.product_modis_earthaccess.core:modis_earthaccess_plugin"
-entry-points."aer.plugins".product_sentinel3_earthaccess = "aer.product_sentinel3_earthaccess.core:sentinel3_earthaccess_plugin"
-entry-points."aer.plugins".product_viirs_earthaccess = "aer.product_viirs_earthaccess.core:viirs_earthaccess_plugin"
-entry-points."aer.plugins".spectral_goes = "aer.spectral_goes.core:goes_plugin"
-entry-points."aer.plugins".spectral_modis = "aer.spectral_modis.core:modis_plugin"
-entry-points."aer.plugins".spectral_sentinel3 = "aer.spectral_sentinel3.core:sentinel3_plugin"
-entry-points."aer.plugins".spectral_viirs = "aer.spectral_viirs.core:viirs_plugin"
 
 [dependency-groups]
 dev = [
@@ -106,4 +100,3 @@ bricks."components/aer/search" = "aer/search"
 bricks."components/aer/goes_fetcher" = "aer/goes_fetcher"
 bricks."components/aer/bootstrap" = "aer/bootstrap"
 bricks."components/aer/plugin" = "aer/plugin"
-bricks."components/aer/search_goes_aws" = "aer/search_goes_aws"
