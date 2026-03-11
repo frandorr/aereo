@@ -6,14 +6,14 @@ Provides:
 - ``s3_uri_to_https``  — utility to convert ``s3://`` URIs to downloadable HTTPS URLs.
 
 The component is protocol-agnostic.
-Concrete backends (e.g. ``downloader_aria2``, ``downloader_raw``) are provided as part of the main library.
+Concrete backends (e.g. ``downloader_aria2``, ``downloader_raw``) are provided
+as part of the main library.  The smart ``download()`` orchestrator lives in
+the ``download_api`` base.
 """
 
 from __future__ import annotations
 
 import enum
-import shutil
-from typing import Any
 from urllib.parse import quote
 
 import pandera.pandas as pa
@@ -90,68 +90,3 @@ def s3_uri_to_https(
     # Fallback: public AWS virtual-hosted-style URL
     safe_key = "/".join(quote(seg, safe="") for seg in key.split("/"))
     return f"https://{bucket}.s3.amazonaws.com/{safe_key}"
-
-
-# ---------------------------------------------------------------------------
-# Smart download orchestrator
-# ---------------------------------------------------------------------------
-
-
-def download(
-    gdf: pa.DataFrame["SearchResultSchema"] | Any,
-    dest_dir: str
-    | Any,  # using Any or specific Path to avoid extra imports here, though we can import them
-    *,
-    max_concurrent: int = 5,
-    timeout: int = 600,
-    verbose: bool = False,
-    headers: dict[str, str] | None = None,
-    options: dict[str, Any] | None = None,
-    extra_args: list[str] | None = None,
-    **kwargs: Any,
-) -> pa.DataFrame["DownloadedResultSchema"] | Any:
-    """Smart downloader that uses aria2 if available, or falls back to multithreaded raw HTTP.
-
-    Args:
-        gdf: DataFrame of search results to download.
-        dest_dir: Local directory where files should be saved.
-        max_concurrent: Max number of parallel downloads (default 5).
-        timeout: Overall timeout in seconds (default 600).
-        verbose: If ``True``, logs progress.
-        headers: Optional mapping of extra HTTP headers (e.g. ``Authorization: Bearer …``).
-        options: Backend-specific options.
-        extra_args: Additional CLI flags.
-        **kwargs: Reserved for forward compatibility.
-
-    Returns:
-        A new GeoDataFrame conforming to DownloadedResultSchema.
-    """
-
-    from aer.downloader_aria2 import download_aria2
-    from aer.downloader_raw import download_raw
-
-    if shutil.which("aria2c"):
-        return download_aria2(
-            gdf,
-            dest_dir,
-            max_concurrent=max_concurrent,
-            timeout=timeout,
-            verbose=verbose,
-            headers=headers,
-            options=options,
-            extra_args=extra_args,
-            **kwargs,
-        )
-    else:
-        logger.warning("aria2c not found. Falling back to the raw python backend.")
-        return download_raw(
-            gdf,
-            dest_dir,
-            max_concurrent=max_concurrent,
-            timeout=timeout,
-            verbose=verbose,
-            headers=headers,
-            options=options,
-            extra_args=extra_args,
-            **kwargs,
-        )

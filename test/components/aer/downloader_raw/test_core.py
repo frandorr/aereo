@@ -126,3 +126,26 @@ class TestDownloadRaw:
         # By default it Capitalizes initial letters
         assert "Authorization" in called_headers
         assert called_headers["Authorization"] == "Bearer tok123"
+
+    def test_rows_with_missing_https_url_are_skipped(self, tmp_path):
+        """Rows with None in https_url should be marked as 'skipped'."""
+        dest = tmp_path / "output"
+        dest.mkdir()
+
+        df = pd.DataFrame(
+            {
+                "product_name": ["VNP", "VNP"],
+                "granule_id": ["G0", "G1"],
+                "start_time": [pd.Timestamp("2024-01-01")] * 2,
+                "end_time": [pd.Timestamp("2024-01-01")] * 2,
+                "s3_url": ["s3://something/", "s3://something/"],
+                "https_url": [None, None],
+                "size_mb": [1.0, 1.0],
+            }
+        )
+        gdf = gpd.GeoDataFrame(df, geometry=[Point(0, 0), Point(1, 1)])
+        results = download_raw(gdf, str(dest))
+
+        assert len(results) == 2
+        assert (results["download_status"] == DownloadStatus.SKIPPED.value).all()
+        assert results["local_path"].isna().all()

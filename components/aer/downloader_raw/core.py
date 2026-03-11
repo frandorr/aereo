@@ -68,10 +68,12 @@ def _download_single_file(
         if dest_file.exists() and dest_file.stat().st_size > 0:
             return (uri, DownloadStatus.COMPLETE.value, None)
         else:
+            # Clean up the empty file so it isn't mistaken for data
+            dest_file.unlink(missing_ok=True)
             return (
                 uri,
                 DownloadStatus.FAILED.value,
-                "File not found or empty after download",
+                "Empty file after download",
             )
     except Exception as e:
         tmp_path.unlink(missing_ok=True)
@@ -115,6 +117,20 @@ def download_raw(
     res_gdf = gdf.copy()
 
     import pandas as pd
+
+    # Warn if backend-specific options are passed (they are ignored)
+    if options:
+        logger.warning(
+            "downloader_raw_ignored_options",
+            options=options,
+            message="downloader_raw ignores 'options'",
+        )
+    if extra_args:
+        logger.warning(
+            "downloader_raw_ignored_extra_args",
+            extra_args=extra_args,
+            message="downloader_raw ignores 'extra_args'",
+        )
 
     if len(res_gdf) == 0:
         res_gdf["local_path"] = pd.Series([], dtype="string")
@@ -163,9 +179,10 @@ def download_raw(
 
         for future in concurrent.futures.as_completed(future_to_uri):
             uri = future_to_uri[future]
+            status = DownloadStatus.FAILED.value
+            error_msg: str | None = "Unknown error"
             try:
-                # The _download_single_file function returns (uri, status, error_msg)
-                res_uri, status, error_msg = future.result()
+                _, status, error_msg = future.result()
             except Exception as exc:
                 status = DownloadStatus.FAILED.value
                 error_msg = f"Unexpected error: {exc}"
@@ -181,12 +198,11 @@ def download_raw(
         dest_file = dest_path / filename
 
         if status == DownloadStatus.COMPLETE.value:
-            if verbose:
-                logger.info(
-                    "download_complete",
-                    uri=uri,
-                    path=str(dest_file),
-                )
+            logger.debug(
+                "download_complete",
+                uri=uri,
+                path=str(dest_file),
+            )
             local_paths.append(str(dest_file))
             statuses.append(status)
         else:
