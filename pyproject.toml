@@ -38,6 +38,9 @@ dependencies = [
 optional-dependencies.aws-goes = [
   "aer-search-aws-goes>=2,<3",
 ]
+optional-dependencies.earthaccess = [
+  "aer-search-earthaccess>=1.1.1,<2",
+]
 entry-points."aer.plugins".aria2 = "aer.downloader_aria2.core:download_aria2"
 
 [dependency-groups]
