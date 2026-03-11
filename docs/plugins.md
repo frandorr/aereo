@@ -183,7 +183,6 @@ Plugins are declared in the `[project.entry-points]` section of your `pyproject.
 ```toml
 [project.entry-points."aer.plugins"]
 earthaccess = "aer.search_earthaccess.core:search_earthaccess"
-aria2 = "aer.downloader_aria2.core:download_aria2"
 ```
 
 > [!IMPORTANT]

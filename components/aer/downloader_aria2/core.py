@@ -20,7 +20,6 @@ from pandera.typing.geopandas import GeoDataFrame
 from structlog import get_logger
 
 from aer.downloader import DownloadedResultSchema, DownloadStatus
-from aer.plugin import plugin
 from aer.search import SearchResultSchema
 
 logger = get_logger()
@@ -79,7 +78,6 @@ def _write_input_file(
 # ---------------------------------------------------------------------------
 
 
-@plugin(name="aria2", category="download")
 def download_aria2(
     gdf: GeoDataFrame["SearchResultSchema"],
     dest_dir: Path | str,
