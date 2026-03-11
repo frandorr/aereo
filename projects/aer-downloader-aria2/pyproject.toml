@@ -31,7 +31,6 @@ dependencies = [
 urls.Homepage = "https://github.com/frandorr/aer"
 urls.Issues = "https://github.com/frandorr/aer/issues"
 urls.Repository = "https://github.com/frandorr/aer"
-entry-points."aer.plugins".aria2 = "aer.downloader_aria2.core:download_aria2"
 
 [tool.hatch]
 build.hooks.polylith-bricks = {}
