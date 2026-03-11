@@ -1,12 +1,12 @@
-"""Tests for the smart downloader."""
+"""Tests for the smart download orchestrator (download_api base)."""
 
 from unittest.mock import patch
 
-import pandas as pd
 import geopandas as gpd
+import pandas as pd
 from shapely.geometry import Point
 
-from aer.downloader import download
+from aer.download_api import download
 
 
 def make_test_gdf():
@@ -25,8 +25,8 @@ def make_test_gdf():
 
 
 class TestDownloadSmartOrchestrator:
-    @patch("aer.downloader.core.shutil.which")
-    @patch("aer.downloader_aria2.download_aria2")
+    @patch("aer.download_api.core.shutil.which")
+    @patch("aer.download_api.core.download_aria2")
     def test_uses_aria2_if_available(self, mock_download_aria2, mock_which, tmp_path):
         mock_which.return_value = "/usr/bin/aria2c"
         gdf = make_test_gdf()
@@ -45,9 +45,9 @@ class TestDownloadSmartOrchestrator:
             extra_args=None,
         )
 
-    @patch("aer.downloader.core.shutil.which")
-    @patch("aer.downloader_raw.download_raw")
-    @patch("aer.downloader.core.logger.warning")
+    @patch("aer.download_api.core.shutil.which")
+    @patch("aer.download_api.core.download_raw")
+    @patch("aer.download_api.core.logger.warning")
     def test_uses_raw_if_aria2_missing(
         self, mock_warning, mock_download_raw, mock_which, tmp_path
     ):
