@@ -25,6 +25,9 @@ class TestDownloadedResultSchema:
                 "size_mb": [10.5],
                 "local_path": ["/tmp/data.nc"],
                 "download_status": [DownloadStatus.COMPLETE.value],
+                "overlapping_spatial_extent": [None],
+                "input_spatial_extent": [None],
+                "cell_overlap_mode": ["contains"],
             }
         )
         gdf = gpd.GeoDataFrame(df, geometry=[Point(0, 0)])

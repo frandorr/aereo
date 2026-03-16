@@ -40,6 +40,9 @@ class SearchResultSchema(pa.DataFrameModel):  # type: ignore[misc]
     https_url: Series[pa.String] = pa.Field(nullable=True)
     size_mb: Series[float] = pa.Field(nullable=True)
     geometry: GeoSeries[Any] = pa.Field(nullable=True)
+    overlapping_spatial_extent: Series[Any] = pa.Field(nullable=True)
+    input_spatial_extent: Series[Any] = pa.Field(nullable=True)
+    cell_overlap_mode: Series[pa.String] = pa.Field(nullable=False)
 
     class Config:
         strict = False
@@ -60,34 +63,28 @@ class SearchQuery:
 
     products: list[Product]
     time_range: TimeRange
-    channels: tuple[Channel, ...] | None = attrs.field(default=None)
-    satellites: tuple[Satellite, ...] | None = attrs.field(default=None)
-    spatial_extent: GridSpatialExtent | None = None
+    spatial_extent: GridSpatialExtent
+    satellites: tuple[Satellite, ...] = attrs.field()
+    channels: tuple[Channel, ...] = attrs.field()
     cell_overlap_mode: CellOverlapMode = "contains"
     options: dict[str, Any] = attrs.field(factory=dict)
 
     @channels.validator
-    def _validate_channels(
-        self, attribute: Any, value: tuple[Channel, ...] | None
-    ) -> None:
-        if value is not None:
-            allowed_channels = {c for p in self.products for c in p.channels}
-            if not set(value).issubset(allowed_channels):
-                raise ValueError(
-                    f"Requested channels {value} must be a subset of the channels available "
-                    f"in the provided products: {allowed_channels}"
-                )
+    def _validate_channels(self, attribute: Any, value: tuple[Channel, ...]) -> None:
+        allowed_channels = {c for p in self.products for c in p.channels}
+        if not set(value).issubset(allowed_channels):
+            raise ValueError(
+                f"Requested channels {value} must be a subset of the channels available "
+                f"in the provided products: {allowed_channels}"
+            )
 
     @satellites.validator
     def _validate_satellites(
-        self, attribute: Any, value: tuple[Satellite, ...] | None
+        self, attribute: Any, value: tuple[Satellite, ...]
     ) -> None:
-        if value is not None:
-            allowed_satellites = {
-                s for p in self.products for s in p.supported_satellites
-            }
-            if not set(value).issubset(allowed_satellites):
-                raise ValueError(
-                    f"Requested satellites {value} must be a subset of the satellites available "
-                    f"in the provided products: {allowed_satellites}"
-                )
+        allowed_satellites = {s for p in self.products for s in p.supported_satellites}
+        if not set(value).issubset(allowed_satellites):
+            raise ValueError(
+                f"Requested satellites {value} must be a subset of the satellites available "
+                f"in the provided products: {allowed_satellites}"
+            )

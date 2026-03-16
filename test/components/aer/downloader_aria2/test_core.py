@@ -30,6 +30,9 @@ def make_test_gdf(urls):
                 "https_url",
                 "size_mb",
                 "geometry",
+                "overlapping_spatial_extent",
+                "input_spatial_extent",
+                "cell_overlap_mode",
             ]
         )
         return gpd.GeoDataFrame(df, geometry="geometry")
@@ -43,6 +46,9 @@ def make_test_gdf(urls):
             "s3_url": ["s3://something/"] * len(urls),
             "https_url": urls,
             "size_mb": [1.0] * len(urls),
+            "overlapping_spatial_extent": [None] * len(urls),
+            "input_spatial_extent": [None] * len(urls),
+            "cell_overlap_mode": ["contains"] * len(urls),
         }
     )
     return gpd.GeoDataFrame(df, geometry=[Point(0, 0)] * len(urls))
