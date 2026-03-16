@@ -8,6 +8,8 @@ from shapely.geometry import Polygon
 from aer.search import SearchQuery, SearchResultSchema
 from aer.temporal import TimeRange
 from aer.spectral import Product
+from aer.spatial import GridSpatialExtent
+from unittest.mock import MagicMock
 
 
 def get_channel(pid, cid):
@@ -40,6 +42,9 @@ def test_schema_rejects_nulls_in_required_columns():
             "granule_id": "123",
             "start_time": pd.to_datetime("2023-01-01"),
             "end_time": pd.to_datetime("2023-01-02"),
+            "overlapping_spatial_extent": None,
+            "input_spatial_extent": None,
+            "cell_overlap_mode": "contains",
         }
         # Set the one column to None (null)
         row[null_col] = None
@@ -65,6 +70,9 @@ def test_schema_allows_extra_columns():
                 "size_mb": 42.0,
                 "my_custom_column": "extra_value",
                 "another_custom": 999,
+                "overlapping_spatial_extent": None,
+                "input_spatial_extent": None,
+                "cell_overlap_mode": "contains",
             }
         ],
         geometry=[Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])],
@@ -96,6 +104,9 @@ def test_schema_allows_null_geometry():
                 "s3_url": "s3://goes-bucket/key",
                 "https_url": "https://example.com/goes",
                 "size_mb": 100.0,
+                "overlapping_spatial_extent": None,
+                "input_spatial_extent": None,
+                "cell_overlap_mode": "contains",
             }
         ],
         geometry=[None],
@@ -104,6 +115,9 @@ def test_schema_allows_null_geometry():
     assert not gdf.empty
     assert gdf.iloc[0]["geometry"] is None
     assert gdf.iloc[0]["product_name"] == "ABI-L1b-RadF"
+
+
+mock_spatial_extent = MagicMock(spec=GridSpatialExtent)
 
 
 def test_search_query_channel_validation():
@@ -118,6 +132,8 @@ def test_search_query_channel_validation():
         products=[VNP02IMG_EA],
         time_range=time_range,
         channels=(VIIRS_I1,),
+        satellites=(),
+        spatial_extent=mock_spatial_extent,
     )
 
     # 2. Invalid channel selection (M1 is not in VNP02IMG) raises ValueError
@@ -126,6 +142,8 @@ def test_search_query_channel_validation():
             products=[VNP02IMG_EA],
             time_range=time_range,
             channels=(VIIRS_M1,),
+            satellites=(),
+            spatial_extent=mock_spatial_extent,
         )
 
     # 3. Multiple products: union of channels is allowed
@@ -133,7 +151,15 @@ def test_search_query_channel_validation():
         products=[VNP02IMG_EA, VNP02MOD_EA],
         time_range=time_range,
         channels=(VIIRS_I1, VIIRS_M1),
+        satellites=(),
+        spatial_extent=mock_spatial_extent,
     )
 
-    # 4. None channels (default) is valid
-    SearchQuery(products=[VNP02IMG_EA], time_range=time_range, channels=None)
+    # 4. Empty channels is valid
+    SearchQuery(
+        products=[VNP02IMG_EA],
+        time_range=time_range,
+        channels=(),
+        satellites=(),
+        spatial_extent=mock_spatial_extent,
+    )
