@@ -19,6 +19,9 @@ def make_test_gdf():
             "s3_url": ["s3://something/"],
             "https_url": ["https://example.com/a.hdf"],
             "size_mb": [1.0],
+            "overlapping_spatial_extent": [None],
+            "input_spatial_extent": [None],
+            "cell_overlap_mode": ["contains"],
         }
     )
     return gpd.GeoDataFrame(df, geometry=[Point(0, 0)])
