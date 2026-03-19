@@ -15,7 +15,7 @@ Define the extract plugin interface and registry pattern in aer-core. **Plugins 
 
 ### Plugin Interface
 - Use the same `@plugin` decorator pattern as search plugins
-- Function signature: `extract(gdf, grid_spatial_extent, output_dir, **options) -> GeoDataFrame[ExtractedResultSchema]`
+- Function signature: `extract(gdf, output_dir, **options) -> GeoDataFrame[ExtractedResultSchema]`
 - Plugins handle reprojection to majortom grid internally
 - **Plugins are external** — aer-core defines the contract, external repos implement plugins
 
