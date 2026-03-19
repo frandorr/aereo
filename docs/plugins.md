@@ -8,7 +8,7 @@ The plugin system has two layers:
 
 1. **Spectral Registry** — `Instrument`, `Satellite`, `BandType`, and `Product` are immutable frozen dataclasses backed by class-level registries. When you call `.register()`, it instantiates your new element and adds it to the global namespace.
 
-2. **Plugin Registry** — The `PluginRegistry` provides a unified registry for all functional plugins (search, download, transform, etc.). It automatically infers input/output types from function annotations, building a **Capability Graph** of all available data pipelines.
+2. **Plugin Registry** — The `PluginRegistry` provides a unified registry for all functional plugins (search, extract, download, transform, etc.). It automatically infers input/output types from function annotations, building a **Capability Graph** of all available data pipelines.
 
 ## Writing a Plugin
 
@@ -31,6 +31,25 @@ That's it. The registry automatically:
 2. Registers the function in the global plugin registry.
 3. Adds an edge to the Capability Graph so the plugin can be discovered and chained.
 
+### Extract Plugins
+
+Extract plugins are responsible for downloading and reprojecting data to the **majortom grid**. They follow the same `@plugin` pattern but use the `category="extract"`:
+
+```python
+from aer.plugin import plugin
+from aer.extract import ExtractedResultSchema
+import geopandas as gpd
+
+@plugin(name="my_extractor", category="extract")
+def extract_data(gdf: gpd.GeoDataFrame, output_dir: str) -> gpd.GeoDataFrame:
+    """Extract and reproject granules to the majortom grid."""
+    # 1. Download data from S3/HTTPS
+    # 2. Reproject to the grid cell specified in 'overlapping_spatial_extent'
+    # 3. Save to output_dir
+    # 4. Return GeoDataFrame[ExtractedResultSchema]
+    return gpd.GeoDataFrame(...)
+```
+
 ### Using Plugins
 
 ```python
@@ -40,16 +59,21 @@ from aer.plugin import plugin_registry
 for p in plugin_registry.all():
     print(p)  # <Plugin 'earthaccess' (search): SearchQuery -> GeoDataFrame>
 
-# Use a plugin by name
-search = plugin_registry.get("earthaccess")
-gdf = search(query)
+# Use the simplified public API
+from aer.plugin import run_search, run_extract
+
+# 1. Search
+results = run_search("earthaccess", query)
+
+# 2. Extract (calls the 'extract' category plugin by name)
+extracted = run_extract("my_extractor", results, "/tmp/output")
 
 # Visualise possible type transitions
 from aer.search import SearchQuery
 plugin_registry.show_capabilities(SearchQuery)
 # [*] SearchQuery
 #  └── (earthaccess) -> GeoDataFrame
-#       └── (my_filter) -> GeoDataFrame
+#       └── (my_extractor) -> GeoDataFrame
 ```
 
 ### Chaining Plugins with Pipeline
@@ -149,6 +173,8 @@ assert Product.get("LC08_L1TP") is LC08_PRODUCT
 | List all | `plugin_registry.all()` |
 | Show graph | `plugin_registry.show_capabilities(StartType)` |
 | Chain | `Pipeline("step1", "step2").run(input)` |
+| Search API | `run_search("name", query)` |
+| Extract API | `run_extract("name", gdf, out_dir)` |
 
 ### Spectral Registry
 
