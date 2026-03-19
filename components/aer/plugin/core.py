@@ -286,3 +286,59 @@ class Pipeline:
             data = step(data)
 
         return data
+
+
+def run_search(plugin_name: str, query: Any, **kwargs: Any) -> Any:
+    """Run a search plugin by name and return results.
+
+    Looks up the plugin registered under category ``"search"`` and invokes it
+    with the given *query* and any extra keyword arguments.
+
+    Parameters
+    ----------
+    plugin_name:
+        Name the plugin was registered with (e.g. ``"aws-goes"``).
+    query:
+        A :class:`SearchQuery` (or compatible) object.
+    **kwargs:
+        Forwarded to the plugin function.
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        Search results conforming to :class:`SearchResultSchema`.
+    """
+    info = plugin_registry.get(plugin_name, "search")
+    return info(query, **kwargs)
+
+
+def run_extract(
+    plugin_name: str,
+    gdf: Any,
+    output_dir: str,
+    **kwargs: Any,
+) -> Any:
+    """Run an extract plugin by name on search results.
+
+    Looks up the plugin registered under category ``"extract"`` and invokes it
+    with the given GeoDataFrame, output directory, and any extra keyword
+    arguments.
+
+    Parameters
+    ----------
+    plugin_name:
+        Name the plugin was registered with (e.g. ``"aws-goes"``).
+    gdf:
+        A GeoDataFrame conforming to :class:`SearchResultSchema`.
+    output_dir:
+        Directory (local path or S3 prefix) where extracted files are written.
+    **kwargs:
+        Forwarded to the plugin function.
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        Extraction results conforming to :class:`ExtractedResultSchema`.
+    """
+    info = plugin_registry.get(plugin_name, "extract")
+    return info(gdf, output_dir, **kwargs)
