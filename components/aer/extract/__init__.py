@@ -1,3 +1,3 @@
-from aer.extract import core
+from .core import ExtractedResultSchema, ExtractPlugin
 
-__all__ = ["core"]
+__all__ = ["ExtractedResultSchema", "ExtractPlugin"]
