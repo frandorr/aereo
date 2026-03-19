@@ -8,7 +8,6 @@ from shapely.geometry import Point
 
 from aer.extract.core import ExtractedResultSchema, ExtractPlugin
 from aer.search.core import SearchResultSchema
-from aer.spatial.core import GridSpatialExtent
 
 
 def test_extracted_result_schema() -> None:
@@ -47,7 +46,6 @@ def test_extract_plugin_protocol() -> None:
         def extract(
             self,
             gdf: GeoDataFrame[SearchResultSchema],
-            grid_spatial_extent: GridSpatialExtent,
             output_dir: str,
             **options: Any,
         ) -> GeoDataFrame[ExtractedResultSchema]:
