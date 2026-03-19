@@ -46,12 +46,14 @@ from aer.search import SearchQuery
 
 @plugin(name="acme_search", category="search")
 def run_acme_search(query: SearchQuery) -> gpd.GeoDataFrame:
-    """Implement your plugin logic here."""
+    """Search for data using the ACME system."""
+    # ...
+    return gpd.GeoDataFrame(...)
 
-    # 1. Parse the standard SearchQuery
-    # 2. Call your external API or process data
-    # 3. Return the standard result type (e.g., GeoDataFrame)
-
+@plugin(name="acme_extract", category="extract")
+def run_acme_extract(gdf: gpd.GeoDataFrame, output_dir: str) -> gpd.GeoDataFrame:
+    """Extract and reproject ACME data to the grid cell in 'overlapping_spatial_extent'."""
+    # ...
     return gpd.GeoDataFrame(...)
 ```
 
@@ -79,8 +81,13 @@ from aer.plugin import plugin_registry
 bootstrap()
 
 # Your plugin is now part of the ecosystem!
-my_search = plugin_registry.get("acme_search")
-results = my_search(query)
+from aer.plugin import run_search, run_extract
+
+# 1. Search
+results = run_search("acme_search", query)
+
+# 2. Extract
+extracted = run_extract("acme_extract", results, "/tmp/acme")
 ```
 
 Because your plugin is just a standard Python package, you can publish it to PyPI (`uv build` and `uv publish`) or share it internally. Users just `pip install aer-plugin-acme` and they are ready to go!
