@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Define the extract plugin interface and registry pattern in aer-core. Extract plugins receive SearchResultSchema GeoDataFrames, reproject data to majortom grid cells, and return extraction results as paths with metadata.
+Define the extract plugin interface and registry pattern in aer-core. **Plugins live in separate external repositories** — this phase only defines what plugins implement against (interface, schema, entry points). Extract plugins receive SearchResultSchema GeoDataFrames, reproject data to majortom grid cells, and return extraction results as paths with metadata.
 
 </domain>
 
@@ -17,6 +17,7 @@ Define the extract plugin interface and registry pattern in aer-core. Extract pl
 - Use the same `@plugin` decorator pattern as search plugins
 - Function signature: `extract(gdf, grid_spatial_extent, output_dir, **options) -> GeoDataFrame[ExtractedResultSchema]`
 - Plugins handle reprojection to majortom grid internally
+- **Plugins are external** — aer-core defines the contract, external repos implement plugins
 
 ### Result Schema
 - New `ExtractedResultSchema` (Pandera DataFrameModel) in new `components/aer/extract/` component
@@ -85,7 +86,7 @@ Define the extract plugin interface and registry pattern in aer-core. Extract pl
 <deferred>
 ## Deferred Ideas
 
-None — discussion stayed within phase scope
+- **Phase 3 (aws-goes-extract) scope change needed** — This phase was planned as example plugin implementation, but plugins live in external repositories. Either remove Phase 3 or reframe as "plugin implementation guide" / "example plugin template"
 
 </deferred>
 
