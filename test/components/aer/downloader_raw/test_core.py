@@ -17,6 +17,9 @@ from aer.downloader_raw.core import (
 
 
 def make_test_gdf(urls):
+    from shapely.geometry import Polygon
+
+    test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
     if not urls:
         df = pd.DataFrame(
             columns=[
@@ -28,8 +31,12 @@ def make_test_gdf(urls):
                 "https_url",
                 "size_mb",
                 "geometry",
-                "overlapping_spatial_extent",
-                "input_spatial_extent",
+                "cell_row",
+                "cell_col",
+                "cell_dist",
+                "cell_epsg",
+                "cell_bounds",
+                "channel_name",
                 "cell_overlap_mode",
             ]
         )
@@ -44,8 +51,12 @@ def make_test_gdf(urls):
             "s3_url": ["s3://something/"] * len(urls),
             "https_url": urls,
             "size_mb": [1.0] * len(urls),
-            "overlapping_spatial_extent": [None] * len(urls),
-            "input_spatial_extent": [None] * len(urls),
+            "cell_row": ["10U"] * len(urls),
+            "cell_col": ["20R"] * len(urls),
+            "cell_dist": [100] * len(urls),
+            "cell_epsg": ["EPSG:32615"] * len(urls),
+            "cell_bounds": [test_geom] * len(urls),
+            "channel_name": ["I1"] * len(urls),
             "cell_overlap_mode": ["contains"] * len(urls),
         }
     )
@@ -135,6 +146,8 @@ class TestDownloadRaw:
 
     def test_rows_with_missing_https_url_are_skipped(self, tmp_path):
         """Rows with None in https_url should be marked as 'skipped'."""
+        from shapely.geometry import Polygon
+
         dest = tmp_path / "output"
         dest.mkdir()
 
@@ -150,6 +163,15 @@ class TestDownloadRaw:
                 "overlapping_spatial_extent": [None, None],
                 "input_spatial_extent": [None, None],
                 "cell_overlap_mode": ["contains", "contains"],
+                "cell_row": ["10U", "10U"],
+                "cell_col": ["20R", "20R"],
+                "cell_dist": [100, 100],
+                "cell_epsg": ["EPSG:32615", "EPSG:32615"],
+                "cell_bounds": [
+                    Polygon([(0, 0), (1, 0), (1, 1), (0, 1)]),
+                    Polygon([(0, 0), (1, 0), (1, 1), (0, 1)]),
+                ],
+                "channel_name": ["I1", "I1"],
             }
         )
         gdf = gpd.GeoDataFrame(df, geometry=[Point(0, 0), Point(1, 1)])

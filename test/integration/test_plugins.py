@@ -3,7 +3,7 @@ from aer.plugin import plugin_registry
 
 
 @pytest.mark.integration
-def test_earthaccess_registered():
-    """Verify that the earthaccess plugin is correctly registered."""
+def test_dummy_search_registered():
+    """Verify that the dummy-search plugin is correctly registered."""
     names = {m.name for m in plugin_registry.all()}
-    assert "earthaccess" in names
+    assert "dummy-search" in names
