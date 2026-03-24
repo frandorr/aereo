@@ -37,6 +37,12 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 2: Pipeline Integration | ○ Pending | Orchestration |
 | 3: Example Plugin | ○ Pending | Reference impl |
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260324-wyj | check failing tests | 2026-03-24 | 5c3effc | [260324-wyj-check-failing-tests](./quick/260324-wyj-check-failing-tests/) |
+
 ## Progress
 
 - Requirements: 11 defined
@@ -44,4 +50,4 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 - Current: Phase 1 context captured, ready to plan
 
 ---
-*Last updated: 2026-03-19 after Phase 1 context*
+*Last activity: 2026-03-24 - Completed quick task 260324-wyj: check failing tests*
