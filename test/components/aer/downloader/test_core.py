@@ -14,6 +14,9 @@ from shapely.geometry import Point
 
 class TestDownloadedResultSchema:
     def test_validates_schema(self):
+        from shapely.geometry import Polygon
+
+        test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
         df = pd.DataFrame(
             {
                 "product_name": ["VNP02IMG"],
@@ -25,8 +28,12 @@ class TestDownloadedResultSchema:
                 "size_mb": [10.5],
                 "local_path": ["/tmp/data.nc"],
                 "download_status": [DownloadStatus.COMPLETE.value],
-                "overlapping_spatial_extent": [None],
-                "input_spatial_extent": [None],
+                "cell_row": ["10U"],
+                "cell_col": ["20R"],
+                "cell_dist": [100],
+                "cell_epsg": ["EPSG:32615"],
+                "cell_bounds": [test_geom],
+                "channel_name": ["I1"],
                 "cell_overlap_mode": ["contains"],
             }
         )

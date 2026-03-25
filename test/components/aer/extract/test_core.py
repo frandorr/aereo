@@ -12,6 +12,9 @@ from aer.search.core import SearchResultSchema
 
 def test_extracted_result_schema() -> None:
     """Test that a valid GeoDataFrame passes ExtractedResultSchema validation."""
+    from shapely.geometry import Polygon
+
+    test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
     data = {
         "product_name": ["test_product"],
         "granule_id": ["granule_1"],
@@ -21,8 +24,12 @@ def test_extracted_result_schema() -> None:
         "https_url": ["https://bucket/test.nc"],
         "size_mb": [10.5],
         "geometry": [Point(0, 0)],
-        "overlapping_spatial_extent": [None],
-        "input_spatial_extent": [None],
+        "cell_row": ["10U"],
+        "cell_col": ["20R"],
+        "cell_dist": [100],
+        "cell_epsg": ["EPSG:32615"],
+        "cell_bounds": [test_geom],
+        "channel_name": ["I1"],
         "cell_overlap_mode": ["contains"],
         "reprojected_path": ["/local/path/to/extracted.tif"],
         "resolution": [1000.0],

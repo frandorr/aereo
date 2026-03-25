@@ -12,6 +12,7 @@ from aer.spatial.core import (
     GridSpatialExtent,
     GridDefinition,
     GridNotFoundError,
+    GridSchema,
 )
 
 
@@ -232,3 +233,33 @@ def test_grid_definition_intersecting_grid_spatial_extent():
         assert len(extent2.grid_cells) == 2
         rows_cols = set((c.row, c.col) for c in extent2.grid_cells)
         assert rows_cols == {("A", "1"), ("A", "2")}
+
+
+def test_grid_schema_validation():
+    import pandas as pd
+    from shapely.geometry import Point, Polygon
+
+    df = pd.DataFrame(
+        {
+            "name": ["89D_36L"],
+            "row": ["89D"],
+            "col": ["36L"],
+            "row_idx": [0],
+            "col_idx": [0],
+            "utm_zone": ["32701"],
+            "epsg": ["EPSG:32701"],
+        }
+    )
+    gdf = gpd.GeoDataFrame(
+        df,
+        geometry=[Point(-180, -79.70149)],
+    )
+    gdf["cell_bounds"] = [
+        Polygon([(-180, -79.701), (-180, -78.806), (-175, -78.806), (-175, -79.701)])
+    ]
+
+    # This should pass validation
+    validated_gdf = GridSchema.validate(gdf)
+    assert not validated_gdf.empty
+    assert "name" in validated_gdf.columns
+    assert validated_gdf.iloc[0]["name"] == "89D_36L"
