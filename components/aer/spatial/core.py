@@ -237,16 +237,23 @@ class GridDefinition:
         """Load grid points from a parquet file."""
         # check if it is default grid
         current_file_dir = Path(__file__).parent
-        grid_path = current_file_dir / f"grid_{self.name}_{self.dist}km.parquet"
+        grid_filename = f"grid_{self.name}_{int(self.dist)}km.parquet"
+        grid_path = current_file_dir / grid_filename
         if grid_path.exists():
             gdf = gpd.read_parquet(grid_path)
             return result.Success(gdf)
 
         # try to load from grid store
-        grid_path = (
-            ENV_SETTINGS.GRID_STORE_PATH / f"grid_{self.name}_{self.dist}km.parquet"
-        )
         try:
+            if ENV_SETTINGS.GRID_STORE_PATH is None:
+                return result.Failure(
+                    GridNotFoundError(f"Grid file at {grid_path} not found.")
+                )
+            grid_path = ENV_SETTINGS.GRID_STORE_PATH / grid_filename
+            if not grid_path.exists():
+                return result.Failure(
+                    GridNotFoundError(f"Grid file at {grid_path} not found.")
+                )
             gdf = gpd.read_parquet(grid_path)  # pyright: ignore[reportUnknownMemberType]
             return result.Success(gdf)
         except Exception:
@@ -381,6 +388,7 @@ class Grid:
         self.points["cell_bounds"] = self.points.apply(
             self.get_bounded_footprint, axis=1
         )
+        self.grid_filename = f"grid_{self.name}_{int(self.dist)}km.parquet"
         # validate self.points with grid schema
         GridSchema.validate(self.points)
 
@@ -616,12 +624,11 @@ class Grid:
             )
         ENV_SETTINGS.GRID_STORE_PATH.mkdir(parents=True, exist_ok=True)
         self.points.reset_index(drop=True).to_parquet(
-            ENV_SETTINGS.GRID_STORE_PATH / f"grid_{self.name}_{self.dist}km.parquet"
+            ENV_SETTINGS.GRID_STORE_PATH / self.grid_filename
         )  # pyright: ignore[reportUnknownMemberType]
         logger.info(
             "Grid saved to parquet",
             grid_name=self.name,
             dist=self.dist,
-            path=ENV_SETTINGS.GRID_STORE_PATH
-            / f"grid_{self.name}_{self.dist}km.parquet",
+            path=ENV_SETTINGS.GRID_STORE_PATH / self.grid_filename,
         )
