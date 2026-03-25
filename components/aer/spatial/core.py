@@ -33,8 +33,6 @@ class GridSchema(pa.DataFrameModel):
     name: Series[pa.String] = pa.Field(nullable=False)
     row: Series[pa.String] = pa.Field(nullable=False)
     col: Series[pa.String] = pa.Field(nullable=False)
-    row_idx: Series[pa.Int64] = pa.Field(nullable=False)
-    col_idx: Series[pa.Int64] = pa.Field(nullable=False)
     utm_zone: Series[pa.String] = pa.Field(nullable=False)
     epsg: Series[pa.String] = pa.Field(nullable=False)
     dist: Series[pa.Int64] = pa.Field(nullable=False)
@@ -54,8 +52,6 @@ class GridRow:
         name (str): Grid cell name (row_col).
         row (str): Grid row name.
         col (str): Grid column name.
-        row_idx (int): Row index.
-        col_idx (int): Column index.
         utm_zone (str): UTM zone string.
         epsg (str): EPSG code string.
         dist (int): Grid resolution in kilometers.
@@ -66,8 +62,6 @@ class GridRow:
     name: str
     row: str
     col: str
-    row_idx: int
-    col_idx: int
     utm_zone: str
     epsg: str
     dist: int
@@ -98,8 +92,6 @@ class GridRow:
             "name": f"{cell.row}_{cell.col}",
             "row": cell.row,
             "col": cell.col,
-            "row_idx": int(cell.row[:-1]) if cell.row else 0,
-            "col_idx": int(cell.col[:-1]) if cell.col else 0,
             "utm_zone": cell.epsg.split(":")[-1] if cell.epsg else "",
             "epsg": cell.epsg,
             "dist": cell.dist,
@@ -454,23 +446,18 @@ class Grid:
                 point_names,
                 grid_row_names,
                 grid_col_names,
-                grid_row_idx,
-                grid_col_idx,
                 grid_lats,
                 grid_lons,
                 utm_zones,
                 epsgs,
-            ) = [], [], [], [], [], [], [], [], []
+            ) = [], [], [], [], [], [], []
             cols, lons = self.subdivide_circumference(lat, return_cols=True)  # pyright: ignore[reportUnknownVariableType,reportCallIssue]
 
             cols, lons = self.filter_longitude(cols, lons)  # pyright: ignore[reportUnknownArgumentType]
-            c_idx = 0
             for c, lon in zip(cols, lons):
                 point_names.append(f"{r}_{c}")
                 grid_row_names.append(r)
                 grid_col_names.append(c)
-                grid_row_idx.append(r_idx)
-                grid_col_idx.append(c_idx)
                 grid_lats.append(lat)
                 grid_lons.append(lon)
                 if self.utm_definition == "bottomleft":
@@ -485,14 +472,11 @@ class Grid:
                     raise ValueError(f"Invalid utm_definition {self.utm_definition}")
                 epsgs.append(f"EPSG:{utm_zones[-1]}")
 
-                c_idx += 1
             points_by_row[r_idx] = gpd.GeoDataFrame(
                 {
                     "name": point_names,
                     "row": grid_row_names,
                     "col": grid_col_names,
-                    "row_idx": grid_row_idx,
-                    "col_idx": grid_col_idx,
                     "utm_zone": utm_zones,
                     "epsg": epsgs,
                     "dist": [self.dist] * len(point_names),
@@ -570,8 +554,12 @@ class Grid:
         # Grid point defined as bottom-left corner of polygon. Buffer ratio is the ratio of the grid cell's width/height to buffer by.
 
         bottom, left = point.geometry.y, point.geometry.x  # pyright: ignore[reportUnknownMemberType]
-        row_idx = point.row_idx  # pyright: ignore[reportUnknownMemberType]
-        col_idx = point.col_idx  # pyright: ignore[reportUnknownMemberType]
+        # Derive row_idx and col_idx from the actual index in self.rows (numpy array)
+        row_idx = int(np.where(self.rows == point.row)[0][0])  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
+        # Get unique columns from the points DataFrame for this row
+        row_df = self.points_by_row[row_idx]
+        cols_for_row = row_df["col"].tolist()
+        col_idx = cols_for_row.index(point.col)  # pyright: ignore[reportUnknownMemberType]
         next_row_idx = row_idx + 1  # pyright: ignore[reportUnknownVariableType]
         next_col_idx = col_idx + 1  # pyright: ignore[reportUnknownVariableType]
 
@@ -583,17 +571,18 @@ class Grid:
         else:
             top = self.lats[next_row_idx]
 
-        max_col: int = len(self.points_by_row[row_idx].col_idx) - 1  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType,reportUnknownArgumentType]
+        row_df = self.points_by_row[row_idx]
+        max_col: int = len(row_df) - 1  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType,reportUnknownArgumentType]
         if (
             next_col_idx > max_col
         ):  # If at rightmost column, use difference between rightmost and second-to-rightmost column for width
             width = (
-                self.points_by_row[row_idx].iloc[col_idx].geometry.x  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
-                - self.points_by_row[row_idx].iloc[col_idx - 1].geometry.x  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
+                row_df.iloc[col_idx].geometry.x  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
+                - row_df.iloc[col_idx - 1].geometry.x  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
             )
-            right = self.points_by_row[row_idx].iloc[col_idx].geometry.x + width  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
+            right = row_df.iloc[col_idx].geometry.x + width  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
         else:
-            right = self.points_by_row[row_idx].iloc[next_col_idx].geometry.x  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
+            right = row_df.iloc[next_col_idx].geometry.x  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
 
         # Buffer the polygon by the ratio of the grid cell's width/height
         width = right - left  # pyright: ignore[reportUnknownVariableType]

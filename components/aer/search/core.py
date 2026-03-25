@@ -11,7 +11,6 @@ from aer.spatial import GridCell, GridSpatialExtent, GridSchema, GridRow
 from aer.spectral import Channel, Product, Satellite
 from aer.temporal import TimeRange
 from typing import Protocol
-from shapely.geometry import Polygon
 import geopandas as gpd
 
 logger = get_logger()
@@ -54,8 +53,6 @@ class SearchResult:
             "name",
             "row",
             "col",
-            "row_idx",
-            "col_idx",
             "utm_zone",
             "epsg",
             "dist",
