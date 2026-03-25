@@ -1,6 +1,6 @@
 import pytest
 import attrs
-from datetime import datetime, timezone
+from datetime import datetime
 import geopandas as gpd
 import pandas as pd
 from pandera.errors import SchemaError
@@ -15,7 +15,7 @@ from aer.search import (
 from aer.temporal import TimeRange
 from aer.spectral import Product
 from aer.spatial import GridCell, GridSpatialExtent
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 
 def get_channel(pid, cid):
