@@ -44,10 +44,11 @@ def get_current_version(pyproject_path: Path):
 def get_next_version(project_path: Path, tag_format: str):
     tmp_config = project_path / "release_tmp.toml"
 
+    abs_project_path = project_path.resolve()
     tmp_config.write_text(
         f"""
 [tool.semantic_release]
-version_toml = ["{project_path}/pyproject.toml:project.version"]
+version_toml = ["{abs_project_path}/pyproject.toml:project.version"]
 tag_format = "{tag_format}"
 commit_parser = "angular"
 """
