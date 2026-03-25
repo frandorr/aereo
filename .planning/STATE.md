@@ -44,6 +44,7 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260324-wyj | check failing tests | 2026-03-24 | 5c3effc | [260324-wyj-check-failing-tests](./quick/260324-wyj-check-failing-tests/) |
 | 260324-xas | create GridSchema for MajorTom geodatafr | 2026-03-24 | a23df4d | [260324-xas-create-gridschema-for-majortom-geodatafr](./quick/260324-xas-create-gridschema-for-majortom-geodatafr/) |
 | 260325-07c | refactor SearchResultSchema to extend Gr | 2026-03-25 | pending | [260325-07c-refactor-searchresultschema-to-extend-gr](./quick/260325-07c-refactor-searchresultschema-to-extend-gr/) |
+| 260326-grid | grid_cell property in SearchResult should | 2026-03-25 | 49ffae3 | [260326-grid-cell-property-in-searchresult-shoul](./quick/260326-grid-cell-property-in-searchresult-shoul/) |
 
 ## Progress
 
@@ -52,4 +53,4 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 - Current: Phase 1 context captured, ready to plan
 
 ---
-*Last activity: 2026-03-25 - Completed quick task 260325-07c: refactor SearchResultSchema to extend GridSchema*
+*Last activity: 2026-03-25 - Completed quick task 260326-grid: grid_cell property in SearchResult should actually call a GridRow.grid_cell property*
