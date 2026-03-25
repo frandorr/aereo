@@ -45,6 +45,7 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260324-xas | create GridSchema for MajorTom geodatafr | 2026-03-24 | a23df4d | [260324-xas-create-gridschema-for-majortom-geodatafr](./quick/260324-xas-create-gridschema-for-majortom-geodatafr/) |
 | 260325-07c | refactor SearchResultSchema to extend Gr | 2026-03-25 | pending | [260325-07c-refactor-searchresultschema-to-extend-gr](./quick/260325-07c-refactor-searchresultschema-to-extend-gr/) |
 | 260326-grid | grid_cell property in SearchResult should | 2026-03-25 | 49ffae3 | [260326-grid-cell-property-in-searchresult-shoul](./quick/260326-grid-cell-property-in-searchresult-shoul/) |
+| 260327-remov | Remove row_idx and col_idx from GridRow/G | 2026-03-25 | befb6e9 | [260327-remove-row-idx-and-col-idx-from-gridrow-](./quick/260327-remove-row-idx-and-col-idx-from-gridrow-/) |
 
 ## Progress
 
@@ -53,4 +54,4 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 - Current: Phase 1 context captured, ready to plan
 
 ---
-*Last activity: 2026-03-25 - Completed quick task 260326-grid: grid_cell property in SearchResult should actually call a GridRow.grid_cell property*
+*Last activity: 2026-03-25 - Completed quick task 260327-remov: Remove row_idx and col_idx from GridRow and GridSchema*
