@@ -48,7 +48,7 @@ class Settings(BaseSettings):  # type: ignore[misc]
     CDSE_USER: str | None = None
     CDSE_PASSWORD: str | None = None
 
-    GRID_STORE_PATH: Path = Path("/tmp/aer/grids")
+    GRID_STORE_PATH: Path | None = None
 
 
 def apply_runtime_env(settings: Settings) -> None:
