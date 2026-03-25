@@ -67,7 +67,7 @@ def test_schema_to_grid_cell():
     assert result["row"] == "10U"
     assert result["col"] == "20R"
     assert result["epsg"] == "EPSG:32615"
-    assert result["channel"] == "I1"
+    assert result["channel"] == VIIRS_I1
 
     reconstructed = SearchResultSchema.to_grid_cell(result)
     assert reconstructed.row == cell.row
