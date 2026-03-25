@@ -174,18 +174,20 @@ def test_grid_definition_grid_property_empty():
             _ = grid_def.grid
 
 
-def test_grid_definition_grid_property_failure():
-    grid_def = GridDefinition(name="TestGrid", dist=100)
+def test_grid_definition_grid_property_autogen():
+    grid_def = GridDefinition(name="TestGrid", dist=5000)  # large dist for speed
 
+    # Simulate missing grid initially
     with patch.object(
         GridDefinition,
         "load_grid",
-        return_value=Failure(GridNotFoundError("Grid not found")),
+        side_effect=[Failure(GridNotFoundError("Grid not found")), MagicMock()],
     ):
-        with pytest.raises(
-            GridNotFoundError, match=r"Grid not found\. Create grid first\."
-        ):
-            _ = grid_def.grid
+        with patch("aer.spatial.core.Grid.save_to_parquet") as mock_save:
+            gdf = grid_def.grid
+            assert not gdf.empty
+            assert "dist" in gdf.columns
+            assert mock_save.called
 
 
 def test_grid_definition_intersecting_grid_spatial_extent():
@@ -248,6 +250,7 @@ def test_grid_schema_validation():
             "col_idx": [0],
             "utm_zone": ["32701"],
             "epsg": ["EPSG:32701"],
+            "dist": [100],
         }
     )
     gdf = gpd.GeoDataFrame(

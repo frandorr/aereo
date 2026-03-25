@@ -36,6 +36,7 @@ class TestDownloadedResultSchema:
                 "col_idx": [0],
                 "utm_zone": ["31N"],
                 "epsg": ["EPSG:32615"],
+                "dist": [100],
                 "cell_bounds": [test_geom],
                 "channel": ["I1"],
                 "overlap_mode": ["contains"],

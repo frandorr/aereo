@@ -38,6 +38,7 @@ def make_test_gdf(urls):
                 "col_idx",
                 "utm_zone",
                 "epsg",
+                "dist",
                 "cell_bounds",
                 "channel",
                 "overlap_mode",
@@ -62,6 +63,7 @@ def make_test_gdf(urls):
             "col_idx": [0] * len(urls),
             "utm_zone": ["31N"] * len(urls),
             "epsg": ["EPSG:32615"] * len(urls),
+            "dist": [100] * len(urls),
             "cell_bounds": [test_geom] * len(urls),
             "channel": ["I1"] * len(urls),
             "overlap_mode": ["contains"] * len(urls),
@@ -175,6 +177,7 @@ class TestDownloadRaw:
                 "col_idx": [0, 0],
                 "utm_zone": ["31N", "31N"],
                 "epsg": ["EPSG:32615", "EPSG:32615"],
+                "dist": [100, 100],
                 "cell_bounds": [
                     Polygon([(0, 0), (1, 0), (1, 1), (0, 1)]),
                     Polygon([(0, 0), (1, 0), (1, 1), (0, 1)]),
