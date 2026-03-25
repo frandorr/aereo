@@ -10,6 +10,9 @@ from aer.download_api import download
 
 
 def make_test_gdf():
+    from shapely.geometry import Polygon
+
+    test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
     df = pd.DataFrame(
         {
             "product_name": ["VNP"],
@@ -19,8 +22,12 @@ def make_test_gdf():
             "s3_url": ["s3://something/"],
             "https_url": ["https://example.com/a.hdf"],
             "size_mb": [1.0],
-            "overlapping_spatial_extent": [None],
-            "input_spatial_extent": [None],
+            "cell_row": ["10U"],
+            "cell_col": ["20R"],
+            "cell_dist": [100],
+            "cell_epsg": ["EPSG:32615"],
+            "cell_bounds": [test_geom],
+            "channel_name": ["I1"],
             "cell_overlap_mode": ["contains"],
         }
     )

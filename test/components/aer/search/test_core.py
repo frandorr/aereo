@@ -8,7 +8,7 @@ from shapely.geometry import Polygon
 from aer.search import SearchQuery, SearchResultSchema
 from aer.temporal import TimeRange
 from aer.spectral import Product
-from aer.spatial import GridSpatialExtent
+from aer.spatial import GridCell, GridSpatialExtent
 from unittest.mock import MagicMock
 
 
@@ -33,23 +33,82 @@ def test_schema_rejects_missing_columns():
         SearchResultSchema.validate(gdf)
 
 
+def test_schema_to_grid_cell():
+    """Schema can reconstruct a GridCell from a row."""
+    from aer.spatial import GridCell
+
+    cell = GridCell(
+        row="10U",
+        col="20R",
+        dist=100,
+        bounds=Polygon([(0, 0), (1, 0), (1, 1), (0, 1)]),
+        epsg="EPSG:32615",
+    )
+
+    row_dict = {
+        "product_name": "TEST",
+        "granule_id": "G123",
+        "start_time": pd.to_datetime("2023-01-01"),
+        "end_time": pd.to_datetime("2023-01-02"),
+        "s3_url": "s3://bucket/key",
+        "https_url": "https://example.com/key",
+        "size_mb": 42.0,
+        "geometry": None,
+        "cell_overlap_mode": "contains",
+    }
+
+    result = SearchResultSchema.from_grid_cell(cell, VIIRS_I1, **row_dict)
+
+    assert result["cell_row"] == "10U"
+    assert result["cell_col"] == "20R"
+    assert result["cell_dist"] == 100
+    assert result["cell_epsg"] == "EPSG:32615"
+    assert result["channel_name"] == "I1"
+
+    reconstructed = SearchResultSchema.to_grid_cell(result)
+    assert reconstructed.row == cell.row
+    assert reconstructed.col == cell.col
+    assert reconstructed.dist == cell.dist
+
+
 def test_schema_rejects_nulls_in_required_columns():
     """Schema rejects a GeoDataFrame if required columns contain nulls."""
-    # Test each required column one by one
-    for null_col in ["product_name", "granule_id", "start_time", "end_time"]:
+    GridCell(
+        row="10U",
+        col="20R",
+        dist=100,
+        bounds=Polygon([(0, 0), (1, 0), (1, 1), (0, 1)]),
+        epsg="EPSG:32615",
+    )
+    test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
+
+    for null_col in [
+        "product_name",
+        "granule_id",
+        "start_time",
+        "end_time",
+        "cell_row",
+        "cell_col",
+        "cell_dist",
+        "cell_epsg",
+        "channel_name",
+    ]:
         row = {
             "product_name": "TEST",
             "granule_id": "123",
             "start_time": pd.to_datetime("2023-01-01"),
             "end_time": pd.to_datetime("2023-01-02"),
-            "overlapping_spatial_extent": None,
-            "input_spatial_extent": None,
+            "cell_row": "10U",
+            "cell_col": "20R",
+            "cell_dist": 100,
+            "cell_epsg": "EPSG:32615",
+            "cell_bounds": test_geom,
+            "channel_name": "I1",
             "cell_overlap_mode": "contains",
         }
-        # Set the one column to None (null)
         row[null_col] = None
 
-        gdf = gpd.GeoDataFrame([row], geometry=[None])
+        gdf = gpd.GeoDataFrame([row], geometry=[test_geom])
 
         with pytest.raises(SchemaError):
             SearchResultSchema.validate(gdf)
@@ -57,6 +116,7 @@ def test_schema_rejects_nulls_in_required_columns():
 
 def test_schema_allows_extra_columns():
     """Extra columns beyond the schema are preserved (strict=False)."""
+    test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
 
     gdf = gpd.GeoDataFrame(
         [
@@ -68,14 +128,18 @@ def test_schema_allows_extra_columns():
                 "s3_url": "s3://bucket/key",
                 "https_url": "https://example.com/key",
                 "size_mb": 42.0,
+                "cell_row": "10U",
+                "cell_col": "20R",
+                "cell_dist": 100,
+                "cell_epsg": "EPSG:32615",
+                "cell_bounds": test_geom,
+                "channel_name": "I1",
+                "cell_overlap_mode": "contains",
                 "my_custom_column": "extra_value",
                 "another_custom": 999,
-                "overlapping_spatial_extent": None,
-                "input_spatial_extent": None,
-                "cell_overlap_mode": "contains",
             }
         ],
-        geometry=[Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])],
+        geometry=[test_geom],
     )
 
     gdf = SearchResultSchema.validate(gdf)
@@ -93,6 +157,7 @@ def test_schema_allows_extra_columns():
 
 def test_schema_allows_null_geometry():
     """Geometry column can be None (e.g. GOES products without granule-level footprints)."""
+    test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
 
     gdf = gpd.GeoDataFrame(
         [
@@ -104,8 +169,12 @@ def test_schema_allows_null_geometry():
                 "s3_url": "s3://goes-bucket/key",
                 "https_url": "https://example.com/goes",
                 "size_mb": 100.0,
-                "overlapping_spatial_extent": None,
-                "input_spatial_extent": None,
+                "cell_row": "10U",
+                "cell_col": "20R",
+                "cell_dist": 100,
+                "cell_epsg": "EPSG:32615",
+                "cell_bounds": test_geom,
+                "channel_name": "C01",
                 "cell_overlap_mode": "contains",
             }
         ],

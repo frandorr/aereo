@@ -15,6 +15,32 @@ import utm
 from shapely.geometry import Point, MultiPolygon, LineString
 from shapely.geometry.base import BaseGeometry
 
+from typing import Any
+import pandera.pandas as pa
+from pandera.typing import Series
+from pandera.typing.geopandas import GeoSeries
+
+
+class GridSchema(pa.DataFrameModel):  # type: ignore[misc]
+    """Schema for validating a MajorTom-compliant grid GeoDataFrame.
+
+    Defines the standard set of columns for the global 100km grid.
+    """
+
+    name: Series[pa.String] = pa.Field(nullable=False)
+    row: Series[pa.String] = pa.Field(nullable=False)
+    col: Series[pa.String] = pa.Field(nullable=False)
+    row_idx: Series[pa.Int64] = pa.Field(nullable=False)
+    col_idx: Series[pa.Int64] = pa.Field(nullable=False)
+    utm_zone: Series[pa.String] = pa.Field(nullable=False)
+    epsg: Series[pa.String] = pa.Field(nullable=False)
+    geometry: GeoSeries[Any] = pa.Field(nullable=False)
+    cell_bounds: GeoSeries[Any] = pa.Field(nullable=False)
+
+    class Config:
+        strict = False
+        coerce = True
+
 
 class GridNotFoundError(Exception):
     """Exception raised when a grid is not found."""
