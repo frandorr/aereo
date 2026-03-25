@@ -25,41 +25,48 @@ def make_test_gdf(urls):
     if not urls:
         df = pd.DataFrame(
             columns=[
-                "product_name",
+                "unique_id",
+                "product_id",
                 "granule_id",
                 "start_time",
                 "end_time",
                 "s3_url",
                 "https_url",
                 "size_mb",
-                "geometry",
-                "cell_row",
-                "cell_col",
-                "cell_dist",
-                "cell_epsg",
+                "name",
+                "row",
+                "col",
+                "row_idx",
+                "col_idx",
+                "utm_zone",
+                "epsg",
                 "cell_bounds",
-                "channel_name",
-                "cell_overlap_mode",
+                "channel",
+                "overlap_mode",
             ]
         )
-        return gpd.GeoDataFrame(df, geometry="geometry")
+        return gpd.GeoDataFrame(df, geometry=gpd.GeoSeries([], dtype="geometry"))
 
     df = pd.DataFrame(
         {
-            "product_name": ["VNP"] * len(urls),
+            "unique_id": [f"U{i}" for i in range(len(urls))],
+            "product_id": ["VNP"] * len(urls),
             "granule_id": [f"G{i}" for i in range(len(urls))],
             "start_time": [pd.Timestamp("2024-01-01")] * len(urls),
             "end_time": [pd.Timestamp("2024-01-01")] * len(urls),
             "s3_url": ["s3://something/"] * len(urls),
             "https_url": urls,
             "size_mb": [1.0] * len(urls),
-            "cell_row": ["10U"] * len(urls),
-            "cell_col": ["20R"] * len(urls),
-            "cell_dist": [100] * len(urls),
-            "cell_epsg": ["EPSG:32615"] * len(urls),
+            "name": ["10U_20R"] * len(urls),
+            "row": ["10U"] * len(urls),
+            "col": ["20R"] * len(urls),
+            "row_idx": [0] * len(urls),
+            "col_idx": [0] * len(urls),
+            "utm_zone": ["31N"] * len(urls),
+            "epsg": ["EPSG:32615"] * len(urls),
             "cell_bounds": [test_geom] * len(urls),
-            "channel_name": ["I1"] * len(urls),
-            "cell_overlap_mode": ["contains"] * len(urls),
+            "channel": ["I1"] * len(urls),
+            "overlap_mode": ["contains"] * len(urls),
         }
     )
     return gpd.GeoDataFrame(df, geometry=[Point(0, 0)] * len(urls))

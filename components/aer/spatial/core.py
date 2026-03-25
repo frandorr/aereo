@@ -312,6 +312,8 @@ class Grid:
         self.points["cell_bounds"] = self.points.apply(
             self.get_bounded_footprint, axis=1
         )
+        # validate self.points with grid schema
+        GridSchema.validate(self.points)
 
     def get_rows(self):
         # Define set of latitudes to use, based on the grid distance

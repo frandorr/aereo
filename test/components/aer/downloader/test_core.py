@@ -19,7 +19,8 @@ class TestDownloadedResultSchema:
         test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
         df = pd.DataFrame(
             {
-                "product_name": ["VNP02IMG"],
+                "unique_id": ["U1"],
+                "product_id": ["VNP02IMG"],
                 "granule_id": ["G1"],
                 "start_time": [pd.Timestamp("2024-01-01T00:00:00")],
                 "end_time": [pd.Timestamp("2024-01-01T00:05:00")],
@@ -28,13 +29,16 @@ class TestDownloadedResultSchema:
                 "size_mb": [10.5],
                 "local_path": ["/tmp/data.nc"],
                 "download_status": [DownloadStatus.COMPLETE.value],
-                "cell_row": ["10U"],
-                "cell_col": ["20R"],
-                "cell_dist": [100],
-                "cell_epsg": ["EPSG:32615"],
+                "name": ["10U_20R"],
+                "row": ["10U"],
+                "col": ["20R"],
+                "row_idx": [0],
+                "col_idx": [0],
+                "utm_zone": ["31N"],
+                "epsg": ["EPSG:32615"],
                 "cell_bounds": [test_geom],
-                "channel_name": ["I1"],
-                "cell_overlap_mode": ["contains"],
+                "channel": ["I1"],
+                "overlap_mode": ["contains"],
             }
         )
         gdf = gpd.GeoDataFrame(df, geometry=[Point(0, 0)])
