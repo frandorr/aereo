@@ -1,13 +1,10 @@
 from datetime import datetime
-from typing import Any
 
 import geopandas as gpd
-import pandas as pd
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Point
 
 from aer.extract.core import ExtractedResultSchema, ExtractPlugin
-from aer.search.core import SearchResultSchema
 
 
 def test_extracted_result_schema() -> None:
@@ -31,6 +28,7 @@ def test_extracted_result_schema() -> None:
         "col_idx": [0],
         "utm_zone": ["31N"],
         "epsg": ["EPSG:32615"],
+        "dist": [100],
         "cell_bounds": [test_geom],
         "channel": ["I1"],
         "overlap_mode": ["contains"],
@@ -51,15 +49,17 @@ def test_extracted_result_schema() -> None:
 
 def test_extract_plugin_protocol() -> None:
     """Test that the ExtractPlugin Protocol can be implemented."""
+    from aer.extract.core import ExtractionTask
 
     class DummyExtractPlugin:
         def extract(
             self,
-            gdf: GeoDataFrame[SearchResultSchema],
-            output_dir: str,
-            **options: Any,
-        ) -> GeoDataFrame[ExtractedResultSchema]:
-            return pd.DataFrame()
+            task: ExtractionTask,
+        ) -> ExtractionTask:
+            """Dummy implementation that returns the task with updated status."""
+            return task
 
+    # The key verification: DummyExtractPlugin can be assigned to ExtractPlugin
+    # This is the structural subtyping check that Protocol provides
     plugin: ExtractPlugin = DummyExtractPlugin()
     assert hasattr(plugin, "extract")
