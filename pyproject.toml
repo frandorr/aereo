@@ -38,14 +38,14 @@ optional-dependencies.earthaccess = [ "aer-search-earthaccess>=1.1.1" ]
 
 [dependency-groups]
 dev = [
-  "matplotlib>=3.10.8",
-  "satpy>=0.59",
-  "aer-extract-aws-goes>=0.1.0",
+  "aer-extract-aws-goes>=0.1",
   "aer-search-aws-goes>=2",
-  "aer-search-earthaccess>=2.0.3,<3.0.0",
+  "aer-search-earthaccess>=2.0.3,<3",
+  "matplotlib>=3.10.8",
   "polylith-cli>=1.42.5,<2",
   "pytest>=9.0.2,<10",
   "python-semantic-release>=10.5.3,<11",
+  "satpy>=0.59",
   "types-requests>=2.32.4.20260107,<3",
 ]
 
@@ -54,10 +54,10 @@ build.dev-mode-dirs = [ "components", "bases", "development", "." ]
 metadata.allow-direct-references = true
 
 [tool.uv]
-sources.aer-core = { workspace = true }
-sources.aer-search-aws-goes = { path = "/root/repos/aer-search-aws-goes/projects/aer-search-aws-goes", editable = true }
-sources.aer-search-earthaccess = { path = "/root/repos/aer-search-earthaccess/projects/aer-search-earthaccess", editable = true }
-sources.aer-extract-aws-goes = { path = "/root/repos/aer-extract-aws-goes/projects/aer-extract-aws-goes", editable = true }
+sources.aer-core = { path = "projects/aer-core", editable = true }
+sources.aer-extract-aws-goes = { path = "../aer-extract-aws-goes/projects/aer-extract-aws-goes", editable = true }
+sources.aer-search-aws-goes = { path = "../aer-search-aws-goes/projects/aer-search-aws-goes", editable = true }
+sources.aer-search-earthaccess = { path = "../aer-search-earthaccess/projects/aer-search-earthaccess", editable = true }
 managed = true
 workspace.members = [ "projects/*" ]
 
