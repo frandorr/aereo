@@ -1,15 +1,21 @@
 import pytest
-from datetime import datetime
+import attrs
+from datetime import datetime, timezone
 import geopandas as gpd
 import pandas as pd
 from pandera.errors import SchemaError
 from shapely.geometry import Polygon, Point
 
-from aer.search import SearchQuery, SearchResultSchema
+from aer.search import (
+    SearchQuery,
+    SearchResultSchema,
+    serialize_search_results,
+    deserialize_search_results,
+)
 from aer.temporal import TimeRange
 from aer.spectral import Product
 from aer.spatial import GridCell, GridSpatialExtent
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 
 def get_channel(pid, cid):
@@ -59,17 +65,40 @@ def test_schema_to_grid_cell():
         "row_idx": 0,
         "col_idx": 0,
         "utm_zone": "31N",
+        "epsg": "EPSG:32615",
+        "dist": 100,
         "overlap_mode": "contains",
     }
 
-    result = SearchResultSchema.from_grid_cell(cell, VIIRS_I1, **row_dict)
+    from aer.spatial import GridRow
+
+    grid_row = GridRow.from_grid_cell(cell, geometry=Point(0, 0))
+    result = {
+        **row_dict,
+        **attrs.asdict(grid_row),
+        "channel": VIIRS_I1,
+    }
 
     assert result["row"] == "10U"
     assert result["col"] == "20R"
     assert result["epsg"] == "EPSG:32615"
     assert result["channel"] == VIIRS_I1
 
-    reconstructed = SearchResultSchema.to_grid_cell(result)
+    reconstructed = GridRow(
+        **{
+            k: result[k]
+            for k in [
+                "name",
+                "row",
+                "col",
+                "utm_zone",
+                "epsg",
+                "dist",
+                "geometry",
+                "cell_bounds",
+            ]
+        }
+    )
     assert reconstructed.row == cell.row
     assert reconstructed.col == cell.col
 
@@ -108,6 +137,7 @@ def test_schema_rejects_nulls_in_required_columns():
             "col_idx": 0,
             "utm_zone": "31N",
             "epsg": "EPSG:32615",
+            "dist": 100,
             "cell_bounds": test_geom,
             "channel": "I1",
             "overlap_mode": "contains",
@@ -142,6 +172,7 @@ def test_schema_allows_extra_columns():
                 "col_idx": 0,
                 "utm_zone": "31N",
                 "epsg": "EPSG:32615",
+                "dist": 100,
                 "cell_bounds": test_geom,
                 "channel": "I1",
                 "overlap_mode": "contains",
@@ -187,6 +218,7 @@ def test_schema_allows_null_geometry():
                 "col_idx": 0,
                 "utm_zone": "31N",
                 "epsg": "EPSG:32615",
+                "dist": 100,
                 "cell_bounds": test_geom,
                 "channel": "C01",
                 "overlap_mode": "contains",
@@ -245,3 +277,51 @@ def test_search_query_channel_validation():
         satellites=(),
         spatial_extent=mock_spatial_extent,
     )
+
+
+def test_serialization_deserialization():
+    """Verify that search results can be serialized for Parquet and restored."""
+    from aer.spectral import Product
+
+    test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
+    pid = "VNP02IMG"
+    product = Product.get(pid)
+    channel = product.channels[0]
+
+    data = {
+        "unique_id": ["U1"],
+        "product_id": [pid],
+        "granule_id": ["G1"],
+        "start_time": [pd.to_datetime("2023-01-01")],
+        "end_time": [pd.to_datetime("2023-01-02")],
+        "s3_url": ["s3://bucket/key"],
+        "https_url": ["https://example.com/key"],
+        "size_mb": [42.0],
+        "name": ["10U_20R"],
+        "row": ["10U"],
+        "col": ["20R"],
+        "row_idx": [0],
+        "col_idx": [0],
+        "utm_zone": ["31N"],
+        "epsg": ["EPSG:32615"],
+        "dist": [100],
+        "cell_bounds": [test_geom],
+        "channel": [channel],
+        "overlap_mode": ["contains"],
+    }
+    gdf = gpd.GeoDataFrame(data, geometry=[test_geom])
+    gdf = SearchResultSchema.validate(gdf)
+
+    # 1. Serialize
+    serialized = serialize_search_results(gdf)
+    assert isinstance(serialized.iloc[0]["channel"], str)
+    assert serialized.iloc[0]["channel"] == channel.c_id
+
+    # 2. Deserialize
+    deserialized = deserialize_search_results(serialized)
+    assert not deserialized.empty
+    assert deserialized.iloc[0]["channel"] == channel
+    assert deserialized.iloc[0]["product_id"] == pid
+
+    # Validate it still matches schema
+    SearchResultSchema.validate(deserialized)
