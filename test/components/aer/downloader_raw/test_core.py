@@ -23,41 +23,48 @@ def make_test_gdf(urls):
     if not urls:
         df = pd.DataFrame(
             columns=[
-                "product_name",
+                "unique_id",
+                "product_id",
                 "granule_id",
                 "start_time",
                 "end_time",
                 "s3_url",
                 "https_url",
                 "size_mb",
-                "geometry",
-                "cell_row",
-                "cell_col",
-                "cell_dist",
-                "cell_epsg",
+                "name",
+                "row",
+                "col",
+                "row_idx",
+                "col_idx",
+                "utm_zone",
+                "epsg",
                 "cell_bounds",
-                "channel_name",
-                "cell_overlap_mode",
+                "channel",
+                "overlap_mode",
             ]
         )
-        return gpd.GeoDataFrame(df, geometry="geometry")
+        return gpd.GeoDataFrame(df, geometry=gpd.GeoSeries([], dtype="geometry"))
 
     df = pd.DataFrame(
         {
-            "product_name": ["VNP"] * len(urls),
+            "unique_id": [f"U{i}" for i in range(len(urls))],
+            "product_id": ["VNP"] * len(urls),
             "granule_id": [f"G{i}" for i in range(len(urls))],
             "start_time": [pd.Timestamp("2024-01-01")] * len(urls),
             "end_time": [pd.Timestamp("2024-01-01")] * len(urls),
             "s3_url": ["s3://something/"] * len(urls),
             "https_url": urls,
             "size_mb": [1.0] * len(urls),
-            "cell_row": ["10U"] * len(urls),
-            "cell_col": ["20R"] * len(urls),
-            "cell_dist": [100] * len(urls),
-            "cell_epsg": ["EPSG:32615"] * len(urls),
+            "name": ["10U_20R"] * len(urls),
+            "row": ["10U"] * len(urls),
+            "col": ["20R"] * len(urls),
+            "row_idx": [0] * len(urls),
+            "col_idx": [0] * len(urls),
+            "utm_zone": ["31N"] * len(urls),
+            "epsg": ["EPSG:32615"] * len(urls),
             "cell_bounds": [test_geom] * len(urls),
-            "channel_name": ["I1"] * len(urls),
-            "cell_overlap_mode": ["contains"] * len(urls),
+            "channel": ["I1"] * len(urls),
+            "overlap_mode": ["contains"] * len(urls),
         }
     )
     return gpd.GeoDataFrame(df, geometry=[Point(0, 0)] * len(urls))
@@ -153,25 +160,27 @@ class TestDownloadRaw:
 
         df = pd.DataFrame(
             {
-                "product_name": ["VNP", "VNP"],
+                "unique_id": ["U0", "U1"],
+                "product_id": ["VNP", "VNP"],
                 "granule_id": ["G0", "G1"],
                 "start_time": [pd.Timestamp("2024-01-01")] * 2,
                 "end_time": [pd.Timestamp("2024-01-01")] * 2,
                 "s3_url": ["s3://something/", "s3://something/"],
                 "https_url": [None, None],
                 "size_mb": [1.0, 1.0],
-                "overlapping_spatial_extent": [None, None],
-                "input_spatial_extent": [None, None],
-                "cell_overlap_mode": ["contains", "contains"],
-                "cell_row": ["10U", "10U"],
-                "cell_col": ["20R", "20R"],
-                "cell_dist": [100, 100],
-                "cell_epsg": ["EPSG:32615", "EPSG:32615"],
+                "name": ["10U_20R", "10U_20R"],
+                "row": ["10U", "10U"],
+                "col": ["20R", "20R"],
+                "row_idx": [0, 0],
+                "col_idx": [0, 0],
+                "utm_zone": ["31N", "31N"],
+                "epsg": ["EPSG:32615", "EPSG:32615"],
                 "cell_bounds": [
                     Polygon([(0, 0), (1, 0), (1, 1), (0, 1)]),
                     Polygon([(0, 0), (1, 0), (1, 1), (0, 1)]),
                 ],
-                "channel_name": ["I1", "I1"],
+                "channel": ["I1", "I1"],
+                "overlap_mode": ["contains", "contains"],
             }
         )
         gdf = gpd.GeoDataFrame(df, geometry=[Point(0, 0), Point(1, 1)])
