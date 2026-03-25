@@ -19,9 +19,12 @@ from typing import Any
 import pandera.pandas as pa
 from pandera.typing import Series
 from pandera.typing.geopandas import GeoSeries
+from structlog import get_logger
+
+logger = get_logger()
 
 
-class GridSchema(pa.DataFrameModel):  # type: ignore[misc]
+class GridSchema(pa.DataFrameModel):
     """Schema for validating a MajorTom-compliant grid GeoDataFrame.
 
     Defines the standard set of columns for the global 100km grid.
@@ -34,12 +37,77 @@ class GridSchema(pa.DataFrameModel):  # type: ignore[misc]
     col_idx: Series[pa.Int64] = pa.Field(nullable=False)
     utm_zone: Series[pa.String] = pa.Field(nullable=False)
     epsg: Series[pa.String] = pa.Field(nullable=False)
+    dist: Series[pa.Int64] = pa.Field(nullable=False)
     geometry: GeoSeries[Any] = pa.Field(nullable=False)
     cell_bounds: GeoSeries[Any] = pa.Field(nullable=False)
 
     class Config:
         strict = False
         coerce = True
+
+
+@attrs.frozen
+class GridRow:
+    """A single row representation of a grid cell following GridSchema.
+
+    Attributes:
+        name (str): Grid cell name (row_col).
+        row (str): Grid row name.
+        col (str): Grid column name.
+        row_idx (int): Row index.
+        col_idx (int): Column index.
+        utm_zone (str): UTM zone string.
+        epsg (str): EPSG code string.
+        dist (int): Grid resolution in kilometers.
+        geometry (Any): Primary geometry (footprint or point).
+        cell_bounds (Polygon): The bounding box of the grid cell.
+    """
+
+    name: str
+    row: str
+    col: str
+    row_idx: int
+    col_idx: int
+    utm_zone: str
+    epsg: str
+    dist: int
+    geometry: Any
+    cell_bounds: Polygon
+
+    @property
+    def grid_cell(self) -> "GridCell":
+        """Return a GridCell from this GridRow's attributes.
+
+        Returns:
+            GridCell: A GridCell constructed from the row, col, dist, cell_bounds, and epsg.
+        """
+        return GridCell(
+            row=self.row,
+            col=self.col,
+            dist=self.dist,
+            bounds=self.cell_bounds,
+            epsg=self.epsg,
+        )
+
+    @classmethod
+    def from_grid_cell(
+        cls, cell: "GridCell", geometry: Any = None, **overrides
+    ) -> "GridRow":
+        """Create a GridRow from a GridCell."""
+        data = {
+            "name": f"{cell.row}_{cell.col}",
+            "row": cell.row,
+            "col": cell.col,
+            "row_idx": int(cell.row[:-1]) if cell.row else 0,
+            "col_idx": int(cell.col[:-1]) if cell.col else 0,
+            "utm_zone": cell.epsg.split(":")[-1] if cell.epsg else "",
+            "epsg": cell.epsg,
+            "dist": cell.dist,
+            "cell_bounds": cell.bounds,
+            "geometry": geometry or cell.bounds,
+        }
+        data.update(overrides)
+        return cls(**data)
 
 
 class GridNotFoundError(Exception):
@@ -211,7 +279,16 @@ class GridDefinition:
                     raise ValueError("Grid is empty.")
                 return gdf
             case result.Failure(_):
-                raise GridNotFoundError("Grid not found. Create grid first.")
+                logger.info(
+                    "Grid not found. Generating now...",
+                    name=self.name,
+                    dist=self.dist,
+                )
+                from aer.spatial.core import Grid
+
+                grid_obj = Grid(name=self.name, dist=float(self.dist))
+                grid_obj.save_to_parquet()
+                return grid_obj.points
 
     def intersecting_grid_spatial_extent(self, geometry: Polygon) -> GridSpatialExtent:
         """Get all grid cells that intersect with a given geometry.
@@ -418,6 +495,7 @@ class Grid:
                     "col_idx": grid_col_idx,
                     "utm_zone": utm_zones,
                     "epsg": epsgs,
+                    "dist": [self.dist] * len(point_names),
                 },
                 geometry=gpd.points_from_xy(grid_lons, grid_lats),  # pyright: ignore[reportUnknownArgumentType]
             )
@@ -543,7 +621,18 @@ class Grid:
 
     def save_to_parquet(self):
         """Save grid points to a parquet file in the configured grid store."""
+        if ENV_SETTINGS.GRID_STORE_PATH is None:
+            raise ValueError(
+                "GRID_STORE_PATH not configured. Set it in .env file first."
+            )
         ENV_SETTINGS.GRID_STORE_PATH.mkdir(parents=True, exist_ok=True)
         self.points.reset_index(drop=True).to_parquet(
             ENV_SETTINGS.GRID_STORE_PATH / f"grid_{self.name}_{self.dist}km.parquet"
         )  # pyright: ignore[reportUnknownMemberType]
+        logger.info(
+            "Grid saved to parquet",
+            grid_name=self.name,
+            dist=self.dist,
+            path=ENV_SETTINGS.GRID_STORE_PATH
+            / f"grid_{self.name}_{self.dist}km.parquet",
+        )
