@@ -29,17 +29,19 @@ dependencies = [
   "python-geotiepoints>=1.9,<2",
   "pyyaml>=6.0.3,<7",
   "returns[compatible-mypy]>=0.26,<0.27",
-  "s3fs>=2025.2,<2026",
+  "s3fs>=2025.2,<2027",
   "satpy>=0.59,<0.60",
   "shapely>=2.1.2,<3",
   "structlog>=25.5,<26",
   "utm>=0.8.1,<0.9",
 ]
-optional-dependencies.aws-goes = [ "aer-search-aws-goes>=2,<3" ]
-optional-dependencies.earthaccess = [ "aer-search-earthaccess>=1.1.1,<2" ]
+optional-dependencies.aws-goes = [ "aer-search-aws-goes>=2" ]
+optional-dependencies.earthaccess = [ "aer-search-earthaccess>=1.1.1" ]
 
 [dependency-groups]
 dev = [
+  "aer-search-aws-goes>=2",
+  "aer-search-earthaccess>=2.0.3,<3.0.0",
   "polylith-cli>=1.42.5,<2",
   "pytest>=9.0.2,<10",
   "python-semantic-release>=10.5.3,<11",
@@ -52,6 +54,8 @@ metadata.allow-direct-references = true
 
 [tool.uv]
 sources.aer-core = { workspace = true }
+sources.aer-search-aws-goes = { path = "/root/repos/aer-search-aws-goes/projects/aer-search-aws-goes", editable = true }
+sources.aer-search-earthaccess = { path = "/root/repos/aer-search-earthaccess/projects/aer-search-earthaccess", editable = true }
 managed = true
 workspace.members = [ "projects/*" ]
 add-bounds = "major"
