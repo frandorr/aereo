@@ -23,23 +23,26 @@ def _dummy_search(query: Any, **kwargs: Any) -> gpd.GeoDataFrame:
 
     test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
     data = {
-        "product_name": ["GOES-ABI-L2-CMIP"],
+        "unique_id": ["U1"],
+        "product_id": ["GOES-ABI-L2-CMIP"],
         "granule_id": ["G16_s20250101_e20250102"],
         "start_time": [datetime(2025, 1, 1)],
         "end_time": [datetime(2025, 1, 2)],
         "s3_url": ["s3://noaa-goes16/test.nc"],
         "https_url": [None],
         "size_mb": [42.0],
-        "geometry": [Point(-75.0, 40.0)],
-        "cell_row": ["10U"],
-        "cell_col": ["20R"],
-        "cell_dist": [100],
-        "cell_epsg": ["EPSG:32615"],
+        "name": ["10U_20R"],
+        "row": ["10U"],
+        "col": ["20R"],
+        "row_idx": [0],
+        "col_idx": [0],
+        "utm_zone": ["31N"],
+        "epsg": ["EPSG:32615"],
         "cell_bounds": [test_geom],
-        "channel_name": ["C01"],
-        "cell_overlap_mode": ["contains"],
+        "channel": ["C01"],
+        "overlap_mode": ["contains"],
     }
-    return gpd.GeoDataFrame(data, geometry="geometry")
+    return gpd.GeoDataFrame(data, geometry=[Point(-75.0, 40.0)])
 
 
 @plugin(name="dummy-extract", category="extract")
@@ -84,7 +87,7 @@ def test_search_then_extract_integration() -> None:
     assert validated.iloc[0]["resolution"] == 2000.0
 
     # Original search columns preserved
-    assert validated.iloc[0]["product_name"] == "GOES-ABI-L2-CMIP"
+    assert validated.iloc[0]["product_id"] == "GOES-ABI-L2-CMIP"
     assert validated.iloc[0]["granule_id"] == "G16_s20250101_e20250102"
 
 
@@ -92,23 +95,26 @@ def test_extract_empty_gdf() -> None:
     """Extract on empty (but schema-valid) GeoDataFrame returns empty result."""
     empty_gdf = gpd.GeoDataFrame(
         {
-            "product_name": pd.Series([], dtype="str"),
+            "unique_id": pd.Series([], dtype="str"),
+            "product_id": pd.Series([], dtype="str"),
             "granule_id": pd.Series([], dtype="str"),
             "start_time": pd.Series([], dtype="datetime64[ns]"),
             "end_time": pd.Series([], dtype="datetime64[ns]"),
             "s3_url": pd.Series([], dtype="str"),
             "https_url": pd.Series([], dtype="str"),
             "size_mb": pd.Series([], dtype="float"),
-            "geometry": gpd.GeoSeries([], dtype="geometry"),
-            "cell_row": pd.Series([], dtype="str"),
-            "cell_col": pd.Series([], dtype="str"),
-            "cell_dist": pd.Series([], dtype="int64"),
-            "cell_epsg": pd.Series([], dtype="str"),
+            "name": pd.Series([], dtype="str"),
+            "row": pd.Series([], dtype="str"),
+            "col": pd.Series([], dtype="str"),
+            "row_idx": pd.Series([], dtype="int64"),
+            "col_idx": pd.Series([], dtype="int64"),
+            "utm_zone": pd.Series([], dtype="str"),
+            "epsg": pd.Series([], dtype="str"),
             "cell_bounds": gpd.GeoSeries([], dtype="geometry"),
-            "channel_name": pd.Series([], dtype="str"),
-            "cell_overlap_mode": pd.Series([], dtype="str"),
+            "channel": pd.Series([], dtype="str"),
+            "overlap_mode": pd.Series([], dtype="str"),
         },
-        geometry="geometry",
+        geometry=gpd.GeoSeries([], dtype="geometry"),
     )
 
     extracted = run_extract("dummy-extract", empty_gdf, "/tmp/empty")

@@ -3,10 +3,10 @@ from typing import Any, Literal
 import attrs
 import pandera.pandas as pa
 from pandera.typing import Series
-from pandera.typing.geopandas import GeoDataFrame, GeoSeries
+from pandera.typing.geopandas import GeoDataFrame
 from structlog import get_logger
 
-from aer.spatial import GridCell, GridSpatialExtent
+from aer.spatial import GridCell, GridSpatialExtent, GridSchema
 from aer.spectral import Channel, Product, Satellite
 from aer.temporal import TimeRange
 from typing import Protocol
@@ -16,32 +16,24 @@ logger = get_logger()
 CellOverlapMode = Literal["contains", "intersects"]
 
 
-class SearchResultSchema(pa.DataFrameModel):  # type: ignore[misc]
+class SearchResultSchema(GridSchema):
     """Schema defining search results with one row per (granule, grid cell, channel).
 
     Each row represents a single file intersecting a single grid cell for a single
     channel. This exploded format allows direct iteration without unpacking nested
     structures.
-
-    The ``geometry`` column holds the granule footprint polygon (nullable
-    because some products like GOES may not carry granule-level geometry).
     """
 
-    product_name: Series[pa.String] = pa.Field(nullable=False)
+    unique_id: Series[pa.String] = pa.Field(nullable=False)
+    product_id: Series[pa.String] = pa.Field(nullable=False)
     granule_id: Series[pa.String] = pa.Field(nullable=False)
     start_time: Series[pa.DateTime] = pa.Field(nullable=False)
     end_time: Series[pa.DateTime] = pa.Field(nullable=False)
+    channel: Series[pa.String] = pa.Field(nullable=False)
+    overlap_mode: Series[pa.String] = pa.Field(nullable=False)
     s3_url: Series[pa.String] = pa.Field(nullable=True)
     https_url: Series[pa.String] = pa.Field(nullable=True)
     size_mb: Series[float] = pa.Field(nullable=True)
-    geometry: GeoSeries[Any] = pa.Field(nullable=True)
-    cell_row: Series[pa.String] = pa.Field(nullable=False)
-    cell_col: Series[pa.String] = pa.Field(nullable=False)
-    cell_dist: Series[pa.Int64] = pa.Field(nullable=False)
-    cell_epsg: Series[pa.String] = pa.Field(nullable=False)
-    cell_bounds: GeoSeries[Any] = pa.Field(nullable=False)
-    channel_name: Series[pa.String] = pa.Field(nullable=False)
-    cell_overlap_mode: Series[pa.String] = pa.Field(nullable=False)
 
     class Config:
         strict = False
@@ -54,24 +46,22 @@ class SearchResultSchema(pa.DataFrameModel):  # type: ignore[misc]
         """Create a row dict from a GridCell and Channel."""
         return {
             **base_fields,
-            "cell_row": cell.row,
-            "cell_col": cell.col,
-            "cell_dist": cell.dist,
-            "cell_epsg": cell.epsg,
+            "row": cell.row,
+            "col": cell.col,
+            "epsg": cell.epsg,
             "cell_bounds": cell.bounds,
-            "channel_name": channel.c_id,
+            "channel": channel.c_id,
         }
 
     @classmethod
     def to_grid_cell(cls, row: dict[str, Any]) -> "GridCell":
         """Reconstruct a GridCell from a row."""
-
         return GridCell(
-            row=row["cell_row"],
-            col=row["cell_col"],
-            dist=row["cell_dist"],
+            row=row["row"],
+            col=row["col"],
+            dist=row.get("cell_dist", 100),  # dist is not in new schema, default to 100
             bounds=row["cell_bounds"],
-            epsg=row["cell_epsg"],
+            epsg=row["epsg"],
         )
 
 
