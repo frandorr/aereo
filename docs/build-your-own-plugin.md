@@ -91,3 +91,26 @@ extracted = run_extract("acme_extract", results, "/tmp/acme")
 ```
 
 Because your plugin is just a standard Python package, you can publish it to PyPI (`uv build` and `uv publish`) or share it internally. Users just `pip install aer-plugin-acme` and they are ready to go!
+
+---
+
+## Troubleshooting: Local Development alongside `aer`
+
+If you are developing your plugin *simultaneously* with the `aer` core framework on the same machine (e.g., using `uv` workspace paths), you might notice that `uv sync` installs the dependencies into your `.venv` and masks your local source edits by copying physical files into `site-packages`.
+
+This happens because `aer` uses `hatch-polylith-bricks`, which by default bundles files during an editable install.
+
+To fix this and force `hatchling` to use `.pth` namespace pointer files instead of copying physical files, add `build.dev-mode-dirs` to the `[tool.hatch]` configuration in both your plugin's and `aer-core`'s `pyproject.toml` files:
+
+```toml
+[tool.hatch]
+build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", "." ]
+# Make sure to adjust paths based on your repository structure!
+```
+
+Then clear the cached packages and reinstall:
+```bash
+rm -rf .venv/lib/python*/site-packages/aer
+uv sync --reinstall-package aer-core --reinstall-package aer-plugin-acme
+```
+Your local imports will now properly resolve directly to your hot-reloading `components/` directory.
