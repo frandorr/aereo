@@ -29,7 +29,7 @@ class SearchResultSchema(GridSchema):
     granule_id: Series[pa.String] = pa.Field(nullable=False)
     start_time: Series[pa.DateTime] = pa.Field(nullable=False)
     end_time: Series[pa.DateTime] = pa.Field(nullable=False)
-    channel: Series[pa.String] = pa.Field(nullable=False)
+    channel: Series[pa.Object] = pa.Field(nullable=True)
     overlap_mode: Series[pa.String] = pa.Field(nullable=False)
     s3_url: Series[pa.String] = pa.Field(nullable=True)
     https_url: Series[pa.String] = pa.Field(nullable=True)
@@ -50,16 +50,16 @@ class SearchResultSchema(GridSchema):
             "col": cell.col,
             "epsg": cell.epsg,
             "cell_bounds": cell.bounds,
-            "channel": channel.c_id,
+            "channel": channel,
         }
 
     @classmethod
-    def to_grid_cell(cls, row: dict[str, Any]) -> "GridCell":
+    def to_grid_cell(cls, row: dict[str, Any], dist: int = 100) -> "GridCell":
         """Reconstruct a GridCell from a row."""
         return GridCell(
             row=row["row"],
             col=row["col"],
-            dist=row.get("cell_dist", 100),  # dist is not in new schema, default to 100
+            dist=dist,
             bounds=row["cell_bounds"],
             epsg=row["epsg"],
         )
