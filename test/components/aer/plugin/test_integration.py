@@ -19,6 +19,9 @@ from aer.plugin import plugin, run_extract, run_search
 @plugin(name="dummy-search", category="search")
 def _dummy_search(query: Any, **kwargs: Any) -> gpd.GeoDataFrame:
     """Return a minimal SearchResultSchema-compliant GeoDataFrame."""
+    from shapely.geometry import Polygon
+
+    test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
     data = {
         "product_name": ["GOES-ABI-L2-CMIP"],
         "granule_id": ["G16_s20250101_e20250102"],
@@ -28,8 +31,12 @@ def _dummy_search(query: Any, **kwargs: Any) -> gpd.GeoDataFrame:
         "https_url": [None],
         "size_mb": [42.0],
         "geometry": [Point(-75.0, 40.0)],
-        "overlapping_spatial_extent": [None],
-        "input_spatial_extent": [None],
+        "cell_row": ["10U"],
+        "cell_col": ["20R"],
+        "cell_dist": [100],
+        "cell_epsg": ["EPSG:32615"],
+        "cell_bounds": [test_geom],
+        "channel_name": ["C01"],
         "cell_overlap_mode": ["contains"],
     }
     return gpd.GeoDataFrame(data, geometry="geometry")
@@ -93,8 +100,12 @@ def test_extract_empty_gdf() -> None:
             "https_url": pd.Series([], dtype="str"),
             "size_mb": pd.Series([], dtype="float"),
             "geometry": gpd.GeoSeries([], dtype="geometry"),
-            "overlapping_spatial_extent": pd.Series([], dtype="object"),
-            "input_spatial_extent": pd.Series([], dtype="object"),
+            "cell_row": pd.Series([], dtype="str"),
+            "cell_col": pd.Series([], dtype="str"),
+            "cell_dist": pd.Series([], dtype="int64"),
+            "cell_epsg": pd.Series([], dtype="str"),
+            "cell_bounds": gpd.GeoSeries([], dtype="geometry"),
+            "channel_name": pd.Series([], dtype="str"),
             "cell_overlap_mode": pd.Series([], dtype="str"),
         },
         geometry="geometry",

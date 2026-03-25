@@ -19,6 +19,9 @@ from aer.downloader_aria2.core import (
 
 
 def make_test_gdf(urls):
+    from shapely.geometry import Polygon
+
+    test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
     if not urls:
         df = pd.DataFrame(
             columns=[
@@ -30,8 +33,12 @@ def make_test_gdf(urls):
                 "https_url",
                 "size_mb",
                 "geometry",
-                "overlapping_spatial_extent",
-                "input_spatial_extent",
+                "cell_row",
+                "cell_col",
+                "cell_dist",
+                "cell_epsg",
+                "cell_bounds",
+                "channel_name",
                 "cell_overlap_mode",
             ]
         )
@@ -46,8 +53,12 @@ def make_test_gdf(urls):
             "s3_url": ["s3://something/"] * len(urls),
             "https_url": urls,
             "size_mb": [1.0] * len(urls),
-            "overlapping_spatial_extent": [None] * len(urls),
-            "input_spatial_extent": [None] * len(urls),
+            "cell_row": ["10U"] * len(urls),
+            "cell_col": ["20R"] * len(urls),
+            "cell_dist": [100] * len(urls),
+            "cell_epsg": ["EPSG:32615"] * len(urls),
+            "cell_bounds": [test_geom] * len(urls),
+            "channel_name": ["I1"] * len(urls),
             "cell_overlap_mode": ["contains"] * len(urls),
         }
     )

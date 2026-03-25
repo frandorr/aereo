@@ -1,4 +1,5 @@
 codemap.csv
+.planning
 .local_ci_env
 .vscode
 development/local
