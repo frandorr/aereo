@@ -11,6 +11,7 @@ from aer.spatial.core import (
     reproject_polygon,
     get_utm_epsg_from_geometry,
     get_utm_zone_from_latlng,
+    GridRow,
 )
 
 __all__ = [
@@ -22,4 +23,5 @@ __all__ = [
     "reproject_polygon",
     "get_utm_epsg_from_geometry",
     "get_utm_zone_from_latlng",
+    "GridRow",
 ]
