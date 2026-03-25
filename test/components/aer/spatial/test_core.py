@@ -129,7 +129,7 @@ def test_grid_definition_load_grid_success_store_path(monkeypatch):
     grid_def = GridDefinition(name="TestGrid", dist=100)
     mock_gdf = gpd.GeoDataFrame()
 
-    with patch("aer.spatial.core.Path.exists", return_value=False):
+    with patch("aer.spatial.core.Path.exists", side_effect=[False, True]):
         with patch("geopandas.read_parquet", return_value=mock_gdf) as mock_read:
             result = grid_def.load_grid()
             assert isinstance(result, Success)
