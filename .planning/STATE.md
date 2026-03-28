@@ -48,6 +48,7 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260327-remov | Remove row_idx and col_idx from GridRow/G | 2026-03-25 | befb6e9 | [260327-remove-row-idx-and-col-idx-from-gridrow-](./quick/260327-remove-row-idx-and-col-idx-from-gridrow-/) |
 | 260328-deter | Determine whether ExtractPlugin.extract s | 2026-03-25 | 00ce438 | [260328-determine-whether-extractplugin-extract-](./quick/260328-determine-whether-extractplugin-extract-/) |
 | 260329-creat | Fix extraction component tests to match a | 2026-03-25 | 63d9738 | [260329-create-tests-for-extraction-component-an](./quick/260329-create-tests-for-extraction-component-an/) |
+| 260330-adap | adapt repository and models to remove UU | 2026-03-28 | 3bfe069 | [260330-adapt-repository-and-models-to-remove-uu](./quick/260330-adapt-repository-and-models-to-remove-uu/) |
 
 ## Progress
 
@@ -56,4 +57,4 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 - Current: Phase 1 context captured, ready to plan
 
 ---
-*Last activity: 2026-03-25 - Completed quick task 260329-creat: Fix extraction component tests to match actual class definitions*
+*Last activity: 2026-03-28 - Completed quick task 260330-adap: adapt repository and models to remove UUID from domain entities*
