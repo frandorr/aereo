@@ -49,6 +49,7 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260328-deter | Determine whether ExtractPlugin.extract s | 2026-03-25 | 00ce438 | [260328-determine-whether-extractplugin-extract-](./quick/260328-determine-whether-extractplugin-extract-/) |
 | 260329-creat | Fix extraction component tests to match a | 2026-03-25 | 63d9738 | [260329-create-tests-for-extraction-component-an](./quick/260329-create-tests-for-extraction-component-an/) |
 | 260330-adap | adapt repository and models to remove UU | 2026-03-28 | 3bfe069 | [260330-adapt-repository-and-models-to-remove-uu](./quick/260330-adapt-repository-and-models-to-remove-uu/) |
+| 260331-refa | refactor Instrument/Satellite to many-to- | 2026-03-28 | c357c95 | [260331-refactor-satellite-instrument-channel-re](./quick/260331-refactor-satellite-instrument-channel-re/) |
 
 ## Progress
 
@@ -57,4 +58,4 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 - Current: Phase 1 context captured, ready to plan
 
 ---
-*Last activity: 2026-03-28 - Completed quick task 260330-adap: adapt repository and models to remove UUID from domain entities*
+*Last activity: 2026-03-28 - Completed quick task 260331-refa: refactor Instrument/Satellite to many-to-many relationship*
