@@ -41,6 +41,7 @@ dev = [
   "aer-extract-aws-goes>=0.1",
   "aer-search-aws-goes>=2",
   "aer-search-earthaccess>=2.0.3,<3",
+  "basedpyright>=1.38",
   "graphviz>=0.21",
   "matplotlib>=3.10.8",
   "polylith-cli>=1.42.5,<2",
@@ -68,30 +69,17 @@ ini_options.markers = [
   "integration: marks tests as integration tests",
 ]
 
-[tool.mypy]
-# The mypy configurations: http://bit.ly/2zEl9WI
-mypy_path = "components:bases:development"
-ignore_missing_imports = true
-strict = true
-local_partial_types = true
-warn_unreachable = true
-explicit_package_bases = true
-enable_error_code = [
-  "truthy-bool",
-  "truthy-iterable",
-  "redundant-expr",
-  "unused-awaitable",
-  # "ignore-without-code",
-  "possibly-undefined",
-  "redundant-self",
-  # "explicit-override",
-  # "mutable-override",
-  "unimported-reveal",
-]
-disable_error_code = [
-  "no-untyped-def",  # TODO: fix
-  "no-untyped-call",
-]
+[tool.basedpyright]
+typeCheckingMode = "basic"
+reportMissingTypeStubs = false
+pythonVersion = "3.13"
+autoImportCompletions = true
+useLibraryCodeForTypes = true
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+reportMissingImports = true
+extraPaths = [ "components", "bases", "development" ]
 
 [tool.polylith]
 bricks."components/aer/spectral" = "aer/spectral"
