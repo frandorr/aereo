@@ -170,11 +170,17 @@ class AerRepository(ABC):
     def create_instrument(
         self,
         instrument_id: str,
-        satellite_id: str,
         instrument_name: str,
         sensor_type: str,
     ) -> str:
         """Create a new instrument and return its ID."""
+        pass
+
+    @abstractmethod
+    def link_instrument_to_satellite(
+        self, instrument_id: str, satellite_id: str
+    ) -> None:
+        """Link an instrument to a satellite (many-to-many relationship)."""
         pass
 
     @abstractmethod
