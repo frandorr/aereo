@@ -1,30 +1,29 @@
+import math
+from functools import cached_property
+from pathlib import Path
+from typing import Any
+
 import attrs
 import geopandas as gpd
-from functools import cached_property
-from shapely.geometry import Polygon
-from pyresample.geometry import AreaDefinition
-from aer.settings import ENV_SETTINGS
-from pyproj import Transformer
-from shapely.ops import transform
-from returns import result
-from pathlib import Path
-import math
 import numpy as np
 import pandas as pd
-import utm
-from shapely.geometry import Point, MultiPolygon, LineString
-from shapely.geometry.base import BaseGeometry
-
-from typing import Any
 import pandera.pandas as pa
+import utm
+from aer.settings import ENV_SETTINGS
 from pandera.typing import Series
 from pandera.typing.geopandas import GeoSeries
+from pyproj import Transformer
+from pyresample.geometry import AreaDefinition
+from returns import result
+from shapely.geometry import LineString, MultiPolygon, Point, Polygon
+from shapely.geometry.base import BaseGeometry
+from shapely.ops import transform
 from structlog import get_logger
 
 logger = get_logger()
 
 
-class GridSchema(pa.DataFrameModel):
+class GridSchema(pa.DataFrameModel):  # type: ignore[misc]
     """Schema for validating a MajorTom-compliant grid GeoDataFrame.
 
     Defines the standard set of columns for the global 100km grid.

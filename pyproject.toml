@@ -41,6 +41,7 @@ dev = [
   "aer-extract-aws-goes>=0.1",
   "aer-search-aws-goes>=2",
   "aer-search-earthaccess>=2.0.3,<3",
+  "graphviz>=0.21",
   "matplotlib>=3.10.8",
   "polylith-cli>=1.42.5,<2",
   "pytest>=9.0.2,<10",
