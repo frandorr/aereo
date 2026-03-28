@@ -79,6 +79,33 @@
 
 ---
 
+---
+
+## Phase 4: SearchResult Grid Refactor
+
+**Goal:** Refactor SearchResult and ExtractionTask classes to support multiple GridRows per SearchResult, instead of exploding overlapping spatial extents into separate results.
+
+**Requirements:**
+- SGRD-01: SearchResult has list of GridRows (not single grid_cell)
+- SGRD-02: ExtractionTask receives all overlapping grid_cells in one task
+- SGRD-03: Search plugins updated to return multiple GridRows per result
+- SGRD-04: Avoid duplicate extraction costs from overlapping cells
+
+**Success Criteria:**
+1. SearchResultSchema has `grid_rows: list[GridRow]` attribute
+2. SearchResultSchema has computed grid_cells property returning all cells
+3. ExtractionTask receives full list of GridRows from search results
+4. Search plugins refactored to emit GridRows per spatial extent
+5. Unit tests for multi-grid SearchResult scenarios
+
+**Artifacts:**
+- Updated SearchResultSchema with grid_rows list
+- Updated ExtractionTask to accept multiple GridRows
+- Refactored any search plugins that need updating
+- Tests in components/aer/*/test/
+
+---
+
 ## Phase Summary
 
 | Phase | Focus | Key Deliverable |
@@ -86,6 +113,8 @@
 | 1 | Interface | ExtractPlugin protocol + registry |
 | 2 | Orchestration | Pipeline search → extract |
 | 3 | Example | aws-goes-extract reference impl |
+| 4 | Grid Refactor | Multi-grid SearchResult support |
 
 ---
-*Roadmap created: 2026-03-19*
+
+*Roadmap updated: 2026-03-27*

@@ -19,11 +19,11 @@ class ExtractionStatus(Enum):
 class ExtractionTask:
     """Task for extracting data from a search result to a standardized grid.
 
-    This represents a single work unit for an extraction, containing the search result record,
-    from which the target grid cell is derived.
+    This represents a single work unit for an extraction, containing the search results records,
+    from which the target grid cells are derived.
 
     Attributes:
-        search_result (SearchResult): The search result record.
+        search_results (list[SearchResult]): The search result records.
         output_dir (str): The directory to save the extracted data.
         auxiliary_data (dict[str, Any]): Auxiliary data for the extraction.
             Can be for example Geolocation data, or other data that is needed for the extraction.
@@ -32,7 +32,7 @@ class ExtractionTask:
         status (ExtractionStatus): The status of the extraction.
     """
 
-    search_result: SearchResult
+    search_results: list[SearchResult]
     output_dir: Path
     auxiliary_data: dict[str, Any] = attrs.field(factory=dict)
     extraction_params: dict[str, Any] = attrs.field(factory=dict)

@@ -1,6 +1,6 @@
 """Tests for the smart download orchestrator (download_api base)."""
 
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 import geopandas as gpd
 import pandas as pd
@@ -45,7 +45,7 @@ class TestDownloadSmartOrchestrator:
 
         mock_which.assert_called_once_with("aria2c")
         mock_download_aria2.assert_called_once_with(
-            gdf,
+            ANY,
             str(tmp_path),
             max_concurrent=2,
             timeout=600,
@@ -69,7 +69,7 @@ class TestDownloadSmartOrchestrator:
         mock_which.assert_called_once_with("aria2c")
         mock_warning.assert_called_once()
         mock_download_raw.assert_called_once_with(
-            gdf,
+            ANY,
             str(tmp_path),
             max_concurrent=2,
             timeout=600,
@@ -78,3 +78,39 @@ class TestDownloadSmartOrchestrator:
             options=None,
             extra_args=None,
         )
+
+    @patch("aer.download_api.core.shutil.which")
+    @patch("aer.download_api.core.download_aria2")
+    @patch("aer.download_api.core.DownloadedResultSchema")
+    def test_skips_already_downloaded_files(
+        self, mock_schema, mock_download_aria2, mock_which, tmp_path
+    ):
+        mock_which.return_value = "/usr/bin/aria2c"
+        mock_schema.validate.side_effect = lambda x: x
+        # Create a fake cached file
+        cached_file = tmp_path / "a.hdf"
+        cached_file.write_bytes(b"fake data")
+
+        gdf = make_test_gdf()
+        result = download(gdf, dest_dir=str(tmp_path))
+
+        # Backend should NOT be called since file exists
+        mock_download_aria2.assert_not_called()
+        assert result.iloc[0]["download_status"] == "complete"
+        assert result.iloc[0]["local_path"] == str(cached_file)
+
+    @patch("aer.download_api.core.shutil.which")
+    @patch("aer.download_api.core.download_aria2")
+    def test_partial_cache_downloads_missing(
+        self, mock_download_aria2, mock_which, tmp_path
+    ):
+        mock_which.return_value = "/usr/bin/aria2c"
+        # No cached file — backend should be called
+        gdf = make_test_gdf()
+        download(gdf, dest_dir=str(tmp_path))
+
+        mock_download_aria2.assert_called_once()
+        # The gdf passed to backend should have the cached file excluded
+        passed_gdf = mock_download_aria2.call_args[0][0]
+        assert "local_path" in passed_gdf.columns
+        assert "download_status" in passed_gdf.columns
