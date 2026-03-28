@@ -94,7 +94,6 @@ class Satellite(AerModel):
 
 class Instrument(AerModel):
     instrument_id: str
-    satellite_id: str
     instrument_name: str
     sensor_type: str
 
