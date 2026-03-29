@@ -29,7 +29,15 @@ class InMemoryRepository(AerRepository):
         return self._satellites[acronym]
 
     def store_instrument(self, instrument: Instrument) -> str:
-        """Store an instrument and return its acronym."""
+        """Store an instrument and return its acronym.
+
+        Raises:
+            KeyError: If the satellite does not exist.
+        """
+        if instrument.satellite_acronym not in self._satellites:
+            raise KeyError(
+                f"Cannot store instrument: Satellite '{instrument.satellite_acronym}' not found"
+            )
         self._instruments[instrument.acronym] = instrument
         return instrument.acronym
 
@@ -40,7 +48,15 @@ class InMemoryRepository(AerRepository):
         return self._instruments[acronym]
 
     def store_channel(self, channel: Channel) -> str:
-        """Store a channel and return its identifier (using central_wavelength as key)."""
+        """Store a channel and return its identifier (using central_wavelength as key).
+
+        Raises:
+            KeyError: If the instrument does not exist.
+        """
+        if channel.instrument_acronym not in self._instruments:
+            raise KeyError(
+                f"Cannot store channel: Instrument '{channel.instrument_acronym}' not found"
+            )
         key = str(channel.central_wavelength)
         self._channels[key] = channel
         return key

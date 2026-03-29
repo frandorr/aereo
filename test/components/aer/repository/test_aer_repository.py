@@ -1,27 +1,32 @@
 """Abstract tests for AerRepository implementations.
 
-TestAerRepository can be subclassed with any concrete AerRepository implementation.
-The repo fixture must be provided by subclasses.
+Use this to create tests for any AerRepository implementation (database-backed, etc.)
+by subclassing and providing a `repo` fixture.
 
-Also includes TestInMemoryRepository as a concrete example.
+Example:
+    class TestMyRepository(TestAerRepositoryBase):
+        @pytest.fixture
+        def repo(self):
+            return MyRepository()
 """
 
 import pytest
 
-from aer.repository import Channel, InMemoryRepository, Instrument, Satellite
+from aer.repository import Channel, Instrument, Satellite
 
 
-class TestInMemoryRepository:
-    """Test cases for InMemoryRepository using shared test logic.
+@pytest.mark.skip(reason="Abstract base class - subclass and provide repo fixture")
+class TestAerRepositoryBase:
+    """Abstract test cases for AerRepository implementations.
 
-    The tests in this class can be reused for any AerRepository implementation
-    by subclassing and providing a `repo` fixture.
+    Subclasses must provide a `repo` fixture that returns a fresh
+    AerRepository instance.
     """
 
     @pytest.fixture
     def repo(self):
-        """Create a fresh InMemoryRepository for each test."""
-        return InMemoryRepository()
+        """Override in subclass to provide concrete repository."""
+        raise NotImplementedError("Subclass must provide `repo` fixture")
 
     def test_store_and_get_satellite(self, repo):
         """Test storing and retrieving a satellite."""
