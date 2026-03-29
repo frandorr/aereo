@@ -1,0 +1,43 @@
+{
+  "instrument_id": 352,
+  "instrument_acronym": "MWTS-1",
+  "instrument_fullname": "Micro-Wave Temperature Sounder - 1",
+  "url": "https://space.oscar.wmo.int/instruments/view/mwts-1",
+  "columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT"
+  ],
+  "channels": [
+    {
+      "No.": "1",
+      "Central frequency (GHz)": "50.30",
+      "Bandwidth (MHz)": "180",
+      "Polarisation": "V",
+      "NEΔT": "0.5 K"
+    },
+    {
+      "No.": "2",
+      "Central frequency (GHz)": "53.596 ± 0.115",
+      "Bandwidth (MHz)": "340",
+      "Polarisation": "H",
+      "NEΔT": "0.4 K"
+    },
+    {
+      "No.": "3",
+      "Central frequency (GHz)": "54.94",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "V",
+      "NEΔT": "0.4 K"
+    },
+    {
+      "No.": "4",
+      "Central frequency (GHz)": "57.290",
+      "Bandwidth (MHz)": "330",
+      "Polarisation": "H",
+      "NEΔT": "0.4 K"
+    }
+  ]
+}

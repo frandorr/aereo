@@ -1,0 +1,58 @@
+{
+  "instrument_id": 1168,
+  "instrument_acronym": "FLORIS",
+  "instrument_fullname": "FLuORescence Imaging Spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/floris",
+  "columns": [
+    "Spectral interval",
+    "Spectral resolution",
+    "SNR @ expected spectral radiance"
+  ],
+  "channels": [
+    {
+      "Spectral interval": "500-600 nm",
+      "Spectral resolution": "2 nm",
+      "SNR @ expected spectral radiance": "245"
+    },
+    {
+      "Spectral interval": "600-677 nm",
+      "Spectral resolution": "2 nm",
+      "SNR @ expected spectral radiance": "245"
+    },
+    {
+      "Spectral interval": "697-740 nm",
+      "Spectral resolution": "2 nm",
+      "SNR @ expected spectral radiance": "425"
+    },
+    {
+      "Spectral interval": "677-686 nm",
+      "Spectral resolution": "0.5 nm",
+      "SNR @ expected spectral radiance": "340"
+    },
+    {
+      "Spectral interval": "686-697 nm",
+      "Spectral resolution": "0.1 nm",
+      "SNR @ expected spectral radiance": "175"
+    },
+    {
+      "Spectral interval": "740-755 nm",
+      "Spectral resolution": "0.5 nm",
+      "SNR @ expected spectral radiance": "510-1015"
+    },
+    {
+      "Spectral interval": "755-759 nm",
+      "Spectral resolution": "0.5 nm",
+      "SNR @ expected spectral radiance": "1015"
+    },
+    {
+      "Spectral interval": "759-769 nm",
+      "Spectral resolution": "0.1 nm",
+      "SNR @ expected spectral radiance": "115-455"
+    },
+    {
+      "Spectral interval": "769-780 nm",
+      "Spectral resolution": "0.5 nm",
+      "SNR @ expected spectral radiance": "1015"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "instrument_id": 1391,
+  "instrument_acronym": "CZI2",
+  "instrument_fullname": "Coastal Zone Imager 2",
+  "url": "https://space.oscar.wmo.int/instruments/view/czi2",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "S/N"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "425 nm",
+      "Bandwidth": "50 nm",
+      "S/N": ">300"
+    },
+    {
+      "Central wavelength": "485 nm",
+      "Bandwidth": "70 nm",
+      "S/N": ">300"
+    },
+    {
+      "Central wavelength": "555 nm",
+      "Bandwidth": "70 nm",
+      "S/N": ">300"
+    },
+    {
+      "Central wavelength": "605 nm",
+      "Bandwidth": "40 nm",
+      "S/N": ">300"
+    },
+    {
+      "Central wavelength": "660 nm",
+      "Bandwidth": "60 nm",
+      "S/N": ">300"
+    },
+    {
+      "Central wavelength": "725 nm",
+      "Bandwidth": "40 nm",
+      "S/N": ">200"
+    },
+    {
+      "Central wavelength": "830 nm",
+      "Bandwidth": "120 nm",
+      "S/N": ">200"
+    },
+    {
+      "Central wavelength": "950 nm",
+      "Bandwidth": "180 nm",
+      "S/N": ">200"
+    },
+    {
+      "Central wavelength": "625 nm",
+      "Bandwidth": "350 nm",
+      "S/N": ">200"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "instrument_id": 235,
+  "instrument_acronym": "ITPR",
+  "instrument_fullname": "Infrared Temperature Profile Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/itpr",
+  "columns": [
+    "Wavelength",
+    "Wave number",
+    "Bandwidth",
+    "NEN"
+  ],
+  "channels": [
+    {
+      "Wavelength": "19.71 µm",
+      "Wave number": "507.3 cm-1",
+      "Bandwidth": "84 cm-1",
+      "NEN": "0.195 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "14.96 µm",
+      "Wave number": "668.3 cm-1",
+      "Bandwidth": "5.3 cm-1",
+      "NEN": "0.500 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "14.50 µm",
+      "Wave number": "689.5 cm-1",
+      "Bandwidth": "15.2 cm-1",
+      "NEN": "0.187 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "14.01 µm",
+      "Wave number": "713.8 cm-1",
+      "Bandwidth": "17.0 cm-1",
+      "NEN": "0.192 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "13.39 µm",
+      "Wave number": "747.0 cm-1",
+      "Bandwidth": "17.2 cm-1",
+      "NEN": "0.192 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "11.12 µm",
+      "Wave number": "899.0 cm-1",
+      "Bandwidth": "39.5 cm-1",
+      "NEN": "0.192 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "3.73 µm",
+      "Wave number": "2683 cm-1",
+      "Bandwidth": "430 cm-1",
+      "NEN": "0.004 mW m-2sr-1cm"
+    }
+  ]
+}

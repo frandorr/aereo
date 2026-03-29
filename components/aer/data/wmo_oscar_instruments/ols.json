@@ -1,0 +1,28 @@
+{
+  "instrument_id": 376,
+  "instrument_acronym": "OLS",
+  "instrument_fullname": "Operational Linescan Systerm ",
+  "url": "https://space.oscar.wmo.int/instruments/view/ols",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.71 µm (day/night)",
+      "Spectral interval": "0.47-0.95 µm",
+      "SNR or NEΔT @ specified input": "… @ … W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "0.75 µm",
+      "Spectral interval": "0.40-1.10 µm",
+      "SNR or NEΔT @ specified input": "… @ … W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "11.7 µm",
+      "Spectral interval": "10.0-13.4 µm",
+      "SNR or NEΔT @ specified input": "… K @ 300 K"
+    }
+  ]
+}

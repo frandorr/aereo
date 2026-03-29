@@ -1,0 +1,38 @@
+{
+  "instrument_id": 563,
+  "instrument_acronym": "TES-nadir",
+  "instrument_fullname": "Tropospheric Emission Spectrometer ",
+  "url": "https://space.oscar.wmo.int/instruments/view/tes-nadir",
+  "columns": [
+    "Spectral range (µm)",
+    "Spectral range (cm-1)",
+    "Spectral resolution(unapodised)",
+    "NEΔT @ specified scene temperature"
+  ],
+  "channels": [
+    {
+      "Spectral range (µm)": "11.11-15.38 µm",
+      "Spectral range (cm-1)": "650-900 cm-1",
+      "Spectral resolution(unapodised)": "0.059 cm-1",
+      "NEΔT @ specified scene temperature": "< 1 K @ 280 K"
+    },
+    {
+      "Spectral range (µm)": "8.70-12.20 µm",
+      "Spectral range (cm-1)": "820-1150 cm-1",
+      "Spectral resolution(unapodised)": "0.059 cm-1",
+      "NEΔT @ specified scene temperature": "< 1 K @ 280 K"
+    },
+    {
+      "Spectral range (µm)": "5.13-9.09 µm",
+      "Spectral range (cm-1)": "1100-1950 cm-1",
+      "Spectral resolution(unapodised)": "0.059 cm-1",
+      "NEΔT @ specified scene temperature": "< 1 K @ 280 K"
+    },
+    {
+      "Spectral range (µm)": "3.28-5.26 µm",
+      "Spectral range (cm-1)": "1900-3050 cm-1",
+      "Spectral resolution(unapodised)": "0.059 cm-1",
+      "NEΔT @ specified scene temperature": "< 2 K @ 280 K"
+    }
+  ]
+}

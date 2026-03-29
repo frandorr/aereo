@@ -1,0 +1,50 @@
+{
+  "instrument_id": 468,
+  "instrument_acronym": "SCAMS",
+  "instrument_fullname": "Scanning Microwave Spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/scams",
+  "columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT"
+  ],
+  "channels": [
+    {
+      "No.": "1",
+      "Central frequency (GHz)": "22.231",
+      "Bandwidth (MHz)": "220",
+      "Polarisation": "V",
+      "NEΔT": "0.2 K"
+    },
+    {
+      "No.": "2",
+      "Central frequency (GHz)": "31.650",
+      "Bandwidth (MHz)": "220",
+      "Polarisation": "V",
+      "NEΔT": "0.2 K"
+    },
+    {
+      "No.": "3",
+      "Central frequency (GHz)": "52.863",
+      "Bandwidth (MHz)": "220",
+      "Polarisation": "V",
+      "NEΔT": "0.6 K"
+    },
+    {
+      "No.": "4",
+      "Central frequency (GHz)": "53.845",
+      "Bandwidth (MHz)": "220",
+      "Polarisation": "V",
+      "NEΔT": "0.5 K"
+    },
+    {
+      "No.": "5",
+      "Central frequency (GHz)": "55.445",
+      "Bandwidth (MHz)": "220",
+      "Polarisation": "H",
+      "NEΔT": "0.5 K"
+    }
+  ]
+}

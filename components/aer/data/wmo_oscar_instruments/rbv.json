@@ -1,0 +1,28 @@
+{
+  "instrument_id": 419,
+  "instrument_acronym": "RBV",
+  "instrument_fullname": "Return-Beam Vidicon camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/rbv",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.53 µm",
+      "Spectral interval": "0.48 - 0.58 µm",
+      "SNR @ specified input spectral radiance": ".... @ .... W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "0.63 µm",
+      "Spectral interval": "0.58 - 0.68 µm",
+      "SNR @ specified input spectral radiance": ".... @ .... W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "0.76 µm",
+      "Spectral interval": "0.70 - 0.83 µm",
+      "SNR @ specified input spectral radiance": ".... @ .... W m-2sr-1μm-1"
+    }
+  ]
+}

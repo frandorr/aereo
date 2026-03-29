@@ -1,0 +1,33 @@
+{
+  "instrument_id": 961,
+  "instrument_acronym": "Végétation-P",
+  "instrument_fullname": "Végétation for PROBA",
+  "url": "https://space.oscar.wmo.int/instruments/view/v%C3%A9g%C3%A9tation-p",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.457 µm",
+      "Spectral interval": "0.415 - 0.500 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.675 µm",
+      "Spectral interval": "0.580 - 0.770 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.845 µm",
+      "Spectral interval": "0.730 - 0.960 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "1.620 µm",
+      "Spectral interval": "1.480 - 1.760 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    }
+  ]
+}

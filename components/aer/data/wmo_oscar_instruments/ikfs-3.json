@@ -1,0 +1,32 @@
+{
+  "instrument_id": 559,
+  "instrument_acronym": "IKFS-3",
+  "instrument_fullname": "Infra Red Fourier Spectrometer - 3",
+  "url": "https://space.oscar.wmo.int/instruments/view/ikfs-3",
+  "columns": [
+    "Spectral range (µm)",
+    "Spectral range (cm-1)",
+    "Spectral resolution (unapodised)",
+    "NEΔT @ specified scene temperature"
+  ],
+  "channels": [
+    {
+      "Spectral range (µm)": "15.50-8.33 µm",
+      "Spectral range (cm-1)": "645-1200 cm-1",
+      "Spectral resolution (unapodised)": "0.25 cm-1",
+      "NEΔT @ specified scene temperature": "….. K @ 280 K"
+    },
+    {
+      "Spectral range (µm)": "8.33-5.00 µm",
+      "Spectral range (cm-1)": "1200-2000 cm-1",
+      "Spectral resolution (unapodised)": "0.25 cm-1",
+      "NEΔT @ specified scene temperature": "….. K @ 280 K"
+    },
+    {
+      "Spectral range (µm)": "5.00-3.62 µm",
+      "Spectral range (cm-1)": "2000-2760 cm-1",
+      "Spectral resolution (unapodised)": "0.25 cm-1",
+      "NEΔT @ specified scene temperature": "….. K @ 280 K"
+    }
+  ]
+}

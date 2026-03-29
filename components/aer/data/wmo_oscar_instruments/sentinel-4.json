@@ -1,0 +1,32 @@
+{
+  "instrument_id": 584,
+  "instrument_acronym": "Sentinel-4",
+  "instrument_fullname": "UVN: Ultra-violet, Visible and Near-infrared sounder",
+  "url": "https://space.oscar.wmo.int/instruments/view/sentinel-4",
+  "columns": [
+    "Spectral ranges",
+    "Number of channels",
+    "Spectral resolution",
+    "SNR at specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Spectral ranges": "305-400 nm",
+      "Number of channels": "600",
+      "Spectral resolution": "0.5 nm",
+      "SNR at specified input spectral radiance": "200-1400 @ 40-120 W m-2sr-1μm-1"
+    },
+    {
+      "Spectral ranges": "400-500 nm",
+      "Number of channels": "600",
+      "Spectral resolution": "0.5 nm",
+      "SNR at specified input spectral radiance": "1400 @ 140 W m-2sr-1μm-1"
+    },
+    {
+      "Spectral ranges": "755-775 nm",
+      "Number of channels": "300",
+      "Spectral resolution": "0.2 nm",
+      "SNR at specified input spectral radiance": "1200 @ 60 W m-2sr-1μm-1"
+    }
+  ]
+}

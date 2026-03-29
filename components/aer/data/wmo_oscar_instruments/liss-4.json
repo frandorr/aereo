@@ -1,0 +1,28 @@
+{
+  "instrument_id": 256,
+  "instrument_acronym": "LISS-4",
+  "instrument_fullname": "Linear Imaging Self-Scanning Sensor - 4",
+  "url": "https://space.oscar.wmo.int/instruments/view/liss-4",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.555 µm",
+      "Spectral interval": "0.52 - 0.59 µm",
+      "SNR @ specified input spectral radiance": "335 @ 612 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "0.650 µm",
+      "Spectral interval": "0.62 - 0.68 µm",
+      "SNR @ specified input spectral radiance": "360 @ 496 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "0.815 µm",
+      "Spectral interval": "0.77 - 0.86 µm",
+      "SNR @ specified input spectral radiance": "248 @ 391 W m-2sr-1µm-1"
+    }
+  ]
+}

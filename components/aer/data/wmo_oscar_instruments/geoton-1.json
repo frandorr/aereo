@@ -1,0 +1,33 @@
+{
+  "instrument_id": 152,
+  "instrument_acronym": "Geoton-1",
+  "instrument_fullname": "Panchromatic and multispectral radiometer 1",
+  "url": "https://space.oscar.wmo.int/instruments/view/geoton-1",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.55 µm",
+      "Spectral interval": "0.5 - 0.6 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.65 µm",
+      "Spectral interval": "0.6 - 0.7 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.75 µm",
+      "Spectral interval": "0.7 - 0.8 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "Panchromatic",
+      "Spectral interval": "0.58 - 0.8 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    }
+  ]
+}

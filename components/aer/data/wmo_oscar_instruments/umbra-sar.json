@@ -1,0 +1,38 @@
+{
+  "instrument_id": 1300,
+  "instrument_acronym": "UMBRA-SAR",
+  "instrument_fullname": "SAR instrument for UMBRA satellites",
+  "url": "https://space.oscar.wmo.int/instruments/view/umbra-sar",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "Operation mode": "Spotlight",
+      "Resolution": "0.25-4 m",
+      "Swath": "4x4 km",
+      "Polarisation": "HH or VV"
+    },
+    {
+      "Operation mode": "Stripmap",
+      "Resolution": "3 m",
+      "Swath": "5-20 km x 50 km",
+      "Polarisation": "HH or VV"
+    },
+    {
+      "Operation mode": "Extended Dwell",
+      "Resolution": "0.25-2 m",
+      "Swath": "4x4 km",
+      "Polarisation": "HH or VV"
+    },
+    {
+      "Operation mode": "Scanning",
+      "Resolution": "10 m",
+      "Swath": "100x100 km",
+      "Polarisation": "HH or VV"
+    }
+  ]
+}

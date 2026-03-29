@@ -1,0 +1,33 @@
+{
+  "instrument_id": 1243,
+  "instrument_acronym": "IRMSS-2",
+  "instrument_fullname": "Infrared Multispectral Scanner - 2",
+  "url": "https://space.oscar.wmo.int/instruments/view/irmss-2",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.700 µm",
+      "Spectral interval": "0.50-0.9 µm",
+      "SNR or NEΔT @ specified input": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "1.650 µm",
+      "Spectral interval": "1.55-1.75 µm",
+      "SNR or NEΔT @ specified input": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "2.215 µm",
+      "Spectral interval": "2.08-2.35 µm",
+      "SNR or NEΔT @ specified input": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "11.450 µm",
+      "Spectral interval": "10.4-12.5 µm",
+      "SNR or NEΔT @ specified input": "….. K @ …… K"
+    }
+  ]
+}

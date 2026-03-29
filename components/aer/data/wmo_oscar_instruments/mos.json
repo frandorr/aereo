@@ -1,0 +1,116 @@
+{
+  "instrument_id": 298,
+  "instrument_acronym": "MOS",
+  "instrument_fullname": "Multispectral Opto-electronic Scanner",
+  "url": "https://space.oscar.wmo.int/instruments/view/mos",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR @ specified input spectral radiance",
+    "IFOV at s.s.p."
+  ],
+  "channels": [
+    {
+      "Central wavelength": "408 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "443 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "485 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "520 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "570 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "615 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "685 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "750 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "756.7 nm",
+      "Bandwidth": "1.4 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "1.5 km"
+    },
+    {
+      "Central wavelength": "760.6 nm",
+      "Bandwidth": "1.4 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "1.5 km"
+    },
+    {
+      "Central wavelength": "763.5 nm",
+      "Bandwidth": "1.4 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "1.5 km"
+    },
+    {
+      "Central wavelength": "766.4 nm",
+      "Bandwidth": "1.4 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "1.5 km"
+    },
+    {
+      "Central wavelength": "815 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "870 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "945 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "1010 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "1600 nm",
+      "Bandwidth": "100 nm",
+      "SNR @ specified input spectral radiance": "…. @ …. W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "0.5 km"
+    }
+  ]
+}

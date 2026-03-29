@@ -1,0 +1,73 @@
+{
+  "instrument_id": 503,
+  "instrument_acronym": "SEVIRI",
+  "instrument_fullname": "Spinning Enhanced Visible Infra-Red Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/seviri",
+  "columns": [
+    "Central wavelength",
+    "Spectralinterval(99 % encircled energy)",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "N/A (broad bandwidth channel)",
+      "Spectralinterval(99 % encircled energy)": "0.6 - 0.9 µm",
+      "SNR or NEΔT @ specified input": "4.3 @ 1 % albedo"
+    },
+    {
+      "Central wavelength": "0.635 µm",
+      "Spectralinterval(99 % encircled energy)": "0.56 - 0.71 µm",
+      "SNR or NEΔT @ specified input": "10.1 @ 1 % albedo"
+    },
+    {
+      "Central wavelength": "0.81 µm",
+      "Spectralinterval(99 % encircled energy)": "0.74 - 0.88 µm",
+      "SNR or NEΔT @ specified input": "7.28 @ 1 % albedo"
+    },
+    {
+      "Central wavelength": "1.64 µm",
+      "Spectralinterval(99 % encircled energy)": "1.50 - 1.78 µm",
+      "SNR or NEΔT @ specified input": "3 @ 1 % albedo"
+    },
+    {
+      "Central wavelength": "3.92 µm",
+      "Spectralinterval(99 % encircled energy)": "3.48 - 4.36 µm",
+      "SNR or NEΔT @ specified input": "0.35 K @ 300 K"
+    },
+    {
+      "Central wavelength": "6.25 µm",
+      "Spectralinterval(99 % encircled energy)": "5.35 - 7.15 µm",
+      "SNR or NEΔT @ specified input": "0.75 K @ 250 K"
+    },
+    {
+      "Central wavelength": "7.35 µm",
+      "Spectralinterval(99 % encircled energy)": "6.85 - 7.85 µm",
+      "SNR or NEΔT @ specified input": "0.75 K @ 250 K"
+    },
+    {
+      "Central wavelength": "8.70 µm",
+      "Spectralinterval(99 % encircled energy)": "8.30 - 9.10 µm",
+      "SNR or NEΔT @ specified input": "0.28 K @ 300 K"
+    },
+    {
+      "Central wavelength": "9.66 µm",
+      "Spectralinterval(99 % encircled energy)": "9.38 - 9.94 µm",
+      "SNR or NEΔT @ specified input": "1.50 K @ 255 K"
+    },
+    {
+      "Central wavelength": "10.8 µm",
+      "Spectralinterval(99 % encircled energy)": "9.80 - 11.8 µm",
+      "SNR or NEΔT @ specified input": "0.25 K @ 300 K"
+    },
+    {
+      "Central wavelength": "12.0 µm",
+      "Spectralinterval(99 % encircled energy)": "11.0 - 13.0 µm",
+      "SNR or NEΔT @ specified input": "0.37 K @ 300 K"
+    },
+    {
+      "Central wavelength": "13.4 µm",
+      "Spectralinterval(99 % encircled energy)": "12.4 - 14.4 µm",
+      "SNR or NEΔT @ specified input": "1.80 K @ 270 K"
+    }
+  ]
+}

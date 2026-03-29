@@ -1,0 +1,38 @@
+{
+  "instrument_id": 1179,
+  "instrument_acronym": "EMI",
+  "instrument_fullname": "Environment Monitoring Instrument",
+  "url": "https://space.oscar.wmo.int/instruments/view/emi",
+  "columns": [
+    "Spectral range",
+    "No. of channels",
+    "Spectral resolution",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Spectral range": "240-315 nm",
+      "No. of channels": "256",
+      "Spectral resolution": "0.3 nm",
+      "SNR @ specified input spectral radiance": "200 @ 1.27 mW cm-2sr-1nm-1"
+    },
+    {
+      "Spectral range": "311-403 nm",
+      "No. of channels": "256",
+      "Spectral resolution": "0.3 nm",
+      "SNR @ specified input spectral radiance": "200 @ 1.27 mW cm-2sr-1nm-1"
+    },
+    {
+      "Spectral range": "401-600 nm",
+      "No. of channels": "512",
+      "Spectral resolution": "0.5 nm",
+      "SNR @ specified input spectral radiance": "2000 @ 10.89 mW cm-2sr-1nm-1"
+    },
+    {
+      "Spectral range": "590-790 nm",
+      "No. of channels": "512",
+      "Spectral resolution": "0.5 nm",
+      "SNR @ specified input spectral radiance": "2000 @ 10.89 mW cm-2sr-1nm-1"
+    }
+  ]
+}

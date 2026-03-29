@@ -1,0 +1,36 @@
+{
+  "instrument_id": 1094,
+  "instrument_acronym": "SAR-10",
+  "instrument_fullname": "Synthetic Aperture Radar -10",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar-10",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Field of regard",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "Operation mode": "Spotlight",
+      "Resolution": "1-2 m",
+      "Swath": "10-20 km",
+      "Field of regard": "500 km, either right or left",
+      "Polarisation": "HH or VV"
+    },
+    {
+      "Operation mode": "Stripmap",
+      "Resolution": "1-3 m",
+      "Swath": "10-20 km",
+      "Field of regard": "500 km, either right or left",
+      "Polarisation": "HH or VV"
+    },
+    {
+      "Operation mode": "ScanSAR",
+      "Resolution": "5-30 m",
+      "Swath": "20-150 km",
+      "Field of regard": "500 km, either right or left",
+      "Polarisation": "HH"
+    }
+  ]
+}

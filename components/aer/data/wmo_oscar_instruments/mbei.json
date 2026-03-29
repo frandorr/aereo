@@ -1,0 +1,33 @@
+{
+  "instrument_id": 274,
+  "instrument_acronym": "MBEI",
+  "instrument_fullname": "Multi-Band Earth Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/mbei",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ typical input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "550 nm",
+      "Spectral interval": "510 - 590 nm",
+      "SNR @ typical input": "> 150"
+    },
+    {
+      "Central wavelength": "645 nm",
+      "Spectral interval": "610 - 680 nm",
+      "SNR @ typical input": "> 150"
+    },
+    {
+      "Central wavelength": "845 nm",
+      "Spectral interval": "800 - 890 nm",
+      "SNR @ typical input": "> 150"
+    },
+    {
+      "Central wavelength": "N/A  (PAN)",
+      "Spectral interval": "510 - 900 nm",
+      "SNR @ typical input": "> 300"
+    }
+  ]
+}

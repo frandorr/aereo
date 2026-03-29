@@ -1,0 +1,38 @@
+{
+  "instrument_id": 236,
+  "instrument_acronym": "JAMI",
+  "instrument_fullname": "Japanese Advanced Meteorological Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/jami",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.725 µm",
+      "Spectral interval": "0.55 - 0.90 µm",
+      "SNR or NEΔT @ specified input": "6.5 @ 2.5 % albedo"
+    },
+    {
+      "Central wavelength": "3.75 µm",
+      "Spectral interval": "3.50 - 4.00 µm",
+      "SNR or NEΔT @ specified input": "0.18 K @ 300 K"
+    },
+    {
+      "Central wavelength": "6.75 µm",
+      "Spectral interval": "6.50 - 7.00 µm",
+      "SNR or NEΔT @ specified input": "0.18 K @ 300 K"
+    },
+    {
+      "Central wavelength": "10.8 µm",
+      "Spectral interval": "10.3 - 11.3 µm",
+      "SNR or NEΔT @ specified input": "0.15 K @ 300 K"
+    },
+    {
+      "Central wavelength": "12.0 µm",
+      "Spectral interval": "11.5 - 12.5 µm",
+      "SNR or NEΔT @ specified input": "0.18 K @ 300 K"
+    }
+  ]
+}

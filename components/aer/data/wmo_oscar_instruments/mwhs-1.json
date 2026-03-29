@@ -1,0 +1,50 @@
+{
+  "instrument_id": 340,
+  "instrument_acronym": "MWHS-1",
+  "instrument_fullname": "Micro-Wave Humidity Sounder -1",
+  "url": "https://space.oscar.wmo.int/instruments/view/mwhs-1",
+  "columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT"
+  ],
+  "channels": [
+    {
+      "No.": "1",
+      "Central frequency (GHz)": "150",
+      "Bandwidth (MHz)": "1000",
+      "Polarisation": "V",
+      "NEΔT": "0.9 K"
+    },
+    {
+      "No.": "2",
+      "Central frequency (GHz)": "150",
+      "Bandwidth (MHz)": "1000",
+      "Polarisation": "H",
+      "NEΔT": "0.9 k"
+    },
+    {
+      "No.": "3",
+      "Central frequency (GHz)": "183.31 ± 1.0",
+      "Bandwidth (MHz)": "500",
+      "Polarisation": "H",
+      "NEΔT": "1.1 K"
+    },
+    {
+      "No.": "4",
+      "Central frequency (GHz)": "183.31 ± 3.0",
+      "Bandwidth (MHz)": "1000",
+      "Polarisation": "H",
+      "NEΔT": "0.9 K"
+    },
+    {
+      "No.": "5",
+      "Central frequency (GHz)": "183.31 ± 7.0",
+      "Bandwidth (MHz)": "2000",
+      "Polarisation": "H",
+      "NEΔT": "0.9 K"
+    }
+  ]
+}

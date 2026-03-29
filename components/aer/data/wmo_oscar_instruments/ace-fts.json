@@ -1,0 +1,26 @@
+{
+  "instrument_id": 6,
+  "instrument_acronym": "ACE-FTS",
+  "instrument_fullname": "Atmospheric Chemistry Experiment - Fourier Transform Spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/ace-fts",
+  "columns": [
+    "Spectral range",
+    "No. of channels",
+    "Spectral resolution",
+    "SNR @ expected input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Spectral range": "2.0 - 5.5 µm",
+      "No. of channels": "160,000",
+      "Spectral resolution": "0.02 cm-1",
+      "SNR @ expected input spectral radiance": "1000 @ ......... W m-2sr-1µm-1"
+    },
+    {
+      "Spectral range": "5.5 - 13 µm",
+      "No. of channels": "50,000",
+      "Spectral resolution": "0.02 cm-1",
+      "SNR @ expected input spectral radiance": "1000 @ ......... W m-2sr-1µm-1"
+    }
+  ]
+}

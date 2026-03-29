@@ -1,0 +1,116 @@
+{
+  "instrument_id": 342,
+  "instrument_acronym": "ICI",
+  "instrument_fullname": "Ice Cloud Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/ici",
+  "columns": [
+    "No.",
+    "Central requency (GHz)",
+    "Bandwidth (MHz)",
+    "NEΔT",
+    "Bias",
+    "Polarisations",
+    "IFOV"
+  ],
+  "channels": [
+    {
+      "No.": "1",
+      "Central requency (GHz)": "183.31±7.0",
+      "Bandwidth (MHz)": "2x2000",
+      "NEΔT": "0.8 K",
+      "Bias": "1.0 K",
+      "Polarisations": "V",
+      "IFOV": "16 km"
+    },
+    {
+      "No.": "2",
+      "Central requency (GHz)": "183.31±3.4",
+      "Bandwidth (MHz)": "2x1500",
+      "NEΔT": "0.8 K",
+      "Bias": "1.0 K",
+      "Polarisations": "V",
+      "IFOV": "16 km"
+    },
+    {
+      "No.": "3",
+      "Central requency (GHz)": "183.31±2.0",
+      "Bandwidth (MHz)": "2x1500",
+      "NEΔT": "0.8 K",
+      "Bias": "1.0 K",
+      "Polarisations": "V",
+      "IFOV": "16 km"
+    },
+    {
+      "No.": "4",
+      "Central requency (GHz)": "243.2±2.5",
+      "Bandwidth (MHz)": "2x3000",
+      "NEΔT": "0.7 K",
+      "Bias": "1.5 K",
+      "Polarisations": "V, H",
+      "IFOV": "16 km"
+    },
+    {
+      "No.": "5",
+      "Central requency (GHz)": "325.15±9.5",
+      "Bandwidth (MHz)": "2x3000",
+      "NEΔT": "1.2 K",
+      "Bias": "1.5 K",
+      "Polarisations": "V",
+      "IFOV": "16 km"
+    },
+    {
+      "No.": "6",
+      "Central requency (GHz)": "325.15±3.5",
+      "Bandwidth (MHz)": "2x2400",
+      "NEΔT": "1.3 K",
+      "Bias": "1.5 K",
+      "Polarisations": "V",
+      "IFOV": "16 km"
+    },
+    {
+      "No.": "7",
+      "Central requency (GHz)": "325.15±1.5",
+      "Bandwidth (MHz)": "2x1600",
+      "NEΔT": "1.5 K",
+      "Bias": "1.5 K",
+      "Polarisations": "V",
+      "IFOV": "16 km"
+    },
+    {
+      "No.": "8",
+      "Central requency (GHz)": "448±7.2",
+      "Bandwidth (MHz)": "2x3000",
+      "NEΔT": "14 K",
+      "Bias": "1.5 K",
+      "Polarisations": "V",
+      "IFOV": "16 km"
+    },
+    {
+      "No.": "9",
+      "Central requency (GHz)": "448±3.0",
+      "Bandwidth (MHz)": "2x2000",
+      "NEΔT": "1.6 K",
+      "Bias": "1.5 K",
+      "Polarisations": "V",
+      "IFOV": "16 km"
+    },
+    {
+      "No.": "10",
+      "Central requency (GHz)": "448±1.4",
+      "Bandwidth (MHz)": "2x1200",
+      "NEΔT": "2.0 K",
+      "Bias": "1.5 K",
+      "Polarisations": "V",
+      "IFOV": "16 km"
+    },
+    {
+      "No.": "11",
+      "Central requency (GHz)": "664±4.2",
+      "Bandwidth (MHz)": "2x5000",
+      "NEΔT": "1.6 K",
+      "Bias": "1.5 K",
+      "Polarisations": "V, H",
+      "IFOV": "16 km"
+    }
+  ]
+}

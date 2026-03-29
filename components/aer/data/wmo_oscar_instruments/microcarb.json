@@ -1,0 +1,44 @@
+{
+  "instrument_id": 1221,
+  "instrument_acronym": "MicroCarb",
+  "instrument_fullname": "MicroCarb",
+  "url": "https://space.oscar.wmo.int/instruments/view/microcarb",
+  "columns": [
+    "Spectral bands",
+    "Resolving power (λ/∆λ)",
+    "SNR",
+    "Species"
+  ],
+  "channels": [
+    {
+      "Spectral bands": "764-768 nm",
+      "Resolving power (λ/∆λ)": "25000",
+      "SNR": "600",
+      "Species": "O2"
+    },
+    {
+      "Spectral bands": "1264-1282 nm",
+      "Resolving power (λ/∆λ)": "25000",
+      "SNR": "900",
+      "Species": "O2"
+    },
+    {
+      "Spectral bands": "1602-1609 nm",
+      "Resolving power (λ/∆λ)": "25000",
+      "SNR": "600",
+      "Species": "CO2"
+    },
+    {
+      "Spectral bands": "1660-1672 nm",
+      "Resolving power (λ/∆λ)": "25000",
+      "SNR": "670",
+      "Species": "CH4"
+    },
+    {
+      "Spectral bands": "2037-2065 nm",
+      "Resolving power (λ/∆λ)": "25000",
+      "SNR": "280",
+      "Species": "CO2"
+    }
+  ]
+}

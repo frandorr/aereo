@@ -1,0 +1,28 @@
+{
+  "instrument_id": 322,
+  "instrument_acronym": "MSU-E",
+  "instrument_fullname": "Multispectral VNIR radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/msu-e",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.555 μm",
+      "Spectral interval": "0.535 - 0.575 μm",
+      "SNR @ specified albedo": "200 @ 100 % albedo"
+    },
+    {
+      "Central wavelength": "0.655 μm",
+      "Spectral interval": "0.63 - 0.68 μm",
+      "SNR @ specified albedo": "200 @ 100 % albedo"
+    },
+    {
+      "Central wavelength": "0.845 μm",
+      "Spectral interval": "0.79 - 0.90 μm",
+      "SNR @ specified albedo": "200 @ 100 % albedo"
+    }
+  ]
+}

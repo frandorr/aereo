@@ -1,0 +1,43 @@
+{
+  "instrument_id": 799,
+  "instrument_acronym": "MX-VNIR",
+  "instrument_fullname": "Multi-spectral Visible  Near Infrared",
+  "url": "https://space.oscar.wmo.int/instruments/view/mx-vnir",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.485 µm",
+      "Spectral interval": "0.45-0.52 µm",
+      "SNR @ specified input": "200 @ 100 % albedo"
+    },
+    {
+      "Central wavelength": "0.555 µm",
+      "Spectral interval": "0.52-0.59 µm",
+      "SNR @ specified input": "200 @ 100 % albedo"
+    },
+    {
+      "Central wavelength": "0.650 µm",
+      "Spectral interval": "0.62-0.68 µm",
+      "SNR @ specified input": "200 @ 100 % albedo"
+    },
+    {
+      "Central wavelength": "0.725 µm",
+      "Spectral interval": "0.71-0.74 µm",
+      "SNR @ specified input": "200 @ 100 % albedo"
+    },
+    {
+      "Central wavelength": "0.815 µm",
+      "Spectral interval": "0.77-0.86 µm",
+      "SNR @ specified input": "200 @ 100 % albedo"
+    },
+    {
+      "Central wavelength": "0.860 µm",
+      "Spectral interval": "0.845-0.875 µm",
+      "SNR @ specified input": "200 @ 100 % albedo"
+    }
+  ]
+}

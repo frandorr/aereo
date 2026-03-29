@@ -1,0 +1,48 @@
+{
+  "instrument_id": 1056,
+  "instrument_acronym": "MSI",
+  "instrument_fullname": "Multispectral imager\n",
+  "url": "https://space.oscar.wmo.int/instruments/view/msi",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "670 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "500 @ 1 % albedo"
+    },
+    {
+      "Central wavelength": "865 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "500 @ 1 % albedo"
+    },
+    {
+      "Central wavelength": "1670 nm",
+      "Bandwidth": "60 nm",
+      "SNR or NEΔT @ specified input": "250 @ 1 % albedo"
+    },
+    {
+      "Central wavelength": "2210 nm",
+      "Bandwidth": "100 nm",
+      "SNR or NEΔT @ specified input": "250 @ 1 % albedo"
+    },
+    {
+      "Central wavelength": "8.80 µm",
+      "Bandwidth": "0.9 µm",
+      "SNR or NEΔT @ specified input": "0.25 K @ 293 K"
+    },
+    {
+      "Central wavelength": "10.80 µm",
+      "Bandwidth": "0.9 µm",
+      "SNR or NEΔT @ specified input": "0.25 K @ 293 K"
+    },
+    {
+      "Central wavelength": "12.00 µm",
+      "Bandwidth": "0.9 µm",
+      "SNR or NEΔT @ specified input": "0.25 K @ 293 K"
+    }
+  ]
+}

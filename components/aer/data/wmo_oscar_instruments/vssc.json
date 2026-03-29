@@ -1,0 +1,73 @@
+{
+  "instrument_id": 613,
+  "instrument_acronym": "VSSC",
+  "instrument_fullname": "VENµS SuperSpectral Camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/vssc",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "415 nm",
+      "Bandwidth": "40 nm",
+      "SNR @ specified input spectral radiance": "50 @ 40 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "440 nm",
+      "Bandwidth": "40 nm",
+      "SNR @ specified input spectral radiance": "80 @ 50 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "490 nm",
+      "Bandwidth": "40 nm",
+      "SNR @ specified input spectral radiance": "100 @ 30 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "555 nm",
+      "Bandwidth": "40 nm",
+      "SNR @ specified input spectral radiance": "100 @ 30 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "620 nm",
+      "Bandwidth": "40 nm",
+      "SNR @ specified input spectral radiance": "100 @ 20 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "620 nm  (highest quality for DEM)",
+      "Bandwidth": "40 nm",
+      "SNR @ specified input spectral radiance": "100 @ 20 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "667 nm",
+      "Bandwidth": "30 nm",
+      "SNR @ specified input spectral radiance": "100 @ 20 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "702 nm",
+      "Bandwidth": "24 nm",
+      "SNR @ specified input spectral radiance": "100 @ 15 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "742 nm",
+      "Bandwidth": "16 nm",
+      "SNR @ specified input spectral radiance": "100 @ 20 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "782 nm",
+      "Bandwidth": "16 nm",
+      "SNR @ specified input spectral radiance": "100 @ 30 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "865 nm",
+      "Bandwidth": "40 nm",
+      "SNR @ specified input spectral radiance": "100 @ 30 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "910 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "50 @ 30 W m-2sr-1µm-1"
+    }
+  ]
+}

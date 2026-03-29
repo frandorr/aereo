@@ -1,0 +1,28 @@
+{
+  "instrument_id": 513,
+  "instrument_acronym": "SLIM6",
+  "instrument_fullname": "Surrey Linear Imager Multispectral 6 channels - but 3 spectral bands",
+  "url": "https://space.oscar.wmo.int/instruments/view/slim6",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "570 nm",
+      "Spectral interval": "520 - 620 nm",
+      "SNR @ specified albedo": "100 @ 10 % albedo"
+    },
+    {
+      "Central wavelength": "660 nm",
+      "Spectral interval": "630 - 690 nm",
+      "SNR @ specified albedo": "100 @ 10 % albedo"
+    },
+    {
+      "Central wavelength": "830 nm",
+      "Spectral interval": "760 - 900 nm",
+      "SNR @ specified albedo": "100 @ 10 % albedo"
+    }
+  ]
+}

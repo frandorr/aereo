@@ -1,0 +1,38 @@
+{
+  "instrument_id": 283,
+  "instrument_acronym": "MI",
+  "instrument_fullname": "Meteorological Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/mi",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.675 µm",
+      "Spectral interval": "0.55 - 0.8 µm",
+      "SNR or NEΔT @ specified input": "10 @ 5 % albedo, 170 @ 100 % albedo"
+    },
+    {
+      "Central wavelength": "3.75 µm",
+      "Spectral interval": "3.50 - 4.0 µm",
+      "SNR or NEΔT @ specified input": "0.10 K @ 300 K"
+    },
+    {
+      "Central wavelength": "6.75 µm",
+      "Spectral interval": "6.5 - 7.0 µm",
+      "SNR or NEΔT @ specified input": "0.12 K @ 300 K"
+    },
+    {
+      "Central wavelength": "10.8 µm",
+      "Spectral interval": "10.3 - 11.3 µm",
+      "SNR or NEΔT @ specified input": "0.12 K @ 300 K"
+    },
+    {
+      "Central wavelength": "12.0 µm",
+      "Spectral interval": "11.5 - 12.5 µm",
+      "SNR or NEΔT @ specified input": "0.20 K @ 300 K"
+    }
+  ]
+}

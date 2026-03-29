@@ -1,0 +1,208 @@
+{
+  "instrument_id": 1367,
+  "instrument_acronym": "MWS",
+  "instrument_fullname": "Microwave Sounder for Geostationary Orbit.",
+  "url": "https://space.oscar.wmo.int/instruments/view/mws",
+  "columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT",
+    "IFOV at s.s.p."
+  ],
+  "channels": [
+    {
+      "No.": "1",
+      "Central frequency (GHz)": "23.8",
+      "Bandwidth (MHz)": "270",
+      "Polarisation": "V or H",
+      "NEΔT": "0.25 K",
+      "IFOV at s.s.p.": "40 km"
+    },
+    {
+      "No.": "2",
+      "Central frequency (GHz)": "31.4",
+      "Bandwidth (MHz)": "180",
+      "Polarisation": "V or H",
+      "NEΔT": "0.35 K",
+      "IFOV at s.s.p.": "40 km"
+    },
+    {
+      "No.": "3",
+      "Central frequency (GHz)": "50.3",
+      "Bandwidth (MHz)": "180",
+      "Polarisation": "V or H",
+      "NEΔT": "0.5 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "4",
+      "Central frequency (GHz)": "52.8",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "V or H",
+      "NEΔT": "0.35 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "5",
+      "Central frequency (GHz)": "53.246±0.08",
+      "Bandwidth (MHz)": "2x140",
+      "Polarisation": "H or V",
+      "NEΔT": "0.4 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "6",
+      "Central frequency (GHz)": "53.596±0.115",
+      "Bandwidth (MHz)": "2x170",
+      "Polarisation": "H",
+      "NEΔT": "0.4 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "7",
+      "Central frequency (GHz)": "53.948±0.081",
+      "Bandwidth (MHz)": "2x142",
+      "Polarisation": "H or V",
+      "NEΔT": "0.4 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "8",
+      "Central frequency (GHz)": "54.4",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "H or V",
+      "NEΔT": "0.35 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "9",
+      "Central frequency (GHz)": "54.94",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "V or H",
+      "NEΔT": "0.35 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "10",
+      "Central frequency (GHz)": "55.5",
+      "Bandwidth (MHz)": "330",
+      "Polarisation": "H or V",
+      "NEΔT": "0.4 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "11",
+      "Central frequency (GHz)": "57.290344",
+      "Bandwidth (MHz)": "330",
+      "Polarisation": "H or V",
+      "NEΔT": "0.4 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "12",
+      "Central frequency (GHz)": "57.290344±0.217",
+      "Bandwidth (MHz)": "2x78",
+      "Polarisation": "H or V",
+      "NEΔT": "0.55 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "13",
+      "Central frequency (GHz)": "57.290344±0.3222±0.048",
+      "Bandwidth (MHz)": "4x36",
+      "Polarisation": "H or V",
+      "NEΔT": "0.6 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "14",
+      "Central frequency (GHz)": "57.290344±0.3222±0.022",
+      "Bandwidth (MHz)": "4x16",
+      "Polarisation": "H or V",
+      "NEΔT": "0.9 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "15",
+      "Central frequency (GHz)": "57.290344±0.3222±0.010",
+      "Bandwidth (MHz)": "4x8",
+      "Polarisation": "H or V",
+      "NEΔT": "1.2 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "16",
+      "Central frequency (GHz)": "57.290344±0.3222±0.0045",
+      "Bandwidth (MHz)": "4x3",
+      "Polarisation": "H or V",
+      "NEΔT": "2.0 K",
+      "IFOV at s.s.p.": "20 km"
+    },
+    {
+      "No.": "17",
+      "Central frequency (GHz)": "89",
+      "Bandwidth (MHz)": "4000",
+      "Polarisation": "V or H",
+      "NEΔT": "0.25 K",
+      "IFOV at s.s.p.": "17 km"
+    },
+    {
+      "No.": "18",
+      "Central frequency (GHz)": "164-167",
+      "Bandwidth (MHz)": "2x1350",
+      "Polarisation": "V or H",
+      "NEΔT": "0.5 K",
+      "IFOV at s.s.p.": "17 km"
+    },
+    {
+      "No.": "19",
+      "Central frequency (GHz)": "183.311±7.0",
+      "Bandwidth (MHz)": "2x2000",
+      "Polarisation": "V or H",
+      "NEΔT": "0.4 K",
+      "IFOV at s.s.p.": "17 km"
+    },
+    {
+      "No.": "20",
+      "Central frequency (GHz)": "183.311±4.5",
+      "Bandwidth (MHz)": "2x2000",
+      "Polarisation": "V or H",
+      "NEΔT": "0.4 K",
+      "IFOV at s.s.p.": "17 km"
+    },
+    {
+      "No.": "21",
+      "Central frequency (GHz)": "183.311±3.0",
+      "Bandwidth (MHz)": "2x1000",
+      "Polarisation": "V or H",
+      "NEΔT": "0.6 K",
+      "IFOV at s.s.p.": "17 km"
+    },
+    {
+      "No.": "22",
+      "Central frequency (GHz)": "183.311±1.8",
+      "Bandwidth (MHz)": "2x1000",
+      "Polarisation": "V or H",
+      "NEΔT": "0.6 K",
+      "IFOV at s.s.p.": "17 km"
+    },
+    {
+      "No.": "23",
+      "Central frequency (GHz)": "183.311±1.0",
+      "Bandwidth (MHz)": "2x500",
+      "Polarisation": "V or H",
+      "NEΔT": "0.75 K",
+      "IFOV at s.s.p.": "17 km"
+    },
+    {
+      "No.": "24",
+      "Central frequency (GHz)": "229.0",
+      "Bandwidth (MHz)": "2000",
+      "Polarisation": "V or H",
+      "NEΔT": "0.70 K",
+      "IFOV at s.s.p.": "17 km"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "instrument_id": 144,
+  "instrument_acronym": "GAS",
+  "instrument_fullname": "Greenhouse-gases Absorption Spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/gas",
+  "columns": [
+    "Spectral range (μm)",
+    "Spectral range (cm-1)",
+    "Spectral resolution",
+    "SNR @ expected input radiance"
+  ],
+  "channels": [
+    {
+      "Spectral range (μm)": "0.75-0.77 μm",
+      "Spectral range (cm-1)": "13000-13300 cm-1",
+      "Spectral resolution": "0.60 cm-1",
+      "SNR @ expected input radiance": "> 300"
+    },
+    {
+      "Spectral range (μm)": "1.56-1.72 μm",
+      "Spectral range (cm-1)": "5800-6400 cm-1",
+      "Spectral resolution": "0.27 cm-1",
+      "SNR @ expected input radiance": "> 300"
+    },
+    {
+      "Spectral range (μm)": "1.92-2.08 μm",
+      "Spectral range (cm-1)": "4800-5200 cm-1",
+      "Spectral resolution": "0.27 cm-1",
+      "SNR @ expected input radiance": "> 300"
+    },
+    {
+      "Spectral range (μm)": "2.20-2.38 μm",
+      "Spectral range (cm-1)": "4200-4550 cm-1",
+      "Spectral resolution": "0.27 cm-1",
+      "SNR @ expected input radiance": "> 300"
+    }
+  ]
+}

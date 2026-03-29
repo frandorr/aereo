@@ -1,0 +1,50 @@
+{
+  "instrument_id": 635,
+  "instrument_acronym": "ASAR",
+  "instrument_fullname": "Onboard Radar Complex (X-band)",
+  "url": "https://space.oscar.wmo.int/instruments/view/asar",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Field of regard",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "Operation mode": "Stripmap",
+      "Resolution": "30 m",
+      "Swath": "100 km",
+      "Field of regard": "485 km",
+      "Polarisation": "HH or VV"
+    },
+    {
+      "Operation mode": "ScanSAR alternating pol",
+      "Resolution": "30 m",
+      "Swath": "100 km",
+      "Field of regard": "485 km",
+      "Polarisation": "VV/HH, HH/HV, VV/VH"
+    },
+    {
+      "Operation mode": "ScanSAR wide swath",
+      "Resolution": "150 m",
+      "Swath": "405 km",
+      "Field of regard": "405 km",
+      "Polarisation": "HH or VV"
+    },
+    {
+      "Operation mode": "ScanSAR wide swath",
+      "Resolution": "150 m",
+      "Swath": "405 km",
+      "Field of regard": "405 km",
+      "Polarisation": "HH or VV"
+    },
+    {
+      "Operation mode": "ScanSAR global monitoring",
+      "Resolution": "1 km",
+      "Swath": "405 km",
+      "Field of regard": "405 km",
+      "Polarisation": "HH or VV"
+    }
+  ]
+}

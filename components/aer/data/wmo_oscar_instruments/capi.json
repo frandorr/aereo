@@ -1,0 +1,50 @@
+{
+  "instrument_id": 1130,
+  "instrument_acronym": "CAPI",
+  "instrument_fullname": "Cloud and Aerosol Polarization Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/capi",
+  "columns": [
+    "Central frequency",
+    "Bandwidth",
+    "SNR @ typical radiance",
+    "Polarization angles",
+    "Resolution at s.s.p."
+  ],
+  "channels": [
+    {
+      "Central frequency": "380 nm",
+      "Bandwidth": "43 nm",
+      "SNR @ typical radiance": "260 @ 28.0 W·m-2·μm-1·sr-1",
+      "Polarization angles": "-",
+      "Resolution at s.s.p.": "250 m"
+    },
+    {
+      "Central frequency": "670 nm",
+      "Bandwidth": "50 nm",
+      "SNR @ typical radiance": "160 @ 22.0 W·m-2·μm-1·sr-1",
+      "Polarization angles": "0°, 60°, 120°",
+      "Resolution at s.s.p.": "250 m"
+    },
+    {
+      "Central frequency": "870 nm",
+      "Bandwidth": "30 nm",
+      "SNR @ typical radiance": "400 @ 25.0 W·m-2·μm-1·sr-1",
+      "Polarization angles": "-",
+      "Resolution at s.s.p.": "250 m"
+    },
+    {
+      "Central frequency": "1375 nm",
+      "Bandwidth": "30 nm",
+      "SNR @ typical radiance": "180 @ 6.0 W·m-2·μm-1·sr-1",
+      "Polarization angles": "-",
+      "Resolution at s.s.p.": "1000 m"
+    },
+    {
+      "Central frequency": "1640 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ typical radiance": "110 @ 7.3 W·m-2·μm-1·sr-1",
+      "Polarization angles": "0°, 60°, 120°",
+      "Resolution at s.s.p.": "1000 m"
+    }
+  ]
+}

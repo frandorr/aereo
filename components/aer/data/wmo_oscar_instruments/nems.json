@@ -1,0 +1,44 @@
+{
+  "instrument_id": 356,
+  "instrument_acronym": "NEMS",
+  "instrument_fullname": "Nimbus-E Microwave Sounder",
+  "url": "https://space.oscar.wmo.int/instruments/view/nems",
+  "columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "NEΔT"
+  ],
+  "channels": [
+    {
+      "No.": "1",
+      "Central frequency (GHz)": "22.235",
+      "Bandwidth (MHz)": "220",
+      "NEΔT": "0.24 K"
+    },
+    {
+      "No.": "2",
+      "Central frequency (GHz)": "31.400",
+      "Bandwidth (MHz)": "250",
+      "NEΔT": "0.23 K"
+    },
+    {
+      "No.": "3",
+      "Central frequency (GHz)": "53.650",
+      "Bandwidth (MHz)": "250",
+      "NEΔT": "0.29 K"
+    },
+    {
+      "No.": "4",
+      "Central frequency (GHz)": "54.900",
+      "Bandwidth (MHz)": "250",
+      "NEΔT": "0.29 K"
+    },
+    {
+      "No.": "5",
+      "Central frequency (GHz)": "58.800",
+      "Bandwidth (MHz)": "250",
+      "NEΔT": "0.24 K"
+    }
+  ]
+}

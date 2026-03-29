@@ -1,0 +1,38 @@
+{
+  "instrument_id": 609,
+  "instrument_acronym": "VIRS",
+  "instrument_fullname": "Visible and Infra Red Scanner",
+  "url": "https://space.oscar.wmo.int/instruments/view/virs",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.630 µm",
+      "Spectral interval": "0.58 - 0.68 µm",
+      "SNR or NEΔT @ specified input": "9 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "1.61 µm",
+      "Spectral interval": "1.58 - 1.64 µm",
+      "SNR or NEΔT @ specified input": "20 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "3.74 µm",
+      "Spectral interval": "3.55 - 3.93 µm",
+      "SNR or NEΔT @ specified input": "0.12 K @ 300 K"
+    },
+    {
+      "Central wavelength": "10.80 µm",
+      "Spectral interval": "10.3 - 11.3 µm",
+      "SNR or NEΔT @ specified input": "0.12 K @ 300 K"
+    },
+    {
+      "Central wavelength": "12.00 µm",
+      "Spectral interval": "11.5 - 12.5 µm",
+      "SNR or NEΔT @ specified input": "0.12 K @ 300 K"
+    }
+  ]
+}

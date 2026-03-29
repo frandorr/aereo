@@ -1,0 +1,38 @@
+{
+  "instrument_id": 421,
+  "instrument_acronym": "REIS",
+  "instrument_fullname": "RapidEye Earth Imaging System",
+  "url": "https://space.oscar.wmo.int/instruments/view/reis",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "475 nm",
+      "Spectral interval": "440 - 510 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "555 nm",
+      "Spectral interval": "520 - 590 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "657 nm",
+      "Spectral interval": "630 - 685 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "710 nm",
+      "Spectral interval": "690 - 730 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "805 nm",
+      "Spectral interval": "760 - 850 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    }
+  ]
+}

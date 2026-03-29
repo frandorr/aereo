@@ -1,0 +1,43 @@
+{
+  "instrument_id": 55,
+  "instrument_acronym": "ATSR",
+  "instrument_fullname": "Along-Track Scanning Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/atsr",
+  "columns": [
+    "Central wavelength/frequency",
+    "Bandwidth",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength/frequency": "1.61 µm",
+      "Bandwidth": "1.46-1.76 µm",
+      "SNR or NEΔT @ specified input": "20 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength/frequency": "3.70 µm",
+      "Bandwidth": "3.55-3.85 µm",
+      "SNR or NEΔT @ specified input": "0.08 K @ 270 K"
+    },
+    {
+      "Central wavelength/frequency": "10.85 µm",
+      "Bandwidth": "10.35-11.35 µm",
+      "SNR or NEΔT @ specified input": "0.05 K @ 270 K"
+    },
+    {
+      "Central wavelength/frequency": "12.00 µm",
+      "Bandwidth": "11.50-12.50 µm",
+      "SNR or NEΔT @ specified input": "0.05 K @ 270 K"
+    },
+    {
+      "Central wavelength/frequency": "23.8 GHz",
+      "Bandwidth": "400 MHz",
+      "SNR or NEΔT @ specified input": "0.5 K"
+    },
+    {
+      "Central wavelength/frequency": "36.5 GHz",
+      "Bandwidth": "400 MHz",
+      "SNR or NEΔT @ specified input": "0.5 K"
+    }
+  ]
+}

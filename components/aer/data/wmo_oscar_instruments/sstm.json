@@ -1,0 +1,23 @@
+{
+  "instrument_id": 1071,
+  "instrument_acronym": "SSTM",
+  "instrument_fullname": "Sea Surface Temperature Monitor",
+  "url": "https://space.oscar.wmo.int/instruments/view/sstm",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "11.0 µm",
+      "Spectral interval": "10.75-11.25 µm",
+      "NEΔT @ specified input": "0.15 K @ 300 K"
+    },
+    {
+      "Central wavelength": "12.0 µm",
+      "Spectral interval": "11.75-12.25 µm",
+      "NEΔT @ specified input": "0.15 K @ 300 K"
+    }
+  ]
+}

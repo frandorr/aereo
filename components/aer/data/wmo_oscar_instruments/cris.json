@@ -1,0 +1,36 @@
+{
+  "instrument_id": 709,
+  "instrument_acronym": "CRIS",
+  "instrument_fullname": "Cosmic Ray Isotope Spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/cris",
+  "columns": [
+    "Spectral range(µm)",
+    "Spectral range(cm-1)",
+    "Spectral resolution (unapodised) NSR",
+    "Spectral resolution (unapodised) FSR",
+    "NEΔT @ specified scene temperature"
+  ],
+  "channels": [
+    {
+      "Spectral range(µm)": "9.13 - 15.40 µm",
+      "Spectral range(cm-1)": "650 - 1095 cm-1",
+      "Spectral resolution (unapodised) NSR": "0.625 cm-1",
+      "Spectral resolution (unapodised) FSR": "0.625 cm-1",
+      "NEΔT @ specified scene temperature": "0.24-0.39 K @ 287 K"
+    },
+    {
+      "Spectral range(µm)": "5.71 - 8.26 µm",
+      "Spectral range(cm-1)": "1210 - 1750 cm-1",
+      "Spectral resolution (unapodised) NSR": "1.25 cm-1",
+      "Spectral resolution (unapodised) FSR": "0.625 cm-1",
+      "NEΔT @ specified scene temperature": "0.19-0.28 K @ 287 K"
+    },
+    {
+      "Spectral range(µm)": "3.92 - 4.64 µm",
+      "Spectral range(cm-1)": "2155 - 2550 cm-1",
+      "Spectral resolution (unapodised) NSR": "2.5 cm-1",
+      "Spectral resolution (unapodised) FSR": "0.625 cm-1",
+      "NEΔT @ specified scene temperature": "0.18-0.21 K @ 287 K"
+    }
+  ]
+}

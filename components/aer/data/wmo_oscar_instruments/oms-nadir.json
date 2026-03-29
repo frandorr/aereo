@@ -1,0 +1,32 @@
+{
+  "instrument_id": 381,
+  "instrument_acronym": "OMS-nadir",
+  "instrument_fullname": "Ozone Monitoring Suite - nadir scanning unit",
+  "url": "https://space.oscar.wmo.int/instruments/view/oms-nadir",
+  "columns": [
+    "Spectral range",
+    "No. of channels",
+    "Spectral resolution",
+    "IFOV Along x Across Track"
+  ],
+  "channels": [
+    {
+      "Spectral range": "250-300 nm",
+      "No. of channels": "50",
+      "Spectral resolution": "1 nm",
+      "IFOV Along x Across Track": "21 x 28 km"
+    },
+    {
+      "Spectral range": "300-320 nm",
+      "No. of channels": "40",
+      "Spectral resolution": "0.5 nm",
+      "IFOV Along x Across Track": "7 x 7 km"
+    },
+    {
+      "Spectral range": "320 - 500 nm",
+      "No. of channels": "327",
+      "Spectral resolution": "0.5-0.6 nm",
+      "IFOV Along x Across Track": "7 x 7 km"
+    }
+  ]
+}

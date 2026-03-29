@@ -1,0 +1,43 @@
+{
+  "instrument_id": 188,
+  "instrument_acronym": "HRCC",
+  "instrument_fullname": "High-Resolution CCD Camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/hrcc",
+  "columns": [
+    "Centralwavelength",
+    "Spectralinterval",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Centralwavelength": "",
+      "Spectralinterval": "",
+      "SNR @ specified input spectral radiance": "Low signal"
+    },
+    {
+      "Centralwavelength": "N/A (PAN)",
+      "Spectralinterval": "0.51 - 0.73 µm",
+      "SNR @ specified input spectral radiance": "32 @ 4.6 W m-2sr-1μm-1"
+    },
+    {
+      "Centralwavelength": "0.485 µm",
+      "Spectralinterval": "0.45 - 0.52 µm",
+      "SNR @ specified input spectral radiance": "31 @ 3.7 W m-2sr-1μm-1"
+    },
+    {
+      "Centralwavelength": "0.555 µm",
+      "Spectralinterval": "0.52 - 0.59 µm",
+      "SNR @ specified input spectral radiance": "26 @ 2.4 W m-2sr-1μm-1"
+    },
+    {
+      "Centralwavelength": "0.660 µm",
+      "Spectralinterval": "0.63 - 0.69 µm",
+      "SNR @ specified input spectral radiance": "29 @ 2.7 W m-2sr-1μm-1"
+    },
+    {
+      "Centralwavelength": "0.830 µm",
+      "Spectralinterval": "0.77 - 0.89 µm",
+      "SNR @ specified input spectral radiance": "37@ 9.0 W m-2sr-1μm-1"
+    }
+  ]
+}

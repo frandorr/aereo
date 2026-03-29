@@ -1,0 +1,68 @@
+{
+  "instrument_id": 35,
+  "instrument_acronym": "APS",
+  "instrument_fullname": "Aerosol Polarimetry Sensor",
+  "url": "https://space.oscar.wmo.int/instruments/view/aps",
+  "columns": [
+    "Centralλ",
+    "Bandwidth",
+    "Polarisations",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Centralλ": "412 nm",
+      "Bandwidth": "20 nm",
+      "Polarisations": "0, 45, 90 and 135 degrees",
+      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+    },
+    {
+      "Centralλ": "443 nm",
+      "Bandwidth": "20 nm",
+      "Polarisations": "0, 45, 90 and 135 degrees",
+      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+    },
+    {
+      "Centralλ": "555 nm",
+      "Bandwidth": "20 nm",
+      "Polarisations": "0, 45, 90 and 135 degrees",
+      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+    },
+    {
+      "Centralλ": "672 nm",
+      "Bandwidth": "20 nm",
+      "Polarisations": "0, 45, 90 and 135 degrees",
+      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+    },
+    {
+      "Centralλ": "865 nm",
+      "Bandwidth": "39 nm",
+      "Polarisations": "0, 45, 90 and 135 degrees",
+      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+    },
+    {
+      "Centralλ": "910 nm",
+      "Bandwidth": "20 nm",
+      "Polarisations": "0, 45, 90 and 135 degrees",
+      "SNR @ specified input spectral radiance": "94 @ ….. W m-2sr-1μm-1"
+    },
+    {
+      "Centralλ": "1378 nm",
+      "Bandwidth": "35 nm",
+      "Polarisations": "0, 45, 90 and 135 degrees",
+      "SNR @ specified input spectral radiance": "141 @ ….. W m-2sr-1μm-1"
+    },
+    {
+      "Centralλ": "1610 nm",
+      "Bandwidth": "60 nm",
+      "Polarisations": "0, 45, 90 and 135 degrees",
+      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+    },
+    {
+      "Centralλ": "2250 nm",
+      "Bandwidth": "75 nm",
+      "Polarisations": "0, 45, 90 and 135 degrees",
+      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+    }
+  ]
+}

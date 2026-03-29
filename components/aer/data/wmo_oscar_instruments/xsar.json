@@ -1,0 +1,36 @@
+{
+  "instrument_id": 1181,
+  "instrument_acronym": "XSAR",
+  "instrument_fullname": "X-band Synthetic Aperture Radar",
+  "url": "https://space.oscar.wmo.int/instruments/view/xsar",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Polarisations",
+    "Incidence angle"
+  ],
+  "channels": [
+    {
+      "Operation mode": "Spotlight",
+      "Resolution": "1 m",
+      "Swath": "10 km",
+      "Polarisations": "HH or VV",
+      "Incidence angle": "15-45°"
+    },
+    {
+      "Operation mode": "Stripmap",
+      "Resolution": "2 m",
+      "Swath": "12 km",
+      "Polarisations": "HH or VV",
+      "Incidence angle": "15-45°"
+    },
+    {
+      "Operation mode": "ScanSAR",
+      "Resolution": "16 m",
+      "Swath": "50 km",
+      "Polarisations": "HH or VV",
+      "Incidence angle": "15-45°"
+    }
+  ]
+}

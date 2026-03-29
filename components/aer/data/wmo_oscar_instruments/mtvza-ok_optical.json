@@ -1,0 +1,38 @@
+{
+  "instrument_id": 899,
+  "instrument_acronym": "MTVZA-OK (optical)",
+  "instrument_fullname": "Combined Microwave-Optical Imaging/Sounding Radiometer (optical component)",
+  "url": "https://space.oscar.wmo.int/instruments/view/mtvza-ok%20%28optical%29",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.41 µm",
+      "Spectral interval": "0.37-0.45 µm",
+      "SNR or NEΔT @ specified input": "8.1 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "0.51 µm",
+      "Spectral interval": "0.45-0.51 µm",
+      "SNR or NEΔT @ specified input": "8.1 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "0.63 µm",
+      "Spectral interval": "0.58-0.68 µm",
+      "SNR or NEΔT @ specified input": "8.1 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "0.73 µm",
+      "Spectral interval": "0.68-0.78 µm",
+      "SNR or NEΔT @ specified input": "8.1 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "3.74 µm",
+      "Spectral interval": "3.55-3.93 µm",
+      "SNR or NEΔT @ specified input": "0.2 K @ 300 K"
+    }
+  ]
+}

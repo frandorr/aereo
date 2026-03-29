@@ -1,0 +1,63 @@
+{
+  "instrument_id": 338,
+  "instrument_acronym": "MVISR",
+  "instrument_fullname": "Multichannel Visible Infrared Scanning Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/mvisr",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.455 µm",
+      "Spectral interval": "0.43 - 0.48 µm",
+      "SNR or NEΔT @ specified input": "3.0 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "0.505 µm",
+      "Spectral interval": "0.48 - 0.53 µm",
+      "SNR or NEΔT @ specified input": "3.0 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "0.555 µm",
+      "Spectral interval": "0.53 - 0.58 µm",
+      "SNR or NEΔT @ specified input": "3.0 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "0.630 µm",
+      "Spectral interval": "0.58 - 0.68 µm",
+      "SNR or NEΔT @ specified input": "3.0 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "0.865 µm",
+      "Spectral interval": "0.84 - 0.89 µm",
+      "SNR or NEΔT @ specified input": "3.0 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "0.932 µm",
+      "Spectral interval": "0.90 - 0.965 µm",
+      "SNR or NEΔT @ specified input": "3.0 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "1.610 µm",
+      "Spectral interval": "1.58 - 1.64 µm",
+      "SNR or NEΔT @ specified input": "3.0 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "3.750 µm",
+      "Spectral interval": "3.55 - 3.95 µm",
+      "SNR or NEΔT @ specified input": "0.40 K @ 300 K"
+    },
+    {
+      "Central wavelength": "10.80 µm",
+      "Spectral interval": "10.3 - 11.3 µm",
+      "SNR or NEΔT @ specified input": "0.22 K @ 300 K"
+    },
+    {
+      "Central wavelength": "12.00 µm",
+      "Spectral interval": "11.5 - 12.5 µm",
+      "SNR or NEΔT @ specified input": "0.22 K @ 300 K"
+    }
+  ]
+}

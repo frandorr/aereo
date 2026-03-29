@@ -1,0 +1,38 @@
+{
+  "instrument_id": 190,
+  "instrument_acronym": "HRG",
+  "instrument_fullname": "Haute Résolution Géométrique",
+  "url": "https://space.oscar.wmo.int/instruments/view/hrg",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.545 µm",
+      "Spectral interval": "0.49 - 0.61 µm",
+      "SNR @ specified albedo": "171 @ 50 % albedo, SZA=60°"
+    },
+    {
+      "Central wavelength": "0.645 µm",
+      "Spectral interval": "0.61 - 0.68 µm",
+      "SNR @ specified albedo": "188 @ 50 % albedo, SZA=60°"
+    },
+    {
+      "Central wavelength": "0.835 µm",
+      "Spectral interval": "0.78 - 0.89 µm",
+      "SNR @ specified albedo": "202 @ 70 % albedo, SZA=60°"
+    },
+    {
+      "Central wavelength": "1.645 µm",
+      "Spectral interval": "1.58 - 1.75 µm",
+      "SNR @ specified albedo": "189 @ 50 % albedo, SZA=60°"
+    },
+    {
+      "Central wavelength": "0.59 µm (PAN) (2 shifted channels)",
+      "Spectral interval": "0.49 - 0.69 µm",
+      "SNR @ specified albedo": "149 @ 50 % albedo, SZA=60°"
+    }
+  ]
+}

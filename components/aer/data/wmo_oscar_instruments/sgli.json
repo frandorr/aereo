@@ -1,0 +1,128 @@
+{
+  "instrument_id": 505,
+  "instrument_acronym": "SGLI",
+  "instrument_fullname": "Second-generation Global Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/sgli",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR or NEΔT @ specified input",
+    "IFOV at s.s.p."
+  ],
+  "channels": [
+    {
+      "Central wavelength": "380 nm",
+      "Bandwidth": "10 nm",
+      "SNR or NEΔT @ specified input": "250 @ 60 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Central wavelength": "412 nm",
+      "Bandwidth": "10 nm",
+      "SNR or NEΔT @ specified input": "400 @ 75 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Central wavelength": "443 nm",
+      "Bandwidth": "10 nm",
+      "SNR or NEΔT @ specified input": "300 @ 64 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Central wavelength": "490 nm",
+      "Bandwidth": "10 nm",
+      "SNR or NEΔT @ specified input": "400 @ 53 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Central wavelength": "530 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "250 @ 41 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Central wavelength": "565 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "400 @ 33 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Central wavelength": "673.5 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "400 @ 23 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Central wavelength": "673.5 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "250 @ 25 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Central wavelength": "763 nm",
+      "Bandwidth": "12 nm",
+      "SNR or NEΔT @ specified input": "1200 @ 40 W m-2sr-1µm-1(@ 1 km)",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Central wavelength": "868.5 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "400 @ 8 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Central wavelength": "868.5 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "200 @ 30 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Central wavelength": "673.5 nm   3 pol",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "250 @ 25 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Central wavelength": "868.5 nm   3 pol",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "250 @ 30 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Central wavelength": "1050 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "500 @ 57 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Central wavelength": "1380 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "150 @ 8 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Central wavelength": "1630 nm",
+      "Bandwidth": "200 nm",
+      "SNR or NEΔT @ specified input": "57 @ 3 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Central wavelength": "2210 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEΔT @ specified input": "211 @ 1.9 W m-2sr-1µm-1",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Central wavelength": "10.8 µm",
+      "Bandwidth": "0.7 µm",
+      "SNR or NEΔT @ specified input": "0.2 K @ 300 K",
+      "IFOV at s.s.p.": "500 m"
+    },
+    {
+      "Central wavelength": "12.0 µm",
+      "Bandwidth": "0.7 µm",
+      "SNR or NEΔT @ specified input": "0.2 K @ 300 K",
+      "IFOV at s.s.p.": "500 m"
+    }
+  ]
+}

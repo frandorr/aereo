@@ -1,0 +1,53 @@
+{
+  "instrument_id": 87,
+  "instrument_acronym": "COBAN",
+  "instrument_fullname": "Multiband Camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/coban",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.400 μm",
+      "Spectral interval": "0.38 - 0.42 μm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.450 µm",
+      "Spectral interval": "0.41 - 0.49 µm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.500 µm",
+      "Spectral interval": "0.46 - 0.54 µm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.550 µm",
+      "Spectral interval": "0.51 - 0.59 µm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.600 µm",
+      "Spectral interval": "0.56 - 0.64 µm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.650 µm",
+      "Spectral interval": "0.61 - 0.69 µm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.700 µm",
+      "Spectral interval": "0.66 - 0.74 µm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.925 µm",
+      "Spectral interval": "0.85 - 1.00 µm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    }
+  ]
+}

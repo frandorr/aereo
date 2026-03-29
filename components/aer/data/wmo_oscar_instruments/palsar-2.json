@@ -1,0 +1,50 @@
+{
+  "instrument_id": 388,
+  "instrument_acronym": "PALSAR-2",
+  "instrument_fullname": "Phased-Array L-band Synthetic Aperture Radar - 2",
+  "url": "https://space.oscar.wmo.int/instruments/view/palsar-2",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Polarisations",
+    "Incidence angle"
+  ],
+  "channels": [
+    {
+      "Operation mode": "Spotlight",
+      "Resolution": "1-3 m",
+      "Swath": "25 km",
+      "Polarisations": "HH or VV",
+      "Incidence angle": "8-70°"
+    },
+    {
+      "Operation mode": "Stripmap(ultra-fine)",
+      "Resolution": "3 m",
+      "Swath": "50 km",
+      "Polarisations": "HH or VV or HH/HV or VV/VH",
+      "Incidence angle": "8-70°"
+    },
+    {
+      "Operation mode": "Stripmap(high-sensitive)",
+      "Resolution": "6 m",
+      "Swath": "50 km",
+      "Polarisations": "HH or VV or HH/HV or VV/VH HH or VV or HH/HV or VV/VH or (HH/HV + VV/VH)",
+      "Incidence angle": "8-70°"
+    },
+    {
+      "Operation mode": "Stripmap(fine)",
+      "Resolution": "10 m",
+      "Swath": "70 km",
+      "Polarisations": "HH or VV or HH/HV or VV/VH HH or VV or HH/HV or VV/VH or (HH/HV + VV/VH)",
+      "Incidence angle": "8-70°"
+    },
+    {
+      "Operation mode": "ScanSAR",
+      "Resolution": "100 m",
+      "Swath": "350 km",
+      "Polarisations": "HH or VV or HH/HV or VV/VH",
+      "Incidence angle": "8-70°"
+    }
+  ]
+}

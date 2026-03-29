@@ -1,0 +1,68 @@
+{
+  "instrument_id": 405,
+  "instrument_acronym": "POLDER",
+  "instrument_fullname": "Polarization and Directionality of the Earth’s Reflectances",
+  "url": "https://space.oscar.wmo.int/instruments/view/polder",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "No. of pol.",
+    "SNR at specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "443.5 nm",
+      "Bandwidth": "13.4 nm",
+      "No. of pol.": "-",
+      "SNR at specified input spectral radiance": "200 @ 61.9 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "490.9 nm",
+      "Bandwidth": "16.3 nm",
+      "No. of pol.": "three",
+      "SNR at specified input spectral radiance": "200 @ 63.2 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "563.8 nm",
+      "Bandwidth": "15.4 nm",
+      "No. of pol.": "-",
+      "SNR at specified input spectral radiance": "200 @ 58.1 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "669.9 nm",
+      "Bandwidth": "15.1 nm",
+      "No. of pol.": "-",
+      "SNR at specified input spectral radiance": "200 @ 48.7 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "762.9 nm",
+      "Bandwidth": "10.9 nm",
+      "No. of pol.": "three",
+      "SNR at specified input spectral radiance": "200 @ 38.9 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "762.7 nm",
+      "Bandwidth": "38.1 nm",
+      "No. of pol.": "-",
+      "SNR at specified input spectral radiance": "200 @ 38.9 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "863.7 nm",
+      "Bandwidth": "33.7 nm",
+      "No. of pol.": "-",
+      "SNR at specified input spectral radiance": "200 @ 30.8 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "907.1 nm",
+      "Bandwidth": "21.1 nm",
+      "No. of pol.": "three",
+      "SNR at specified input spectral radiance": "200 @ 27.5 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "1019.6 nm",
+      "Bandwidth": "17.1 nm",
+      "No. of pol.": "-",
+      "SNR at specified input spectral radiance": "200 @ 22.6 W m-2sr-1µm-1"
+    }
+  ]
+}
