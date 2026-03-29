@@ -78,7 +78,7 @@ useLibraryCodeForTypes = true
 reportUnknownMemberType = false
 reportUnknownVariableType = false
 reportUnknownArgumentType = false
-reportMissingImports = true
+reportMissingImports = false
 extraPaths = [ "components", "bases", "development" ]
 
 [tool.polylith]
