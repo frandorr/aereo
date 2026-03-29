@@ -1,0 +1,26 @@
+{
+  "instrument_id": 557,
+  "instrument_acronym": "IRFS-GS",
+  "instrument_fullname": "Infrared Fourier-transform Spectrometer - Geostationary",
+  "url": "https://space.oscar.wmo.int/instruments/view/irfs-gs",
+  "columns": [
+    "Spectral range (µm)",
+    "Spectral range (cm-1)",
+    "Spectral resolution",
+    "NEΔT @ specified scene temperature"
+  ],
+  "channels": [
+    {
+      "Spectral range (µm)": "15.4 - 8.3 µm",
+      "Spectral range (cm-1)": "650 - 1200 cm-1",
+      "Spectral resolution": "0.625 cm-1",
+      "NEΔT @ specified scene temperature": "….. K @ 280 K"
+    },
+    {
+      "Spectral range (µm)": "6.0 - 3.7 µm",
+      "Spectral range (cm-1)": "1670 - 2700 cm-1",
+      "Spectral resolution": "0.625 cm-1",
+      "NEΔT @ specified scene temperature": "….. K @ 280 K"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "instrument_id": 377,
+  "instrument_acronym": "OMI ",
+  "instrument_fullname": "Ozone Monitoring Instrument ",
+  "url": "https://space.oscar.wmo.int/instruments/view/omi%20",
+  "columns": [
+    "Spectral range",
+    "No. of channels",
+    "Spectral resolution",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Spectral range": "270 - 314 nm",
+      "No. of channels": "390",
+      "Spectral resolution": "0.63 nm",
+      "SNR @ specified input spectral radiance": "…….. @ ……… W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "306 - 380 nm",
+      "No. of channels": "390",
+      "Spectral resolution": "0.42 nm",
+      "SNR @ specified input spectral radiance": "…….. @ ……… W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "350 - 500 nm",
+      "No. of channels": "780",
+      "Spectral resolution": "0.63 nm",
+      "SNR @ specified input spectral radiance": "…….. @ ……… W m-2sr-1μm-1"
+    }
+  ]
+}

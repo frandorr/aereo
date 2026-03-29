@@ -1,0 +1,38 @@
+{
+  "instrument_id": 336,
+  "instrument_acronym": "MUXCAM",
+  "instrument_fullname": "Multispectral Camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/muxcam",
+  "columns": [
+    "Central",
+    "Spectral",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central": "wavelength",
+      "Spectral": "interval",
+      "SNR @ specified input spectral radiance": "Low signal"
+    },
+    {
+      "Central": "0.485 µm",
+      "Spectral": "0.45 - 0.52 µm",
+      "SNR @ specified input spectral radiance": "31 @ 35.3 W m-2sr-1μm-1"
+    },
+    {
+      "Central": "0.555 µm",
+      "Spectral": "0.52 - 0.59 µm",
+      "SNR @ specified input spectral radiance": "29 @ 25.7 W m-2sr-1μm-1"
+    },
+    {
+      "Central": "0.660 µm",
+      "Spectral": "0.63 - 0.69 µm",
+      "SNR @ specified input spectral radiance": "23 @ 12.9 W m-2sr-1μm-1"
+    },
+    {
+      "Central": "0.830 µm",
+      "Spectral": "0.77 - 0.89 µm",
+      "SNR @ specified input spectral radiance": "24 @ 8.9 W m-2sr-1μm-1"
+    }
+  ]
+}

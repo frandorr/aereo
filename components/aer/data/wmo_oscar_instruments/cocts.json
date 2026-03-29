@@ -1,0 +1,63 @@
+{
+  "instrument_id": 88,
+  "instrument_acronym": "COCTS",
+  "instrument_fullname": "China Ocean Colour & Temperature Scanner",
+  "url": "https://space.oscar.wmo.int/instruments/view/cocts",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR or NE∆T @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "412 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NE∆T @ specified input": "349 @ 91.0 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "443 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NE∆T @ specified input": "472 @ 84.1 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "490 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NE∆T @ specified input": "467 @ 65.6 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "520 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NE∆T @ specified input": "448 @ 54.6 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "565 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NE∆T @ specified input": "417 @ 45.7 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "670 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NE∆T @ specified input": "309 @ 24.6 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "750 nm",
+      "Bandwidth": "40 nm",
+      "SNR or NE∆T @ specified input": "319 @ 16.1 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "865 nm",
+      "Bandwidth": "40 nm",
+      "SNR or NE∆T @ specified input": "327 @ 10.9 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "11.0 μm",
+      "Bandwidth": "1.0 μm",
+      "SNR or NE∆T @ specified input": "0.2 K @ 300 K"
+    },
+    {
+      "Central wavelength": "12.0 μm",
+      "Bandwidth": "1.0 μm",
+      "SNR or NE∆T @ specified input": "0.2 K @ 300 K"
+    }
+  ]
+}

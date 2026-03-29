@@ -1,0 +1,48 @@
+{
+  "instrument_id": 118,
+  "instrument_acronym": "Delta-2D",
+  "instrument_fullname": "Scanning Microwave Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/delta-2d",
+  "columns": [
+    "Central frequency",
+    "Bandwidth",
+    "Polarisations",
+    "NEΔT",
+    "IFOV",
+    "Pixel"
+  ],
+  "channels": [
+    {
+      "Central frequency": "6.9 GHz",
+      "Bandwidth": "…. MHz",
+      "Polarisations": "V, H",
+      "NEΔT": "0.1 K",
+      "IFOV": "91x120 km",
+      "Pixel": "40x60 km"
+    },
+    {
+      "Central frequency": "13.0 GHz",
+      "Bandwidth": "…. MHz",
+      "Polarisations": "V, H",
+      "NEΔT": "0.1 K",
+      "IFOV": "49x65 km",
+      "Pixel": "20x20 km"
+    },
+    {
+      "Central frequency": "22.3 GHz",
+      "Bandwidth": ".... MHz",
+      "Polarisations": "V, H",
+      "NEΔT": "0.15 K",
+      "IFOV": "28x37 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "Central frequency": "37.5 GHz",
+      "Bandwidth": ".... MHz",
+      "Polarisations": "V, H",
+      "NEΔT": "0.15 K",
+      "IFOV": "17x21 km",
+      "Pixel": "10x10 km"
+    }
+  ]
+}

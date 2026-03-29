@@ -1,0 +1,116 @@
+{
+  "instrument_id": 184,
+  "instrument_acronym": "HIRS/4",
+  "instrument_fullname": "High-resolution Infra Red Sounder / 4",
+  "url": "https://space.oscar.wmo.int/instruments/view/hirs/4",
+  "columns": [
+    "Wavelength",
+    "Wave number",
+    "Bandwidth",
+    "SNR @ specified input"
+  ],
+  "channels": [
+    {
+      "Wavelength": "15.0 µm",
+      "Wave number": "668 cm-1",
+      "Bandwidth": "2.8 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "14.7 µm",
+      "Wave number": "679 cm-1",
+      "Bandwidth": "13.7 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "14.4 µm",
+      "Wave number": "690 cm-1",
+      "Bandwidth": "12.6 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "14.2 µm",
+      "Wave number": "702 cm-1",
+      "Bandwidth": "15.9 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "14.0 µm",
+      "Wave number": "716 cm-1",
+      "Bandwidth": "17.5 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "13.6 µm",
+      "Wave number": "733 cm-1",
+      "Bandwidth": "17.6 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "13.4 µm",
+      "Wave number": "749 cm-1",
+      "Bandwidth": "18.4 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "11.0 µm",
+      "Wave number": "900 cm-1",
+      "Bandwidth": "34.6 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "8.20 µm",
+      "Wave number": "1224 cm-1",
+      "Bandwidth": "63.4 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "6.70 µm",
+      "Wave number": "1496 cm-1",
+      "Bandwidth": "87.6 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "4.57 µm",
+      "Wave number": "2190 cm-1",
+      "Bandwidth": "20.6 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "4.52 µm",
+      "Wave number": "2212 cm-1",
+      "Bandwidth": "22.5 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "4.46 µm",
+      "Wave number": "2242 cm-1",
+      "Bandwidth": "21.6 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "4.40 µm",
+      "Wave number": "2275 cm-1",
+      "Bandwidth": "35.2 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "4.24 µm",
+      "Wave number": "2357 cm-1",
+      "Bandwidth": "23.0 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "3.71 µm",
+      "Wave number": "2692 cm-1",
+      "Bandwidth": "297 cm-1",
+      "SNR @ specified input": "…. @ ….. mW m-2sr-1μm-1"
+    },
+    {
+      "Wavelength": "0.69 µm",
+      "Wave number": "14,443 cm-1",
+      "Bandwidth": "892 cm-1",
+      "SNR @ specified input": "…. @ …. % albedo"
+    }
+  ]
+}

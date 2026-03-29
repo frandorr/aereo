@@ -1,0 +1,23 @@
+{
+  "instrument_id": 618,
+  "instrument_acronym": "WFI",
+  "instrument_fullname": "Wide Field Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/wfi",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.66 µm",
+      "Spectral interval": "0.63 - 0.69 µm",
+      "SNR @ specified albedo": "8 @ 2 % albedo"
+    },
+    {
+      "Central wavelength": "0.83 µm",
+      "Spectral interval": "0.77 - 0.89 µm",
+      "SNR @ specified albedo": "16 @ 4 % albedo"
+    }
+  ]
+}

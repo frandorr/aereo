@@ -51,6 +51,7 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260330-adap | adapt repository and models to remove UU | 2026-03-28 | 3bfe069 | [260330-adapt-repository-and-models-to-remove-uu](./quick/260330-adapt-repository-and-models-to-remove-uu/) |
 | 260331-refa | refactor Instrument/Satellite to many-to- | 2026-03-28 | c357c95 | [260331-refactor-satellite-instrument-channel-re](./quick/260331-refactor-satellite-instrument-channel-re/) |
 | 260332-creat | Create InMemoryRepository and tests | 2026-03-29 | 6fd997d | [260332-create-tests-subclassing-aerrepository-w](./quick/260332-create-tests-subclassing-aerrepository-w/) |
+| 260334-pars | Parse WMO OSCAR instrument channels to JSON | 2026-03-29 | aaa84cf | [260334-parse-wmo-oscar-instrument-channels-from](./quick/260334-parse-wmo-oscar-instrument-channels-from/) |
 
 ## Progress
 
@@ -59,4 +60,4 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 - Current: Phase 1 context captured, ready to plan
 
 ---
-*Last activity: 2026-03-29 - Modified 260332: Added validation and abstract tests for AerRepository*
+*Last activity: 2026-03-29 - Completed 260334: Scraped WMO OSCAR instrument channels to 262 JSON files*

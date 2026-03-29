@@ -1,0 +1,32 @@
+{
+  "instrument_id": 1129,
+  "instrument_acronym": "ACGS",
+  "instrument_fullname": "Atmospheric Carbon-dioxide Grating Spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/acgs",
+  "columns": [
+    "Spectral range",
+    "No. of channels",
+    "Spectral resolution",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Spectral range": "758-776 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.044 nm",
+      "SNR @ specified input spectral radiance": "360 @ 5.8 1019photons s-1m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "1594-1624 nm",
+      "No. of channels": "512",
+      "Spectral resolution": "0.125 nm",
+      "SNR @ specified input spectral radiance": "250 @ 2.1 1019photons s-1m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "2041-2081 nm",
+      "No. of channels": "512",
+      "Spectral resolution": "0.165 nm",
+      "SNR @ specified input spectral radiance": "180 @ 1.1 1019photons s-1m-2sr-1μm-1"
+    }
+  ]
+}

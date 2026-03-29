@@ -1,0 +1,120 @@
+{
+  "instrument_id": 30,
+  "instrument_acronym": "AMSU-A",
+  "instrument_fullname": "Advanced Microwave Sounding Unit - A",
+  "url": "https://space.oscar.wmo.int/instruments/view/amsu-a",
+  "columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT"
+  ],
+  "channels": [
+    {
+      "No.": "1",
+      "Central frequency (GHz)": "23.800",
+      "Bandwidth (MHz)": "270",
+      "Polarisation": "QV",
+      "NEΔT": "0.30 K"
+    },
+    {
+      "No.": "2",
+      "Central frequency (GHz)": "31.400",
+      "Bandwidth (MHz)": "180",
+      "Polarisation": "QV",
+      "NEΔT": "0.30 K"
+    },
+    {
+      "No.": "3",
+      "Central frequency (GHz)": "50.300",
+      "Bandwidth (MHz)": "180",
+      "Polarisation": "QV",
+      "NEΔT": "0.40 K"
+    },
+    {
+      "No.": "4",
+      "Central frequency (GHz)": "52.800",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "QV",
+      "NEΔT": "0.25 K"
+    },
+    {
+      "No.": "5",
+      "Central frequency (GHz)": "53.596 ± 0.115",
+      "Bandwidth (MHz)": "170",
+      "Polarisation": "QH",
+      "NEΔT": "0.25 K"
+    },
+    {
+      "No.": "6",
+      "Central frequency (GHz)": "54.400",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "QH",
+      "NEΔT": "0.25 K"
+    },
+    {
+      "No.": "7",
+      "Central frequency (GHz)": "54.940",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "QV",
+      "NEΔT": "0.25 K"
+    },
+    {
+      "No.": "8",
+      "Central frequency (GHz)": "55.500",
+      "Bandwidth (MHz)": "330",
+      "Polarisation": "QH",
+      "NEΔT": "0.25 K"
+    },
+    {
+      "No.": "9",
+      "Central frequency (GHz)": "f0 = 57.290344",
+      "Bandwidth (MHz)": "330",
+      "Polarisation": "QH",
+      "NEΔT": "0.25 K"
+    },
+    {
+      "No.": "10",
+      "Central frequency (GHz)": "f0 ± 0.217",
+      "Bandwidth (MHz)": "78",
+      "Polarisation": "QH",
+      "NEΔT": "0.40 K"
+    },
+    {
+      "No.": "11",
+      "Central frequency (GHz)": "f0 ± 0.3222  ± 0.048",
+      "Bandwidth (MHz)": "36",
+      "Polarisation": "QH",
+      "NEΔT": "0.40 K"
+    },
+    {
+      "No.": "12",
+      "Central frequency (GHz)": "f0 ± 0.3222  ± 0.022",
+      "Bandwidth (MHz)": "16",
+      "Polarisation": "QH",
+      "NEΔT": "0.60 K"
+    },
+    {
+      "No.": "13",
+      "Central frequency (GHz)": "f0 ± 0.3222  ± 0.010",
+      "Bandwidth (MHz)": "8",
+      "Polarisation": "QH",
+      "NEΔT": "0.80 K"
+    },
+    {
+      "No.": "14",
+      "Central frequency (GHz)": "f0 ± 0.3222  ± 0.0045",
+      "Bandwidth (MHz)": "3",
+      "Polarisation": "QH",
+      "NEΔT": "1.20 K"
+    },
+    {
+      "No.": "15",
+      "Central frequency (GHz)": "89.000 ± 1.0",
+      "Bandwidth (MHz)": "1000",
+      "Polarisation": "QV",
+      "NEΔT": "0.50 K"
+    }
+  ]
+}

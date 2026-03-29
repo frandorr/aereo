@@ -1,0 +1,64 @@
+{
+  "instrument_id": 448,
+  "instrument_acronym": "CSG-SAR",
+  "instrument_fullname": "COSMO-SkyMed Second Generation Synthetic Aperture Radar",
+  "url": "https://space.oscar.wmo.int/instruments/view/csg-sar",
+  "columns": [
+    "Mode",
+    "Resolution",
+    "Swath",
+    "Field-of-Regard",
+    "Polarisations"
+  ],
+  "channels": [
+    {
+      "Mode": "Spotlight",
+      "Resolution": "0.50x0.35 m",
+      "Swath": "7.3x3.1",
+      "Field-of-Regard": "600 km, either right or left",
+      "Polarisations": "Single: HH or VV or HV or VH"
+    },
+    {
+      "Mode": "Spotlight",
+      "Resolution": "0.63x0.63 m",
+      "Swath": "10 km",
+      "Field-of-Regard": "600 km, either right or left",
+      "Polarisations": "Double: HH & HV or VV &VH"
+    },
+    {
+      "Mode": "Stripmap",
+      "Resolution": "3.0x3.0 m",
+      "Swath": "40 km",
+      "Field-of-Regard": "600 km, either right or left",
+      "Polarisations": "Single: HH or VV or HV or VH"
+    },
+    {
+      "Mode": "Stripmap",
+      "Resolution": "3.0x3.0 m",
+      "Swath": "30 km",
+      "Field-of-Regard": "600 km, either right or left",
+      "Polarisations": "Double: HH & HV or VV &VH"
+    },
+    {
+      "Mode": "Stripmap",
+      "Resolution": "3.0x3.0 m",
+      "Swath": "15 km",
+      "Field-of-Regard": "600 km, either right or left",
+      "Polarisations": "Quadruple: HH & VV & HV & VH"
+    },
+    {
+      "Mode": "ScanSAR",
+      "Resolution": "4x20 m",
+      "Swath": "100 km",
+      "Field-of-Regard": "600 km, either right or left",
+      "Polarisations": "Single: HH or VV or HV or VH"
+    },
+    {
+      "Mode": "ScanSAR",
+      "Resolution": "6x40 m",
+      "Swath": "200 km",
+      "Field-of-Regard": "600 km, either right or left",
+      "Polarisations": "Double: HH & HV or VV &VH"
+    }
+  ]
+}

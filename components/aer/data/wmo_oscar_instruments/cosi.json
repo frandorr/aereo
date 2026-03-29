@@ -1,0 +1,32 @@
+{
+  "instrument_id": 89,
+  "instrument_acronym": "COSI",
+  "instrument_fullname": "Corea SAR Instrument",
+  "url": "https://space.oscar.wmo.int/instruments/view/cosi",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "Operation mode": "High Resolution mode",
+      "Resolution": "1 m",
+      "Swath": "5 km",
+      "Polarisation": "HH or VV or HV or VH, selectable"
+    },
+    {
+      "Operation mode": "Standard mode",
+      "Resolution": "3 m",
+      "Swath": "30 km",
+      "Polarisation": "HH or VV or HV or VH, selectable"
+    },
+    {
+      "Operation mode": "Wide Swath mode",
+      "Resolution": "20 m",
+      "Swath": "100 km",
+      "Polarisation": "HH or VV or HV or VH, selectable"
+    }
+  ]
+}

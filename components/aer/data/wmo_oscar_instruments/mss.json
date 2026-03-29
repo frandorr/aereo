@@ -1,0 +1,33 @@
+{
+  "instrument_id": 317,
+  "instrument_acronym": "MSS",
+  "instrument_fullname": "Multispectral film-making system ",
+  "url": "https://space.oscar.wmo.int/instruments/view/mss",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.55 µm",
+      "Spectral interval": "0.50 - 0.60 µm",
+      "SNR @ specified input spectral radiance": "120 @ 248 W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "0.65 µm",
+      "Spectral interval": "0.60 - 0.70 µm",
+      "SNR @ specified input spectral radiance": "90 @ 200 W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "0.75 µm",
+      "Spectral interval": "0.70 - 0.80 µm",
+      "SNR @ specified input spectral radiance": "75 @ 176 W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "0.95 µm",
+      "Spectral interval": "0.80 - 1.10 µm",
+      "SNR @ specified input spectral radiance": "125 @ 153 W m-2sr-1μm-1"
+    }
+  ]
+}

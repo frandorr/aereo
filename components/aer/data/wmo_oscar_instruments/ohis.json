@@ -1,0 +1,32 @@
+{
+  "instrument_id": 963,
+  "instrument_acronym": "OHIS",
+  "instrument_fullname": "OrbView Hyperspectral Imaging System",
+  "url": "https://space.oscar.wmo.int/instruments/view/ohis",
+  "columns": [
+    "Spectral range",
+    "Number of channels",
+    "Spectral resolution",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Spectral range": "450 - 905 nm",
+      "Number of channels": "40",
+      "Spectral resolution": "11.4 nm",
+      "SNR @ specified albedo": "….. @ …. % albedo"
+    },
+    {
+      "Spectral range": "830 - 1740 nm",
+      "Number of channels": "80",
+      "Spectral resolution": "11.4 nm",
+      "SNR @ specified albedo": "….. @ …. % albedo"
+    },
+    {
+      "Spectral range": "1580 - 2490 nm",
+      "Number of channels": "80",
+      "Spectral resolution": "11.4 nm",
+      "SNR @ specified albedo": "….. @ …. % albedo"
+    }
+  ]
+}

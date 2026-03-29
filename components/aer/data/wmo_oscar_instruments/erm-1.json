@@ -1,0 +1,29 @@
+{
+  "instrument_id": 132,
+  "instrument_acronym": "ERM-1",
+  "instrument_fullname": "Earth Radiation Measurement - 1",
+  "url": "https://space.oscar.wmo.int/instruments/view/erm-1",
+  "columns": [
+    "Channel",
+    "Spectral interval",
+    "Noise Equivalent Radiance",
+    "Absolute accuracy",
+    "SNR"
+  ],
+  "channels": [
+    {
+      "Channel": "Short-wave (outgoing)",
+      "Spectral interval": "0.2 - 3.8  µm",
+      "Noise Equivalent Radiance": "0.4  W m-2sr-1",
+      "Absolute accuracy": "1.5  W m-2sr-1",
+      "SNR": "900"
+    },
+    {
+      "Channel": "Total radiance (outgoing)",
+      "Spectral interval": "0.2 - 50  µm",
+      "Noise Equivalent Radiance": "0.4  W m-2sr-1",
+      "Absolute accuracy": "1.1  W m-2sr-1",
+      "SNR": "1250"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "instrument_id": 631,
+  "instrument_acronym": "ERBR",
+  "instrument_fullname": "Earth Radiation Budget Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/erbr",
+  "columns": [
+    "Channel",
+    "Spectral interval",
+    "Noise Equivalent Radiance",
+    "Absolute accuracy",
+    "SNR"
+  ],
+  "channels": [
+    {
+      "Channel": "Short-wave",
+      "Spectral interval": "0.32 - 4.0 µm",
+      "Noise Equivalent Radiance": "...... W m-2sr-1",
+      "Absolute accuracy": "...... W m-2sr-1",
+      "SNR": ",,,,,,,"
+    },
+    {
+      "Channel": "Total radiance",
+      "Spectral interval": "0.32 - 30 µm",
+      "Noise Equivalent Radiance": "…… W m-2sr-1",
+      "Absolute accuracy": "...... W m-2sr-1",
+      "SNR": "......."
+    }
+  ]
+}

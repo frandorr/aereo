@@ -1,0 +1,98 @@
+{
+  "instrument_id": 50,
+  "instrument_acronym": "ASTER",
+  "instrument_fullname": "Advanced Spaceborne Thermal Emission and Reflection radiometer ",
+  "url": "https://space.oscar.wmo.int/instruments/view/aster",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input",
+    "Resolution s.s.p."
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.56 µm",
+      "Spectral interval": "0.52-0.60 µm",
+      "SNR or NEΔT @ specified input": "140 @ 70% albedo",
+      "Resolution s.s.p.": "15 m"
+    },
+    {
+      "Central wavelength": "0.66 µm",
+      "Spectral interval": "0.63-0.69 µm",
+      "SNR or NEΔT @ specified input": "140 @ 70% albedo",
+      "Resolution s.s.p.": "15 m"
+    },
+    {
+      "Central wavelength": "0.81 µm",
+      "Spectral interval": "0.76-0.86 µm",
+      "SNR or NEΔT @ specified input": "140 @ 70% albedo",
+      "Resolution s.s.p.": "15 m"
+    },
+    {
+      "Central wavelength": "1.65 µm",
+      "Spectral interval": "1.60-1.70 µm",
+      "SNR or NEΔT @ specified input": "140 @ 70% albedo",
+      "Resolution s.s.p.": "30 m"
+    },
+    {
+      "Central wavelength": "2.165 µm",
+      "Spectral interval": "2.145-2.185 µm",
+      "SNR or NEΔT @ specified input": "54 @ 70% albedo",
+      "Resolution s.s.p.": "30 m"
+    },
+    {
+      "Central wavelength": "2.205 µm",
+      "Spectral interval": "2.185-2.225 µm",
+      "SNR or NEΔT @ specified input": "54 @ 70% albedo",
+      "Resolution s.s.p.": "30 m"
+    },
+    {
+      "Central wavelength": "2.260 µm",
+      "Spectral interval": "2.235-2.285 µm",
+      "SNR or NEΔT @ specified input": "54 @ 70% albedo",
+      "Resolution s.s.p.": "30 m"
+    },
+    {
+      "Central wavelength": "2.330 µm",
+      "Spectral interval": "2.295-2.365 µm",
+      "SNR or NEΔT @ specified input": "70 @ 70% albedo",
+      "Resolution s.s.p.": "30 m"
+    },
+    {
+      "Central wavelength": "2.395 µm",
+      "Spectral interval": "2.360-2.430 µm",
+      "SNR or NEΔT @ specified input": "54 @ 70% albedo",
+      "Resolution s.s.p.": "30 m"
+    },
+    {
+      "Central wavelength": "8.30 µm",
+      "Spectral interval": "8.125-8.475 µm",
+      "SNR or NEΔT @ specified input": "0.3 K @ 300 K",
+      "Resolution s.s.p.": "90 m"
+    },
+    {
+      "Central wavelength": "8.65 µm",
+      "Spectral interval": "8.475-8.825 µm",
+      "SNR or NEΔT @ specified input": "0.3 K @ 300 K",
+      "Resolution s.s.p.": "90 m"
+    },
+    {
+      "Central wavelength": "9.10 µm",
+      "Spectral interval": "8.925-9.275 µm",
+      "SNR or NEΔT @ specified input": "0.3 K @ 300 K",
+      "Resolution s.s.p.": "90 m"
+    },
+    {
+      "Central wavelength": "10.60 µm",
+      "Spectral interval": "10.25-10.95 µm",
+      "SNR or NEΔT @ specified input": "0.3 K @ 300 K",
+      "Resolution s.s.p.": "90 m"
+    },
+    {
+      "Central wavelength": "11.30 µm",
+      "Spectral interval": "10.95-11.65 µm",
+      "SNR or NEΔT @ specified input": "0.3 K @ 300 K",
+      "Resolution s.s.p.": "90 m"
+    }
+  ]
+}

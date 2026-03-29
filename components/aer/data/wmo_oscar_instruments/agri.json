@@ -1,0 +1,120 @@
+{
+  "instrument_id": 275,
+  "instrument_acronym": "AGRI",
+  "instrument_fullname": "Advanced Geostationary Radiation Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/agri",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input",
+    "IFOV at s.s.p.",
+    "Comment"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.47 µm",
+      "Spectral interval": "0.45-0.49 µm",
+      "SNR or NEΔT @ specified input": "≥90 @ 100% albedo",
+      "IFOV at s.s.p.": "1 km",
+      "Comment": ""
+    },
+    {
+      "Central wavelength": "0.65 µm",
+      "Spectral interval": "0.55-0.75 µm",
+      "SNR or NEΔT @ specified input": "≥150 @ 100% albedo",
+      "IFOV at s.s.p.": "0.5 km",
+      "Comment": ""
+    },
+    {
+      "Central wavelength": "0.825 µm",
+      "Spectral interval": "0.75-0.90 µm",
+      "SNR or NEΔT @ specified input": "≥200 @ 100% albedo or ≥3 @ 1% albedo",
+      "IFOV at s.s.p.": "1 km",
+      "Comment": ""
+    },
+    {
+      "Central wavelength": "1.378 µm",
+      "Spectral interval": "1.371~1.386 µm",
+      "SNR or NEΔT @ specified input": "≥120 @ 100% albedo or ≥2 @ 1% albedo",
+      "IFOV at s.s.p.": "2 km",
+      "Comment": ""
+    },
+    {
+      "Central wavelength": "1.61 µm",
+      "Spectral interval": "1.58-1.64 µm",
+      "SNR or NEΔT @ specified input": "≥200 @ 100% albedo or ≥3 @ 1% albedo",
+      "IFOV at s.s.p.": "2 km",
+      "Comment": ""
+    },
+    {
+      "Central wavelength": "2.25 µm",
+      "Spectral interval": "2.10-2.35 µm",
+      "SNR or NEΔT @ specified input": "≥200 @ 100% albedo or ≥2 @ 1% albedo",
+      "IFOV at s.s.p.": "2 km",
+      "Comment": ""
+    },
+    {
+      "Central wavelength": "3.75 µm (high)",
+      "Spectral interval": "3.50-4.00 µm",
+      "SNR or NEΔT @ specified input": "≤ 0.7 K @ 315 K",
+      "IFOV at s.s.p.": "2 km",
+      "Comment": ""
+    },
+    {
+      "Central wavelength": "3.75 µm (low)",
+      "Spectral interval": "3.50-4.00 µm",
+      "SNR or NEΔT @ specified input": "0.2 K @ 300 K or 2.0 K @ 240 K",
+      "IFOV at s.s.p.": "4 km",
+      "Comment": ""
+    },
+    {
+      "Central wavelength": "6.25 µm",
+      "Spectral interval": "5.80-6.70 µm",
+      "SNR or NEΔT @ specified input": "0.2 K @ 300 K or 0.9 K @ 240 K",
+      "IFOV at s.s.p.": "4 km",
+      "Comment": ""
+    },
+    {
+      "Central wavelength": "6.95",
+      "Spectral interval": "6.75~7.15",
+      "SNR or NEΔT @ specified input": "0.25K @ 300K or 0.9 K @ 240 K",
+      "IFOV at s.s.p.": "4 km",
+      "Comment": "Not on FY-4A"
+    },
+    {
+      "Central wavelength": "7.1 µm/7.42 µm",
+      "Spectral interval": "6.90-7.30 µm/7.24-7.60 µm",
+      "SNR or NEΔT @ specified input": "0.25 K @ 300 K or 0.9 K @ 240 K",
+      "IFOV at s.s.p.": "4 km",
+      "Comment": "FY-4A/FY-4B"
+    },
+    {
+      "Central wavelength": "8.55 µm",
+      "Spectral interval": "8.30-8.80 µm",
+      "SNR or NEΔT @ specified input": "0.2 K @ 300 K or 0.4 K @ 240 K",
+      "IFOV at s.s.p.": "4 km",
+      "Comment": ""
+    },
+    {
+      "Central wavelength": "10.80 µm",
+      "Spectral interval": "10.30-11.30 µm",
+      "SNR or NEΔT @ specified input": "0.2 K @ 300 K or 0.4 K @ 240 K",
+      "IFOV at s.s.p.": "4 km",
+      "Comment": ""
+    },
+    {
+      "Central wavelength": "12.00 µm",
+      "Spectral interval": "11.50-12.50 µm",
+      "SNR or NEΔT @ specified input": "0.2 K @ 300 K or 0.4 K @ 240 K",
+      "IFOV at s.s.p.": "4 km",
+      "Comment": ""
+    },
+    {
+      "Central wavelength": "13.50 µm",
+      "Spectral interval": "13.20-13.80 µm",
+      "SNR or NEΔT @ specified input": "0.5 K @ 300 K or 0.9 K @ 240 K",
+      "IFOV at s.s.p.": "4 km",
+      "Comment": ""
+    }
+  ]
+}

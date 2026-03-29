@@ -1,0 +1,33 @@
+{
+  "instrument_id": 1242,
+  "instrument_acronym": "WVC-2",
+  "instrument_fullname": "Wide View CCD camera - 2",
+  "url": "https://space.oscar.wmo.int/instruments/view/wvc-2",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.47 µm",
+      "Spectral interval": "0.43 - 0.52 µm",
+      "SNR @ specified albedo": "……  @  ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.56 µm",
+      "Spectral interval": "0.52 - 0.60 µm",
+      "SNR @ specified albedo": "……  @  ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.66 µm",
+      "Spectral interval": "0.63 - 0.69 µm",
+      "SNR @ specified albedo": "……  @  ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.83 µm",
+      "Spectral interval": "0.76 - 0.90 µm",
+      "SNR @ specified albedo": "……  @  ….. % albedo"
+    }
+  ]
+}

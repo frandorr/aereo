@@ -1,0 +1,33 @@
+{
+  "instrument_id": 65,
+  "instrument_acronym": "AVNIR-2",
+  "instrument_fullname": "Advanced Visible and Near-Infrared Radiometer - 2",
+  "url": "https://space.oscar.wmo.int/instruments/view/avnir-2",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.46 µm",
+      "Spectral interval": "0.42 - 0.50 µm",
+      "SNR @ specified albedo": "200 @ 25 % albedo"
+    },
+    {
+      "Central wavelength": "0.56 µm",
+      "Spectral interval": "0.52 – 0.60 µm",
+      "SNR @ specified albedo": "200 @ 29 % albedo"
+    },
+    {
+      "Central wavelength": "0.65 µm",
+      "Spectral interval": "0.61 – 0.69 µm",
+      "SNR @ specified albedo": "200 @ 41 % albedo"
+    },
+    {
+      "Central wavelength": "0.825 µm",
+      "Spectral interval": "0.76 – 0.89 µm",
+      "SNR @ specified albedo": "200 @ 59 % albedo"
+    }
+  ]
+}

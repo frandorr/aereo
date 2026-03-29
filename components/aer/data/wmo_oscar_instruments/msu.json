@@ -1,0 +1,43 @@
+{
+  "instrument_id": 319,
+  "instrument_acronym": "MSU",
+  "instrument_fullname": "Microwave Sounding Unit",
+  "url": "https://space.oscar.wmo.int/instruments/view/msu",
+  "columns": [
+    "Channel Number",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT"
+  ],
+  "channels": [
+    {
+      "Channel Number": "1",
+      "Central frequency (GHz)": "50.30",
+      "Bandwidth (MHz)": "200",
+      "Polarisation": "V",
+      "NEΔT": "0.3 K"
+    },
+    {
+      "Channel Number": "2",
+      "Central frequency (GHz)": "53.74",
+      "Bandwidth (MHz)": "200",
+      "Polarisation": "V",
+      "NEΔT": "0.3 K"
+    },
+    {
+      "Channel Number": "3",
+      "Central frequency (GHz)": "54.96",
+      "Bandwidth (MHz)": "200",
+      "Polarisation": "V",
+      "NEΔT": "0.3 K"
+    },
+    {
+      "Channel Number": "4",
+      "Central frequency (GHz)": "57.95",
+      "Bandwidth (MHz)": "200",
+      "Polarisation": "V",
+      "NEΔT": "0.3 K"
+    }
+  ]
+}

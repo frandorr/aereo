@@ -1,0 +1,43 @@
+{
+  "instrument_id": 471,
+  "instrument_acronym": "ScaRaB",
+  "instrument_fullname": "Scanner for Radiation Budget",
+  "url": "https://space.oscar.wmo.int/instruments/view/scarab",
+  "columns": [
+    "Channel",
+    "Spectral interval",
+    "Noise Equivalent Radiance",
+    "Absolute accuracy",
+    "SNR"
+  ],
+  "channels": [
+    {
+      "Channel": "Short-wave",
+      "Spectral interval": "0.2 - 4.0 µm",
+      "Noise Equivalent Radiance": "< 0.5 W m-2sr-1",
+      "Absolute accuracy": ".......... W m-2sr-1",
+      "SNR": "850"
+    },
+    {
+      "Channel": "Total radiance",
+      "Spectral interval": "0.2 - 50 µm",
+      "Noise Equivalent Radiance": "< 0.5 W m-2sr-1",
+      "Absolute accuracy": ".......... W m-2sr-1",
+      "SNR": "1000"
+    },
+    {
+      "Channel": "VIS",
+      "Spectral interval": "0.55 - 0.65 µm",
+      "Noise Equivalent Radiance": "< 1.0 W m-2sr-1",
+      "Absolute accuracy": ".......... W m-2sr-1",
+      "SNR": "120"
+    },
+    {
+      "Channel": "TIR",
+      "Spectral interval": "10.5 - 12.5 µm",
+      "Noise Equivalent Radiance": "< 0.5 W m-2sr-1",
+      "Absolute accuracy": ".......... W m-2sr-1",
+      "SNR": "60"
+    }
+  ]
+}

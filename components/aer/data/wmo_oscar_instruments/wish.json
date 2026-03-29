@@ -1,0 +1,48 @@
+{
+  "instrument_id": 946,
+  "instrument_acronym": "WISH",
+  "instrument_fullname": "Wide-Swath and High-Resolution Optical Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/wish",
+  "columns": [
+    "Spectral interval",
+    "SNR @ specified input",
+    "IFOV at s.s.p."
+  ],
+  "channels": [
+    {
+      "Spectral interval": "0.52-0.77 µm (PAN)",
+      "SNR @ specified input": "….. @ … albedo",
+      "IFOV at s.s.p.": "0.8 m"
+    },
+    {
+      "Spectral interval": "0.40-0.45 µm",
+      "SNR @ specified input": "….. @ … albedo",
+      "IFOV at s.s.p.": "3.2 m"
+    },
+    {
+      "Spectral interval": "0.45-0.50 µm",
+      "SNR @ specified input": "….. @ … albedo",
+      "IFOV at s.s.p.": "3.2 m"
+    },
+    {
+      "Spectral interval": "0.52-0.60 µm",
+      "SNR @ specified input": "….. @ … albedo",
+      "IFOV at s.s.p.": "3.2 m"
+    },
+    {
+      "Spectral interval": "0.61-0.69 µm",
+      "SNR @ specified input": "….. @ … albedo",
+      "IFOV at s.s.p.": "3.2 m"
+    },
+    {
+      "Spectral interval": "0.69-0.74 µm",
+      "SNR @ specified input": "….. @ … albedo",
+      "IFOV at s.s.p.": "3.2 m"
+    },
+    {
+      "Spectral interval": "0.76-0.89 µm",
+      "SNR @ specified input": ".…. @ … albedo",
+      "IFOV at s.s.p.": "3.2 m"
+    }
+  ]
+}

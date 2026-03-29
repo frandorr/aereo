@@ -1,0 +1,44 @@
+{
+  "instrument_id": 1215,
+  "instrument_acronym": "COWVR",
+  "instrument_fullname": "Compact Ocean Wind Vector Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/cowvr",
+  "columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisations (*)",
+    "NEΔT",
+    "IFOV",
+    "Pixel"
+  ],
+  "channels": [
+    {
+      "No.": "1",
+      "Central frequency (GHz)": "18.7",
+      "Bandwidth (MHz)": "780",
+      "Polarisations (*)": "V, H, P, M, L, R",
+      "NEΔT": "0.23 K",
+      "IFOV": "31x20 km",
+      "Pixel": "30x30 km"
+    },
+    {
+      "No.": "2",
+      "Central frequency (GHz)": "23.8",
+      "Bandwidth (MHz)": "475",
+      "Polarisations (*)": "V, H, P, M, L, R",
+      "NEΔT": "0.19 K",
+      "IFOV": "25x15 km",
+      "Pixel": "30x30 km"
+    },
+    {
+      "No.": "3",
+      "Central frequency (GHz)": "33.9",
+      "Bandwidth (MHz)": "1975",
+      "Polarisations (*)": "V, H, P, M, L, R",
+      "NEΔT": "0.13 K",
+      "IFOV": "18x11 km",
+      "Pixel": "30x30 km"
+    }
+  ]
+}

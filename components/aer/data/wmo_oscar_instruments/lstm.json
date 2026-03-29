@@ -1,0 +1,158 @@
+{
+  "instrument_id": 1268,
+  "instrument_acronym": "LSTM",
+  "instrument_fullname": "Land Surface Temperature Monitoring",
+  "url": "https://space.oscar.wmo.int/instruments/view/lstm",
+  "columns": [
+    "Channel",
+    "Wavelength",
+    "Bandwidth",
+    "SNR @ reference input L or NEΔT"
+  ],
+  "channels": [
+    {
+      "Channel": "VNIR-0",
+      "Wavelength": "0.490 µm",
+      "Bandwidth": "65 nm",
+      "SNR @ reference input L or NEΔT": "162 @ 128.00 W m-2sr-1µm-1"
+    },
+    {
+      "Channel": "VNIR-1",
+      "Wavelength": "0.665 µm",
+      "Bandwidth": "30 nm",
+      "SNR @ reference input L or NEΔT": "142 @ 108.00 W m-2sr-1µm-1"
+    },
+    {
+      "Channel": "VNIR-2",
+      "Wavelength": "0.865 µm",
+      "Bandwidth": "20 nm",
+      "SNR @ reference input L or NEΔT": "100 @ 52.38 W m-2sr-1µm-1"
+    },
+    {
+      "Channel": "VNIR-3",
+      "Wavelength": "0.945 µm",
+      "Bandwidth": "20 nm",
+      "SNR @ reference input L or NEΔT": "114 @ 8.77 W m-2sr-1µm-1"
+    },
+    {
+      "Channel": "SWIR-1",
+      "Wavelength": "1.380 µm",
+      "Bandwidth": "30 nm",
+      "SNR @ reference input L or NEΔT": "100 @ 6.00 W m-2sr-1µm-1"
+    },
+    {
+      "Channel": "SWIR-2",
+      "Wavelength": "1.610 µm",
+      "Bandwidth": "90 nm",
+      "SNR @ reference input L or NEΔT": "133 @ 4.00 W m-2sr-1µm-1"
+    },
+    {
+      "Channel": "TIR-1",
+      "Wavelength": "8.6 µm",
+      "Bandwidth": "0.18/0.30 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-2",
+      "Wavelength": "8.9 µm",
+      "Bandwidth": "0.18/0.30 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-3",
+      "Wavelength": "9.2 µm",
+      "Bandwidth": "0.18/0.30 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-4",
+      "Wavelength": "10.9 µm",
+      "Bandwidth": "0.40 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-5",
+      "Wavelength": "12.0 µm",
+      "Bandwidth": "0.47 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S1",
+      "Wavelength": "8.2 µm",
+      "Bandwidth": "0.20 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S2",
+      "Wavelength": "9.1 µm",
+      "Bandwidth": "0.20 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S3",
+      "Wavelength": "8.63 µm",
+      "Bandwidth": "0.10 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S4",
+      "Wavelength": "12.63 µm",
+      "Bandwidth": "0.10 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S5",
+      "Wavelength": "7.5 µm",
+      "Bandwidth": "0.1/02 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S6",
+      "Wavelength": "12.2 µm",
+      "Bandwidth": "0.1/02 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S7",
+      "Wavelength": "9.0 µm",
+      "Bandwidth": "0.10 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S8",
+      "Wavelength": "9.8 µm",
+      "Bandwidth": "0.10 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S9",
+      "Wavelength": "10.5 µm",
+      "Bandwidth": "0.1/0.2 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S10",
+      "Wavelength": "10.95 µm",
+      "Bandwidth": "0.1/02 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S11",
+      "Wavelength": "12.3 µm",
+      "Bandwidth": "0.1/0.2 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S12",
+      "Wavelength": "9.3 µm",
+      "Bandwidth": "0.1/0.2 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    },
+    {
+      "Channel": "TIR-S13",
+      "Wavelength": "9.53 µm",
+      "Bandwidth": "0.1/0.2 µm",
+      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+    }
+  ]
+}

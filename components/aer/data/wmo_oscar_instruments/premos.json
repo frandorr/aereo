@@ -1,0 +1,43 @@
+{
+  "instrument_id": 661,
+  "instrument_acronym": "PREMOS",
+  "instrument_fullname": "Precision Monitoring of Solar variability",
+  "url": "https://space.oscar.wmo.int/instruments/view/premos",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "210 nm",
+      "Spectral interval": "",
+      "SNR or NEΔT @ specified input": ""
+    },
+    {
+      "Central wavelength": "215 nm",
+      "Spectral interval": "",
+      "SNR or NEΔT @ specified input": ""
+    },
+    {
+      "Central wavelength": "268 nm",
+      "Spectral interval": "",
+      "SNR or NEΔT @ specified input": ""
+    },
+    {
+      "Central wavelength": "535 nm",
+      "Spectral interval": "",
+      "SNR or NEΔT @ specified input": ""
+    },
+    {
+      "Central wavelength": "607 nm",
+      "Spectral interval": "",
+      "SNR or NEΔT @ specified input": ""
+    },
+    {
+      "Central wavelength": "782 nm",
+      "Spectral interval": "",
+      "SNR or NEΔT @ specified input": ""
+    }
+  ]
+}

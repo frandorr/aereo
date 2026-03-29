@@ -1,0 +1,38 @@
+{
+  "instrument_id": 1083,
+  "instrument_acronym": "SkySat",
+  "instrument_fullname": "SkySat",
+  "url": "https://space.oscar.wmo.int/instruments/view/skysat",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "N/A (PAN)",
+      "Spectral interval": "450-900 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "482 nm",
+      "Spectral interval": "450-515 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "555 nm",
+      "Spectral interval": "515-595 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "650 nm",
+      "Spectral interval": "605-695 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "820 nm",
+      "Spectral interval": "740-900 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    }
+  ]
+}

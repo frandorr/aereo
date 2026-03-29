@@ -3,12 +3,14 @@
 
 Reads wmo_oscar_instruments.csv, fetches each instrument's OSCAR page,
 extracts the "Detailed characteristics" frequency table, and writes
-wmo_oscar_channels.csv with one row per channel.
+one JSON file per instrument to components/aer/data/wmo_oscar_instruments/.
 """
 
 import argparse
 import csv
+import json
 import logging
+import re
 import time
 import urllib.parse
 from pathlib import Path
@@ -19,16 +21,7 @@ from bs4 import BeautifulSoup
 BASE_URL = "https://space.oscar.wmo.int/instruments/view/"
 DATA_DIR = Path(__file__).resolve().parent.parent / "components" / "aer" / "data"
 INSTRUMENTS_CSV = DATA_DIR / "wmo_oscar_instruments.csv"
-CHANNELS_CSV = DATA_DIR / "wmo_oscar_channels.csv"
-
-CSV_FIELDS = [
-    "instrument_id",
-    "instrument_acronym",
-    "central_wavelength",
-    "bandwidth",
-    "snr_or_nedt",
-    "resolution",
-]
+OUTPUT_DIR = DATA_DIR / "wmo_oscar_instruments"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -36,6 +29,14 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 log = logging.getLogger(__name__)
+
+
+def slugify(text: str) -> str:
+    """Convert acronym to a safe filename slug."""
+    text = text.lower().strip()
+    text = re.sub(r"[^\w\s-]", "", text)
+    text = re.sub(r"[\s_]+", "_", text)
+    return text.strip("_")
 
 
 def load_instruments(path: Path) -> list[dict]:
@@ -60,91 +61,60 @@ def fetch_page(client: httpx.Client, acronym: str) -> str | None:
         return None
 
 
-def _normalize_header(text: str) -> str:
-    """Map a header cell text to one of our output column names."""
-    t = text.lower().strip()
-    if "central" in t and "wavelength" in t:
-        return "central_wavelength"
-    if "bandwidth" in t:
-        return "bandwidth"
-    if "snr" in t or "nedt" in t or "ne" in t and "t" in t:
-        return "snr_or_nedt"
-    if "resolution" in t:
-        return "resolution"
-    return ""
+def parse_characteristics(html: str) -> tuple[list[str], list[dict[str, str]]]:
+    """Parse the Detailed characteristics frequency table.
 
+    Returns (columns, channels) where:
+    - columns: list of header strings from the table
+    - channels: list of dicts mapping header -> cell value
 
-def _detect_columns(header_cells: list) -> dict[int, str]:
-    """Inspect header cells and return {cell_index: output_field_name} mapping."""
-    mapping: dict[int, str] = {}
-    for idx, cell in enumerate(header_cells):
-        field = _normalize_header(cell.get_text(strip=True))
-        if field:
-            mapping[idx] = field
-    return mapping
-
-
-def parse_channels(html: str) -> list[dict[str, str]]:
-    """Parse the frequency table from an instrument page.
-
-    Returns a list of dicts with keys: central_wavelength, bandwidth,
-    snr_or_nedt, resolution.
-
-    Tables have varying column layouts. We detect which columns correspond
-    to our output fields by examining header cell text.
+    Returns ([], []) if no frequency table found.
     """
     soup = BeautifulSoup(html, "html.parser")
     freq_div = soup.find("div", class_="frequencytable")
     if freq_div is None:
-        return []
+        return [], []
 
     table = freq_div.find("table")
     if table is None:
-        return []
+        return [], []
 
     rows = table.find_all("tr")
     if not rows:
-        return []
+        return [], []
 
-    # Detect column mapping from the header row (first <tr> with <strong> or <th>)
-    col_map: dict[int, str] = {}
+    # Find header row (contains <strong> tags)
     header_row_idx = 0
+    columns: list[str] = []
     for i, row in enumerate(rows):
         cells = row.find_all("td")
         if cells and cells[0].find("strong"):
-            col_map = _detect_columns(cells)
+            columns = [c.get_text(strip=True) for c in cells]
             header_row_idx = i
             break
 
-    if not col_map:
-        # Fallback: assume 4-column layout (central_wavelength, bandwidth, snr_or_nedt, resolution)
-        col_map = {
-            0: "central_wavelength",
-            1: "bandwidth",
-            2: "snr_or_nedt",
-            3: "resolution",
-        }
+    if not columns:
+        return [], []
 
     channels: list[dict[str, str]] = []
     for row in rows[header_row_idx + 1 :]:
         cells = row.find_all("td")
-        if not cells:
+        if not cells or len(cells) < len(columns):
             continue
-        # Need at least enough cells for the highest mapped index
-        max_idx = max(col_map.keys())
-        if len(cells) <= max_idx:
-            continue
-        entry: dict[str, str] = {}
-        for idx, field in col_map.items():
-            entry[field] = cells[idx].get_text(strip=True)
-        # Only keep rows that have at least a wavelength
-        if entry.get("central_wavelength"):
-            channels.append(entry)
-    return channels
+        channel = {}
+        for j, col in enumerate(columns):
+            channel[col] = cells[j].get_text(strip=True)
+        # Skip empty rows
+        if any(v for v in channel.values()):
+            channels.append(channel)
+
+    return columns, channels
 
 
-def run(limit: int | None = None) -> None:
+def run(limit: int | None = None, resume: bool = False) -> None:
     """Main scraper loop."""
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
     instruments = load_instruments(INSTRUMENTS_CSV)
     total = len(instruments)
     if limit:
@@ -153,8 +123,11 @@ def run(limit: int | None = None) -> None:
     else:
         log.info("Processing all %d instruments", total)
 
-    all_channels: list[dict] = []
     instruments_with_channels = 0
+    total_channels = 0
+    skipped = 0
+    errors = 0
+    already_done = 0
 
     client = httpx.Client(
         headers={"User-Agent": "aer-scraper/1.0 (research; contact: aer-project)"},
@@ -165,62 +138,80 @@ def run(limit: int | None = None) -> None:
         for i, inst in enumerate(instruments, 1):
             inst_id = inst["Id"]
             acronym = inst["Acronym"]
+            fullname = inst.get("Full name", "")
+
+            # Skip if already processed (resume mode)
+            slug = slugify(acronym)
+            out_path = OUTPUT_DIR / f"{slug}.json"
+            if resume and out_path.exists():
+                already_done += 1
+                if already_done % 100 == 0:
+                    log.info("Skipped %d already-processed instruments", already_done)
+                continue
 
             html = fetch_page(client, acronym)
             if html is None:
+                errors += 1
                 if i % 50 == 0:
                     log.info(
-                        "Processed %d/%d instruments, %d channels so far",
+                        "Progress: %d/%d | %d with channels | %d errors",
                         i,
                         len(instruments),
-                        len(all_channels),
+                        instruments_with_channels,
+                        errors,
                     )
                 time.sleep(0.5)
                 continue
 
-            channels = parse_channels(html)
+            columns, channels = parse_characteristics(html)
             if channels:
                 instruments_with_channels += 1
-                for ch in channels:
-                    all_channels.append(
-                        {
-                            "instrument_id": inst_id,
-                            "instrument_acronym": acronym,
-                            **ch,
-                        }
-                    )
+                total_channels += len(channels)
+
+                data = {
+                    "instrument_id": int(inst_id),
+                    "instrument_acronym": acronym,
+                    "instrument_fullname": fullname,
+                    "url": BASE_URL + urllib.parse.quote(acronym.lower()),
+                    "columns": columns,
+                    "channels": channels,
+                }
+
+                out_path = OUTPUT_DIR / f"{slug}.json"
+                with open(out_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2, ensure_ascii=False)
+            else:
+                skipped += 1
 
             if i % 50 == 0:
                 log.info(
-                    "Processed %d/%d instruments, %d channels so far",
+                    "Progress: %d/%d | %d with channels | %d skipped | %d errors",
                     i,
                     len(instruments),
-                    len(all_channels),
+                    instruments_with_channels,
+                    skipped,
+                    errors,
                 )
 
             time.sleep(0.5)
     finally:
         client.close()
 
-    # Write output CSV
-    CHANNELS_CSV.parent.mkdir(parents=True, exist_ok=True)
-    with open(CHANNELS_CSV, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, quoting=csv.QUOTE_MINIMAL)
-        writer.writeheader()
-        writer.writerows(all_channels)
-
     log.info(
-        "Done: %d instruments processed, %d with channels, %d total channel rows → %s",
+        "Done: %d processed | %d with channels (%d total channels) | %d skipped | %d errors | %d already done",
         len(instruments),
         instruments_with_channels,
-        len(all_channels),
-        CHANNELS_CSV,
+        total_channels,
+        skipped,
+        errors,
+        already_done,
     )
+    log.info("JSON files written to: %s", OUTPUT_DIR)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Scrape WMO OSCAR instrument channel characteristics."
+        description="Scrape WMO OSCAR instrument channel characteristics to JSON."
     )
     parser.add_argument(
         "--limit",
@@ -228,8 +219,13 @@ def main() -> None:
         default=None,
         help="Process only the first N instruments (for testing).",
     )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Skip instruments that already have JSON files.",
+    )
     args = parser.parse_args()
-    run(limit=args.limit)
+    run(limit=args.limit, resume=args.resume)
 
 
 if __name__ == "__main__":

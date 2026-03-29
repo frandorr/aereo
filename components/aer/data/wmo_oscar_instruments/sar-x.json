@@ -1,0 +1,36 @@
+{
+  "instrument_id": 1454,
+  "instrument_acronym": "SAR-X",
+  "instrument_fullname": "Synthetic Aperture Radar (X-band) for PLATiNO-1",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar-x",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Field of regard",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "Operation mode": "Spotlight",
+      "Resolution": "1 m",
+      "Swath": "10 km",
+      "Field of regard": "463 km, either right or left",
+      "Polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "Operation mode": "Stripmap",
+      "Resolution": "3 m",
+      "Swath": "30 km",
+      "Field of regard": "287 km, either left or right",
+      "Polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "Operation mode": "ScanSAR",
+      "Resolution": "16 m",
+      "Swath": "100 km",
+      "Field of regard": "287 km, either left or right",
+      "Polarisation": "HH or VV or HV or VH"
+    }
+  ]
+}

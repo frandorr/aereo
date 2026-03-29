@@ -1,0 +1,110 @@
+{
+  "instrument_id": 15,
+  "instrument_acronym": "AHI",
+  "instrument_fullname": "Advanced Himawari Imager ",
+  "url": "https://space.oscar.wmo.int/instruments/view/ahi",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR or NEΔT @ specified input",
+    "Resolution at s.s.p."
+  ],
+  "channels": [
+    {
+      "Central wavelength": "455 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEΔT @ specified input": "≥ 300 @ 100 % albedo",
+      "Resolution at s.s.p.": "1.0 km"
+    },
+    {
+      "Central wavelength": "510 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "≥ 300 @ 100 % albedo",
+      "Resolution at s.s.p.": "1.0 km"
+    },
+    {
+      "Central wavelength": "645 nm",
+      "Bandwidth": "30 nm",
+      "SNR or NEΔT @ specified input": "≥ 300 @ 100 % albedo",
+      "Resolution at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "860 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "≥ 300 @ 100 % albedo",
+      "Resolution at s.s.p.": "1.0 km"
+    },
+    {
+      "Central wavelength": "1610 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "≥ 300 @ 100 % albedo",
+      "Resolution at s.s.p.": "2.0 km"
+    },
+    {
+      "Central wavelength": "2260 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "≥ 300 @ 100 % albedo",
+      "Resolution at s.s.p.": "2.0 km"
+    },
+    {
+      "Central wavelength": "3.85 µm",
+      "Bandwidth": "0.22 µm",
+      "SNR or NEΔT @ specified input": "≤ 0.16 @ 300 K",
+      "Resolution at s.s.p.": "2.0 km"
+    },
+    {
+      "Central wavelength": "6.25 µm",
+      "Bandwidth": "0.37 µm",
+      "SNR or NEΔT @ specified input": "≤ 0.40 @ 240 K",
+      "Resolution at s.s.p.": "2.0 km"
+    },
+    {
+      "Central wavelength": "6.95 µm",
+      "Bandwidth": "0.12 µm",
+      "SNR or NEΔT @ specified input": "≤ 0.10 @ 300 K",
+      "Resolution at s.s.p.": "2.0 km"
+    },
+    {
+      "Central wavelength": "7.35 µm",
+      "Bandwidth": "0.17 µm",
+      "SNR or NEΔT @ specified input": "≤ 0.32 @ 240 K",
+      "Resolution at s.s.p.": "2.0 km"
+    },
+    {
+      "Central wavelength": "8.60 µm",
+      "Bandwidth": "0.32 µm",
+      "SNR or NEΔT @ specified input": "≤  0.10 @ 300 K",
+      "Resolution at s.s.p.": "2.0 km"
+    },
+    {
+      "Central wavelength": "9.63 µm",
+      "Bandwidth": "0.18 µm",
+      "SNR or NEΔT @ specified input": "≤  0.10 @ 300 K",
+      "Resolution at s.s.p.": "2.0 km"
+    },
+    {
+      "Central wavelength": "10.45 µm",
+      "Bandwidth": "0.30 µm",
+      "SNR or NEΔT @ specified input": "≤ 0.10 @ 300 K",
+      "Resolution at s.s.p.": "2.0 km"
+    },
+    {
+      "Central wavelength": "11.20 µm",
+      "Bandwidth": "0.20 µm",
+      "SNR or NEΔT @ specified input": "≤ 0.10 @ 300 K",
+      "Resolution at s.s.p.": "2.0 km"
+    },
+    {
+      "Central wavelength": "12.35 µm",
+      "Bandwidth": "0.30 µm",
+      "SNR or NEΔT @ specified input": "≤ 0.10 @ 300 K",
+      "Resolution at s.s.p.": "2.0 km"
+    },
+    {
+      "Central wavelength": "13.30 µm",
+      "Bandwidth": "0.20 µm",
+      "SNR or NEΔT @ specified input": "≤ 0.30 @ 300 K",
+      "Resolution at s.s.p.": "2.0 km"
+    }
+  ]
+}

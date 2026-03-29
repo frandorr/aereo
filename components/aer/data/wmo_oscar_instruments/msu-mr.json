@@ -1,0 +1,43 @@
+{
+  "instrument_id": 326,
+  "instrument_acronym": "MSU-MR",
+  "instrument_fullname": "VIS/IR Imaging Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/msu-mr",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.60 µm",
+      "Spectral interval": "0.50 - 0.70 µm",
+      "SNR or NEΔT @ specified input": "1000 @ 80 % albedo"
+    },
+    {
+      "Central wavelength": "0.90 µm",
+      "Spectral interval": "0.70 - 1.10 µm",
+      "SNR or NEΔT @ specified input": "1000 @ 80 % albedo"
+    },
+    {
+      "Central wavelength": "1.70 µm",
+      "Spectral interval": "1.60 - 1.80 µm",
+      "SNR or NEΔT @ specified input": "1000 @ 80 % albedo"
+    },
+    {
+      "Central wavelength": "3.80 µm",
+      "Spectral interval": "3.50 - 4.10 µm",
+      "SNR or NEΔT @ specified input": "0.5 K @ 300 K"
+    },
+    {
+      "Central wavelength": "11.00 µm",
+      "Spectral interval": "10.5 - 11.5 µm",
+      "SNR or NEΔT @ specified input": "0.15 K @ 300 K"
+    },
+    {
+      "Central wavelength": "12.00 µm",
+      "Spectral interval": "11.5 - 12.5 µm",
+      "SNR or NEΔT @ specified input": "0.15 K @ 300 K"
+    }
+  ]
+}

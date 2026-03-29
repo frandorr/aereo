@@ -1,0 +1,50 @@
+{
+  "instrument_id": 33,
+  "instrument_acronym": "AMSU-B",
+  "instrument_fullname": "Advanced Microwave Sounding Unit - B",
+  "url": "https://space.oscar.wmo.int/instruments/view/amsu-b",
+  "columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT"
+  ],
+  "channels": [
+    {
+      "No.": "16",
+      "Central frequency (GHz)": "89.0",
+      "Bandwidth (MHz)": "1000",
+      "Polarisation": "QV",
+      "NEΔT": "0.37 K"
+    },
+    {
+      "No.": "17",
+      "Central frequency (GHz)": "150.0",
+      "Bandwidth (MHz)": "1000",
+      "Polarisation": "QV",
+      "NEΔT": "0.84 K"
+    },
+    {
+      "No.": "18",
+      "Central frequency (GHz)": "183.31 ± 1.0",
+      "Bandwidth (MHz)": "500",
+      "Polarisation": "QV",
+      "NEΔT": "1.06 K"
+    },
+    {
+      "No.": "19",
+      "Central frequency (GHz)": "183.31 ± 3.0",
+      "Bandwidth (MHz)": "1000",
+      "Polarisation": "QV",
+      "NEΔT": "0.70 K"
+    },
+    {
+      "No.": "20",
+      "Central frequency (GHz)": "183.31 ± 7.0",
+      "Bandwidth (MHz)": "2000",
+      "Polarisation": "QV",
+      "NEΔT": "0.60 K"
+    }
+  ]
+}

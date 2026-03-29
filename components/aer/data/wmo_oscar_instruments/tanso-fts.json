@@ -1,0 +1,34 @@
+{
+  "instrument_id": 554,
+  "instrument_acronym": "TANSO-FTS",
+  "instrument_fullname": "Thermal And Near infrared Sensor for carbon Observations - Fourier Transform Spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/tanso-fts",
+  "columns": [
+    "Spectral range",
+    "Spectral range",
+    "Spectral resolution(unapodised)",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Spectral range": "700-1800 cm-1",
+      "Spectral resolution(unapodised)": "0.2 cm-1",
+      "SNR or NEΔT @ specified input": "0.3 K @ 280 K"
+    },
+    {
+      "Spectral range": "4800-5200 cm-1",
+      "Spectral resolution(unapodised)": "0.2 cm-1",
+      "SNR or NEΔT @ specified input": "300 @ 30 % albedo"
+    },
+    {
+      "Spectral range": "5800-6400 cm-1",
+      "Spectral resolution(unapodised)": "0.2 cm-1",
+      "SNR or NEΔT @ specified input": "300 @ 30 % albedo"
+    },
+    {
+      "Spectral range": "12900-13200 cm-1",
+      "Spectral resolution(unapodised)": "0.2 cm-1",
+      "SNR or NEΔT @ specified input": "300 @ 30 % albedo"
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "instrument_id": 604,
+  "instrument_acronym": "VIIRS",
+  "instrument_fullname": "Visible Infrared Imager Radiometer Suite",
+  "url": "https://space.oscar.wmo.int/instruments/view/viirs",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR or NEΔT @ specified input(High or single gain)",
+    "SNR or NEΔT @ specified input(Low gain)",
+    "Resolution"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "412 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input(High or single gain)": "352 @ 45 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "316 @ 155 W m-2sr-1µm-1",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "445 nm",
+      "Bandwidth": "18 nm",
+      "SNR or NEΔT @ specified input(High or single gain)": "380 @ 40 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "409 @ 146 W m-2sr-1µm-1",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "488 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input(High or single gain)": "416 @ 32 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "414 @ 123 W m-2sr-1µm-1",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "555 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input(High or single gain)": "362 @ 21 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "315 @ 90 W m-2sr-1µm-1",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "672 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input(High or single gain)": "242 @ 10 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "360 @ 68 W m-2sr-1µm-1",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "746 nm",
+      "Bandwidth": "15 nm",
+      "SNR or NEΔT @ specified input(High or single gain)": "199 @ 9.6 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "865 nm",
+      "Bandwidth": "39 nm",
+      "SNR or NEΔT @ specified input(High or single gain)": "215 @ 6.4 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "340 @ 33.4 W m-2sr-1µm-1",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "1240 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input(High or single gain)": "101 @ 5.4 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "1378 nm",
+      "Bandwidth": "15 nm",
+      "SNR or NEΔT @ specified input(High or single gain)": "83 @ 6.0 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "1610 nm",
+      "Bandwidth": "60 nm",
+      "SNR or NEΔT @ specified input(High or single gain)": "342 @ 7.3 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "2250 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEΔT @ specified input(High or single gain)": "10 @ 0.12 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "3.70 µm",
+      "Bandwidth": "0.18 µm",
+      "SNR or NEΔT @ specified input(High or single gain)": "0.40 K @ 270 K",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "4.05 µm",
+      "Bandwidth": "0.155 µm",
+      "SNR or NEΔT @ specified input(High or single gain)": "0.11 K @ 300 K",
+      "SNR or NEΔT @ specified input(Low gain)": "0.42 K @ 380 K",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "8.55 µm",
+      "Bandwidth": "0.30 µm",
+      "SNR or NEΔT @ specified input(High or single gain)": "0.09 K @ 270 K",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "10.763 µm",
+      "Bandwidth": "1.00 µm",
+      "SNR or NEΔT @ specified input(High or single gain)": "0.07 K @ 300 K",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "12.013 µm",
+      "Bandwidth": "0.95 µm",
+      "SNR or NEΔT @ specified input(High or single gain)": "0.07 K @ 300 K",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "750 m"
+    },
+    {
+      "Central wavelength": "0.7 µm (day/night)",
+      "Bandwidth": "0.5-0.9 µm",
+      "SNR or NEΔT @ specified input(High or single gain)": "6 @ 6.70 10-5W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "375 m"
+    },
+    {
+      "Central wavelength": "0.64 µm",
+      "Bandwidth": "0.60-0.68 µm",
+      "SNR or NEΔT @ specified input(High or single gain)": "119 @ 22 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "375 m"
+    },
+    {
+      "Central wavelength": "0.865 µm",
+      "Bandwidth": "0.845-0.884 µm",
+      "SNR or NEΔT @ specified input(High or single gain)": "150 @ 25 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "375 m"
+    },
+    {
+      "Central wavelength": "1.61 µm",
+      "Bandwidth": "1.58-1.64 µm",
+      "SNR or NEΔT @ specified input(High or single gain)": "6 @ 7.3 W m-2sr-1µm-1",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "375 m"
+    },
+    {
+      "Central wavelength": "3.74 µm",
+      "Bandwidth": "3.55-3.93 µm",
+      "SNR or NEΔT @ specified input(High or single gain)": "2.50 K @ 270 K",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "375 m"
+    },
+    {
+      "Central wavelength": "11.45 µm",
+      "Bandwidth": "10.5-12.4 µm",
+      "SNR or NEΔT @ specified input(High or single gain)": "1.50 K @ 210 K",
+      "SNR or NEΔT @ specified input(Low gain)": "",
+      "Resolution": "375 m"
+    }
+  ]
+}

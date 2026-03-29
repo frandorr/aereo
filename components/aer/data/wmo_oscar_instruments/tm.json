@@ -1,0 +1,53 @@
+{
+  "instrument_id": 568,
+  "instrument_acronym": "TM",
+  "instrument_fullname": "Thematic Mapper",
+  "url": "https://space.oscar.wmo.int/instruments/view/tm",
+  "columns": [
+    "Centralwavelength",
+    "Spectralinterval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Centralwavelength": "",
+      "Spectralinterval": "",
+      "SNR or NEΔT @ specified input": "Low signal"
+    },
+    {
+      "Centralwavelength": "0.48 µm",
+      "Spectralinterval": "0.45-0.52 µm",
+      "SNR or NEΔT @ specified input": "56 @ 40 W m-2sr-1μm-1"
+    },
+    {
+      "Centralwavelength": "0.56 µm",
+      "Spectralinterval": "0.52-0.60 µm",
+      "SNR or NEΔT @ specified input": "60 @ 30 W m-2sr-1μm-1"
+    },
+    {
+      "Centralwavelength": "0.66 µm",
+      "Spectralinterval": "0.63-0.69 µm",
+      "SNR or NEΔT @ specified input": "47 @ 21.7 W m-2sr-1μm-1"
+    },
+    {
+      "Centralwavelength": "0.83 µm",
+      "Spectralinterval": "0.76-0.90 µm",
+      "SNR or NEΔT @ specified input": "41 @ 13.6 W m-2sr-1μm-1"
+    },
+    {
+      "Centralwavelength": "1.65 µm",
+      "Spectralinterval": "1.55-1.75 µm",
+      "SNR or NEΔT @ specified input": "38 @ 4.0 W m-2sr-1μm-1"
+    },
+    {
+      "Centralwavelength": "2.20 µm",
+      "Spectralinterval": "2.08-2.35 µm",
+      "SNR or NEΔT @ specified input": "25 @ 1.7 W m-2sr-1μm-1"
+    },
+    {
+      "Centralwavelength": "11.45 µm",
+      "Spectralinterval": "10.4-12.5 µm",
+      "SNR or NEΔT @ specified input": "0.13 K @ 300 K"
+    }
+  ]
+}

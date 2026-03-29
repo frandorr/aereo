@@ -1,0 +1,50 @@
+{
+  "instrument_id": 281,
+  "instrument_acronym": "MHS",
+  "instrument_fullname": "Microwave Humidity Sounding",
+  "url": "https://space.oscar.wmo.int/instruments/view/mhs",
+  "columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT"
+  ],
+  "channels": [
+    {
+      "No.": "1",
+      "Central frequency (GHz)": "89.0",
+      "Bandwidth (MHz)": "2800",
+      "Polarisation": "QV",
+      "NEΔT": "0.22 K"
+    },
+    {
+      "No.": "2",
+      "Central frequency (GHz)": "157.0",
+      "Bandwidth (MHz)": "2800",
+      "Polarisation": "QV",
+      "NEΔT": "0.38 K"
+    },
+    {
+      "No.": "3",
+      "Central frequency (GHz)": "183.31 ± 1.0",
+      "Bandwidth (MHz)": "1000",
+      "Polarisation": "QH",
+      "NEΔT": "0.57 K"
+    },
+    {
+      "No.": "4",
+      "Central frequency (GHz)": "183.31 ± 3.0",
+      "Bandwidth (MHz)": "2000",
+      "Polarisation": "QH",
+      "NEΔT": "0.42 K"
+    },
+    {
+      "No.": "5",
+      "Central frequency (GHz)": "190.311",
+      "Bandwidth (MHz)": "2000",
+      "Polarisation": "QV",
+      "NEΔT": "0.45 K"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "instrument_id": 477,
+  "instrument_acronym": "SCIAMACHY-limb",
+  "instrument_fullname": "Scanning Imaging Absorption Spectrometer for Atmospheric Cartography (limb-scanning component)",
+  "url": "https://space.oscar.wmo.int/instruments/view/sciamachy-limb",
+  "columns": [
+    "Spectral range",
+    "No. of channels",
+    "Spectral resolution",
+    "SNR at specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Spectral range": "214-334 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.24 nm",
+      "SNR at specified input spectral radiance": "500 @ 1.5 W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "300-412 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.26 nm",
+      "SNR at specified input spectral radiance": "4000 @ 130 W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "383-628 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.44 nm",
+      "SNR at specified input spectral radiance": "4500 @ 170 W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "595-812 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.48 nm",
+      "SNR at specified input spectral radiance": "3000 @ 49 W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "773-1063 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.54 nm",
+      "SNR at specified input spectral radiance": "2500 @ 24 W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "971-1773 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "1.48 nm",
+      "SNR at specified input spectral radiance": "1000 @ 8.2 W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "1934-2044 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.22 nm",
+      "SNR at specified input spectral radiance": "10 @ 0.2 W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "2259-2386 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.26 nm",
+      "SNR at specified input spectral radiance": "7 @ 0.1 W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "310-2380 nm",
+      "No. of channels": "7",
+      "Spectral resolution": "67 to 137 nm",
+      "SNR at specified input spectral radiance": "Not relevant"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "instrument_id": 164,
+  "instrument_acronym": "GOCI",
+  "instrument_fullname": "Geostationary Ocean Color Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/goci",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "412 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "1000 @ 100 mW m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "443 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "1090 @ 86 mW m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "490 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "1170 @ 67 mW m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "555 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "1070 @ 56 mW m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "660 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "1010 @ 32 mW m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "680 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "870 @ 31 mW m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "745 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "860 @ 20 mW m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "865 nm",
+      "Bandwidth": "40 nm",
+      "SNR @ specified input spectral radiance": "750 @ 16 mW m-2sr-1μm-1"
+    }
+  ]
+}

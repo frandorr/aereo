@@ -1,0 +1,89 @@
+{
+  "instrument_id": 27,
+  "instrument_acronym": "AMSR",
+  "instrument_fullname": "Advanced Microwave Scanning Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/amsr",
+  "columns": [
+    "Channel Number",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisations",
+    "NEΔT",
+    "IFOV",
+    "Pixel"
+  ],
+  "channels": [
+    {
+      "Channel Number": "1",
+      "Central frequency (GHz)": "6.925",
+      "Bandwidth (MHz)": "350",
+      "Polarisations": "V, H",
+      "NEΔT": "0.3 K",
+      "IFOV": "40x70 km",
+      "Pixel": "50x50 km"
+    },
+    {
+      "Channel Number": "2",
+      "Central frequency (GHz)": "10.65",
+      "Bandwidth (MHz)": "100",
+      "Polarisations": "V, H",
+      "NEΔT": "0.7 K",
+      "IFOV": "26x46 km",
+      "Pixel": "50x50 km"
+    },
+    {
+      "Channel Number": "3",
+      "Central frequency (GHz)": "18.7",
+      "Bandwidth (MHz)": "200",
+      "Polarisations": "V, H",
+      "NEΔT": "0.7 K",
+      "IFOV": "15x26 km",
+      "Pixel": "25x25 km"
+    },
+    {
+      "Channel Number": "4",
+      "Central frequency (GHz)": "23.8",
+      "Bandwidth (MHz)": "400",
+      "Polarisations": "V, H",
+      "NEΔT": "0.6 K",
+      "IFOV": "12x20 km",
+      "Pixel": "25x25 km"
+    },
+    {
+      "Channel Number": "5",
+      "Central frequency (GHz)": "36.5",
+      "Bandwidth (MHz)": "1000",
+      "Polarisations": "V, H",
+      "NEΔT": "0.7 K",
+      "IFOV": "7.6x13 km",
+      "Pixel": "15x15 km"
+    },
+    {
+      "Channel Number": "6",
+      "Central frequency (GHz)": "50.2",
+      "Bandwidth (MHz)": "200",
+      "Polarisations": "V, H",
+      "NEΔT": "1.8 K",
+      "IFOV": "5.5x9.6 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "Channel Number": "7",
+      "Central frequency (GHz)": "53.8",
+      "Bandwidth (MHz)": "400",
+      "Polarisations": "V, H",
+      "NEΔT": "1.6 K",
+      "IFOV": "5.2x9.0 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "Channel Number": "8",
+      "Central frequency (GHz)": "89.0",
+      "Bandwidth (MHz)": "3000",
+      "Polarisations": "V, H",
+      "NEΔT": "1.2 K",
+      "IFOV": "3.1x5.4 km",
+      "Pixel": "5x5 km"
+    }
+  ]
+}

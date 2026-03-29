@@ -1,0 +1,71 @@
+{
+  "instrument_id": 29,
+  "instrument_acronym": "AMSR-E",
+  "instrument_fullname": "Advanced Microwave Scanning Radiometer for EOS",
+  "url": "https://space.oscar.wmo.int/instruments/view/amsr-e",
+  "columns": [
+    "Channel number",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisations",
+    "NEΔT",
+    "IFOV",
+    "Pixel"
+  ],
+  "channels": [
+    {
+      "Channel number": "1",
+      "Central frequency (GHz)": "6.925",
+      "Bandwidth (MHz)": "350",
+      "Polarisations": "V, H",
+      "NEΔT": "0.3 K",
+      "IFOV": "43x75 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "Channel number": "2",
+      "Central frequency (GHz)": "10.65",
+      "Bandwidth (MHz)": "100",
+      "Polarisations": "V, H",
+      "NEΔT": "0.6 K",
+      "IFOV": "29x51 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "Channel number": "3",
+      "Central frequency (GHz)": "18.7",
+      "Bandwidth (MHz)": "200",
+      "Polarisations": "V, H",
+      "NEΔT": "0.6 K",
+      "IFOV": "16x27 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "Channel number": "4",
+      "Central frequency (GHz)": "23.8",
+      "Bandwidth (MHz)": "400",
+      "Polarisations": "V, H",
+      "NEΔT": "0.6 K",
+      "IFOV": "14x21 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "Channel number": "5",
+      "Central frequency (GHz)": "36.5",
+      "Bandwidth (MHz)": "1000",
+      "Polarisations": "V, H",
+      "NEΔT": "0.6 K",
+      "IFOV": "9x14 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "Channel number": "6",
+      "Central frequency (GHz)": "89.0",
+      "Bandwidth (MHz)": "3000",
+      "Polarisations": "V, H",
+      "NEΔT": "1.1 K",
+      "IFOV": "4x6 km",
+      "Pixel": "5x5 km"
+    }
+  ]
+}

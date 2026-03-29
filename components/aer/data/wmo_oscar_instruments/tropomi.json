@@ -1,0 +1,32 @@
+{
+  "instrument_id": 586,
+  "instrument_acronym": "TROPOMI",
+  "instrument_fullname": "Tropospheric Monitoring Instrument",
+  "url": "https://space.oscar.wmo.int/instruments/view/tropomi",
+  "columns": [
+    "Spectral ranges",
+    "Number of channels",
+    "Spectral resolution",
+    "SNR @ expected input radiance"
+  ],
+  "channels": [
+    {
+      "Spectral ranges": "270-495 nm",
+      "Number of channels": "1200",
+      "Spectral resolution": "0.55 nm",
+      "SNR @ expected input radiance": "1000"
+    },
+    {
+      "Spectral ranges": "710-775 nm",
+      "Number of channels": "600",
+      "Spectral resolution": "0.55 nm",
+      "SNR @ expected input radiance": "500"
+    },
+    {
+      "Spectral ranges": "2305-2385 nm",
+      "Number of channels": "800",
+      "Spectral resolution": "0.25 nm",
+      "SNR @ expected input radiance": "100"
+    }
+  ]
+}

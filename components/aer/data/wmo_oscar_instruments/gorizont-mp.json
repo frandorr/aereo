@@ -1,0 +1,50 @@
+{
+  "instrument_id": 1091,
+  "instrument_acronym": "GORIZONT-MP",
+  "instrument_fullname": "Multi-spectral scanner",
+  "url": "https://space.oscar.wmo.int/instruments/view/gorizont-mp",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo",
+    "Resolution at s.s.p."
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.41 µm",
+      "Spectral interval": "0.37 - 0.45 µm",
+      "SNR @ specified albedo": "200 @ 100 % albedo",
+      "Resolution at s.s.p.": "120 m"
+    },
+    {
+      "Central wavelength": "0.48 µm",
+      "Spectral interval": "0.45 - 0.51 µm",
+      "SNR @ specified albedo": "200 @ 100 % albedo",
+      "Resolution at s.s.p.": "120 m"
+    },
+    {
+      "Central wavelength": "0.635 µm",
+      "Spectral interval": "0.58 - 0.69 µm",
+      "SNR @ specified albedo": "200 @ 100 % albedo",
+      "Resolution at s.s.p.": "120 m"
+    },
+    {
+      "Central wavelength": "0.555 µm",
+      "Spectral interval": "0.535 - 0.575 µm",
+      "SNR @ specified albedo": "200 @ 100 % albedo",
+      "Resolution at s.s.p.": "60 m"
+    },
+    {
+      "Central wavelength": "0.655 µm",
+      "Spectral interval": "0.63 - 0.68 µm",
+      "SNR @ specified albedo": "200 @ 100 % albedo",
+      "Resolution at s.s.p.": "60 m"
+    },
+    {
+      "Central wavelength": "0.830 µm",
+      "Spectral interval": "0.76 - 0.90 µm",
+      "SNR @ specified albedo": "200 @ 100 % albedo",
+      "Resolution at s.s.p.": "60 m"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "instrument_id": 337,
+  "instrument_acronym": "MVIRI",
+  "instrument_fullname": "Meteosat Visible Infra-Red Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/mviri",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.70 µm",
+      "Spectral interval": "0.50 - 0.90 µm",
+      "SNR or NEΔT @ specified input": "3.0 @ 1 % albedo"
+    },
+    {
+      "Central wavelength": "6.40 µm",
+      "Spectral interval": "5.70 - 7.10 µm",
+      "SNR or NEΔT @ specified input": "1.0 K @ 250 K"
+    },
+    {
+      "Central wavelength": "11.5 µm",
+      "Spectral interval": "10.5 - 12.5 µm",
+      "SNR or NEΔT @ specified input": "0.5 K @ 300 K"
+    }
+  ]
+}

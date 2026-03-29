@@ -1,0 +1,48 @@
+{
+  "instrument_id": 56,
+  "instrument_acronym": "ATSR-2",
+  "instrument_fullname": "Along-Track Scanning Radiometer - 2",
+  "url": "https://space.oscar.wmo.int/instruments/view/atsr-2",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "550 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "20 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "659 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "20 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "865 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEΔT @ specified input": "20 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "1610 nm",
+      "Bandwidth": "300 nm",
+      "SNR or NEΔT @ specified input": "20 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "3.70 µm",
+      "Bandwidth": "3.55 - 3.85 µm",
+      "SNR or NEΔT @ specified input": "0.08 K @ 270 K"
+    },
+    {
+      "Central wavelength": "10.85 µm",
+      "Bandwidth": "10.35 - 11.35 µm",
+      "SNR or NEΔT @ specified input": "0.05 K @ 270 K"
+    },
+    {
+      "Central wavelength": "12.00 µm",
+      "Bandwidth": "11.50 - 12.50 µm",
+      "SNR or NEΔT @ specified input": "0.05 K @ 270 K"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "instrument_id": 1107,
+  "instrument_acronym": "VHRI-100",
+  "instrument_fullname": "Very High Resolution Imager - 100",
+  "url": "https://space.oscar.wmo.int/instruments/view/vhri-100",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "475 nm",
+      "Spectral interval": "440 - 510 nm",
+      "SNR @ specified albedo": "100 @ 10 % albedo"
+    },
+    {
+      "Central wavelength": "550 nm",
+      "Spectral interval": "510 - 590 nm",
+      "SNR @ specified albedo": "100 @ 10 % albedo"
+    },
+    {
+      "Central wavelength": "635 nm",
+      "Spectral interval": "600 - 670 nm",
+      "SNR @ specified albedo": "100 @ 10 % albedo"
+    },
+    {
+      "Central wavelength": "835 nm",
+      "Spectral interval": "760 - 910 nm",
+      "SNR @ specified albedo": "100 @ 10 % albedo"
+    },
+    {
+      "Central wavelength": "PAN",
+      "Spectral interval": "450 - 650 nm",
+      "SNR @ specified albedo": "100 @ 10 % albedo"
+    }
+  ]
+}

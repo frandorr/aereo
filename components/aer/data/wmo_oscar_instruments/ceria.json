@@ -1,0 +1,28 @@
+{
+  "instrument_id": 1251,
+  "instrument_acronym": "CERIA",
+  "instrument_fullname": "CERIA Camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/ceria",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "455 nm",
+      "Spectral interval": "400 - 510 nm",
+      "SNR @ specified albedo": "…….. @ ……. % albedo"
+    },
+    {
+      "Central wavelength": "535 nm",
+      "Spectral interval": "490 - 580 nm",
+      "SNR @ specified albedo": "…….. @ ……. % albedo"
+    },
+    {
+      "Central wavelength": "605 nm",
+      "Spectral interval": "580 - 630 nm",
+      "SNR @ specified albedo": "…….. @ ……. % albedo"
+    }
+  ]
+}

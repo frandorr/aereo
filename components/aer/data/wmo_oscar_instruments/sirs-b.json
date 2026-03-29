@@ -1,0 +1,98 @@
+{
+  "instrument_id": 512,
+  "instrument_acronym": "SIRS-B",
+  "instrument_fullname": "Satellite Infra-Red Spectrometer - B",
+  "url": "https://space.oscar.wmo.int/instruments/view/sirs-b",
+  "columns": [
+    "Wavelength",
+    "Wave number",
+    "Bandwidth",
+    "NEΔT @ specified scene temperature"
+  ],
+  "channels": [
+    {
+      "Wavelength": "35.71 µm",
+      "Wave number": "280.0 cm-1",
+      "Bandwidth": "7.86 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "33.11 µm",
+      "Wave number": "302.0 cm-1",
+      "Bandwidth": "8.32 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "25.54 µm",
+      "Wave number": "391.5 cm-1",
+      "Bandwidth": "8.10 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "23.50 µm",
+      "Wave number": "425.5 cm-1",
+      "Bandwidth": "8.30 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "22.91 µm",
+      "Wave number": "436.5 cm-1",
+      "Bandwidth": "8.47 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "18.81 µm",
+      "Wave number": "531.5 cm-1",
+      "Bandwidth": "10.14 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "14.95 µm",
+      "Wave number": "668.7 cm-1",
+      "Bandwidth": "10.42 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "14.71 µm",
+      "Wave number": "679.8 cm-1",
+      "Bandwidth": "10.61 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "14.45 µm",
+      "Wave number": "692.0 cm-1",
+      "Bandwidth": "10.81 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "14.26 µm",
+      "Wave number": "701.0 cm-1",
+      "Bandwidth": "10.96 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "14.10 µm",
+      "Wave number": "709.0 cm-1",
+      "Bandwidth": "11.13 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "13.62 µm",
+      "Wave number": "734.0 cm-1",
+      "Bandwidth": "11.70 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "13.33 µm",
+      "Wave number": "750.0 cm-1",
+      "Bandwidth": "11.83 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    },
+    {
+      "Wavelength": "11.12 µm",
+      "Wave number": "899.0 cm-1",
+      "Bandwidth": "12.36 cm-1",
+      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+    }
+  ]
+}

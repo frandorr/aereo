@@ -1,0 +1,103 @@
+{
+  "instrument_id": 1390,
+  "instrument_acronym": "COCTS2",
+  "instrument_fullname": "China Ocean Colour & Temperature Scanner 2",
+  "url": "https://space.oscar.wmo.int/instruments/view/cocts2",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "S/N"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "360 nm",
+      "Bandwidth": "20 nm",
+      "S/N": ">1000"
+    },
+    {
+      "Central wavelength": "385 nm",
+      "Bandwidth": "20 nm",
+      "S/N": ">1000"
+    },
+    {
+      "Central wavelength": "412 nm",
+      "Bandwidth": "20 nm",
+      "S/N": ">1000"
+    },
+    {
+      "Central wavelength": "443 nm",
+      "Bandwidth": "20 nm",
+      "S/N": ">1000"
+    },
+    {
+      "Central wavelength": "490 nm",
+      "Bandwidth": "20 nm",
+      "S/N": ">1000"
+    },
+    {
+      "Central wavelength": "520 nm",
+      "Bandwidth": "20 nm",
+      "S/N": ">1000"
+    },
+    {
+      "Central wavelength": "565 nm",
+      "Bandwidth": "20 nm",
+      "S/N": ">1000"
+    },
+    {
+      "Central wavelength": "620 nm",
+      "Bandwidth": "15 nm",
+      "S/N": ">1000"
+    },
+    {
+      "Central wavelength": "665 nm",
+      "Bandwidth": "15 nm",
+      "S/N": ">1000"
+    },
+    {
+      "Central wavelength": "681 nm",
+      "Bandwidth": "15 nm",
+      "S/N": ">1400"
+    },
+    {
+      "Central wavelength": "705 nm",
+      "Bandwidth": "20 nm",
+      "S/N": ">1000"
+    },
+    {
+      "Central wavelength": "744 nm",
+      "Bandwidth": "20 nm",
+      "S/N": ">400"
+    },
+    {
+      "Central wavelength": "865 nm",
+      "Bandwidth": "40 nm",
+      "S/N": ">600"
+    },
+    {
+      "Central wavelength": "1245 nm",
+      "Bandwidth": "40 nm",
+      "S/N": ">250"
+    },
+    {
+      "Central wavelength": "1640 nm",
+      "Bandwidth": "80 nm",
+      "S/N": ">180"
+    },
+    {
+      "Central wavelength": "3.74 μm",
+      "Bandwidth": "190 nm",
+      "S/N": ""
+    },
+    {
+      "Central wavelength": "11.0 μm",
+      "Bandwidth": "1.0 μm",
+      "S/N": ""
+    },
+    {
+      "Central wavelength": "12.0 μm",
+      "Bandwidth": "1.1 μm",
+      "S/N": ""
+    }
+  ]
+}

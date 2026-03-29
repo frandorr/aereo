@@ -1,0 +1,36 @@
+{
+  "instrument_id": 1266,
+  "instrument_acronym": "CLIM",
+  "instrument_fullname": "Cloud Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/clim",
+  "columns": [
+    "Channel",
+    "Wavelenght",
+    "Bandwidth",
+    "SNR @ specified input radiance",
+    "IFOV at s.s.p."
+  ],
+  "channels": [
+    {
+      "Channel": "CLIM-1",
+      "Wavelenght": "670 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input radiance": "… @ … W m-2sr-1µ-1",
+      "IFOV at s.s.p.": "174 m"
+    },
+    {
+      "Channel": "CLIM-2",
+      "Wavelenght": "753 nm",
+      "Bandwidth": "9 nm",
+      "SNR @ specified input radiance": "… @ … W m-2sr-1µ-1",
+      "IFOV at s.s.p.": "174 m"
+    },
+    {
+      "Channel": "CLIM-3",
+      "Wavelenght": "1370 nm",
+      "Bandwidth": "15 nm",
+      "SNR @ specified input radiance": "… @ … W m-2sr-1µ-1",
+      "IFOV at s.s.p.": "348 m"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "instrument_id": 220,
+  "instrument_acronym": "IMG",
+  "instrument_fullname": "Interferometric Monitor for Greenhouse gases",
+  "url": "https://space.oscar.wmo.int/instruments/view/img",
+  "columns": [
+    "Spectral range(µm)",
+    "Spectral range(cm-1)",
+    "Spectral resolution(apodised)",
+    "NESR"
+  ],
+  "channels": [
+    {
+      "Spectral range(µm)": "5.0-14.0 µm",
+      "Spectral range(cm-1)": "714-2000 cm-1",
+      "Spectral resolution(apodised)": "0.1 cm-1",
+      "NESR": "0.230 mW·m-2·cm"
+    },
+    {
+      "Spectral range(µm)": "4.3-5.0 µm",
+      "Spectral range(cm-1)": "2000-2325 cm-1",
+      "Spectral resolution(apodised)": "0.25 cm-1",
+      "NESR": "0.020 mW·m-2·cm"
+    },
+    {
+      "Spectral range(µm)": "3.3-4.3 µm",
+      "Spectral range(cm-1)": "2325-3030 cm-1",
+      "Spectral resolution(apodised)": "0.15 cm-1",
+      "NESR": "0.014 mW·m-2·cm"
+    }
+  ]
+}

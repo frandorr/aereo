@@ -1,0 +1,62 @@
+{
+  "instrument_id": 615,
+  "instrument_acronym": "VTPR",
+  "instrument_fullname": "Vertical Temperature Profile Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/vtpr",
+  "columns": [
+    "Wavelength",
+    "Wave number",
+    "Bandwidth",
+    "NESR"
+  ],
+  "channels": [
+    {
+      "Wavelength": "18.69 μm",
+      "Wave number": "535.0 cm-1",
+      "Bandwidth": "18 cm-1",
+      "NESR": "< 0.25 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "14.96 μm",
+      "Wave number": "668.5 cm-1",
+      "Bandwidth": "3.5 cm-1",
+      "NESR": "< 0.25 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "14.77 μm",
+      "Wave number": "677.5 cm-1",
+      "Bandwidth": "10 cm-1",
+      "NESR": "< 0.25 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "14.38 μm",
+      "Wave number": "695.0 cm-1",
+      "Bandwidth": "10 cm-1",
+      "NESR": "< 0.25 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "14.12 μm",
+      "Wave number": "708.0 cm-1",
+      "Bandwidth": "10 cm-1",
+      "NESR": "< 0.25 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "13.79 μm",
+      "Wave number": "725.0 cm-1",
+      "Bandwidth": "10 cm-1",
+      "NESR": "< 0.25 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "13.38 μm",
+      "Wave number": "747.0 cm-1",
+      "Bandwidth": "10 cm-1",
+      "NESR": "< 0.25 mW m-2sr-1cm"
+    },
+    {
+      "Wavelength": "11.97 μm",
+      "Wave number": "833.0 cm-1",
+      "Bandwidth": "10 cm-1",
+      "NESR": "< 0.25 mW m-2sr-1cm"
+    }
+  ]
+}

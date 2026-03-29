@@ -1,0 +1,38 @@
+{
+  "instrument_id": 1162,
+  "instrument_acronym": "ALISS-3",
+  "instrument_fullname": "Advanced Linear Imaging Self-Scanning Sensor - 3",
+  "url": "https://space.oscar.wmo.int/instruments/view/aliss-3",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "PAN",
+      "Spectral interval": "0.4 - 1.0 µm",
+      "SNR @ specified input spectral radiance": "200 @ …. W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "0.555 µm",
+      "Spectral interval": "0.52 - 0.59 µm",
+      "SNR @ specified input spectral radiance": "200 @ 278 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "0.650 µm",
+      "Spectral interval": "0.62 - 0.68 µm",
+      "SNR @ specified input spectral radiance": "200 @ 284 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "0.815 µm",
+      "Spectral interval": "0.77 - 0.86 µm",
+      "SNR @ specified input spectral radiance": "200 @ 320 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "1.625 µm",
+      "Spectral interval": "1.55 - 1.75 µm",
+      "SNR @ specified input spectral radiance": "200 @ 76.4 W m-2sr-1µm-1"
+    }
+  ]
+}

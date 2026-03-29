@@ -1,0 +1,38 @@
+{
+  "instrument_id": 196,
+  "instrument_acronym": "HRVIR",
+  "instrument_fullname": "Haute Résolution dans le Visible et l’Infra-Rouge",
+  "url": "https://space.oscar.wmo.int/instruments/view/hrvir",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.545 µm",
+      "Spectral interval": "0.50 - 0.59 µm",
+      "SNR @ specified albedo": "188 @ 50 % albedo, SZA=60°"
+    },
+    {
+      "Central wavelength": "0.645 µm (MS)",
+      "Spectral interval": "0.61 - 0.68 µm",
+      "SNR @ specified albedo": "198 @ 50 % albedo, SZA=60°"
+    },
+    {
+      "Central wavelength": "0.645 µm (PAN)",
+      "Spectral interval": "0.61 - 0.68 µm",
+      "SNR @ specified albedo": "152 @ 50 % albedo, SZA=60°"
+    },
+    {
+      "Central wavelength": "0.84 µm",
+      "Spectral interval": "0.79 - 0.89 µm",
+      "SNR @ specified albedo": "218 @ 70 % albedo, SZA=60°"
+    },
+    {
+      "Central wavelength": "1.64 µm",
+      "Spectral interval": "1.58 - 1.75 µm",
+      "SNR @ specified albedo": "60 @ 50 % albedo, SZA=60°"
+    }
+  ]
+}

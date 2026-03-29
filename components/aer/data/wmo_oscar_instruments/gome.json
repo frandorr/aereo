@@ -1,0 +1,56 @@
+{
+  "instrument_id": 166,
+  "instrument_acronym": "GOME",
+  "instrument_fullname": "Global Ozone Monitoring Experiment ",
+  "url": "https://space.oscar.wmo.int/instruments/view/gome",
+  "columns": [
+    "Spectral range",
+    "No. of channels",
+    "Spectral resolution",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Spectral range": "240-295 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.22 nm",
+      "SNR @ specified input spectral radiance": "......... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "290-405 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.24 nm",
+      "SNR @ specified input spectral radiance": "......... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "400-605 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.40 nm",
+      "SNR @ specified input spectral radiance": "......... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "590-790 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.40 nm",
+      "SNR @ specified input spectral radiance": "......... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "292-402 nm",
+      "No. of channels": "1",
+      "Spectral resolution": "110 nm",
+      "SNR @ specified input spectral radiance": "......... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "402-597 nm",
+      "No. of channels": "1",
+      "Spectral resolution": "195 nm",
+      "SNR @ specified input spectral radiance": "......... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "597-790 nm",
+      "No. of channels": "1",
+      "Spectral resolution": "193 nm",
+      "SNR @ specified input spectral radiance": "......... @ ...... W m-2sr-1μm-1"
+    }
+  ]
+}
