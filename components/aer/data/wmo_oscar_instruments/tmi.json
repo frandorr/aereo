@@ -1,0 +1,98 @@
+{
+  "instrument_id": 569,
+  "instrument_acronym": "TMI ",
+  "instrument_fullname": "TRMM Microwave Imager ",
+  "url": "https://space.oscar.wmo.int/instruments/view/tmi%20",
+  "columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT",
+    "IFOV",
+    "Pixel"
+  ],
+  "channels": [
+    {
+      "No.": "1",
+      "Central frequency (GHz)": "10.65",
+      "Bandwidth (MHz)": "100",
+      "Polarisation": "V",
+      "NEΔT": "0.6 K",
+      "IFOV": "37x63 km",
+      "Pixel": "9.2x13.7 km"
+    },
+    {
+      "No.": "2",
+      "Central frequency (GHz)": "10.65",
+      "Bandwidth (MHz)": "100",
+      "Polarisation": "H",
+      "NEΔT": "0.6 K",
+      "IFOV": "37x63 km",
+      "Pixel": "9.2x13.7 km"
+    },
+    {
+      "No.": "3",
+      "Central frequency (GHz)": "19.35",
+      "Bandwidth (MHz)": "500",
+      "Polarisation": "V",
+      "NEΔT": "0.7 K",
+      "IFOV": "18x30 km",
+      "Pixel": "9.2x13.7 km"
+    },
+    {
+      "No.": "4",
+      "Central frequency (GHz)": "19.35",
+      "Bandwidth (MHz)": "500",
+      "Polarisation": "H",
+      "NEΔT": "0.7 K",
+      "IFOV": "18x30 km",
+      "Pixel": "9.2x13.7 km"
+    },
+    {
+      "No.": "5",
+      "Central frequency (GHz)": "21.3",
+      "Bandwidth (MHz)": "200",
+      "Polarisation": "V",
+      "NEΔT": "0.9 K",
+      "IFOV": "18x23 km",
+      "Pixel": "9,2x13.7 km"
+    },
+    {
+      "No.": "6",
+      "Central frequency (GHz)": "37.0",
+      "Bandwidth (MHz)": "2000",
+      "Polarisation": "V",
+      "NEΔT": "0.4 K",
+      "IFOV": "9x16 km",
+      "Pixel": "9.2x13.7 km"
+    },
+    {
+      "No.": "7",
+      "Central frequency (GHz)": "37.0",
+      "Bandwidth (MHz)": "2000",
+      "Polarisation": "H",
+      "NEΔT": "0.4 K",
+      "IFOV": "9x16 km",
+      "Pixel": "9.2x13.7 km"
+    },
+    {
+      "No.": "8",
+      "Central frequency (GHz)": "85.5",
+      "Bandwidth (MHz)": "3000",
+      "Polarisation": "V",
+      "NEΔT": "0.7 K",
+      "IFOV": "5x7 km",
+      "Pixel": "4.6x13.7 km"
+    },
+    {
+      "No.": "9",
+      "Central frequency (GHz)": "85.5",
+      "Bandwidth (MHz)": "3000",
+      "Polarisation": "H",
+      "NEΔT": "0.7 K",
+      "IFOV": "5x7 km",
+      "Pixel": "4.6x13.7 km"
+    }
+  ]
+}

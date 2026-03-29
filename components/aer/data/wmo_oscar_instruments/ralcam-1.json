@@ -1,0 +1,33 @@
+{
+  "instrument_id": 420,
+  "instrument_acronym": "RALCam-1",
+  "instrument_fullname": "Rutherford Appleton Laboratory Camera - 1",
+  "url": "https://space.oscar.wmo.int/instruments/view/ralcam-1",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "485 nm",
+      "Spectral interval": "420-550 nm",
+      "SNR @ specified albedo": "…….. @ ……. % albedo"
+    },
+    {
+      "Central wavelength": "590 nm",
+      "Spectral interval": "550-630 nm",
+      "SNR @ specified albedo": "…….. @ ……. % albedo"
+    },
+    {
+      "Central wavelength": "655 nm",
+      "Spectral interval": "580-730 nm",
+      "SNR @ specified albedo": "…….. @ ……. % albedo"
+    },
+    {
+      "Central wavelength": "N/A  (PAN)",
+      "Spectral interval": "420-730 nm",
+      "SNR @ specified albedo": "…….. @ ……. % albedo"
+    }
+  ]
+}

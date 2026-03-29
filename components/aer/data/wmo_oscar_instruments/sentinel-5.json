@@ -1,0 +1,56 @@
+{
+  "instrument_id": 587,
+  "instrument_acronym": "Sentinel-5",
+  "instrument_fullname": "UVNS: Ultra-violet, Visible and Near-infrared Sounder",
+  "url": "https://space.oscar.wmo.int/instruments/view/sentinel-5",
+  "columns": [
+    "Band ID",
+    "Spectral range",
+    "Spectral resolution",
+    "SNR"
+  ],
+  "channels": [
+    {
+      "Band ID": "UV-1",
+      "Spectral range": "270-300 nm",
+      "Spectral resolution": "1.0 nm",
+      "SNR": "100 @ 270 nm"
+    },
+    {
+      "Band ID": "UV-2",
+      "Spectral range": "300-370 nm",
+      "Spectral resolution": "0.5 nm",
+      "SNR": "1000 @ 320 nm"
+    },
+    {
+      "Band ID": "VIS",
+      "Spectral range": "370-500 nm",
+      "Spectral resolution": "0.5 nm",
+      "SNR": "1500 @ 420 nm, for λ < 430 nm1800 @ 460 nm for 430-460 nm1500 @ 460 nm for λ > 460 nm"
+    },
+    {
+      "Band ID": "NIR-1",
+      "Spectral range": "685-710 nm",
+      "Spectral resolution": "0.4 nm",
+      "SNR": "500 @ 710 nm"
+    },
+    {
+      "Band ID": "NIR-2",
+      "Spectral range": "750-775 nm",
+      "Spectral resolution": "0.4 nm",
+      "SNR": "500 @ 750 nm"
+    },
+    {
+      "Band ID": "SWIR-1",
+      "Spectral range": "1590-1675 nm",
+      "Spectral resolution": "0.25 nm",
+      "SNR": "250 @ 1675 nm"
+    },
+    {
+      "Band ID": "SWIR-2",
+      "Spectral range": "2305-2385 nm",
+      "Spectral resolution": "0.25 nm",
+      "SNR": "120 @ 2385 nm"
+    }
+  ]
+}

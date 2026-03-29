@@ -1,0 +1,38 @@
+{
+  "instrument_id": 1448,
+  "instrument_acronym": "MSC",
+  "instrument_fullname": "Magnetic Search Coil",
+  "url": "https://space.oscar.wmo.int/instruments/view/msc",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "485 nm",
+      "Spectral interval": "450 - 520 nm",
+      "SNR @ specified input spectral radiance": "100 @ 79.46. W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "560 nm",
+      "Spectral interval": "520 - 600 nm",
+      "SNR @ specified input spectral radiance": "100 @ 89.92 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "660 nm",
+      "Spectral interval": "630 - 690 nm",
+      "SNR @ specified input spectral radiance": "100 @ 98.48 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "830 nm",
+      "Spectral interval": "760 - 900 nm",
+      "SNR @ specified input spectral radiance": "100 @ 104.15 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "N/A  (PAN)",
+      "Spectral interval": "500 - 900 nm",
+      "SNR @ specified input spectral radiance": "100 @ 86.88 W m-2sr-1µm-1"
+    }
+  ]
+}

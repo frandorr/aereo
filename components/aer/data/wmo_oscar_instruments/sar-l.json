@@ -1,0 +1,43 @@
+{
+  "instrument_id": 451,
+  "instrument_acronym": "SAR-L",
+  "instrument_fullname": "Synthetic Aperture Radar (L-band)",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar-l",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Field of regard",
+    "Polarisations"
+  ],
+  "channels": [
+    {
+      "Operation mode": "High resolution A",
+      "Resolution": "10 m",
+      "Swath": "60 km",
+      "Field of regard": "320 km",
+      "Polarisations": "HH or VV"
+    },
+    {
+      "Operation mode": "High resolution B",
+      "Resolution": "10 m",
+      "Swath": "30 km",
+      "Field of regard": "320 km",
+      "Polarisations": "VV/HH, HH/HV, VV/VH"
+    },
+    {
+      "Operation mode": "Medium resolution",
+      "Resolution": "20 m",
+      "Swath": "60 km",
+      "Field of regard": "320 km",
+      "Polarisations": "HH or VV"
+    },
+    {
+      "Operation mode": "ScanSAR wide swath",
+      "Resolution": "100 m",
+      "Swath": "320 km",
+      "Field of regard": "320 km",
+      "Polarisations": "HH or VV"
+    }
+  ]
+}

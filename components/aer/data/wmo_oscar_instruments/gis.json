@@ -1,0 +1,38 @@
+{
+  "instrument_id": 677,
+  "instrument_acronym": "GIS",
+  "instrument_fullname": "GeoEye Imaging System",
+  "url": "https://space.oscar.wmo.int/instruments/view/gis",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "N/A (PAN)",
+      "Spectral interval": "450 - 900 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "485 nm",
+      "Spectral interval": "450 - 520 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "560 nm",
+      "Spectral interval": "520 - 600 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "660 nm",
+      "Spectral interval": "625 - 695 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "830 nm",
+      "Spectral interval": "760 - 900 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    }
+  ]
+}

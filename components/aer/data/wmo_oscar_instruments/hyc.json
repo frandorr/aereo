@@ -1,0 +1,29 @@
+{
+  "instrument_id": 203,
+  "instrument_acronym": "HYC",
+  "instrument_fullname": "HYperspectral Camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/hyc",
+  "columns": [
+    "Band",
+    "Spectral interval",
+    "No. of channels",
+    "Channel bandwidth",
+    "SNR at expected input radiance"
+  ],
+  "channels": [
+    {
+      "Band": "VIS/NIR",
+      "Spectral interval": "400 - 1010 nm",
+      "No. of channels": "66",
+      "Channel bandwidth": "10 nm",
+      "SNR at expected input radiance": "200 (average)"
+    },
+    {
+      "Band": "NIR/SWIR",
+      "Spectral interval": "920 - 2505 nm",
+      "No. of channels": "171",
+      "Channel bandwidth": "10 nm",
+      "SNR at expected input radiance": "200 (average in 1-2 μm), 100 (average in 2-2.5 μm)"
+    }
+  ]
+}

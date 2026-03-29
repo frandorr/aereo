@@ -1,0 +1,32 @@
+{
+  "instrument_id": 214,
+  "instrument_acronym": "GIIRS",
+  "instrument_fullname": "Prototype Geostationary Interferometric Infrared Sounder",
+  "url": "https://space.oscar.wmo.int/instruments/view/giirs",
+  "columns": [
+    "Spectral range (µm)",
+    "Spectral range (cm-1)",
+    "Spectral resolution",
+    "NEΔR or SNR"
+  ],
+  "channels": [
+    {
+      "Spectral range (µm)": "14.2-8.85 µm",
+      "Spectral range (cm-1)": "700-1130 cm-1",
+      "Spectral resolution": "0.625 cm-1",
+      "NEΔR or SNR": "0.5 mW m-2sr-1cm"
+    },
+    {
+      "Spectral range (µm)": "6.06-4.44 µm",
+      "Spectral range (cm-1)": "1650-2250 cm-1",
+      "Spectral resolution": "0.625 cm-1",
+      "NEΔR or SNR": "0.1 mW m-2sr-1cm"
+    },
+    {
+      "Spectral range (µm)": "0.55-0.90 µm",
+      "Spectral range (cm-1)": "N/A",
+      "Spectral resolution": "N/A",
+      "NEΔR or SNR": "200 @ 100 % albedo"
+    }
+  ]
+}

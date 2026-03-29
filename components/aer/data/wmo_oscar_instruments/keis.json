@@ -1,0 +1,38 @@
+{
+  "instrument_id": 1070,
+  "instrument_acronym": "KEIS",
+  "instrument_fullname": "Kazakh Earth Imaging System",
+  "url": "https://space.oscar.wmo.int/instruments/view/keis",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.475 μm",
+      "Spectral interval": "0.44 - 0.51 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.555 μm",
+      "Spectral interval": "0.52 - 0.59 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.657.5 μm",
+      "Spectral interval": "0.63 - 0.685 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.710 μm",
+      "Spectral interval": "0.69 - 0.73 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.805 μm",
+      "Spectral interval": "0.76 - 0.85 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    }
+  ]
+}

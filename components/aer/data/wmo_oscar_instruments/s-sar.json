@@ -1,0 +1,43 @@
+{
+  "instrument_id": 1199,
+  "instrument_acronym": "S-SAR",
+  "instrument_fullname": "S-band Synthetic Aperture Radar",
+  "url": "https://space.oscar.wmo.int/instruments/view/s-sar",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Incidence angle",
+    "Swath",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "Operation mode": "ScanSAR",
+      "Resolution": "20 m",
+      "Incidence angle": "16-30°",
+      "Swath": "50-100 km",
+      "Polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "Operation mode": "Maritime Surveillance",
+      "Resolution": "30 m",
+      "Incidence angle": "48-73°",
+      "Swath": "750 km",
+      "Polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "Operation mode": "Stripmap",
+      "Resolution": "6 m",
+      "Incidence angle": "16-31°",
+      "Swath": "13-20 km",
+      "Polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "Operation mode": "ScanSAR Wide",
+      "Resolution": "30 m",
+      "Incidence angle": "15-32°",
+      "Swath": "55-140 km",
+      "Polarisation": "HH or VV or HV or VH"
+    }
+  ]
+}

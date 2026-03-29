@@ -1,0 +1,38 @@
+{
+  "instrument_id": 1158,
+  "instrument_acronym": "PMS-3",
+  "instrument_fullname": "Panchromatic and Multi-spectral CCD Camera - 3",
+  "url": "https://space.oscar.wmo.int/instruments/view/pms-3",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.485 μm",
+      "Spectral interval": "0.45-0.52 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.555 μm",
+      "Spectral interval": "0.52-0.59 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.660 μm",
+      "Spectral interval": "0.63-0.69 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.830 μm",
+      "Spectral interval": "0.77-0.89 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "N/A  (PAN)",
+      "Spectral interval": "0.45-0.90 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    }
+  ]
+}

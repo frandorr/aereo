@@ -1,0 +1,63 @@
+{
+  "instrument_id": 375,
+  "instrument_acronym": "OLI",
+  "instrument_fullname": "Operational Land Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/oli",
+  "columns": [
+    "Central",
+    "Spectral",
+    "SNR at specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central": "wavelength",
+      "Spectral": "interval",
+      "SNR at specified input spectral radiance": "Low signal"
+    },
+    {
+      "Central": "443 nm",
+      "Spectral": "433 - 453 nm",
+      "SNR at specified input spectral radiance": "130 @ 40 W m-2sr-1μm-1"
+    },
+    {
+      "Central": "482 nm",
+      "Spectral": "450 - 515 nm",
+      "SNR at specified input spectral radiance": "130 @ 40 W m-2sr-1μm-1"
+    },
+    {
+      "Central": "565 nm",
+      "Spectral": "525 - 600 nm",
+      "SNR at specified input spectral radiance": "100 @ 30 W m-2sr-1μm-1"
+    },
+    {
+      "Central": "660 nm",
+      "Spectral": "630 - 680 nm",
+      "SNR at specified input spectral radiance": "90 @ 22 W m-2sr-1μm-1"
+    },
+    {
+      "Central": "867 nm",
+      "Spectral": "845 - 885 nm",
+      "SNR at specified input spectral radiance": "90 @ 14 W m-2sr-1μm-1"
+    },
+    {
+      "Central": "1375 nm",
+      "Spectral": "1360 - 1390 nm",
+      "SNR at specified input spectral radiance": "50 @ 6.0 W m-2sr-1μm-1"
+    },
+    {
+      "Central": "1650 nm",
+      "Spectral": "1560 - 1660 nm",
+      "SNR at specified input spectral radiance": "100 @ 4.0 W m-2sr-1μm-1"
+    },
+    {
+      "Central": "2215 nm",
+      "Spectral": "2100 - 2300 nm",
+      "SNR at specified input spectral radiance": "100 @ 1.7 W m-2sr-1μm-1"
+    },
+    {
+      "Central": "Panchromatic",
+      "Spectral": "500 - 680 nm",
+      "SNR at specified input spectral radiance": "80 @ 23 W m-2sr-1μm-1"
+    }
+  ]
+}

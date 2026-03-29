@@ -1,0 +1,152 @@
+{
+  "instrument_id": 1259,
+  "instrument_acronym": "MWRI-RM",
+  "instrument_fullname": "Micro-Wave Radiation Imager for the Rainfall Mission",
+  "url": "https://space.oscar.wmo.int/instruments/view/mwri-rm",
+  "columns": [
+    "Channel number",
+    "Central frequency",
+    "Bandwidth",
+    "Polarization",
+    "NEΔT",
+    "IFOV"
+  ],
+  "channels": [
+    {
+      "Channel number": "1",
+      "Central frequency": "10.65 GHz",
+      "Bandwidth": "180 MHz",
+      "Polarization": "V，H",
+      "NEΔT": "0.5 K",
+      "IFOV": "21×35 km"
+    },
+    {
+      "Channel number": "2",
+      "Central frequency": "18.7 GHz",
+      "Bandwidth": "200 MHz",
+      "Polarization": "V，H",
+      "NEΔT": "0.5 K",
+      "IFOV": "14×23 km"
+    },
+    {
+      "Channel number": "3",
+      "Central frequency": "23.8 GHz",
+      "Bandwidth": "400 MHz",
+      "Polarization": "V，H",
+      "NEΔT": "0.5 K",
+      "IFOV": "13×21 km"
+    },
+    {
+      "Channel number": "4",
+      "Central frequency": "36.5 GHz",
+      "Bandwidth": "900 MHz",
+      "Polarization": "V，H",
+      "NEΔT": "0.5 K",
+      "IFOV": "9×15 km"
+    },
+    {
+      "Channel number": "5",
+      "Central frequency": "50.30 GHz",
+      "Bandwidth": "400 MHz",
+      "Polarization": "V，H",
+      "NEΔT": "0.5 K",
+      "IFOV": "7×11 km"
+    },
+    {
+      "Channel number": "6",
+      "Central frequency": "52.61 GHz",
+      "Bandwidth": "400 MHz",
+      "Polarization": "V，H",
+      "NEΔT": "0.5 K",
+      "IFOV": "7×11 km"
+    },
+    {
+      "Channel number": "7",
+      "Central frequency": "53.24 GHz",
+      "Bandwidth": "400 MHz",
+      "Polarization": "V，H",
+      "NEΔT": "0.5 K",
+      "IFOV": "7×11 km"
+    },
+    {
+      "Channel number": "8",
+      "Central frequency": "53.75 GHz",
+      "Bandwidth": "400 MHz",
+      "Polarization": "V，H",
+      "NEΔT": "0.5 K",
+      "IFOV": "7×11 km"
+    },
+    {
+      "Channel number": "9",
+      "Central frequency": "89.0 GHz",
+      "Bandwidth": "3000 MHz",
+      "Polarization": "V，H",
+      "NEΔT": "0.5 K",
+      "IFOV": "5×8 km"
+    },
+    {
+      "Channel number": "10",
+      "Central frequency": "118.7503±3.2 GHz",
+      "Bandwidth": "2x500 MHz",
+      "Polarization": "V",
+      "NEΔT": "0.8 K",
+      "IFOV": "4×7 km"
+    },
+    {
+      "Channel number": "11",
+      "Central frequency": "118.7503±2.1 GHz",
+      "Bandwidth": "2x400 MHz",
+      "Polarization": "V",
+      "NEΔT": "0.8 K",
+      "IFOV": "4×7 km"
+    },
+    {
+      "Channel number": "12",
+      "Central frequency": "118.7503±1.4 GHz",
+      "Bandwidth": "2x400 MHz",
+      "Polarization": "V",
+      "NEΔT": "0.8 K",
+      "IFOV": "4×7 km"
+    },
+    {
+      "Channel number": "13",
+      "Central frequency": "118.7503±1.2 GHz",
+      "Bandwidth": "2x400 MHz",
+      "Polarization": "V",
+      "NEΔT": "0.8 K",
+      "IFOV": "4×7 km"
+    },
+    {
+      "Channel number": "14",
+      "Central frequency": "165.5±0.75 GHz",
+      "Bandwidth": "2x1350 MHz",
+      "Polarization": "V",
+      "NEΔT": "0.8 K",
+      "IFOV": "4×6 km"
+    },
+    {
+      "Channel number": "15",
+      "Central frequency": "183.31±2.0 GHz",
+      "Bandwidth": "2x1500 MHz",
+      "Polarization": "V",
+      "NEΔT": "0.8 K",
+      "IFOV": "4×7 km"
+    },
+    {
+      "Channel number": "16",
+      "Central frequency": "183.31±3.4 GHz",
+      "Bandwidth": "2x1500 MHz",
+      "Polarization": "V",
+      "NEΔT": "0.8 K",
+      "IFOV": "4×7 km"
+    },
+    {
+      "Channel number": "17",
+      "Central frequency": "183.31±7.0 GHz",
+      "Bandwidth": "2x2000 MHz",
+      "Polarization": "V",
+      "NEΔT": "0.8 K",
+      "IFOV": "4×7 km"
+    }
+  ]
+}

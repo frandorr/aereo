@@ -1,0 +1,38 @@
+{
+  "instrument_id": 1172,
+  "instrument_acronym": "RSI",
+  "instrument_fullname": "Remote Sensing Instrument ",
+  "url": "https://space.oscar.wmo.int/instruments/view/rsi",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.485 μm",
+      "Spectral interval": "0.45 - 0.52 μm",
+      "SNR @ specified albedo": "……... @ ……. % albedo"
+    },
+    {
+      "Central wavelength": "0.560 μm",
+      "Spectral interval": "0.52 - 0.60 μm",
+      "SNR @ specified albedo": "……... @ ……. % albedo"
+    },
+    {
+      "Central wavelength": "0.660 μm",
+      "Spectral interval": "0.63 - 0.69 μm",
+      "SNR @ specified albedo": "……... @ ……. % albedo"
+    },
+    {
+      "Central wavelength": "0.830 μm",
+      "Spectral interval": "0.76 - 0.90 μm",
+      "SNR @ specified albedo": "……... @ ……. % albedo"
+    },
+    {
+      "Central wavelength": "PAN",
+      "Spectral interval": "0.45 - 0.90 μm",
+      "SNR @ specified albedo": "……... @ ……. % albedo"
+    }
+  ]
+}

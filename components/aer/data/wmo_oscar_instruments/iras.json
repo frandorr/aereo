@@ -1,0 +1,170 @@
+{
+  "instrument_id": 226,
+  "instrument_acronym": "IRAS",
+  "instrument_fullname": "Infra Red Atmospheric Sounder",
+  "url": "https://space.oscar.wmo.int/instruments/view/iras",
+  "columns": [
+    "Wavelength",
+    "Wave number",
+    "Bandwidth",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Wavelength": "14.95 µm",
+      "Wave number": "669 cm-1",
+      "Bandwidth": "3 cm-1",
+      "SNR or NEΔT @ specified input": "2.50 K @ 290 K"
+    },
+    {
+      "Wavelength": "14.71 µm",
+      "Wave number": "680 cm-1",
+      "Bandwidth": "10 cm-1",
+      "SNR or NEΔT @ specified input": "0.50 K @ 290 K"
+    },
+    {
+      "Wavelength": "14.49 µm",
+      "Wave number": "690 cm-1",
+      "Bandwidth": "12 cm-1",
+      "SNR or NEΔT @ specified input": "0.37 K @ 290 K"
+    },
+    {
+      "Wavelength": "14.22 µm",
+      "Wave number": "703 cm-1",
+      "Bandwidth": "16 cm-1",
+      "SNR or NEΔT @ specified input": "0.22 K @ 290 K"
+    },
+    {
+      "Wavelength": "13.97 µm",
+      "Wave number": "716 cm-1",
+      "Bandwidth": "16 cm-1",
+      "SNR or NEΔT @ specified input": "0.20 K @ 290 K"
+    },
+    {
+      "Wavelength": "13.64 µm",
+      "Wave number": "733 cm-1",
+      "Bandwidth": "16 cm-1",
+      "SNR or NEΔT @ specified input": "0.22 K @ 290 K"
+    },
+    {
+      "Wavelength": "13.35 µm",
+      "Wave number": "749 cm-1",
+      "Bandwidth": "16 cm-1",
+      "SNR or NEΔT @ specified input": "0.18 K @ 290 K"
+    },
+    {
+      "Wavelength": "12.47 µm",
+      "Wave number": "802 cm-1",
+      "Bandwidth": "30 cm-1",
+      "SNR or NEΔT @ specified input": "0.12 K @ 290 K"
+    },
+    {
+      "Wavelength": "11.11 µm",
+      "Wave number": "900 cm-1",
+      "Bandwidth": "35 cm-1",
+      "SNR or NEΔT @ specified input": "0.10 K @ 290 K"
+    },
+    {
+      "Wavelength": "9.71 µm",
+      "Wave number": "1030 cm-1",
+      "Bandwidth": "25 cm-1",
+      "SNR or NEΔT @ specified input": "0.14 K @ 290 K"
+    },
+    {
+      "Wavelength": "7.43 µm",
+      "Wave number": "1345 cm-1",
+      "Bandwidth": "50 cm-1",
+      "SNR or NEΔT @ specified input": "0.27 K @ 290 K"
+    },
+    {
+      "Wavelength": "7.33 µm",
+      "Wave number": "1365 cm-1",
+      "Bandwidth": "40 cm-1",
+      "SNR or NEΔT @ specified input": "0.37 K @ 290 K"
+    },
+    {
+      "Wavelength": "6.52 µm",
+      "Wave number": "1533 cm-1",
+      "Bandwidth": "55 cm-1",
+      "SNR or NEΔT @ specified input": "0.53 K @ 290 K"
+    },
+    {
+      "Wavelength": "4.57 µm",
+      "Wave number": "2188 cm-1",
+      "Bandwidth": "23 cm-1",
+      "SNR or NEΔT @ specified input": "0.10 K @ 290 K"
+    },
+    {
+      "Wavelength": "4.52 µm",
+      "Wave number": "2210 cm-1",
+      "Bandwidth": "23 cm-1",
+      "SNR or NEΔT @ specified input": "0.05 K @ 290 K"
+    },
+    {
+      "Wavelength": "4.47 µm",
+      "Wave number": "2235 cm-1",
+      "Bandwidth": "23 cm-1",
+      "SNR or NEΔT @ specified input": "0.08 K @ 290 K"
+    },
+    {
+      "Wavelength": "4.45 µm",
+      "Wave number": "2245 cm-1",
+      "Bandwidth": "23 cm-1",
+      "SNR or NEΔT @ specified input": "0.08 K @ 290 K"
+    },
+    {
+      "Wavelength": "4.19 µm",
+      "Wave number": "2388 cm-1",
+      "Bandwidth": "25 cm-1",
+      "SNR or NEΔT @ specified input": "0.06 K @ 290 K"
+    },
+    {
+      "Wavelength": "3.98 µm",
+      "Wave number": "2515 cm-1",
+      "Bandwidth": "35 cm-1",
+      "SNR or NEΔT @ specified input": "0.10 K @ 290 K"
+    },
+    {
+      "Wavelength": "3.76 µm",
+      "Wave number": "2660 cm-1",
+      "Bandwidth": "100 cm-1",
+      "SNR or NEΔT @ specified input": "0.11 K @ 290 K"
+    },
+    {
+      "Wavelength": "1.64 µm",
+      "Wave number": "n/a",
+      "Bandwidth": "120 nm",
+      "SNR or NEΔT @ specified input": "…..  @ ..... % albedo"
+    },
+    {
+      "Wavelength": "1.24 µm",
+      "Wave number": "n/a",
+      "Bandwidth": "100 nm",
+      "SNR or NEΔT @ specified input": "…..  @ ..... % albedo"
+    },
+    {
+      "Wavelength": "0.94 µm",
+      "Wave number": "n/a",
+      "Bandwidth": "18 nm",
+      "SNR or NEΔT @ specified input": "…..  @ ..... % albedo"
+    },
+    {
+      "Wavelength": "0.94 µm",
+      "Wave number": "n/a",
+      "Bandwidth": "49 nm",
+      "SNR or NEΔT @ specified input": "…..  @ ..... % albedo"
+    },
+    {
+      "Wavelength": "0.885 µm",
+      "Wave number": "n/a",
+      "Bandwidth": "30 nm",
+      "SNR or NEΔT @ specified input": "…..  @ ..... % albedo"
+    },
+    {
+      "Wavelength": "0.69 µm",
+      "Wave number": "n/a",
+      "Bandwidth": "48 nm",
+      "SNR or NEΔT @ specified input": "…..  @ ..... % albedo"
+    }
+  ]
+}

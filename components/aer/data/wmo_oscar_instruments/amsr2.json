@@ -1,0 +1,161 @@
+{
+  "instrument_id": 28,
+  "instrument_acronym": "AMSR2",
+  "instrument_fullname": "Advanced Microwave Scanning Radiometer - 2",
+  "url": "https://space.oscar.wmo.int/instruments/view/amsr2",
+  "columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT",
+    "IFOV",
+    "Pixel"
+  ],
+  "channels": [
+    {
+      "No.": "1",
+      "Central frequency (GHz)": "6.925",
+      "Bandwidth (MHz)": "350",
+      "Polarisation": "V",
+      "NEΔT": "0.3 K",
+      "IFOV": "35x62 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "No.": "2",
+      "Central frequency (GHz)": "6.925",
+      "Bandwidth (MHz)": "350",
+      "Polarisation": "H",
+      "NEΔT": "0.3 K",
+      "IFOV": "35x62 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "No.": "3",
+      "Central frequency (GHz)": "7.3",
+      "Bandwidth (MHz)": "350",
+      "Polarisation": "V",
+      "NEΔT": "0.3 K",
+      "IFOV": "35x62 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "No.": "4",
+      "Central frequency (GHz)": "7.3",
+      "Bandwidth (MHz)": "350",
+      "Polarisation": "H",
+      "NEΔT": "0.3 K",
+      "IFOV": "35x62 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "No.": "5",
+      "Central frequency (GHz)": "10.65",
+      "Bandwidth (MHz)": "100",
+      "Polarisation": "V",
+      "NEΔT": "0.6 K",
+      "IFOV": "24x42 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "No.": "6",
+      "Central frequency (GHz)": "10.65",
+      "Bandwidth (MHz)": "100",
+      "Polarisation": "H",
+      "NEΔT": "0.6 K",
+      "IFOV": "24x42 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "No.": "7",
+      "Central frequency (GHz)": "18.7",
+      "Bandwidth (MHz)": "200",
+      "Polarisation": "V",
+      "NEΔT": "0.6 K",
+      "IFOV": "14x22 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "No.": "8",
+      "Central frequency (GHz)": "18.7",
+      "Bandwidth (MHz)": "200",
+      "Polarisation": "H",
+      "NEΔT": "0.6 K",
+      "IFOV": "14x22 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "No.": "9",
+      "Central frequency (GHz)": "23.8",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "V",
+      "NEΔT": "0.6 K",
+      "IFOV": "11x19 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "No.": "10",
+      "Central frequency (GHz)": "23.8",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "H",
+      "NEΔT": "0.6 K",
+      "IFOV": "11x19 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "No.": "11",
+      "Central frequency (GHz)": "36.5",
+      "Bandwidth (MHz)": "1000",
+      "Polarisation": "V",
+      "NEΔT": "0.6 K",
+      "IFOV": "7x12 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "No.": "12",
+      "Central frequency (GHz)": "36.5",
+      "Bandwidth (MHz)": "1000",
+      "Polarisation": "H",
+      "NEΔT": "0.6 K",
+      "IFOV": "7x12 km",
+      "Pixel": "10x10 km"
+    },
+    {
+      "No.": "13",
+      "Central frequency (GHz)": "89.0 A",
+      "Bandwidth (MHz)": "3000",
+      "Polarisation": "V",
+      "NEΔT": "1.1 K",
+      "IFOV": "3x5 km",
+      "Pixel": "5x5 km"
+    },
+    {
+      "No.": "14",
+      "Central frequency (GHz)": "89.0 A",
+      "Bandwidth (MHz)": "3000",
+      "Polarisation": "H",
+      "NEΔT": "1.1 K",
+      "IFOV": "3x5 km",
+      "Pixel": "5x5 km"
+    },
+    {
+      "No.": "15",
+      "Central frequency (GHz)": "89.0 B",
+      "Bandwidth (MHz)": "3000",
+      "Polarisation": "V",
+      "NEΔT": "1.1 K",
+      "IFOV": "3x5 km",
+      "Pixel": "5x5 km"
+    },
+    {
+      "No.": "16",
+      "Central frequency (GHz)": "89.0 B",
+      "Bandwidth (MHz)": "3000",
+      "Polarisation": "H",
+      "NEΔT": "1.1 K",
+      "IFOV": "3x5 km",
+      "Pixel": "5x5 km"
+    }
+  ]
+}

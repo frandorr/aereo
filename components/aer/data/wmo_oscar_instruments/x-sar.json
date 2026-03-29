@@ -1,0 +1,26 @@
+{
+  "instrument_id": 1287,
+  "instrument_acronym": "X-SAR",
+  "instrument_fullname": "X-SAR",
+  "url": "https://space.oscar.wmo.int/instruments/view/x-sar",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "Operation mode": "Spotlight",
+      "Resolution": "1 m",
+      "Swath": "10 km",
+      "Polarisation": "VV"
+    },
+    {
+      "Operation mode": "Stripmap",
+      "Resolution": "3 m",
+      "Swath": "30 km",
+      "Polarisation": "VV"
+    }
+  ]
+}

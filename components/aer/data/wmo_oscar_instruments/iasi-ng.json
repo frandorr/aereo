@@ -1,0 +1,86 @@
+{
+  "instrument_id": 206,
+  "instrument_acronym": "IASI-NG",
+  "instrument_fullname": "Infrared Atmospheric Sounder Interferometer - New Generation",
+  "url": "https://space.oscar.wmo.int/instruments/view/iasi-ng",
+  "columns": [
+    "Band",
+    "Wavelength",
+    "Wavenumber",
+    "NEΔT after apodisation"
+  ],
+  "channels": [
+    {
+      "Band": "IAS-1",
+      "Wavelength": "15.50 μm15.27 μm15.08 μm14.49 μm",
+      "Wavenumber": "645 cm-1655 cm-1663 cm-1690 cm-1",
+      "NEΔT after apodisation": "0.39 K @ 280 K0.26 K @ 280 K0.225 K @ 280 K0.225 K @ 280 K"
+    },
+    {
+      "Band": "IAS-2",
+      "Wavelength": "12.99-14.49 μm",
+      "Wavenumber": "690-770 cm-1",
+      "NEΔT after apodisation": "0.130 K @ 280 K"
+    },
+    {
+      "Band": "IAS-3",
+      "Wavelength": "10.00-12.99 μm",
+      "Wavenumber": "770-1000 cm-1",
+      "NEΔT after apodisation": "0.130 K @ 280 K"
+    },
+    {
+      "Band": "IAS-4",
+      "Wavelength": "9.35-10.00 μm",
+      "Wavenumber": "1000-1070 cm-1",
+      "NEΔT after apodisation": "0.195 K @ 280 K"
+    },
+    {
+      "Band": "IAS-5",
+      "Wavelength": "8.70-10.00 μm",
+      "Wavenumber": "1070-1150 cm-1",
+      "NEΔT after apodisation": "0.195 K @ 280 K"
+    },
+    {
+      "Band": "IAS-6",
+      "Wavelength": "6.06-8.70 μm",
+      "Wavenumber": "1150-1650 cm-1",
+      "NEΔT after apodisation": "0.130 K @ 280 K"
+    },
+    {
+      "Band": "IAS-7",
+      "Wavelength": "4.76-6.06 μm",
+      "Wavenumber": "1650-2100 cm-1",
+      "NEΔT after apodisation": "0.449 K @ 280 K"
+    },
+    {
+      "Band": "IAS-8",
+      "Wavelength": "4.59-4.76 μm",
+      "Wavenumber": "2100-2180 cm-1",
+      "NEΔT after apodisation": "0.156 K @ 280 K"
+    },
+    {
+      "Band": "IAS-9",
+      "Wavelength": "4.44-4.59 μm",
+      "Wavenumber": "2180-2250 cm-1",
+      "NEΔT after apodisation": "0.26 K @ 280 K"
+    },
+    {
+      "Band": "IAS-10",
+      "Wavelength": "4.13-4.44 μm",
+      "Wavenumber": "2250-2420 cm-1",
+      "NEΔT after apodisation": "0.26 K @ 280 K"
+    },
+    {
+      "Band": "IAS-11",
+      "Wavelength": "4.13 μm4.08 μm3.85 μm3.70 μm",
+      "Wavenumber": "2420 cm-12450 cm-12600 cm-12700 cm-1",
+      "NEΔT after apodisation": "0.26 K @ 280 K0.26 K @ 280 K0.65 K @ 280 K1.138 K @ 280 K"
+    },
+    {
+      "Band": "IAS-12",
+      "Wavelength": "3.70 μm3.62 μm",
+      "Wavenumber": "2700 cm-12760 cm-1",
+      "NEΔT after apodisation": "1.138 K @ 280 K1.43 K @ 280 K"
+    }
+  ]
+}

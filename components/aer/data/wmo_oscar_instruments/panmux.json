@@ -1,0 +1,38 @@
+{
+  "instrument_id": 398,
+  "instrument_acronym": "PANMUX",
+  "instrument_fullname": "Panchromatic and Multispectral imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/panmux",
+  "columns": [
+    "Centralwavelength",
+    "Spectralinterval",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Centralwavelength": "",
+      "Spectralinterval": "",
+      "SNR @ specified input spectral radiance": "Low signal"
+    },
+    {
+      "Centralwavelength": "N/A (PAN)",
+      "Spectralinterval": "0.51 - 0.85 µm",
+      "SNR @ specified input spectral radiance": "25 @ 18 W m-2sr-1µm-1"
+    },
+    {
+      "Centralwavelength": "0.555 µm",
+      "Spectralinterval": "0.52 - 0.59 µm",
+      "SNR @ specified input spectral radiance": "26 @ 28 W m-2sr-1µm-1"
+    },
+    {
+      "Centralwavelength": "0.660 µm",
+      "Spectralinterval": "0.63 - 0.69 µm",
+      "SNR @ specified input spectral radiance": "21 @ 18 W m-2sr-1µm-1"
+    },
+    {
+      "Centralwavelength": "0.830 µm",
+      "Spectralinterval": "0.77 - 0.89 µm",
+      "SNR @ specified input spectral radiance": "20 @ 10 W m-2sr-1µm-1"
+    }
+  ]
+}

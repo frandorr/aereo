@@ -1,0 +1,33 @@
+{
+  "instrument_id": 594,
+  "instrument_acronym": "Végétation ",
+  "instrument_fullname": "Végétation",
+  "url": "https://space.oscar.wmo.int/instruments/view/v%C3%A9g%C3%A9tation%20",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.450 µm",
+      "Spectral interval": "0.43 - 0.47 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.645 µm",
+      "Spectral interval": "0.61 - 0.68 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.835 µm",
+      "Spectral interval": "0.78 - 0.89 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "1.645 µm",
+      "Spectral interval": "1.58 - 1.75 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    }
+  ]
+}

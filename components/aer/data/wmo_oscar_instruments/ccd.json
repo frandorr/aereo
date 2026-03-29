@@ -1,0 +1,28 @@
+{
+  "instrument_id": 76,
+  "instrument_acronym": "CCD",
+  "instrument_fullname": "Charge Coupled Device Camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/ccd",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.65 µm",
+      "Spectral interval": "0.62 - 0.68 µm",
+      "SNR @ specified albedo": "900  @  100 % albedo"
+    },
+    {
+      "Central wavelength": "0.81 µm",
+      "Spectral interval": "0.77 - 0.86 µm",
+      "SNR @ specified albedo": "850  @  100 % albedo"
+    },
+    {
+      "Central wavelength": "1.62 µm",
+      "Spectral interval": "1.55 - 1.69 µm",
+      "SNR @ specified albedo": "900  @  100 % albedo"
+    }
+  ]
+}

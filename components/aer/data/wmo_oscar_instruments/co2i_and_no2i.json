@@ -1,0 +1,38 @@
+{
+  "instrument_id": 1264,
+  "instrument_acronym": "CO2I and NO2I",
+  "instrument_fullname": "Combined Carbon Dioxide and Nitrogen Dioxide Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/co2i%20and%20no2i",
+  "columns": [
+    "Spectralband",
+    "Spectralrange",
+    "Spectralresolution",
+    "SNR @ specifiedinputspectral radiance"
+  ],
+  "channels": [
+    {
+      "Spectralband": "VIS",
+      "Spectralrange": "405 - 490 nm",
+      "Spectralresolution": "0.6 nm",
+      "SNR @ specifiedinputspectral radiance": "…. @ … W m-2sr-1μm-1"
+    },
+    {
+      "Spectralband": "NIR",
+      "Spectralrange": "747 - 773 nm",
+      "Spectralresolution": "0.12 nm",
+      "SNR @ specifiedinputspectral radiance": "... @ … W m-2sr-1μm-1"
+    },
+    {
+      "Spectralband": "SWIR1",
+      "Spectralrange": "1590 - 1675 nm",
+      "Spectralresolution": "0.30 nm",
+      "SNR @ specifiedinputspectral radiance": "... @ … W m-2sr-1μm-1"
+    },
+    {
+      "Spectralband": "SWIR2",
+      "Spectralrange": "1990 - 2095 nm",
+      "Spectralresolution": "0.35 nm",
+      "SNR @ specifiedinputspectral radiance": "… @ … W m-2sr-1μm-1"
+    }
+  ]
+}

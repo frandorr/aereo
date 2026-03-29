@@ -1,0 +1,43 @@
+{
+  "instrument_id": 802,
+  "instrument_acronym": "MX-LWIR",
+  "instrument_fullname": "Multispectral - Long Wave Infrared",
+  "url": "https://space.oscar.wmo.int/instruments/view/mx-lwir",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "7.35 µm",
+      "Spectral interval": "7.1-7.6 µm",
+      "NEΔT @ specified input": "0.15 K @ 300 K"
+    },
+    {
+      "Central wavelength": "8.50 µm",
+      "Spectral interval": "8.3-8.7 µm",
+      "NEΔT @ specified input": "0.15 K @ 300 K"
+    },
+    {
+      "Central wavelength": "9.60 µm",
+      "Spectral interval": "9.4-9.8 µm",
+      "NEΔT @ specified input": "0.15 K @ 300 K"
+    },
+    {
+      "Central wavelength": "10.8 µm",
+      "Spectral interval": "10-3-11.3 µm",
+      "NEΔT @ specified input": "0.15 K @ 300 K"
+    },
+    {
+      "Central wavelength": "12.0 µm",
+      "Spectral interval": "11.5-12.5 µm",
+      "NEΔT @ specified input": "0.15 K @ 300 K"
+    },
+    {
+      "Central wavelength": "13.25 µm",
+      "Spectral interval": "13.0-13.5 µm",
+      "NEΔT @ specified input": "0.15 K @ 300 K"
+    }
+  ]
+}

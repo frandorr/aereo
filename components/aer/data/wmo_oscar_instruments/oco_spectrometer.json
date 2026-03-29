@@ -1,0 +1,32 @@
+{
+  "instrument_id": 368,
+  "instrument_acronym": "OCO spectrometer",
+  "instrument_fullname": "Orbiting Carbon Observatory Spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/oco%20spectrometer",
+  "columns": [
+    "Spectral range",
+    "No. of channels",
+    "Spectral resolution",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Spectral range": "758 - 772 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.04 nm",
+      "SNR @ specified input spectral radiance": "…….. @ ……… W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "1594 - 1619 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.08 nm",
+      "SNR @ specified input spectral radiance": "…….. @ ……… W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "2042 - 2082 nm",
+      "No. of channels": "1024",
+      "Spectral resolution": "0.10 nm",
+      "SNR @ specified input spectral radiance": "…….. @ ……… W m-2sr-1μm-1"
+    }
+  ]
+}

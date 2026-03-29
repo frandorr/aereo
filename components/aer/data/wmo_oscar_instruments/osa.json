@@ -1,0 +1,38 @@
+{
+  "instrument_id": 687,
+  "instrument_acronym": "OSA",
+  "instrument_fullname": "Optical Sensor Assembly",
+  "url": "https://space.oscar.wmo.int/instruments/view/osa",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "N/A (PAN)",
+      "Spectral interval": "450 - 900 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "490 nm",
+      "Spectral interval": "450 - 530 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "565 nm",
+      "Spectral interval": "520 - 610 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "680 nm",
+      "Spectral interval": "640 - 720 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "810 nm",
+      "Spectral interval": "760 - 860 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "instrument_id": 1415,
+  "instrument_acronym": "SAR-X (LOTUSat)",
+  "instrument_fullname": "Synthetic Aperture Radar (X-band) for LOTUSat",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar-x%20%28lotusat%29",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "Operation mode": "Spotlight",
+      "Resolution": "1 m",
+      "Swath": "10 km",
+      "Polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "Operation mode": "Stripmap",
+      "Resolution": "2 m",
+      "Swath": "12 km",
+      "Polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "Operation mode": "ScanSAR",
+      "Resolution": "16 m",
+      "Swath": "50 km",
+      "Polarisation": "HH or VV or HV or VH"
+    }
+  ]
+}

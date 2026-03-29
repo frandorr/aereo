@@ -1,0 +1,43 @@
+{
+  "instrument_id": 1167,
+  "instrument_acronym": "ShMSA-VR ",
+  "instrument_fullname": "High resolution wide capture multispectral optical sensor",
+  "url": "https://space.oscar.wmo.int/instruments/view/shmsa-vr%20",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.470 µm",
+      "Spectral interval": "0.43-0.51 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.545 µm",
+      "Spectral interval": "0.51-0.58 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.650 µm",
+      "Spectral interval": "0.60-0.70 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.750 µm",
+      "Spectral interval": "0.7-0.8 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.850 µm",
+      "Spectral interval": "0.8-0.9 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "Panchromatic",
+      "Spectral interval": "0.43-0.7 µm",
+      "SNR @ specified albedo": "…... @ ….. % albedo"
+    }
+  ]
+}

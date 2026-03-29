@@ -1,0 +1,38 @@
+{
+  "instrument_id": 1253,
+  "instrument_acronym": "Capella SAR",
+  "instrument_fullname": "Capella SAR",
+  "url": "https://space.oscar.wmo.int/instruments/view/capella%20sar",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "Operation mode": "Spotlight",
+      "Resolution": "0.3 m",
+      "Swath": "10 km",
+      "Polarisation": "HH"
+    },
+    {
+      "Operation mode": "Sliding Spotlight",
+      "Resolution": "0.3 m",
+      "Swath": "20 km",
+      "Polarisation": "HH"
+    },
+    {
+      "Operation mode": "Stripmap",
+      "Resolution": "0.3 m",
+      "Swath": "30 km",
+      "Polarisation": "HH"
+    },
+    {
+      "Operation mode": "Multi-swath Stripmap",
+      "Resolution": "0.3 m",
+      "Swath": "50 km",
+      "Polarisation": "HH"
+    }
+  ]
+}

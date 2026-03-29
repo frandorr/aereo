@@ -1,0 +1,62 @@
+{
+  "instrument_id": 920,
+  "instrument_acronym": "ACS-limb",
+  "instrument_fullname": "Atmospheric Composition Spectrometer (limb-scanning component) ",
+  "url": "https://space.oscar.wmo.int/instruments/view/acs-limb",
+  "columns": [
+    "Spectral range",
+    "No. of channels",
+    "Spectral resolution",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Spectral range": "214-334 nm",
+      "No. of channels": "256",
+      "Spectral resolution": "0.5 nm",
+      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "320-452 nm",
+      "No. of channels": "256",
+      "Spectral resolution": "0.5 nm",
+      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "430-800 nm",
+      "No. of channels": "256",
+      "Spectral resolution": "1.5 nm",
+      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "755-910 nm",
+      "No. of channels": "256",
+      "Spectral resolution": "0.9 nm",
+      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "900-1210 nm",
+      "No. of channels": "256",
+      "Spectral resolution": "0.9 nm",
+      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "1200-1770 nm",
+      "No. of channels": "256",
+      "Spectral resolution": "2.0 nm",
+      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "1934-2044 nm",
+      "No. of channels": "256",
+      "Spectral resolution": "0.5 nm",
+      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+    },
+    {
+      "Spectral range": "2259-2386 nm",
+      "No. of channels": "256",
+      "Spectral resolution": "0.5 nm",
+      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "instrument_id": 213,
+  "instrument_acronym": "IIR",
+  "instrument_fullname": "Imaging Infrared Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/iir",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "NEΔT @ specified scene temperature"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "8.65 µm",
+      "Spectral interval": "8.25 - 9.05 µm",
+      "NEΔT @ specified scene temperature": "0.3 K @ 300 K"
+    },
+    {
+      "Central wavelength": "10.60 µm",
+      "Spectral interval": "10.2 - 11.0 µm",
+      "NEΔT @ specified scene temperature": "0.3 K @ 300 K"
+    },
+    {
+      "Central wavelength": "12.00 µm",
+      "Spectral interval": "11.6 - 12.4 µm",
+      "NEΔT @ specified scene temperature": "0.3 K @ 300 K"
+    }
+  ]
+}

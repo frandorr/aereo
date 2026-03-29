@@ -1,0 +1,53 @@
+{
+  "instrument_id": 384,
+  "instrument_acronym": "OSMI",
+  "instrument_fullname": "Ocean Scanning Multispectral Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/osmi",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "412 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "…… @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "443 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "…… @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "490 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "…… @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "510 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "…… @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "555 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "…… @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "670 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "…… @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "765 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "…… @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "865 nm",
+      "Bandwidth": "40 nm",
+      "SNR @ specified input spectral radiance": "…… @ …….. W m-2sr-1μm-1"
+    }
+  ]
+}

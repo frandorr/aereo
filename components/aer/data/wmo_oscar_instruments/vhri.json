@@ -1,0 +1,38 @@
+{
+  "instrument_id": 596,
+  "instrument_acronym": "VHRI",
+  "instrument_fullname": "Very High Resolution Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/vhri",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "N/A (PAN)",
+      "Spectral interval": "0.45 - 0.90 μm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.485 μm",
+      "Spectral interval": "0.45 - 0.52 μm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.560 μm",
+      "Spectral interval": "0.52 - 0.60 μm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.660 μm",
+      "Spectral interval": "0.63 - 0.69 μm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.830 μm",
+      "Spectral interval": "0.76 - 0.90 μm",
+      "SNR @ specified albedo": "…… @ ….. % albedo"
+    }
+  ]
+}

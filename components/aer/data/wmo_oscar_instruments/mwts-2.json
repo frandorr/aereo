@@ -1,0 +1,106 @@
+{
+  "instrument_id": 353,
+  "instrument_acronym": "MWTS-2",
+  "instrument_fullname": "Micro-Wave Temperature Sounder - 2",
+  "url": "https://space.oscar.wmo.int/instruments/view/mwts-2",
+  "columns": [
+    "Channel number",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT"
+  ],
+  "channels": [
+    {
+      "Channel number": "1",
+      "Central frequency (GHz)": "50.30",
+      "Bandwidth (MHz)": "180",
+      "Polarisation": "QH",
+      "NEΔT": "1.5 K"
+    },
+    {
+      "Channel number": "2",
+      "Central frequency (GHz)": "51.76",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "QH",
+      "NEΔT": "0.9 K"
+    },
+    {
+      "Channel number": "3",
+      "Central frequency (GHz)": "52.8",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "QH",
+      "NEΔT": "0.9 K"
+    },
+    {
+      "Channel number": "4",
+      "Central frequency (GHz)": "53.596",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "QH",
+      "NEΔT": "0.9 K"
+    },
+    {
+      "Channel number": "5",
+      "Central frequency (GHz)": "54.40",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "QH",
+      "NEΔT": "0.9 K"
+    },
+    {
+      "Channel number": "6",
+      "Central frequency (GHz)": "54.94",
+      "Bandwidth (MHz)": "400",
+      "Polarisation": "QH",
+      "NEΔT": "0.9 K"
+    },
+    {
+      "Channel number": "7",
+      "Central frequency (GHz)": "55.50",
+      "Bandwidth (MHz)": "330",
+      "Polarisation": "QH",
+      "NEΔT": "0.9 K"
+    },
+    {
+      "Channel number": "8",
+      "Central frequency (GHz)": "57.290",
+      "Bandwidth (MHz)": "330",
+      "Polarisation": "QH",
+      "NEΔT": "0.9 K"
+    },
+    {
+      "Channel number": "9",
+      "Central frequency (GHz)": "57.290 ± 0.217",
+      "Bandwidth (MHz)": "78",
+      "Polarisation": "QH",
+      "NEΔT": "1.5 K"
+    },
+    {
+      "Channel number": "10",
+      "Central frequency (GHz)": "57.290 ± 0.322 ± 0.048",
+      "Bandwidth (MHz)": "36",
+      "Polarisation": "QH",
+      "NEΔT": "1.5 K"
+    },
+    {
+      "Channel number": "11",
+      "Central frequency (GHz)": "57.290 ± 0.322 ± 0.022",
+      "Bandwidth (MHz)": "16",
+      "Polarisation": "QH",
+      "NEΔT": "2.3 K"
+    },
+    {
+      "Channel number": "12",
+      "Central frequency (GHz)": "57.290 ± 0.322 ± 0.010",
+      "Bandwidth (MHz)": "8",
+      "Polarisation": "QH",
+      "NEΔT": "3.0 K"
+    },
+    {
+      "Channel number": "13",
+      "Central frequency (GHz)": "57.290 ± 0.322 ± 0.0045",
+      "Bandwidth (MHz)": "3",
+      "Polarisation": "QH",
+      "NEΔT": "4.5 K"
+    }
+  ]
+}

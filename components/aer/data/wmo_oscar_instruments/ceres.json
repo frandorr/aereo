@@ -1,0 +1,36 @@
+{
+  "instrument_id": 78,
+  "instrument_acronym": "CERES",
+  "instrument_fullname": "Clouds and the Earth’s Radiant Energy System ",
+  "url": "https://space.oscar.wmo.int/instruments/view/ceres",
+  "columns": [
+    "Channel",
+    "Spectral interval",
+    "Noise Equivalent Radiance",
+    "Absolute accuracy",
+    "SNR"
+  ],
+  "channels": [
+    {
+      "Channel": "Short-wave",
+      "Spectral interval": "0.3 - 5.0 µm",
+      "Noise Equivalent Radiance": "0.3 W m-2sr-1",
+      "Absolute accuracy": "0.8 W m-2sr-1",
+      "SNR": "225"
+    },
+    {
+      "Channel": "Total radiance",
+      "Spectral interval": "0.3 - 100 µm",
+      "Noise Equivalent Radiance": "0.3 W m-2sr-1",
+      "Absolute accuracy": "0.6 W m-2sr-1",
+      "SNR": "750"
+    },
+    {
+      "Channel": "TIR",
+      "Spectral interval": "8 - 12 µm",
+      "Noise Equivalent Radiance": "0.3 W m-2sr-1",
+      "Absolute accuracy": "0.3 W m-2sr-1",
+      "SNR": "750"
+    }
+  ]
+}

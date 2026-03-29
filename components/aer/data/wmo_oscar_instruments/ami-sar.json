@@ -1,0 +1,29 @@
+{
+  "instrument_id": 23,
+  "instrument_acronym": "AMI-SAR",
+  "instrument_fullname": "Active Microwave Instrument - Synthetic Aperture Antenna",
+  "url": "https://space.oscar.wmo.int/instruments/view/ami-sar",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Field of regard",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "Operation mode": "Imaging",
+      "Resolution": "30 m",
+      "Swath": "100 km",
+      "Field of regard": "100 km",
+      "Polarisation": "VV"
+    },
+    {
+      "Operation mode": "Scatterometer (see AMI-Scat)",
+      "Resolution": "",
+      "Swath": "",
+      "Field of regard": "",
+      "Polarisation": ""
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "instrument_id": 678,
+  "instrument_acronym": "SpaceView-110",
+  "instrument_fullname": "SpaceView-110 Imaging System",
+  "url": "https://space.oscar.wmo.int/instruments/view/spaceview-110",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "N/A (PAN)",
+      "Spectral interval": "450 - 800 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "480 nm",
+      "Spectral interval": "450 - 510 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "545 nm",
+      "Spectral interval": "510 - 580 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "672 nm",
+      "Spectral interval": "655 - 690 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "850 nm",
+      "Spectral interval": "780 - 920 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    }
+  ]
+}

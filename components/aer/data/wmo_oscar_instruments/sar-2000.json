@@ -1,0 +1,50 @@
+{
+  "instrument_id": 447,
+  "instrument_acronym": "SAR-2000",
+  "instrument_fullname": "Synthetic Aperture Radar 2000 (X-band) ",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar-2000",
+  "columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Field of regard",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "Operation mode": "Spotlight",
+      "Resolution": "1 m",
+      "Swath": "10 km",
+      "Field of regard": "600 km, either right or left",
+      "Polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "Operation mode": "Stripmap",
+      "Resolution": "3-15 m",
+      "Swath": "40 km",
+      "Field of regard": "600 km, either right or left",
+      "Polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "Operation mode": "ScanSAR wide swath",
+      "Resolution": "30 m",
+      "Swath": "100 km",
+      "Field of regard": "600 km, either right or left",
+      "Polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "Operation mode": "ScanSAR huge swath",
+      "Resolution": "100 m",
+      "Swath": "200 km",
+      "Field of regard": "600 km, either right or left",
+      "Polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "Operation mode": "Stripmap ping-pong",
+      "Resolution": "15 m",
+      "Swath": "30 km",
+      "Field of regard": "600 km, either right or left",
+      "Polarisation": "HH/HV + VV/VH"
+    }
+  ]
+}

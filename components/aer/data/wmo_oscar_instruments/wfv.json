@@ -1,0 +1,33 @@
+{
+  "instrument_id": 1028,
+  "instrument_acronym": "WFV",
+  "instrument_fullname": "Wide Field Camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/wfv",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.485 μm",
+      "Spectral interval": "0.45-0.52 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.555 μm",
+      "Spectral interval": "0.52-0.59 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.660 μm",
+      "Spectral interval": "0.63-0.69 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "0.830 μm",
+      "Spectral interval": "0.77-0.89 μm",
+      "SNR @ specified albedo": "….. @ ….. % albedo"
+    }
+  ]
+}

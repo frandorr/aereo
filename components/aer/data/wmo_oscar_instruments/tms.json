@@ -1,0 +1,99 @@
+{
+  "instrument_id": 1252,
+  "instrument_acronym": "TMS",
+  "instrument_fullname": "TROPICS Millimeter-wave Sounder",
+  "url": "https://space.oscar.wmo.int/instruments/view/tms",
+  "columns": [
+    "No.",
+    "Central frequency",
+    "Bandwidth",
+    "Effective resolution across scan",
+    "NE∆T"
+  ],
+  "channels": [
+    {
+      "No.": "1",
+      "Central frequency": "91.655 ± 1.4 GHz",
+      "Bandwidth": "1000 MHz",
+      "Effective resolution across scan": "50.7 km",
+      "NE∆T": "0.95 K"
+    },
+    {
+      "No.": "2",
+      "Central frequency": "114.50 GHz",
+      "Bandwidth": "1000 MHz",
+      "Effective resolution across scan": "41.2 km",
+      "NE∆T": "0.55 K"
+    },
+    {
+      "No.": "3",
+      "Central frequency": "115.95 GHz",
+      "Bandwidth": "800 MHz",
+      "Effective resolution across scan": "41.2 km",
+      "NE∆T": "0.60 K"
+    },
+    {
+      "No.": "4",
+      "Central frequency": "116.65 GHz",
+      "Bandwidth": "600 MHz",
+      "Effective resolution across scan": "41.2 km",
+      "NE∆T": "0.70 K"
+    },
+    {
+      "No.": "5",
+      "Central frequency": "117.25 GHz",
+      "Bandwidth": "600 MHz",
+      "Effective resolution across scan": "41.2 km",
+      "NE∆T": "0.70 K"
+    },
+    {
+      "No.": "6",
+      "Central frequency": "117.80 GHz",
+      "Bandwidth": "500 MHz",
+      "Effective resolution across scan": "41.2 km",
+      "NE∆T": "0.75 K"
+    },
+    {
+      "No.": "7",
+      "Central frequency": "118.24 GHz",
+      "Bandwidth": "380 MHz",
+      "Effective resolution across scan": "41.2 km",
+      "NE∆T": "0.85 K"
+    },
+    {
+      "No.": "8",
+      "Central frequency": "118.58 GHz",
+      "Bandwidth": "300 MHz",
+      "Effective resolution across scan": "41.2 km",
+      "NE∆T": "1.00 K"
+    },
+    {
+      "No.": "9",
+      "Central frequency": "184.41 GHz",
+      "Bandwidth": "2000 MHz",
+      "Effective resolution across scan": "27.5 km",
+      "NE∆T": "0.60 K"
+    },
+    {
+      "No.": "10",
+      "Central frequency": "186.51 GHz",
+      "Bandwidth": "2000 MHz",
+      "Effective resolution across scan": "27.5 km",
+      "NE∆T": "0.60 K"
+    },
+    {
+      "No.": "11",
+      "Central frequency": "190.31 GHz",
+      "Bandwidth": "2000 MHz",
+      "Effective resolution across scan": "27.5 km",
+      "NE∆T": "0.60 K"
+    },
+    {
+      "No.": "12",
+      "Central frequency": "204.8 GHz",
+      "Bandwidth": "2000 MHz",
+      "Effective resolution across scan": "26.0 km",
+      "NE∆T": "0.60 K"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "instrument_id": 331,
+  "instrument_acronym": "MSU-V",
+  "instrument_fullname": "Multispectral VIS/IR radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/msu-v",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input",
+    "IFOV at s.s.p."
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.47 μm",
+      "Spectral interval": "0.42-0.52 μm",
+      "SNR or NEΔT @ specified input": ".… @ …. % albedo",
+      "IFOV at s.s.p.": "50 m"
+    },
+    {
+      "Central wavelength": "0.57 μm",
+      "Spectral interval": "0.54-0.61 μm",
+      "SNR or NEΔT @ specified input": ".… @ …. % albedo",
+      "IFOV at s.s.p.": "50 m"
+    },
+    {
+      "Central wavelength": "0.68 μm",
+      "Spectral interval": "0.63-0.73 μm",
+      "SNR or NEΔT @ specified input": ".… @ …. % albedo",
+      "IFOV at s.s.p.": "50 m"
+    },
+    {
+      "Central wavelength": "0.85 μm",
+      "Spectral interval": "0.78-0.92 μm",
+      "SNR or NEΔT @ specified input": ".… @ …. % albedo",
+      "IFOV at s.s.p.": "50 m"
+    },
+    {
+      "Central wavelength": "0.95 μm",
+      "Spectral interval": "0.91-1.00 μm",
+      "SNR or NEΔT @ specified input": ".… @ …. % albedo",
+      "IFOV at s.s.p.": "50 m"
+    },
+    {
+      "Central wavelength": "1.54 μm",
+      "Spectral interval": "1.47-1.62 μm",
+      "SNR or NEΔT @ specified input": ".… @ …. % albedo",
+      "IFOV at s.s.p.": "100 m"
+    },
+    {
+      "Central wavelength": "2.22 μm",
+      "Spectral interval": "2.06-2.38 μm",
+      "SNR or NEΔT @ specified input": ".… @ …. % albedo",
+      "IFOV at s.s.p.": "300 m"
+    },
+    {
+      "Central wavelength": "11.3 μm",
+      "Spectral interval": "10.6-12.0 μm",
+      "SNR or NEΔT @ specified input": ".... K @ 300 K",
+      "IFOV at s.s.p.": "250 m"
+    }
+  ]
+}

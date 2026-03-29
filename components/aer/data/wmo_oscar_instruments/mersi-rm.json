@@ -1,0 +1,62 @@
+{
+  "instrument_id": 1258,
+  "instrument_acronym": "MERSI-RM",
+  "instrument_fullname": "MERSI-Rainfall Measurement",
+  "url": "https://space.oscar.wmo.int/instruments/view/mersi-rm",
+  "columns": [
+    "Center wavelength",
+    "Bandwidth",
+    "SNR or NEΔT @ specified input",
+    "IFOV at s.s.p."
+  ],
+  "channels": [
+    {
+      "Center wavelength": "650 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEΔT @ specified input": "150 @ 22 W m-2sr-1μm-1",
+      "IFOV at s.s.p.": "500 m"
+    },
+    {
+      "Center wavelength": "865 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEΔT @ specified input": "150 @ 25 W m-2sr-1μm-1",
+      "IFOV at s.s.p.": "500 m"
+    },
+    {
+      "Center wavelength": "940 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEΔT @ specified input": "150 @ 15.0 W m-2sr-1μm-1",
+      "IFOV at s.s.p.": "500 m"
+    },
+    {
+      "Center wavelength": "1380 nm",
+      "Bandwidth": "30 nm",
+      "SNR or NEΔT @ specified input": "150 @ 6 W m-2sr-1μm-1",
+      "IFOV at s.s.p.": "500 m"
+    },
+    {
+      "Center wavelength": "1640 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEΔT @ specified input": "340 @ 7.3 W m-2sr-1μm-1",
+      "IFOV at s.s.p.": "500 m"
+    },
+    {
+      "Center wavelength": "3.80 μm",
+      "Bandwidth": "0.18 μm",
+      "SNR or NEΔT @ specified input": "0.15 K @ 300 K",
+      "IFOV at s.s.p.": "500 m"
+    },
+    {
+      "Center wavelength": "10.8 μm",
+      "Bandwidth": "1.0 μm",
+      "SNR or NEΔT @ specified input": "0.10 K @ 300 K",
+      "IFOV at s.s.p.": "500 m"
+    },
+    {
+      "Center wavelength": "12.0 μm",
+      "Bandwidth": "1.0 μm",
+      "SNR or NEΔT @ specified input": "0.10 K @ 300 K",
+      "IFOV at s.s.p.": "500 m"
+    }
+  ]
+}

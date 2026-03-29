@@ -1,0 +1,20 @@
+{
+  "instrument_id": 227,
+  "instrument_acronym": "IKFS-2",
+  "instrument_fullname": "Infrared Fourier Spectrometer - 2",
+  "url": "https://space.oscar.wmo.int/instruments/view/ikfs-2",
+  "columns": [
+    "Spectral range (µm)",
+    "Spectral range (cm-1)",
+    "Spectral resolution(unapodised)",
+    "NEΔT @ specified scene temperature"
+  ],
+  "channels": [
+    {
+      "Spectral range (µm)": "5-15 µm",
+      "Spectral range (cm-1)": "665-2000 cm-1",
+      "Spectral resolution(unapodised)": "0.5 cm-1",
+      "NEΔT @ specified scene temperature": "0.5 K @ 280 K"
+    }
+  ]
+}

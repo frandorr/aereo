@@ -1,0 +1,38 @@
+{
+  "instrument_id": 290,
+  "instrument_acronym": "MISR",
+  "instrument_fullname": "Multi-angle Imaging Spectro-Radiometer ",
+  "url": "https://space.oscar.wmo.int/instruments/view/misr",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "446.4 nm",
+      "Bandwidth": "41.9 nm",
+      "SNR @ specified input spectral radiance": "300 @ 179 W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "557.5 nm",
+      "Bandwidth": "28.6 nm",
+      "SNR @ specified input spectral radiance": "620 @ 177 W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "671.7 nm",
+      "Bandwidth": "21.9 nm",
+      "SNR @ specified input spectral radiance": "650 @ 146 W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "866.4 nm",
+      "Bandwidth": "39.7 nm",
+      "SNR @ specified input spectral radiance": "740 @   93 W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "",
+      "Bandwidth": "",
+      "SNR @ specified input spectral radiance": "Radiometric accuracy: 3% at maximum signal"
+    }
+  ]
+}

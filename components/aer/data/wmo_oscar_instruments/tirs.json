@@ -1,0 +1,23 @@
+{
+  "instrument_id": 1239,
+  "instrument_acronym": "TIRS",
+  "instrument_fullname": "Thermal IR Spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/tirs",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "NEΔT @ specific scene temperature"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "10.8 μm",
+      "Spectral interval": "10.3 - 11.3 μm",
+      "NEΔT @ specific scene temperature": "0.4 K @ 300K;  0.35 K @ 320K"
+    },
+    {
+      "Central wavelength": "12.0 μm",
+      "Spectral interval": "11.5 - 12.5  μm",
+      "NEΔT @ specific scene temperature": "0.4 K @ 300K;  0.35 K @ 320K"
+    }
+  ]
+}

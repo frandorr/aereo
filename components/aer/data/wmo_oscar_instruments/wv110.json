@@ -1,0 +1,58 @@
+{
+  "instrument_id": 696,
+  "instrument_acronym": "WV110",
+  "instrument_fullname": "World View 110 camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/wv110",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "N/A (PAN)",
+      "Spectral interval": "450-800 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "425 nm",
+      "Spectral interval": "400-450 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "480 nm",
+      "Spectral interval": "450-510 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "545 nm",
+      "Spectral interval": "510-580 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "605 nm",
+      "Spectral interval": "585-625 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "660 nm",
+      "Spectral interval": "630-690 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "725 nm",
+      "Spectral interval": "705-745 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "832 nm",
+      "Spectral interval": "770-895 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    },
+    {
+      "Central wavelength": "950 nm",
+      "Spectral interval": "860-1040 nm",
+      "SNR @ specified albedo": "……….. @ ……… % albedo"
+    }
+  ]
+}

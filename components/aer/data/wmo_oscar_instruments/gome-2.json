@@ -1,0 +1,44 @@
+{
+  "instrument_id": 167,
+  "instrument_acronym": "GOME-2",
+  "instrument_fullname": "Global Ozone Monitoring Experiment - 2",
+  "url": "https://space.oscar.wmo.int/instruments/view/gome-2",
+  "columns": [
+    "Spectral range",
+    "Number of channels",
+    "Spectral resolution",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Spectral range": "240-315 nm",
+      "Number of channels": "1024",
+      "Spectral resolution": "0.24 - 0.29 nm",
+      "SNR @ specified albedo": "7-177 @ 50 % albedo and 60° Solar Zenith Angle"
+    },
+    {
+      "Spectral range": "311-403 nm",
+      "Number of channels": "1024",
+      "Spectral resolution": "0.26 - 0.28 nm",
+      "SNR @ specified albedo": "372-3000 @ 50 % albedo and 60° SZA"
+    },
+    {
+      "Spectral range": "401-600 nm",
+      "Number of channels": "1024",
+      "Spectral resolution": "0.44 - 0.53 nm",
+      "SNR @ specified albedo": "4000 @ 50 % albedo and 60° SZA"
+    },
+    {
+      "Spectral range": "590-790 nm",
+      "Number of channels": "1024",
+      "Spectral resolution": "0.44 - 0.53 nm",
+      "SNR @ specified albedo": "2000-4000 @ 50 % albedo and 60° SZA"
+    },
+    {
+      "Spectral range": "312-790 nm",
+      "Number of channels": "200",
+      "Spectral resolution": "2.8 nm at 312 nm to 40 nm at 790 nm",
+      "SNR @ specified albedo": "100 for λ< 400 nm, 1000 for 400 nm < λ < 790 nm"
+    }
+  ]
+}

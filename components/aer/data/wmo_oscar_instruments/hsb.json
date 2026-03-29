@@ -1,0 +1,43 @@
+{
+  "instrument_id": 197,
+  "instrument_acronym": "HSB",
+  "instrument_fullname": "Humidity Sounder for Brazil ",
+  "url": "https://space.oscar.wmo.int/instruments/view/hsb",
+  "columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT"
+  ],
+  "channels": [
+    {
+      "No.": "17",
+      "Central frequency (GHz)": "150.0",
+      "Bandwidth (MHz)": "1000",
+      "Polarisation": "V",
+      "NEΔT": "1.0 K"
+    },
+    {
+      "No.": "20",
+      "Central frequency (GHz)": "183.31 ± 7.0",
+      "Bandwidth (MHz)": "2000",
+      "Polarisation": "V",
+      "NEΔT": "1.0 K"
+    },
+    {
+      "No.": "19",
+      "Central frequency (GHz)": "183.31 ± 3.0",
+      "Bandwidth (MHz)": "1000",
+      "Polarisation": "V",
+      "NEΔT": "1.0 K"
+    },
+    {
+      "No.": "18",
+      "Central frequency (GHz)": "183.31 ± 1.0",
+      "Bandwidth (MHz)": "500",
+      "Polarisation": "V",
+      "NEΔT": "1.0 K"
+    }
+  ]
+}

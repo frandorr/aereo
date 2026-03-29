@@ -1,0 +1,28 @@
+{
+  "instrument_id": 357,
+  "instrument_acronym": "NIRST",
+  "instrument_fullname": "New Infra Red Scanner Technology",
+  "url": "https://space.oscar.wmo.int/instruments/view/nirst",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "NEΔT @ specified scene temperature"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "3.80 µm",
+      "Spectral interval": "3.4 - 4.2 µm",
+      "NEΔT @ specified scene temperature": "0.5 K @ 400 K"
+    },
+    {
+      "Central wavelength": "10.85 µm",
+      "Spectral interval": "10.4 - 11.3 µm",
+      "NEΔT @ specified scene temperature": "0.3 K @ 300 K"
+    },
+    {
+      "Central wavelength": "11.85 µm",
+      "Spectral interval": "11.4 - 12.3 µm",
+      "NEΔT @ specified scene temperature": "0.4 K @ 300 K"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "instrument_id": 552,
+  "instrument_acronym": "SZS",
+  "instrument_fullname": "Shore Zone Scanner",
+  "url": "https://space.oscar.wmo.int/instruments/view/szs",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "415 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "200 @ …..… W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "490 nm",
+      "Bandwidth": "10 nm",
+      "SNR @ specified input spectral radiance": "200 @ …..… W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "557.5 nm",
+      "Bandwidth": "15 nm",
+      "SNR @ specified input spectral radiance": "200 @ …..… W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "595 nm",
+      "Bandwidth": "30 nm",
+      "SNR @ specified input spectral radiance": "200 @ …..… W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "665 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "200 @ …..… W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "779 nm",
+      "Bandwidth": "14 nm",
+      "SNR @ specified input spectral radiance": "200 @ …..… W m-2sr-1µm-1"
+    }
+  ]
+}

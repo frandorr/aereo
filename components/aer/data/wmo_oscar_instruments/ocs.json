@@ -1,0 +1,53 @@
+{
+  "instrument_id": 370,
+  "instrument_acronym": "OCS",
+  "instrument_fullname": "Ocean Colour Scanner",
+  "url": "https://space.oscar.wmo.int/instruments/view/ocs",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "412 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "443 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "490 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "520 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "565 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "670 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "750 nm",
+      "Bandwidth": "20 nm",
+      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+    },
+    {
+      "Central wavelength": "865 nm",
+      "Bandwidth": "40 nm",
+      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+    }
+  ]
+}

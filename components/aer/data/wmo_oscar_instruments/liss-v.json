@@ -1,0 +1,33 @@
+{
+  "instrument_id": 1192,
+  "instrument_acronym": "LISS-V",
+  "instrument_fullname": "Linear Imaging Self Scanner-V",
+  "url": "https://space.oscar.wmo.int/instruments/view/liss-v",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "485 nm",
+      "Spectral interval": "450 - 520 nm",
+      "SNR @ specified albedo": "…. @ … % albedo"
+    },
+    {
+      "Central wavelength": "555 nm",
+      "Spectral interval": "520 - 590 nm",
+      "SNR @ specified albedo": "…. @ … % albedo"
+    },
+    {
+      "Central wavelength": "650 nm",
+      "Spectral interval": "620 - 680 nm",
+      "SNR @ specified albedo": "…. @ … % albedo"
+    },
+    {
+      "Central wavelength": "815 µm",
+      "Spectral interval": "770 - 860 nm",
+      "SNR @ specified albedo": "…. @ … % albedo"
+    }
+  ]
+}

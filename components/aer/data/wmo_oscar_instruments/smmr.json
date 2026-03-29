@@ -1,0 +1,56 @@
+{
+  "instrument_id": 522,
+  "instrument_acronym": "SMMR",
+  "instrument_fullname": "Scanning Multichannel Microwave Radiometer)",
+  "url": "https://space.oscar.wmo.int/instruments/view/smmr",
+  "columns": [
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisations",
+    "NEΔT",
+    "IFOV",
+    "Pixel"
+  ],
+  "channels": [
+    {
+      "Central frequency (GHz)": "6.6",
+      "Bandwidth (MHz)": "250",
+      "Polarisations": "V, H",
+      "NEΔT": "0.9 K",
+      "IFOV": "95x160 km",
+      "Pixel": "40x26 km"
+    },
+    {
+      "Central frequency (GHz)": "10.7",
+      "Bandwidth (MHz)": "250",
+      "Polarisations": "V, H",
+      "NEΔT": "0.9 K",
+      "IFOV": "60x100 km",
+      "Pixel": "20x26 km"
+    },
+    {
+      "Central frequency (GHz)": "18.0",
+      "Bandwidth (MHz)": "250",
+      "Polarisations": "V, H",
+      "NEΔT": "1.2 K",
+      "IFOV": "35x60 km",
+      "Pixel": "20x26 km"
+    },
+    {
+      "Central frequency (GHz)": "21.0",
+      "Bandwidth (MHz)": "250",
+      "Polarisations": "V, H",
+      "NEΔT": "1.5 K",
+      "IFOV": "30x50 km",
+      "Pixel": "20x26 km"
+    },
+    {
+      "Central frequency (GHz)": "37.0",
+      "Bandwidth (MHz)": "250",
+      "Polarisations": "V, H",
+      "NEΔT": "1.5 K",
+      "IFOV": "17x29 km",
+      "Pixel": "10x26 km"
+    }
+  ]
+}

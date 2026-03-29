@@ -1,0 +1,29 @@
+{
+  "instrument_id": 68,
+  "instrument_acronym": "BBR",
+  "instrument_fullname": "Broad-Band Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/bbr",
+  "columns": [
+    "Channel",
+    "Spectral interval",
+    "Noise Equivalent Radiance",
+    "Absolute accuracy",
+    "SNR"
+  ],
+  "channels": [
+    {
+      "Channel": "Short-wave (outgoing)",
+      "Spectral interval": "0.2 - 3.8 µm",
+      "Noise Equivalent Radiance": ".... W m-2sr-1",
+      "Absolute accuracy": "2.5  W m-2sr-1",
+      "SNR": "……………..."
+    },
+    {
+      "Channel": "Total radiance (outgoing)",
+      "Spectral interval": "0.2 - 50 µm",
+      "Noise Equivalent Radiance": "....  W m-2sr-1",
+      "Absolute accuracy": "1.5  W m-2sr-1",
+      "SNR": "……………..."
+    }
+  ]
+}

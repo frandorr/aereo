@@ -1,0 +1,33 @@
+{
+  "instrument_id": 96,
+  "instrument_acronym": "CZI",
+  "instrument_fullname": "Coastal Zone Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/czi",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "460 nm",
+      "Bandwidth": "80 nm",
+      "SNR @ specified input": "410 @ 45.7 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "560 nm",
+      "Bandwidth": "80 nm",
+      "SNR @ specified input": "300 @ 24.6 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "650 nm",
+      "Bandwidth": "80 nm",
+      "SNR @ specified input": "248 @ 10.9 W m-2sr-1µm-1"
+    },
+    {
+      "Central wavelength": "825 nm",
+      "Bandwidth": "130 nm",
+      "SNR @ specified input": "240 @ 10.9 W m-2sr-1µm-1"
+    }
+  ]
+}

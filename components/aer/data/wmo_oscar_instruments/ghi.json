@@ -1,0 +1,56 @@
+{
+  "instrument_id": 1161,
+  "instrument_acronym": "GHI",
+  "instrument_fullname": "Geostationary High-speed Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/ghi",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input",
+    "IFOV at s.s.p."
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.675 µm",
+      "Spectral interval": "0.45-0.9",
+      "SNR or NEΔT @ specified input": "> 300 @ 100 % albedo",
+      "IFOV at s.s.p.": "0.25 km"
+    },
+    {
+      "Central wavelength": "0.470 µm",
+      "Spectral interval": "0.445-0.495",
+      "SNR or NEΔT @ specified input": "> 300 @ 100 % albedo",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "0.545 µm",
+      "Spectral interval": "0.52-0.57",
+      "SNR or NEΔT @ specified input": "> 300 @ 100 % albedo",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "0.645 µm",
+      "Spectral interval": "0.62-0.67",
+      "SNR or NEΔT @ specified input": "> 300 @ 100 % albedo",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "1.378 µm",
+      "Spectral interval": "1.371-1.386",
+      "SNR or NEΔT @ specified input": "> 300 @ 100 % albedo",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "1.61 µm",
+      "Spectral interval": "1.58-1.64",
+      "SNR or NEΔT @ specified input": "> 300 @ 100 % albedo",
+      "IFOV at s.s.p.": "0.5 km"
+    },
+    {
+      "Central wavelength": "11.4 µm",
+      "Spectral interval": "10.3-12.5",
+      "SNR or NEΔT @ specified input": "0.2 K @ 300 K",
+      "IFOV at s.s.p.": "2.0 km"
+    }
+  ]
+}

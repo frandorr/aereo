@@ -1,0 +1,33 @@
+{
+  "instrument_id": 60,
+  "instrument_acronym": "AVHRR",
+  "instrument_fullname": "Advanced Very High Resolution Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/avhrr",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "0.615 µm",
+      "Spectral interval": "0.55 - 0.68 µm",
+      "SNR or NEΔT @ specified input": "9 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "0.912 µm",
+      "Spectral interval": "0.725 - 1.10 µm",
+      "SNR or NEΔT @ specified input": "9 @ 0.5 % albedo"
+    },
+    {
+      "Central wavelength": "3.74 µm",
+      "Spectral interval": "3.55 - 3.93 µm",
+      "SNR or NEΔT @ specified input": "0.12 K @ 300 K"
+    },
+    {
+      "Central wavelength": "11.0 µm",
+      "Spectral interval": "10.5 - 11.5 µm",
+      "SNR or NEΔT @ specified input": "0.12 K @ 300 K"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "instrument_id": 153,
+  "instrument_acronym": "GERB",
+  "instrument_fullname": "Geostationary Earth Radiation Budget",
+  "url": "https://space.oscar.wmo.int/instruments/view/gerb",
+  "columns": [
+    "Channel",
+    "Spectral interval",
+    "Noise Equivalent Radiance",
+    "Absolute accuracy",
+    "SNR"
+  ],
+  "channels": [
+    {
+      "Channel": "Short-wave",
+      "Spectral interval": "0.32 - 4.0 µm",
+      "Noise Equivalent Radiance": "0.8 W m-2sr-1",
+      "Absolute accuracy": "2.4 W m-2sr-1",
+      "SNR": "1250"
+    },
+    {
+      "Channel": "Total radiance",
+      "Spectral interval": "0.32 - 100 µm",
+      "Noise Equivalent Radiance": "0.15 W m-2sr-1",
+      "Absolute accuracy": "0.4 W m-2sr-1",
+      "SNR": "400"
+    }
+  ]
+}

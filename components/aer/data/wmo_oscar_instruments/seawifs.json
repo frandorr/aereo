@@ -1,0 +1,53 @@
+{
+  "instrument_id": 481,
+  "instrument_acronym": "SeaWiFS",
+  "instrument_fullname": "Sea-viewing Wide Field-of-view Sensor",
+  "url": "https://space.oscar.wmo.int/instruments/view/seawifs",
+  "columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR at specified input radiance"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "412 nm",
+      "Bandwidth": "20 nm",
+      "SNR at specified input radiance": "499 @ 9.10 mW cm-2"
+    },
+    {
+      "Central wavelength": "443 nm",
+      "Bandwidth": "20 nm",
+      "SNR at specified input radiance": "674 @ 8.41 mW cm-2"
+    },
+    {
+      "Central wavelength": "490 nm",
+      "Bandwidth": "20 nm",
+      "SNR at specified input radiance": "667 @ 6.56 mW cm-2"
+    },
+    {
+      "Central wavelength": "510 nm",
+      "Bandwidth": "20 nm",
+      "SNR at specified input radiance": "640 @ 5.64 mW cm-2"
+    },
+    {
+      "Central wavelength": "555 nm",
+      "Bandwidth": "20 nm",
+      "SNR at specified input radiance": "596 @ 4.57 mW cm-2"
+    },
+    {
+      "Central wavelength": "670 nm",
+      "Bandwidth": "20 nm",
+      "SNR at specified input radiance": "442 @ 2.46 mW cm-2"
+    },
+    {
+      "Central wavelength": "765 nm",
+      "Bandwidth": "40 nm",
+      "SNR at specified input radiance": "455 @ 1.61 mW cm-2"
+    },
+    {
+      "Central wavelength": "865 nm",
+      "Bandwidth": "40 nm",
+      "SNR at specified input radiance": "467 @ 1.09 mW cm-2"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "instrument_id": 278,
+  "instrument_acronym": "MERSI-1",
+  "instrument_fullname": "Medium Resolution Spectral Imager -1",
+  "url": "https://space.oscar.wmo.int/instruments/view/mersi-1",
+  "columns": [
+    "Center wavelength",
+    "Bandwidth",
+    "SNR or NEρ or NEΔT @ specified input",
+    "IFOV at s.s.p."
+  ],
+  "channels": [
+    {
+      "Center wavelength": "412 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "300 @ 44.9 W m-2sr-1μm-1",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "443 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "300 @ 41.9 W m-2sr-1μm-1",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "470 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEρ or NEΔT @ specified input": "100 @ 50% albedo",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Center wavelength": "490 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "300 @ 32.1 W m-2sr-1μm-1",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "520 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "500 @ 29.0 W m-2sr-1μm-1",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "550 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEρ or NEΔT @ specified input": "100 @ 50% albedo",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Center wavelength": "565 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "500 @ 21.0 W m-2sr-1μm-1",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "650 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEρ or NEΔT @ specified input": "100 @ 50% albedo",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Center wavelength": "650 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "500 @ 10.0 W m-2sr-1μm-1",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "685 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "0.05 %",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "765 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "0.05 %",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "865 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "0.05 %",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "865 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEρ or NEΔT @ specified input": "100 @ 50% albedo",
+      "IFOV at s.s.p.": "250 m"
+    },
+    {
+      "Center wavelength": "905 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "0.10 %",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "940 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "0.10 %",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "980 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "0.10 %",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "1030 nm",
+      "Bandwidth": "20 nm",
+      "SNR or NEρ or NEΔT @ specified input": "0.10 %",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "1640 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEρ or NEΔT @ specified input": "0.08 %",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "2130 nm",
+      "Bandwidth": "50 nm",
+      "SNR or NEρ or NEΔT @ specified input": "0.07 %",
+      "IFOV at s.s.p.": "1000 m"
+    },
+    {
+      "Center wavelength": "11.50 μm",
+      "Bandwidth": "2.50 μm",
+      "SNR or NEρ or NEΔT @ specified input": "0.3 K @ 300 K",
+      "IFOV at s.s.p.": "250 m"
+    }
+  ]
+}

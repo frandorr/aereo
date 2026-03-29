@@ -1,0 +1,136 @@
+{
+  "instrument_id": 341,
+  "instrument_acronym": "MWHS-2",
+  "instrument_fullname": "Micro-Wave Humidity Sounder -2",
+  "url": "https://space.oscar.wmo.int/instruments/view/mwhs-2",
+  "columns": [
+    "Channel number",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisations",
+    "NEΔT",
+    "IFOV (deg)"
+  ],
+  "channels": [
+    {
+      "Channel number": "1",
+      "Central frequency (GHz)": "89",
+      "Bandwidth (MHz)": "1500",
+      "Polarisations": "QH",
+      "NEΔT": "0.4 K",
+      "IFOV (deg)": "2.0"
+    },
+    {
+      "Channel number": "2",
+      "Central frequency (GHz)": "118.75±0.08",
+      "Bandwidth (MHz)": "20",
+      "Polarisations": "QV",
+      "NEΔT": "2.2 K",
+      "IFOV (deg)": "2.0"
+    },
+    {
+      "Channel number": "3",
+      "Central frequency (GHz)": "118.75±0.2",
+      "Bandwidth (MHz)": "100",
+      "Polarisations": "QV",
+      "NEΔT": "1.0 K",
+      "IFOV (deg)": "2.0"
+    },
+    {
+      "Channel number": "4",
+      "Central frequency (GHz)": "118.75±0.3",
+      "Bandwidth (MHz)": "165",
+      "Polarisations": "QV",
+      "NEΔT": "0.8 K",
+      "IFOV (deg)": "2.0"
+    },
+    {
+      "Channel number": "5",
+      "Central frequency (GHz)": "118.75±0.8",
+      "Bandwidth (MHz)": "200",
+      "Polarisations": "QV",
+      "NEΔT": "0.8 K",
+      "IFOV (deg)": "2.0"
+    },
+    {
+      "Channel number": "6",
+      "Central frequency (GHz)": "118.75±1.1",
+      "Bandwidth (MHz)": "200",
+      "Polarisations": "QV",
+      "NEΔT": "0.8 K",
+      "IFOV (deg)": "2.0"
+    },
+    {
+      "Channel number": "7",
+      "Central frequency (GHz)": "118.75±2.5",
+      "Bandwidth (MHz)": "200",
+      "Polarisations": "QV",
+      "NEΔT": "0.8 K",
+      "IFOV (deg)": "2.0"
+    },
+    {
+      "Channel number": "8",
+      "Central frequency (GHz)": "118.75±3.0",
+      "Bandwidth (MHz)": "1000",
+      "Polarisations": "QV",
+      "NEΔT": "0.5 K",
+      "IFOV (deg)": "2.0"
+    },
+    {
+      "Channel number": "9",
+      "Central frequency (GHz)": "118.75±5.0",
+      "Bandwidth (MHz)": "2000",
+      "Polarisations": "QV",
+      "NEΔT": "0.5 K",
+      "IFOV (deg)": "2.0"
+    },
+    {
+      "Channel number": "10",
+      "Central frequency (GHz)": "166",
+      "Bandwidth (MHz)": "1500",
+      "Polarisations": "QH",
+      "NEΔT": "0.4 K",
+      "IFOV (deg)": "1.1"
+    },
+    {
+      "Channel number": "11",
+      "Central frequency (GHz)": "183±1",
+      "Bandwidth (MHz)": "500",
+      "Polarisations": "QV",
+      "NEΔT": "0.6 K",
+      "IFOV (deg)": "1.1"
+    },
+    {
+      "Channel number": "12",
+      "Central frequency (GHz)": "183±1.8",
+      "Bandwidth (MHz)": "700",
+      "Polarisations": "QV",
+      "NEΔT": "0.6 K",
+      "IFOV (deg)": "1.1"
+    },
+    {
+      "Channel number": "13",
+      "Central frequency (GHz)": "183±3",
+      "Bandwidth (MHz)": "1000",
+      "Polarisations": "QV",
+      "NEΔT": "0.5 K",
+      "IFOV (deg)": "1.1"
+    },
+    {
+      "Channel number": "14",
+      "Central frequency (GHz)": "183±4.5",
+      "Bandwidth (MHz)": "2000",
+      "Polarisations": "QV",
+      "NEΔT": "0.5 K",
+      "IFOV (deg)": "1.1"
+    },
+    {
+      "Channel number": "15",
+      "Central frequency (GHz)": "183±7",
+      "Bandwidth (MHz)": "2000",
+      "Polarisations": "QV",
+      "NEΔT": "0.5 K",
+      "IFOV (deg)": "1.1"
+    }
+  ]
+}

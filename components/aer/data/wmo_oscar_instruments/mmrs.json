@@ -1,0 +1,38 @@
+{
+  "instrument_id": 295,
+  "instrument_acronym": "MMRS",
+  "instrument_fullname": "Multispectral Medium Resolution Scanner",
+  "url": "https://space.oscar.wmo.int/instruments/view/mmrs",
+  "columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "Central wavelength": "490 nm",
+      "Spectral interval": "480 - 500 nm",
+      "SNR @ specified albedo": "…….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "550 nm",
+      "Spectral interval": "540 - 560 nm",
+      "SNR @ specified albedo": "…….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "660 nm",
+      "Spectral interval": "630 - 690 nm",
+      "SNR @ specified albedo": "…….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "815 nm",
+      "Spectral interval": "795 - 835 nm",
+      "SNR @ specified albedo": "…….. @ ….. % albedo"
+    },
+    {
+      "Central wavelength": "1625 nm",
+      "Spectral interval": "1550 - 1700 nm",
+      "SNR @ specified albedo": "…….. @ ….. % albedo"
+    }
+  ]
+}
