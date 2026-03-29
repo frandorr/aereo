@@ -60,11 +60,38 @@ def fetch_page(client: httpx.Client, acronym: str) -> str | None:
         return None
 
 
+def _normalize_header(text: str) -> str:
+    """Map a header cell text to one of our output column names."""
+    t = text.lower().strip()
+    if "central" in t and "wavelength" in t:
+        return "central_wavelength"
+    if "bandwidth" in t:
+        return "bandwidth"
+    if "snr" in t or "nedt" in t or "ne" in t and "t" in t:
+        return "snr_or_nedt"
+    if "resolution" in t:
+        return "resolution"
+    return ""
+
+
+def _detect_columns(header_cells: list) -> dict[int, str]:
+    """Inspect header cells and return {cell_index: output_field_name} mapping."""
+    mapping: dict[int, str] = {}
+    for idx, cell in enumerate(header_cells):
+        field = _normalize_header(cell.get_text(strip=True))
+        if field:
+            mapping[idx] = field
+    return mapping
+
+
 def parse_channels(html: str) -> list[dict[str, str]]:
     """Parse the frequency table from an instrument page.
 
     Returns a list of dicts with keys: central_wavelength, bandwidth,
     snr_or_nedt, resolution.
+
+    Tables have varying column layouts. We detect which columns correspond
+    to our output fields by examining header cell text.
     """
     soup = BeautifulSoup(html, "html.parser")
     freq_div = soup.find("div", class_="frequencytable")
@@ -76,22 +103,43 @@ def parse_channels(html: str) -> list[dict[str, str]]:
         return []
 
     rows = table.find_all("tr")
-    channels: list[dict[str, str]] = []
-    for row in rows:
+    if not rows:
+        return []
+
+    # Detect column mapping from the header row (first <tr> with <strong> or <th>)
+    col_map: dict[int, str] = {}
+    header_row_idx = 0
+    for i, row in enumerate(rows):
         cells = row.find_all("td")
-        if len(cells) < 4:
+        if cells and cells[0].find("strong"):
+            col_map = _detect_columns(cells)
+            header_row_idx = i
+            break
+
+    if not col_map:
+        # Fallback: assume 4-column layout (central_wavelength, bandwidth, snr_or_nedt, resolution)
+        col_map = {
+            0: "central_wavelength",
+            1: "bandwidth",
+            2: "snr_or_nedt",
+            3: "resolution",
+        }
+
+    channels: list[dict[str, str]] = []
+    for row in rows[header_row_idx + 1 :]:
+        cells = row.find_all("td")
+        if not cells:
             continue
-        # Skip header rows that contain <strong> tags
-        if cells[0].find("strong"):
+        # Need at least enough cells for the highest mapped index
+        max_idx = max(col_map.keys())
+        if len(cells) <= max_idx:
             continue
-        channels.append(
-            {
-                "central_wavelength": cells[0].get_text(strip=True),
-                "bandwidth": cells[1].get_text(strip=True),
-                "snr_or_nedt": cells[2].get_text(strip=True),
-                "resolution": cells[3].get_text(strip=True),
-            }
-        )
+        entry: dict[str, str] = {}
+        for idx, field in col_map.items():
+            entry[field] = cells[idx].get_text(strip=True)
+        # Only keep rows that have at least a wavelength
+        if entry.get("central_wavelength"):
+            channels.append(entry)
     return channels
 
 
