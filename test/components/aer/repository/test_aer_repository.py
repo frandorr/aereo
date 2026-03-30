@@ -1,57 +1,29 @@
-"""Abstract tests for AerRepository implementations.
-
-Use this to create tests for any AerRepository implementation (database-backed, etc.)
-by subclassing and providing a `repo` fixture.
-
-Example:
-    class TestMyRepository(TestAerRepositoryBase):
-        @pytest.fixture
-        def repo(self):
-            return MyRepository()
-"""
+"""Tests for AerLocalSpectralRepository using real WMO OSCAR data."""
 
 import pytest
 
-from aer.repository import Instrument, Satellite
-from aer.repository.models import OpticalChannel
+from aer.repository import AerLocalSpectralRepository
 
 
-@pytest.mark.skip(reason="Abstract base class - subclass and provide repo fixture")
-class TestAerRepositoryBase:
-    """Abstract test cases for AerRepository implementations.
+@pytest.fixture
+def repo():
+    """Provide a fresh AerLocalSpectralRepository instance."""
+    return AerLocalSpectralRepository()
 
-    Subclasses must provide a `repo` fixture that returns a fresh
-    AerRepository instance.
-    """
 
-    @pytest.fixture
-    def repo(self):
-        """Override in subclass to provide concrete repository."""
-        raise NotImplementedError("Subclass must provide `repo` fixture")
+class TestAerLocalSpectralRepository:
+    """Test AerLocalSpectralRepository with real WMO OSCAR data."""
 
-    def test_store_and_get_satellite(self, repo):
-        """Test storing and retrieving a satellite."""
-        instrument = Instrument(
-            satellite_acronym="SENTINEL-2",
-            acronym="MSI",
-            channels=[
-                OpticalChannel(
-                    channel_name="B01",
-                    instrument_acronym="MSI",
-                    unit="um",
-                    central_wavelength=0.5,
-                    bandwidth=0.1,
-                    spatial_resolution=20.0,
-                )
-            ],
-        )
-        satellite = Satellite(acronym="SENTINEL-2", payload=[instrument])
+    def test_get_satellite_aqua(self, repo):
+        """Test retrieving Aqua satellite from CSV data."""
+        satellite = repo.get_satellite("Aqua")
 
-        returned_acronym = repo.store_satellite(satellite)
-
-        assert returned_acronym == "SENTINEL-2"
-        retrieved = repo.get_satellite("SENTINEL-2")
-        assert retrieved.acronym == satellite.acronym
+        assert satellite.acronym == "Aqua"
+        assert satellite.orbit == "SunSync"
+        assert satellite.altitude_km == 705.0
+        assert satellite.status == "Operational"
+        # Aqua has many instruments, just check payload is a list
+        assert isinstance(satellite.payload, list)
 
     def test_get_satellite_not_found(self, repo):
         """Test that KeyError is raised for non-existent satellite."""
@@ -60,40 +32,24 @@ class TestAerRepositoryBase:
         ):
             repo.get_satellite("NONEXISTENT")
 
-    def test_store_and_get_instrument(self, repo):
-        """Test storing and retrieving an instrument after storing its satellite."""
-        satellite = Satellite(acronym="AQUA", payload=[])
-        repo.store_satellite(satellite)
+    def test_get_instrument_modis(self, repo):
+        """Test retrieving MODIS instrument from JSON data."""
+        instrument = repo.get_instrument("MODIS")
 
-        channel = OpticalChannel(
-            channel_name="Band 1",
-            instrument_acronym="AIRS",
-            unit="um",
-            central_wavelength=11.0,
-            bandwidth=1.0,
-            spatial_resolution=1000.0,
-        )
-        instrument = Instrument(
-            satellite_acronym="AQUA", acronym="AIRS", channels=[channel]
-        )
+        assert instrument.acronym == "MODIS"
+        # MODIS should have many channels
+        assert len(instrument.channels) > 0
+        # Check first channel has expected attributes
+        channel = instrument.channels[0]
+        assert hasattr(channel, "channel_name")
+        assert hasattr(channel, "instrument_acronym")
 
-        returned_acronym = repo.store_instrument(instrument)
+    def test_get_instrument_viirs(self, repo):
+        """Test retrieving VIIRS instrument from JSON data."""
+        instrument = repo.get_instrument("VIIRS")
 
-        assert returned_acronym == "AIRS"
-        retrieved = repo.get_instrument("AIRS")
-        assert retrieved.acronym == instrument.acronym
-        assert retrieved.satellite_acronym == instrument.satellite_acronym
-
-    def test_store_instrument_missing_satellite(self, repo):
-        """Test that KeyError is raised when storing instrument without satellite."""
-        instrument = Instrument(
-            satellite_acronym="NONEXISTENT",
-            acronym="TEST",
-            channels=[],
-        )
-
-        with pytest.raises(KeyError, match="Satellite 'NONEXISTENT' not found"):
-            repo.store_instrument(instrument)
+        assert instrument.acronym == "VIIRS"
+        assert len(instrument.channels) > 0
 
     def test_get_instrument_not_found(self, repo):
         """Test that KeyError is raised for non-existent instrument."""
@@ -102,51 +58,48 @@ class TestAerRepositoryBase:
         ):
             repo.get_instrument("NONEXISTENT")
 
-    def test_store_and_get_channel(self, repo):
-        """Test storing and retrieving a channel after storing its instrument and satellite."""
-        satellite = Satellite(acronym="TERRA", payload=[])
-        repo.store_satellite(satellite)
+    def test_get_channel_by_name_modis(self, repo):
+        """Test retrieving a MODIS channel by name."""
+        # MODIS has channel names like "B01", "B02", etc.
+        channel = repo.get_channel("MODIS", channel_name="B01")
 
-        instrument = Instrument(
-            satellite_acronym="TERRA",
-            acronym="MODIS",
-            channels=[],
-        )
-        repo.store_instrument(instrument)
+        assert channel.channel_name == "B01"
+        assert channel.instrument_acronym == "MODIS"
+        assert hasattr(channel, "central_wavelength")
 
-        channel = OpticalChannel(
-            channel_name="Band 1",
-            instrument_acronym="MODIS",
-            unit="um",
-            central_wavelength=0.65,
-            bandwidth=0.05,
-            spatial_resolution=10.0,
-        )
+    def test_get_channel_by_number_viirs(self, repo):
+        """Test retrieving a VIIRS channel by number."""
+        # Get first channel
+        channel = repo.get_channel("VIIRS", channel_number=1)
 
-        returned_key = repo.store_channel(channel)
+        assert channel.instrument_acronym == "VIIRS"
+        assert hasattr(channel, "channel_name")
 
-        assert returned_key == "MODIS_Band 1"
-        retrieved = repo.get_channel("MODIS_Band 1")
-        assert retrieved.central_wavelength == channel.central_wavelength
-        assert retrieved.instrument_acronym == channel.instrument_acronym
-
-    def test_store_channel_missing_instrument(self, repo):
-        """Test that KeyError is raised when storing channel without instrument."""
-        channel = OpticalChannel(
-            channel_name="Band 1",
-            instrument_acronym="NONEXISTENT",
-            unit="um",
-            central_wavelength=0.65,
-            bandwidth=0.05,
-            spatial_resolution=10.0,
-        )
-
-        with pytest.raises(KeyError, match="Instrument 'NONEXISTENT' not found"):
-            repo.store_channel(channel)
-
-    def test_get_channel_not_found(self, repo):
-        """Test that KeyError is raised for non-existent channel."""
+    def test_get_channel_not_found_by_name(self, repo):
+        """Test that KeyError is raised for non-existent channel name."""
         with pytest.raises(
-            KeyError, match="Channel with identifier 'NONEXISTENT_99.0' not found"
+            KeyError, match="Channel name 'NonExistent' not found in instrument 'MODIS'"
         ):
-            repo.get_channel("NONEXISTENT_99.0")
+            repo.get_channel("MODIS", channel_name="NonExistent")
+
+    def test_get_channel_not_found_by_number(self, repo):
+        """Test that KeyError is raised for out-of-range channel number."""
+        with pytest.raises(
+            KeyError, match="Channel number 999 is out of range for instrument 'MODIS'"
+        ):
+            repo.get_channel("MODIS", channel_number=999)
+
+    def test_get_channel_requires_name_or_number(self, repo):
+        """Test that ValueError is raised when neither name nor number provided."""
+        with pytest.raises(
+            ValueError, match="Either channel_name or channel_number must be provided"
+        ):
+            repo.get_channel("MODIS")
+
+    def test_get_channel_rejects_both_name_and_number(self, repo):
+        """Test that ValueError is raised when both name and number provided."""
+        with pytest.raises(
+            ValueError,
+            match="Only one of channel_name or channel_number should be provided",
+        ):
+            repo.get_channel("MODIS", channel_name="test", channel_number=1)

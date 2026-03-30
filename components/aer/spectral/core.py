@@ -1,159 +1,167 @@
-from typing import FrozenSet, ClassVar, Dict, Optional
+from typing import Any, Union
+
 import attrs
+import cattrs
 
 
-@attrs.frozen
-class Instrument:
-    """An extensible registry of instruments."""
-
-    name: str
-    url: Optional[str] = None
-    _registry: ClassVar[Dict[str, "Instrument"]] = {}
-
-    def __repr__(self) -> str:
-        return f"Instrument.{self.name.replace('-', '_').upper()}"
-
-    @classmethod
-    def register(cls, name: str, url: Optional[str] = None) -> "Instrument":
-        if name in cls._registry:
-            return cls._registry[name]
-        instance = cls(name=name, url=url)
-        cls._registry[name] = instance
-        setattr(cls, name.replace("-", "_").upper(), instance)
-        return instance
-
-    @classmethod
-    def get(cls, name: str) -> "Instrument":
-        if name not in cls._registry:
-            raise KeyError(
-                f"Instrument '{name}' is not registered. Available: {list(cls._registry.keys())}"
-            )
-        return cls._registry[name]
-
-    @classmethod
-    def all(cls) -> tuple["Instrument", ...]:
-        return tuple(cls._registry.values())
+# ==========================================
+#  Channel Models
+# ==========================================
+@attrs.frozen(kw_only=True)
+class BaseChannel:
+    channel_name: str
+    instrument_acronym: str
+    unit: str | None = None
 
 
-@attrs.frozen
-class Satellite:
-    """An extensible registry of satellites."""
-
-    name: str
-    url: Optional[str] = None
-    _registry: ClassVar[Dict[str, "Satellite"]] = {}
-
-    def __repr__(self) -> str:
-        return f"Satellite.{self.name.replace('-', '_').upper()}"
-
-    @classmethod
-    def register(cls, name: str, url: Optional[str] = None) -> "Satellite":
-        if name in cls._registry:
-            return cls._registry[name]
-        instance = cls(name=name, url=url)
-        cls._registry[name] = instance
-        setattr(cls, name.replace("-", "_").upper(), instance)
-        return instance
-
-    @classmethod
-    def get(cls, name: str) -> "Satellite":
-        if name not in cls._registry:
-            raise KeyError(
-                f"Satellite '{name}' is not registered. Available: {list(cls._registry.keys())}"
-            )
-        return cls._registry[name]
-
-    @classmethod
-    def all(cls) -> tuple["Satellite", ...]:
-        return tuple(cls._registry.values())
-
-
-@attrs.frozen
-class BandType:
-    """An extensible categorization of spectral bands."""
-
-    name: str
-    _registry: ClassVar[Dict[str, "BandType"]] = {}
-
-    def __repr__(self) -> str:
-        prop = self.name.replace(" ", "_").replace("/", "_").replace("-", "_").upper()
-        return f"BandType.{prop}"
-
-    @classmethod
-    def register(cls, name: str) -> "BandType":
-        if name in cls._registry:
-            return cls._registry[name]
-        instance = cls(name=name)
-        cls._registry[name] = instance
-        prop_name = name.replace(" ", "_").replace("/", "_").replace("-", "_").upper()
-        setattr(cls, prop_name, instance)
-        return instance
-
-    @classmethod
-    def get(cls, name: str) -> "BandType":
-        if name not in cls._registry:
-            raise KeyError(
-                f"BandType '{name}' is not registered. Available: {list(cls._registry.keys())}"
-            )
-        return cls._registry[name]
-
-    @classmethod
-    def all(cls) -> tuple["BandType", ...]:
-        return tuple(cls._registry.values())
-
-
-# Pre-register BandTypes
-BandType.register("Visible")
-BandType.register("Near-Infrared")
-BandType.register("Shortwave Infrared")
-BandType.register("Infrared")
-BandType.register("Day/Night")
-
-
-@attrs.frozen
-class Band:
-    """Base spectral band type."""
-
-    name: str
-    band_type: BandType
+@attrs.frozen(kw_only=True)
+class OpticalChannel(BaseChannel):
     central_wavelength: float
     bandwidth: float
+    spatial_resolution: float
+    snr_low: float | str | None = None
+    snr_high: float | str | None = None
+    snr_or_nedt: float | str | None = None
 
 
-@attrs.frozen
-class Channel:
-    """A spectral channel binding an instrument band to a specific channel ID and resolution."""
+@attrs.frozen(kw_only=True)
+class MicrowaveChannel(BaseChannel):
+    central_frequency: float
+    bandwidth: float
+    spatial_resolution: float
+    polarisations: str | None = None
+    nedt: float | None = None
 
-    c_id: str
-    instrument: Instrument
-    band: Band
-    resolution: int
+
+@attrs.frozen(kw_only=True)
+class SARChannel(BaseChannel):
+    operation_mode: str
+    spatial_resolution: float | tuple[float, float]
+    swath_width: float | tuple[float, float] | None = None
+    polarisation: str | None = None
+    field_of_regard: float | tuple[float, float] | str | None = None
 
 
-@attrs.frozen
-class Product:
-    """A specific data product produced by an instrument, containing a subset of channels."""
+@attrs.frozen(kw_only=True)
+class SpectrometerChannel(BaseChannel):
+    wave_number_min: float
+    wave_number_max: float
+    spectral_resolution: float
+    number_of_channels: float | None = None
+    snr_or_nedt: float | str | None = None
 
-    name: str
-    instrument: Instrument
-    supported_satellites: FrozenSet[Satellite]
-    channels: tuple[Channel, ...]
-    _registry: ClassVar[Dict[str, "Product"]] = {}
 
-    def __attrs_post_init__(self) -> None:
-        Product._registry[self.name] = self
+ChannelType = Union[OpticalChannel, MicrowaveChannel, SARChannel, SpectrometerChannel]
+
+
+# ==========================================
+#  Satellites & Instruments Models
+# ==========================================
+@attrs.frozen(repr=False)
+class Instrument:
+    satellite_acronym: str
+    acronym: str
+    channels: list[ChannelType]
 
     def __repr__(self) -> str:
-        return f"Product({self.name!r})"
+        lines = [f"Instrument: {self.acronym}"]
+        lines.append(f"└─ Channels ({len(self.channels)}):")
+        for ch in self.channels:
+            lines.append(f"   - {repr(ch)}")
+        return "\n".join(lines)
 
-    @classmethod
-    def get(cls, name: str) -> "Product":
-        if name not in cls._registry:
-            raise KeyError(
-                f"Product '{name}' is not registered. Available: {list(cls._registry.keys())}"
-            )
-        return cls._registry[name]
 
-    @classmethod
-    def all(cls) -> tuple["Product", ...]:
-        return tuple(cls._registry.values())
+@attrs.frozen(repr=False)
+class Satellite:
+    acronym: str
+    payload: list[Instrument]
+    orbit: str | None = None
+    altitude_km: float | None = None
+    status: str | None = None
+    agencies: list[str] | None = None
+
+    def __repr__(self) -> str:
+        lines = [f"Satellite({self.acronym})"]
+        lines.append(
+            f"  Orbit: {self.orbit} | Altitude: {self.altitude_km} km | Status: {self.status}"
+        )
+        agencies_str = ", ".join(self.agencies) if self.agencies else "Unknown"
+        lines.append(f"  Agencies: {agencies_str}")
+        lines.append(f"  └─ Payload ({len(self.payload)} instruments):")
+
+        for inst in self.payload:
+            inst_repr = repr(inst)
+            indented_inst = "\n".join(f"     {line}" for line in inst_repr.split("\n"))
+            lines.append(indented_inst)
+
+        return "\n".join(lines)
+
+
+# ==========================================
+#  Cattrs Converters for Custom Structuring
+# ==========================================
+
+converter = cattrs.Converter()
+
+
+def _structure_float_str_none(val: Any, _type: Any) -> float | str | None:
+    if val is None:
+        return None
+    if isinstance(val, (int, float)):
+        return float(val)
+    return str(val)
+
+
+def _structure_float_tuple(val: Any, _type: Any) -> float | tuple[float, float]:
+    if isinstance(val, (int, float)):
+        return float(val)
+    if isinstance(val, (list, tuple)) and len(val) == 2:
+        return (float(val[0]), float(val[1]))
+    raise ValueError(f"Cannot structure {val} as float or tuple[float, float]")
+
+
+converter.register_structure_hook(
+    Union[float, str, type(None)], _structure_float_str_none
+)
+converter.register_structure_hook(
+    Union[float, tuple[float, float]], _structure_float_tuple
+)
+converter.register_structure_hook(
+    Union[float, tuple[float, float], type(None)],
+    lambda val, t: None if val is None else _structure_float_tuple(val, t),
+)
+
+
+def _structure_float_tuple_str_none(
+    val: Any, _type: Any
+) -> float | tuple[float, float] | str | None:
+    if val is None:
+        return None
+    if isinstance(val, (int, float)):
+        return float(val)
+    if isinstance(val, (list, tuple)) and len(val) == 2:
+        return (float(val[0]), float(val[1]))
+    return str(val)
+
+
+converter.register_structure_hook(
+    Union[float, tuple[float, float], str, type(None)], _structure_float_tuple_str_none
+)
+
+
+def create_channel(
+    schema_type: str, data: dict[str, Any], instrument_acronym: str
+) -> ChannelType:
+    struct_data = dict(data)
+    struct_data["instrument_acronym"] = instrument_acronym
+
+    if schema_type == "optical_infrared":
+        return converter.structure(struct_data, OpticalChannel)
+    elif schema_type == "microwave":
+        return converter.structure(struct_data, MicrowaveChannel)
+    elif schema_type == "sar_active":
+        return converter.structure(struct_data, SARChannel)
+    elif schema_type == "spectrometer_sounder":
+        return converter.structure(struct_data, SpectrometerChannel)
+    else:
+        raise ValueError(f"Unknown schema_type: {schema_type}")

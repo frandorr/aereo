@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from aer.repository.models import (
+from aer.spectral import (
     ChannelType,
     Instrument,
     Satellite,
@@ -19,11 +19,6 @@ class AerSpectralRepository(ABC):
     # ==========================================
 
     @abstractmethod
-    def store_satellite(self, satellite: Satellite) -> str:
-        """Store satellite and return its ID."""
-        pass
-
-    @abstractmethod
     def get_satellite(self, acronym: str) -> Satellite:
         """Retrieve a satellite by its acronym.
 
@@ -34,11 +29,6 @@ class AerSpectralRepository(ABC):
         Raises:
             An exception if no satellite with the given acronym is found.
         """
-        pass
-
-    @abstractmethod
-    def store_instrument(self, instrument: Instrument) -> str:
-        """Store an instrument and return its ID."""
         pass
 
     @abstractmethod
@@ -55,19 +45,21 @@ class AerSpectralRepository(ABC):
         pass
 
     @abstractmethod
-    def store_channel(self, channel: ChannelType) -> str:
-        """Store a channel and return its ID."""
-        pass
-
-    @abstractmethod
-    def get_channel(self, acronym: str) -> ChannelType:
+    def get_channel(
+        self,
+        acronym: str,
+        channel_name: str | None = None,
+        channel_number: int | None = None,
+    ) -> ChannelType:
         """Retrieve a channel by its acronym.
 
         Args:
-            acronym: The unique acronym identifier for the channel.
+            acronym: The unique acronym identifier for the instrument channel.
+                channel_name: Optional name of the channel to disambiguate if multiple channels share the same acronym.
+                channel_number: Optional number of the channel to disambiguate if multiple channels share the same acronym.
         Returns:
-            A ChannelType object corresponding to the provided acronym.
+            A ChannelType object corresponding to the provided instrument acronym.
         Raises:
-            An exception if no channel with the given acronym is found.
+            An exception if no channel with the given name or position is found.
         """
         pass
