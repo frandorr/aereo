@@ -15,18 +15,9 @@
     {
       "channel_name": "Band_01",
       "operation_mode": "Imaging",
-      "spatial_resolution": {
-        "value": 30.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 100.0,
-        "unit": "km"
-      },
-      "field_of_regard": {
-        "value": 100.0,
-        "unit": "km"
-      },
+      "spatial_resolution": 30.0,
+      "swath_width": 100000.0,
+      "field_of_regard": 100.0,
       "polarisation": "VV"
     },
     {

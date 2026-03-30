@@ -15,32 +15,32 @@
     {
       "channel_name": "Short-wave (outgoing)",
       "Channel": "Short-wave (outgoing)",
-      "bandwidth": {
-        "min": 0.2,
-        "max": 3.8,
-        "unit": "µm"
-      },
+      "bandwidth": 0.2,
       "Noise Equivalent Radiance": ".... W m-2sr-1",
       "Absolute accuracy": {
         "value": 2.5,
         "unit": "W m-2sr-1"
       },
-      "snr_or_nedt": "……………..."
+      "snr_or_nedt": "……………...",
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Total radiance (outgoing)",
       "Channel": "Total radiance (outgoing)",
-      "bandwidth": {
-        "min": 0.2,
-        "max": 50.0,
-        "unit": "µm"
-      },
+      "bandwidth": 0.2,
       "Noise Equivalent Radiance": "....  W m-2sr-1",
       "Absolute accuracy": {
         "value": 1.5,
         "unit": "W m-2sr-1"
       },
-      "snr_or_nedt": "……………..."
+      "snr_or_nedt": "……………...",
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

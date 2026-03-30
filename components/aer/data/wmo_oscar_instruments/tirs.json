@@ -12,35 +12,31 @@
   "channels": [
     {
       "channel_name": "B10",
-      "central_wavelength": {
-        "value": 10.8,
-        "unit": "μm"
-      },
-      "bandwidth": {
-        "min": 10.3,
-        "max": 11.3,
-        "unit": "μm"
-      },
+      "central_wavelength": 10.8,
+      "bandwidth": 10.3,
       "NEΔT @ specific scene temperature": {
         "value": 0.4,
         "unit": "K @ 300K;  0.35 K @ 320K"
-      }
+      },
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B11",
-      "central_wavelength": {
-        "value": 12.0,
-        "unit": "μm"
-      },
-      "bandwidth": {
-        "min": 11.5,
-        "max": 12.5,
-        "unit": "μm"
-      },
+      "central_wavelength": 12.0,
+      "bandwidth": 11.5,
       "NEΔT @ specific scene temperature": {
         "value": 0.4,
         "unit": "K @ 300K;  0.35 K @ 320K"
-      }
+      },
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     }
   ]
 }

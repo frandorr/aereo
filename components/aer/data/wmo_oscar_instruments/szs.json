@@ -12,51 +12,63 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": "200 @ …..… W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 10.0,
-        "unit": "nm"
-      }
+      "central_wavelength": 415.0,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "200 @ …..… W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": "200 @ …..… W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 10.0,
-        "unit": "nm"
-      }
+      "central_wavelength": 490.0,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "200 @ …..… W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": "200 @ …..… W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 15.0,
-        "unit": "nm"
-      }
+      "central_wavelength": 557.5,
+      "bandwidth": 15.0,
+      "snr_or_nedt": "200 @ …..… W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": "200 @ …..… W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 30.0,
-        "unit": "nm"
-      }
+      "central_wavelength": 595.0,
+      "bandwidth": 30.0,
+      "snr_or_nedt": "200 @ …..… W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_05",
-      "central_wavelength": "200 @ …..… W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      }
+      "central_wavelength": 665.0,
+      "bandwidth": 20.0,
+      "snr_or_nedt": "200 @ …..… W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_06",
-      "central_wavelength": "200 @ …..… W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 14.0,
-        "unit": "nm"
-      }
+      "central_wavelength": 779.0,
+      "bandwidth": 14.0,
+      "snr_or_nedt": "200 @ …..… W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

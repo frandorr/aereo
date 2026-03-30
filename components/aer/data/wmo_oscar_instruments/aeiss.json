@@ -12,48 +12,52 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": "100 @ 79.46 W cm-2sr-1µm-1",
-      "bandwidth": {
-        "min": 450.0,
-        "max": 520.0,
-        "unit": "nm"
-      }
+      "central_wavelength": 485.0,
+      "bandwidth": 450.0,
+      "snr_or_nedt": "100 @ 79.46 W cm-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": "100 @ 89.92 W cm-2sr-1µm-1",
-      "bandwidth": {
-        "min": 520.0,
-        "max": 600.0,
-        "unit": "nm"
-      }
+      "central_wavelength": 560.0,
+      "bandwidth": 520.0,
+      "snr_or_nedt": "100 @ 89.92 W cm-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": "100 @ 98.48 W cm-2sr-1µm-1",
-      "bandwidth": {
-        "min": 630.0,
-        "max": 690.0,
-        "unit": "nm"
-      }
+      "central_wavelength": 660.0,
+      "bandwidth": 630.0,
+      "snr_or_nedt": "100 @ 98.48 W cm-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": "100 @ 104.15 W cm-2sr-1µm-1",
-      "bandwidth": {
-        "min": 760.0,
-        "max": 900.0,
-        "unit": "nm"
-      }
+      "central_wavelength": 830.0,
+      "bandwidth": 760.0,
+      "snr_or_nedt": "100 @ 104.15 W cm-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_05",
-      "central_wavelength": "100 @ 99.60 W cm-2sr-1µm-1",
-      "bandwidth": {
-        "min": 450.0,
-        "max": 900.0,
-        "unit": "nm"
-      }
+      "central_wavelength": "N/A (PAN)",
+      "bandwidth": 450.0,
+      "snr_or_nedt": "100 @ 99.60 W cm-2sr-1µm-1",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

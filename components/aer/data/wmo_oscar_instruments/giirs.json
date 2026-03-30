@@ -23,14 +23,12 @@
         "max": 1130.0,
         "unit": "cm-1"
       },
-      "spectral_resolution": {
-        "value": 0.625,
-        "unit": "cm-1"
-      },
-      "snr_or_nedt": {
-        "value": 0.5,
-        "unit": "mW m-2sr-1cm"
-      }
+      "spectral_resolution": 0.625,
+      "snr_or_nedt": 0.5,
+      "unit": "cm-1",
+      "wave_number_min": 700.0,
+      "wave_number_max": 1130.0,
+      "number_of_channels": null
     },
     {
       "channel_name": "MWIR",
@@ -44,14 +42,12 @@
         "max": 2250.0,
         "unit": "cm-1"
       },
-      "spectral_resolution": {
-        "value": 0.625,
-        "unit": "cm-1"
-      },
-      "snr_or_nedt": {
-        "value": 0.1,
-        "unit": "mW m-2sr-1cm"
-      }
+      "spectral_resolution": 0.625,
+      "snr_or_nedt": 0.1,
+      "unit": "cm-1",
+      "wave_number_min": 1650.0,
+      "wave_number_max": 2250.0,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_03",
@@ -62,7 +58,8 @@
       },
       "wave_number_range": "N/A",
       "spectral_resolution": "N/A",
-      "snr_or_nedt": "200 @ 100 % albedo"
+      "snr_or_nedt": "200 @ 100 % albedo",
+      "number_of_channels": null
     }
   ]
 }

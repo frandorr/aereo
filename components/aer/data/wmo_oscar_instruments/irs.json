@@ -18,11 +18,13 @@
         "value": 1600.0,
         "unit": "to 2250 cm-1"
       },
-      "spectral_resolution": {
-        "value": 0.604,
-        "unit": "cm-1"
-      },
-      "NE∆T @ specified scene temperature": "Between"
+      "spectral_resolution": 0.604,
+      "NE∆T @ specified scene temperature": "Between",
+      "unit": "to 2250 cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_02",
@@ -31,11 +33,13 @@
         "value": 680.0,
         "unit": "to 1210 cm-1"
       },
-      "spectral_resolution": {
-        "value": 0.604,
-        "unit": "cm-1"
-      },
-      "NE∆T @ specified scene temperature": "Between"
+      "spectral_resolution": 0.604,
+      "NE∆T @ specified scene temperature": "Between",
+      "unit": "to 1210 cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     }
   ]
 }

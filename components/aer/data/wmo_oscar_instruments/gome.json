@@ -22,11 +22,11 @@
         "value": 1024,
         "unit": null
       },
-      "spectral_resolution": {
-        "value": 0.22,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1"
+      "spectral_resolution": 0.22,
+      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_02",
@@ -39,11 +39,11 @@
         "value": 1024,
         "unit": null
       },
-      "spectral_resolution": {
-        "value": 0.24,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1"
+      "spectral_resolution": 0.24,
+      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_03",
@@ -56,11 +56,11 @@
         "value": 1024,
         "unit": null
       },
-      "spectral_resolution": {
-        "value": 0.4,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1"
+      "spectral_resolution": 0.4,
+      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_04",
@@ -73,11 +73,11 @@
         "value": 1024,
         "unit": null
       },
-      "spectral_resolution": {
-        "value": 0.4,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1"
+      "spectral_resolution": 0.4,
+      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_05",
@@ -90,11 +90,11 @@
         "value": 1,
         "unit": null
       },
-      "spectral_resolution": {
-        "value": 110.0,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1"
+      "spectral_resolution": 110.0,
+      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_06",
@@ -107,11 +107,11 @@
         "value": 1,
         "unit": null
       },
-      "spectral_resolution": {
-        "value": 195.0,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1"
+      "spectral_resolution": 195.0,
+      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_07",
@@ -124,11 +124,11 @@
         "value": 1,
         "unit": null
       },
-      "spectral_resolution": {
-        "value": 193.0,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1"
+      "spectral_resolution": 193.0,
+      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     }
   ]
 }

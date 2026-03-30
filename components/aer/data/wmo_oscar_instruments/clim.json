@@ -19,15 +19,12 @@
         "value": 670.0,
         "unit": "nm"
       },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "bandwidth": 20.0,
       "snr_or_nedt": "… @ … W m-2sr-1µ-1",
-      "spatial_resolution": {
-        "value": 174.0,
-        "unit": "m"
-      }
+      "spatial_resolution": 174.0,
+      "central_wavelength": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CLIM-2",
@@ -36,15 +33,12 @@
         "value": 753.0,
         "unit": "nm"
       },
-      "bandwidth": {
-        "value": 9.0,
-        "unit": "nm"
-      },
+      "bandwidth": 9.0,
       "snr_or_nedt": "… @ … W m-2sr-1µ-1",
-      "spatial_resolution": {
-        "value": 174.0,
-        "unit": "m"
-      }
+      "spatial_resolution": 174.0,
+      "central_wavelength": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CLIM-3",
@@ -53,15 +47,12 @@
         "value": 1370.0,
         "unit": "nm"
       },
-      "bandwidth": {
-        "value": 15.0,
-        "unit": "nm"
-      },
+      "bandwidth": 15.0,
       "snr_or_nedt": "… @ … W m-2sr-1µ-1",
-      "spatial_resolution": {
-        "value": 348.0,
-        "unit": "m"
-      }
+      "spatial_resolution": 348.0,
+      "central_wavelength": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 
 from aer.repository.models import (
-    Channel,
+    ChannelType,
     Instrument,
     Satellite,
 )
 
 
-class AerRepository(ABC):
+class AerSpectralRepository(ABC):
     """Abstract Base Class defining the Aer data access interface.
 
     This repository orchestrates persistence and retrieval across several
@@ -55,18 +55,18 @@ class AerRepository(ABC):
         pass
 
     @abstractmethod
-    def store_channel(self, channel: Channel) -> str:
+    def store_channel(self, channel: ChannelType) -> str:
         """Store a channel and return its ID."""
         pass
 
     @abstractmethod
-    def get_channel(self, acronym: str) -> Channel:
+    def get_channel(self, acronym: str) -> ChannelType:
         """Retrieve a channel by its acronym.
 
         Args:
             acronym: The unique acronym identifier for the channel.
         Returns:
-            A Channel object corresponding to the provided acronym.
+            A ChannelType object corresponding to the provided acronym.
         Raises:
             An exception if no channel with the given acronym is found.
         """

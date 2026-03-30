@@ -18,18 +18,11 @@
         "max": 400.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 600,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "value": 0.5,
-        "unit": "nm"
-      },
-      "snr_or_nedt": {
-        "value": 200.0,
-        "unit": "-1400 @ 40-120 W m-2sr-1μm-1"
-      }
+      "number_of_channels": 600.0,
+      "spectral_resolution": 0.5,
+      "snr_or_nedt": 200.0,
+      "wave_number_min": null,
+      "wave_number_max": null
     },
     {
       "channel_name": "Band_02",
@@ -38,15 +31,11 @@
         "max": 500.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 600,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "value": 0.5,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "1400 @ 140 W m-2sr-1μm-1"
+      "number_of_channels": 600.0,
+      "spectral_resolution": 0.5,
+      "snr_or_nedt": "1400 @ 140 W m-2sr-1μm-1",
+      "wave_number_min": null,
+      "wave_number_max": null
     },
     {
       "channel_name": "Band_03",
@@ -55,15 +44,11 @@
         "max": 775.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 300,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "value": 0.2,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "1200 @ 60 W m-2sr-1μm-1"
+      "number_of_channels": 300.0,
+      "spectral_resolution": 0.2,
+      "snr_or_nedt": "1200 @ 60 W m-2sr-1μm-1",
+      "wave_number_min": null,
+      "wave_number_max": null
     }
   ]
 }

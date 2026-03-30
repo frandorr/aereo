@@ -25,7 +25,13 @@
         "value": 18.0,
         "unit": "cm-1"
       },
-      "NESR": "< 0.25 mW m-2sr-1cm"
+      "NESR": "< 0.25 mW m-2sr-1cm",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_02",
@@ -41,7 +47,13 @@
         "value": 3.5,
         "unit": "cm-1"
       },
-      "NESR": "< 0.25 mW m-2sr-1cm"
+      "NESR": "< 0.25 mW m-2sr-1cm",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_03",
@@ -57,7 +69,13 @@
         "value": 10.0,
         "unit": "cm-1"
       },
-      "NESR": "< 0.25 mW m-2sr-1cm"
+      "NESR": "< 0.25 mW m-2sr-1cm",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_04",
@@ -73,7 +91,13 @@
         "value": 10.0,
         "unit": "cm-1"
       },
-      "NESR": "< 0.25 mW m-2sr-1cm"
+      "NESR": "< 0.25 mW m-2sr-1cm",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_05",
@@ -89,7 +113,13 @@
         "value": 10.0,
         "unit": "cm-1"
       },
-      "NESR": "< 0.25 mW m-2sr-1cm"
+      "NESR": "< 0.25 mW m-2sr-1cm",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_06",
@@ -105,7 +135,13 @@
         "value": 10.0,
         "unit": "cm-1"
       },
-      "NESR": "< 0.25 mW m-2sr-1cm"
+      "NESR": "< 0.25 mW m-2sr-1cm",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_07",
@@ -121,7 +157,13 @@
         "value": 10.0,
         "unit": "cm-1"
       },
-      "NESR": "< 0.25 mW m-2sr-1cm"
+      "NESR": "< 0.25 mW m-2sr-1cm",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_08",
@@ -137,7 +179,13 @@
         "value": 10.0,
         "unit": "cm-1"
       },
-      "NESR": "< 0.25 mW m-2sr-1cm"
+      "NESR": "< 0.25 mW m-2sr-1cm",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     }
   ]
 }

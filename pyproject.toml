@@ -17,6 +17,7 @@ classifiers = [
 ]
 dependencies = [
   "attrs>=25.4",
+  "cattrs>=26.1",
   "geopandas>=1.1.2",
   "pandas>=3.0.1",
   "pandera[geopandas]>=0.24",
@@ -43,6 +44,7 @@ dev = [
   "aer-search-earthaccess>=2.0.3,<3",
   "basedpyright>=1.38",
   "graphviz>=0.21",
+  "marimo[mcp]>=0.21.1",
   "matplotlib>=3.10.8",
   "polylith-cli>=1.42.5,<2",
   "pytest>=9.0.2,<10",

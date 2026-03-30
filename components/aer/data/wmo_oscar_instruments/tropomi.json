@@ -18,18 +18,11 @@
         "max": 495.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 1200,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "value": 0.55,
-        "unit": "nm"
-      },
-      "snr_or_nedt": {
-        "value": 1000,
-        "unit": null
-      }
+      "number_of_channels": 1200.0,
+      "spectral_resolution": 0.55,
+      "snr_or_nedt": 1000.0,
+      "wave_number_min": null,
+      "wave_number_max": null
     },
     {
       "channel_name": "UV-2",
@@ -38,18 +31,11 @@
         "max": 775.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 600,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "value": 0.55,
-        "unit": "nm"
-      },
-      "snr_or_nedt": {
-        "value": 500,
-        "unit": null
-      }
+      "number_of_channels": 600.0,
+      "spectral_resolution": 0.55,
+      "snr_or_nedt": 500.0,
+      "wave_number_min": null,
+      "wave_number_max": null
     },
     {
       "channel_name": "UVIS-3",
@@ -58,18 +44,11 @@
         "max": 2385.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 800,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "value": 0.25,
-        "unit": "nm"
-      },
-      "snr_or_nedt": {
-        "value": 100,
-        "unit": null
-      }
+      "number_of_channels": 800.0,
+      "spectral_resolution": 0.25,
+      "snr_or_nedt": 100.0,
+      "wave_number_min": null,
+      "wave_number_max": null
     }
   ]
 }

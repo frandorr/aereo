@@ -14,28 +14,18 @@
     {
       "channel_name": "Band_01",
       "operation_mode": "Spotlight",
-      "spatial_resolution": {
-        "value": 1.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 10.0,
-        "unit": "km"
-      },
-      "polarisation": "VV"
+      "spatial_resolution": 1.0,
+      "swath_width": 10000.0,
+      "polarisation": "VV",
+      "field_of_regard": null
     },
     {
       "channel_name": "Band_02",
       "operation_mode": "Stripmap",
-      "spatial_resolution": {
-        "value": 3.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 30.0,
-        "unit": "km"
-      },
-      "polarisation": "VV"
+      "spatial_resolution": 3.0,
+      "swath_width": 30000.0,
+      "polarisation": "VV",
+      "field_of_regard": null
     }
   ]
 }

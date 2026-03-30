@@ -23,14 +23,16 @@
         "max": 2000.0,
         "unit": "cm-1"
       },
-      "spectral_resolution": {
-        "value": 0.5,
-        "unit": "cm-1"
-      },
+      "spectral_resolution": 0.5,
       "NEΔT @ specified scene temperature": {
         "value": 0.5,
         "unit": "K @ 280 K"
-      }
+      },
+      "unit": "cm-1",
+      "wave_number_min": 665.0,
+      "wave_number_max": 2000.0,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     }
   ]
 }

@@ -24,10 +24,11 @@
         "unit": "cm-1"
       },
       "spectral_resolution": "~ 2.0 cm-1",
-      "snr_or_nedt": {
-        "value": 0.14,
-        "unit": "K @ 280 K"
-      }
+      "snr_or_nedt": 0.14,
+      "unit": "cm-1",
+      "wave_number_min": 2170.0,
+      "wave_number_max": 2674.0,
+      "number_of_channels": null
     },
     {
       "channel_name": "MWIR",
@@ -42,10 +43,11 @@
         "unit": "cm-1"
       },
       "spectral_resolution": "~ 1.0 cm-1",
-      "snr_or_nedt": {
-        "value": 0.2,
-        "unit": "K @ 280 K"
-      }
+      "snr_or_nedt": 0.2,
+      "unit": "cm-1",
+      "wave_number_min": 1216.0,
+      "wave_number_max": 1613.0,
+      "number_of_channels": null
     },
     {
       "channel_name": "SWIR",
@@ -60,10 +62,11 @@
         "unit": "cm-1"
       },
       "spectral_resolution": "~ 0.5 cm-1",
-      "snr_or_nedt": {
-        "value": 0.35,
-        "unit": "K @ 280 K"
-      }
+      "snr_or_nedt": 0.35,
+      "unit": "cm-1",
+      "wave_number_min": 650.0,
+      "wave_number_max": 1136.0,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_04",
@@ -73,11 +76,9 @@
         "unit": "µm"
       },
       "wave_number_range": "not relevant",
-      "spectral_resolution": {
-        "value": 30.0,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "> 100 @ 40 % albedo"
+      "spectral_resolution": 30.0,
+      "snr_or_nedt": "> 100 @ 40 % albedo",
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_05",
@@ -87,11 +88,9 @@
         "unit": "µm"
       },
       "wave_number_range": "not relevant",
-      "spectral_resolution": {
-        "value": 100.0,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "> 100 @ 40 % albedo"
+      "spectral_resolution": 100.0,
+      "snr_or_nedt": "> 100 @ 40 % albedo",
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_06",
@@ -101,11 +100,9 @@
         "unit": "µm"
       },
       "wave_number_range": "not relevant",
-      "spectral_resolution": {
-        "value": 210.0,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "> 100 @ 40 % albedo"
+      "spectral_resolution": 210.0,
+      "snr_or_nedt": "> 100 @ 40 % albedo",
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_07",
@@ -116,7 +113,8 @@
       },
       "wave_number_range": "not relevant",
       "spectral_resolution": "N/A (broadband)",
-      "snr_or_nedt": "> 100 @ 40 % albedo"
+      "snr_or_nedt": "> 100 @ 40 % albedo",
+      "number_of_channels": null
     }
   ]
 }

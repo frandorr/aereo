@@ -3,164 +3,130 @@
   "instrument_acronym": "MSI (Sentinel-2A)",
   "instrument_fullname": "",
   "url": "https://space.oscar.wmo.int/instruments/view/msi_sentinel-2a",
-  "schema_type": "unknown",
-  "original_columns": [],
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "channel_name",
+    "central_wavelength",
+    "bandwidth",
+    "spatial_resolution"
+  ],
   "channels": [
     {
       "channel_name": "B01",
       "central_wavelength": "129 @ 129.11 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 60.0,
-        "unit": "m"
-      }
+      "bandwidth": 20.0,
+      "spatial_resolution": 60.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B02",
       "central_wavelength": "154 @ 128.00 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 65.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 10.0,
-        "unit": "m"
-      }
+      "bandwidth": 65.0,
+      "spatial_resolution": 10.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B03",
       "central_wavelength": "168 @ 128.00 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 35.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 10.0,
-        "unit": "m"
-      }
+      "bandwidth": 35.0,
+      "spatial_resolution": 10.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B04",
       "central_wavelength": "142 @ 108.00 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 30.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 10.0,
-        "unit": "m"
-      }
+      "bandwidth": 30.0,
+      "spatial_resolution": 10.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B05",
       "central_wavelength": "117 @ 74.60 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 15.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 20.0,
-        "unit": "m"
-      }
+      "bandwidth": 15.0,
+      "spatial_resolution": 20.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B06",
       "central_wavelength": "89 @ 68.23 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 15.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 20.0,
-        "unit": "m"
-      }
+      "bandwidth": 15.0,
+      "spatial_resolution": 20.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B07",
       "central_wavelength": "105 @ 66.70 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 20.0,
-        "unit": "m"
-      }
+      "bandwidth": 20.0,
+      "spatial_resolution": 20.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B08",
       "central_wavelength": "174 @ 103.00 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 115.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 10.0,
-        "unit": "m"
-      }
+      "bandwidth": 115.0,
+      "spatial_resolution": 10.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B8A",
       "central_wavelength": "72 @ 52.39 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 20.0,
-        "unit": "m"
-      }
+      "bandwidth": 20.0,
+      "spatial_resolution": 20.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B09",
       "central_wavelength": "114 @ 8.77 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 60.0,
-        "unit": "m"
-      }
+      "bandwidth": 20.0,
+      "spatial_resolution": 60.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B10",
       "central_wavelength": "50 @ 6.00 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 60.0,
-        "unit": "m"
-      }
+      "bandwidth": 20.0,
+      "spatial_resolution": 60.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B11",
       "central_wavelength": "100 @ 4.00 W m-2sr-1µm-1and 504 @ 32.00 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 90.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 20.0,
-        "unit": "m"
-      }
+      "bandwidth": 90.0,
+      "spatial_resolution": 20.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "B12",
       "central_wavelength": "100 @ 1.70 W m-2sr-1µm-1and 475 @ 11.00 W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 180.0,
-        "unit": "nm"
-      },
-      "spatial_resolution": {
-        "value": 20.0,
-        "unit": "m"
-      }
+      "bandwidth": 180.0,
+      "spatial_resolution": 20.0,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     }
   ]
 }

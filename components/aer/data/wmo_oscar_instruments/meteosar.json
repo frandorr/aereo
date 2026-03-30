@@ -14,67 +14,42 @@
     {
       "channel_name": "Band_01",
       "operation_mode": "Spotlight",
-      "spatial_resolution": {
-        "value": 1.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 10.0,
-        "unit": "km"
-      },
-      "polarisation": "HH or VV or HV or VH"
+      "spatial_resolution": 1.0,
+      "swath_width": 10000.0,
+      "polarisation": "HH or VV or HV or VH",
+      "field_of_regard": null
     },
     {
       "channel_name": "Band_02",
       "operation_mode": "Stripmap",
-      "spatial_resolution": {
-        "value": 5.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 30.0,
-        "unit": "km"
-      },
-      "polarisation": "HH or VV or HV or VH"
+      "spatial_resolution": 5.0,
+      "swath_width": 30000.0,
+      "polarisation": "HH or VV or HV or VH",
+      "field_of_regard": null
     },
     {
       "channel_name": "Band_03",
       "operation_mode": "ScanSAR (narrow swath)",
-      "spatial_resolution": {
-        "value": 50.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 130.0,
-        "unit": "km"
-      },
-      "polarisation": "HH or VV or HV or VH"
+      "spatial_resolution": 50.0,
+      "swath_width": 130000.0,
+      "polarisation": "HH or VV or HV or VH",
+      "field_of_regard": null
     },
     {
       "channel_name": "Band_04",
       "operation_mode": "ScanSAR (medium swath)",
-      "spatial_resolution": {
-        "value": 200.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 600.0,
-        "unit": "km"
-      },
-      "polarisation": "HH or VV or HV or VH"
+      "spatial_resolution": 200.0,
+      "swath_width": 600000.0,
+      "polarisation": "HH or VV or HV or VH",
+      "field_of_regard": null
     },
     {
       "channel_name": "Band_05",
       "operation_mode": "ScanSAR (wide swath)",
-      "spatial_resolution": {
-        "value": 500.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 750.0,
-        "unit": "km"
-      },
-      "polarisation": "HH or VV or HV or VH"
+      "spatial_resolution": 500.0,
+      "swath_width": 750000.0,
+      "polarisation": "HH or VV or HV or VH",
+      "field_of_regard": null
     }
   ]
 }

@@ -18,19 +18,11 @@
         "max": 315.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 1024,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "min": 0.24,
-        "max": 0.29,
-        "unit": "nm"
-      },
-      "snr_or_nedt": {
-        "value": 7.0,
-        "unit": "-177 @ 50 % albedo and 60° Solar Zenith Angle"
-      }
+      "number_of_channels": 1024.0,
+      "spectral_resolution": 0.24,
+      "snr_or_nedt": 7.0,
+      "wave_number_min": null,
+      "wave_number_max": null
     },
     {
       "channel_name": "Band 1B",
@@ -39,19 +31,11 @@
         "max": 403.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 1024,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "min": 0.26,
-        "max": 0.28,
-        "unit": "nm"
-      },
-      "snr_or_nedt": {
-        "value": 372.0,
-        "unit": "-3000 @ 50 % albedo and 60° SZA"
-      }
+      "number_of_channels": 1024.0,
+      "spectral_resolution": 0.26,
+      "snr_or_nedt": 372.0,
+      "wave_number_min": null,
+      "wave_number_max": null
     },
     {
       "channel_name": "Band 2A",
@@ -60,16 +44,11 @@
         "max": 600.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 1024,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "min": 0.44,
-        "max": 0.53,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "4000 @ 50 % albedo and 60° SZA"
+      "number_of_channels": 1024.0,
+      "spectral_resolution": 0.44,
+      "snr_or_nedt": "4000 @ 50 % albedo and 60° SZA",
+      "wave_number_min": null,
+      "wave_number_max": null
     },
     {
       "channel_name": "Band 2B",
@@ -78,19 +57,11 @@
         "max": 790.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 1024,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "min": 0.44,
-        "max": 0.53,
-        "unit": "nm"
-      },
-      "snr_or_nedt": {
-        "value": 2000.0,
-        "unit": "-4000 @ 50 % albedo and 60° SZA"
-      }
+      "number_of_channels": 1024.0,
+      "spectral_resolution": 0.44,
+      "snr_or_nedt": 2000.0,
+      "wave_number_min": null,
+      "wave_number_max": null
     },
     {
       "channel_name": "Band 3",
@@ -99,18 +70,11 @@
         "max": 790.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 200,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "value": 2.8,
-        "unit": "nm at 312 nm to 40 nm at 790 nm"
-      },
-      "snr_or_nedt": {
-        "value": 100.0,
-        "unit": "for λ< 400 nm, 1000 for 400 nm < λ < 790 nm"
-      }
+      "number_of_channels": 200.0,
+      "spectral_resolution": 2.8,
+      "snr_or_nedt": 100.0,
+      "wave_number_min": null,
+      "wave_number_max": null
     }
   ]
 }

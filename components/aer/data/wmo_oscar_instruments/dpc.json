@@ -13,131 +13,91 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": {
-        "value": 443.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 443.0,
+      "bandwidth": 20.0,
       "No. of pol.": "-",
-      "snr_or_nedt": {
-        "value": 500,
-        "unit": null
-      }
+      "snr_or_nedt": 500.0,
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": {
-        "value": 490.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 490.0,
+      "bandwidth": 20.0,
       "No. of pol.": "three",
-      "snr_or_nedt": {
-        "value": 500,
-        "unit": null
-      }
+      "snr_or_nedt": 500.0,
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": {
-        "value": 565.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 565.0,
+      "bandwidth": 20.0,
       "No. of pol.": "-",
-      "snr_or_nedt": {
-        "value": 500,
-        "unit": null
-      }
+      "snr_or_nedt": 500.0,
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": {
-        "value": 670.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 670.0,
+      "bandwidth": 20.0,
       "No. of pol.": "three",
-      "snr_or_nedt": {
-        "value": 500,
-        "unit": null
-      }
+      "snr_or_nedt": 500.0,
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_05",
-      "central_wavelength": {
-        "value": 765.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 40.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 765.0,
+      "bandwidth": 40.0,
       "No. of pol.": "-",
-      "snr_or_nedt": {
-        "value": 500,
-        "unit": null
-      }
+      "snr_or_nedt": 500.0,
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_06",
-      "central_wavelength": {
-        "value": 768.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 768.0,
+      "bandwidth": 20.0,
       "No. of pol.": "-",
-      "snr_or_nedt": {
-        "value": 500,
-        "unit": null
-      }
+      "snr_or_nedt": 500.0,
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_07",
-      "central_wavelength": {
-        "value": 865.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 40.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 865.0,
+      "bandwidth": 40.0,
       "No. of pol.": "three",
-      "snr_or_nedt": {
-        "value": 500,
-        "unit": null
-      }
+      "snr_or_nedt": 500.0,
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_08",
-      "central_wavelength": {
-        "value": 910.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 910.0,
+      "bandwidth": 20.0,
       "No. of pol.": "-",
-      "snr_or_nedt": {
-        "value": 500,
-        "unit": null
-      }
+      "snr_or_nedt": 500.0,
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

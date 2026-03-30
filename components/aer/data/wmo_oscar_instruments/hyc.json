@@ -15,28 +15,28 @@
     {
       "channel_name": "Band_01",
       "central_wavelength": "VIS/NIR",
-      "bandwidth": {
-        "value": 10.0,
-        "unit": "nm"
-      },
+      "bandwidth": 10.0,
       "No. of channels": {
         "value": 66,
         "unit": null
       },
-      "snr_or_nedt": "200 (average)"
+      "snr_or_nedt": "200 (average)",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
       "central_wavelength": "NIR/SWIR",
-      "bandwidth": {
-        "value": 10.0,
-        "unit": "nm"
-      },
+      "bandwidth": 10.0,
       "No. of channels": {
         "value": 171,
         "unit": null
       },
-      "snr_or_nedt": "200 (average in 1-2 μm), 100 (average in 2-2.5 μm)"
+      "snr_or_nedt": "200 (average in 1-2 μm), 100 (average in 2-2.5 μm)",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }
