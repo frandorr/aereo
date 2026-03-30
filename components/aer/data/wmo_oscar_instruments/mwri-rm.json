@@ -3,7 +3,8 @@
   "instrument_acronym": "MWRI-RM",
   "instrument_fullname": "Micro-Wave Radiation Imager for the Rainfall Mission",
   "url": "https://space.oscar.wmo.int/instruments/view/mwri-rm",
-  "columns": [
+  "schema_type": "microwave",
+  "original_columns": [
     "Channel number",
     "Central frequency",
     "Bandwidth",
@@ -13,140 +14,345 @@
   ],
   "channels": [
     {
-      "Channel number": "1",
-      "Central frequency": "10.65 GHz",
-      "Bandwidth": "180 MHz",
+      "channel_name": "CH01",
+      "Channel number": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 10.65,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 180.0,
+        "unit": "MHz"
+      },
       "Polarization": "V，H",
-      "NEΔT": "0.5 K",
-      "IFOV": "21×35 km"
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "21×35 km"
     },
     {
-      "Channel number": "2",
-      "Central frequency": "18.7 GHz",
-      "Bandwidth": "200 MHz",
+      "channel_name": "CH02",
+      "Channel number": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 18.7,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 200.0,
+        "unit": "MHz"
+      },
       "Polarization": "V，H",
-      "NEΔT": "0.5 K",
-      "IFOV": "14×23 km"
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "14×23 km"
     },
     {
-      "Channel number": "3",
-      "Central frequency": "23.8 GHz",
-      "Bandwidth": "400 MHz",
+      "channel_name": "CH03",
+      "Channel number": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 23.8,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 400.0,
+        "unit": "MHz"
+      },
       "Polarization": "V，H",
-      "NEΔT": "0.5 K",
-      "IFOV": "13×21 km"
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "13×21 km"
     },
     {
-      "Channel number": "4",
-      "Central frequency": "36.5 GHz",
-      "Bandwidth": "900 MHz",
+      "channel_name": "CH04",
+      "Channel number": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 36.5,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 900.0,
+        "unit": "MHz"
+      },
       "Polarization": "V，H",
-      "NEΔT": "0.5 K",
-      "IFOV": "9×15 km"
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "9×15 km"
     },
     {
-      "Channel number": "5",
-      "Central frequency": "50.30 GHz",
-      "Bandwidth": "400 MHz",
+      "channel_name": "CH05",
+      "Channel number": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 50.3,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 400.0,
+        "unit": "MHz"
+      },
       "Polarization": "V，H",
-      "NEΔT": "0.5 K",
-      "IFOV": "7×11 km"
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "7×11 km"
     },
     {
-      "Channel number": "6",
-      "Central frequency": "52.61 GHz",
-      "Bandwidth": "400 MHz",
+      "channel_name": "CH06",
+      "Channel number": {
+        "value": 6,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 52.61,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 400.0,
+        "unit": "MHz"
+      },
       "Polarization": "V，H",
-      "NEΔT": "0.5 K",
-      "IFOV": "7×11 km"
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "7×11 km"
     },
     {
-      "Channel number": "7",
-      "Central frequency": "53.24 GHz",
-      "Bandwidth": "400 MHz",
+      "channel_name": "CH07",
+      "Channel number": {
+        "value": 7,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 53.24,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 400.0,
+        "unit": "MHz"
+      },
       "Polarization": "V，H",
-      "NEΔT": "0.5 K",
-      "IFOV": "7×11 km"
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "7×11 km"
     },
     {
-      "Channel number": "8",
-      "Central frequency": "53.75 GHz",
-      "Bandwidth": "400 MHz",
+      "channel_name": "CH08",
+      "Channel number": {
+        "value": 8,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 53.75,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 400.0,
+        "unit": "MHz"
+      },
       "Polarization": "V，H",
-      "NEΔT": "0.5 K",
-      "IFOV": "7×11 km"
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "7×11 km"
     },
     {
-      "Channel number": "9",
-      "Central frequency": "89.0 GHz",
-      "Bandwidth": "3000 MHz",
+      "channel_name": "CH09",
+      "Channel number": {
+        "value": 9,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 89.0,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 3000.0,
+        "unit": "MHz"
+      },
       "Polarization": "V，H",
-      "NEΔT": "0.5 K",
-      "IFOV": "5×8 km"
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "5×8 km"
     },
     {
-      "Channel number": "10",
-      "Central frequency": "118.7503±3.2 GHz",
-      "Bandwidth": "2x500 MHz",
+      "channel_name": "CH10",
+      "Channel number": {
+        "value": 10,
+        "unit": null
+      },
+      "central_frequency": "118.7503±3.2 GHz",
+      "bandwidth": {
+        "x": 2.0,
+        "y": 500.0,
+        "unit": "MHz"
+      },
       "Polarization": "V",
-      "NEΔT": "0.8 K",
-      "IFOV": "4×7 km"
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": "4×7 km"
     },
     {
-      "Channel number": "11",
-      "Central frequency": "118.7503±2.1 GHz",
-      "Bandwidth": "2x400 MHz",
+      "channel_name": "CH11",
+      "Channel number": {
+        "value": 11,
+        "unit": null
+      },
+      "central_frequency": "118.7503±2.1 GHz",
+      "bandwidth": {
+        "x": 2.0,
+        "y": 400.0,
+        "unit": "MHz"
+      },
       "Polarization": "V",
-      "NEΔT": "0.8 K",
-      "IFOV": "4×7 km"
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": "4×7 km"
     },
     {
-      "Channel number": "12",
-      "Central frequency": "118.7503±1.4 GHz",
-      "Bandwidth": "2x400 MHz",
+      "channel_name": "CH12",
+      "Channel number": {
+        "value": 12,
+        "unit": null
+      },
+      "central_frequency": "118.7503±1.4 GHz",
+      "bandwidth": {
+        "x": 2.0,
+        "y": 400.0,
+        "unit": "MHz"
+      },
       "Polarization": "V",
-      "NEΔT": "0.8 K",
-      "IFOV": "4×7 km"
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": "4×7 km"
     },
     {
-      "Channel number": "13",
-      "Central frequency": "118.7503±1.2 GHz",
-      "Bandwidth": "2x400 MHz",
+      "channel_name": "CH13",
+      "Channel number": {
+        "value": 13,
+        "unit": null
+      },
+      "central_frequency": "118.7503±1.2 GHz",
+      "bandwidth": {
+        "x": 2.0,
+        "y": 400.0,
+        "unit": "MHz"
+      },
       "Polarization": "V",
-      "NEΔT": "0.8 K",
-      "IFOV": "4×7 km"
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": "4×7 km"
     },
     {
-      "Channel number": "14",
-      "Central frequency": "165.5±0.75 GHz",
-      "Bandwidth": "2x1350 MHz",
+      "channel_name": "CH14",
+      "Channel number": {
+        "value": 14,
+        "unit": null
+      },
+      "central_frequency": "165.5±0.75 GHz",
+      "bandwidth": {
+        "x": 2.0,
+        "y": 1350.0,
+        "unit": "MHz"
+      },
       "Polarization": "V",
-      "NEΔT": "0.8 K",
-      "IFOV": "4×6 km"
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": "4×6 km"
     },
     {
-      "Channel number": "15",
-      "Central frequency": "183.31±2.0 GHz",
-      "Bandwidth": "2x1500 MHz",
+      "channel_name": "CH15",
+      "Channel number": {
+        "value": 15,
+        "unit": null
+      },
+      "central_frequency": "183.31±2.0 GHz",
+      "bandwidth": {
+        "x": 2.0,
+        "y": 1500.0,
+        "unit": "MHz"
+      },
       "Polarization": "V",
-      "NEΔT": "0.8 K",
-      "IFOV": "4×7 km"
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": "4×7 km"
     },
     {
-      "Channel number": "16",
-      "Central frequency": "183.31±3.4 GHz",
-      "Bandwidth": "2x1500 MHz",
+      "channel_name": "CH16",
+      "Channel number": {
+        "value": 16,
+        "unit": null
+      },
+      "central_frequency": "183.31±3.4 GHz",
+      "bandwidth": {
+        "x": 2.0,
+        "y": 1500.0,
+        "unit": "MHz"
+      },
       "Polarization": "V",
-      "NEΔT": "0.8 K",
-      "IFOV": "4×7 km"
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": "4×7 km"
     },
     {
-      "Channel number": "17",
-      "Central frequency": "183.31±7.0 GHz",
-      "Bandwidth": "2x2000 MHz",
+      "channel_name": "CH17",
+      "Channel number": {
+        "value": 17,
+        "unit": null
+      },
+      "central_frequency": "183.31±7.0 GHz",
+      "bandwidth": {
+        "x": 2.0,
+        "y": 2000.0,
+        "unit": "MHz"
+      },
       "Polarization": "V",
-      "NEΔT": "0.8 K",
-      "IFOV": "4×7 km"
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": "4×7 km"
     }
   ]
 }

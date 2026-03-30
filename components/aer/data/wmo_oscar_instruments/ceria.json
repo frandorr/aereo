@@ -3,26 +3,51 @@
   "instrument_acronym": "CERIA",
   "instrument_fullname": "CERIA Camera",
   "url": "https://space.oscar.wmo.int/instruments/view/ceria",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "455 nm",
-      "Spectral interval": "400 - 510 nm",
-      "SNR @ specified albedo": "…….. @ ……. % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 455.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 400.0,
+        "max": 510.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……. % albedo"
     },
     {
-      "Central wavelength": "535 nm",
-      "Spectral interval": "490 - 580 nm",
-      "SNR @ specified albedo": "…….. @ ……. % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 535.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 490.0,
+        "max": 580.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……. % albedo"
     },
     {
-      "Central wavelength": "605 nm",
-      "Spectral interval": "580 - 630 nm",
-      "SNR @ specified albedo": "…….. @ ……. % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 605.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 580.0,
+        "max": 630.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……. % albedo"
     }
   ]
 }

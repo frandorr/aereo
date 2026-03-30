@@ -3,7 +3,8 @@
   "instrument_acronym": "PALSAR-2",
   "instrument_fullname": "Phased-Array L-band Synthetic Aperture Radar - 2",
   "url": "https://space.oscar.wmo.int/instruments/view/palsar-2",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -12,39 +13,90 @@
   ],
   "channels": [
     {
-      "Operation mode": "Spotlight",
-      "Resolution": "1-3 m",
-      "Swath": "25 km",
-      "Polarisations": "HH or VV",
-      "Incidence angle": "8-70°"
+      "channel_name": "Spotlight",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": {
+        "min": 1.0,
+        "max": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 25.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV",
+      "field_of_regard": {
+        "value": 8.0,
+        "unit": "-70°"
+      }
     },
     {
-      "Operation mode": "Stripmap(ultra-fine)",
-      "Resolution": "3 m",
-      "Swath": "50 km",
-      "Polarisations": "HH or VV or HH/HV or VV/VH",
-      "Incidence angle": "8-70°"
+      "channel_name": "Stripmap",
+      "operation_mode": "Stripmap(ultra-fine)",
+      "spatial_resolution": {
+        "value": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 50.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HH/HV or VV/VH",
+      "field_of_regard": {
+        "value": 8.0,
+        "unit": "-70°"
+      }
     },
     {
-      "Operation mode": "Stripmap(high-sensitive)",
-      "Resolution": "6 m",
-      "Swath": "50 km",
-      "Polarisations": "HH or VV or HH/HV or VV/VH HH or VV or HH/HV or VV/VH or (HH/HV + VV/VH)",
-      "Incidence angle": "8-70°"
+      "channel_name": "ScanSAR",
+      "operation_mode": "Stripmap(high-sensitive)",
+      "spatial_resolution": {
+        "value": 6.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 50.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HH/HV or VV/VH HH or VV or HH/HV or VV/VH or (HH/HV + VV/VH)",
+      "field_of_regard": {
+        "value": 8.0,
+        "unit": "-70°"
+      }
     },
     {
-      "Operation mode": "Stripmap(fine)",
-      "Resolution": "10 m",
-      "Swath": "70 km",
-      "Polarisations": "HH or VV or HH/HV or VV/VH HH or VV or HH/HV or VV/VH or (HH/HV + VV/VH)",
-      "Incidence angle": "8-70°"
+      "channel_name": "Band_04",
+      "operation_mode": "Stripmap(fine)",
+      "spatial_resolution": {
+        "value": 10.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 70.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HH/HV or VV/VH HH or VV or HH/HV or VV/VH or (HH/HV + VV/VH)",
+      "field_of_regard": {
+        "value": 8.0,
+        "unit": "-70°"
+      }
     },
     {
-      "Operation mode": "ScanSAR",
-      "Resolution": "100 m",
-      "Swath": "350 km",
-      "Polarisations": "HH or VV or HH/HV or VV/VH",
-      "Incidence angle": "8-70°"
+      "channel_name": "Band_05",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": {
+        "value": 100.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 350.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HH/HV or VV/VH",
+      "field_of_regard": {
+        "value": 8.0,
+        "unit": "-70°"
+      }
     }
   ]
 }

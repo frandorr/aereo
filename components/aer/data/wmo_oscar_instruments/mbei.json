@@ -3,31 +3,61 @@
   "instrument_acronym": "MBEI",
   "instrument_fullname": "Multi-Band Earth Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/mbei",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ typical input"
   ],
   "channels": [
     {
-      "Central wavelength": "550 nm",
-      "Spectral interval": "510 - 590 nm",
-      "SNR @ typical input": "> 150"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 550.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 510.0,
+        "max": 590.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "> 150"
     },
     {
-      "Central wavelength": "645 nm",
-      "Spectral interval": "610 - 680 nm",
-      "SNR @ typical input": "> 150"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 645.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 610.0,
+        "max": 680.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "> 150"
     },
     {
-      "Central wavelength": "845 nm",
-      "Spectral interval": "800 - 890 nm",
-      "SNR @ typical input": "> 150"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 845.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 800.0,
+        "max": 890.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "> 150"
     },
     {
-      "Central wavelength": "N/A  (PAN)",
-      "Spectral interval": "510 - 900 nm",
-      "SNR @ typical input": "> 300"
+      "channel_name": "Band_04",
+      "central_wavelength": "N/A  (PAN)",
+      "bandwidth": {
+        "min": 510.0,
+        "max": 900.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "> 300"
     }
   ]
 }

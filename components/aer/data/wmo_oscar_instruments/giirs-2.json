@@ -3,7 +3,8 @@
   "instrument_acronym": "GIIRS-2",
   "instrument_fullname": "Geostationary Interferometric Infrared Sounder-2",
   "url": "https://space.oscar.wmo.int/instruments/view/giirs-2",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range (µm)",
     "Spectral range (cm-1)",
     "Spectral resolution",
@@ -11,22 +12,57 @@
   ],
   "channels": [
     {
-      "Spectral range (µm)": "14.7-8.85 µm",
-      "Spectral range (cm-1)": "680-1130 cm-1",
-      "Spectral resolution": "0.625 cm-1",
-      "NEΔR or SNR": "0.5 mW m-2sr-1cm"
+      "channel_name": "LWIR",
+      "Spectral range (µm)": {
+        "min": 14.7,
+        "max": 8.85,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "min": 680.0,
+        "max": 1130.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.625,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.5,
+        "unit": "mW m-2sr-1cm"
+      }
     },
     {
-      "Spectral range (µm)": "6.06-4.44 µm",
-      "Spectral range (cm-1)": "1650-2250 cm-1",
-      "Spectral resolution": "0.625 cm-1",
-      "NEΔR or SNR": "0.1 mW m-2sr-1cm"
+      "channel_name": "MWIR",
+      "Spectral range (µm)": {
+        "min": 6.06,
+        "max": 4.44,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "min": 1650.0,
+        "max": 2250.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.625,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.1,
+        "unit": "mW m-2sr-1cm"
+      }
     },
     {
-      "Spectral range (µm)": "0.55-0.90 µm",
-      "Spectral range (cm-1)": "N/A",
-      "Spectral resolution": "N/A",
-      "NEΔR or SNR": "200 @ 100 % albedo"
+      "channel_name": "Band_03",
+      "Spectral range (µm)": {
+        "min": 0.55,
+        "max": 0.9,
+        "unit": "µm"
+      },
+      "wave_number_range": "N/A",
+      "spectral_resolution": "N/A",
+      "snr_or_nedt": "200 @ 100 % albedo"
     }
   ]
 }

@@ -3,7 +3,8 @@
   "instrument_acronym": "COSI",
   "instrument_fullname": "Corea SAR Instrument",
   "url": "https://space.oscar.wmo.int/instruments/view/cosi",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -11,22 +12,43 @@
   ],
   "channels": [
     {
-      "Operation mode": "High Resolution mode",
-      "Resolution": "1 m",
-      "Swath": "5 km",
-      "Polarisation": "HH or VV or HV or VH, selectable"
+      "channel_name": "Band_01",
+      "operation_mode": "High Resolution mode",
+      "spatial_resolution": {
+        "value": 1.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 5.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH, selectable"
     },
     {
-      "Operation mode": "Standard mode",
-      "Resolution": "3 m",
-      "Swath": "30 km",
-      "Polarisation": "HH or VV or HV or VH, selectable"
+      "channel_name": "Band_02",
+      "operation_mode": "Standard mode",
+      "spatial_resolution": {
+        "value": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 30.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH, selectable"
     },
     {
-      "Operation mode": "Wide Swath mode",
-      "Resolution": "20 m",
-      "Swath": "100 km",
-      "Polarisation": "HH or VV or HV or VH, selectable"
+      "channel_name": "Band_03",
+      "operation_mode": "Wide Swath mode",
+      "spatial_resolution": {
+        "value": 20.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 100.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH, selectable"
     }
   ]
 }

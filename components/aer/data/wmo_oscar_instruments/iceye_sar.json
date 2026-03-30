@@ -3,7 +3,8 @@
   "instrument_acronym": "ICEYE SAR",
   "instrument_fullname": "ICEYE SAR",
   "url": "https://space.oscar.wmo.int/instruments/view/iceye%20sar",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -12,25 +13,55 @@
   ],
   "channels": [
     {
-      "Operation mode": "Spotlight",
-      "Resolution": "1 m",
-      "Swath": "5 km",
-      "Field of regard": "600 km, either right or left",
-      "Polarisation": "VV"
+      "channel_name": "Band_01",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": {
+        "value": 1.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 5.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "VV"
     },
     {
-      "Operation mode": "Stripmap",
-      "Resolution": "3 m",
-      "Swath": "30 km",
-      "Field of regard": "600 km, either right or left",
-      "Polarisation": "VV"
+      "channel_name": "Band_02",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "value": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 30.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "VV"
     },
     {
-      "Operation mode": "ScanSAR",
-      "Resolution": "15 m",
-      "Swath": "100 km",
-      "Field of regard": "600 km, either right or left",
-      "Polarisation": "VV"
+      "channel_name": "Band_03",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": {
+        "value": 15.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 100.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "VV"
     }
   ]
 }

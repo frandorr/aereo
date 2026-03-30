@@ -3,31 +3,64 @@
   "instrument_acronym": "VTIR",
   "instrument_fullname": "Visible and Thermal Infrared Radiometer",
   "url": "https://space.oscar.wmo.int/instruments/view/vtir",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR or NEΔT @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "0.6 µm",
-      "Spectral interval": "0.5-0.7 µm",
-      "SNR or NEΔT @ specified input": ".... @ .... % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.6,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.5,
+        "max": 0.7,
+        "unit": "µm"
+      },
+      "snr_or_nedt": ".... @ .... % albedo"
     },
     {
-      "Central wavelength": "6.5 µm",
-      "Spectral interval": "6.0-7.0 µm",
-      "SNR or NEΔT @ specified input": ".... K @ .... K"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 6.5,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 6.0,
+        "max": 7.0,
+        "unit": "µm"
+      },
+      "snr_or_nedt": ".... K @ .... K"
     },
     {
-      "Central wavelength": "11 µm",
-      "Spectral interval": "10.5-11.5 µm",
-      "SNR or NEΔT @ specified input": ".... K @ .... K"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 11.0,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 10.5,
+        "max": 11.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": ".... K @ .... K"
     },
     {
-      "Central wavelength": "12 µm",
-      "Spectral interval": "11.5-12.5 µm",
-      "SNR or NEΔT @ specified input": ".... K @ .... K"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 12.0,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 11.5,
+        "max": 12.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": ".... K @ .... K"
     }
   ]
 }

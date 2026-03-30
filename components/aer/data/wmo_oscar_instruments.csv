@@ -1,0 +1,4445 @@
+Id,Acronym,Full name,Space Agency,Instrument type,Satellites,Usage from,Usage to,Last update
+956,3D-Winds Lidar,Lidar of 3D-Winds,NASA,Space lidar,"
+3D-Winds",0,0,2021-09-27 09:03:05
+1,3MI,Multi-viewing Multi-channel Multi-polarisation Imager,ESA,Moderate-resolution optical imager,"
+Metop-SG-A1
+Metop-SG-A2
+Metop-SG-A3",2026,2047,2025-05-27 09:12:14
+10,A-DCS,"Advanced Data Collection System (also called ""Argos-3"")",CNES,Data collection system,"
+Metop-A
+Metop-B
+Metop-C
+Metop-SG-B1
+Metop-SG-B2
+Metop-SG-B3
+NOAA-19
+SARAL",2007,2048,2024-09-23 15:33:20
+2,AATSR,Advanced Along-Track Scanning Radiometer,UKSA,Moderate-resolution optical imager,"
+Envisat",2002,2012,2022-07-26 10:35:29
+3,ABI,Advanced Baseline Imager,NOAA,Moderate-resolution optical imager,"
+GeoXO 1
+GOES-16
+GOES-17
+GOES-18
+GOES-19",2017,2045,2023-09-21 15:49:53
+4,AC,Radiation Budget Sensor,Roscosmos,Broad band radiometer,"
+Meteor-1-1
+Meteor-1-10
+Meteor-1-11
+Meteor-1-12
+Meteor-1-13
+Meteor-1-14
+Meteor-1-15
+Meteor-1-16
+Meteor-1-17
+Meteor-1-19
+Meteor-1-2
+Meteor-1-20
+Meteor-1-21
+Meteor-1-22
+Meteor-1-23
+Meteor-1-24
+Meteor-1-26
+Meteor-1-27
+Meteor-1-3
+Meteor-1-4
+Meteor-1-5
+Meteor-1-6
+Meteor-1-7
+Meteor-1-8
+Meteor-1-9",1969,1978,2012-06-12 13:19:54
+5,ACC,Accelerometer,ESA,Gravity sensing system,"
+SWARM-A
+SWARM-B
+SWARM-C",2014,2026,2024-09-23 10:58:53
+1296,ACDL,Aerosol and Carbon Detection Lidar,CNSA,Space lidar,"
+DQ-1
+DQ-2",2022,2033,2022-07-18 13:14:17
+1445,ACE,Analyzer for Cusp Electrons,NASA,Energetic particle spectrometer,"
+TRACERS",2025,2026,2025-07-28 13:50:36
+957,ACE Lidar,Aerosol-Cloud Ecosystems Lidar,NASA,Space lidar,"
+ACE (Aer.Clo.Eco.)",0,0,2016-11-10 16:48:56
+6,ACE-FTS,Atmospheric Chemistry Experiment - Fourier Transform Spectrometer,CSA,Limb sounder,"
+SCISAT-1",2003,2027,2021-08-30 18:13:22
+1129,ACGS,Atmospheric Carbon-dioxide Grating Spectrometer,MOST,Cross-nadir scanning SW sounder,"
+TANSAT",2017,2022,2024-09-09 15:00:38
+1446,ACI,Analyzer for Cusp Ions,NASA,Energetic particle spectrometer,"
+TRACERS",2025,2026,2025-07-28 14:01:55
+7,ACRIM-I,Active Cavity Radiometer Irradiance Monitoring - I,NASA,Solar irradiance monitor,"
+SMM",1980,1989,2012-06-12 13:31:46
+8,ACRIM-II,Active Cavity Radiometer Irradiance Monitoring - II,NASA,Solar irradiance monitor,"
+UARS",1991,2005,2012-06-27 12:23:04
+9,ACRIM-III,Active Cavity Radiometer Irradiance Monitoring - III,NASA,Solar irradiance monitor,"
+ACRIMSat",2000,2013,2022-07-25 15:45:45
+920,ACS-limb,Atmospheric Composition Spectrometer (limb-scanning component) ,Roscosmos,Limb sounder,"
+",0,0,2021-11-27 01:18:23
+1346,ACX,GeoXO Atmospheric Composition Instrument,NOAA,Cross-nadir scanning SW sounder,"
+",0,0,2023-05-08 08:28:18
+14,AEISS,Advanced Electronic Image Scanning System,KARI,High-resolution optical imager,"
+KOMPSAT-3
+KOMPSAT-3A",2012,2026,2021-06-16 11:09:28
+1105,AEISS-HR,Advanced Electronic Image Scanning System - High Resolution,KARI,High-resolution optical imager,"
+CAS 500-1
+CAS 500-2
+CAS 500-3
+KOMPSAT-7",2021,2029,2025-12-04 14:51:28
+787,AFG,Analog Fluxgate Magnetometer,NASA,Field or radiowave sensor,"
+MMS-A
+MMS-B
+MMS-C
+MMS-D",2015,2026,2021-10-02 22:36:11
+275,AGRI,Advanced Geostationary Radiation Imager,CMA,Moderate-resolution optical imager,"
+FY-4A
+FY-4B
+FY-4C
+FY-4D
+FY-4E
+FY-4F",2017,2037,2025-03-31 08:12:01
+15,AHI,Advanced Himawari Imager ,JMA,Moderate-resolution optical imager,"
+Himawari-8
+Himawari-9",2015,2034,2024-09-30 08:21:01
+1190,AHSI,Advanced Hyperspectral Imager,CNSA,High-resolution optical imager,"
+GF-5
+GF-5-01A
+GF-5-02",2018,2030,2018-05-05 01:33:56
+641,AIA,Atmospheric Imaging Assembly,NASA,Solar activity monitor,"
+SDO",2010,2026,2021-12-16 00:52:33
+1173,AIP,Advanced Ionospheric Probe,NSPO,Energetic particle spectrometer,"
+FORMOSAT-5",2017,2026,2021-12-16 01:00:31
+16,AIRS,Atmospheric Infra-Red Sounder ,NASA,Cross-nadir infrared sounder,"
+Aqua",2002,2026,2024-09-30 08:34:27
+1313,AIS,Automated Identification System,CSA,Data collection system,"
+ALOS-4 (DAICHI-4)
+GF-3(02) or CSAR-01
+GF-3(03) or CSAR-02
+HY-1C
+HY-1D
+HY-1F
+HY-3A (HY-1E)
+HY-3B
+RCM-1
+RCM-2
+RCM-3
+Sentinel-1C",2018,2036,2024-12-05 13:40:10
+1177,AIUS,Atmospheric Infrared Ultra-spectral spectrometer,CNSA,Limb sounder,"
+GF-5
+GF-5-01A
+GF-5-02",2018,2030,2021-08-30 19:00:17
+17,ALADIN,Atmospheric Laser Doppler Instrument,ESA,Space lidar,"
+Aeolus",2018,2023,2024-09-09 15:39:15
+18,ALI,Advanced Land Imager,NASA,High-resolution optical imager,"
+NMP-EO-1",2001,2017,2022-07-25 14:03:28
+1384,ALI,Aerosol Limb Imager,CSA,Moderate-resolution optical imager,"
+AOS-HAWCSat",0,0,2023-11-02 15:07:20
+1471,ALICE,Advanced Limb Infrared Chemistry Experiment ,NASA,Limb sounder,"
+STRIVE",2030,2033,2026-02-16 09:54:07
+1162,ALISS-3,Advanced Linear Imaging Self-Scanning Sensor - 3,ISRO,High-resolution optical imager,"
+ResourceSat-3
+ResourceSat-3A",2026,2030,2022-08-01 10:43:42
+1254,ALT,Radar Altimeter,NSOAS,Radar altimeter,"
+HY-2A
+HY-2B
+HY-2E",2011,2031,2023-11-20 11:37:44
+19,ALT,Radar Altimeter,NASA,Radar altimeter,"
+SeaSat",1978,1978,2013-02-15 16:31:16
+20,ALT,Radar Altimeter,NSOAS,Radar altimeter,"
+HY-2C
+HY-2D
+HY-2F",2020,2031,2023-11-20 11:32:41
+21,AltiKa,Ka-band Altimeter,CNES,Radar altimeter,"
+SARAL",2013,2026,2021-06-15 18:13:45
+1051,Altimeter,Altimeter,JAXA,Radar altimeter,"
+COMPIRA",2026,2029,2021-10-02 23:49:50
+1270,ALTIUS,Atmospheric Limb Tracker for Investigation of the Upcoming Stratosphere,ESA,Limb sounder,"
+ALTIUS",2026,2029,2024-07-01 12:57:22
+285,AMI,Advanced Meteorological Imager,KMA,Moderate-resolution optical imager,"
+GEO-KOMPSAT-2A",2019,2029,2021-06-02 14:38:23
+1436,AMI (GK5),Advanced Meteorological Imager - GK5,KMA,Moderate-resolution optical imager,"
+GEO-KOMPSAT-5",2032,2041,2025-06-09 14:47:04
+23,AMI-SAR,Active Microwave Instrument - Synthetic Aperture Antenna,ESA,Imaging radar (SAR),"
+ERS-1
+ERS-2",1991,2011,2012-09-05 16:52:43
+24,AMI-SCAT,Active Microwave Instrument - Scatterometer,ESA,Radar scatterometer,"
+ERS-1
+ERS-2",1991,2011,2012-06-06 15:49:10
+26,AMR,Advanced Microwave Radiometer,NASA,Microwave cross-track scanning radiometer,"
+JASON-2
+JASON-3",2008,2027,2024-09-23 15:52:22
+1311,AMR-C,Advanced Microwave Radiometer - Climate Quality,NOAA,Microwave cross-track scanning radiometer,"
+Sentinel-6A
+Sentinel-6B
+Sentinel-6C",2021,2036,2025-04-14 09:08:16
+1035,AMR-CR,Advanced Microwave Radiometer - CR,NOAA,Microwave cross-track scanning radiometer,"
+CRISTAL-A
+CRISTAL-B",2028,2036,2025-04-14 08:37:42
+27,AMSR,Advanced Microwave Scanning Radiometer,JAXA,Microwave conical scanning radiometer,"
+ADEOS-2",2003,2003,2025-04-14 08:45:26
+29,AMSR-E,Advanced Microwave Scanning Radiometer for EOS,JAXA,Microwave conical scanning radiometer,"
+Aqua",2002,2016,2025-04-14 08:31:53
+28,AMSR2,Advanced Microwave Scanning Radiometer - 2,JAXA,Microwave conical scanning radiometer,"
+GCOM-W",2012,2026,2022-11-02 17:58:06
+1236,AMSR3,Advanced Microwave Scanning Radiometer 3,JAXA,Microwave conical scanning radiometer,"
+GOSAT-GW",2025,2032,2026-02-09 17:11:44
+30,AMSU-A,Advanced Microwave Sounding Unit - A,NOAA,Microwave cross-track scanning radiometer,"
+Aqua
+Metop-A
+Metop-B
+Metop-C
+NOAA-15
+NOAA-16
+NOAA-17
+NOAA-18
+NOAA-19",1998,2027,2024-12-04 16:31:35
+33,AMSU-B,Advanced Microwave Sounding Unit - B,UKSA,Microwave cross-track scanning radiometer,"
+NOAA-15
+NOAA-16
+NOAA-17",1998,2011,2025-01-28 16:18:32
+34,AOPOD,Atmosphere Occultation and Precision Orbit Determination,KARI,GNSS radio-occultation sounder,"
+KOMPSAT-5",2013,2026,2021-10-02 23:35:13
+1379,AOS-Lidar,Atmosphere Observing System-Lidar,NASA,Space lidar,"
+AOS-Sky",2032,2036,2023-10-30 14:15:28
+1378,AOS-Sky MWR,AOS-Sky Microwave Radiometer,NASA,Microwave cross-track scanning radiometer,"
+AOS-Sky",2032,2036,2023-10-31 16:59:04
+1380,AOS-Sky polarimeter,AOS-Sky multi-angle polarimeter,NASA,Moderate-resolution optical imager,"
+AOS-Sky",2032,2036,2023-10-31 17:03:40
+1377,AOS-Sky radar,AOS-Sky Single-frequency Doppler Radar,NASA,Cloud and precipitation radar,"
+AOS-Sky",2032,2036,2023-10-30 13:17:55
+1193,APAN,Advanced Panchromatic Camera,ISRO,High-resolution optical imager,"
+ResourceSat-3S
+ResourceSat-3SA",2026,2031,2022-07-27 09:52:40
+35,APS,Aerosol Polarimetry Sensor,NASA,Moderate-resolution optical imager,"
+Glory",2011,2011,2018-03-20 02:57:07
+37,APT,Automatic Picture Transmission,NASA,Moderate-resolution optical imager,"
+ESSA-2
+ESSA-4
+ESSA-6
+ESSA-8
+ITOS-1 (TIROS-M)
+Nimbus-1
+Nimbus-2
+NOAA-1
+TIROS-8",1964,1976,2017-03-26 00:57:46
+41,Aquarius,Aquarius,NASA,Microwave cross-track scanning radiometer,"
+SAC-D",2011,2015,2022-08-08 15:15:27
+42,Argos,Argos Data Collection System,CNES,Data collection system,"
+NOAA-10
+NOAA-11
+NOAA-12
+NOAA-13
+NOAA-14
+NOAA-6
+NOAA-7
+NOAA-8
+NOAA-9
+TIROS-N",1979,2007,2022-10-10 08:28:42
+1472,ARGOS,Aerosol Radiometer for Global Observations of the Stratosphere,NASA,Limb sounder,"
+STRIVE",2030,2033,2026-02-16 10:04:35
+1314,Argos-4,"Advanced Data Collection System (called ""Argos-4"")",CNES,Data collection system,"
+Argos-4 (GAzelle)
+OceanSat-3 (EOS-06)",2022,2027,2022-12-19 14:23:16
+948,ARINA,ARINA,Roscosmos,Energetic particle spectrometer,"
+Resurs-DK",2006,2016,2022-08-08 15:01:18
+1090,ARMA-MP,Radio occultation instrument for Meteor-MP,Roscosmos,GNSS radio-occultation sounder,"
+Meteor-MP N1
+Meteor-MP N2",2036,2044,2024-03-04 16:06:40
+44,ASAR,Advanced Synthetic Aperture Radar,ESA,Imaging radar (SAR),"
+Envisat",2002,2012,2022-07-26 10:36:15
+635,ASAR,Onboard Radar Complex (X-band),Roscosmos,Imaging radar (SAR),"
+Obzor-R N1
+Obzor-R N2
+Obzor-R N3
+Obzor-R N4",2026,2034,2023-07-10 08:14:27
+45,ASC,Advanced Stellar Compass,DNSC,Positioning system,"
+CHAMP
+Ørsted",1999,2006,2012-09-06 01:18:10
+47,ASCAT,Advanced Scatterometer,ESA,Radar scatterometer,"
+Metop-A
+Metop-B
+Metop-C",2007,2027,2024-09-23 15:34:38
+49,ASM,Absolute Scalar Magnetometer,CNES,Field or radiowave sensor,"
+SWARM-A
+SWARM-B
+SWARM-C",2014,2026,2024-09-23 10:59:19
+1183,ASPEX,Aditya Solar wind Particle Experiment,ISRO,Energetic particle spectrometer,"
+Aditya-1",2024,2028,2021-11-10 18:59:35
+1443,ASPIICS,Association of Spacecraft for Polarimetry and Imaging Investigation of the Corona of the Sun,ESA,Solar activity monitor,"
+PROBA-3C",2025,2030,2025-06-24 10:38:21
+769,ASPOC,Active Spacecraft Potential Control,ESA,Field or radiowave sensor,"
+CLUSTER-1
+CLUSTER-2
+CLUSTER-3
+CLUSTER-4",2000,2000,2016-03-20 01:37:24
+927,ASPOC,Active Spacecraft Potential Control Devices,NASA,Field or radiowave sensor,"
+MMS-A
+MMS-B
+MMS-C
+MMS-D",2015,2026,2016-03-20 01:15:10
+50,ASTER,Advanced Spaceborne Thermal Emission and Reflection radiometer ,METI,High-resolution optical imager,"
+Terra",2000,2022,2024-09-30 11:00:01
+1163,ATCOR,Atmospheric Correction,ISRO,High-resolution optical imager,"
+ResourceSat-3
+ResourceSat-3A",2026,2030,2022-07-27 10:08:49
+51,ATLAS,Advanced Topographic Laser Altimeter System,NASA,Space lidar,"
+ICESat-2",2019,2034,2021-06-23 22:22:37
+52,ATLID,Atmospheric Lidar,ESA,Space lidar,"
+EarthCARE",2024,2034,2021-06-15 21:44:46
+53,ATMS,Advanced Technology Microwave Sounder,NOAA,Microwave cross-track scanning radiometer,"
+JPSS-3
+JPSS-4
+NOAA-20
+NOAA-21
+QuickSounder
+SNPP",2012,2041,2024-11-21 09:29:31
+55,ATSR,Along-Track Scanning Radiometer,UKSA,Moderate-resolution optical imager,"
+ERS-1",1991,2000,2022-05-13 13:08:00
+56,ATSR-2,Along-Track Scanning Radiometer - 2,UKSA,Moderate-resolution optical imager,"
+ERS-2",1995,2008,2022-05-13 13:08:25
+57,AVCS,Advanced Vidicon Camera System,NASA,Moderate-resolution optical imager,"
+ESSA-3
+ESSA-5
+ESSA-7
+ESSA-9
+ITOS-1 (TIROS-M)
+Nimbus-1
+Nimbus-2
+NOAA-1",1964,1972,2017-03-26 01:02:22
+60,AVHRR,Advanced Very High Resolution Radiometer,NOAA,Moderate-resolution optical imager,"
+NOAA-10
+NOAA-6
+NOAA-8
+TIROS-N",1979,2001,2017-03-26 01:04:15
+61,AVHRR/2,Advanced Very High Resolution Radiometer / 2,NOAA,Moderate-resolution optical imager,"
+NOAA-11
+NOAA-12
+NOAA-13
+NOAA-14
+NOAA-7
+NOAA-9",1981,2007,2017-03-26 01:05:49
+62,AVHRR/3,Advanced Very High Resolution Radiometer / 3,NOAA,Moderate-resolution optical imager,"
+Metop-A
+Metop-B
+Metop-C
+NOAA-15
+NOAA-16
+NOAA-17
+NOAA-18
+NOAA-19",1998,2027,2024-09-23 15:34:57
+64,AVNIR,Advanced Visible and Near-Infrared Radiometer,JAXA,High-resolution optical imager,"
+ADEOS",1996,1997,2017-03-27 23:44:29
+65,AVNIR-2,Advanced Visible and Near-Infrared Radiometer - 2,JAXA,High-resolution optical imager,"
+ALOS",2006,2011,2017-03-27 23:46:05
+994,AVS,Amplitude-time Spectrum Analyser,Roscosmos,Solar activity monitor,"
+Coronas-F
+Coronas-I",1994,2005,2017-05-17 20:12:20
+66,AWFI,Advanced Wide Field Imager,INPE,High-resolution optical imager,"
+Amazônia-1
+Amazônia-1B",2021,2029,2021-06-16 11:13:27
+1176,AWFI-2,Advanced Wide Field Imager - 2,INPE,High-resolution optical imager,"
+Amazônia-2",2026,2029,2021-06-16 11:14:07
+67,AWiFS,Advanced Wide Field Sensor,ISRO,High-resolution optical imager,"
+ResourceSat-1 (IRS-P6)
+ResourceSat-2
+ResourceSat-2A",2004,2026,2021-06-16 11:15:16
+68,BBR,Broad-Band Radiometer,ESA,Broad band radiometer,"
+EarthCARE",2024,2034,2022-07-18 14:29:22
+970,BCS,Bragg Crystal Spectrometer,JAXA,Solar activity monitor,"
+Solar-A (Yohkoh)",1991,2001,2017-05-19 12:22:13
+676,BGIS-2000,Ball Global Imaging System 2000,DigitalGlobe,High-resolution optical imager,"
+QuickBird",2002,2015,2022-07-25 15:37:19
+69,BlackJack,BlackJack GPS Receiver,NASA,GNSS radio-occultation sounder,"
+CHAMP",2001,2008,2022-07-25 14:00:43
+70,BlackJack,BlackJack GPS Receiver,NASA,GNSS radio-occultation sounder,"
+GRACE A
+GRACE B",2002,2017,2022-08-08 14:07:01
+1425,Blacksky Imager ,SpaceView  Generation 3 imaging telescope,BSG,High-resolution optical imager,"
+BlackSky-20 (Gen3-1)",2025,2030,2025-03-03 08:48:55
+739,BRM,Fast X-ray Monitor,Roscosmos,Solar activity monitor,"
+Coronas-Photon",2009,2009,2017-05-18 20:09:08
+72,BUV,Backscatter Ultraviolet Spectrometer,NASA,Cross-nadir scanning SW sounder,"
+Nimbus-4",1970,1980,2012-05-04 17:44:45
+1302,C&A,Cloud and Aerosol Instrument,GHGSat,High-resolution optical imager,"
+GHGSat",2016,2030,2022-08-01 10:45:57
+1382,C²OMODO-R,"C²OMODO (Convective Core Observations through MicrOwave Derivatives in the trOpics) Microwave Radiometer (formerly, SAPHIR-NG)",CNES,Microwave cross-track scanning radiometer,"
+AOS-PMM
+AOS-Storm",2029,2034,2025-10-13 07:26:56
+73,CALIOP,Cloud-Aerosol Lidar with Orthogonal Polarisation,NASA,Space lidar,"
+CALIPSO",2006,2023,2021-06-23 22:23:54
+755,CAMMICE,Charge and Mass Magnetospheric Ion Composition Experiment,NASA,Energetic particle spectrometer,"
+Polar",1996,2008,2017-06-05 01:51:46
+1253,Capella SAR,Capella SAR,Capella,Imaging radar (SAR),"
+Capella",2019,2040,2021-08-31 11:43:20
+1428,CAPHI,Cloud and Aerosol polarization hyperspectral imager ,CMA,Moderate-resolution optical imager,"
+TANSAT-2",2026,2032,2025-03-31 15:47:18
+1130,CAPI,Cloud and Aerosol Polarization Imager,MOST,Moderate-resolution optical imager,"
+TANSAT",2017,2022,2024-09-09 15:01:10
+1368,Carbon Mapper,Tanager Carbon Mapper,NASA,Cross-nadir scanning SW sounder,"
+Tanager-1
+Tanager-2",2024,2029,2023-09-19 12:31:39
+1159,CARMEN,Environment Characterization and Modelisation,CNES,Energetic particle spectrometer,"
+JASON-2
+JASON-3",2008,2027,2021-11-13 12:38:45
+1079,CATS,Cloud-Aerosol Transport System,NASA,Space lidar,"
+ISS CATS",2015,2017,2022-07-25 14:01:49
+75,CC,Cloud Camera,NASA,Moderate-resolution optical imager,"
+Glory",2011,2011,2017-03-26 11:32:57
+76,CCD,Charge Coupled Device Camera,ISRO,Moderate-resolution optical imager,"
+INSAT-2E
+INSAT-3A",1999,2016,2022-07-27 09:13:44
+1210,CCOR-1,Compact CORonagraph-1,NRL,Solar activity monitor,"
+GOES-19",2024,2043,2025-01-27 09:37:09
+1417,CCOR-2,Compact CORonagraph-2,NRL,Solar activity monitor,"
+SWFO-L1
+SWNext SOL-A
+SWNext SOL-B
+Vigil-L5",2026,2038,2025-01-27 09:41:04
+712,CDS,Coronal Diagnostic Spectrometer,UKSA,Solar activity monitor,"
+SOHO",1996,2027,2021-11-09 14:29:43
+717,CELIAS,"Charge, Element, Isotope Analysis ",DLR,Energetic particle spectrometer,"
+SOHO",1996,2027,2021-11-10 09:51:09
+756,CEPPAD,Comprehensive Energetic-Particle Pitch Angle Distribution,NASA,Energetic particle spectrometer,"
+Polar",1996,2008,2017-06-04 21:32:23
+780,CER,Coherent Electromagnetic Radiation,CSA,Field or radiowave sensor,"
+CASSIOPE",2014,2021,2021-10-02 22:31:38
+78,CERES,Clouds and the Earth’s Radiant Energy System ,NASA,Broad band radiometer,"
+Aqua
+NOAA-20
+SNPP
+Terra
+TRMM",1998,2032,2024-09-30 08:41:41
+1251,CERIA,CERIA Camera,GISTDA,High-resolution optical imager,"
+THEOS-2A Small",2026,2026,2022-08-30 10:13:41
+907,CERTO,Coherent Electromagnetic Radio Tomography ,NRL,Field or radiowave sensor,"
+C/NOFS",2008,2015,2022-08-08 15:12:59
+952,CERTO/TBB,Coherent Electromagnetic Radio Tomography / Triband Beacon Transmitter,USAF,Field or radiowave sensor,"
+COSMIC-1",2006,2020,2022-08-08 13:44:53
+1263,CHIME,Copernicus Hyperspectral Imaging Mission for the Environment,ESA,High-resolution optical imager,"
+CHIME-A
+CHIME-B",2029,2037,2021-10-25 10:43:40
+82,CHRIS,Compact High Resolution Imaging Spectrometer,UKSA,High-resolution optical imager,"
+PROBA-1",2001,2022,2024-09-09 15:48:12
+1247,CIMR,Copernicus Imaging Microwave Radiometer,ESA,Microwave conical scanning radiometer,"
+CIMR-A
+CIMR-B",2029,2042,2025-04-14 08:34:58
+903,CINDI,Coupled Ion-Neutral Dynamics Investigation,NASA,Field or radiowave sensor,"
+C/NOFS",2008,2015,2022-07-25 14:57:50
+1223,CION,CICERO Instrument for GNSS-RO,GeoOptics,GNSS radio-occultation sounder,"
+CICERO",2017,2026,2022-07-18 14:56:34
+1299,CION-2,CICERO-2 Instrument for GNSS-RO,GeoOptics,GNSS radio-occultation sounder,"
+CICERO-2",2022,2035,2022-07-18 12:59:13
+944,CIRC,Compact Infrared Camera,JAXA,High-resolution optical imager,"
+ALOS-2",2014,2026,2022-08-01 10:47:05
+766,CIS,Cluster Ion Spectrometry experiment,CNES,Energetic particle spectrometer,"
+CLUSTER-1
+CLUSTER-2
+CLUSTER-3
+CLUSTER-4",2000,2020,2021-12-16 01:16:35
+913,CITRIS,Computerized Ionospheric Tomography Receiver In Space,NRL,Field or radiowave sensor,"
+STPSat-1",2007,2009,2017-04-21 18:39:56
+83,CLAES,Cryogenic Limb Array Etalon Spectrometer,NASA,Limb sounder,"
+UARS",1991,2005,2017-01-17 15:16:00
+1266,CLIM,Cloud Imager,ESA,Moderate-resolution optical imager,"
+CO2M-A
+CO2M-B
+CO2M-C",2027,2036,2023-11-27 11:00:23
+1412,CLOUD ,CLOUD Camera,ISA,High-resolution optical imager,"
+C3IEL-A
+C3IEL-B",2028,2031,2024-10-07 10:22:43
+1235,CMR,Calibration Microwave Radiometer,NSOAS,Microwave cross-track scanning radiometer,"
+HY-2A
+HY-2B
+HY-2C
+HY-2D
+HY-2E
+HY-2F",2011,2031,2023-02-08 16:50:13
+84,CMT,China Mapping Telescope,NRSCC,High-resolution optical imager,"
+Beijing-1",2006,2010,2017-03-28 00:33:28
+85,CO sensor,Carbon oxide sensor,NASA,Cross-nadir infrared sounder,"
+ASCENDS",0,0,2014-09-17 17:24:31
+86,CO2 lidar,Carbon dioxide lidar,NASA,Space lidar,"
+ASCENDS",0,0,2021-06-15 21:47:06
+1264,CO2I and NO2I,Combined Carbon Dioxide and Nitrogen Dioxide Imager,ESA,Cross-nadir scanning SW sounder,"
+CO2M-A
+CO2M-B
+CO2M-C",2027,2036,2023-12-21 17:10:57
+87,COBAN,Multiband Camera,TÜBITAK-BILTEN,High-resolution optical imager,"
+BILSat",2003,2006,2020-01-06 20:47:10
+88,COCTS,China Ocean Colour & Temperature Scanner,NSOAS,Moderate-resolution optical imager,"
+HY-1A
+HY-1B
+HY-1C
+HY-1D",2002,2026,2021-06-22 22:27:17
+1390,COCTS2,China Ocean Colour & Temperature Scanner 2,NSOAS,High-resolution optical imager,"
+HY-1F
+HY-3A (HY-1E)
+HY-3B",2023,2036,2025-05-12 09:53:01
+1334,CoDICE,Compact Dual Ion Composition Experiment,NASA,Energetic particle spectrometer,"
+IMAP",2026,2029,2023-02-20 10:33:50
+974,COMIS,Compact Imaging Spectrometer,KARI,High-resolution optical imager,"
+STSat-3",2014,2023,2022-11-21 11:48:37
+906,CORISS,C/NOFS Occultation Receiver for Ionospheric Sensing and Specification,NASA,GNSS radio-occultation sounder,"
+C/NOFS",2008,2015,2022-07-25 15:00:09
+89,COSI,Corea SAR Instrument,KARI,Imaging radar (SAR),"
+KOMPSAT-5
+KOMPSAT-6",2013,2029,2023-02-02 16:36:55
+1318,COSIS,COSIS,DLR,Cross-nadir scanning SW sounder,"
+CO2Image",2026,2029,2022-10-24 08:16:19
+1374,Cosmic Radio Noise,Cosmic Radio Noise,CSA,Field or radiowave sensor,"
+Alouette-1
+Alouette-2",1962,1975,2023-10-16 14:43:03
+718,COSTEP,Suprathermal & Energetic Particle Analyzer,DLR,Energetic particle spectrometer,"
+SOHO",1996,2027,2021-11-10 09:49:33
+1215,COWVR,Compact Ocean Wind Vector Radiometer,NASA,Microwave conical scanning radiometer,"
+ISS COWVR",2022,2026,2024-06-24 08:09:43
+1005,CP,Coronagraph/Polarimeter,NASA,Solar activity monitor,"
+SMM",1980,1989,2017-05-19 00:51:03
+90,CPD,Charged Particle Detector,DNSC,Energetic particle spectrometer,"
+Ørsted",1999,2014,2022-07-25 15:42:23
+749,CPI,Comprehensive Plasma Investigation,NASA,Energetic particle spectrometer,"
+GEOTAIL",1992,2022,2021-12-16 01:11:43
+91,CPR,Cloud Profiling Radar for CloudSat,NASA,Cloud and precipitation radar,"
+ACE (Aer.Clo.Eco.)
+CloudSat",0,2023,2021-06-15 20:28:50
+92,CPR,Cloud Profiling Radar for Earth-CARE,JAXA,Cloud and precipitation radar,"
+EarthCARE",2024,2034,2022-03-28 10:16:56
+93,CrIS,Cross-track Infrared Sounder,NOAA,Cross-nadir infrared sounder,"
+JPSS-3
+JPSS-4
+NOAA-20
+NOAA-21
+SNPP",2012,2041,2025-11-03 16:40:15
+709,CRIS,Cosmic Ray Isotope Spectrometer,NASA,Energetic particle spectrometer,"
+ACE",1997,2027,2021-11-10 11:34:19
+1276,CSAR,Cryogenic Solar Absolute Radiometer,ESA,Solar irradiance monitor,"
+TRUTHS",0,0,2022-11-28 09:14:07
+918,CSCAT,CFOSAT Scatterometer,CNSA,Radar scatterometer,"
+CFOSAT
+HY-2L (CFOSAT-FO)",2019,2038,2024-11-18 12:23:18
+448,CSG-SAR,COSMO-SkyMed Second Generation Synthetic Aperture Radar,ASI,Imaging radar (SAR),"
+CSG-1
+CSG-2
+CSG-3
+CSG-4",2020,2033,2021-06-15 20:53:04
+1309,CTIM-FD,Compact Total Irradiance Monitor-Flight Demonstration,NASA,Solar irradiance monitor,"
+CTIM-FD",2022,2024,2022-07-11 08:33:39
+1019,CUBIC,"Cosmic Unresolved X-Ray Background
+Instrument using CCDs",NASA,Space radiometer or spectrometer,"
+SAC-B",1996,1996,2017-05-21 13:13:10
+95,CZCS,Coastal Zone Colour Scanner,NASA,Moderate-resolution optical imager,"
+Nimbus-7",1979,1994,2012-11-29 02:52:00
+96,CZI,Coastal Zone Imager,NSOAS,High-resolution optical imager,"
+HY-1A
+HY-1B
+HY-1C
+HY-1D",2002,2026,2023-01-12 12:20:55
+1391,CZI2,Coastal Zone Imager 2,NSOAS,High-resolution optical imager,"
+HY-1F
+HY-3A (HY-1E)
+HY-3B",2023,2036,2023-12-01 14:14:14
+863,DCIS,Data Collection and Interrogation Service,NOAA,Data collection system,"
+EWS-G1
+EWS-G2
+GeoXO 1
+GeoXO 2
+GeoXO 3
+GeoXO 4
+GOES-1
+GOES-10
+GOES-10 (S-America)
+GOES-11
+GOES-12
+GOES-12 (S-America)
+GOES-13
+GOES-14
+GOES-15
+GOES-16
+GOES-17
+GOES-18
+GOES-19
+GOES-2
+GOES-3
+GOES-4
+GOES-5
+GOES-6
+GOES-7
+GOES-8
+GOES-9
+GOES-9 (GMS backup)
+SMS-1
+SMS-2",1974,2051,2023-03-20 14:16:35
+100,DCS,Data Collection Service,NOAA,Data collection system,"
+Meteosat-1
+Meteosat-10
+Meteosat-11
+Meteosat-12
+Meteosat-2
+Meteosat-3
+Meteosat-3 (ADC)
+Meteosat-3 (X-ADC)
+Meteosat-4
+Meteosat-5
+Meteosat-5 (IODC)
+Meteosat-6
+Meteosat-6 (IODC)
+Meteosat-7
+Meteosat-7 (IODC)
+Meteosat-8
+Meteosat-8 (IODC)
+Meteosat-9
+Meteosat-9 (IODC)
+MTG-I2
+MTG-I3
+MTG-I4",1978,2047,2022-11-16 17:03:07
+103,DCS,Data Collection Service,JMA,Data collection system,"
+Himawari-1 (GMS-1)
+Himawari-10
+Himawari-2 (GMS-2)
+Himawari-3 (GMS-3)
+Himawari-4 (GMS-4)
+Himawari-5 (GMS-5)
+Himawari-6 (MTSAT-1R)
+Himawari-7 (MTSAT-2)
+Himawari-8
+Himawari-9",1977,2046,2012-06-05 02:56:08
+105,DCS,Data Collection Service,CMA,Data collection system,"
+FY-2A
+FY-2B
+FY-2C
+FY-2D
+FY-2E
+FY-2F
+FY-2G
+FY-2H
+FY-4A
+FY-4B
+FY-4C
+FY-4D
+FY-4E
+FY-4F",1997,2037,2012-06-05 02:51:59
+107,DCS,Data Collection Service,ISRO,Data collection system,"
+INSAT-1A
+INSAT-1B
+INSAT-1C
+INSAT-1D
+INSAT-2A
+INSAT-2B
+INSAT-2D
+INSAT-2E
+INSAT-3A
+INSAT-3D
+INSAT-3DR
+INSAT-3DS
+Kalpana-1",1982,2034,2012-06-05 02:52:39
+109,DCS,Data Collection Service,Roscosmos,Data collection system,"
+Electro-GOMS
+Electro-L N1
+Electro-L N2
+Electro-L N3
+Electro-L N4
+Electro-L N5
+Electro-L N6
+Electro-L N7
+Electro-M N1-1
+Electro-M N1-2",1995,2046,2016-07-05 13:09:43
+112,DCS,Data Collection System,NASA,Data collection system,"
+Landsat-1 (ERTS)
+Landsat-2
+Landsat-3",1972,1983,2012-07-11 17:56:04
+114,DCS,Data Collection System,INPE,Data collection system,"
+CBERS-1
+CBERS-2
+CBERS-2B
+CBERS-3
+CBERS-4
+CBERS-4B
+SCD-1
+SCD-2",1993,2026,2012-06-05 02:59:41
+116,DCS,Data Collection System,CNES,Data collection system,"
+ADEOS-2",2003,2003,2012-06-05 03:00:44
+117,DCS,Data Collection System,CONAE,Data collection system,"
+SAC-C
+SAC-D
+SAC-E/SABIA-MAR A
+SAC-E/SABIA-MAR B",2001,2029,2012-06-05 03:01:24
+803,DCS/2,"Data Collection System / 2 (also called ""Argos-2"")",CNES,Data collection system,"
+NOAA-15
+NOAA-16
+NOAA-17
+NOAA-18",1998,2025,2012-06-05 03:01:57
+654,DCS/A,Data Collection Service for Arktika,Roscosmos,Data collection system,"
+Arctica-M N1
+Arctica-M N2
+Arctica-M N3
+Arctica-M N4
+Arctica-M N5
+Arctica-M N6
+Arctica-M N7
+Arctica-M N8",2021,2040,2024-01-22 10:53:44
+921,DDMI,Delay Doppler Mapping Instrument ,NASA,Positioning system,"
+CYGNSS (8 sats)",2017,2026,2021-06-17 15:22:46
+118,Delta-2D,Scanning Microwave Radiometer,Roscosmos,Microwave conical scanning radiometer,"
+Okean-O-1",1999,2000,2012-09-03 15:01:51
+1082,DESIS,DLR Earth Sensing Imaging Spectrometer,DLR,High-resolution optical imager,"
+ISS DESIS",2018,2026,2021-06-22 22:29:05
+926,DFG,Digital Fluxgate Magnetometer,NASA,Field or radiowave sensor,"
+MMS-A
+MMS-B
+MMS-C
+MMS-D",2015,2026,2021-10-02 22:51:55
+638,DIDM,Digital Ion Drift Meter,NASA,Field or radiowave sensor,"
+C/NOFS
+CHAMP",2000,2015,2022-08-08 15:05:26
+988,DIFOS,Solar Flux Optical Photometer,Roscosmos,Solar irradiance monitor,"
+Coronas-F
+Coronas-I",1994,2005,2016-11-07 19:59:55
+983,DIOGENESS,Diagnostic of Energy Sources and Sinks in Flares,Roscosmos,Solar activity monitor,"
+Coronas-F
+Coronas-I",1994,2005,2017-05-17 20:16:37
+119,DMAC,DubaiSat-1 Medium Aperture Camera,EIAST,High-resolution optical imager,"
+DubaiSat-1",2010,2016,2022-08-08 14:17:24
+120,DORIS,Doppler Orbitography and Radiopositioning Integrated by Satellite,CNES,Positioning system,"
+CryoSat
+CryoSat-2
+Envisat
+HY-2A
+HY-2C
+HY-2D
+HY-2F
+JASON-1
+JASON-2
+JASON-3
+SARAL
+Sentinel-3A
+Sentinel-3B
+Sentinel-3C
+Sentinel-3D
+Sentinel-6A
+Sentinel-6B
+Sentinel-6C
+SPOT-2
+SPOT-3
+SPOT-4
+SPOT-5
+SWOT
+TOPEX-Poseidon",1990,2037,2024-09-23 15:52:42
+1361,Dosimeter,Dosimeter,ESA,Energetic particle spectrometer,"
+PRETTY",2023,2026,2023-06-12 09:35:30
+786,DP,Double Probes,NASA,Field or radiowave sensor,"
+MMS-A
+MMS-B
+MMS-C
+MMS-D",2015,2026,2021-10-02 22:35:29
+1178,DPC,Directional Polarization Camera,CNSA,Moderate-resolution optical imager,"
+GF-5
+GF-5-01A
+GF-5-02",2018,2030,2022-04-25 12:26:48
+1294,DPC-2,Directional Polarization Camera - 2,CNSA,Moderate-resolution optical imager,"
+DQ-1",2022,2030,2022-07-18 13:10:06
+125,DPR,Dual-frequency Precipitation Radar,JAXA,Cloud and precipitation radar,"
+GPM Core Observatory",2014,2030,2021-06-15 20:30:39
+977,DREAM,Dual-channel Radiometers for Earth and Atmosphere Monitoring,KARI,Microwave cross-track scanning radiometer,"
+STSat-2",2009,2009,2013-02-06 16:09:11
+735,DSLP,Dual Segmented Langmuir Probe,ESA,Field or radiowave sensor,"
+PROBA-2",2009,2026,2021-12-09 12:37:32
+1429,DuSIFIS,Dual band SIF imaging spectrometer,CMA,Moderate-resolution optical imager,"
+TANSAT-2",2026,2032,2025-03-31 15:57:14
+1093,ECOSTRESS,"ECOsystem
+Spaceborne Thermal Radiometer Experiment on Space Station",NASA,High-resolution optical imager,"
+ISS ECOSTRESS",2018,2026,2022-08-01 10:48:02
+1304,ECP,Energetic Charged Particle sensor,DoD,Energetic particle spectrometer,"
+WSF-M1
+WSF-M2",2024,2035,2024-04-12 10:13:54
+1054,ECT/HOPE,ECT Helium Oxygen Proton Electron,NASA,Energetic particle spectrometer,"
+VAP (2 sat)",2012,2019,2021-10-02 19:10:18
+1053,ECT/MagEIS,ECT Magnetic Electron and Ion Spectrometer,NASA,Energetic particle spectrometer,"
+VAP (2 sat)",2012,2019,2021-10-02 19:08:52
+1055,ECT/REPT,ECT Relativistic Electron Proton Telescope,NASA,Energetic particle spectrometer,"
+VAP (2 sat)",2012,2019,2021-10-02 19:11:28
+1473,EDGE LIDAR,Earth Dynamics Geodetic Explorer LIDAR,NASA,Space lidar,"
+EDGE",2030,2033,2026-02-16 11:25:07
+645,EDI,Electron Drift Instrument,NASA,Field or radiowave sensor,"
+MMS-A
+MMS-B
+MMS-C
+MMS-D",2015,2026,2021-10-02 22:18:57
+765,EDI,Electron Drift Instrument,ESA,Field or radiowave sensor,"
+CLUSTER-1
+CLUSTER-2
+CLUSTER-3
+CLUSTER-4",2000,2025,2021-12-10 04:58:41
+665,EFD,Electric Field Detector,JAXA,Field or radiowave sensor,"
+GEOTAIL",1992,2022,2021-12-10 00:37:02
+750,EFI,Electric Fields Instrument,NASA,Field or radiowave sensor,"
+Polar",1996,2008,2016-03-20 01:06:48
+773,EFI,Electric Field Instrument,NASA,Field or radiowave sensor,"
+ARTEMIS-P1
+ARTEMIS-P2
+THEMIS-A
+THEMIS-D
+THEMIS-E",2007,2026,2021-12-07 00:29:44
+1447,EFI,Electric Field Instrument,NASA,Energetic particle spectrometer,"
+TRACERS",2025,2026,2025-07-28 14:47:05
+126,EFI,Electric Field Instrument,CSA,Field or radiowave sensor,"
+SWARM-A
+SWARM-B
+SWARM-C",2014,2026,2024-09-23 10:59:48
+667,EFW,Electric Fields and Waves,ESA,Field or radiowave sensor,"
+CLUSTER-1
+CLUSTER-2
+CLUSTER-3
+CLUSTER-4",2000,2025,2021-12-09 12:33:41
+782,EFW,Electric Field and Waves Suite,NASA,Field or radiowave sensor,"
+VAP (2 sat)",2012,2019,2021-10-02 22:32:36
+127,EGG,3-Axis Electrostatic Gravity Gradiometer,ESA,Gravity sensing system,"
+GOCE",2009,2013,2023-02-08 11:46:57
+642,EIS,EUV Imaging Spectrometer,JAXA,Solar activity monitor,"
+Solar-B (Hinode)",2007,2026,2021-12-16 00:30:35
+925,EIS,Energetic Ion Spectrometer,NASA,Energetic particle spectrometer,"
+MMS-A
+MMS-B
+MMS-C
+MMS-D",2015,2026,2021-12-16 01:17:30
+713,EIT,Extreme UV Imaging Telescope,NASA,Solar activity monitor,"
+SOHO",1996,2027,2021-11-09 14:30:39
+742,Electron-M-PESCA,Charged particle analyzer,Roscosmos,Energetic particle spectrometer,"
+Coronas-Photon",2009,2009,2017-06-04 21:39:33
+691,EMFISIS,Electric and Magnetic Field Instrument Suite and Integrated Science,NASA,Field or radiowave sensor,"
+VAP (2 sat)",2012,2019,2021-10-02 22:20:14
+1179,EMI,Environment Monitoring Instrument,CNSA,Cross-nadir scanning SW sounder,"
+GF-5
+GF-5-01A
+GF-5-02",2018,2030,2022-04-25 12:15:24
+1295,EMI-2,Environment Monitoring Instrument-2,CNSA,Cross-nadir scanning SW sounder,"
+DQ-1",2022,2030,2022-07-18 13:12:30
+1234,EMIT,Earth Surface Mineral Dust Source Investigation,NASA,Moderate-resolution optical imager,"
+ISS EMIT",2022,2026,2023-11-27 11:16:39
+1147,EMU,Environmental Monitor Unit,ESA,Energetic particle spectrometer,"
+Galileo",2012,2031,2021-10-02 19:16:03
+1458,ENAI,The Energetic Neutral Atom Imager,CMA,Energetic particle spectrometer,"
+FY-3J
+FY-4M1",2027,2034,2025-10-27 08:56:44
+1462,EnSAC,Environmental Sensor for Atmospheric Composition,ISRO,Cross-nadir infrared sounder,"
+G20",2027,2032,2025-11-10 16:52:57
+128,EOC,Electro-Optical Camera,KARI,High-resolution optical imager,"
+KOMPSAT-1",2000,2008,2017-03-28 00:41:49
+1406,EOIR,Electro Optical Infrared Payload,ISRO,High-resolution optical imager,"
+EOS-08",2024,2026,2024-08-12 07:46:31
+941,EOS-C,Earth Observation Satellite - Camera,TÜBITAK-UZAY,High-resolution optical imager,"
+Göktürk-2",2013,2023,2021-06-17 16:26:06
+726,EPACT,"Energetic Particles Acceleration, Composition, Transport",NASA,Energetic particle spectrometer,"
+WIND",1995,2026,2021-11-10 11:46:58
+710,EPAM,"Electron, Proton, and Alpha-particle Monitor",NASA,Energetic particle spectrometer,"
+ACE",1997,2027,2021-11-10 11:35:43
+1142,EPD,Energetic Particle Telescope,ESA,Energetic particle spectrometer,"
+PROBA-V",2013,2021,2024-09-23 10:32:39
+928,EPD,Energetic Particle Detector,CDTI,Energetic particle spectrometer,"
+Solar Orbiter",2020,2030,2021-12-16 16:05:15
+1372,EPD,Energetic Particle Detectors,CSA,Energetic particle spectrometer,"
+Alouette-1
+Alouette-2",1962,1975,2023-10-16 14:51:25
+748,EPIC,Energetic Particle and Ion Composition Experiment,NASA,Energetic particle spectrometer,"
+GEOTAIL",1992,2022,2022-08-02 10:55:00
+793,EPIC,Earth Polychromatic Imaging Camera,NASA,Moderate-resolution optical imager,"
+DSCOVR",2015,2029,2017-03-27 16:01:06
+1143,EPIC,European Photon Imaging Camera,ESA,Space radiometer or spectrometer,"
+XMM-Newton",2000,2026,2024-01-22 08:44:46
+129,ERB,Earth Radiation Budget,NASA,Broad band radiometer,"
+Nimbus-6
+Nimbus-7",1975,1994,2014-09-24 17:51:55
+130,ERBE,Earth Radiation Budget Experiment,NASA,Broad band radiometer,"
+ERBS",1985,2005,2014-09-24 17:57:01
+131,ERBE,Earth Radiation Budget Experiment,NASA,Broad band radiometer,"
+NOAA-10
+NOAA-9",1985,2001,2014-09-24 18:29:21
+631,ERBR,Earth Radiation Budget Radiometer,Roscosmos,Broad band radiometer,"
+Electro-M N1-1
+Electro-M N1-2",2036,2046,2021-06-14 23:25:17
+132,ERM-1,Earth Radiation Measurement - 1,CMA,Broad band radiometer,"
+FY-3A
+FY-3B
+FY-3C",2008,2024,2024-09-09 14:23:32
+133,ERM-2,Earth Radiation Measurement - 2,CMA,Broad band radiometer,"
+FY-3F",2023,2031,2024-09-09 14:57:21
+719,ERNE,Energetic and Relativistic Nuclei and Electron experiment,ESA,Energetic particle spectrometer,"
+SOHO",1996,2027,2021-11-10 09:47:14
+1421,ERS,Earth Radiative Sensor,LATMOS,Broad band radiometer,"
+UVSQ-NG",2025,2030,2025-02-03 16:23:56
+795,ES,Electron Spectrometer,NASA,Energetic particle spectrometer,"
+DSCOVR",2015,2029,2021-10-02 18:17:37
+770,ESA,Electrostatic Analyzer,NASA,Energetic particle spectrometer,"
+ARTEMIS-P1
+ARTEMIS-P2
+THEMIS-A
+THEMIS-D
+THEMIS-E",2007,2026,2021-12-16 01:21:16
+883,ESEP,Ionospheric plasma energy spectrometer,Roscosmos,Energetic particle spectrometer,"
+Ionosfera-M N1 & N2
+Ionosfera-M N3 & N4",2025,2033,2021-12-16 01:05:32
+807,ESMR,Electrically Scanning Microwave Radiometer,NASA,Microwave cross-track scanning radiometer,"
+Nimbus-5",1973,1983,2025-01-15 09:57:30
+134,ESMR,Electrically Scanning Microwave Radiometer,NASA,Microwave conical scanning radiometer,"
+Nimbus-6",1975,1983,2012-05-14 00:49:12
+135,ETM,Enhanced Thematic Mapper,NASA,High-resolution optical imager,"
+Landsat-6",1993,1993,2017-03-28 00:50:19
+136,ETM+,Enhanced Thematic Mapper +,NASA,High-resolution optical imager,"
+Landsat-7",1999,2024,2021-06-16 11:26:07
+929,EUI,Extreme Ultraviolet Imager,BIRA,Solar activity monitor,"
+Solar Orbiter",2020,2030,2021-09-29 19:08:45
+1064,EUV,Extreme Ultraviolet Imager,NASA,Space radiometer or spectrometer,"
+IMAGE",2000,2005,2017-05-21 15:33:00
+1086,EUV,Extreme Ultra Violet Imaging Spectrograph ,NASA,Space radiometer or spectrometer,"
+ICON",2020,2021,2022-08-02 10:42:17
+643,EVE,EUV Variability Experiment,NASA,Solar activity monitor,"
+SDO",2010,2026,2021-12-16 00:34:31
+1217,EvM,Event Monitoring camera,ISRO,High-resolution optical imager,"
+CartoSat-2C
+CartoSat-2D
+CartoSat-2E
+CartoSat-2F",2016,2026,2020-01-04 15:22:23
+137,EXIS,Extreme Ultraviolet Sensor / X-Ray Sensor Irradiance Sensors,NOAA,Solar activity monitor,"
+GOES-16
+GOES-17
+GOES-18
+GOES-19",2017,2043,2021-12-16 00:13:14
+775,FAI,Fast Auroral Imager,CSA,Space radiometer or spectrometer,"
+CASSIOPE",2014,2021,2021-10-02 17:22:58
+796,FC,Faraday Cup,NASA,Energetic particle spectrometer,"
+DSCOVR",2015,2029,2021-10-02 18:19:17
+138,FCI,Flexible Combined Imager,ESA,Moderate-resolution optical imager,"
+Meteosat-12
+MTG-I2
+MTG-I3
+MTG-I4",2023,2047,2024-09-23 15:21:48
+924,FEEPS,Fly's Eye Energetic Particle Sensor,NASA,Energetic particle spectrometer,"
+MMS-A
+MMS-B
+MMS-C
+MMS-D",2015,2026,2021-12-16 01:18:22
+649,FGM,Fluxgate Magnetometer,NASA,Field or radiowave sensor,"
+ARTEMIS-P1
+ARTEMIS-P2
+THEMIS-A
+THEMIS-D
+THEMIS-E",2007,2026,2021-12-07 12:35:17
+760,FGM,Fluxgate Magnetometer,ESA,Field or radiowave sensor,"
+CLUSTER-1
+CLUSTER-2
+CLUSTER-3
+CLUSTER-4",2000,2025,2021-12-07 12:40:46
+1284,FGM,Fluxgate Magnetometer,CMA,Field or radiowave sensor,"
+FY-4E",2027,2035,2022-11-28 17:09:58
+1003,FIELDS,Electromagnetic Fields Investigation,NASA,Field or radiowave sensor,"
+Parker Solar Probe",2018,2026,2024-01-22 08:53:24
+975,FIMS,Far Ultra Violet Imaging Spectrograph,KARI,Space radiometer or spectrometer,"
+STSat-1",2003,2005,2017-05-21 19:57:57
+1262,FLOCK,FLOCK,Planet,High-resolution optical imager,"
+FLOCK",2014,2040,2021-10-02 11:20:22
+1168,FLORIS,FLuORescence Imaging Spectrometer,ESA,Moderate-resolution optical imager,"
+FLEX",2026,2029,2021-10-25 10:37:24
+884,FM-G,Magnetometer,Roscosmos,Field or radiowave sensor,"
+Zond-M",2027,2030,2022-08-01 13:02:23
+1315,FMG,Full-disk solar vector MagnetoGraph,CAS,Solar activity monitor,"
+ASO-S (Kuafu-1)",2023,2026,2022-10-10 10:38:41
+922,FPI,Fast Plasma Instrument,NASA,Energetic particle spectrometer,"
+MMS-A
+MMS-B
+MMS-C
+MMS-D",2015,2026,2021-12-16 01:19:18
+139,FPR,Flat Plate Radiometer,NASA,Broad band radiometer,"
+ESSA-1
+ESSA-3
+ESSA-5
+ESSA-7
+ESSA-9
+Explorer-VII
+ITOS-1 (TIROS-M)
+NOAA-1
+TIROS-2
+TIROS-3
+TIROS-4
+TIROS-7",1961,1972,2016-11-07 18:47:38
+1240,FSI,FORUM Sounding Instrument,ESA,Cross-nadir infrared sounder,"
+FORUM",2028,2033,2023-11-30 09:58:23
+1088,FUV,Far Ultra Violet Imaging Spectrograph ,NASA,Space radiometer or spectrometer,"
+ICON",2020,2026,2024-01-22 08:41:17
+1455,FUV,Far Ultra-violet cameras,NASA,Limb sounder,"
+Carruthers",2026,2028,2025-09-29 09:12:47
+1067,FUV/GEO,Far Ultraviolet Imager / Geocorona Photometer,NASA,Space radiometer or spectrometer,"
+IMAGE",2000,2005,2016-03-10 18:54:46
+1066,FUV/SI,Far Ultraviolet Imager / Spectrographic Imager,NASA,Space radiometer or spectrometer,"
+IMAGE",2000,2005,2017-05-21 15:37:08
+1065,FUV/WIC,Far Ultraviolet Imager / Wideband Imaging Camera,NASA,Space radiometer or spectrometer,"
+IMAGE",2000,2005,2017-05-21 15:40:01
+142,FVM,Fluxgate Vector Magnetometer,DNSC,Field or radiowave sensor,"
+Ørsted
+SAC-C",1999,2014,2022-07-25 15:43:42
+143,FWS,Filter Wedge Spectrometer,NASA,Cross-nadir infrared sounder,"
+Nimbus-4",1970,1980,2017-03-29 16:08:59
+864,GALS/1,Galactic cosmic ray spectrometer / 1,Roscosmos,Energetic particle spectrometer,"
+Ionosfera-M N1 & N2
+Ionosfera-M N3 & N4",2025,2033,2021-12-16 01:06:28
+779,GAP,GPS Attitude and Positioning Experiment,CSA,Positioning system,"
+CASSIOPE",2014,2021,2022-07-25 13:22:03
+1279,GARI,The GAGG Radiation Instruments,NRL,Space radiometer or spectrometer,"
+ISS GARI",2022,2023,2022-01-04 18:45:08
+144,GAS,Greenhouse-gases Absorption Spectrometer,CMA,Cross-nadir scanning SW sounder,"
+FY-3D",2018,2026,2024-09-09 14:32:40
+1260,GAS-2,Greenhouse-gases Absorption Spectrometer - 2,CMA,Cross-nadir scanning SW sounder,"
+DQ-2
+FY-3H",2026,0,2025-06-09 13:30:16
+1092,GEDI Lidar,Global Ecosystem Dynamics Investigation Lidar,NASA,Space lidar,"
+ISS GEDI",2019,2030,2021-08-30 23:26:41
+145,GEMS,Geostationary Environmental Monitoring Spectrometer,ME (NIER),Cross-nadir scanning SW sounder,"
+GEO-KOMPSAT-2B",2020,2030,2023-11-16 14:48:58
+1431,GEMS2,Global Environmental Monitoring System – 2nd Generation,Weatherstream,Microwave cross-track scanning radiometer,"
+GEMS2- Amethyst
+GEMS2- Beryl",2026,2029,2025-04-23 10:12:39
+146,GEOS&R ,Geostationary Search and Rescue,NOAA,Search & rescue system,"
+EWS-G1
+EWS-G2
+GOES-10
+GOES-10 (S-America)
+GOES-11
+GOES-12
+GOES-12 (S-America)
+GOES-13
+GOES-14
+GOES-15
+GOES-16
+GOES-17
+GOES-18
+GOES-19
+GOES-8
+GOES-9
+GOES-9 (GMS backup)
+Meteosat-10
+Meteosat-11
+Meteosat-12
+Meteosat-8
+Meteosat-8 (IODC)
+Meteosat-9
+Meteosat-9 (IODC)
+MTG-I2
+MTG-I3
+MTG-I4",1994,2047,2020-07-12 19:46:46
+150,GEOS&R,Geostationary Search and Rescue,RosHydroMet,Search & rescue system,"
+Electro-L N1
+Electro-L N2
+Electro-L N3
+Electro-L N4
+Electro-L N5
+Electro-L N6
+Electro-L N7
+Electro-M N1-1
+Electro-M N1-2",2012,2046,2016-07-05 13:10:27
+791,GeoSTAR,Geostationary Synthetic Thinned-Aperture Radiometer,NASA,Microwave cross-track scanning radiometer,"
+PATH",,0,2012-09-04 11:46:23
+152,Geoton-1,Panchromatic and multispectral radiometer 1,Roscosmos,High-resolution optical imager,"
+Resurs-DK",2006,2016,2022-07-25 14:12:18
+634,Geoton-L1,Panchromatic and multispectral radiometer - L1,Roscosmos,High-resolution optical imager,"
+Resurs-P1
+Resurs-P2
+Resurs-P3
+Resurs-P4
+Resurs-P5",2013,2029,2021-06-16 14:51:38
+153,GERB,Geostationary Earth Radiation Budget,UKSA,Broad band radiometer,"
+Meteosat-10
+Meteosat-11
+Meteosat-8
+Meteosat-8 (IODC)
+Meteosat-9
+Meteosat-9 (IODC)",2004,2033,2024-09-23 15:15:57
+1140,GF-4/13 imager,Imager of GaoFen-4 and GaoFen-13,CNSA,High-resolution optical imager,"
+GF-13
+GF-13-02
+GF-4",2016,2030,2023-03-20 08:07:14
+154,GFO-RA,GEOSat Follow-On Radar Altimeter,NASA,Radar altimeter,"
+GFO",1998,2008,2012-09-17 12:36:15
+827,GGAK-E/DIR-E,Solar X-ray radiation flux sensor,Roscosmos,Solar activity monitor,"
+Electro-L N1
+Electro-L N2
+Electro-L N3
+Electro-L N4
+Electro-L N5
+Electro-L N6
+Electro-L N7
+Electro-M N1-1
+Electro-M N1-2",2012,2046,2021-12-15 23:56:54
+820,GGAK-E/FM-E,GGAK-E / Magnetometer instrument,Roscosmos,Field or radiowave sensor,"
+Arctica-M N1
+Arctica-M N2
+Arctica-M N3
+Arctica-M N4
+Arctica-M N5
+Arctica-M N6
+Arctica-M N7
+Arctica-M N8
+Electro-L N4
+Electro-L N5
+Electro-L N6
+Electro-L N7
+Electro-M N1-1
+Electro-M N1-2",2021,2046,2022-11-25 08:57:42
+816,GGAK-E/GALS-E,GGAK-E / Detector of galactic cosmic rays,Roscosmos,Energetic particle spectrometer,"
+Electro-L N1
+Electro-L N2
+Electro-L N3
+Electro-L N4
+Electro-L N5
+Electro-L N6
+Electro-L N7
+Electro-M N1-1
+Electro-M N1-2",2012,2046,2022-08-01 15:10:01
+1273,GGAK-E/GALS-E,GGAK-E / Detector of galactic cosmic rays,Roscosmos,Energetic particle spectrometer,"
+Arctica-M N1
+Arctica-M N2
+Arctica-M N3
+Arctica-M N4
+Arctica-M N5
+Arctica-M N6
+Arctica-M N7
+Arctica-M N8",2021,2040,2022-08-01 13:52:28
+1274,GGAK-E/GALS-E,GGAK-E / Detector of galactic cosmic rays,Roscosmos,Energetic particle spectrometer,"
+Meteor-M N1
+Meteor-M N2
+Meteor-M N2-1
+Meteor-M N2-2
+Meteor-M N2-3
+Meteor-M N2-4
+Meteor-M N2-5
+Meteor-M N2-6
+Meteor-M N2-7
+Meteor-M N2-8
+Meteor-MP N1
+Meteor-MP N2",0,2044,2022-08-01 13:53:39
+817,GGAK-E/ISP-2M,GGAK-L / Solar constant sensor,Roscosmos,Solar irradiance monitor,"
+Electro-L N4
+Electro-L N5
+Electro-L N6
+Electro-L N7
+Electro-M N1-1
+Electro-M N1-2",2023,2046,2021-06-23 21:44:12
+814,GGAK-E/SKIF-6,GGAK-E / Corpuscular radiation spectrometer,Roscosmos,Energetic particle spectrometer,"
+Electro-L N1
+Electro-L N2
+Electro-L N3
+Electro-L N4
+Electro-L N5
+Electro-L N6
+Electro-L N7
+Electro-M N1-1
+Electro-M N1-2",2012,2046,2022-08-01 13:47:32
+1271,GGAK-E/SKIF-6,GGAK-E / Corpuscular radiation spectrometer,Roscosmos,Energetic particle spectrometer,"
+Arctica-M N1
+Arctica-M N2
+Arctica-M N3
+Arctica-M N4
+Arctica-M N5
+Arctica-M N6
+Arctica-M N7
+Arctica-M N8",2021,2040,2022-08-01 13:48:29
+1272,GGAK-E/SKIF-6,GGAK-E / Corpuscular radiation spectrometer,Roscosmos,Energetic particle spectrometer,"
+Meteor-M N1
+Meteor-M N2
+Meteor-M N2-1
+Meteor-M N2-2
+Meteor-M N2-3
+Meteor-M N2-4
+Meteor-M N2-5
+Meteor-M N2-6
+Meteor-M N2-7
+Meteor-M N2-8
+Meteor-MP N1
+Meteor-MP N2",0,2044,2022-08-01 13:49:15
+815,GGAK-E/SKL-E,GGAK-E / Solar cosmic rays spectrometer,Roscosmos,Energetic particle spectrometer,"
+Electro-L N1
+Electro-L N2
+Electro-L N3
+Electro-L N4
+Electro-L N5
+Electro-L N6
+Electro-L N7",0,2041,2022-08-01 13:55:28
+818,GGAK-E/VUSS-E,GGAK-E / Solar UV radiation sensor,Roscosmos,Solar activity monitor,"
+Electro-L N1
+Electro-L N2
+Electro-L N3
+Electro-L N4
+Electro-L N5
+Electro-L N6
+Electro-L N7
+Electro-M N1-1
+Electro-M N1-2",2012,2046,2021-09-29 18:12:40
+823,GGAK-M/KGI-4C,GGAK-M / Radiation Monitoring System,Roscosmos,Energetic particle spectrometer,"
+Meteor-3M",2002,2006,2020-03-02 00:36:58
+822,GGAK-M/MSGI-MKA,GGAK-M / Spectrometer for Geoactive Measurements,Roscosmos,Energetic particle spectrometer,"
+Meteor-3M",2002,2006,2020-03-02 00:35:28
+1219,GGAK-M/RIMS-M,Radio-frequency mass spectrometer - M,Roscosmos,Energetic particle spectrometer,"
+Meteor-M N1
+Meteor-M N2
+Meteor-M N2-1
+Meteor-M N2-2
+Meteor-M N2-3
+Meteor-M N2-4
+Meteor-M N2-5
+Meteor-M N2-6
+Meteor-M N2-7
+Meteor-M N2-8
+Meteor-MP N1
+Meteor-MP N2",2009,2044,2021-12-16 01:23:16
+1301,GHGSat-Spectrometer,GHGSat Imaging Spectrometer,GHGSat,Cross-nadir scanning SW sounder,"
+GHGSat",2016,2030,2023-01-23 12:10:47
+1161,GHI,Geostationary High-speed Imager,CMA,Moderate-resolution optical imager,"
+FY-4B
+FY-4E
+GeoXO 3",2021,0,2024-09-09 14:44:44
+1350,GHMI,Geostationary Himawari Imager,JMA,Moderate-resolution optical imager,"
+Himawari-10",2030,2046,2025-06-09 13:20:18
+1347,GHMS,Geostationary Himawari Sounder,JMA,Cross-nadir infrared sounder,"
+Himawari-10",2030,2046,2025-01-27 08:16:21
+1349,GHOSt-Imager,GHOSt-Imager,OSK,Cross-nadir infrared sounder,"
+GHOSt-1
+GHOSt-2
+GHOSt-3
+GHOSt-4
+GHOSt-5",2023,2029,2023-11-27 11:20:48
+214,GIIRS,Prototype Geostationary Interferometric Infrared Sounder,CMA,Cross-nadir infrared sounder,"
+FY-4A",2017,2026,2024-09-09 14:38:37
+1339,GIIRS-2,Geostationary Interferometric Infrared Sounder-2,CMA,Cross-nadir infrared sounder,"
+FY-4B
+FY-4C
+FY-4D
+FY-4E
+FY-4F",2021,2037,2025-03-31 08:16:17
+677,GIS,GeoEye Imaging System,GeoEye,High-resolution optical imager,"
+GeoEye-1",2009,2026,2022-08-08 13:16:57
+155,GLAS,Geoscience Laser Altimeter System,NASA,Space lidar,"
+ICESat",2003,2010,2017-03-31 11:43:08
+156,GLI,Global Imager,JAXA,Moderate-resolution optical imager,"
+ADEOS-2",2003,2003,2013-12-04 13:16:53
+1363,GLIMMER,GLIMMER Imager,CAS,High-resolution optical imager,"
+SDGSAT-1",2022,2026,2023-07-03 13:19:04
+157,GLM,Geostationary Lightning Mapper,NOAA,Lightning imager,"
+GeoXO 1
+GOES-16
+GOES-17
+GOES-18
+GOES-19",2017,2045,2021-06-02 14:26:27
+1337,GLOWS,GLObal solar Wind Structure,NASA,Space radiometer or spectrometer,"
+IMAP",2026,2029,2023-02-20 11:52:11
+158,GMI,GPM Microwave Imager,NASA,Microwave conical scanning radiometer,"
+GPM Core Observatory",2014,2030,2026-03-09 08:55:37
+1180,GMI,Greenhouse-gases Monitoring Instrument,CNSA,Cross-nadir scanning SW sounder,"
+GF-5
+GF-5-01A
+GF-5-02",2018,2030,2025-04-14 08:49:09
+162,GNOS,GNSS Radio Occultation Sounder,CMA,GNSS radio-occultation sounder,"
+FY-3C
+FY-3D",2014,2026,2024-09-09 14:30:24
+1229,GNOS-2,GNSS Radio Occultation Sounder - 2,CMA,GNSS radio-occultation sounder,"
+FY-3E
+FY-3F
+FY-3G
+FY-3H
+FY-3I
+FY-3J",2021,2034,2024-09-09 14:53:37
+1359,GNSS-R,GNSS Reflectometer,ESA,Positioning system,"
+HydroGNSS-1
+HydroGNSS-2",2025,2029,2023-05-22 09:21:01
+1360,GNSS-R,GNSS Reflectometer,ESA,Positioning system,"
+PRETTY",2023,2026,2023-06-12 10:13:49
+1401,GNSS-R,GNSS Reflectometer for MuSat,MUON SPACE,GNSS radio-occultation sounder,"
+MuSat-2",2024,2031,2024-04-02 16:34:25
+1404,GNSS-R (MicroSat-2C),GNSS Reflectometer for MicroSat-2C,ISRO,GNSS radio-occultation sounder,"
+EOS-08",2024,2026,2024-12-23 14:56:33
+163,GNSS-RO,Global Navigation Satellite System - Radio Occultation,NASA,GNSS radio-occultation sounder,"
+CLARREO-1A
+CLARREO-2A",0,0,2019-01-01 21:30:36
+1034,GNSS-RO,Global Navigation Satellite System - Radio Occultation,NOAA,GNSS radio-occultation sounder,"
+Sentinel-6A
+Sentinel-6B
+Sentinel-6C",2021,2036,2024-09-23 16:05:05
+164,GOCI,Geostationary Ocean Color Imager,KIOST,Moderate-resolution optical imager,"
+COMS",2011,2021,2022-07-25 13:23:02
+674,GOCI-II,Geostationary Ocean Color Imager: Follow-on,KIOST,Moderate-resolution optical imager,"
+GEO-KOMPSAT-2B",2020,2030,2021-06-14 23:22:38
+1148,GOLD,Global-scale Observations of the Limb and Disk,NASA,Space radiometer or spectrometer,"
+SES-14",2018,2022,2021-12-09 14:17:15
+720,GOLF,Global Oscillations at Low Frequencies,CNES,Solar activity monitor,"
+SOHO",1996,2027,2021-12-04 18:53:46
+165,GOLPE,GPS Occultation and Passive reflection Experiment ,NASA,GNSS radio-occultation sounder,"
+SAC-C",2001,2013,2022-07-25 15:47:50
+166,GOME,Global Ozone Monitoring Experiment ,ESA,Cross-nadir scanning SW sounder,"
+ERS-2",1995,2011,2018-03-19 03:15:36
+167,GOME-2,Global Ozone Monitoring Experiment - 2,ESA,Cross-nadir scanning SW sounder,"
+Metop-A
+Metop-B
+Metop-C",2007,2027,2024-09-23 15:35:18
+168,GOMOS,Global Ozone Monitoring by Occultation of Stars ,ESA,Limb sounder,"
+Envisat",2002,2011,2022-07-26 10:46:09
+1091,GORIZONT-MP,Multi-spectral scanner,Roscosmos,High-resolution optical imager,"
+",0,0,2021-06-15 08:40:54
+169,GPS,GPS Receiver,ESA,Positioning system,"
+CRISTAL-A
+CRISTAL-B
+Sentinel-3A
+Sentinel-3B
+Sentinel-3C
+Sentinel-3D
+Sentinel-6A
+Sentinel-6B
+Sentinel-6C
+SMOS
+SWARM-A
+SWARM-B
+SWARM-C",2010,2037,2024-09-23 15:59:42
+880,GPS,GPS Receiver,NASA,Positioning system,"
+Landsat-4
+Landsat-5
+SWOT",1982,2026,2022-12-19 10:50:43
+172,GPS/MET,Global Positioning System / Meteorology,NASA,GNSS radio-occultation sounder,"
+OrbView-1/MicroLab",1995,1997,2019-01-01 21:32:26
+171,GPSDR,GPS Demonstration Receiver,NASA,Positioning system,"
+TOPEX-Poseidon",1992,2005,2017-03-31 13:15:34
+1369,GPSR,GPS Reflection,NSPO,Positioning system,"
+TRITON ",0,0,2023-10-02 11:17:21
+173,GRA,GEOSat Radar Altimeter,NASA,Radar altimeter,"
+GEOSat",1985,1990,2012-05-15 20:11:32
+174,GRAS,GNSS Receiver for Atmospheric Sounding,ESA,GNSS radio-occultation sounder,"
+Metop-A
+Metop-B
+Metop-C",2007,2027,2024-09-23 15:35:38
+1006,GRS,Gamma-Ray Spectrometer,NASA,Solar activity monitor,"
+SMM",1980,1989,2017-05-19 00:53:42
+1165,GSA,Hyperspectral imaging equipment,Roscosmos,High-resolution optical imager,"
+Resurs-P1
+Resurs-P2
+Resurs-P3
+Resurs-P4
+Resurs-P5",2013,2029,2021-06-22 22:40:22
+175,GUVI,Global Ultra-Violet Imager,NASA,Space radiometer or spectrometer,"
+TIMED",2002,2026,2021-12-09 12:28:03
+1342,GXI,GeoXO Imager,NOAA,Moderate-resolution optical imager,"
+GeoXO 2
+GeoXO 4",2033,2051,2023-05-08 08:26:29
+1018,GXRE/GRaBS,Goddard X-Ray Experiment - Gamma Ray Burst Spectrometer,NASA,Space radiometer or spectrometer,"
+SAC-B",1996,1996,2017-05-21 13:15:17
+1124,GXRE/SOXS,Goddard X-Ray Experiment / Soft X-Ray Spectrometer,NASA,Solar activity monitor,"
+SAC-B",1997,1996,2017-05-19 00:30:06
+1344,GXS,GeoXO Sounder,NOAA,Cross-nadir infrared sounder,"
+GeoXO 2
+GeoXO 4",2033,2051,2023-10-02 15:09:52
+1427,H3Imager,High-resolution Hyperspectral imager for monitor Hotspot emission ,CMA,Moderate-resolution optical imager,"
+TANSAT-2",2026,2032,2025-03-31 15:42:21
+176,HAIRS,High Accuracy Inter-satellite Ranging System ,NASA,Gravity sensing system,"
+GRACE A
+GRACE B
+GRACE C (GRACE-FO)
+GRACE D (GRACE-FO)
+GRACE-Continuity",2002,2035,2023-02-10 14:49:59
+178,HALOE,Halogen Occultation Experiment,NASA,Limb sounder,"
+UARS",1991,2005,2017-01-17 15:18:37
+1285,HAOC,High Accuracy On-board Calibrator,CMA,Moderate-resolution optical imager,"
+FY-3G
+FY-3I",2023,2033,2024-02-05 11:26:02
+36,HARP2,Hyper Angular Research Polarimeter 2,NASA,Moderate-resolution optical imager,"
+ACE (Aer.Clo.Eco.)
+PACE",0,2027,2024-02-09 09:21:16
+1023,HCMR,Heat Capacity Mapping Radiometer,NASA,Moderate-resolution optical imager,"
+HCMM",1978,1980,2013-12-04 13:21:17
+1186,HEL1OS,High Energy L1 Orbiting X-ray Spectrometer,ISRO,Solar activity monitor,"
+Aditya-1",2024,2028,2025-04-07 08:52:57
+984,HELICON,Solar X-ray and gamma-ray Scintillation Spectrometer,Roscosmos,Solar activity monitor,"
+Coronas-F
+Coronas-I",1994,2005,2017-05-17 20:21:55
+1063,HENA,High-Energy Neutral-Atom Imager,NASA,Energetic particle spectrometer,"
+IMAGE",2000,2005,2017-06-01 02:42:45
+745,HEP,High Energy Particles Experiment,JAXA,Energetic particle spectrometer,"
+GEOTAIL",1992,2003,2021-12-06 19:13:50
+1151,HEP-e,High-energy electron experiments,JAXA,Energetic particle spectrometer,"
+Arase (ERG)",2017,2033,2021-10-02 19:18:52
+1410,HI,Hyperspectral Imager,OSK,Cross-nadir infrared sounder,"
+Aurora",0,0,2024-09-23 08:48:52
+1291,HI1-Vigil,Heliospheric Imager 1 - Vigil,ESA,Solar activity monitor,"
+Vigil-L5",2031,2038,2022-12-15 09:56:10
+1292,HI2-Vigil,Heliospheric Imager 2 - Vigil,ESA,Solar activity monitor,"
+Vigil-L5",2031,2038,2022-12-15 10:05:26
+1078,HICO,Hyperspectral Imager for the Coastal Ocean,NASA,High-resolution optical imager,"
+ISS HICO",2009,2014,2022-07-25 15:38:44
+1058,HILT,Heavy Ion Large Telescope,NASA,Energetic particle spectrometer,"
+SAMPEX",1992,2012,2022-07-26 10:28:17
+964,HiRAIS,High Resolution Advanced Imaging System,EIAST,High-resolution optical imager,"
+Deimos-2
+DubaiSat-2",2014,2026,2021-06-17 15:58:56
+48,HIRAS,Hyperspectral Infrared Atmospheric Sounder,CMA,Cross-nadir infrared sounder,"
+FY-3D",2018,2026,2024-09-09 14:33:01
+1225,HIRAS-2,Hyperspectral Infrared Atmospheric Sounder - 2,CMA,Cross-nadir infrared sounder,"
+FY-3E
+FY-3F
+FY-3H
+FY-3J",2021,2034,2026-02-25 17:44:56
+179,HIRDLS,High-Resolution Dynamics Limb Sounder ,NASA,Limb sounder,"
+Aura",2004,2008,2024-09-30 08:46:37
+180,HiRI,High-Resolution Imager ,CNES,High-resolution optical imager,"
+Falcon-Eye 1
+Falcon-Eye 2
+Göktürk-1A
+Mohammed VI-A
+Mohammed VI-B
+Pléiades-1A
+Pléiades-1B",2012,2028,2023-11-27 11:39:11
+181,HIRS,High-resolution Infra-Red Sounder,NASA,Cross-nadir infrared sounder,"
+Nimbus-6",1975,1983,2012-09-05 23:56:49
+182,HIRS/2,High-resolution Infra Red Sounder / 2,NOAA,Cross-nadir infrared sounder,"
+NOAA-10
+NOAA-11
+NOAA-12
+NOAA-13
+NOAA-14
+NOAA-6
+NOAA-7
+NOAA-8
+NOAA-9
+TIROS-N",1979,2007,2017-03-29 16:13:16
+183,HIRS/3,High-resolution Infra Red Sounder / 3,NOAA,Cross-nadir infrared sounder,"
+NOAA-14
+NOAA-15
+NOAA-16
+NOAA-17",0,2022,2022-07-26 10:13:09
+184,HIRS/4,High-resolution Infra Red Sounder / 4,NOAA,Cross-nadir infrared sounder,"
+Metop-A
+Metop-B
+NOAA-18
+NOAA-19",2005,2023,2024-09-23 15:36:02
+1277,HIS,Hyperspectral Imaging Sensor,ESA,Moderate-resolution optical imager,"
+TRUTHS",0,0,2021-11-30 18:51:05
+1216,HISUI,Hyperspectral Imager Suite,METI,High-resolution optical imager,"
+ISS HISUI",2020,2026,2021-06-22 22:38:45
+1335,HIT,High-energy Ion Telescope,NASA,Energetic particle spectrometer,"
+IMAP",2026,2029,2023-02-20 10:53:33
+644,HMI,Helioseismic and Magnetic Imager,NASA,Solar activity monitor,"
+SDO",2010,2026,2021-12-16 00:51:33
+187,HORUS,High Optical Resolution Utility Sensor,DLR,High-resolution optical imager,"
+BIRD",2002,2007,2017-03-28 01:41:51
+1370,HotSat Imager,HotSat Imager,SSTL,High-resolution optical imager,"
+HOTSAT-1",2023,2023,2023-10-09 10:34:49
+923,HPCA,Hot Plasma Composition Analyzer,NASA,Energetic particle spectrometer,"
+MMS-A
+MMS-B
+MMS-C
+MMS-D",2015,2026,2021-12-16 01:20:07
+1387,HRC,High Resolution Camera,ESA,High-resolution optical imager,"
+PROBA-1",2001,2026,2023-11-06 09:59:22
+1392,HRC,High Resolution Camera,CAST,High-resolution optical imager,"
+HRMIS",2020,2030,2023-12-04 09:53:11
+188,HRCC,High-Resolution CCD Camera,CAST,High-resolution optical imager,"
+CBERS-1
+CBERS-2
+CBERS-2B",2000,2010,2020-01-06 20:59:02
+679,HRCC-2,High-Resolution CCD Camera -2,CAST,High-resolution optical imager,"
+ZY-1-2C",2012,2019,2022-07-25 13:53:40
+189,HRDI,High-Resolution Doppler Imager,NASA,Limb sounder,"
+UARS",1991,2005,2017-03-29 21:32:33
+190,HRG,Haute Résolution Géométrique,CNES,High-resolution optical imager,"
+SPOT-5",2002,2015,2022-07-25 15:32:59
+191,HRIR,High Resolution Infrared Radiometer,NASA,Moderate-resolution optical imager,"
+Nimbus-1
+Nimbus-2
+Nimbus-3",1964,1972,2017-03-26 11:43:13
+1312,HRMR,High Resolution Microwave Radiometer,ESA,Microwave cross-track scanning radiometer,"
+CRISTAL-A
+CRISTAL-B
+Sentinel-6A
+Sentinel-6B
+Sentinel-6C",2021,2036,2025-04-14 08:38:34
+1047,HRMX,High-Resolution Multi-Spectral,ISRO,High-resolution optical imager,"
+CartoSat-2C
+CartoSat-2D
+CartoSat-2E
+CartoSat-2F",2016,2026,2021-06-17 15:51:46
+192,HRPC,High-Resolution Panchromatic Camera,CAST,High-resolution optical imager,"
+CBERS-2B",2007,2010,2017-03-28 01:50:37
+680,HRPC-2,High-Resolution Panchromatic Camera - 2,CAST,High-resolution optical imager,"
+ZY-1-2C",2012,2019,2022-07-25 13:54:27
+193,HRS,Haute Résolution Stéréoscopique,CNES,High-resolution optical imager,"
+SPOT-5",2002,2015,2022-08-08 15:30:37
+1194,HRSAT-1,High Resolution Satellite - 1,ISRO,High-resolution optical imager,"
+HRSAT-1A
+HRSAT-1B",2025,2029,2022-07-27 10:17:45
+194,HRTC,High Resolution Technological Camera,CONAE,High-resolution optical imager,"
+SAC-C",2001,2013,2022-07-25 15:48:28
+195,HRV,Haute Résolution dans le Visible,CNES,High-resolution optical imager,"
+SPOT-1
+SPOT-2
+SPOT-3",1986,2009,2017-03-28 02:02:00
+196,HRVIR,Haute Résolution dans le Visible et l’Infra-Rouge,CNES,High-resolution optical imager,"
+SPOT-4",1998,2013,2022-07-26 10:24:16
+1097,HRWS-SAR,High Resolution Wide Swath X-Band Digital Beamforming SAR,DLR,Imaging radar (SAR),"
+HRWS-SAR",2029,2036,2021-06-15 21:03:26
+197,HSB,Humidity Sounder for Brazil ,INPE,Microwave cross-track scanning radiometer,"
+Aqua",2002,2003,2024-09-30 08:37:27
+198,HSC,High Sensitivity Camera,CONAE,High-resolution optical imager,"
+SAC-D
+SAC-E/SABIA-MAR A
+SAC-E/SABIA-MAR B",2011,2029,2022-07-27 09:57:13
+475,HSCAT,HY Scatterometer,NSOAS,Radar scatterometer,"
+HY-2A
+HY-2B
+HY-2C
+HY-2D
+HY-2E
+HY-2F",2011,2031,2023-02-08 16:56:56
+199,HSI,Hyper-Spectral Imager,CAST,High-resolution optical imager,"
+HJ-1A",2009,2018,2021-06-22 22:30:09
+200,HSI,Hyper-Spectral Imager,DLR,High-resolution optical imager,"
+EnMAP",2022,2026,2022-04-04 10:10:26
+1405,HSI (GLIMR),Geosynchronous Littoral Imaging and Monitoring Radiometer Hyperspectral Imager,NASA,Moderate-resolution optical imager,"
+GLIMR",2027,2029,2024-06-17 09:06:06
+1244,HSI-2,Hyper-Spectral Imager,CAST,High-resolution optical imager,"
+HJ-2A
+HJ-2B",2020,2026,2021-06-22 22:31:41
+201,HSRS,Hot Spot Recognition Sensor,DLR,High-resolution optical imager,"
+BIRD",2002,2007,2012-09-04 22:42:42
+202,HSTC,High Sensitivity Technological Camera,CONAE,High-resolution optical imager,"
+SAC-C",2001,2013,2022-07-27 09:57:56
+1317,HXI,Hard X-ray Imager,CAS,Solar activity monitor,"
+ASO-S (Kuafu-1)",2023,2026,2022-10-10 13:15:01
+1008,HXIS,Hard X-Ray Imaging Spectrometer,NIVR,Solar activity monitor,"
+SMM",1980,1989,2017-05-19 00:56:14
+1007,HXRBS,Hard X-Ray Burst Spectrometer,NASA,Solar activity monitor,"
+SMM",1980,1989,2017-05-19 00:58:28
+1017,HXRS,Hard X-Ray Spectrometer,CONAE,Solar activity monitor,"
+SAC-B",1996,1996,2017-05-19 00:31:52
+968,HXT,Hard X-ray Telescope,JAXA,Solar activity monitor,"
+Solar-A (Yohkoh)",1991,2001,2017-05-19 12:24:30
+203,HYC,HYperspectral Camera,ASI,High-resolution optical imager,"
+PRISMA
+PRISMA2GEN",2019,2035,2023-10-25 14:55:06
+752,HYDRA,Hot Plasma Analyzer Experiment,NASA,Energetic particle spectrometer,"
+Polar",1996,2008,2017-06-05 01:40:45
+1463,HyMATHS,Hyperspectral Millimetre Wave Atmospheric Temperature & Humidity Sounder,ISRO,Microwave cross-track scanning radiometer,"
+G20",2027,2032,2025-11-10 17:09:54
+1348,HYMS,Hyperspectral Microwave Sounder,UKSA,Microwave cross-track scanning radiometer,"
+HYMS IOD",2026,2028,2025-04-14 09:00:52
+204,Hyperion,Hyperion,NASA,High-resolution optical imager,"
+NMP-EO-1",2001,2017,2022-07-25 14:04:36
+1452,HyperScape100,Simera HyperScape100 hyperspectral camera,XPLORE,High-resolution optical imager,"
+XCUBE-1",2025,2029,2025-08-18 10:23:21
+1409,HyperScout-2,HyperScout-2 Multispectral imager for Φsat-2 ,ESA,High-resolution optical imager,"
+Φsat-2",2024,2028,2025-11-05 08:54:08
+801,HyS-SWIR,Hyperspectral Imager - Short Wave Infrared,ISRO,High-resolution optical imager,"
+EOS 03",2021,2021,2021-06-22 22:33:21
+800,HyS-VNIR,Hyperspectral Imager - Visible Near Infrared,ISRO,High-resolution optical imager,"
+EOS 03",2021,2021,2021-06-22 22:34:03
+205,HySI-T,Hyper Spectral Imager,ISRO,High-resolution optical imager,"
+IMS-1",2008,2012,2022-07-26 10:34:55
+1134,HySICS,"Hyper-Spectral Imager for Climate
+Science",NASA,Cross-nadir scanning SW sounder,"
+ISS CLARREO-PF",2027,2028,2022-11-28 09:33:36
+1198,HySIS,Hyper Spectral Imaging Spectrometer,ISRO,High-resolution optical imager,"
+HySIS",2019,2026,2021-06-22 22:39:33
+207,IASI,Infrared Atmospheric Sounding Interferometer,CNES,Cross-nadir infrared sounder,"
+Metop-A
+Metop-B
+Metop-C",2007,2027,2024-09-23 15:36:28
+206,IASI-NG,Infrared Atmospheric Sounder Interferometer - New Generation,CNES,Cross-nadir infrared sounder,"
+Metop-SG-A1
+Metop-SG-A2
+Metop-SG-A3",2026,2047,2024-09-23 15:44:14
+1000,IBEX,Interstellar Boundary Explorer,NASA,Energetic particle spectrometer,"
+IBEX",2009,2023,2021-12-16 01:26:36
+1036,ICARE,Influence of Space Radiation on Advanced Components,CNES,Energetic particle spectrometer,"
+SAC-C
+SAC-D",2001,2015,2022-07-25 15:08:28
+1418,ICARE-NG,Influence sur les Composants Avancés des Radiations de l'Environnement,CNES,Energetic particle spectrometer,"
+HOTBIRD 13F
+HOTBIRD 13G",2023,2037,2025-01-27 11:01:43
+1224,ICEYE SAR,ICEYE SAR,ICEYE,Imaging radar (SAR),"
+ICEYE",2019,2040,2021-08-31 00:01:32
+342,ICI,Ice Cloud Imager,ESA,Microwave conical scanning radiometer,"
+Metop-SG-B1
+Metop-SG-B2
+Metop-SG-B3",2026,2048,2024-09-23 15:46:43
+208,IDCS,Image Dissector Camera System,NASA,Moderate-resolution optical imager,"
+Nimbus-3
+Nimbus-4",1969,1980,2017-03-26 11:44:55
+1336,IDEX,Interstellar Dust Experiment,NASA,Energetic particle spectrometer,"
+IMAP",2026,2029,2023-02-20 11:24:05
+1040,IGOR,Integrated GPS Occultation Receiver,DLR,GNSS radio-occultation sounder,"
+",0,0,2022-07-25 13:39:43
+209,IGOR,Integrated GPS Occultation Receiver,NSPO,GNSS radio-occultation sounder,"
+COSMIC-1",2006,2020,2022-07-18 11:36:22
+212,IGOR,Integrated GPS Occultation Receiver,NASA,GNSS radio-occultation sounder,"
+TacSat-2",2007,2007,2019-01-01 21:35:24
+1104,IIP,Infrared Imaging Payload,KARI,High-resolution optical imager,"
+KOMPSAT-3A",2015,2026,2022-08-01 10:50:13
+213,IIR,Imaging Infrared Radiometer,CNES,Moderate-resolution optical imager,"
+CALIPSO",2006,2023,2022-07-27 09:59:28
+227,IKFS-2,Infrared Fourier Spectrometer - 2,Roscosmos,Cross-nadir infrared sounder,"
+Meteor-M N2
+Meteor-M N2-1
+Meteor-M N2-2
+Meteor-M N2-3
+Meteor-M N2-4
+Meteor-M N2-5
+Meteor-M N2-6
+Meteor-M N2-7
+Meteor-M N2-8",2014,2040,2021-06-02 18:56:18
+559,IKFS-3,Infra Red Fourier Spectrometer - 3,Roscosmos,Cross-nadir infrared sounder,"
+Meteor-MP N1
+Meteor-MP N2",2036,2044,2021-06-02 19:04:23
+1220,IKOR-M,Broadband SW radiometer,Roscosmos,Broad band radiometer,"
+Meteor-M N1
+Meteor-M N2
+Meteor-M N2-1
+Meteor-M N2-2
+Meteor-M N2-4
+Meteor-M N2-5
+Meteor-M N2-6
+Meteor-M N2-7
+Meteor-M N2-8
+Meteor-MP N2",2009,2044,2021-06-15 08:32:57
+215,ILAS-I,Improved Limb Atmosperic Spectrometer - I,JAXA,Limb sounder,"
+ADEOS",1996,1997,2017-03-29 20:22:14
+216,ILAS-II,Improved Limb Atmosperic Spectrometer - II,JAXA,Limb sounder,"
+ADEOS-2",2003,2003,2017-03-29 20:35:58
+217,IMAGER,GOES Imager,NOAA,Moderate-resolution optical imager,"
+GOES-10
+GOES-10 (S-America)
+GOES-11
+GOES-8
+GOES-9
+GOES-9 (GMS backup)",1994,2011,2022-07-26 10:43:05
+218,IMAGER,INSAT imager,ISRO,Moderate-resolution optical imager,"
+INSAT-3D
+INSAT-3DR
+INSAT-3DS",2013,2034,2024-04-29 08:51:10
+219,IMAGER,MTSAT-2 Imager ,JMA,Moderate-resolution optical imager,"
+Himawari-7 (MTSAT-2)",2010,2016,2022-07-25 14:10:23
+1423,Imager,NEMO Imager,ISRO,Moderate-resolution optical imager,"
+NEMO-AM",2026,2030,2025-02-17 16:09:55
+879,IMAGER,GOES Imager,NOAA,Moderate-resolution optical imager,"
+EWS-G1
+EWS-G2
+GOES-12
+GOES-12 (S-America)
+GOES-13
+GOES-14
+GOES-15",2003,2027,2022-07-25 13:00:16
+996,IMAP-5,Three-axis Magnetometer,Roscosmos,Field or radiowave sensor,"
+Coronas-F",2001,2005,2016-03-21 12:37:44
+1329,IMAP-Hi,IMAP high energy neutral atoms,NASA,Energetic particle spectrometer,"
+IMAP",2026,2029,2023-02-13 15:59:44
+1328,IMAP-Lo,IMAP Low energy neutral atoms,NASA,Energetic particle spectrometer,"
+IMAP",2026,2029,2023-02-13 14:43:48
+1330,IMAP-Ultra,IMAP-Ultra high energy,NASA,Energetic particle spectrometer,"
+IMAP",2026,2029,2023-02-13 15:54:06
+914,iMESA-R,Integrated Miniaturized Electrostatic Analyzer - Reflight.,AFRL,Field or radiowave sensor,"
+STPSat-3",2014,2022,2017-04-21 00:18:43
+220,IMG,Interferometric Monitor for Greenhouse gases,METI,Cross-nadir infrared sounder,"
+ADEOS",1996,1997,2020-03-06 13:36:21
+859,IMPACT/MAG,IMPACT / Magnetometer,NASA,Field or radiowave sensor,"
+STEREO-A
+STEREO-B",2007,2026,2021-12-04 20:21:10
+852,IMPACT/SEP,IMPACT / Solar Energetic Particles,NASA,Energetic particle spectrometer,"
+STEREO-A
+STEREO-B",2007,2026,2021-12-16 16:18:23
+843,IMPACT/STE,"IMPACT / Suprathermal Electron Telescope
+",NASA,Energetic particle spectrometer,"
+STEREO-A
+STEREO-B",2007,2026,2021-12-16 16:19:45
+844,IMPACT/SWEA,"IMPACT / Solar Wind Electron Analyzer
+",NASA,Energetic particle spectrometer,"
+STEREO-A
+STEREO-B",2007,2026,2021-12-16 16:20:54
+1450,IMR,Interferometric Microwave Radiometer ,NSOAS,Microwave cross-track scanning radiometer,"
+HY-4A (or HY-2S)",2024,2033,2025-08-04 08:54:13
+1396,INCUS-radar,Radar on 3 INCUS satellites,NASA,Cloud and precipitation radar,"
+INCUS-1
+INCUS-2
+INCUS-3",2027,2029,2024-02-19 15:09:09
+1320,INMS,Ion and Neutral Mass Spectrometer,UKSA,Energetic particle spectrometer,"
+CIRCE",2023,2023,2022-11-07 11:37:56
+221,InSAR,Interferometric Synthetic Aperture Radar,NASA,Imaging radar (SAR),"
+DESDynI",,0,2013-12-22 14:25:59
+1043,IPDA lidar,Integrated Path Differential-Absorption Lidar,DLR,Space lidar,"
+MERLIN",2026,2031,2022-10-17 09:36:18
+1171,IPEI,Ionospheric Plasma and Electrodynamics Instrument,NSPO,Energetic particle spectrometer,"
+FORMOSAT-1",1999,2004,2017-08-01 13:23:27
+876,IR,Infrared Instrument,Roscosmos,Moderate-resolution optical imager,"
+Meteor-2-1
+Meteor-2-10
+Meteor-2-11
+Meteor-2-12
+Meteor-2-13
+Meteor-2-14
+Meteor-2-15
+Meteor-2-16
+Meteor-2-17
+Meteor-2-18
+Meteor-2-19
+Meteor-2-2
+Meteor-2-20
+Meteor-2-21
+Meteor-2-3
+Meteor-2-4
+Meteor-2-5
+Meteor-2-6
+Meteor-2-7
+Meteor-2-8
+Meteor-2-9",1975,1995,2012-09-05 13:24:25
+222,IR,Infrared Instrument,Roscosmos,Moderate-resolution optical imager,"
+Meteor-1-1
+Meteor-1-10
+Meteor-1-11
+Meteor-1-12
+Meteor-1-13
+Meteor-1-14
+Meteor-1-15
+Meteor-1-16
+Meteor-1-17
+Meteor-1-19
+Meteor-1-2
+Meteor-1-20
+Meteor-1-21
+Meteor-1-22
+Meteor-1-23
+Meteor-1-24
+Meteor-1-26
+Meteor-1-27
+Meteor-1-3
+Meteor-1-4
+Meteor-1-5
+Meteor-1-6
+Meteor-1-7
+Meteor-1-8
+Meteor-1-9
+Meteor-P1
+Meteor-P2",1969,1978,2013-02-13 20:28:38
+225,IR spectrometer,Infra Red Spectrometer,NASA,Cross-nadir infrared sounder,"
+CLARREO-1A
+CLARREO-2A",0,0,2022-11-28 09:15:26
+226,IRAS,Infra Red Atmospheric Sounder,CMA,Cross-nadir infrared sounder,"
+FY-3A
+FY-3B
+FY-3C",2008,2020,2024-09-09 14:24:43
+288,IREI,Infra-Red Earth Imager,NSAU,High-resolution optical imager,"
+EgyptSat-1
+SICH-2
+SICH-2-30",2007,2027,2022-08-01 10:51:08
+557,IRFS-GS,Infrared Fourier-transform Spectrometer - Geostationary,Roscosmos,Cross-nadir infrared sounder,"
+Electro-M N1-1
+Electro-M N1-2",2036,2046,2021-06-02 14:32:54
+633,IRIS,Iris,NTU,High-resolution optical imager,"
+X-Sat",2011,2019,2022-07-25 13:52:07
+985,IRIS,Solar Burst Spectrometer,Roscosmos,Solar activity monitor,"
+Coronas-F
+Coronas-I",1994,2005,2017-05-17 20:25:09
+997,IRIS,Interface Region Imaging Spectrograph ,NASA,Solar activity monitor,"
+IRIS",2013,2026,2021-12-16 00:38:34
+1267,IRIS,Interferometric Radar altimeter for Ice and Snow,ESA,Radar altimeter,"
+CRISTAL-A
+CRISTAL-B",2028,2036,2022-03-28 09:08:34
+228,IRIS-B,Infra-Red Interferometer Spectrometer - B,NASA,Cross-nadir infrared sounder,"
+Nimbus-3",1969,1969,2012-09-05 15:10:40
+229,IRIS-D,Infra-Red Interferometer Spectrometer - D,NASA,Cross-nadir infrared sounder,"
+Nimbus-4",1970,1980,2012-09-05 15:10:18
+230,IRLS,"Interrogation, Recording and Location System",NASA,Data collection system,"
+Nimbus-3
+Nimbus-4",1969,1980,2012-09-05 15:40:09
+668,IRM,Imaging and Rapid-scanning Ion Mass Spectrometer,CSA,Energetic particle spectrometer,"
+CASSIOPE",2014,2021,2021-12-16 01:08:31
+231,IRMSS,Infrared Multispectral Scanner,CAST,High-resolution optical imager,"
+CBERS-1
+CBERS-2",2000,2005,2017-03-28 12:04:09
+1038,IRMSS,Infrared Multispectral Scanner ,CAST,High-resolution optical imager,"
+HJ-1B",2009,2018,2021-06-16 11:31:01
+1037,IRMSS-2,Infrared Multispectral Scanner - 2,CAST,High-resolution optical imager,"
+CBERS-3
+CBERS-4
+CBERS-4B",2013,2026,2021-06-16 13:05:47
+1243,IRMSS-2,Infrared Multispectral Scanner - 2,CAST,High-resolution optical imager,"
+HJ-2A
+HJ-2B",2020,2026,2021-06-16 11:32:49
+1103,IRS,Infrared scanner,CAST,High-resolution optical imager,"
+SJ-9B",2013,2022,2022-07-25 13:11:28
+232,IRS,InfraRed Sounder,ESA,Cross-nadir infrared sounder,"
+MTG-S1
+MTG-S2",2026,2046,2024-09-23 15:23:24
+233,ISAMS,Improved Stratospheric and Mesospheric Sounder,UKSA,Limb sounder,"
+UARS",1991,2005,2017-01-17 15:27:21
+1020,ISENA,"Imaging Particle Spectrometer
+for Energetic Neutral Atoms",ASI,Energetic particle spectrometer,"
+SAC-B",1996,1996,2017-06-01 02:38:43
+1004,ISIS-EPI,Integrated Science Investigation of the Sun - Energetic Particle Instruments,NASA,Energetic particle spectrometer,"
+Parker Solar Probe",2018,2026,2021-12-16 16:13:47
+234,IST,Italian Star Tracker,ASI,Positioning system,"
+SAC-C",2001,2013,2012-09-06 01:19:17
+967,ISUAL,Imager of Sprites and Upper Atmospheric Lightning,NSPO,Lightning imager,"
+FORMOSAT-2",2004,2016,2022-07-27 10:11:11
+235,ITPR,Infrared Temperature Profile Radiometer,NASA,Cross-nadir infrared sounder,"
+Nimbus-5",1973,1983,2012-09-06 02:28:34
+1085,IVM,In-situ Ion Velocity Meter,NASA,Field or radiowave sensor,"
+ICON",2020,2026,2021-12-09 12:16:10
+626,IXAE,Indian X-ray Astronomy Experiment,ISRO,Space radiometer or spectrometer,"
+IRS-P3",1996,2004,2017-05-21 13:11:15
+236,JAMI,Japanese Advanced Meteorological Imager,JMA,Moderate-resolution optical imager,"
+Himawari-6 (MTSAT-1R)",2005,2015,2024-09-30 08:26:58
+1289,JEDI,Extreme Ultra-Violet Imager,NASA,Solar activity monitor,"
+Vigil-L5",2031,2038,2024-05-28 15:19:25
+1325,Jilin Imager,Jilin Imager,CRESDA,High-resolution optical imager,"
+Jilin-1",2019,2030,2022-12-10 09:43:19
+237,JMR,JASON Microwave Radiometer,NASA,Microwave cross-track scanning radiometer,"
+JASON-1",2002,2013,2022-07-27 09:43:10
+238,KaRIN,Ka-band Radar Interferometer,NASA,Radar altimeter,"
+SWOT",2022,2026,2021-08-30 23:28:03
+1070,KEIS,Kazakh Earth Imaging System,Kazcosmos,High-resolution optical imager,"
+KazEOSat-2",2014,2022,2023-11-27 11:40:48
+1203,KHCS,KhalifaSat Camera System,EIAST,High-resolution optical imager,"
+DubaiSat-3",2019,2026,2021-06-17 16:03:09
+240,Klimat,Infrared Imaging Radiometer,Roscosmos,Moderate-resolution optical imager,"
+Meteor-3-1
+Meteor-3-2
+Meteor-3-3
+Meteor-3-4
+Meteor-3-5
+Meteor-3-6
+Meteor-3M",1986,2006,2013-11-19 23:20:34
+242,KMSS,High-resolution VIS/IR Radiometer ,Roscosmos,High-resolution optical imager,"
+Meteor-M N1
+Meteor-M N2
+Meteor-M N2-1
+Meteor-M N2-2
+Meteor-M N2-3
+Meteor-M N2-4
+Meteor-M N2-5
+Meteor-M N2-6
+Meteor-M N2-7
+Meteor-M N2-8",2010,2040,2021-06-02 19:02:11
+243,Kondor,Data collection system,Roscosmos,Data collection system,"
+Okean-O1-1
+Okean-O1-2
+Okean-O1-3
+Okean-O1-4
+Okean-O1-5
+Okean-O1-6
+Okean-O1-7
+SICH-1",1986,2001,2012-09-06 13:34:33
+897,Kondor-2,Data collection system,Roscosmos,Data collection system,"
+Okean-O-1",1999,2000,2012-09-06 13:33:33
+729,KONUS,Gamma Ray Burst Investigation,NASA,Space radiometer or spectrometer,"
+WIND",1995,2026,2022-12-05 11:16:38
+738,Konus-RF,X-ray and gamma-ray spectrometer,Roscosmos,Solar activity monitor,"
+Coronas-Photon",2009,2009,2017-05-18 20:12:55
+1438,KSEM-II HEEL,Korea Space wEather Monitor / High Energy Electron Detector,KARI,Energetic particle spectrometer,"
+GEO-KOMPSAT-5",2032,2041,2025-06-09 15:40:18
+1437,KSEM-II HEPT,Korea Space wEather Monitor / High Energy Proton Detector,KARI,Energetic particle spectrometer,"
+GEO-KOMPSAT-5",2032,2041,2025-06-09 15:38:51
+1439,KSEM-II SOSMAG-II,Korean Space wEather Monitor / Magnetometer. SOSMAG-II.,ESA,Field or radiowave sensor,"
+GEO-KOMPSAT-5",2032,2041,2025-06-09 15:17:00
+1441,KSEM-II SXRD,Korea Space wEather Monitor / Solar X-ray detector,KARI,Solar activity monitor,"
+GEO-KOMPSAT-5",2032,2041,2025-06-09 15:45:27
+1440,KSEM-II/CM,Korean Space wEather Monitor / Charging and Radiation Monitor,KARI,Field or radiowave sensor,"
+GEO-KOMPSAT-5",2032,2041,2025-06-09 15:42:13
+1077,KSEM/CM,Korean Space wEather Monitor / Charging Monitor,KARI,Field or radiowave sensor,"
+GEO-KOMPSAT-2A",2019,2029,2025-04-07 08:04:08
+1076,KSEM/MAG,Korean Space wEather Monitor / Magnetometer. ESA acronym is SOSMAG.,ESA,Field or radiowave sensor,"
+GEO-KOMPSAT-2A",2019,2029,2024-01-16 15:19:22
+1075,KSEM/PD,Korea Space wEather Monitor / Particle Detector,KARI,Energetic particle spectrometer,"
+GEO-KOMPSAT-2A",2019,2029,2024-01-16 15:18:30
+1383,KuDPR,Ku-band Doppler Precipitation Radar,JAXA,Cloud and precipitation radar,"
+AOS-PMM",2029,2034,2025-10-13 07:33:14
+1308,L band SAR,L-band differential interferometric synthetic aperture radar,CNSA,Imaging radar (SAR),"
+Ludi-Tance 1 01A
+Ludi-Tance 1 01B
+Ludi-Tance 4 01A",2022,2040,2023-08-21 07:54:30
+1246,L-SAR,L-band Synthetic Aperture Radar,DLR,Imaging radar (SAR),"
+Tandem-L",2028,2040,2021-08-30 23:46:42
+245,LAC,LEISA Atmospheric Corrector (LEISA = Linear Etalon Imaging Spectrometer Array,NASA,High-resolution optical imager,"
+NMP-EO-1",2001,2001,2014-01-17 22:44:07
+1110,LAD,Lyman Alpha Detector,NASA,Solar activity monitor,"
+TWINS (2 sats)",2006,2020,2021-09-29 21:30:36
+881,LAERTES,On-board Ionosonde,Roscosmos,Field or radiowave sensor,"
+Ionosfera-M N1 & N2
+Ionosfera-M N3 & N4",2025,2033,2023-12-21 17:02:13
+1411,LandIS,Landsat Next Instrument Suite,NASA,High-resolution optical imager,"
+Landsat Next-A
+Landsat Next-B
+Landsat Next-C",2031,2036,2024-09-30 15:48:22
+715,LASCO,Large Angle and Spectrometric Coronagraph,NASA,Solar activity monitor,"
+SOHO",1996,2027,2021-11-09 14:26:19
+1057,LEICA,Low-Energy Ion Composition Analyzer,NASA,Energetic particle spectrometer,"
+SAMPEX",1992,2012,2022-08-15 09:27:22
+1061,LENA,Low-Energy Neutral-Atom Imager,NASA,Energetic particle spectrometer,"
+IMAGE",2000,2005,2017-06-01 02:36:24
+746,LEP,Low Energy Particles Experiment,JAXA,Energetic particle spectrometer,"
+GEOTAIL",1992,2022,2021-12-16 01:14:28
+1149,LEP-e,Low-energy particle experiments - electron analyzer,JAXA,Energetic particle spectrometer,"
+Arase (ERG)",2017,2033,2021-10-02 19:17:31
+1153,LEP-i,Low-energy particle experiments - ion mass analyzer,JAXA,Energetic particle spectrometer,"
+Arase (ERG)",2017,2033,2021-12-16 01:09:27
+828,LETITsIYA-Camera,"Multispectral system for UV, VIS and IR ranges",Roscosmos,Space radiometer or spectrometer,"
+Zond-M",2027,2030,2021-10-02 17:27:12
+247,LI,Lightning Imager,ESA,Lightning imager,"
+Meteosat-12
+MTG-I2
+MTG-I3
+MTG-I4",2023,2047,2024-09-23 15:22:45
+1467,LIA,Light Ion Analyser,CAS,Energetic particle spectrometer,"
+SMILE",2026,2029,2025-11-24 09:36:38
+1248,Libera,Libera,NASA,Broad band radiometer,"
+JPSS-4",0,2036,2024-02-14 17:26:45
+249,LIMS,Limb Infrared Monitor of the Stratosphere,NASA,Limb sounder,"
+Nimbus-7",1979,1994,2017-01-17 15:28:31
+250,LIS,Lightning Imaging Sensor ,NASA,Lightning imager,"
+TRMM",1998,2015,2022-08-08 15:20:44
+1138,LIS,Lightning Imaging Sensor,NASA,Lightning imager,"
+ISS LIS",2017,2023,2019-11-23 01:58:03
+251,LISS-1,Linear Imaging Self-Scanning Sensor - 1,ISRO,High-resolution optical imager,"
+IRS-1A
+IRS-1B
+IRS-1E (IRS-P1)",1988,2001,2020-01-06 23:48:59
+252,LISS-2,Linear Imaging Self-Scanning Sensor - 2,ISRO,High-resolution optical imager,"
+IRS-1A
+IRS-1B",1988,2001,2020-01-06 23:50:33
+253,LISS-2M,Linear Imaging Self-Scanning Sensor - 2M,ISRO,High-resolution optical imager,"
+IRS-P2",1995,1997,2020-01-06 23:51:57
+254,LISS-3,Linear Imaging Self-Scanning Sensor - 3,ISRO,High-resolution optical imager,"
+IRS-1C
+IRS-1D",1996,2010,2020-01-06 23:53:56
+898,LISS-3,Linear Imaging Self-Scanning Sensor - 3,ISRO,High-resolution optical imager,"
+ResourceSat-1 (IRS-P6)
+ResourceSat-2
+ResourceSat-2A",2004,2026,2021-06-16 11:17:29
+256,LISS-4,Linear Imaging Self-Scanning Sensor - 4,ISRO,High-resolution optical imager,"
+ResourceSat-1 (IRS-P6)
+ResourceSat-2
+ResourceSat-2A",2004,2026,2021-06-16 11:16:56
+1192,LISS-V,Linear Imaging Self Scanner-V,ISRO,High-resolution optical imager,"
+ResourceSat-3S
+ResourceSat-3SA",2026,2031,2022-07-27 10:00:44
+632,LM,Lightning Mapper,Roscosmos,Lightning imager,"
+Electro-M N1-1
+Electro-M N1-2",2036,2046,2021-06-02 14:33:27
+257,LMI,Lightning Mapping Imager,CMA,Lightning imager,"
+FY-4A
+FY-4C
+FY-4D
+FY-4F",2017,2037,2024-09-09 14:39:43
+1343,LMX,GeoXO Lightning Mapper,NOAA,Lightning imager,"
+GeoXO 3",2039,0,2023-05-08 08:26:59
+1413,LOIP,Lightning Optical Imagers and Photometers,ISA,Lightning imager,"
+C3IEL-A
+C3IEL-B",2028,2031,2024-10-07 09:53:03
+979,LP,Langmuir probe,KARI,Field or radiowave sensor,"
+STSat-2C
+TIROS-7",1963,2014,2022-08-08 15:38:33
+1160,LPT,Light Particle Telescope,JAXA,Energetic particle spectrometer,"
+JASON-2
+JASON-3",2008,2027,2021-11-13 12:44:44
+258,LR,Laser Reflectors,CNES,Positioning system,"
+STARLETTE
+STELLA",1975,2050,2021-06-17 18:09:48
+262,LRA,Laser Retroreflector Array,ASI,Positioning system,"
+LAGEOS-1
+LAGEOS-2
+LARES-1
+LARES-2",1976,2050,2023-02-10 14:49:39
+264,LRA,Laser Retroreflector Array,NASA,Positioning system,"
+GFO
+HY-2A
+HY-2B
+HY-2C
+HY-2D
+HY-2E
+HY-2F
+ICESat
+ICESat-2
+JASON-1
+JASON-2
+JASON-3
+Sentinel-6A
+Sentinel-6B
+Sentinel-6C
+SWOT
+TOPEX-Poseidon",1992,2036,2023-02-10 14:51:50
+959,LRA,Laser Retroreflector Array,CNES,Positioning system,"
+SARAL",2013,2026,2017-03-31 13:01:18
+978,LRA,Laser Retroreflector Array,KARI,Positioning system,"
+STSat-2
+STSat-2C",2009,2014,2017-03-31 13:03:16
+266,LRIR,Limb Radiance Inversion Radiometer,NASA,Limb sounder,"
+Nimbus-6",1975,1983,2017-01-17 15:29:16
+259,LRR,Laser Retro-Reflector,ESA,Positioning system,"
+CRISTAL-A
+CRISTAL-B
+CryoSat
+CryoSat-2
+Envisat
+ERS-1
+ERS-2
+GOCE
+Sentinel-3A
+Sentinel-3B
+Sentinel-3C
+Sentinel-3D",1991,2037,2024-09-09 15:40:49
+269,LRR,Laser Retro-Reflector,DLR,Positioning system,"
+CHAMP
+GRACE A
+GRACE B
+GRACE C (GRACE-FO)
+GRACE D (GRACE-FO)
+GRACE-Continuity
+KOMPSAT-5
+SEOSAR/Paz
+SWARM-A
+SWARM-B
+SWARM-C",2000,2035,2020-02-26 13:17:49
+270,LRR,Laser Retro-Reflector,NASA,Positioning system,"
+SeaSat",1978,1978,2017-03-31 12:51:20
+1316,LST,Lyman-alpha Solar Telescope,CAS,Solar activity monitor,"
+ASO-S (Kuafu-1)",2023,2026,2022-10-10 13:03:29
+1268,LSTM,Land Surface Temperature Monitoring,ESA,High-resolution optical imager,"
+LSTM-A
+LSTM-B",2029,2038,2023-06-15 17:13:17
+1376,LTI,Laser Tracking Instrument,ESA,Positioning system,"
+MAGIC-1
+MAGIC-2",2028,2040,2023-10-30 11:21:36
+733,LYRA,LYman-alpha RAdiometer,ESA,Solar activity monitor,"
+PROBA-2",2009,2026,2021-12-16 00:28:50
+1106,MADPI,Multi-Angle Dual Polarisation Imaging sensor,CAST,Moderate-resolution optical imager,"
+",0,0,2022-07-18 14:50:52
+271,MADRAS,Microwave Analysis & Detection of Rain & Atmospheric Structures,ISRO,Microwave conical scanning radiometer,"
+Megha-Tropiques",2012,2013,2021-06-17 11:16:50
+272,MAESTRO,Measurements of Aerosol Extinction in the Stratosphere and Troposphere Retrieved by Occultation,CSA,Limb sounder,"
+SCISAT-1",2003,2027,2023-12-04 16:02:49
+707,MAG,Magnetic Field Monitor,NASA,Field or radiowave sensor,"
+ACE",1997,2027,2021-11-10 11:36:50
+794,MAG,Magnetometer,NASA,Field or radiowave sensor,"
+DSCOVR",2015,2029,2022-08-01 14:07:24
+1333,MAG,IMAP Magnetometer,UKSA,Field or radiowave sensor,"
+IMAP",2026,2029,2024-02-22 18:32:22
+1444,MAG,DC Magnetometer on TRACERS,NASA,Field or radiowave sensor,"
+TRACERS",2025,2026,2025-07-28 13:37:44
+1468,MAG,Smile's magnetometer,CAS,Field or radiowave sensor,"
+SMILE",2026,2029,2025-11-24 09:42:55
+931,MAG,Magnetometer (Solar Orbiter),UKSA,Field or radiowave sensor,"
+Solar Orbiter",2020,2030,2021-10-02 22:56:12
+1449,MAGIC,MAGnetometers for Innovation and Capability,NASA,Field or radiowave sensor,"
+TRACERS",2025,2026,2025-07-28 15:12:19
+1402,Magnetometer,Magnetometer on Vigil-L5,UKSA,Field or radiowave sensor,"
+Vigil-L5",2031,2038,2025-12-15 08:40:35
+1187,Magnetometer,Magnetometer,ISRO,Field or radiowave sensor,"
+Aditya-1",2024,2028,2023-09-04 08:12:16
+1169,MAIA, Multi-Angle Imager for Aerosols ,NASA,Moderate-resolution optical imager,"
+MAIA
+PLATiNO-2",2026,2029,2022-07-18 14:22:23
+1265,MAP,Multi-Angle Polarimeter,ESA,Moderate-resolution optical imager,"
+CO2M-A
+CO2M-B
+CO2M-C",2027,2036,2022-01-04 18:58:13
+1059,MAST,Mass Spectrometer Telescope,NASA,Energetic particle spectrometer,"
+SAMPEX",1992,2012,2022-07-26 10:32:27
+1403,MATHS,Millimetre wave Atmospheric Temperature and Humidity Sounder,ISRO,Microwave cross-track scanning radiometer,"
+OceanSat-3A",2026,2030,2025-03-24 17:24:22
+1196,MATS,Mesospheric Airglow/Aerosol Tomography and Spectroscopy,SNSA,Space radiometer or spectrometer,"
+MATS",2023,2026,2022-11-07 09:00:09
+887,MAYAK,On-board radio transmitters,Roscosmos,Field or radiowave sensor,"
+Ionosfera-M N1 & N2
+Ionosfera-M N3 & N4",2025,2033,2024-03-04 16:11:24
+274,MBEI,Multi-Band Earth Imager,NSAU,High-resolution optical imager,"
+EgyptSat-1
+SICH-2
+SICH-2-30",2007,2027,2022-07-18 14:18:33
+722,MDI,Michelson Doppler Imager,NASA,Solar activity monitor,"
+SOHO",1996,2027,2021-10-02 16:05:09
+1146,MEA,Magnetic Electron Spectrometer,NASA,Energetic particle spectrometer,"
+CRRES",1990,1991,2017-06-28 14:58:26
+1062,MENA,Medium-Energy Neutral-Atom Imager,NASA,Energetic particle spectrometer,"
+IMAGE",2000,2005,2017-06-01 02:40:05
+276,MEOSS,Monocular Electro-Optical Stereo Scanner,DLR,High-resolution optical imager,"
+IRS-1E (IRS-P1)",1993,1993,2017-03-28 12:50:14
+1150,MEP-e,"Medium-energy particle experiments - electron analyzer
+",JAXA,Energetic particle spectrometer,"
+Arase (ERG)",2017,2033,2021-10-02 19:18:12
+1154,MEP-i,Medium-energy particle experiments - ion mass analyzer,JAXA,Energetic particle spectrometer,"
+Arase (ERG)",2017,2033,2021-12-16 01:10:17
+277,MERIS,Medium Resolution Imaging Spectrometer ,ESA,Moderate-resolution optical imager,"
+Envisat",2002,2012,2022-07-26 10:37:07
+278,MERSI-1,Medium Resolution Spectral Imager -1,CMA,Moderate-resolution optical imager,"
+FY-3A
+FY-3B
+FY-3C",2008,2015,2024-09-09 14:25:21
+279,MERSI-2,Medium Resolution Spectral Imager -2,CMA,Moderate-resolution optical imager,"
+FY-3D",2018,2026,2021-06-17 16:13:00
+1257,MERSI-3,Medium Resolution Spectral Imager - 3,CMA,Moderate-resolution optical imager,"
+FY-3F
+FY-3H",2023,2033,2024-09-09 14:56:30
+1226,MERSI-LL,Medium Resolution Spectral Imager - Low-Light,CMA,Moderate-resolution optical imager,"
+FY-3E
+FY-3J",2021,2034,2024-09-09 14:51:47
+1258,MERSI-RM,MERSI-Rainfall Measurement,CMA,Moderate-resolution optical imager,"
+FY-3G
+FY-3I",2023,2033,2024-09-09 14:58:13
+280,MESSR,Multi-spectral Electronic Self-Scanning Radiometer,JAXA,High-resolution optical imager,"
+MOS-1
+MOS-1B",1987,1996,2020-01-06 23:56:26
+462,MeteoSAR,Meteorological Synthetic Aperture Radar,Roscosmos,Imaging radar (SAR),"
+Meteor-M N2-3
+Meteor-M N2-4
+Meteor-M N2-5
+Meteor-M N2-6
+Meteor-M N2-7
+Meteor-M N2-8",2023,2040,2024-06-10 13:53:40
+1399,MethaneSAT Spectrometer-1,MethaneSAT Spectrometer 1,NZSA,Cross-nadir infrared sounder,"
+MethaneSAT",2024,2025,2024-03-18 11:56:13
+1400,MethaneSAT Spectrometer-2,MethaneSAT Spectrometer 2,NZSA,Cross-nadir infrared sounder,"
+MethaneSAT",2024,2025,2024-03-18 11:42:53
+603,METimage,Meteorological Imager (Previous name: VII - Visible and Infrared Imager ),DLR,Moderate-resolution optical imager,"
+Metop-SG-A1
+Metop-SG-A2
+Metop-SG-A3",2026,2047,2024-09-23 15:45:02
+930,METIS,Multi Element Telescope for Imaging and Spectroscopy,ASI,Solar activity monitor,"
+Solar Orbiter",2020,2030,2021-12-16 12:38:39
+666,MFE,Magnetic Field Experiment,NASA,Field or radiowave sensor,"
+Polar",1996,2008,2016-03-21 12:50:56
+659,MFI,Magnetic Field Investigation,NASA,Field or radiowave sensor,"
+WIND",1995,2026,2021-11-10 09:55:14
+744,MGF,Magnetic Field Measurement,JAXA,Field or radiowave sensor,"
+GEOTAIL",1992,2022,2021-12-07 12:37:15
+777,MGF,Magnetic Field Instrument,CSA,Field or radiowave sensor,"
+CASSIOPE",2014,2021,2021-10-02 22:22:20
+1155,MGF,"Magnetic field experiment
+",JAXA,Field or radiowave sensor,"
+Arase (ERG)",2017,2033,2021-10-02 23:11:44
+1351,MHS,Microwave Humidity Sounder on EOS-07,ISRO,Microwave cross-track scanning radiometer,"
+EOS-07",2023,2026,2024-06-03 09:07:03
+281,MHS,Microwave Humidity Sounding,EUMETSAT,Microwave cross-track scanning radiometer,"
+Metop-A
+Metop-B
+Metop-C
+NOAA-18
+NOAA-19",2005,2027,2025-01-28 16:20:32
+283,MI,Meteorological Imager,KMA,Moderate-resolution optical imager,"
+COMS",2011,2020,2022-07-25 13:43:21
+284,MIAS,Magnetometer Instrument Assembly System,DLR,Field or radiowave sensor,"
+CHAMP",2000,2010,2016-03-21 12:38:32
+1451,MICAP,Microwave Imager Combined Active and Passive,NSOAS,Microwave cross-track scanning radiometer,"
+HY-4A (or HY-2S)",2024,2033,2026-03-25 09:58:22
+1221,MicroCarb,MicroCarb,CNES,Cross-nadir scanning SW sounder,"
+MicroCarb",2026,2030,2023-04-17 08:50:14
+1375,MicroSTAR,MicroSTAR 3 axis accelerometer,ESA,Gravity sensing system,"
+MAGIC-1
+MAGIC-2",2028,2040,2023-10-30 11:06:32
+1089,MIGHTI,Michelson Interferometer for Global High-resolution Thermospheric Imaging,NASA,Limb sounder,"
+ICON",2020,2026,2021-11-27 01:23:05
+1305,MIMAN Optical Camera,MIMAN Optical Camera,KARI,Moderate-resolution optical imager,"
+MIMAN",2022,2026,2022-10-17 08:26:57
+286,MIPAS,Michelson Interferometer for Passive Atmospheric Sounding ,ESA,Limb sounder,"
+Envisat",2002,2012,2022-07-26 10:38:32
+287,MIRAS,Microwave Imaging Radiometer using Aperture Synthesis,ESA,Microwave cross-track scanning radiometer,"
+SMOS",2010,2028,2024-09-23 10:35:56
+973,MIRIS/MEOC,Multipurpose InfraRed Imaging System / MIRIS Earth Observation Camera,KARI,High-resolution optical imager,"
+STSat-3",2014,2023,2022-08-01 10:53:53
+972,MIRIS/MSOC,Multi-purpose Infrared Imaging System / MIRIS Space Observation Camera,KARI,Space radiometer or spectrometer,"
+STSat-3",2014,2015,2021-09-29 22:19:18
+290,MISR,Multi-angle Imaging Spectro-Radiometer ,NASA,Moderate-resolution optical imager,"
+Terra",2000,2026,2024-09-30 11:02:10
+291,MIVZA,Microwave humidity sounder,Roscosmos,Microwave conical scanning radiometer,"
+Meteor-3M",2002,2006,2017-03-29 18:00:52
+292,MLS ,Microwave Limb Sounder ,NASA,Limb sounder,"
+UARS",1991,2005,2018-03-18 18:14:51
+293,MLS ,Microwave Limb Sounder ,NASA,Limb sounder,"
+Aura",2004,2026,2024-09-30 08:48:52
+1278,MM Radiometer,Millimetre-wave Radiometer,NASA,Microwave cross-track scanning radiometer,"
+INCUS-2
+ISS TEMPEST-1
+ISS TEMPEST-D",2018,2029,2024-02-19 15:24:55
+1189,MMIA,Modular Multispectral Imaging Array,ESA,Lightning imager,"
+ISS ASIM",2018,2026,2022-08-01 10:54:41
+295,MMRS,Multispectral Medium Resolution Scanner,CONAE,High-resolution optical imager,"
+SAC-C",2001,2013,2022-07-27 10:12:18
+1201,MODI lidar,Multi-footprint Observation Lidar and Imager - Lidar componemt,JAXA,Space lidar,"
+ISS MOLI",2027,2028,2021-08-30 23:31:47
+296,MODIS,Moderate-resolution Imaging Spectro-radiometer ,NASA,Moderate-resolution optical imager,"
+Aqua
+Terra",2000,2026,2024-09-30 08:43:30
+1202,MOLI imager,"Multi-footprint Observation Lidar and Imager - Imaging component
+",JAXA,High-resolution optical imager,"
+ISS MOLI",2027,2028,2022-07-27 10:18:18
+297,MOPITT,Measurement Of Pollution In The Troposphere ,NASA,Cross-nadir infrared sounder,"
+Terra",2000,2026,2024-09-30 11:03:43
+298,MOS,Multispectral Opto-electronic Scanner,DLR,Moderate-resolution optical imager,"
+IRS-P3",1996,2004,2012-09-07 17:58:45
+299,MP-900B,TV camera,Roscosmos,Moderate-resolution optical imager,"
+Resurs-O1-4",1998,2002,2017-03-27 00:37:16
+300,MR-2000M,Television Camera,Roscosmos,Moderate-resolution optical imager,"
+Meteor-3-1
+Meteor-3-2
+Meteor-3-3
+Meteor-3-4
+Meteor-3-5
+Meteor-3-6",1986,1996,2017-03-27 00:39:15
+301,MR-2000M1,Television Camera,Roscosmos,Moderate-resolution optical imager,"
+Meteor-3M",2002,2006,2017-03-27 00:40:41
+302,MR-900B,Television Camera,Roscosmos,Moderate-resolution optical imager,"
+Meteor-3-1
+Meteor-3-2
+Meteor-3-3
+Meteor-3-4
+Meteor-3-5
+Meteor-3-6",1986,1996,2017-03-27 00:43:47
+303,MRI,Medium Resolution Imager,NASRDA,High-resolution optical imager,"
+NigeriaSat-2",2011,2023,2023-11-27 11:44:14
+304,MRIR,Medium Resolution Infrared Radiometer,NASA,Broad band radiometer,"
+Nimbus-2
+Nimbus-3
+TIROS-2
+TIROS-3
+TIROS-4
+TIROS-7",1961,1972,2014-09-24 17:47:42
+306,MS,Multispectral Radiometer,Roscosmos,High-resolution optical imager,"
+Monitor-E",2005,2008,2020-01-07 00:03:57
+307,MS,Multispectral imager,CDTI,High-resolution optical imager,"
+SEOSat/Ingenio",0,2020,2021-01-16 15:34:47
+308,MS,Multispectral imager,GISTDA,High-resolution optical imager,"
+THEOS-1",2009,2026,2021-06-16 11:53:26
+1249,MS,New Astrosat Optical Modular Imager (MS),GISTDA,High-resolution optical imager,"
+THEOS-2 Main",2024,2033,2021-11-04 14:41:58
+805,MS,Multispectral imager,CAST,High-resolution optical imager,"
+TH-1A
+TH-1B
+TH-1C",2010,2026,2021-06-16 15:04:46
+309,MSC,Multi-Spectral Camera,KARI,High-resolution optical imager,"
+KOMPSAT-2",2006,2026,2021-06-16 11:10:21
+943,MSC,Multi-Spectral Camera,CAST,High-resolution optical imager,"
+ZY-3-01
+ZY-3-02
+ZY-3-03",2012,2026,2021-06-17 18:28:40
+1448,MSC,Magnetic Search Coil,NASA,Field or radiowave sensor,"
+TRACERS",2025,2026,2025-07-28 14:58:28
+1364,MSI,Multispectral Imager on SDGSAT,CAS,High-resolution optical imager,"
+SDGSAT-1",2022,2026,2023-07-03 14:05:14
+311,MSI,Multi-Spectral Imager for Earth-CARE,ESA,Moderate-resolution optical imager,"
+EarthCARE",2024,2034,2022-07-18 14:30:12
+312,MSI,Multi-Spectral Imager for Sentinel-2,ESA,High-resolution optical imager,"
+Sentinel-2A
+Sentinel-2B
+Sentinel-2C
+Sentinel-2D",2015,2038,2021-06-15 10:12:11
+543,MSI,Multi-Spectral Imager,SANSA,High-resolution optical imager,"
+SumbandilaSat",2009,2011,2020-01-07 00:10:32
+1056,MSI,"Multispectral imager
+",NARSS,High-resolution optical imager,"
+EgyptSat-2
+EgyptSat-A",2014,2026,2021-06-17 16:04:56
+313,MSIS,Multispectral Imaging System,TÜBITAK-BILTEN,High-resolution optical imager,"
+BILSat",2003,2006,2020-01-07 00:12:25
+314,MSMR,Multi-frequency Scanning Microwave Radiometer,ISRO,Microwave conical scanning radiometer,"
+OceanSat-1 (IRS-P4)",1999,2010,2025-04-14 09:06:34
+315,MSR,Microwave Scanning Radiometer,JAXA,Microwave cross-track scanning radiometer,"
+MOS-1
+MOS-1B",1987,1996,2017-03-29 18:58:26
+316,MSS,Multi-Spectral Scanner,NASA,High-resolution optical imager,"
+Landsat-1 (ERTS)
+Landsat-2
+Landsat-3
+Landsat-4
+Landsat-5",1972,2011,2020-01-07 00:13:55
+317,MSS,Multispectral film-making system ,Roscosmos,High-resolution optical imager,"
+KANOPUS-V-IK-1
+KANOPUS-V1
+KANOPUS-V3
+KANOPUS-V4
+KANOPUS-V5
+KANOPUS-V6",2012,2026,2021-06-16 12:59:58
+1011,MSS Fragment,Multispectral Scanning System Fragment,Roscosmos,High-resolution optical imager,"
+Meteor-P5",1980,1982,2020-01-07 00:15:59
+318,MSSCC,Multi-color Spin Scan Cloud Camera,NASA,Moderate-resolution optical imager,"
+ATS-3",1968,1978,2017-03-27 00:49:35
+319,MSU,Microwave Sounding Unit,NOAA,Microwave cross-track scanning radiometer,"
+NOAA-10
+NOAA-11
+NOAA-12
+NOAA-13
+NOAA-14
+NOAA-6
+NOAA-7
+NOAA-8
+NOAA-9
+TIROS-N",1979,2007,2025-01-29 14:54:24
+320,MSU-200,Multispectral high resolution electronic scanner,Roscosmos,High-resolution optical imager,"
+KANOPUS-V1
+KANOPUS-V3
+KANOPUS-V4
+KANOPUS-V5
+KANOPUS-V6",0,2026,2022-07-27 10:13:08
+321,MSU-E,High-resolution Multi-spectral Pushbroom Imager,Roscosmos,High-resolution optical imager,"
+Meteor-3M",2002,2006,2020-01-07 00:17:59
+322,MSU-E,Multispectral VNIR radiometer,Roscosmos,High-resolution optical imager,"
+Meteor-P5
+Resurs-O1-1
+Resurs-O1-2
+Resurs-O1-3
+Resurs-O1-4",1980,2002,2020-01-07 00:17:03
+323,MSU-EU,Multispectral VNIR radiometer,NSAU,High-resolution optical imager,"
+SICH-1M",2005,2006,2020-01-07 00:18:56
+324,MSU-GS,Electro-L Imager,Roscosmos,Moderate-resolution optical imager,"
+Electro-L N1
+Electro-L N2
+Electro-L N3
+Electro-L N4
+Electro-L N5
+Electro-L N6
+Electro-L N7",2012,2041,2021-06-02 14:31:38
+656,MSU-GS/A,Electro-L Imager for Arktika,Roscosmos,Moderate-resolution optical imager,"
+Arctica-M N1
+Arctica-M N2
+Arctica-M N3
+Arctica-M N4
+Arctica-M N5
+Arctica-M N6
+Arctica-M N7
+Arctica-M N8",2021,2040,2024-04-29 10:23:07
+556,MSU-GSM,Electro-GOMS Imager for Electro M,Roscosmos,Moderate-resolution optical imager,"
+Electro-M N1-1
+Electro-M N1-2",2036,2046,2021-06-02 14:32:20
+1164,MSU-IK-SR,Multi-channel medium and far IR range radiometer,Roscosmos,High-resolution optical imager,"
+KANOPUS-V-IK-1",2017,2026,2022-08-01 10:57:34
+325,MSU-M,Multispectral VNIR radiometer,Roscosmos,Moderate-resolution optical imager,"
+Meteor-P1
+Meteor-P2
+Meteor-P3
+Meteor-P4
+Meteor-P5
+Meteor-P6
+Okean-O-1",1974,2000,2017-03-27 00:56:23
+326,MSU-MR,VIS/IR Imaging Radiometer,Roscosmos,Moderate-resolution optical imager,"
+Meteor-M N1
+Meteor-M N2
+Meteor-M N2-1
+Meteor-M N2-2
+Meteor-M N2-3
+Meteor-M N2-4
+Meteor-M N2-5
+Meteor-M N2-6
+Meteor-M N2-7
+Meteor-M N2-8",2010,2040,2021-06-17 17:16:40
+558,MSU-MR-MP,VIS/IR Imaging Radiometer for Meteor-MP,Roscosmos,Moderate-resolution optical imager,"
+Meteor-MP N1
+Meteor-MP N2",2036,2044,2021-06-02 19:03:21
+1012,MSU-S,Multispectral Scanner,Roscosmos,High-resolution optical imager,"
+Meteor-P1
+Meteor-P2
+Meteor-P3
+Meteor-P4
+Meteor-P5
+Meteor-P6",1974,1983,2020-01-07 00:19:46
+327,MSU-SK,Multispectral VNIR/IR conical scanning radiometer,Roscosmos,High-resolution optical imager,"
+Meteor-P5
+Resurs-O1-1
+Resurs-O1-2
+Resurs-O1-3",1980,2001,2017-03-28 15:10:53
+328,MSU-SK,Multispectral VNIR/IR conical scanning radiometer,Roscosmos,High-resolution optical imager,"
+Okean-O-1
+Okean-O1-1
+Okean-O1-2
+Okean-O1-3
+Okean-O1-4
+Okean-O1-5
+Okean-O1-6
+Okean-O1-7
+SICH-1",1986,2001,2017-03-28 15:24:23
+1024,MSU-SK1,Multispectral VNIR/IR conical scanning radiometer - 1,Roscosmos,High-resolution optical imager,"
+Resurs-O1-4",1998,2002,2017-03-29 10:00:13
+331,MSU-V,Multispectral VIS/IR radiometer,Roscosmos,High-resolution optical imager,"
+Okean-O-1",1999,2000,2017-03-28 17:03:36
+332,MTVZA,Imaging/Sounding Microwave Radiometer,Roscosmos,Microwave conical scanning radiometer,"
+Meteor-3M",2002,2006,2019-11-14 13:08:32
+333,MTVZA-GY,Imaging/Sounding Microwave Radiometer - improved,Roscosmos,Microwave conical scanning radiometer,"
+Meteor-M N1
+Meteor-M N2
+Meteor-M N2-1
+Meteor-M N2-2
+Meteor-M N2-3
+Meteor-M N2-4
+Meteor-M N2-5
+Meteor-M N2-6
+Meteor-M N2-7
+Meteor-M N2-8",2010,2040,2024-11-18 09:50:00
+627,MTVZA-GY-MP,Imaging/Sounding Microwave Radiometer for Meteor-MP,Roscosmos,Microwave conical scanning radiometer,"
+Meteor-MP N1
+Meteor-MP N2",2036,2044,2024-11-18 14:57:59
+334,MTVZA-OK (MW),Combined Microwave-Optical Imaging/Sounding Radiometer (MW component),NSAU,Microwave conical scanning radiometer,"
+SICH-1M",2005,2006,2019-11-14 13:16:11
+899,MTVZA-OK (optical),Combined Microwave-Optical Imaging/Sounding Radiometer (optical component),NSAU,Moderate-resolution optical imager,"
+SICH-1M",2005,2006,2017-03-27 20:18:27
+1080,MUS-nir/swir,Multi-spectral Optical Camera - NIR/SWIR,CONAE,Moderate-resolution optical imager,"
+SAC-E/SABIA-MAR A",2026,2029,2022-08-08 12:50:41
+1081,MUS-uv/vis/nir,Multi-spectral Optical Camera - UV/VIS/NIR,CONAE,Moderate-resolution optical imager,"
+SAC-E/SABIA-MAR B",2026,2029,2022-07-18 13:59:14
+335,MUSE,Monitor of Ultraviolet Solar Energy,NASA,Solar activity monitor,"
+Nimbus-3
+Nimbus-4",1969,1980,2017-05-19 00:06:22
+1209,MUSI,Multiband Ionospheric Ultra-Violet Spectrum Imager,CMA,Space radiometer or spectrometer,"
+FY-4C
+FY-4E",2026,2035,2025-04-07 07:21:24
+1102,MUX,Multispectral CCD Camera,CAST,High-resolution optical imager,"
+SJ-9A",2013,2022,2021-06-17 17:57:43
+336,MUXCAM,Multispectral Camera,CAST,High-resolution optical imager,"
+CBERS-3
+CBERS-4
+CBERS-4B",2013,2026,2021-06-16 13:02:55
+337,MVIRI,Meteosat Visible Infra-Red Imager,ESA,Moderate-resolution optical imager,"
+Meteosat-1
+Meteosat-2
+Meteosat-3
+Meteosat-3 (ADC)
+Meteosat-3 (X-ADC)
+Meteosat-4
+Meteosat-5
+Meteosat-5 (IODC)
+Meteosat-6
+Meteosat-6 (IODC)
+Meteosat-7
+Meteosat-7 (IODC)",1978,2017,2024-09-23 15:13:12
+338,MVISR,Multichannel Visible Infrared Scanning Radiometer,CMA,Moderate-resolution optical imager,"
+FY-1A
+FY-1B
+FY-1C
+FY-1D",1988,2012,2024-09-09 14:41:39
+339,MW radiometer,Microwave radiometer,NASA,Microwave cross-track scanning radiometer,"
+SWOT",2022,2026,2022-07-27 09:44:02
+340,MWHS-1,Micro-Wave Humidity Sounder -1,CMA,Microwave cross-track scanning radiometer,"
+FY-3A
+FY-3B",2008,2021,2025-01-28 16:22:27
+341,MWHS-2,Micro-Wave Humidity Sounder -2,CMA,Microwave cross-track scanning radiometer,"
+FY-3C
+FY-3D
+FY-3E
+FY-3F
+FY-3H
+FY-3J",2014,2034,2025-02-14 17:26:35
+1303,MWI,MicroWave Imager on WSF-M,DoD,Microwave conical scanning radiometer,"
+WSF-M1
+WSF-M2",2024,2035,2026-03-09 13:23:57
+683,MWI,Micro-Wave Imager,ESA,Microwave conical scanning radiometer,"
+Metop-SG-B1
+Metop-SG-B2
+Metop-SG-B3",2026,2048,2024-09-23 15:47:19
+344,MWR,Microwave Radiometer (Okean),Roscosmos,Microwave cross-track scanning radiometer,"
+Okean-O1-1
+Okean-O1-2
+Okean-O1-3
+Okean-O1-4
+Okean-O1-5
+Okean-O1-6
+Okean-O1-7
+SICH-1",1986,2001,2024-12-09 13:39:49
+347,MWR,Micro-Wave Radiometer,ESA,Microwave cross-track scanning radiometer,"
+Envisat
+ERS-2",1995,2012,2022-07-27 09:45:43
+348,MWR,Micro-Wave Radiometer,ESA,Microwave cross-track scanning radiometer,"
+Sentinel-3A
+Sentinel-3B
+Sentinel-3C
+Sentinel-3D",2016,2037,2024-09-23 15:58:29
+349,MWR,Micro-Wave Radiometer,CONAE,Microwave cross-track scanning radiometer,"
+SAC-D",2011,2015,2016-11-01 21:18:44
+1275,MWR,Microwave Radiometer for EPS Sterna,ESA,Microwave cross-track scanning radiometer,"
+EPS-Sterna-1
+EPS-Sterna-2
+EPS-Sterna-3",2029,2042,2025-02-03 09:54:45
+1419,MWR,Microwave Radiometer for AWS mission,ESA,Microwave cross-track scanning radiometer,"
+AWS PFM",0,0,2025-02-03 09:56:38
+417,MWRI,Microwave Radiometer Imager,NSOAS,Microwave conical scanning radiometer,"
+HY-2A
+HY-2B
+HY-2E",2011,2031,2025-01-29 14:48:19
+350,MWRI-1,Micro-Wave Radiation Imager 1,CMA,Microwave conical scanning radiometer,"
+FY-3A
+FY-3B
+FY-3C
+FY-3D",2008,2026,2025-01-29 14:46:18
+1324,MWRI-2,Micro-Wave Radiation Imager 2,CMA,Microwave conical scanning radiometer,"
+FY-3F
+FY-3H",2023,2033,2025-01-29 14:47:36
+1259,MWRI-RM,Micro-Wave Radiation Imager for the Rainfall Mission,CMA,Microwave conical scanning radiometer,"
+FY-3G
+FY-3I",2023,2033,2025-01-29 14:51:27
+797,MWS,Micro-Wave Sounder,ESA,Microwave cross-track scanning radiometer,"
+Metop-SG-A1
+Metop-SG-A2
+Metop-SG-A3",2026,2047,2024-09-23 15:45:23
+1367,MWS,Microwave Sounder for Geostationary Orbit.,CAS,Microwave cross-track scanning radiometer,"
+FY-4M1",2027,2033,2025-08-04 07:27:45
+352,MWTS-1,Micro-Wave Temperature Sounder - 1,CMA,Microwave cross-track scanning radiometer,"
+FY-3A
+FY-3B",2008,2020,2024-09-09 14:26:29
+353,MWTS-2,Micro-Wave Temperature Sounder - 2,CMA,Microwave cross-track scanning radiometer,"
+FY-3C
+FY-3D",2014,2026,2025-01-29 14:42:54
+1133,MWTS-3,Micro-Wave Temperature Sounder - 3,CMA,Microwave cross-track scanning radiometer,"
+FY-3E
+FY-3F
+FY-3H
+FY-3J",2021,2034,2025-01-29 14:44:43
+1049,MX,Multispectral VNIR,ISRO,High-resolution optical imager,"
+CartoSat-3",2020,2026,2021-06-17 15:52:37
+802,MX-LWIR,Multispectral - Long Wave Infrared,ISRO,High-resolution optical imager,"
+EOS 03",2021,2021,2021-06-16 15:03:48
+354,Mx-T,Multispectral CCD Camera,ISRO,High-resolution optical imager,"
+IMS-1",2008,2012,2020-01-07 00:29:56
+799,MX-VNIR,Multi-spectral Visible  Near Infrared,ISRO,High-resolution optical imager,"
+EOS 03",2021,2021,2021-06-16 15:00:50
+1188,MXGS,Modular X-ray and Gamma-ray Sensor,ESA,Space radiometer or spectrometer,"
+ISS ASIM",2018,2026,2021-10-02 17:47:23
+1307,NACHOS,NACHOS-Imager,LANL,Cross-nadir scanning SW sounder,"
+NACHOS-1
+NACHOS-2",2022,2026,2022-07-18 14:57:45
+1069,NAOMI,New AstroSat Optical Modular Instrument,Kazcosmos,High-resolution optical imager,"
+KazEOSat-1
+PeruSat-1",2014,2026,2023-11-27 11:47:30
+355,NAOMI,New AstroSat Optical Modular Instrument,CAST,High-resolution optical imager,"
+AlSat-2
+AlSat-2B
+AlSat-3A
+AlSat-3B
+VNREDSat-1",2010,2032,2026-01-16 09:26:50
+639,NAOMI,New AstroSat Optical Modular Instrument,CNES,High-resolution optical imager,"
+SPOT-6
+SPOT-7",2013,2026,2021-12-17 00:26:56
+965,NAOMI,New AstroSat Optical Modular Instrument,ACE,High-resolution optical imager,"
+SSOT",2012,2022,2017-03-29 09:49:28
+1115,Natalya-2M-particles,High energy radiation spectrometer - particles,Roscosmos,Energetic particle spectrometer,"
+Coronas-Photon",2009,2009,2017-05-28 11:54:50
+660,Natalya-2M-rad,High energy radiation spectrometer - radiation,Roscosmos,Solar activity monitor,"
+Coronas-Photon",2009,2009,2017-05-18 20:15:35
+882,NBK/2,Low-frequency wave complex,Roscosmos,Field or radiowave sensor,"
+Ionosfera-M N1 & N2
+Ionosfera-M N3 & N4
+Zond-M",2025,2033,2021-12-09 12:11:24
+356,NEMS,Nimbus-E Microwave Sounder,NASA,Microwave cross-track scanning radiometer,"
+Nimbus-5",1973,1983,2019-11-14 15:51:17
+1280,NFI,Narrow Field Imager Coronagraph,NASA,Solar activity monitor,"
+PUNCH",2025,2028,2022-02-07 09:04:11
+357,NIRST,New Infra Red Scanner Technology,CONAE,High-resolution optical imager,"
+SAC-D",2011,2015,2022-07-27 10:13:43
+792,NISTAR,NIST Advanced Radiometer (NIST = National Institute of Standards and Technology Advanced Radiometer),NASA,Broad band radiometer,"
+DSCOVR",2015,2029,2021-06-17 11:05:16
+776,NMS,Neutral Mass and Velocity Spectrometer,JAXA,Energetic particle spectrometer,"
+CASSIOPE",2014,2021,2021-10-02 18:10:49
+1016,NRA,NASA Radar Altimeter,NASA,Radar altimeter,"
+TOPEX-Poseidon",1992,2005,2013-02-15 16:44:24
+366,NSCAT,NASA Scatterometer,NASA,Radar scatterometer,"
+ADEOS",1996,1997,2012-09-13 10:58:08
+1095,Nucleon,Coronas-Nucleon,Roscosmos,Energetic particle spectrometer,"
+Resurs-P2",2015,2018,2022-08-02 10:59:27
+1293,ÑuSat-Imager,ÑuSat-Imager,Satellogic ,High-resolution optical imager,"
+ÑuSat     ",2016,0,2024-12-23 17:16:51
+1044,O3 lidar,Ozone lidar,NASA,Space lidar,"
+GACM",,0,2014-02-01 01:09:44
+1395,Occulter,Occulter for coronograph,ESA,Solar activity monitor,"
+PROBA-3O",2025,2030,2024-11-30 16:17:52
+1170,OCI,Ocean Color Imager,NSPO,Moderate-resolution optical imager,"
+FORMOSAT-1",1999,2004,2017-08-01 12:54:27
+372,OCI,Ocean Color Instrument,NASA,Moderate-resolution optical imager,"
+ACE (Aer.Clo.Eco.)
+PACE",0,2027,2024-02-19 16:33:57
+367,OCM,Ocean Color Monitor,ISRO,Moderate-resolution optical imager,"
+OceanSat-1 (IRS-P4)",1999,2010,2012-09-11 17:22:24
+865,OCM,Ocean Color Monitor,ISRO,Moderate-resolution optical imager,"
+OceanSat-2",2010,2023,2021-06-15 18:30:09
+866,OCM,Ocean Color Monitor,ISRO,Moderate-resolution optical imager,"
+OceanSat-3 (EOS-06)
+OceanSat-3A",2023,2030,2021-11-04 11:35:43
+1135,OCO (ISS) spectrometer,Orbiting Carbon Observatory ISS spectrometer,NASA,Cross-nadir scanning SW sounder,"
+ISS OCO-3",2019,2026,2024-01-22 08:09:38
+368,OCO spectrometer,Orbiting Carbon Observatory Spectrometer,NASA,Cross-nadir scanning SW sounder,"
+OCO
+OCO-2",2009,2026,2024-01-22 08:06:33
+370,OCS,Ocean Colour Scanner,Roscosmos,Moderate-resolution optical imager,"
+Meteor-3M",2013,4,2022-07-18 11:17:04
+371,OCTS,Ocean Color and Temperature Scanner,JAXA,Moderate-resolution optical imager,"
+ADEOS",1996,1997,2013-12-04 13:20:16
+1345,OCX,GeoXO Ocean Color Instrument,NOAA,Moderate-resolution optical imager,"
+",0,0,2023-05-08 08:27:27
+916,ODTML,Ocean Data Telemetry Microsat Link,NRL,Data collection system,"
+STPSat-2",2011,2019,2012-11-02 01:18:13
+963,OHIS,OrbView Hyperspectral Imaging System,GeoEye,High-resolution optical imager,"
+OrbView-4",2001,2001,2020-01-07 00:32:10
+685,OHRIS,OrbView High Resolution Imaging System,GeoEye,High-resolution optical imager,"
+OrbView-3
+OrbView-4",2001,2007,2017-03-29 00:05:07
+373,OIS,Optical Imaging System,TÜBITAK-UZAY,High-resolution optical imager,"
+RASAT",2011,2026,2023-11-27 11:49:33
+374,OLCI ,Ocean and Land Colour Imager ,ESA,Moderate-resolution optical imager,"
+Sentinel-3A
+Sentinel-3B
+Sentinel-3C
+Sentinel-3D",2016,2037,2024-10-07 10:15:10
+375,OLI,Operational Land Imager,NASA,High-resolution optical imager,"
+Landsat-8
+Landsat-9",2013,2031,2021-09-28 16:12:37
+376,OLS,Operational Linescan Systerm ,DoD,Moderate-resolution optical imager,"
+DMSP-F01
+DMSP-F02
+DMSP-F03
+DMSP-F04
+DMSP-F05
+DMSP-F06
+DMSP-F07
+DMSP-F08
+DMSP-F09
+DMSP-F10
+DMSP-F11
+DMSP-F12
+DMSP-F13
+DMSP-F14
+DMSP-F15
+DMSP-F16
+DMSP-F17
+DMSP-F18
+DMSP-F19",1976,2026,2021-06-22 11:36:42
+1145,OM,Optical Monitor,ESA,Space radiometer or spectrometer,"
+XMM-Newton",2000,2026,2024-01-22 08:45:33
+377,OMI ,Ozone Monitoring Instrument ,NIVR,Cross-nadir scanning SW sounder,"
+Aura",2004,2026,2024-09-30 08:51:35
+378,OMPS-limb,Ozone Mapping and Profiler Suite,NOAA,Limb sounder,"
+JPSS-3
+JPSS-4
+NOAA-21
+SNPP",2012,2041,2024-11-21 09:30:30
+379,OMPS-nadir,Ozone Mapping and Profiler Suite,NOAA,Cross-nadir scanning SW sounder,"
+JPSS-3
+JPSS-4
+NOAA-20
+NOAA-21
+SNPP",2012,2041,2024-11-21 09:31:07
+700,OMS-limb,Ozone Monitoring Suite - limb scanning unit,CMA,Limb sounder,"
+FY-3F",2023,2031,2025-06-12 08:33:45
+381,OMS-nadir,Ozone Monitoring Suite - nadir scanning unit,CMA,Cross-nadir scanning SW sounder,"
+FY-3F",2023,2031,2024-09-09 14:55:26
+382,OPS,Optical Sensor,JAXA,High-resolution optical imager,"
+JERS",1992,1998,2020-01-07 00:34:25
+671,OPS,Optical sensor,NEC,High-resolution optical imager,"
+ASNARO-1",2015,2026,2023-11-27 11:50:32
+687,OSA,Optical Sensor Assembly,GeoEye,High-resolution optical imager,"
+Ikonos",1999,2015,2022-08-08 15:27:48
+474,OSCAT,OceanSat Scatterometer,ISRO,Radar scatterometer,"
+OceanSat-2
+ScatSat-1",2010,2014,2021-06-15 18:28:48
+1306,OSCAT-3,Scatterometer for Oceansat-3,ISRO,Radar scatterometer,"
+OceanSat-3 (EOS-06)
+OceanSat-3A",2023,2030,2023-05-05 13:35:51
+383,OSIRIS,Optical Spectrograph and Infra-Red Imaging System,SNSA,Limb sounder,"
+Odin",2001,2026,2022-12-22 14:04:47
+384,OSMI,Ocean Scanning Multispectral Imager,KARI,Moderate-resolution optical imager,"
+KOMPSAT-1",2000,2008,2016-10-14 02:07:59
+385,OTD,Optical Transient Detector,NASA,Lightning imager,"
+OrbView-1/MicroLab",1995,2000,2018-12-08 20:07:54
+386,OVM,Overhauser Magnetometer,CNES,Field or radiowave sensor,"
+Ørsted
+SAC-C",1999,2014,2022-07-25 15:43:08
+885,Ozonometer-3,Scanning ozonometer,Roscosmos,Cross-nadir scanning SW sounder,"
+Zond-M",2027,2030,2021-06-16 15:29:42
+886,Ozonometer-TM,Ozonometer,Roscosmos,Cross-nadir scanning SW sounder,"
+Ionosfera-M N1 & N2
+Ionosfera-M N3 & N4",2025,2033,2021-06-16 15:31:06
+387,PALSAR,Phased-Array L-band Synthetic Aperture Radar,JAXA,Imaging radar (SAR),"
+ALOS",2006,2011,2012-09-11 20:14:52
+388,PALSAR-2,Phased-Array L-band Synthetic Aperture Radar - 2,JAXA,Imaging radar (SAR),"
+ALOS-2",2014,2026,2021-08-30 23:39:23
+1200,PALSAR-3,Phased-Array L-band Synthetic Aperture Radar - 3,JAXA,Imaging radar (SAR),"
+ALOS-4 (DAICHI-4)",2024,2031,2023-11-20 09:38:49
+389,PAMELA,Payload for AntiMatter Exploration and Light-nuclei Astrophysics,Roscosmos,Energetic particle spectrometer,"
+Resurs-DK",2006,2016,2022-07-25 14:13:55
+390,PAN,Panchromatic Camera,ASI,High-resolution optical imager,"
+PRISMA
+PRISMA2GEN",2019,2035,2022-07-25 12:53:45
+391,PAN,Panchromatic Camera,ISRO,High-resolution optical imager,"
+IRS-1C
+IRS-1D",1996,2010,2022-07-25 12:59:12
+392,PAN,Panchromatic Camera,ISRO,High-resolution optical imager,"
+CartoSat-1 (IRS-P5)",2005,2019,2022-07-25 13:10:36
+393,PAN,Panchromatic Camera,ISRO,High-resolution optical imager,"
+CartoSat-3",2020,2026,2022-08-01 11:00:13
+394,PAN,Panchromatic Radiometer,Roscosmos,High-resolution optical imager,"
+Monitor-E",2005,2008,2022-08-15 12:23:20
+395,PAN,Panchromatic Imager,CDTI,High-resolution optical imager,"
+SEOSat/Ingenio",0,2020,2022-07-18 15:19:13
+396,PAN,Panchromatic Imager,GISTDA,High-resolution optical imager,"
+THEOS-1",2009,2026,2022-07-25 13:50:43
+1101,PAN,Panchromatic imager,CAST,High-resolution optical imager,"
+SJ-9A",2013,2022,2022-07-18 14:54:19
+1250,PAN,New Astrosat Optical Modular Imager (PAN),GISTDA,High-resolution optical imager,"
+THEOS-2 Main",2024,2033,2021-03-06 11:31:23
+868,PAN,Panchromatic Camera,ISRO,High-resolution optical imager,"
+CartoSat-2
+CartoSat-2A
+CartoSat-2B",2007,2026,2017-03-28 19:37:22
+1046,PAN,Panchromatic Camera,ISRO,High-resolution optical imager,"
+CartoSat-2C
+CartoSat-2D
+CartoSat-2E
+CartoSat-2F",2016,2026,2022-08-01 10:58:49
+806,PAN,Panchromatic camera,CAST,High-resolution optical imager,"
+TH-1A
+TH-1B
+TH-1C",2010,2026,2017-03-28 19:35:12
+397,PanCam,Panchromatic Camera,TÜBITAK-BILTEN,High-resolution optical imager,"
+BILSat",2003,2006,2017-03-28 19:49:46
+398,PANMUX,Panchromatic and Multispectral imager,CAST,High-resolution optical imager,"
+CBERS-3
+CBERS-4
+CBERS-4B",2013,2026,2021-06-16 13:04:33
+1184,PAPA,Plasma Analyzer Package for Aditya,ISRO,Energetic particle spectrometer,"
+Aditya-1",2024,2028,2021-10-02 20:36:32
+399,PASTEC,Technology Demonstration Passenger,CNES,Field or radiowave sensor,"
+SPOT-4",1998,2011,2016-03-21 19:45:15
+767,PEACE,Plasma Electron and Current Analyzer,ESA,Energetic particle spectrometer,"
+CLUSTER-1
+CLUSTER-2
+CLUSTER-3
+CLUSTER-4",2000,2025,2021-12-06 19:15:17
+1388,Pelican Imager,Pelican Imager,Planet,High-resolution optical imager,"
+Pelican",2023,2039,2023-11-13 10:13:08
+1119,PEM/AXIS,Particle Environment Monitor / Atmospheric X-ray Imaging Spectrometer,NASA,Space radiometer or spectrometer,"
+UARS",1991,2005,2017-05-21 20:53:41
+1120,PEM/EPS ,Particle Environment Monitor / Energetic Particle Spectrometer,NASA,Energetic particle spectrometer,"
+UARS",1991,2005,2017-06-05 03:13:33
+400,PEM/VMAG,Particle Environment Monitor - Vector Magnetometer,NASA,Field or radiowave sensor,"
+UARS",1991,2005,2016-03-21 20:46:13
+737,Penguin-M,Hard X-ray polarimeter-spectrometer,Roscosmos,Solar activity monitor,"
+Coronas-Photon",2009,2009,2017-05-18 20:19:07
+893,PES,GPS-GLONASS device,Roscosmos,Positioning system,"
+Ionosfera-M N1 & N2
+Ionosfera-M N3 & N4",2025,2033,2022-07-18 14:49:48
+1060,PET,Proton/Electron Telescope,NASA,Energetic particle spectrometer,"
+SAMPEX",1992,2012,2022-07-26 10:34:02
+934,PHI,Polarimetric and Helioseismic Imager,DLR,Solar activity monitor,"
+Solar Orbiter",2020,2030,2024-01-22 10:09:30
+740,PHOKA,Multi-channel ultraviolet monitor,Roscosmos,Solar activity monitor,"
+Coronas-Photon",2009,2009,2017-05-18 20:24:48
+759,PIXIE,Polar Ionospheric X-ray Imaging Experiment,NASA,Space radiometer or spectrometer,"
+Polar",1996,2008,2017-05-21 17:27:44
+1424,PLA,Plasma Analyser,UKSA,Energetic particle spectrometer,"
+Vigil-L5",2031,2038,2025-02-26 14:18:19
+727,PLASMA,3-D Plasma and Energetic Particles Experiment,NASA,Energetic particle spectrometer,"
+WIND",1995,2026,2021-11-10 12:01:02
+731,PLASTIC,PLAsma and SupraThermal Ion and Composition,NASA,Energetic particle spectrometer,"
+STEREO-A
+STEREO-B",2007,2026,2021-12-16 16:22:42
+1453,PLATiNO TIR,PLATiNO Thermal IR radiometer,ASI,High-resolution optical imager,"
+PLATiNO-2",2026,2029,2025-09-08 10:37:14
+1218,Pléiades-Neo,Pléiades-Neo,CNES,High-resolution optical imager,"
+Pléiades-Neo 3
+Pléiades-Neo 4
+Pléiades-Neo 5
+Pléiades-Neo 6",2021,2031,2021-08-31 14:51:44
+904,PLP,Planar Langmuir Probe,DoD,Field or radiowave sensor,"
+C/NOFS",2008,2015,2017-04-22 13:41:29
+1338,PMAI,Short-wave Infrared Polarized Multi-Angle Imager,CMA,Moderate-resolution optical imager,"
+FY-3G",2023,2029,2024-09-09 14:59:44
+909,PMC,High Resolution Camera,CAST,High-resolution optical imager,"
+VRSS-1",2013,2022,2021-06-17 18:26:22
+1288,PMI,Photospheric Magnetic Field Imager,ESA,Solar activity monitor,"
+Vigil-L5",2031,2038,2024-01-15 09:11:19
+701,PMR,Precipitation Measurement Radar,CMA,Cloud and precipitation radar,"
+FY-3G
+FY-3I",2023,2033,2023-02-27 08:59:35
+401,PMR,Pressure Modulator Radiometer,UKSA,Cross-nadir infrared sounder,"
+Nimbus-6",1975,1979,2012-09-12 02:34:33
+1389,PMRIS,Programmable Medium Resolution Imaging Spectrometer,CNSA,Moderate-resolution optical imager,"
+HY-1F
+HY-3A (HY-1E)
+HY-3B",2023,2036,2023-11-22 17:21:22
+1027,PMS,Panchromatic and Multi-spectral CCD Camera,CNSA,High-resolution optical imager,"
+GF-1
+GF-1-02
+GF-1-03
+GF-1-04
+GF-6",2013,2026,2023-11-27 11:51:31
+1084,PMS-2,Panchromatic and Multi-spectral CCD Camera - 2,CNSA,High-resolution optical imager,"
+GF-10
+GF-11
+GF-11-02
+GF-11-03
+GF-11-04
+GF-11-05
+GF-14
+GF-14-02
+GF-2
+GF-7
+GF-8
+GF-9
+GF-9-02
+GF-9-03
+GF-9-04
+GF-9-05",2014,2030,2023-11-27 11:52:02
+1158,PMS-3,Panchromatic and Multi-spectral CCD Camera - 3,CAST,High-resolution optical imager,"
+SuperView Neo-1 01
+SuperView Neo-1 02
+SuperView Neo-3-01
+SuperView-1
+SuperView-2
+SuperView-3
+SuperView-4",2017,2029,2023-11-27 11:52:32
+688,POAM,Polar Ozone and Aerosol Measurement,NRL,Limb sounder,"
+SPOT-3
+SPOT-4",1993,2006,2017-01-17 15:45:08
+405,POLDER,Polarization and Directionality of the Earth’s Reflectances,CNES,Moderate-resolution optical imager,"
+ADEOS
+ADEOS-2
+PARASOL",1996,2013,2022-07-25 15:44:31
+1464,POLSAC,Polarisation Sensor for Aerosol & Cloud,ISRO,Moderate-resolution optical imager,"
+G20",2027,2032,2025-11-10 17:39:49
+1386,PolSIR radiometer,PolSIR Radiometer,NASA,Microwave cross-track scanning radiometer,"
+PolSIR-1
+PolSIR-2",2027,2030,2023-11-02 16:19:44
+406,Poseidon-2,Poseidon 2,CNES,Radar altimeter,"
+JASON-1",2002,2013,2024-09-23 15:53:24
+407,Poseidon-3,Poseidon 3,CNES,Radar altimeter,"
+JASON-2",2008,2019,2024-09-23 15:54:33
+408,Poseidon-3B,Poseidon 3B,CNES,Radar altimeter,"
+JASON-3",2016,2027,2024-09-23 15:55:06
+22,Poseidon-3C,Poseidon-3C Altimeter,NASA,Radar altimeter,"
+SWOT",2023,2026,2023-09-21 07:40:48
+1139,Poseidon-4,Poseidon-4,ESA,Radar altimeter,"
+Sentinel-6A
+Sentinel-6B
+Sentinel-6C",2021,2036,2024-09-23 16:05:31
+1430,Poseidon-5,Poseidon-5,ESA,Radar altimeter,"
+S3NG-TOPO A
+S3NG-TOPO B",2032,2040,2025-04-14 13:47:45
+1297,POSP,Particulate Observing Scanning Polarimeter,CNSA,Moderate-resolution optical imager,"
+DQ-1",2022,2030,2022-07-18 13:15:40
+947,Potential,Potential,NSAU,Field or radiowave sensor,"
+SICH-2
+SICH-2-30",2011,2027,2021-10-02 22:57:30
+409,PR,Precipitation Radar ,JAXA,Cloud and precipitation radar,"
+TRMM",1998,2015,2022-07-25 15:14:47
+410,PRARE,Precise Range And Range-rate Equipment,DLR,Positioning system,"
+ERS-1
+ERS-2
+Meteor-3-6",1991,2007,2017-03-31 13:11:30
+661,PREMOS,Precision Monitoring of Solar variability,CNES,Solar irradiance monitor,"
+Picard",2010,2014,2021-09-29 21:37:21
+411,PRISM,Panchromatic Remote-sensing Instrument for Stereo Mapping,JAXA,High-resolution optical imager,"
+ALOS",2006,2011,2017-03-28 19:53:30
+412,PSS,Panchromatic film-making system,Roscosmos,High-resolution optical imager,"
+KANOPUS-V-IK-1
+KANOPUS-V1
+KANOPUS-V3
+KANOPUS-V4
+KANOPUS-V5
+KANOPUS-V6",2012,2026,2017-03-28 19:55:14
+1156,PWE,Plasma Wave Experiment,JAXA,Field or radiowave sensor,"
+Arase (ERG)",2017,2033,2021-12-09 12:25:54
+747,PWI,Plasma Waves Investigation,JAXA,Field or radiowave sensor,"
+GEOTAIL",1992,2022,2021-12-09 12:25:08
+751,PWI,Plasma Wave Instrument,NASA,Field or radiowave sensor,"
+Polar",1996,2008,2017-04-13 01:37:49
+1256,Pyxis-RO,Pyxis-RO,PlanetiQ,GNSS radio-occultation sounder,"
+GNOMES-1
+GNOMES-2
+GNOMES-3
+GNOMES-4
+GNOMES-5",2020,2028,2024-03-04 16:12:36
+1442,QPS-SAR,QPS-SAR,iQPS,Imaging radar (SAR),"
+QPS-SAR 10
+QPS-SAR 11
+QPS-SAR 12
+QPS-SAR 14
+QPS-SAR 15
+QPS-SAR 5
+QPS-SAR 6
+QPS-SAR 7
+QPS-SAR 8
+QPS-SAR 9",2024,2028,2025-06-16 09:06:19
+1015,R10-M,Radiation Measurement Complex,Roscosmos,Energetic particle spectrometer,"
+Meteor-P2
+Meteor-P3
+Meteor-P4
+Meteor-P5
+Meteor-P6",1976,1983,2017-06-04 23:25:06
+413,R225,Passive Microwave Radiometer,Roscosmos,Microwave cross-track scanning radiometer,"
+Okean-O-1",1999,2000,2012-09-12 11:13:56
+414,R600,Passive Microwave Radiometer,Roscosmos,Microwave cross-track scanning radiometer,"
+Okean-O-1",1999,2000,2017-03-29 19:17:13
+415,RA,Radar Altimeter,ESA,Radar altimeter,"
+ERS-1
+ERS-2",1991,2011,2012-06-06 13:31:20
+416,RA-2,Radar Altimeter - 2,ESA,Radar altimeter,"
+Envisat",2002,2012,2022-07-26 10:39:26
+418,Radiomet,Radio-occultation sounder,Roscosmos,GNSS radio-occultation sounder,"
+",0,0,2022-07-18 11:21:40
+1420,Radiometer(FireSat),Multi-spectral IR radiometer for FireSat,MUON SPACE,High-resolution optical imager,"
+FireSat-Pathfinder",2025,2028,2025-02-03 14:11:13
+1322,RadMon,Radiation Monitor,UKSA,Field or radiowave sensor,"
+CIRCE",2023,2023,2022-11-07 14:24:06
+1214,RainCube,Radar In a CubeSat,NASA,Cloud and precipitation radar,"
+ISS RainCube",2018,2020,2021-06-15 20:36:31
+420,RALCam-1,Rutherford Appleton Laboratory Camera - 1,UKSA,High-resolution optical imager,"
+TopSat",2006,2008,2017-03-28 20:32:03
+768,RAPID,Research with Adaptive Particle Imaging Detectors,ESA,Energetic particle spectrometer,"
+CLUSTER-1
+CLUSTER-2
+CLUSTER-3
+CLUSTER-4",2000,2025,2022-08-02 10:57:48
+908,RapidScat,Rapid Scatterometer,NASA,Radar scatterometer,"
+ISS RapidScat",2014,2016,2022-07-25 14:07:49
+783,RBSPICE,Radiation Belt Storm Probes Ion Composition Experiment,NASA,Energetic particle spectrometer,"
+VAP (2 sat)",2012,2019,2021-10-02 18:12:56
+419,RBV,Return-Beam Vidicon camera,NASA,High-resolution optical imager,"
+Landsat-1 (ERTS)
+Landsat-2
+Landsat-3",1972,1983,2020-01-07 00:38:12
+421,REIS,RapidEye Earth Imaging System,DLR,High-resolution optical imager,"
+RapidEye (5 sats)",2008,2020,2023-11-27 11:53:34
+982,RES-C,Solar X-ray Spectral Polarimeter,Roscosmos,Solar activity monitor,"
+Coronas-F
+Coronas-I",1994,2005,2017-05-17 20:35:02
+993,RESIK,X-ray Spectrometer,Roscosmos,Solar activity monitor,"
+Coronas-F",2001,2005,2017-05-17 21:03:13
+890,RESPEKT,X-ray spectrometer for monitoring hard solar X-radiation,Roscosmos,Solar activity monitor,"
+Zond-M",2027,2030,2021-12-16 00:06:11
+954,RFB,Radio Frequency Beacon,USAF,Field or radiowave sensor,"
+COSMIC-2",2020,2026,2021-10-02 23:00:08
+1144,RGS,Reflection Grating Spectrometer,ESA,Space radiometer or spectrometer,"
+XMM-Newton",2000,2026,2024-01-22 08:43:42
+998,RHESSI,Reuven Ramaty High Energy Solar Spectroscopic Imager,NASA,Solar activity monitor,"
+RHESSI",2002,2018,2021-10-01 10:18:10
+832,RIMS-A,Radio-frequency mass spectrometer,Roscosmos,Energetic particle spectrometer,"
+Zond-M",2027,2030,2021-12-16 01:07:30
+423,RIS,Retroreflector In Space,JAXA,Positioning system,"
+ADEOS",1996,1997,2017-03-31 12:52:43
+424,RLSBO,Side Looking Real Aperture Radar,Roscosmos,Imaging radar (SAR),"
+Okean-O-1
+Okean-O1-1
+Okean-O1-2
+Okean-O1-3
+Okean-O1-4
+Okean-O1-5
+Okean-O1-6
+Okean-O1-7
+SICH-1
+SICH-1M",1986,2006,2012-09-12 12:56:39
+427,RM-08,Passive Microwave Scanning Radiometer,Roscosmos,Microwave cross-track scanning radiometer,"
+Okean-O1-1
+Okean-O1-2
+Okean-O1-3
+Okean-O1-4
+Okean-O1-5
+Okean-O1-6
+Okean-O1-7
+SICH-1
+SICH-1M",1986,2006,2017-03-29 19:19:36
+429,RMK-2,Radiation Measurement Complex,Roscosmos,Energetic particle spectrometer,"
+Meteor-2-1
+Meteor-2-10
+Meteor-2-11
+Meteor-2-12
+Meteor-2-13
+Meteor-2-14
+Meteor-2-15
+Meteor-2-16
+Meteor-2-17
+Meteor-2-18
+Meteor-2-19
+Meteor-2-2
+Meteor-2-20
+Meteor-2-21
+Meteor-2-3
+Meteor-2-4
+Meteor-2-5
+Meteor-2-6
+Meteor-2-7
+Meteor-2-8
+Meteor-2-9
+Meteor-3-1
+Meteor-3-2
+Meteor-3-3
+Meteor-3-4
+Meteor-3-5
+Meteor-3-6",1975,1996,2017-06-04 23:37:29
+488,RMS ,Radiation Monitors for Space weather,JMA,Energetic particle spectrometer,"
+Himawari-1 (GMS-1)
+Himawari-10
+Himawari-2 (GMS-2)
+Himawari-3 (GMS-3)
+Himawari-4 (GMS-4)",1977,2046,2025-04-07 08:22:25
+431,RMS-platform,Radiation Measurement System - platform,Roscosmos,Energetic particle spectrometer,"
+Electro-GOMS",1995,2000,2017-06-04 23:47:04
+1109,RMS-solar,Radiation Measurement System - solar,Roscosmos,Solar activity monitor,"
+Electro-GOMS",1995,2000,2017-05-18 21:38:14
+1113,RMS/MAG,Radiation Measurement System - Magnetometer,Roscosmos,Field or radiowave sensor,"
+Electro-GOMS",1995,2000,2016-03-21 12:33:37
+1283,RMU,Radiation Monitor Unit (also referred to as NGRM),ESA,Energetic particle spectrometer,"
+EDRS-C
+Meteosat-12
+Metop-SG-A1
+Metop-SG-A2
+Metop-SG-A3
+Metop-SG-B1
+Metop-SG-B2
+Metop-SG-B3
+MTG-I2
+MTG-I3
+MTG-I4
+MTG-S1
+MTG-S2
+Sentinel-6A
+Sentinel-6B
+Sentinel-6C",2019,0,2025-01-27 19:52:07
+798,RO,Radio Occultation sounder,ESA,GNSS radio-occultation sounder,"
+Metop-SG-A1
+Metop-SG-A2
+Metop-SG-A3
+Metop-SG-B1
+Metop-SG-B2
+Metop-SG-B3",2026,2048,2024-09-23 15:45:48
+630,ROHPP,Radio Occultations and Heavy Precipitation with PAZ,CDTI,GNSS radio-occultation sounder,"
+SEOSAR/Paz",2018,2026,2021-12-13 19:24:10
+1025,ROSA,Radio Occultation Sounder of the Atmosphere,ASI,GNSS radio-occultation sounder,"
+OceanSat-2",2010,2023,2021-10-02 23:38:27
+433,ROSA,Radio Occultation Sounder of the Atmosphere,ASI,GNSS radio-occultation sounder,"
+Megha-Tropiques
+SAC-D",2011,2019,2021-06-17 17:06:13
+1269,ROSE-L,Radar Observation System for Europe in L-band,ESA,Imaging radar (SAR),"
+ROSE-L A
+ROSE-L B",2030,2037,2022-03-28 13:01:19
+1068,RPI,Radio Plasma Imaging,NASA,Field or radiowave sensor,"
+IMAGE",2000,2005,2017-04-23 00:49:11
+784,RPS,Relativistic Proton Spectrometer,NASA,Energetic particle spectrometer,"
+VAP (2 sat)",2012,2019,2021-10-02 18:16:02
+995,RPS-1,X-ray Semi-conductor Spectrometer,Roscosmos,Solar activity monitor,"
+Coronas-F",2001,2005,2017-05-17 21:04:32
+932,RPW,Radio and Plasma Waves,CNES,Solar activity monitor,"
+Solar Orbiter",2020,2030,2021-09-29 19:28:02
+1042,RRA,Retro-Reflector Array,DLR,Positioning system,"
+GFZ-1",1995,1999,2014-01-07 22:09:46
+1096,RRA,Retro-Reflector Array ,CNES,Positioning system,"
+Diadéme-1
+Diadéme-2",1967,2050,2021-06-17 16:00:13
+778,RRI,Radio Receiver Instrument,CSA,Field or radiowave sensor,"
+CASSIOPE",2014,2021,2021-10-02 22:30:07
+436,RSI,Remote Sensing Instrument,NSPO,High-resolution optical imager,"
+FORMOSAT-2",2004,2016,2017-08-02 01:36:57
+1172,RSI,Remote Sensing Instrument ,NSPO,High-resolution optical imager,"
+FORMOSAT-5",2017,2026,2021-06-17 16:08:25
+736,RT-2,Roentgen Telescope-2,ISRO,Solar activity monitor,"
+Coronas-Photon",2009,2009,2017-05-18 21:07:31
+1199,S-SAR,S-band Synthetic Aperture Radar,UKSA,Imaging radar (SAR),"
+NovaSAR-S",2018,2026,2021-08-30 23:45:04
+549,S-VISSR,Stretched Visible and Infrared Spin Scan Radiometer,CMA,Moderate-resolution optical imager,"
+FY-2A
+FY-2B",1997,2004,2024-09-09 14:21:45
+895,S-VISSR,Stretched Visible and Infrared Spin Scan Radiometer,CMA,Moderate-resolution optical imager,"
+FY-2C
+FY-2D
+FY-2E",2005,2018,2022-07-25 13:57:05
+896,S-VISSR,Stretched Visible and Infrared Spin Scan Radiometer,CMA,Moderate-resolution optical imager,"
+FY-2F
+FY-2G
+FY-2H",2012,2026,2022-08-08 13:14:13
+732,S/WAVES,STEREO/WAVES,NASA,Field or radiowave sensor,"
+STEREO-A
+STEREO-B",2007,2026,2021-12-16 16:30:21
+454,S&RSAT,Search & Rescue Satellite-Aided Tracking System,NOAA,Search & rescue system,"
+Meteor-M N2-1
+Metop-A
+Metop-B
+NOAA-10
+NOAA-11
+NOAA-13
+NOAA-14
+NOAA-15
+NOAA-16
+NOAA-17
+NOAA-18
+NOAA-19
+NOAA-8
+NOAA-9",1983,2027,2016-07-01 18:11:54
+437,SABER,Sounding of the Atmosphere using Broadband Emission Radiometry,NASA,Limb sounder,"
+TIMED",2002,2026,2021-06-17 18:23:30
+1465,SACFF,Sensor for advanced Climate and Forest Fire,ISRO,High-resolution optical imager,"
+G20",2027,2032,2025-11-10 17:49:59
+438,SAGE-II,Stratospheric Aerosol and Gas Experiment - II,NASA,Limb sounder,"
+ERBS",1985,2005,2017-01-17 15:37:05
+693,SAGE-III ,Stratospheric Aerosol and Gas Experiment - III,NASA,Limb sounder,"
+ISS SAGE-III
+Meteor-3M",2002,2026,2022-02-23 16:33:56
+440,SAM-II,Stratospheric Aerosol Measurement - II,NASA,Limb sounder,"
+Nimbus-7",1979,1994,2017-01-17 15:37:55
+441,SAMS,Stratospheric and Mesospheric Sounder,NASA,Limb sounder,"
+Nimbus-7",1979,1994,2017-01-17 15:38:53
+442,SAPHIR,Sondeur Atmospherique du Profil d’Humidite Intertropicale par Radiometrie,CNES,Microwave cross-track scanning radiometer,"
+Megha-Tropiques",2012,2022,2021-06-17 11:43:52
+443,SAR,Synthetic Aperture Radar,NASA,Imaging radar (SAR),"
+SeaSat",1978,1978,2012-09-12 20:12:13
+444,SAR,Synthetic Aperture Radar,JAXA,Imaging radar (SAR),"
+JERS",1992,1998,2012-09-12 20:09:03
+445,SAR,Synthetic Aperture Radar (C-band),CSA,Imaging radar (SAR),"
+RadarSat-1
+RadarSat-2",1996,2027,2021-06-15 20:50:29
+1310,SAR,SAR (Superview),CAST,Imaging radar (SAR),"
+SuperView Neo-2 01
+SuperView Neo-2 02
+SuperView Neo-2 03
+SuperView Neo-2 04",2022,2029,2023-11-27 16:16:21
+446,SAR RCM,Synthetic Aperture Radar (C-band) for RadarSat constellation,CSA,Imaging radar (SAR),"
+RCM-1
+RCM-2
+RCM-3",2019,2031,2021-06-15 20:51:17
+1094,SAR-10,Synthetic Aperture Radar -10,NPOMash,Imaging radar (SAR),"
+Kondor-E
+Kondor-E1
+Kondor-FKA 1
+Kondor-FKA 2",2013,2029,2023-11-27 16:32:02
+447,SAR-2000,Synthetic Aperture Radar 2000 (X-band) ,ASI,Imaging radar (SAR),"
+CSK-1
+CSK-2
+CSK-3
+CSK-4",2007,2026,2021-06-15 20:52:12
+449,SAR-C,Synthetic Aperture Radar (C-band),ISRO,Imaging radar (SAR),"
+EOS-04
+RISAT-1
+RISAT-1B (EOS-09)",2012,2029,2021-06-15 20:53:56
+450,SAR-C,Synthetic Aperture Radar (C-band),ESA,Imaging radar (SAR),"
+Sentinel-1A
+Sentinel-1B
+Sentinel-1C
+Sentinel-1D",2014,2035,2021-06-15 10:10:39
+1141,SAR-C,"Synthetic Aperture Radar, C-band",CNSA,Imaging radar (SAR),"
+GF-12
+GF-12-02
+GF-12-03
+GF-12-04
+GF-12-05
+GF-3
+GF-3(02) or CSAR-01
+GF-3(03) or CSAR-02",2016,2029,2023-01-12 11:01:00
+451,SAR-L,Synthetic Aperture Radar (L-band),CONAE,Imaging radar (SAR),"
+SAOCOM-1A
+SAOCOM-1B
+SAOCOM-2A
+SAOCOM-2B",2019,2031,2021-08-30 23:40:40
+1098,SAR-L (NISAR),SAR-L for the NASA-ISRO Synthetic Aperture Radar ,NASA,Imaging radar (SAR),"
+NISAR",2025,2029,2021-08-30 23:43:17
+1026,SAR-P,Synthetic Aperture Radar - P-band,ESA,Imaging radar (SAR),"
+BIOMASS",2025,2030,2022-03-28 08:59:32
+453,SAR-S,Synthetic Aperture Radar (S-band),CAST,Imaging radar (SAR),"
+HJ-1C
+HJ-2E
+HJ-2F",2013,2031,2022-10-14 10:06:50
+1099,SAR-S (NISAR) ,SAR-S for the NASA-ISRO Synthetic Aperture Radar,NASA,Imaging radar (SAR),"
+NISAR",2025,2029,2021-08-30 23:44:14
+458,SAR-Travers,Two-frequency SAR,Roscosmos,Imaging radar (SAR),"
+Resurs-O1-1",1986,1986,2012-09-13 00:44:22
+459,SAR-X,Synthetic Aperture Radar (X-band),DLR,Imaging radar (SAR),"
+TanDEM-X
+TerraSAR-X",2008,2026,2021-06-15 20:57:01
+460,SAR-X,Synthetic Aperture Radar (X-band),ISA,Imaging radar (SAR),"
+EOS-01
+RISAT-2
+RISAT-2B
+RISAT-2BR1",2009,2026,2024-01-23 15:36:03
+461,SAR-X,Synthetic Aperture Radar (X-band),CDTI,Imaging radar (SAR),"
+SEOSAR/Paz",2018,2026,2021-06-15 21:01:04
+1454,SAR-X,Synthetic Aperture Radar (X-band) for PLATiNO-1,ASI,Imaging radar (SAR),"
+PLATiNO-1",2026,2029,2025-09-08 11:01:25
+1415,SAR-X (LOTUSat),Synthetic Aperture Radar (X-band) for LOTUSat,STI-VAST,Imaging radar (SAR),"
+LOTUSat-1",2026,2030,2024-10-21 08:06:53
+1045,SAR-X/Ku,Synthetic Aperture Radar in X- and Ku- bands,NASA,Imaging radar (SAR),"
+SCLP",,0,2014-02-17 19:33:04
+151,SAS&R,Advanced Aided Search & Rescue,ISRO,Search & rescue system,"
+INSAT-2A
+INSAT-2B
+INSAT-2D
+INSAT-2E
+INSAT-3A
+INSAT-3D
+INSAT-3DR
+INSAT-3DS",1992,2034,2025-06-09 08:01:16
+1435,SAS&R (Meteor),Advanced Aided Search & Rescue for Meteor-M,Roscosmos,Search & rescue system,"
+Meteor-M N2-3
+Meteor-M N2-4
+Meteor-M N2-5
+Meteor-M N2-6
+Meteor-M N2-7
+Meteor-M N2-8
+Meteor-MP N1
+Meteor-MP N2",2023,2044,2025-06-09 08:00:46
+463,SASS,SeaSat-A Scatterometer System,NASA,Radar scatterometer,"
+SeaSat",1978,1978,2012-09-13 10:58:00
+464,SBUS,Solar Backscatter Ultraviolet Sounder ,CMA,Cross-nadir scanning SW sounder,"
+FY-3A
+FY-3B
+FY-3C",2008,2020,2024-09-09 14:27:08
+465,SBUV,Solar Backscatter Ultraviolet Spectrometer,NASA,Cross-nadir scanning SW sounder,"
+Nimbus-7",1979,1994,2012-09-13 11:27:28
+466,SBUV/2,Solar Backscatter Ultraviolet / 2,NOAA,Cross-nadir scanning SW sounder,"
+NOAA-10
+NOAA-11
+NOAA-13
+NOAA-14
+NOAA-16
+NOAA-17
+NOAA-18
+NOAA-19
+NOAA-9",1985,2025,2021-06-17 17:25:52
+467,SCA,Scatterometer,ESA,Radar scatterometer,"
+Metop-SG-B1
+Metop-SG-B2
+Metop-SG-B3",2026,2048,2024-09-23 15:46:58
+469,SCA,Star Camera Assembly,DNSC,Positioning system,"
+GRACE A
+GRACE B
+GRACE C (GRACE-FO)
+GRACE D (GRACE-FO)
+GRACE-Continuity",2002,2035,2013-12-22 18:14:28
+468,SCAMS,Scanning Microwave Spectrometer,NASA,Microwave cross-track scanning radiometer,"
+Nimbus-6",1975,1983,2019-11-14 15:59:55
+471,ScaRaB,Scanner for Radiation Budget,CNES,Broad band radiometer,"
+Megha-Tropiques
+Meteor-3-6
+Resurs-O1-4",1994,2022,2021-06-17 11:03:53
+476,SCAT-MP,Scatterometer for Meteor-MP ,RosHydroMet,Radar scatterometer,"
+Meteor-MP N1
+Meteor-MP N2",2036,2044,2023-07-10 08:31:14
+477,SCIAMACHY-limb,Scanning Imaging Absorption Spectrometer for Atmospheric Cartography (limb-scanning component),ESA,Limb sounder,"
+Envisat",2002,2012,2022-07-26 10:40:33
+478,SCIAMACHY-nadir,Scanning Imaging Absorption Spectrometer for Atmospheric Cartography (nadir-scanning component),ESA,Cross-nadir scanning SW sounder,"
+Envisat",2002,2012,2022-07-26 10:41:15
+772,SCM,Search Coil Magnetometer,NASA,Field or radiowave sensor,"
+ARTEMIS-P1
+ARTEMIS-P2
+THEMIS-A
+THEMIS-D
+THEMIS-E",2007,2026,2025-12-15 12:05:01
+785,SCM,Search Coil Magnetometer ,CNES,Field or radiowave sensor,"
+MMS-A
+MMS-B
+MMS-C
+MMS-D",2015,2026,2025-12-15 12:06:17
+480,SCMR,Surface Composition Mapping Radiometer,NASA,Moderate-resolution optical imager,"
+Nimbus-5",1973,1983,2012-09-13 12:45:43
+479,SCR,Selective Chopper Radiometer,UKSA,Cross-nadir infrared sounder,"
+Nimbus-4",1970,1980,2012-09-13 13:28:45
+900,SCR,Selective Chopper Radiometer,UKSA,Cross-nadir infrared sounder,"
+Nimbus-5",1973,1983,2012-09-13 15:30:44
+1327,SCS,Satellite Calibration Spectrometer,NSOAS,Solar irradiance monitor,"
+HY-1C
+HY-1D",2018,2026,2023-01-11 17:35:24
+481,SeaWiFS,Sea-viewing Wide Field-of-view Sensor,NASA,Moderate-resolution optical imager,"
+OrbView-2/SeaStar",1997,2010,2012-09-13 15:41:02
+482,SeaWinds,SeaWinds,NASA,Radar scatterometer,"
+ADEOS-2
+QuikSCAT",1999,2009,2012-07-13 15:53:07
+845,SECCHI/COR-1,SECCHI / Coronagraph imager 1,NRL,Solar activity monitor,"
+STEREO-A
+STEREO-B",2007,2026,2024-01-22 08:29:44
+846,SECCHI/COR-2,SECCHI / Coronagraph imager 2,NRL,Solar activity monitor,"
+STEREO-A
+STEREO-B",2007,2026,2024-01-22 08:32:57
+860,SECCHI/EUVI,SECCHI / EUV Imager,NRL,Solar activity monitor,"
+STEREO-A
+STEREO-B",2007,2026,2024-01-22 08:55:42
+847,SECCHI/HI-1,"SECCHI / Heliospheric Imager 1
+",NRL,Solar activity monitor,"
+STEREO-A
+STEREO-B",2007,2026,2021-12-04 20:16:54
+848,SECCHI/HI-2,SECCHI / Heliospheric Imager 2,NRL,Solar activity monitor,"
+STEREO-A
+STEREO-B",2007,2026,2021-12-04 20:17:37
+1052,SEDA,Space Environment Data Acquisition monitor,JMA,Energetic particle spectrometer,"
+",0,0,2021-10-02 19:07:18
+484,SEE,Solar Extreme Ultraviolet Experiment,NASA,Solar activity monitor,"
+TIMED",2002,2026,2021-12-16 00:32:09
+774,SEI,Suprathermal Electron Imager,CSA,Energetic particle spectrometer,"
+CASSIOPE",2014,2021,2021-10-02 18:10:07
+939,SEISS/EHIS,SEISS / Energetic Heavy Ion Sensor,NASA,Energetic particle spectrometer,"
+GOES-16
+GOES-17
+GOES-18
+GOES-19",2017,2043,2021-10-02 18:45:33
+938,SEISS/MPS,SEISS / Magnetospheric Particle Sensor,NASA,Energetic particle spectrometer,"
+GOES-16
+GOES-17
+GOES-18
+GOES-19",2017,2043,2021-11-10 21:58:50
+940,SEISS/SGPS,SEISS / Solar and Galactic Proton Sensor,NASA,Energetic particle spectrometer,"
+GOES-16
+GOES-17
+GOES-18
+GOES-19",2017,2043,2021-10-02 18:46:29
+1112,SEM,Solar EUV monitor,DLR,Solar activity monitor,"
+SOHO",1996,2027,2021-09-29 21:32:21
+489,SEM,Space Environment Monitor,CMA,Energetic particle spectrometer,"
+FY-2A
+FY-2B
+FY-2C
+FY-2D
+FY-2E
+FY-2F
+FY-2G
+FY-2H",1997,2026,2021-11-11 20:30:56
+849,SEM/EPS,SEM / Energetic Particles Sensor,NOAA,Energetic particle spectrometer,"
+EWS-G1
+EWS-G2
+GOES-1
+GOES-10
+GOES-10 (S-America)
+GOES-11
+GOES-12
+GOES-12 (S-America)
+GOES-13
+GOES-14
+GOES-15
+GOES-2
+GOES-3
+GOES-4
+GOES-5
+GOES-6
+GOES-7
+GOES-8
+GOES-9
+GOES-9 (GMS backup)
+SMS-1
+SMS-2",1974,2027,2022-07-25 12:56:02
+850,SEM/HEPAD,SEM / High Energy Proton and Alpha Particles Detector,NOAA,Energetic particle spectrometer,"
+EWS-G1
+EWS-G2
+GOES-1
+GOES-10
+GOES-10 (S-America)
+GOES-11
+GOES-12
+GOES-12 (S-America)
+GOES-13
+GOES-14
+GOES-15
+GOES-2
+GOES-3
+GOES-4
+GOES-5
+GOES-6
+GOES-7
+GOES-8
+GOES-9
+GOES-9 (GMS backup)
+SMS-1
+SMS-2",1974,2027,2022-07-25 12:57:13
+492,SEM/HEPD,Space Environment Monitor - High Energy Particle Detector,CMA,Energetic particle spectrometer,"
+FY-1A
+FY-1B
+FY-1C
+FY-1D
+FY-3A
+FY-3B
+FY-3C
+FY-3D",1988,2026,2024-09-09 14:36:01
+1117,SEM/IMS,Space Environment Monitor - Ionosphere Measurement Sensor,CMA,Field or radiowave sensor,"
+FY-1A
+FY-1B
+FY-1C
+FY-1D
+FY-3A
+FY-3B
+FY-3C",1988,2020,2022-07-25 13:31:56
+273,SEM/MAG,SEM / Magnetometer,NOAA,Field or radiowave sensor,"
+EWS-G1
+EWS-G2
+GOES-1
+GOES-10
+GOES-10 (S-America)
+GOES-11
+GOES-12
+GOES-12 (S-America)
+GOES-13
+GOES-14
+GOES-15
+GOES-16
+GOES-17
+GOES-18
+GOES-19
+GOES-2
+GOES-3
+GOES-4
+GOES-5
+GOES-6
+GOES-7
+GOES-8
+GOES-9
+GOES-9 (GMS backup)
+SMS-1
+SMS-2",1974,2043,2021-11-10 23:54:27
+857,SEM/MEPED,SEM / Medium energy proton detector,NOAA,Energetic particle spectrometer,"
+Metop-A
+Metop-B
+Metop-C
+NOAA-10
+NOAA-12
+NOAA-13
+NOAA-14
+NOAA-15
+NOAA-16
+NOAA-17
+NOAA-18
+NOAA-19
+NOAA-6
+NOAA-7
+NOAA-8
+NOAA-9
+TIROS-N",1979,2027,2024-09-23 15:38:26
+499,SEM/SSB/X-2,SEM / Special Sensor Gamma/X-ray Detector,DoD,Space radiometer or spectrometer,"
+DMSP-F01
+DMSP-F02
+DMSP-F03
+DMSP-F05
+DMSP-F06
+DMSP-F07
+DMSP-F08
+DMSP-F10
+DMSP-F11
+DMSP-F12
+DMSP-F13",1976,2015,2022-07-25 15:36:48
+1126,SEM/SSI/ES-2,SEM / Special Sensor Ionospheric Plasma Drift/Scintillation Monitor - 2,DoD,Field or radiowave sensor,"
+DMSP-F02
+DMSP-F04
+DMSP-F05
+DMSP-F06
+DMSP-F07
+DMSP-F08
+DMSP-F09
+DMSP-F10
+DMSP-F11
+DMSP-F12
+DMSP-F13
+DMSP-F14
+DMSP-F15",1977,2020,2022-07-25 13:27:18
+1125,SEM/SSJ4,SEM / Special Sensor Precipitating Electron and Ion Spectrometer - 4,DoD,Energetic particle spectrometer,"
+DMSP-F01
+DMSP-F02
+DMSP-F03
+DMSP-F04
+DMSP-F05
+DMSP-F06
+DMSP-F07
+DMSP-F08
+DMSP-F09
+DMSP-F10
+DMSP-F11
+DMSP-F12
+DMSP-F13
+DMSP-F14
+DMSP-F15",1976,2020,2022-07-25 13:26:19
+1127,SEM/SSM,SESS / Special Sensor Magnetometer ,DoD,Field or radiowave sensor,"
+DMSP-F07
+DMSP-F12
+DMSP-F13
+DMSP-F14",1984,2020,2022-07-25 14:05:29
+858,SEM/TED,SEM / Total Energy Detector,NOAA,Energetic particle spectrometer,"
+Metop-A
+Metop-B
+Metop-C
+NOAA-10
+NOAA-12
+NOAA-13
+NOAA-14
+NOAA-15
+NOAA-16
+NOAA-17
+NOAA-18
+NOAA-19
+NOAA-6
+NOAA-7
+NOAA-8
+NOAA-9
+TIROS-N",1979,2027,2024-09-23 15:38:08
+851,SEM/XRS-EUV,SEM / X-Ray Sensor - Extreme Ultra-Violet Sensor,NOAA,Solar activity monitor,"
+EWS-G1
+EWS-G2
+GOES-1
+GOES-10
+GOES-10 (S-America)
+GOES-11
+GOES-12
+GOES-13
+GOES-14
+GOES-15
+GOES-2
+GOES-3
+GOES-4
+GOES-5
+GOES-6
+GOES-7
+GOES-8
+GOES-9
+GOES-9 (GMS backup)
+SMS-1
+SMS-2",1974,2021,2021-12-16 00:22:52
+584,Sentinel-4,"UVN: Ultra-violet, Visible and Near-infrared sounder",ESA,Cross-nadir scanning SW sounder,"
+MTG-S1
+MTG-S2",2026,2046,2025-07-02 07:47:15
+587,Sentinel-5,"UVNS: Ultra-violet, Visible and Near-infrared Sounder",ESA,Cross-nadir scanning SW sounder,"
+Metop-SG-A1
+Metop-SG-A2
+Metop-SG-A3",2026,2047,2026-02-23 15:53:20
+490,SEP,Space Environment Package,CMA,Energetic particle spectrometer,"
+FY-4A
+FY-4B
+FY-4C
+FY-4D
+FY-4F",2017,2037,2025-11-04 16:58:44
+1111,SEP-fields,Space Environment Package - fields,CMA,Field or radiowave sensor,"
+",0,0,2024-09-09 14:42:19
+1460,SEP/HEPS,Space Environment Package High Energy Particles,CMA,Energetic particle spectrometer,"
+",0,0,2025-11-04 16:22:37
+1206,SEP/LEPS,Space Environment Package / Low Energy Particles Sensor,CMA,Energetic particle spectrometer,"
+",0,0,2024-09-09 14:43:41
+1205,SEP/MEPS,Space Environment Package / Medium Energy Particles Sensor,CMA,Energetic particle spectrometer,"
+",0,0,2024-09-09 14:43:13
+705,SEPICA ,Solar Energetic Particle Ionic Charge Analyzer,NASA,Energetic particle spectrometer,"
+ACE",1997,2005,2021-11-10 11:38:44
+855,SESS/SSI/ES-3,SESS / Special Sensor Ionospheric Plasma Drift/Scintillation Monitor - 3,DoD,Field or radiowave sensor,"
+DMSP-F16
+DMSP-F17
+DMSP-F18
+DMSP-F19",2004,2026,2021-12-09 12:58:51
+1021,SESS/SSJ5 ,SESS / Special Sensor Precipitating Electron and Ion Spectrometer ,DoD,Energetic particle spectrometer,"
+DMSP-F16
+DMSP-F17
+DMSP-F18
+DMSP-F19",2004,2026,2021-11-13 13:00:15
+856,SESS/SSM-Boom,SESS / Special Sensor Magnetometer - Boom,DoD,Field or radiowave sensor,"
+DMSP-F15
+DMSP-F16
+DMSP-F17
+DMSP-F18
+DMSP-F19",2000,2026,2021-12-09 13:53:15
+838,SESS/SSULI,SESS / Special Sensor Ultraviolet Limb Imager,NRL,Space radiometer or spectrometer,"
+DMSP-F16
+DMSP-F17
+DMSP-F18
+DMSP-F19",2004,2026,2021-12-16 00:27:08
+837,SESS/SSUSI,SESS / Special Sensor Ultraviolet Spectrographic Imager,DoD,Space radiometer or spectrometer,"
+DMSP-F16
+DMSP-F17
+DMSP-F18
+DMSP-F19",2004,2026,2021-12-09 13:57:23
+1207,SEUVI,Solar Extreme-UltraViolet Imager,CMA,Solar activity monitor,"
+FY-4C
+FY-4D",2026,2034,2025-04-07 07:05:21
+502,Severjanin-M,X-band Synthetic Aperture Radar,RosHydroMet,Imaging radar (SAR),"
+Meteor-M N1
+Meteor-M N2
+Meteor-M N2-1
+Meteor-M N2-2",2010,2025,2024-06-10 13:52:55
+503,SEVIRI,Spinning Enhanced Visible Infra-Red Imager,EUMETSAT,Moderate-resolution optical imager,"
+Meteosat-10
+Meteosat-11
+Meteosat-8
+Meteosat-8 (IODC)
+Meteosat-9
+Meteosat-9 (IODC)",2004,2033,2024-09-23 15:18:04
+504,SFM-2,Spectrophotometer - 2,Roscosmos,Limb sounder,"
+Meteor-3M",2002,2006,2017-01-17 15:40:42
+1371,SFS,Sweep Frequency Sounder,CSA,Field or radiowave sensor,"
+Alouette-1
+Alouette-2",1962,1975,2023-10-16 13:38:00
+505,SGLI,Second-generation Global Imager,JAXA,Moderate-resolution optical imager,"
+GCOM-C",2018,2026,2022-08-01 10:33:03
+1013,SHF,Passive MW Radiometer,Roscosmos,Microwave conical scanning radiometer,"
+Meteor-P1
+Meteor-P2
+Meteor-P3
+Meteor-P6",1974,1983,2013-02-14 00:19:24
+911,SHIMMER,Spatial Heterodyne Imager for Mesospheric Radicals,NRL,Limb sounder,"
+STPSat-1",2007,2009,2017-01-17 15:48:49
+1050,SHIOSAI,SAR Height Imaging Oceanic Sensor with Advanced Interferometry,JAXA,Radar altimeter,"
+COMPIRA",2026,2029,2021-08-30 23:28:54
+1166,ShMSA-SR,Medium resolution wide capture multispectral optical sensor,Roscosmos,High-resolution optical imager,"
+Resurs-P1
+Resurs-P2
+Resurs-P3
+Resurs-P4",2013,2029,2022-07-27 10:05:22
+1167,ShMSA-VR ,High resolution wide capture multispectral optical sensor,Roscosmos,High-resolution optical imager,"
+Resurs-P1
+Resurs-P2
+Resurs-P3
+Resurs-P4
+Resurs-P5",2013,2029,2024-04-04 08:55:31
+1385,SHOW,Spatial Heterodyne Observations of Water,CSA,Moderate-resolution optical imager,"
+AOS-HAWCSat",0,0,2023-11-02 15:16:10
+1014,SI-1,Spectrometer/Interferometer - German Democratic Republic,Roscosmos,Cross-nadir infrared sounder,"
+Meteor-P2
+Meteor-P3
+Meteor-P4",1976,1981,2023-03-06 12:44:15
+1407,SiC UV Dosimeter,SiC UV Dosimeter,ISRO,Space radiometer or spectrometer,"
+EOS-08",2024,2026,2024-08-12 08:00:48
+506,SIM,Spectral Irradiance Monitor,NASA,Solar irradiance monitor,"
+CSIM
+SORCE",2003,2022,2021-06-23 21:46:53
+507,SIM-1,Solar Irradiance Monitor - 1,CMA,Solar irradiance monitor,"
+FY-3A
+FY-3B
+FY-3C",2008,2020,2024-09-09 14:27:46
+508,SIM-2,Solar Irradiance Monitor - 2,CMA,Solar irradiance monitor,"
+FY-3E
+FY-3F
+FY-3J",2021,2034,2024-09-09 14:46:56
+509,SIRAL,SAR Interferometer Radar Altimeter,ESA,Radar altimeter,"
+CryoSat
+CryoSat-2",2005,2028,2026-03-09 08:40:05
+511,SIRS-A,Satellite Infra-Red Spectrometer,NASA,Cross-nadir infrared sounder,"
+Nimbus-3",1969,1972,2025-01-15 09:22:28
+512,SIRS-B,Satellite Infra-Red Spectrometer - B,NASA,Cross-nadir infrared sounder,"
+Nimbus-4",1970,1980,2016-10-29 17:43:35
+708,SIS,Solar Isotope Spectrometer,NASA,Energetic particle spectrometer,"
+ACE",1997,2027,2021-11-10 11:40:22
+990,SKL-particles,Solar Cosmic-ray Spectrometer Complex - particles,Roscosmos,Energetic particle spectrometer,"
+Coronas-F
+Coronas-I",1994,2005,2017-06-05 02:50:18
+1123,SKL-rad,Solar Cosmic-ray Spectrometer Complex - radiation,Roscosmos,Solar activity monitor,"
+Coronas-F
+Coronas-I",1994,2005,2017-05-17 20:37:06
+1083,SkySat,SkySat,Terra Bella,High-resolution optical imager,"
+SkySat-1
+SkySat-10
+SkySat-11
+SkySat-12
+SkySat-13
+SkySat-14
+SkySat-15
+SkySat-16
+SkySat-17
+SkySat-18
+SkySat-19
+SkySat-2
+SkySat-20
+SkySat-21
+SkySat-3
+SkySat-4
+SkySat-5
+SkySat-6
+SkySat-7
+SkySat-8
+SkySat-9",2014,2026,2023-11-13 10:06:45
+513,SLIM6,Surrey Linear Imager Multispectral 6 channels - but 3 spectral bands,ASAL,High-resolution optical imager,"
+AlSat-1
+AlSat-1B
+Beijing-1
+Deimos-1
+NigeriaSat-1
+NigeriaSat-X
+UK-DMC-1
+UK-DMC-2",2003,2026,2023-11-27 11:37:24
+518,SLSTR,Sea and Land Surface Temperature Radiometer ,ESA,Moderate-resolution optical imager,"
+Sentinel-3A
+Sentinel-3B
+Sentinel-3C
+Sentinel-3D",2016,2037,2025-04-10 17:19:09
+519,SM,Infrared Sounding Radiometer,Roscosmos,Cross-nadir infrared sounder,"
+Meteor-2-1
+Meteor-2-10
+Meteor-2-11
+Meteor-2-12
+Meteor-2-13
+Meteor-2-14
+Meteor-2-15
+Meteor-2-16
+Meteor-2-17
+Meteor-2-18
+Meteor-2-19
+Meteor-2-2
+Meteor-2-20
+Meteor-2-21
+Meteor-2-3
+Meteor-2-4
+Meteor-2-5
+Meteor-2-6
+Meteor-2-7
+Meteor-2-8
+Meteor-2-9",1975,1995,2016-10-29 17:46:38
+520,SM,Infrared Sounding Radiometer,Roscosmos,Cross-nadir infrared sounder,"
+Meteor-3-1
+Meteor-3-2
+Meteor-3-3
+Meteor-3-4
+Meteor-3-5
+Meteor-3-6",1986,1996,2016-10-29 17:47:35
+1116,SM-8M,Magnetometer,Roscosmos,Field or radiowave sensor,"
+Coronas-Photon",2009,2009,2016-03-21 12:36:41
+1393,SMAC,Synchronous Monitoring Atmospheric  Corrector,CAST,Moderate-resolution optical imager,"
+HRMIS",2020,2030,2023-12-04 09:49:48
+521,SMAP,Soil Moisture Active-Passive (intended as payload),NASA,Microwave conical scanning radiometer,"
+SMAP",2015,2026,2023-07-14 09:43:57
+1353,SME (IR),SME-Infrared Radiometer,NASA,Cross-nadir infrared sounder,"
+SME",1981,1989,2023-05-15 10:31:17
+1354,SME (SPA),SME - Solar Proton Alarm,NASA,Solar activity monitor,"
+SME",1981,1989,2023-05-15 10:11:12
+1355,SME (SUM),SME - Solar UV Monitor,NASA,Space radiometer or spectrometer,"
+SME",1981,1989,2023-05-15 10:37:35
+1356,SME (UVOE),SME - Ultra-Violet Ozone Experiment.,NASA,Space radiometer or spectrometer,"
+SME",1981,1989,2023-05-15 10:29:59
+1357,SME (VND),SME - Visible Nitrogen Dioxide,NASA,Cross-nadir scanning SW sounder,"
+SME",1981,1989,2023-05-15 10:37:11
+962,SMEI,"Solar Mass Ejection Imager
+",NASA,Space radiometer or spectrometer,"
+Coriolis",2003,2011,2021-09-29 22:18:05
+522,SMMR,Scanning Multichannel Microwave Radiometer),NASA,Microwave conical scanning radiometer,"
+Nimbus-7
+SeaSat",1978,1994,2012-11-29 13:38:20
+524,SMR,Sub-Millimetre Radiometer,SNSA,Limb sounder,"
+Odin",2001,2026,2022-12-22 14:02:41
+725,SMS,"Solar wind ion composition, Mass sensor, and Suprathermal ion composition",NASA,Energetic particle spectrometer,"
+WIND",1995,2026,2021-11-10 12:03:12
+662,SODISM,Solar Diameter Imager and Surface Mapper,CNES,Solar activity monitor,"
+Picard",2010,2014,2021-10-02 15:27:29
+1185,SoLEXS,Solar Low Energy X-ray Spectrometer,ISRO,Solar activity monitor,"
+Aditya-1",2024,2028,2021-12-02 12:17:49
+888,SOLIST,X-ray and UV telescope,Roscosmos,Solar activity monitor,"
+Zond-M",2027,2030,2021-12-16 00:42:07
+935,SoloHI,"Solar Orbiter Heliospheric Imager
+",NRL,Solar activity monitor,"
+Solar Orbiter",2020,2030,2024-01-22 08:58:29
+525,SOLSTICE,Solar/Stellar Irradiance Comparison Experiment,NASA,Solar irradiance monitor,"
+SORCE
+UARS",1991,2020,2022-07-25 13:45:07
+989,SORS,Solar Radiospectrometer,Roscosmos,Solar activity monitor,"
+Coronas-F
+Coronas-I",1994,2005,2017-05-17 20:55:15
+647,SOT,Solar Optical Telescope,JAXA,Solar activity monitor,"
+Solar-B (Hinode)",2007,2026,2021-12-16 00:48:15
+526,SOUNDER,GOES Sounder,NOAA,Cross-nadir infrared sounder,"
+EWS-G1
+EWS-G2
+GOES-10
+GOES-10 (S-America)
+GOES-11
+GOES-12
+GOES-12 (S-America)
+GOES-13
+GOES-14
+GOES-15
+GOES-8
+GOES-9
+GOES-9 (GMS backup)",1994,2027,2022-07-26 10:10:54
+527,SOUNDER,INSAT Sounder,ISRO,Cross-nadir infrared sounder,"
+INSAT-3D
+INSAT-3DR
+INSAT-3DS",2013,2034,2022-07-26 10:10:07
+663,SOVAP,"Solar Constant Variability, Picard",CNES,Solar irradiance monitor,"
+Picard",2010,2014,2021-09-29 21:39:08
+1204,SpaceView 24,SpaceView 24 imaging telescope,BSG,High-resolution optical imager,"
+BlackSky-1
+BlackSky-10
+BlackSky-11
+BlackSky-12
+BlackSky-13
+BlackSky-14
+BlackSky-15
+BlackSky-16
+BlackSky-17
+BlackSky-18
+BlackSky-19
+BlackSky-2
+BlackSky-21 (Gen3-2)
+BlackSky-22 (Gen3-3)
+BlackSky-23 (Gen3-4)
+BlackSky-3
+BlackSky-4
+BlackSky-5
+BlackSky-6
+BlackSky-7
+BlackSky-8
+BlackSky-9",2019,2030,2023-11-27 11:58:17
+678,SpaceView-110,SpaceView-110 Imaging System,DigitalGlobe,High-resolution optical imager,"
+WorldView-4",2017,2019,2021-08-31 14:38:51
+1319,Spaceview-NG,Next Generation Spaceview Imager,Maxar,High-resolution optical imager,"
+WorldView Legion-1
+WorldView Legion-2
+WorldView Legion-3
+WorldView Legion-4
+WorldView Legion-5
+WorldView Legion-6",2024,2030,2024-08-19 09:55:25
+829,SPER/1,Plasma and energy radiation spectrometer,Roscosmos,Energetic particle spectrometer,"
+Ionosfera-M N1 & N2
+Ionosfera-M N3 & N4",2025,2033,2021-11-13 07:31:22
+1394,SPEXone,SPEXone Polarimeter,NSO,Moderate-resolution optical imager,"
+PACE",2024,2027,2024-02-19 16:35:58
+936,SPICE,Spectral Imaging of the Coronal Environment,ESA,Solar activity monitor,"
+Solar Orbiter",2020,2030,2021-12-16 12:39:35
+528,SPM,Solar Proton Monitor,NOAA,Energetic particle spectrometer,"
+ITOS-1 (TIROS-M)
+NOAA-1
+NOAA-2
+NOAA-3
+NOAA-4
+NOAA-5",1970,1979,2017-06-04 23:55:07
+976,SPP-fields,Space Physics Package - fields,KARI,Field or radiowave sensor,"
+STSat-1",2003,2005,2017-04-28 01:02:22
+1122,SPP-particles,Space Physics Package - particle,KARI,Energetic particle spectrometer,"
+STSat-1",2003,2005,2017-06-05 02:08:03
+991,SPR-N,Solar X-ray Polarimeter,Roscosmos,Solar activity monitor,"
+Coronas-F",2001,2005,2017-05-17 19:51:04
+949,SPS/HEPD,Space Physics Sensor - High Energy Particle Detector,KARI,Energetic particle spectrometer,"
+KOMPSAT-1",2000,2001,2017-06-05 03:09:00
+1121,SPS/IMS,Space Physics Sensor / Ionosphere Measurement Sensor,KARI,Field or radiowave sensor,"
+KOMPSAT-1",2000,2008,2017-04-21 00:39:33
+529,SR,Scanning Radiometer,NOAA,Moderate-resolution optical imager,"
+ITOS-1 (TIROS-M)
+NOAA-1
+NOAA-2
+NOAA-3
+NOAA-4
+NOAA-5",1970,1979,2013-12-04 13:22:38
+530,SRAL,Synthetic aperture Radar Altimeter ,ESA,Radar altimeter,"
+Sentinel-3A
+Sentinel-3B
+Sentinel-3C
+Sentinel-3D",2016,2037,2024-09-23 16:01:42
+1114,SREM-dose,Standard Radiation Environment Monitor - dose,ESA,Field or radiowave sensor,"
+PROBA-1
+STSat-2C",2001,2026,2024-09-09 15:50:00
+694,SREM-particles,Standard Radiation Environment Monitor - particles,ESA,Energetic particle spectrometer,"
+PROBA-1
+STSat-2C",2001,2026,2024-09-09 15:49:26
+892,SRF,X-ray photometer for monitoring soft solar X-radiation ,Roscosmos,Solar activity monitor,"
+Zond-M",2027,2030,2021-12-16 00:07:59
+531,SSALT,Single-frequency Solid-state Altimeter,CNES,Radar altimeter,"
+TOPEX-Poseidon",1992,2005,2017-03-31 00:53:59
+532,SSCC,Spin Scan Cloud Camera,NASA,Moderate-resolution optical imager,"
+ATS-1",1967,1978,2017-03-27 11:40:08
+1340,SSH,Special Sensor H (also known as Multichannel Filter Radiometer),DoD,Cross-nadir infrared sounder,"
+DMSP-F01
+DMSP-F02
+DMSP-F03
+DMSP-F04",1976,1980,2023-03-27 07:28:56
+1227,SSIM,Solar Spectral Irradiance Monitor,CMA,Solar irradiance monitor,"
+FY-3E
+FY-3J",2021,2034,2024-09-09 14:52:37
+533,SSM/I,Special Sensor Microwave - Imager,DoD,Microwave conical scanning radiometer,"
+DMSP-F08
+DMSP-F10
+DMSP-F11
+DMSP-F12
+DMSP-F13
+DMSP-F14
+DMSP-F15",1987,2020,2022-07-25 13:23:55
+534,SSM/T,Special Sensor Microwave - Temperature,DoD,Microwave cross-track scanning radiometer,"
+DMSP-F04
+DMSP-F07
+DMSP-F08
+DMSP-F09
+DMSP-F10
+DMSP-F11
+DMSP-F12
+DMSP-F13
+DMSP-F14
+DMSP-F15",1979,2020,2023-03-27 07:31:31
+535,SSM/T-2,Special Sensor Microwave - Humidity,DoD,Microwave cross-track scanning radiometer,"
+DMSP-F11
+DMSP-F12
+DMSP-F14
+DMSP-F15",1992,2015,2022-07-25 15:37:48
+536,SSMIS,Special Sensor Microwave - Imager/Sounder,DoD,Microwave conical scanning radiometer,"
+DMSP-F16
+DMSP-F17
+DMSP-F18
+DMSP-F19",2004,2026,2024-10-16 11:09:54
+537,SSPD,Data Collection and Transmission System,Roscosmos,Data collection system,"
+Meteor-M N1
+Meteor-M N2
+Meteor-M N2-1
+Meteor-M N2-2
+Meteor-M N2-4
+Meteor-M N2-5
+Meteor-M N2-6
+Meteor-M N2-7
+Meteor-M N2-8
+Meteor-MP N1
+Meteor-MP N2",2010,2044,2017-07-18 17:43:25
+771,SST,Solid State Telescope,NASA,Energetic particle spectrometer,"
+ARTEMIS-P1
+ARTEMIS-P2
+THEMIS-A
+THEMIS-D
+THEMIS-E",2007,2026,2021-12-16 01:22:13
+538,SSTI,Satellite-to-Satellite Tracking System,ESA,Gravity sensing system,"
+GOCE",2009,2013,2022-07-25 15:46:58
+1071,SSTM,Sea Surface Temperature Monitor,ISRO,Moderate-resolution optical imager,"
+OceanSat-3A",2026,2030,2023-11-13 17:09:57
+539,SSU,Stratospheric Sounding Unit,UKSA,Cross-nadir infrared sounder,"
+NOAA-11
+NOAA-14
+NOAA-6
+NOAA-7
+NOAA-8
+NOAA-9
+TIROS-N",1979,2007,2012-09-14 16:58:23
+861,ST/1,Gamma-ray spectrometer,Roscosmos,Space radiometer or spectrometer,"
+Ionosfera-M N1 & N2
+Ionosfera-M N3 & N4",2025,2033,2021-10-02 17:39:06
+841,ST/2,Galactic gamma-ray spectrometer,Roscosmos,Solar activity monitor,"
+Zond-M",2027,2030,2021-12-16 00:08:48
+960,STA,Star Tracker Assembly,ESA,Positioning system,"
+SMOS",2010,2028,2013-01-24 03:05:48
+761,STAFF,Spatio-Temporal Analysis of Field Fluctuations,ESA,Field or radiowave sensor,"
+CLUSTER-1
+CLUSTER-2
+CLUSTER-3
+CLUSTER-4",2000,2025,2021-12-09 12:32:38
+540,STAR,Space Three-axis Accelerometer for Research mission,DLR,Gravity sensing system,"
+CHAMP",2000,2010,2012-07-13 20:29:29
+1282,STEAM,Student Thermal Activity Energetic Module ,NASA,Solar activity monitor,"
+PUNCH",2025,2028,2022-02-07 09:09:43
+889,STEK,Telescope-coronagraph,Roscosmos,Solar activity monitor,"
+Zond-M",2027,2030,2021-12-16 00:49:00
+743,STEP-F,Satellite telescope of electrons and protons,NSAU,Energetic particle spectrometer,"
+Coronas-Photon",2009,2009,2017-05-29 11:23:28
+937,STIX,X-ray Spectrometer/Telescope,SSO,Solar activity monitor,"
+Solar Orbiter",2020,2030,2021-09-29 21:22:15
+541,STR,Star Tracker Set,ESA,Positioning system,"
+SWARM-A
+SWARM-B
+SWARM-C",2014,2026,2024-09-23 11:02:56
+698,STR,Scanning TV Radiometer,Roscosmos,Moderate-resolution optical imager,"
+Electro-GOMS",1995,2000,2017-03-27 15:47:38
+1222,STRATOS,STRATOS,SPIRE,GNSS radio-occultation sounder,"
+Lemur-2",2016,2040,2024-06-03 08:53:38
+891,SUF,Spectrometer for measuring UV radiation from the Sun,Roscosmos,Solar activity monitor,"
+Zond-M",2027,2030,2021-12-16 00:31:26
+986,SUFR-Sp-C,Solar UV Radiometer,Roscosmos,Solar activity monitor,"
+Coronas-F
+Coronas-I",1994,2005,2017-05-17 21:11:48
+1182,SUIT,Solar Ultraviolet Imaging Telescope,ISRO,Solar activity monitor,"
+Aditya-1",2024,2028,2021-12-02 22:39:01
+711,SUMER,"Solar UV Measurement of Emitted Radiation
+",DLR,Solar activity monitor,"
+SOHO",1996,2014,2021-09-29 17:57:14
+544,SuperSTAR,Super Space Three-axis Accelerometer for Research,NASA,Gravity sensing system,"
+GRACE A
+GRACE B
+GRACE C (GRACE-FO)
+GRACE D (GRACE-FO)
+GRACE-Continuity",2002,2035,2021-06-15 21:34:46
+546,SUSIM,Solar Ultraviolet Spectral Irradiance Monitor,NRL,Solar irradiance monitor,"
+UARS",1991,2005,2012-09-14 20:04:22
+547,SUVI,Solar Ultraviolet Imager,NOAA,Solar activity monitor,"
+GOES-16
+GOES-17
+GOES-18
+GOES-19",2017,2043,2021-12-16 00:14:15
+548,SW spectrometer,Short-wave Spectrometer,NASA,Cross-nadir scanning SW sounder,"
+CLARREO-1B
+CLARREO-2B",0,0,2018-02-06 19:27:38
+933,SWA,"Solar Wind Plasma Analyser
+",UKSA,Energetic particle spectrometer,"
+Solar Orbiter",2020,2030,2021-12-16 16:03:41
+716,SWAN,Solar Wind Anisotropies ,CNES,Space radiometer or spectrometer,"
+SOHO",1996,2027,2021-09-29 21:58:53
+690,SWAP,Sun Watcher using Active Pixel System detector and Image Processing,ESA,Solar activity monitor,"
+PROBA-2",2009,2026,2021-12-16 00:29:39
+1331,SWAPI,Solar Wind and Pick-up Ion,ESA,Energetic particle spectrometer,"
+IMAP",2026,2029,2023-02-13 16:40:15
+915,SWATS,Small Wind and Temperature Spectrometer,NRL,Field or radiowave sensor,"
+STPSat-3",2014,2022,2021-12-09 12:26:59
+1332,SWE,Solar Wind Electron,NASA,Energetic particle spectrometer,"
+IMAP",2026,2029,2023-02-13 16:58:40
+724,SWE,Solar Wind Experiment,NASA,Energetic particle spectrometer,"
+WIND",1995,2026,2021-11-10 12:04:23
+1001,SWEAPI,Solar Wind Electrons Alphas and Protons Investigation,NASA,Energetic particle spectrometer,"
+Parker Solar Probe",2018,2026,2021-12-16 16:06:55
+706,SWEPAM,"Solar Wind Electron, Proton, and Alpha Monitor",NASA,Energetic particle spectrometer,"
+ACE",1997,2027,2021-11-10 11:42:16
+703,SWICS,Solar Wind Ion Composition Spectrometer,NASA,Energetic particle spectrometer,"
+ACE",1997,2027,2021-11-10 11:43:29
+919,SWIM,Surface Waves Investigation and Monitoring instrument.,CNES,Radar altimeter,"
+CFOSAT
+HY-2L (CFOSAT-FO)",2019,2038,2026-03-09 14:29:07
+702,SWIMS,Solar Wind Ion Mass Spectrometer,NASA,Energetic particle spectrometer,"
+ACE",1997,2027,2021-11-10 11:44:12
+1213,SWIS/MAG,Space Weather Instrument Suite / Magnetometer,NASA,Field or radiowave sensor,"
+SWFO-L1
+SWNext SOL-A
+SWNext SOL-B",2026,2038,2025-01-27 09:26:52
+1212,SWIS/STIS,Space Weather Instrument Suite / SupraThermal Ion Sensor,NASA,Energetic particle spectrometer,"
+SWFO-L1
+SWNext SOL-A
+SWNext SOL-B",2026,2038,2025-01-27 09:20:48
+1211,SWIS/SWiPS,Space Weather Instrument Suite / Solar Wind Plasma Sensor,NASA,Energetic particle spectrometer,"
+SWFO-L1
+SWNext SOL-A
+SWNext SOL-B",2026,2038,2025-01-27 09:19:23
+835,SWS/IPM,Space Weather Suite / Ionospheric PhotoMeter,CMA,Space radiometer or spectrometer,"
+FY-3D
+FY-3H",2018,2033,2025-04-07 07:34:11
+1228,SWS/SEM/FGM,Space Weather Suite / Space Environment Monitor / Flux Gate Magnetometer,CMA,Field or radiowave sensor,"
+FY-3J",2027,2034,2022-08-01 15:26:44
+1022,SWS/SEM/HEPD,Space Weather Suite / Space Environment Monitor / High Energy Particle Detector,CMA,Energetic particle spectrometer,"
+FY-3E
+FY-3J",2021,2034,2022-05-09 14:02:54
+1118,SWS/SEM/IMS,Space Weather Suite / Space Environment Monitor / Ionosphere Measurement Sensor,CMA,Field or radiowave sensor,"
+FY-3J",2027,2034,2024-09-09 14:35:40
+1286,SWS/SEM/NADD,Space Weather Suite / Space Environment Monitor / Neutral Atmospheric Density Detector,CMA,Energetic particle spectrometer,"
+FY-3I",2027,2033,2022-12-05 09:19:48
+1131,SWS/Tri-IPM,Space Weather Suite - Triple-angle Ionospheric PhotoMeter,CMA,Space radiometer or spectrometer,"
+FY-3E
+FY-3J",2021,2034,2024-09-09 14:48:19
+840,SWS/WAI,Space Weather Suite / Wide-field Auroral Imager,CMA,Space radiometer or spectrometer,"
+FY-3D
+FY-3H",2018,2033,2025-04-07 07:42:08
+550,SXEUV,Solar X-EUV imaging telescope,CMA,Solar activity monitor,"
+FY-4C",2026,2033,2025-04-07 07:14:46
+551,SXI,Solar X-ray Imager,NOAA,Solar activity monitor,"
+EWS-G1
+EWS-G2
+GOES-12
+GOES-13
+GOES-14
+GOES-15",2003,2022,2021-12-15 23:54:25
+1469,SXI,Soft X-ray imager,ESA,Space radiometer or spectrometer,"
+SMILE",2026,2029,2025-11-24 09:55:50
+1029,SXM,Solar X-ray monitor,CMA,Solar activity monitor,"
+FY-2F
+FY-2G
+FY-2H",2012,2026,2021-12-15 23:58:11
+969,SXT,Soft X-ray Telescope,JAXA,Solar activity monitor,"
+Solar-A (Yohkoh)",1991,2001,2017-05-19 12:26:39
+1208,SXUS,Solar X-EUV Irradiance Sensor,CMA,Solar activity monitor,"
+FY-4C",2026,2033,2025-03-31 08:23:05
+552,SZS,Shore Zone Scanner,RosHydroMet,Moderate-resolution optical imager,"
+",0,0,2022-07-18 11:28:53
+942,TAC,Three-line Array Camera,CAST,High-resolution optical imager,"
+ZY-3-01
+ZY-3-02
+ZY-3-03",2012,2026,2022-07-27 10:06:57
+1237,TANSO-3,Total Anthropogenic and Natural emissions mapping SpectrOmeter,MOE,Cross-nadir infrared sounder,"
+GOSAT-GW",2025,2032,2025-09-29 13:10:05
+553,TANSO-CAI,Thermal And Near infrared Sensor for carbon Observations - Cloud and Aerosol Imager,JAXA,Moderate-resolution optical imager,"
+GOSAT",2009,2026,2022-07-25 12:49:52
+1074,TANSO-CAI2,Thermal And Near infrared Sensor for carbon Observations - Cloud and Aerosol Imager / 2,JAXA,Moderate-resolution optical imager,"
+GOSAT-2",2019,2026,2021-09-10 14:26:44
+554,TANSO-FTS,Thermal And Near infrared Sensor for carbon Observations - Fourier Transform Spectrometer,JAXA,Cross-nadir infrared sounder,"
+GOSAT",2009,2026,2021-06-16 16:10:10
+1073,TANSO-FTS2,Thermal And Near infrared Sensor for carbon Observations - Fourier Transform Spectrometer / 2,JAXA,Cross-nadir infrared sounder,"
+GOSAT-2",2019,2026,2021-09-10 14:26:25
+1030,TEMPO,Tropospheric Emissions: Monitoring of Pollution,NASA,Cross-nadir scanning SW sounder,"
+TEMPO",2023,2026,2023-12-21 17:19:04
+981,TEREK-C,Solar XUV Telescope/Coronagraph,Roscosmos,Solar activity monitor,"
+Coronas-F
+Coronas-I",1994,2005,2017-05-19 13:43:37
+562,TES-limb,Tropospheric Emission Spectrometer ,NASA,Limb sounder,"
+Aura",2004,2018,2024-09-30 08:53:43
+563,TES-nadir,Tropospheric Emission Spectrometer ,NASA,Cross-nadir infrared sounder,"
+Aura",2004,2018,2024-09-30 08:54:40
+741,TESIS,Telescope-spectrometer for imaging solar spectroscopy in X-rays,Roscosmos,Solar activity monitor,"
+Coronas-Photon",2009,2009,2017-05-18 01:28:07
+1365,TGNOS-M,Tianmu Global Navigation Satellite System Occultation Sounder,CASIC,GNSS radio-occultation sounder,"
+Tianmu-1",2023,2040,2026-02-09 15:53:41
+628,TGRS,TriG (Tri-GNSS) GNSS Radio Occultation System,NASA,GNSS radio-occultation sounder,"
+COSMIC-2",2020,2026,2024-04-15 14:20:31
+728,TGRS,Transient Gamma Ray Spectrometer,NASA,Space radiometer or spectrometer,"
+WIND",1995,2000,2021-11-10 12:05:33
+669,TGSP,Trace Gas SPectrometer,Roscosmos,Cross-nadir scanning SW sounder,"
+Meteor-MP N1
+Meteor-MP N2",2036,2044,2023-07-10 08:17:14
+564,THIR,Temperature-Humidity Infrared Radiometer,NASA,Moderate-resolution optical imager,"
+Nimbus-4
+Nimbus-5
+Nimbus-6
+Nimbus-7",1970,1985,2013-11-19 23:16:32
+1381,TICFIRE,Thin Ice Cloud in the Far InfraREd.,CSA,Broad band radiometer,"
+AOS-Sky",2032,2036,2025-03-06 11:41:41
+753,TIDE/PSI,Thermal Ion Dynamics Experiment / Plasma Source Investigation,NASA,Energetic particle spectrometer,"
+Polar",1996,2008,2017-06-05 01:43:43
+565,TIDI ,TIMED Doppler Interferometer,NASA,Limb sounder,"
+TIMED",2002,2026,2021-11-27 01:21:07
+566,TIM ,Total Irradiance Monitoring,NASA,Solar irradiance monitor,"
+Glory
+SORCE
+STPSat-3",2003,2022,2021-06-23 21:50:35
+754,TIMAS,Toroidal Imaging Mass-Angle Spectrograph,NASA,Energetic particle spectrometer,"
+Polar",1996,2008,2017-06-05 01:48:34
+951,TIP,Tiny Ionosphere Photometer,NRL,Space radiometer or spectrometer,"
+COSMIC-1",2006,2020,2021-09-29 22:17:00
+1362,TIR,Thermal IR Spectrometer,CAS,High-resolution optical imager,"
+SDGSAT-1",2022,2026,2023-07-03 13:05:59
+567,TIRS,Thermal Infra-Red Sensor,NASA,High-resolution optical imager,"
+Landsat-8
+Landsat-9",2013,2031,2022-08-08 11:07:34
+1239,TIRS,Thermal IR Spectrometer,NASA,Broad band radiometer,"
+PREFIRE-1
+PREFIRE-2",2024,2026,2024-05-20 10:24:14
+568,TM,Thematic Mapper,NASA,High-resolution optical imager,"
+Landsat-4
+Landsat-5",1982,2011,2022-07-26 10:44:22
+569,TMI ,TRMM Microwave Imager ,NASA,Microwave conical scanning radiometer,"
+TRMM",1998,2015,2022-07-25 15:12:12
+570,TMR,TOPEX Microwave Radiometer,NASA,Microwave cross-track scanning radiometer,"
+TOPEX-Poseidon",1992,2005,2012-09-16 13:50:22
+1398,TMS,Tomorrow Microwave Sounder,Tomorrow.io,Microwave cross-track scanning radiometer,"
+Tomorrow-S1
+Tomorrow-S10
+Tomorrow-S11
+Tomorrow-S2
+Tomorrow-S3
+Tomorrow-S4
+Tomorrow-S5
+Tomorrow-S6
+Tomorrow-S7
+Tomorrow-S8
+Tomorrow-S9",2024,2029,2026-01-14 17:20:05
+1252,TMS,TROPICS Millimeter-wave Sounder,NASA,Microwave cross-track scanning radiometer,"
+TROPICS-01 (Pathfinder)
+TROPICS-02
+TROPICS-03
+TROPICS-04
+TROPICS-05
+TROPICS-06
+TROPICS-07",2021,2025,2023-05-15 08:13:10
+1358,Tomorrow.io radar,Tomorrow.io radar,Tomorrow.io,Cloud and precipitation radar,"
+Tomorrow-R1
+Tomorrow-R2",2023,2028,2024-03-18 09:57:56
+571,TOMS,Total Ozone Mapping Spectrometer,NASA,Cross-nadir scanning SW sounder,"
+ADEOS
+Meteor-3-5
+Nimbus-7
+TOMS Earth Probe",1979,2006,2013-12-14 17:26:18
+1321,TOPCAT-II,TOPside ionosphere Computer Assisted Tomography,UKSA,GNSS radio-occultation sounder,"
+CIRCE",2023,2023,2022-11-07 14:13:59
+210,TOR,"Tracking, Occultation and Ranging",DLR,GNSS radio-occultation sounder,"
+TanDEM-X
+TerraSAR-X",2008,2026,2021-06-15 20:58:19
+575,TOU,Total Ozone Unit,CMA,Cross-nadir scanning SW sounder,"
+FY-3A
+FY-3B
+FY-3C",2008,2024,2024-09-09 14:28:16
+734,TPMU,Thermal Plasma Measurement Unit,ESA,Field or radiowave sensor,"
+PROBA-2",2009,2026,2021-12-10 08:03:24
+650,TRACE,"Transition Region and Coronal Explorer (instrument, same name as satellite and programme)",NASA,Solar activity monitor,"
+TRACE",1998,2010,2017-05-19 13:06:31
+576,Trasser,Polarisation spectro-radiometer,Roscosmos,Moderate-resolution optical imager,"
+Okean-O-1
+Okean-O1-3",1988,2000,2018-03-19 18:41:48
+71,Tri-G,"Triple G (GPS, Galileo, GLONASS)",NASA,GNSS radio-occultation sounder,"
+GRACE C (GRACE-FO)
+GRACE D (GRACE-FO)
+GRACE-Continuity",2019,2035,2024-01-15 11:18:17
+1323,Tri-TIP,Tiny Ionospheric Photometer,NRL,Space radiometer or spectrometer,"
+CIRCE",2023,2023,2022-11-07 14:50:48
+1195,TRISHNA,TRISHNA,ISRO,High-resolution optical imager,"
+TRISHNA",2026,2031,2023-11-20 09:28:46
+586,TROPOMI,Tropospheric Monitoring Instrument,ESA,Cross-nadir scanning SW sounder,"
+Sentinel-5P",2018,2027,2021-12-13 20:16:21
+578,TRSR,Turbo Rogue Space Receiver,NASA,Positioning system,"
+GFO
+ICESat
+ICESat-2
+JASON-1
+JASON-2
+JASON-3",1998,2034,2024-09-23 15:53:48
+579,TRSR,TurboRogue Space Receiver,NASA,GNSS radio-occultation sounder,"
+Ørsted",1999,2006,2019-01-01 22:17:34
+580,TSIS,Total and Spectral Solar Irradiance Sensor,NOAA,Solar irradiance monitor,"
+ISS TSIS-1
+TSIS-2",2018,2028,2021-06-23 21:51:37
+581,TV,Television Camera,Roscosmos,Moderate-resolution optical imager,"
+Meteor-1-1
+Meteor-1-10
+Meteor-1-11
+Meteor-1-12
+Meteor-1-13
+Meteor-1-14
+Meteor-1-15
+Meteor-1-16
+Meteor-1-17
+Meteor-1-19
+Meteor-1-2
+Meteor-1-20
+Meteor-1-21
+Meteor-1-22
+Meteor-1-23
+Meteor-1-24
+Meteor-1-26
+Meteor-1-27
+Meteor-1-3
+Meteor-1-4
+Meteor-1-5
+Meteor-1-6
+Meteor-1-7
+Meteor-1-8
+Meteor-1-9
+Meteor-P1",1969,1978,2017-03-27 12:20:34
+582,TV,Television Camera,Roscosmos,Moderate-resolution optical imager,"
+Meteor-2-1
+Meteor-2-10
+Meteor-2-11
+Meteor-2-12
+Meteor-2-13
+Meteor-2-14
+Meteor-2-15
+Meteor-2-16
+Meteor-2-17
+Meteor-2-18
+Meteor-2-19
+Meteor-2-2
+Meteor-2-20
+Meteor-2-21
+Meteor-2-3
+Meteor-2-4
+Meteor-2-5
+Meteor-2-6
+Meteor-2-7
+Meteor-2-8
+Meteor-2-9",1975,1995,2017-03-27 12:23:32
+583,TWERLE,Tropical Wind Energy-conversion and Reference Level Experiment,NASA,Data collection system,"
+Nimbus-6",1975,1983,2012-09-16 18:37:52
+999,TWINS,Two Wide-angle Imaging Neutral-atom Spectrometers,NASA,Energetic particle spectrometer,"
+TWINS (2 sats)",2006,2020,2022-07-25 13:48:11
+704,ULEIS,Ultra-Low Energy Isotope Spectrometer,NASA,Energetic particle spectrometer,"
+ACE",1997,2027,2021-11-10 11:45:32
+1300,UMBRA-SAR,SAR instrument for UMBRA satellites,UMBRA,Imaging radar (SAR),"
+UMBRA",2021,2035,2022-08-08 10:47:39
+1422,UNIS,Uvsq-Sat NG NIR spectrometer (UNIS),LATMOS,Moderate-resolution optical imager,"
+UVSQ-NG",2025,2030,2025-02-05 17:36:22
+966,UVAS,Ultraviolet and Visible Atmospheric Sounder,CDTI,Cross-nadir scanning SW sounder,"
+SEOSat/Ingenio",0,0,2022-07-18 11:34:54
+714,UVCS,UV Coronagraph and Spectrometer,NASA,Solar activity monitor,"
+SOHO",1996,2013,2021-11-09 14:21:41
+757,UVI,Ultraviolet Imager,NASA,Space radiometer or spectrometer,"
+Polar",1996,2008,2017-05-21 17:37:53
+1326,UVI,HY Ultraviolet Imaging and calibration sensor,NSOAS,Cross-nadir scanning SW sounder,"
+HY-1C
+HY-1D",2018,2026,2023-01-11 17:24:26
+1470,UVI,Ultraviolet Aurora Imager,CAS,Space radiometer or spectrometer,"
+SMILE",2026,2029,2025-11-24 10:10:04
+1009,UVSP,Ultraviolet Spectrometer and Polarimeter,NASA,Solar activity monitor,"
+SMM",1980,1989,2017-05-19 01:01:35
+1426,Uwhigo,Ultra-Wide Swath Hyperspectral imager for co monitoring greenhouse gases and NO2,CMA,Moderate-resolution optical imager,"
+TANSAT-2",2026,2032,2025-06-09 13:40:38
+589,VAS,VISSR Atmospheric Sounder,NOAA,Cross-nadir infrared sounder,"
+GOES-4
+GOES-5
+GOES-6
+GOES-7",1980,1996,2014-07-09 21:30:11
+248,VCL,Vegetation Canopy Lidar,NASA,Space lidar,"
+DESDynI",,0,2017-03-31 11:44:21
+590,VCS-MA,Vidicon Camera System - Medium Angle,NASA,Moderate-resolution optical imager,"
+TIROS-4
+TIROS-5
+TIROS-6",1962,1963,2017-03-27 12:25:40
+591,VCS-NA,Vidicon Camera System - Narrow Angle,NASA,Moderate-resolution optical imager,"
+TIROS-1
+TIROS-2",1960,1961,2017-03-27 12:26:41
+592,VCS-WA,Vidicon Camera System - Wide Angle,NASA,Moderate-resolution optical imager,"
+ESSA-1
+TIROS-1
+TIROS-10
+TIROS-2
+TIROS-3
+TIROS-4
+TIROS-5
+TIROS-6
+TIROS-7
+TIROS-8
+TIROS-9",1960,1968,2017-03-27 12:28:08
+902,VEFI,Vector Electric Field Instrument,NASA,Field or radiowave sensor,"
+C/NOFS",2008,2015,2022-07-26 10:20:23
+594,Végétation ,Végétation,CNES,Moderate-resolution optical imager,"
+SPOT-4
+SPOT-5",1998,2015,2022-08-08 15:32:56
+961,Végétation-P,Végétation for PROBA,CNES,Moderate-resolution optical imager,"
+PROBA-V
+PROBA-V-CC",2013,2026,2023-10-09 13:54:30
+664,VELC,Visible Emission Line Coronagraph,ISRO,Solar activity monitor,"
+Aditya-1",2024,2028,2021-12-02 22:53:50
+595,VFM,Vector Field Magnetometer,DNSC,Field or radiowave sensor,"
+SWARM-A
+SWARM-B
+SWARM-C",2014,2026,2024-09-23 11:01:59
+596,VHRI,Very High Resolution Imager,NASRDA,High-resolution optical imager,"
+NigeriaSat-2",2011,2023,2021-06-16 14:48:06
+1107,VHRI-100,Very High Resolution Imager - 100,CAST,High-resolution optical imager,"
+SSTL-S1 1
+SSTL-S1 2
+SSTL-S1 3
+SSTL-S1 4",2015,2026,2021-08-31 14:47:40
+597,VHRR,Very High Resolution Radiometer,NASA,Moderate-resolution optical imager,"
+ATS-6",1974,1979,2017-03-27 13:47:40
+602,VHRR,Very High Resolution Radiometer (in LEO),NOAA,Moderate-resolution optical imager,"
+NOAA-2
+NOAA-3
+NOAA-4
+NOAA-5",1973,1979,2013-12-04 13:24:06
+790,VHRR,Very High Resolution Radiometer,ISRO,Moderate-resolution optical imager,"
+INSAT-1A
+INSAT-1B
+INSAT-1C
+INSAT-1D
+INSAT-2A
+INSAT-2B
+INSAT-2D
+INSAT-2E
+INSAT-3A
+Kalpana-1",1982,2017,2021-10-18 09:13:06
+953,VIDI,"Velocity, Ion Density and Irregularities",USAF,Field or radiowave sensor,"
+COSMIC-2",2020,2026,2021-12-09 12:15:16
+604,VIIRS,Visible Infrared Imager Radiometer Suite,NOAA,Moderate-resolution optical imager,"
+JPSS-3
+JPSS-4
+NOAA-20
+NOAA-21
+SNPP",2012,2041,2024-11-21 09:31:44
+1191,VIMS,Visual and Infrared Multispectral Sensor,CNSA,High-resolution optical imager,"
+GF-5
+GF-5-01A
+GF-5-02",2018,2030,2022-07-27 09:51:01
+721,VIRGO ,Variability of Solar Irradiance,ESA,Solar irradiance monitor,"
+SOHO",1996,2027,2021-06-23 21:52:17
+607,VIRR,Visible and Infra-Red Radiometer,CMA,Moderate-resolution optical imager,"
+FY-3A
+FY-3B
+FY-3C",2008,2022,2024-09-09 14:28:43
+608,VIRR,Visible and Infra Red Radiometer,NASA,Moderate-resolution optical imager,"
+SeaSat",1978,1978,2013-12-03 03:14:45
+609,VIRS,Visible and Infra Red Scanner,NASA,Moderate-resolution optical imager,"
+TRMM",1998,2015,2022-08-08 15:26:01
+758,VIS,Visible Imaging System,NASA,Space radiometer or spectrometer,"
+Polar",1996,2008,2017-05-21 17:40:38
+610,VISSR,Visible-Infrared Spin Scan Radiometer,NOAA,Moderate-resolution optical imager,"
+GOES-1
+GOES-2
+GOES-3
+SMS-1
+SMS-2",1974,1993,2017-03-27 15:22:46
+612,VISSR,Visible-Infrared Spin Scan Radiometer,JMA,Moderate-resolution optical imager,"
+Himawari-1 (GMS-1)
+Himawari-2 (GMS-2)
+Himawari-3 (GMS-3)
+Himawari-4 (GMS-4)",1977,2000,2024-09-30 08:20:17
+901,VISSR,Visible-Infrared Spin Scan Radiometer,JAXA,Moderate-resolution optical imager,"
+Himawari-5 (GMS-5)",1995,2003,2024-09-30 08:21:50
+1373,VLF Receiver,Very Low Frequency Receiver,CSA,Field or radiowave sensor,"
+Alouette-1
+Alouette-2",1962,1975,2023-10-16 14:34:54
+613,VSSC,VENµS SuperSpectral Camera,CNES,High-resolution optical imager,"
+VENµS",2017,2026,2021-06-16 14:49:32
+614,VTIR,Visible and Thermal Infrared Radiometer,JAXA,Moderate-resolution optical imager,"
+MOS-1
+MOS-1B",1987,1996,2012-09-17 01:47:40
+615,VTPR,Vertical Temperature Profile Radiometer,NOAA,Cross-nadir infrared sounder,"
+NOAA-2
+NOAA-3
+NOAA-4
+NOAA-5",1973,1979,2014-05-21 15:39:07
+987,VUSS,Vacuum UV Solar spectrum,Roscosmos,Solar activity monitor,"
+Coronas-F
+Coronas-I",1994,2005,2017-05-17 21:00:24
+1100,W-SAR,W-SAR,CAST,Imaging radar (SAR),"
+",0,0,2023-11-21 16:29:32
+616,WAOSS-B,"Wide-Angle Optoelectronic Stereo Scanner, BIRD version",DLR,High-resolution optical imager,"
+BIRD",2002,2007,2020-01-07 00:46:12
+723,WAVES,Radio and Plasma Wave Experiment,NASA,Field or radiowave sensor,"
+WIND",1995,2026,2021-11-10 09:58:51
+763,WBD,Wide Band Data,ESA,Field or radiowave sensor,"
+CLUSTER-1
+CLUSTER-2
+CLUSTER-3
+CLUSTER-4",2000,2025,2021-12-09 12:30:59
+971,WBS,Wide-band Spectrometer,JAXA,Solar activity monitor,"
+Solar-A (Yohkoh)",1991,2001,2017-05-19 12:30:09
+617,WFC,Wide-Field Camera,NASA,High-resolution optical imager,"
+CALIPSO",2006,2023,2017-03-28 21:25:50
+618,WFI,Wide Field Imager,CAST,High-resolution optical imager,"
+CBERS-1
+CBERS-2
+CBERS-2B",2000,2010,2020-01-07 00:47:19
+1281,WFI,Wide Field Heliospheric Imager,NASA,Solar activity monitor,"
+PUNCH",2025,2028,2022-02-07 09:04:45
+619,WFI-2,Wide Field Imager - 2,CAST,High-resolution optical imager,"
+CBERS-3
+CBERS-4
+CBERS-4B",2013,2026,2021-06-16 13:05:09
+1466,WFS Radiometer,WildFireSat radiometer,CSA,Moderate-resolution optical imager,"
+WFS-1",2029,2034,2025-11-14 12:50:13
+1028,WFV,Wide Field Camera,CNSA,High-resolution optical imager,"
+GF-1
+GF-6",2013,2026,2023-11-27 11:56:36
+762,WHISPER,Waves of High Frequency and Sounder for Probing of Density by Relaxation,ESA,Field or radiowave sensor,"
+CLUSTER-1
+CLUSTER-2
+CLUSTER-3
+CLUSTER-4",2000,2025,2023-12-21 16:52:49
+620,WiFS,Wide-Field Sensor,ISRO,High-resolution optical imager,"
+IRS-1C
+IRS-1D",1996,2010,2016-10-20 02:53:38
+1039,WiFS,Wide-Field Sensor ,ISRO,High-resolution optical imager,"
+IRS-P3",1996,2004,2020-01-07 00:55:10
+621,WINDII,Wind Doppler Imaging Interferometer,CSA,Limb sounder,"
+UARS",1991,2005,2017-03-29 21:33:48
+622,WindRAD,Wind Radar,CMA,Radar scatterometer,"
+FY-3E
+FY-3J",2021,2034,2024-09-09 14:47:42
+623,WindSat,WindSat,DoD,Microwave conical scanning radiometer,"
+Coriolis",2003,2020,2025-04-14 08:36:24
+946,WISH,Wide-Swath and High-Resolution Optical Imager,JAXA,High-resolution optical imager,"
+ALOS-3",2023,2023,2022-07-18 13:57:41
+1002,WISPR,Wide-field Imager for Solar Probe,NRL,Solar activity monitor,"
+Parker Solar Probe",2018,2026,2024-01-22 08:50:04
+1457,WIVERN Doppler Radar,WIVERN Doppler Radar,ESA,Cloud and precipitation radar,"
+WIVERN",2033,2038,2025-09-29 14:22:32
+1456,WIVERN Radiometer,WIVERN Radiometer,ESA,Microwave conical scanning radiometer,"
+WIVERN",2033,2038,2025-09-29 13:47:01
+910,WMC,Wide-swath Multispectral Camera,CAST,High-resolution optical imager,"
+VRSS-1",2013,2022,2021-06-17 18:27:03
+1298,WSI,Wide Spectral Imager,CNSA,Moderate-resolution optical imager,"
+DQ-1",2022,2030,2022-07-27 09:51:31
+696,WV110,World View 110 camera,DigitalGlobe,High-resolution optical imager,"
+WorldView-2
+WorldView-3",2010,2026,2021-08-31 14:35:34
+697,WV60,World View 60 camera,DigitalGlobe,High-resolution optical imager,"
+WorldView-1",2008,2026,2021-08-31 14:34:26
+624,WVC,Wide View CCD camera,CAST,High-resolution optical imager,"
+HJ-1A
+HJ-1B",2009,2018,2021-06-16 11:29:49
+1242,WVC-2,Wide View CCD camera - 2,CAST,High-resolution optical imager,"
+HJ-2A
+HJ-2B",2020,2026,2021-06-16 11:32:13
+1414,WVImager,Water Vapour Imager,ISA,Moderate-resolution optical imager,"
+C3IEL-A
+C3IEL-B",2028,2031,2024-10-07 10:15:42
+625,WVR,Water Vapor Radiometer,NASA,Microwave cross-track scanning radiometer,"
+GFO",1998,2008,2012-09-17 12:35:11
+1287,X-SAR,X-SAR,Synspective,Imaging radar (SAR),"
+StriX-1
+StriX-2
+StriX-3
+StriX-4
+StriX-5
+StriX-6
+StriX-α
+StriX-β",2021,2031,2024-03-13 15:17:50
+1366,X-SAR ,PIESAT X-Band SAR,CASC,Imaging radar (SAR),"
+PIESAT-1
+PIESAT-2",2023,2034,2023-08-07 13:01:40
+1152,XEP-e,"Extremely high-energy electron experiments
+",JAXA,Energetic particle spectrometer,"
+Arase (ERG)",2017,2033,2021-10-02 19:19:39
+1132,XEUVI,Solar X-ray and Extreme Ultraviolet Imager,CMA,Solar activity monitor,"
+FY-3E
+FY-3J",2021,2034,2024-09-09 14:48:50
+1416,XFM,X-ray Flux Monitor,ESA,Space radiometer or spectrometer,"
+SWNext SOL-A
+SWNext SOL-B",2029,2038,2024-11-11 09:59:52
+955,XPS,XUV Photometer System,NASA,Solar activity monitor,"
+SORCE",2003,2020,2021-10-01 13:16:58
+1010,XRP,Soft X-Ray Polychromator,UKSA,Solar activity monitor,"
+SMM",1980,1989,2017-05-19 01:03:23
+651,XRT,X-Ray Telescope,JAXA,Solar activity monitor,"
+Solar-B (Hinode)",2007,2026,2021-12-16 00:47:17
+1181,XSAR,X-band Synthetic Aperture Radar,NEC,Imaging radar (SAR),"
+ASNARO-2",2018,2026,2021-06-15 21:07:46
+1397,YunYao-receiver,YunYao GNSS receiver,CASIC,GNSS radio-occultation sounder,"
+YunYao-1",2024,2030,2024-02-26 11:14:40

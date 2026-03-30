@@ -3,56 +3,122 @@
   "instrument_acronym": "ETM+",
   "instrument_fullname": "Enhanced Thematic Mapper +",
   "url": "https://space.oscar.wmo.int/instruments/view/etm%2B",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central",
     "Spectral",
     "SNR or NEΔT @ specified input"
   ],
   "channels": [
     {
+      "channel_name": "Band_01",
       "Central": "wavelength",
-      "Spectral": "interval",
-      "SNR or NEΔT @ specified input": "Low signal"
+      "central_wavelength": "interval",
+      "snr_or_nedt": "Low signal"
     },
     {
-      "Central": "0.48 µm",
-      "Spectral": "0.45 - 0.52 µm",
-      "SNR or NEΔT @ specified input": "36 @ 40 W m-2sr-1μm-1"
+      "channel_name": "Band_02",
+      "Central": {
+        "value": 0.48,
+        "unit": "µm"
+      },
+      "central_wavelength": {
+        "min": 0.45,
+        "max": 0.52,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "36 @ 40 W m-2sr-1μm-1"
     },
     {
-      "Central": "0.56 µm",
-      "Spectral": "0.52 - 0.60 µm",
-      "SNR or NEΔT @ specified input": "37 @ 30 W m-2sr-1μm-1"
+      "channel_name": "Band_03",
+      "Central": {
+        "value": 0.56,
+        "unit": "µm"
+      },
+      "central_wavelength": {
+        "min": 0.52,
+        "max": 0.6,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "37 @ 30 W m-2sr-1μm-1"
     },
     {
-      "Central": "0.66 µm",
-      "Spectral": "0.63 - 0.69 µm",
-      "SNR or NEΔT @ specified input": "24 @ 21.7 W m-2sr-1μm-1"
+      "channel_name": "Band_04",
+      "Central": {
+        "value": 0.66,
+        "unit": "µm"
+      },
+      "central_wavelength": {
+        "min": 0.63,
+        "max": 0.69,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "24 @ 21.7 W m-2sr-1μm-1"
     },
     {
-      "Central": "0.83 µm",
-      "Spectral": "0.76 - 0.90 µm",
-      "SNR or NEΔT @ specified input": "33 @ 13.6 W m-2sr-1μm-1"
+      "channel_name": "Band_05",
+      "Central": {
+        "value": 0.83,
+        "unit": "µm"
+      },
+      "central_wavelength": {
+        "min": 0.76,
+        "max": 0.9,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "33 @ 13.6 W m-2sr-1μm-1"
     },
     {
-      "Central": "1.65 µm",
-      "Spectral": "1.55 - 1.75 µm",
-      "SNR or NEΔT @ specified input": "34 @ 4.0 W m-2sr-1μm-1"
+      "channel_name": "Band_06",
+      "Central": {
+        "value": 1.65,
+        "unit": "µm"
+      },
+      "central_wavelength": {
+        "min": 1.55,
+        "max": 1.75,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "34 @ 4.0 W m-2sr-1μm-1"
     },
     {
-      "Central": "2.21 µm",
-      "Spectral": "2.08 - 2.35 µm",
-      "SNR or NEΔT @ specified input": "27 @ 1.7 W m-2sr-1μm-1"
+      "channel_name": "Band_07",
+      "Central": {
+        "value": 2.21,
+        "unit": "µm"
+      },
+      "central_wavelength": {
+        "min": 2.08,
+        "max": 2.35,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "27 @ 1.7 W m-2sr-1μm-1"
     },
     {
+      "channel_name": "Band_08",
       "Central": "Panchromatic",
-      "Spectral": "0.50 - 0.90 µm",
-      "SNR or NEΔT @ specified input": "14 @ 22.9 W m-2sr-1μm-1"
+      "central_wavelength": {
+        "min": 0.5,
+        "max": 0.9,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "14 @ 22.9 W m-2sr-1μm-1"
     },
     {
-      "Central": "11.45 µm",
-      "Spectral": "10.4 - 12.5 µm",
-      "SNR or NEΔT @ specified input": "0.2 K @ 300 K"
+      "channel_name": "Band_09",
+      "Central": {
+        "value": 11.45,
+        "unit": "µm"
+      },
+      "central_wavelength": {
+        "min": 10.4,
+        "max": 12.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.2,
+        "unit": "K @ 300 K"
+      }
     }
   ]
 }

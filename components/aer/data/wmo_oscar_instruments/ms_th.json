@@ -1,0 +1,62 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MS (TH)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/ms_th",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.47,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.43,
+        "max": 0.52,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…. @ … % albedo"
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.56,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.61,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…. @ … % albedo"
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.65,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.61,
+        "max": 0.69,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…. @ … % albedo"
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.83,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.76,
+        "max": 0.9,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…. @ … % albedo"
+    }
+  ]
+}

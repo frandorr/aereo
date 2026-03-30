@@ -3,7 +3,8 @@
   "instrument_acronym": "TGSP",
   "instrument_fullname": "Trace Gas SPectrometer",
   "url": "https://space.oscar.wmo.int/instruments/view/tgsp",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range",
     "No. of channels",
     "Spectral resolution",
@@ -11,52 +12,140 @@
   ],
   "channels": [
     {
-      "Spectral range": "214-334 nm",
-      "No. of channels": "256",
-      "Spectral resolution": "0.5 nm",
-      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+      "channel_name": "Band_01",
+      "Spectral range": {
+        "min": 214.0,
+        "max": 334.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 256,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.5,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "..... @ ...... W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "320-452 nm",
-      "No. of channels": "256",
-      "Spectral resolution": "0.5 nm",
-      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+      "channel_name": "Band_02",
+      "Spectral range": {
+        "min": 320.0,
+        "max": 452.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 256,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.5,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "..... @ ...... W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "430-800 nm",
-      "No. of channels": "256",
-      "Spectral resolution": "1.5 nm",
-      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+      "channel_name": "Band_03",
+      "Spectral range": {
+        "min": 430.0,
+        "max": 800.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 256,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 1.5,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "..... @ ...... W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "755-910 nm",
-      "No. of channels": "256",
-      "Spectral resolution": "0.9 nm",
-      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+      "channel_name": "Band_04",
+      "Spectral range": {
+        "min": 755.0,
+        "max": 910.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 256,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.9,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "..... @ ...... W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "900-1210 nm",
-      "No. of channels": "256",
-      "Spectral resolution": "0.9 nm",
-      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+      "channel_name": "Band_05",
+      "Spectral range": {
+        "min": 900.0,
+        "max": 1210.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 256,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.9,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "..... @ ...... W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "1200-1770 nm",
-      "No. of channels": "256",
-      "Spectral resolution": "2.0 nm",
-      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+      "channel_name": "Band_06",
+      "Spectral range": {
+        "min": 1200.0,
+        "max": 1770.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 256,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 2.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "..... @ ...... W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "1934-2044 nm",
-      "No. of channels": "256",
-      "Spectral resolution": "0.5 nm",
-      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+      "channel_name": "Band_07",
+      "Spectral range": {
+        "min": 1934.0,
+        "max": 2044.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 256,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.5,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "..... @ ...... W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "2259-2386 nm",
-      "No. of channels": "256",
-      "Spectral resolution": "0.5 nm",
-      "SNR @ specified input spectral radiance": "..... @ ...... W m-2sr-1μm-1"
+      "channel_name": "Band_08",
+      "Spectral range": {
+        "min": 2259.0,
+        "max": 2386.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 256,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.5,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "..... @ ...... W m-2sr-1μm-1"
     }
   ]
 }

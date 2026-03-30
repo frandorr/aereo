@@ -3,7 +3,8 @@
   "instrument_acronym": "MWRI-1",
   "instrument_fullname": "Micro-Wave Radiation Imager 1",
   "url": "https://space.oscar.wmo.int/instruments/view/mwri-1",
-  "columns": [
+  "schema_type": "microwave",
+  "original_columns": [
     "Channel number",
     "Central frequency (GHz)",
     "Bandwidth (MHz)",
@@ -14,58 +15,150 @@
   ],
   "channels": [
     {
-      "Channel number": "1",
-      "Central frequency (GHz)": "10.65",
-      "Bandwidth (MHz)": "180",
-      "Polarisations": "V, H",
-      "NEΔT": "0.5 K",
-      "IFOV": "51 x 85 km",
-      "Pixel": "40 x11.2 km"
+      "channel_name": "10.65V",
+      "Channel number": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 10.65,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 180,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 40.0,
+        "y": 11.2,
+        "unit": "km"
+      }
     },
     {
-      "Channel number": "2",
-      "Central frequency (GHz)": "18.7",
-      "Bandwidth (MHz)": "200",
-      "Polarisations": "V, H",
-      "NEΔT": "0.5 K",
-      "IFOV": "30 x 50 km",
-      "Pixel": "40 x11.2 km"
+      "channel_name": "10.65H",
+      "Channel number": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 18.7,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 200,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 40.0,
+        "y": 11.2,
+        "unit": "km"
+      }
     },
     {
-      "Channel number": "3",
-      "Central frequency (GHz)": "23.8",
-      "Bandwidth (MHz)": "400",
-      "Polarisations": "V, H",
-      "NEΔT": "0.8 K",
-      "IFOV": "27 x45 km",
-      "Pixel": "20 x11.2 km"
+      "channel_name": "18.7V",
+      "Channel number": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 23.8,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 400,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 20.0,
+        "y": 11.2,
+        "unit": "km"
+      }
     },
     {
-      "Channel number": "4",
-      "Central frequency (GHz)": "36.5",
-      "Bandwidth (MHz)": "900",
-      "Polarisations": "V, H",
-      "NEΔT": "0.5 K",
-      "IFOV": "18 x30 km",
-      "Pixel": "20 x11.2 km"
+      "channel_name": "18.7H",
+      "Channel number": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 36.5,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 900,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 20.0,
+        "y": 11.2,
+        "unit": "km"
+      }
     },
     {
-      "Channel number": "5",
-      "Central frequency (GHz)": "89",
-      "Bandwidth (MHz)": "4600",
-      "Polarisations": "V, H",
-      "NEΔT": "1.0 K",
-      "IFOV": "9 x15 km",
-      "Pixel": "10 x11.2 km"
+      "channel_name": "23.8V",
+      "Channel number": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 89,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 4600,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 1.0,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 10.0,
+        "y": 11.2,
+        "unit": "km"
+      }
     },
     {
-      "Channel number": "6",
-      "Central frequency (GHz)": "150",
-      "Bandwidth (MHz)": "3000",
-      "Polarisations": "V, H",
-      "NEΔT": "1.3 K",
-      "IFOV": "7.5 x12 km",
-      "Pixel": ""
+      "channel_name": "23.8H",
+      "Channel number": {
+        "value": 6,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 150,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 3000,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 1.3,
+        "unit": "K"
+      },
+      "spatial_resolution": ""
     }
   ]
 }

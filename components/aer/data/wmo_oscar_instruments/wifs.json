@@ -3,21 +3,30 @@
   "instrument_acronym": "WiFS",
   "instrument_fullname": "Wide-Field Sensor",
   "url": "https://space.oscar.wmo.int/instruments/view/wifs",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified input spectral radiance"
   ],
   "channels": [
     {
-      "Central wavelength": "0.650 µm",
-      "Spectral interval": "0.62-0.68 µm",
-      "SNR @ specified input spectral radiance": "200 @ 263 W m-2sr-1µm-1"
+      "channel_name": "Band_01",
+      "central_wavelength": "200 @ 263 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.62,
+        "max": 0.68,
+        "unit": "µm"
+      }
     },
     {
-      "Central wavelength": "0.815 µm",
-      "Spectral interval": "0.77-0.86 µm",
-      "SNR @ specified input spectral radiance": "200 @ 285 W m-2sr-1µm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": "200 @ 285 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.77,
+        "max": 0.86,
+        "unit": "µm"
+      }
     }
   ]
 }

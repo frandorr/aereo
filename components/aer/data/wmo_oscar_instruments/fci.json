@@ -3,7 +3,8 @@
   "instrument_acronym": "FCI",
   "instrument_fullname": "Flexible Combined Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/fci",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Bandwidth",
     "SNR or NEΔT @ specified input",
@@ -11,100 +12,284 @@
   ],
   "channels": [
     {
-      "Central wavelength": "444 nm",
-      "Bandwidth": "60 nm",
-      "SNR or NEΔT @ specified input": "25 @ 1 % albedo",
-      "Sampling distance": "1.0 km"
+      "channel_name": "VIS 0.4",
+      "central_wavelength": {
+        "value": 444.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 60.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "25 @ 1 % albedo",
+      "Sampling distance": {
+        "value": 1.0,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "510 nm",
-      "Bandwidth": "40 nm",
-      "SNR or NEΔT @ specified input": "25 @ 1 % albedo",
-      "Sampling distance": "1.0 km"
+      "channel_name": "VIS 0.5",
+      "central_wavelength": {
+        "value": 510.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 40.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "25 @ 1 % albedo",
+      "Sampling distance": {
+        "value": 1.0,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "640 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "30 @ 1 % albedo",
-      "Sampling distance": "1.0 km (0.5 km in Hi-Re mode)"
+      "channel_name": "VIS 0.6",
+      "central_wavelength": {
+        "value": 640.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "30 @ 1 % albedo",
+      "Sampling distance": {
+        "value": 1.0,
+        "unit": "km (0.5 km in Hi-Re mode)"
+      }
     },
     {
-      "Central wavelength": "865 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "21 @ 1 % albedo",
-      "Sampling distance": "1.0 km"
+      "channel_name": "VIS 0.8",
+      "central_wavelength": {
+        "value": 865.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "21 @ 1 % albedo",
+      "Sampling distance": {
+        "value": 1.0,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "914 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "12 @ 1 % albedo",
-      "Sampling distance": "1.0 km"
+      "channel_name": "VIS 0.9",
+      "central_wavelength": {
+        "value": 914.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "12 @ 1 % albedo",
+      "Sampling distance": {
+        "value": 1.0,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "1380 nm",
-      "Bandwidth": "30 nm",
-      "SNR or NEΔT @ specified input": "40 @ 1 % albedo",
-      "Sampling distance": "1.0 km"
+      "channel_name": "NIR 1.3",
+      "central_wavelength": {
+        "value": 1380.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 30.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "40 @ 1 % albedo",
+      "Sampling distance": {
+        "value": 1.0,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "1610 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "30 @ 1 % albedo",
-      "Sampling distance": "1.0 km"
+      "channel_name": "NIR 1.6",
+      "central_wavelength": {
+        "value": 1610.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "30 @ 1 % albedo",
+      "Sampling distance": {
+        "value": 1.0,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "2250 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "25 @ 1 % albedo",
-      "Sampling distance": "1.0 km (0.5 km in Hi-Re mode)"
+      "channel_name": "NIR 2.2",
+      "central_wavelength": {
+        "value": 2250.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "25 @ 1 % albedo",
+      "Sampling distance": {
+        "value": 1.0,
+        "unit": "km (0.5 km in Hi-Re mode)"
+      }
     },
     {
-      "Central wavelength": "3.80 µm",
-      "Bandwidth": "0.40 µm",
-      "SNR or NEΔT @ specified input": "0.1 K @ 300 K",
-      "Sampling distance": "2.0 km (1.0 km in Hi-Re mode)"
+      "channel_name": "IR 3.8",
+      "central_wavelength": {
+        "value": 3.8,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.4,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.1,
+        "unit": "K @ 300 K"
+      },
+      "Sampling distance": {
+        "value": 2.0,
+        "unit": "km (1.0 km in Hi-Re mode)"
+      }
     },
     {
-      "Central wavelength": "6.30 µm",
-      "Bandwidth": "1.00 µm",
-      "SNR or NEΔT @ specified input": "0.3 K @ 250 K",
-      "Sampling distance": "2.0 km"
+      "channel_name": "IR 6.3",
+      "central_wavelength": {
+        "value": 6.3,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 1.0,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.3,
+        "unit": "K @ 250 K"
+      },
+      "Sampling distance": {
+        "value": 2.0,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "7.35 µm",
-      "Bandwidth": "0.50 µm",
-      "SNR or NEΔT @ specified input": "0.3 K @ 250 K",
-      "Sampling distance": "2.0 km"
+      "channel_name": "IR 7.3",
+      "central_wavelength": {
+        "value": 7.35,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.3,
+        "unit": "K @ 250 K"
+      },
+      "Sampling distance": {
+        "value": 2.0,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "8.70 µm",
-      "Bandwidth": "0.40 µm",
-      "SNR or NEΔT @ specified input": "0.1 K @ 300 K",
-      "Sampling distance": "2.0 km"
+      "channel_name": "IR 8.7",
+      "central_wavelength": {
+        "value": 8.7,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.4,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.1,
+        "unit": "K @ 300 K"
+      },
+      "Sampling distance": {
+        "value": 2.0,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "9.66 µm",
-      "Bandwidth": "0.30 µm",
-      "SNR or NEΔT @ specified input": "0.3 K @ 250 K",
-      "Sampling distance": "2.0 km"
+      "channel_name": "IR 9.7",
+      "central_wavelength": {
+        "value": 9.66,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.3,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.3,
+        "unit": "K @ 250 K"
+      },
+      "Sampling distance": {
+        "value": 2.0,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "10.50 µm",
-      "Bandwidth": "0.70 µm",
-      "SNR or NEΔT @ specified input": "0.1 K @ 300 K",
-      "Sampling distance": "2.0 km (1.0 km in Hi-Re mode)"
+      "channel_name": "IR 10.5",
+      "central_wavelength": {
+        "value": 10.5,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.7,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.1,
+        "unit": "K @ 300 K"
+      },
+      "Sampling distance": {
+        "value": 2.0,
+        "unit": "km (1.0 km in Hi-Re mode)"
+      }
     },
     {
-      "Central wavelength": "12.30 µm",
-      "Bandwidth": "0.50 µm",
-      "SNR or NEΔT @ specified input": "0.2 K @ 300 K",
-      "Sampling distance": "2.0 km"
+      "channel_name": "IR 12.3",
+      "central_wavelength": {
+        "value": 12.3,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.2,
+        "unit": "K @ 300 K"
+      },
+      "Sampling distance": {
+        "value": 2.0,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "13.30 µm",
-      "Bandwidth": "0.60 µm",
-      "SNR or NEΔT @ specified input": "0.2 K @ 270 K",
-      "Sampling distance": "2.0 km"
+      "channel_name": "IR 13.3",
+      "central_wavelength": {
+        "value": 13.3,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.6,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.2,
+        "unit": "K @ 270 K"
+      },
+      "Sampling distance": {
+        "value": 2.0,
+        "unit": "km"
+      }
     }
   ]
 }

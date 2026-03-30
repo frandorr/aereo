@@ -3,7 +3,8 @@
   "instrument_acronym": "TROPOMI",
   "instrument_fullname": "Tropospheric Monitoring Instrument",
   "url": "https://space.oscar.wmo.int/instruments/view/tropomi",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral ranges",
     "Number of channels",
     "Spectral resolution",
@@ -11,22 +12,64 @@
   ],
   "channels": [
     {
-      "Spectral ranges": "270-495 nm",
-      "Number of channels": "1200",
-      "Spectral resolution": "0.55 nm",
-      "SNR @ expected input radiance": "1000"
+      "channel_name": "UV-1",
+      "Spectral ranges": {
+        "min": 270.0,
+        "max": 495.0,
+        "unit": "nm"
+      },
+      "number_of_channels": {
+        "value": 1200,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.55,
+        "unit": "nm"
+      },
+      "snr_or_nedt": {
+        "value": 1000,
+        "unit": null
+      }
     },
     {
-      "Spectral ranges": "710-775 nm",
-      "Number of channels": "600",
-      "Spectral resolution": "0.55 nm",
-      "SNR @ expected input radiance": "500"
+      "channel_name": "UV-2",
+      "Spectral ranges": {
+        "min": 710.0,
+        "max": 775.0,
+        "unit": "nm"
+      },
+      "number_of_channels": {
+        "value": 600,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.55,
+        "unit": "nm"
+      },
+      "snr_or_nedt": {
+        "value": 500,
+        "unit": null
+      }
     },
     {
-      "Spectral ranges": "2305-2385 nm",
-      "Number of channels": "800",
-      "Spectral resolution": "0.25 nm",
-      "SNR @ expected input radiance": "100"
+      "channel_name": "UVIS-3",
+      "Spectral ranges": {
+        "min": 2305.0,
+        "max": 2385.0,
+        "unit": "nm"
+      },
+      "number_of_channels": {
+        "value": 800,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.25,
+        "unit": "nm"
+      },
+      "snr_or_nedt": {
+        "value": 100,
+        "unit": null
+      }
     }
   ]
 }

@@ -1,0 +1,46 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MSC (ZY)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/msc_zy",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": "100 @ ...... W m-2sr-1μm-1",
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.52,
+        "unit": "µm"
+      }
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": "100 @ ...... W m-2sr-1μm-1",
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.59,
+        "unit": "µm"
+      }
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": "100 @ ...... W m-2sr-1μm-1",
+      "bandwidth": {
+        "min": 0.63,
+        "max": 0.69,
+        "unit": "µm"
+      }
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": "100 @ ...... W m-2sr-1μm-1",
+      "bandwidth": {
+        "min": 0.77,
+        "max": 0.89,
+        "unit": "µm"
+      }
+    }
+  ]
+}

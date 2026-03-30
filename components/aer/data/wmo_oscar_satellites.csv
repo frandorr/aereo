@@ -1,0 +1,4437 @@
+Acronym,SAT ID,Launch,(expected) EOL,Satellite Programme,Agencies,Orbit,Altitude,Longitude,Inclination,Ect,Sat status,Payload,WIGOS Station Identifier,Link,Last update
+3D-Winds,832,TBD,TBD,Three-Dimensional Tropospheric Winds from Space-Based Lidar,"NASA
+",SunSync,TBD km,,,,Mission concept,3D-Winds Lidar,-20009--,,2024-06-10 12:27:14
+ACE,454,25 Aug 1997,≥2027,Advanced Composition Explorer,"NASA
+",L1,1.5e+06 km,,,,Operational,"CRIS (ACE)
+EPAM
+MAG (ACE)
+SEPICA
+SIS
+SWEPAM
+SWICS
+SWIMS
+ULEIS",-20009--,,2024-05-02 08:32:27
+ACE (Aer.Clo.Eco.),506,TBD,TBD,Aerosol-Cloud Ecosystems,"NASA
+",SunSync,,,,,Mission concept,"ACE Lidar
+CPR (CloudSat)
+HARP2
+OCI",,,2016-06-30 01:57:09
+ACRIMSat,1,20 Dec 1999,14 Dec 2013,Active Cavity Radiometer Irradiance Monitor Satellite,"NASA
+",SunSync,696 km,,,10:50 desc,Inactive,ACRIM-III,,,2015-07-27 19:40:14
+ADEOS,2,17 Aug 1996,30 Jun 1997,Advanced Earth Observing Satellite (original name: “Midori”),"JAXA
+",SunSync,797 km,,,10:30 desc,Inactive,"AVNIR
+ILAS-I
+IMG
+NSCAT
+OCTS
+POLDER
+RIS
+TOMS",0-20009-0-120,,2015-07-27 19:41:38
+ADEOS-2,3,14 Dec 2002,25 Oct 2003,Advanced Earth Observing Satellite (original name: “Midori”),"JAXA
+",SunSync,812 km,,,10:30 desc,Inactive,"AMSR
+DCS (ADEOS)
+GLI
+ILAS-II
+POLDER
+SeaWinds",0-20009-0-121,,2015-07-27 19:42:57
+Aditya-1,469,02 Sep 2023,≥2028,"Aditya
+","ISRO
+",L1,1500000 km,,,,Operational,"ASPEX
+HEL1OS
+Magnetometer (Aditya)
+PAPA
+SUIT
+SoLEXS
+VELC",-20009--,,2025-04-07 08:56:38
+Aeolus,4,22 Aug 2018,05 Jul 2023, Aeolus,"ESA
+",SunSync,320 km,,,06:00 desc,Inactive,ALADIN,0-20009-0-048,,2024-03-12 22:11:30
+ALOS,5,24 Jan 2006,22 Apr 2011,Advanced Land Observing Satellite,"JAXA
+",SunSync,692 km,,,10:30 desc,Inactive,"AVNIR-2
+PALSAR
+PRISM",,,2019-10-27 22:34:40
+ALOS-2,6,24 May 2014,≥2026,Advanced Land Observing Satellite,"JAXA
+",SunSync,640 km,,,12:00 desc,Operational,"CIRC
+PALSAR-2",,,2026-01-19 13:23:10
+ALOS-3,7,06 Mar 2023,06 Mar 2023,Advanced Land Observing Satellite,"JAXA
+",SunSync,669 km,,,10:30 desc,Lost at launch,WISH,,,2023-03-07 11:29:16
+ALOS-4 (DAICHI-4),751,01 Jul 2024,≥2031,Advanced Land Observing Satellite,"JAXA
+",SunSync,613 km,,,12:00 desc,Operational,"AIS
+PALSAR-3",-20009--,,2025-05-12 10:37:05
+Alouette-1,1022,29 Sep 1962,30 Sep 1972,Alouette (French for Skylark),"CSA
+",DRIFT,1000 km,,80.5°,,Inactive,"Cosmic Radio Noise
+EPD (Alouette)
+SFS
+VLF Receiver",,,2023-10-16 14:45:02
+Alouette-2,1023,29 Nov 1965,01 Aug 1975,Alouette (French for Skylark),"CSA
+",DRIFT,1000 km,,80.5°,,Inactive,"Cosmic Radio Noise
+EPD (Alouette)
+SFS
+VLF Receiver",,,2023-10-16 14:57:50
+AlSat-1,8,28 Nov 2002,15 Aug 2010,Algeria Satellite,"ASAL
+",SunSync,700 km,,,10:30 asc,Inactive,SLIM6,,,2015-07-27 19:44:40
+AlSat-1B,708,26 Sep 2016,≥2026,Algeria Satellite,"ASAL
+",SunSync,690 km,,,10:30 asc,Operational,SLIM6,0-20009-0-,,2026-02-02 15:40:47
+AlSat-2,9,12 Jul 2010,≥2019,Algeria Satellite,"ASAL
+",SunSync,686 km,,,10:30 asc,Presumably inactive,NAOMI (AlSat),,,2020-01-01 03:12:22
+AlSat-2B,10,26 Sep 2016,≥2030,Algeria Satellite,"ASAL
+",SunSync,680 km,,,09:30 asc,Operational,NAOMI (AlSat),,,2022-10-24 08:42:54
+AlSat-3A,1159,15 Jan 2026,≥2032,Algeria Satellite,"ASAL
+",SunSync,495 km,,,,Commissioning,NAOMI (AlSat),0-20009-0-,,2026-01-16 09:24:40
+AlSat-3B,1160,31 Jan 2026,≥2032,Algeria Satellite,"ASAL
+",SunSync,495 km,,,,Commissioning,NAOMI (AlSat),0-20009-0-,,2026-02-02 17:36:26
+ALTIUS,917,≥2026,≥2029,Atmospheric Limb Tracker for Investigation of the Upcoming Stratosphere,"ESA
+BIRA",SunSync,668 km,,,10:00 desc,Planned,ALTIUS,0-20009-0-045,,2025-04-07 15:11:10
+Amazônia-1,11,28 Feb 2021,≥2026,Amazônia,"INPE
+AEB",SunSync,752 km,,,10:30 desc,Operational,AWFI,,,2021-07-13 14:35:39
+Amazônia-1B,464,≥2026,≥2029,Amazônia,"INPE
+AEB",SunSync,752 km,,,10:30 desc,Planned,AWFI,0-20009-0-,,2026-02-09 10:21:57
+Amazônia-2,728,≥2026,≥2029,Amazônia,"INPE
+AEB",SunSync,778 km,,,10:30 desc,Planned,AWFI-2,0-20009-0-,,2026-01-21 08:42:52
+AOS-HAWCSat,1032,≥2031,≥2036,Atmosphere Observing System-HAWCSat,"JAXA
+CSA
+NASA",SunSync,430 km,,,13:30 ,Planned,"ALI (HAWCSat)
+SHOW",,,2023-11-02 15:20:14
+AOS-PMM,1030,Mar 2029,≥2034,Atmosphere Observing System - Precipitation Measuring Mission,"JAXA
+CNES
+NASA",DRIFT,430 km,,55°,,Planned,"C²OMODO-R
+KuDPR",-20009--,,2025-10-13 07:28:49
+AOS-Sky,1031,Dec 2031,≥2036,Atmosphere Observing System,"NASA
+ASI
+CNES
+CSA
+JAXA",SunSync,450 km,,,13:30 ,Considered,"AOS-Lidar
+AOS-Sky MWR
+AOS-Sky polarimeter
+AOS-Sky radar
+TICFIRE",-20009--,,2025-10-13 09:05:43
+AOS-Storm,1029,Mar 2029,≥2031,Atmosphere Observing System,"NASA
+ASI
+CNES
+CSA
+JAXA",DRIFT,430 km,,55°,,Considered,C²OMODO-R,-20009--,,2025-10-13 07:29:35
+Aqua,79,04 May 2002,≥2026,Earth Observation System,"NASA
+",SunSync,705 km,,,14:18 asc,Operational,"AIRS
+AMSR-E
+AMSU-A
+CERES
+HSB
+MODIS",0-20009-0-784,,2025-11-17 12:05:09
+Arase (ERG),715,20 Dec 2016,≥2033,Exploration of energization and Radiation in Geospace,"JAXA
+",MAG,3000 km,,31°,,Operational,"HEP-e
+LEP-e
+LEP-i
+MEP-e
+MEP-i
+MGF (ERG)
+PWE
+XEP-e",,,2023-04-27 11:03:37
+Arctica-M N1,465,28 Feb 2021,≥2026,Arctica in Molniya orbit,"RosHydroMet
+Roscosmos",Molniya,,,63.4°,,Operational,"DCS/A
+GGAK-E/FM-E
+GGAK-E/GALS-E (Arctica)
+GGAK-E/SKIF-6 (Arctica)
+MSU-GS/A",-20009--,,2026-01-23 14:10:21
+Arctica-M N2,466,16 Dec 2023,≥2028,Arctica in Molniya orbit,"RosHydroMet
+Roscosmos",Molniya,,,63.4°,,Operational,"DCS/A
+GGAK-E/FM-E
+GGAK-E/GALS-E (Arctica)
+GGAK-E/SKIF-6 (Arctica)
+MSU-GS/A",-20009--,,2026-01-23 14:10:47
+Arctica-M N3,1044,≥2029,≥2034,Arctica in Molniya orbit,"RosHydroMet
+Roscosmos",Molniya,,,63.4°,,Planned,"DCS/A
+GGAK-E/FM-E
+GGAK-E/GALS-E (Arctica)
+GGAK-E/SKIF-6 (Arctica)
+MSU-GS/A",-20009--,,2026-01-23 14:11:58
+Arctica-M N4,1045,≥2029,≥2034,Arctica in Molniya orbit,"RosHydroMet
+Roscosmos",Molniya,,,63.4°,,Planned,"DCS/A
+GGAK-E/FM-E
+GGAK-E/GALS-E (Arctica)
+GGAK-E/SKIF-6 (Arctica)
+MSU-GS/A",-20009--,,2026-01-23 14:14:39
+Arctica-M N5,1127,≥2030,≥2035,Arctica in Molniya orbit,"RosHydroMet
+Roscosmos",Molniya,,,63.4°,,Planned,"DCS/A
+GGAK-E/FM-E
+GGAK-E/GALS-E (Arctica)
+GGAK-E/SKIF-6 (Arctica)
+MSU-GS/A",-20009--,,2026-01-23 14:15:27
+Arctica-M N6,1128,≥2030,≥2035,Arctica in Molniya orbit,"RosHydroMet
+Roscosmos",Molniya,,,63.4°,,Planned,"DCS/A
+GGAK-E/FM-E
+GGAK-E/GALS-E (Arctica)
+GGAK-E/SKIF-6 (Arctica)
+MSU-GS/A",-20009--,,2026-01-23 14:15:53
+Arctica-M N7,1129,≥2035,≥2040,Arctica in Molniya orbit,"RosHydroMet
+Roscosmos",Molniya,,,63.4°,,Planned,"DCS/A
+GGAK-E/FM-E
+GGAK-E/GALS-E (Arctica)
+GGAK-E/SKIF-6 (Arctica)
+MSU-GS/A",-20009--,,2026-01-23 14:17:30
+Arctica-M N8,1130,≥2035,≥2040,Arctica in Molniya orbit,"RosHydroMet
+Roscosmos",Molniya,,,63.4°,,Planned,"DCS/A
+GGAK-E/FM-E
+GGAK-E/GALS-E (Arctica)
+GGAK-E/SKIF-6 (Arctica)
+MSU-GS/A",-20009--,,2026-01-23 14:19:01
+Argos-4 (GAzelle),965,07 Oct 2022,≥2027,Argos Data Collection System,"NOAA
+CNES",SunSync,750 km,,,06:00 desc,Operational,Argos-4,0-20009-0-,,2024-11-11 10:09:58
+ARTEMIS-P1,576,15 Jul 2011,≥2026,"Acceleration, Reconnection, Turbulence, and Electrodynamics of the Moon's Interaction with the Sun","NASA
+",Moon,,,6°,,Operational,"EFI (THEMIS)
+ESA
+FGM (THEMIS)
+SCM
+SST",0-20009-0-,,2026-02-02 16:26:43
+ARTEMIS-P2,814,15 Jul 2011,≥2026,"Acceleration, Reconnection, Turbulence, and Electrodynamics of the Moon's Interaction with the Sun","NASA
+",Moon,,,6°,,Operational,"EFI (THEMIS)
+ESA
+FGM (THEMIS)
+SCM
+SST",0-20009-0-,,2026-02-02 16:27:07
+ASCENDS,12,TBD,TBD,"Active Sensing of CO2 Emissions over Nights, Days, and Seasons","NASA
+",SunSync,450 km,,,10:30 asc,Mission concept,"CO2 lidar
+CO sensor",,,2017-07-20 15:15:07
+ASNARO-1,467,06 Nov 2014,≥2026,Advanced Satellite with new system ARchitecture for Observation,"USEF
+METI
+NEC",SunSync,504 km,,,11:00 desc,Operational,OPS (ASNARO),0-20009-0-,,2026-02-02 17:11:52
+ASNARO-2,468,17 Jan 2018,≥2026,Advanced Satellite with new system ARchitecture for Observation,"USEF
+METI
+NEC",SunSync,500 km,,,06:00 desc,Operational,XSAR,0-20009-0-,,2026-02-02 17:12:14
+ASO-S (Kuafu-1),972,08 Oct 2022,≥2026,Advanced Space-based Solar Observatory,"CAS
+",SunSync,744 km,,,06:00 desc,Operational,"FMG
+HXI
+LST",,,2023-05-22 10:06:37
+ATS-1,13,06 Dec 1966,01 Dec 1978,Application Technology Satellite,"NASA
+",GEO,35786 km,150 ° W,,,Inactive,SSCC,,,2016-10-18 17:19:44
+ATS-3,14,06 Nov 1967,01 Dec 1978,Application Technology Satellite,"NASA
+",GEO,35786 km,45 ° W,,,Inactive,MSSCC,,,2015-07-27 19:47:27
+ATS-6,15,30 Apr 1974,03 Aug 1979,Application Technology Satellite,"NASA
+",GEO,35786 km,94 ° W,,,Inactive,VHRR (ATS),,,2015-07-27 19:48:07
+Aura,80,15 Jul 2004,≥2026,Earth Observation System,"NASA
+",SunSync,705 km,,,13:56 asc,Operational,"HIRDLS
+MLS  (EOS-Aura)
+OMI
+TES-limb
+TES-nadir",0-20009-0-785,,2026-02-27 18:09:30
+Aurora,1078,30 Jun 2021,30 Nov 2026,Global Hyperspectral Observation Satellite,"OSK
+",SunSync,454 km,,,15:30 desc,Operational,HI,-20009--,,2024-09-23 08:38:48
+AWS PFM,934,16 Aug 2024,≥2029,Arctic Weather Satellite,"ESA
+",SunSync,600 km,,,10:00 desc,Operational,MWR (AWS),0-20009-0-080,,2025-08-18 14:01:23
+Beijing-1,18,27 Oct 2005,≥2010,Beijing,"NRSCC
+",SunSync,699 km,,,08:15 asc,Presumably inactive,"CMT
+SLIM6",,,2019-12-27 20:34:43
+BILSat,16,27 Sep 2003,15 Aug 2006,BILTEN Satellte,"TÜBITAK-UZAY
+",SunSync,686 km,,,10:30 asc,Inactive,"COBAN
+MSIS
+PanCam",,,2015-07-27 19:49:25
+BIOMASS,508,29 Apr 2025,≥2030,BIOMASS,"ESA
+",SunSync,660 km,,,06:00 desc,Operational,SAR-P,0-20009-0-,,2026-02-23 09:01:16
+BIRD,17,22 Oct 2001,01 Jul 2007,Bi-spectral Infra-Red Detection,"DLR
+",SunSync,572 km,,,10:30 desc,Inactive,"HORUS
+HSRS
+WAOSS-B",,,2015-07-27 19:50:18
+BlackSky-1,776,29 Nov 2018,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,500 km,,,10:30 desc,Operational,SpaceView 24,,,2025-01-09 10:26:29
+BlackSky-10,903,18 Nov 2021,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,500 km,,,10:30 desc,Operational,SpaceView 24,,,2025-01-09 10:26:37
+BlackSky-11,904,18 Nov 2021,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,500 km,,,10:30 desc,Operational,SpaceView 24,,,2025-01-09 10:26:37
+BlackSky-12,905,02 Dec 2021,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,500 km,,,10:30 desc,Operational,SpaceView 24,,,2025-01-09 10:26:37
+BlackSky-13,906,02 Dec 2021,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,500 km,,,10:30 desc,Operational,SpaceView 24,,,2025-01-09 10:26:37
+BlackSky-14,907,09 Dec 2021,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",DRIFT,430 km,,42°,,Operational,SpaceView 24,,,2025-01-09 10:26:37
+BlackSky-15,908,09 Dec 2021,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",DRIFT,430 km,,42°,,Operational,SpaceView 24,,,2025-01-09 10:26:45
+BlackSky-16,925,02 Apr 2022,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",DRIFT,430 km,,42°,,Operational,SpaceView 24,,,2025-01-09 10:26:45
+BlackSky-17,926,02 Apr 2022,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",DRIFT,430 km,,42°,,Operational,SpaceView 24,,,2025-01-09 10:26:45
+BlackSky-18,990,24 Mar 2023,≥2026,BlackSky Global Commercial Imaging Constellation,"BSG
+",DRIFT,450 km,,42°,,Operational,SpaceView 24,,,2023-11-23 09:16:24
+BlackSky-19,991,24 Mar 2023,≥2026,BlackSky Global Commercial Imaging Constellation,"BSG
+",DRIFT,450 km,,42°,,Operational,SpaceView 24,,,2023-11-23 09:16:53
+BlackSky-2,777,03 Dec 2018,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,500 km,,,10:30 desc,Operational,SpaceView 24,,,2025-01-09 10:26:29
+BlackSky-20 (Gen3-1),1112,18 Feb 2025,≥2030,BlackSky Global Commercial Imaging Constellation,"BSG
+",DRIFT,470 km,,59°,,Operational,Blacksky Imager,0-20009-0-,,2025-09-15 13:48:09
+BlackSky-21 (Gen3-2),1124,02 Jun 2025,≥2028,BlackSky Global Commercial Imaging Constellation,"BSG
+",DRIFT,450 km,,59°,,Operational,SpaceView 24,0-20009-0-,,2025-11-24 08:36:51
+BlackSky-22 (Gen3-3),1154,20 Nov 2025,30 Nov 2028,BlackSky Global Commercial Imaging Constellation,"BSG
+",DRIFT,450 km,,59°,,Operational,SpaceView 24,0-20009-0-,,2026-02-23 08:52:54
+BlackSky-23 (Gen3-4),1163,05 Mar 2026,≥2030,BlackSky Global Commercial Imaging Constellation,"BSG
+",DRIFT,450 km,,59°,,Commissioning,SpaceView 24,0-20009-0-,,2026-03-06 11:16:47
+BlackSky-3,785,28 Jun 2019,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,500 km,,,10:30 desc,Operational,SpaceView 24,,,2025-01-09 10:26:29
+BlackSky-4,788,19 Aug 2019,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,500 km,,,10:30 desc,Operational,SpaceView 24,,,2025-01-09 10:26:29
+BlackSky-5,797,07 Aug 2020,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,500 km,,,10:30 desc,Operational,SpaceView 24,,,2025-01-09 10:26:37
+BlackSky-6,891,07 Aug 2020,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,490 km,,,10:30 desc,Operational,SpaceView 24,,,2025-01-09 10:26:37
+BlackSky-7,796,22 Mar 2021,≥2025,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,500 km,,,10:30 desc,Operational,SpaceView 24,,,2025-01-09 10:26:37
+BlackSky-8,795,15 May 2021,15 May 2021,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,500 km,,,10:30 desc,Lost at launch,SpaceView 24,,,2021-08-25 21:21:21
+BlackSky-9,794,15 May 2021,15 May 2021,BlackSky Global Commercial Imaging Constellation,"BSG
+",SunSync,500 km,,,10:30 desc,Lost at launch,SpaceView 24,,,2021-08-25 21:22:57
+C/NOFS,539,16 Apr 2008,28 Nov 2015,Communication/Navigation Outage Forecasting System,"DoD
+NASA
+UCAR
+USAF",DRIFT,588 km,,13°,,Inactive,"CERTO
+CINDI
+CORISS
+DIDM
+PLP
+VEFI",0-20009-0-786,,2016-07-22 17:36:15
+C3IEL-A,1083,≥2028,≥2031,"Cluster for Cloud Evolution, ClimatE and Lightning","CNES
+",SunSync,650 km,,,13:30 ,Planned,"CLOUD
+LOIP
+WVImager",-20009--,,2025-09-18 13:46:03
+C3IEL-B,1084,≥2028,≥2031,"Cluster for Cloud Evolution, ClimatE and Lightning","CNES
+",SunSync,650 km,,,13:30 ,Planned,"CLOUD
+LOIP
+WVImager",-20009--,,2025-09-18 13:47:09
+CALIPSO,19,28 Apr 2006,01 Aug 2023,Cloud-Aerosol Lidar and Infrared Pathfinder Satellite Observations,"NASA
+CNES",SunSync,689 km,,,13:45 asc,Inactive,"CALIOP
+IIR
+WFC",0-20009-0-787,,2023-12-18 08:53:27
+Capella,893,03 Dec 2018,≥2040,Capella,"Capella
+",SunSync,500 km,,,10:30 desc,Operational,Capella SAR,-20009--,,2026-01-12 09:10:42
+CarbonSat,509,TBD,TBD,,"
+",SunSync,,,,,Mission concept,,,,2013-02-20 15:33:41
+Carruthers,1144,24 Sep 2025,≥2028,Carruthers Geocorona Observatory,"NASA
+",L1,,,,,Commissioning,FUV (Carruthers),0-20009-0-0,,2025-10-13 11:06:35
+CartoSat-1 (IRS-P5),20,05 May 2005,05 May 2019,Satellite for Cartography,"ISRO
+",SunSync,618 km,,,10:15 desc,Inactive,PAN (CartoSat-1),,,2020-01-03 20:24:08
+CartoSat-2,21,10 Jan 2007,13 Aug 2019,Satellite for Cartography,"ISRO
+",SunSync,635 km,,,09:30 desc,Inactive,PAN (CartoSat-2A/B),,,2020-01-03 20:29:02
+CartoSat-2A,22,28 Apr 2008,≥2026,Satellite for Cartography,"ISRO
+",SunSync,635 km,,,09:32 desc,Operational,PAN (CartoSat-2A/B),,,2026-01-19 13:23:10
+CartoSat-2B,23,12 Jul 2010,≥2026,Satellite for Cartography,"ISRO
+",SunSync,640 km,,,09:30 desc,Operational,PAN (CartoSat-2A/B),,,2026-01-19 13:23:10
+CartoSat-2C,593,22 Jun 2016,≥2026,Satellite for Cartography,"ISRO
+",SunSync,505 km,,,09:28 desc,Operational,"EvM
+HRMX
+PAN (CartoSat 2C/D",0-20009-0-,,2026-02-02 16:13:44
+CartoSat-2D,594,15 Feb 2017,≥2026,Satellite for Cartography,"ISRO
+",SunSync,515 km,,,09:30 desc,Operational,"EvM
+HRMX
+PAN (CartoSat 2C/D",0-20009-0-,,2026-02-02 16:12:12
+CartoSat-2E,660,23 Jun 2017,≥2026,Satellite for Cartography,"ISRO
+",SunSync,505 km,,,09:29 desc,Operational,"EvM
+HRMX
+PAN (CartoSat 2C/D",0-20009-0-,,2026-02-02 15:34:30
+CartoSat-2F,738,12 Jan 2018,≥2026,Satellite for Cartography,"ISRO
+",SunSync,505 km,,,09:37 desc,Operational,"EvM
+HRMX
+PAN (CartoSat 2C/D",0-20009-0-,,2026-02-02 17:07:27
+CartoSat-3,24,27 Nov 2019,≥2026,Satellite for Cartography,"ISRO
+",SunSync,450 km,,,09:30 desc,Operational,"MX
+PAN (CartoSat-3)",,,2026-01-19 13:23:10
+CAS 500-1,812,22 Mar 2021,≥2026,Korea Multi-Purpose Satellite,"KARI
+",SunSync,528 km,,,10:50 asc,Operational,AEISS-HR,,,2023-07-17 08:42:24
+CAS 500-2,813,≥2026,≥2029,Korea Multi-Purpose Satellite,"KARI
+",SunSync,528 km,,,10:50 asc,Planned,AEISS-HR,0-20009-0-,,2026-01-20 10:43:59
+CAS 500-3,1156,26 Nov 2025,≥2028,Korea Multi-Purpose Satellite,"KARI
+",SunSync,498 km,,,,Commissioning,AEISS-HR,0-20009-0-,,2025-11-27 16:50:59
+CASSIOPE,470,29 Sep 2013,17 Dec 2021,CASSIOPE,"CSA
+",MAG,670 km,,80.97°,,Inactive,"CER
+FAI
+GAP
+IRM
+MGF (CASSIOPE)
+NMS
+RRI
+SEI",,,2022-01-26 14:52:58
+CBERS-1,25,14 Oct 1999,12 Oct 2003,China-Brazil Earth Resources Satellite,"CAST
+AEB
+CRESDA
+INPE",SunSync,778 km,,,10:30 desc,Inactive,"DCS (CBERS)
+HRCC
+IRMSS
+WFI",,,2015-07-27 19:51:51
+CBERS-2,26,21 Oct 2003,15 Nov 2007,China-Brazil Earth Resources Satellite,"CAST
+AEB
+CRESDA
+INPE",SunSync,778 km,,,10:30 desc,Inactive,"DCS (CBERS)
+HRCC
+IRMSS
+WFI",,,2015-07-27 19:52:36
+CBERS-2B,27,19 Sep 2007,16 May 2010,China-Brazil Earth Resources Satellite,"CAST
+AEB
+CRESDA
+INPE",SunSync,778 km,,,10:30 desc,Inactive,"DCS (CBERS)
+HRCC
+HRPC
+WFI",,,2015-07-27 19:53:14
+CBERS-3,28,09 Dec 2013,09 Dec 2013,China-Brazil Earth Resources Satellite,"CAST
+AEB
+CRESDA
+INPE",SunSync,778 km,,,10:30 desc,Lost at launch,"DCS (CBERS)
+IRMSS-2
+MUXCAM
+PANMUX
+WFI-2",,,2015-07-27 19:54:01
+CBERS-4,29,07 Dec 2014,≥2026,China-Brazil Earth Resources Satellite,"CAST
+AEB
+CRESDA
+INPE",SunSync,778 km,,,10:30 asc,Operational,"DCS (CBERS)
+IRMSS-2
+MUXCAM
+PANMUX
+WFI-2",,,2026-01-19 13:23:11
+CBERS-4B,774,20 Dec 2019,≥2026,China-Brazil Earth Resources Satellite,"CAST
+AEB
+CRESDA
+INPE",SunSync,778 km,,,10:30 asc,Operational,"DCS (CBERS)
+IRMSS-2
+MUXCAM
+PANMUX
+WFI-2",0-20009-0-,,2026-02-02 17:20:49
+CFOSAT,545,29 Oct 2018,≥2026,Chinese-French Oceanography Satellite,"NSOAS
+CNES",SunSync,500 km,,,06:00 desc,Operational,"CSCAT
+SWIM",0-20009-0-802,,2025-11-17 12:05:38
+CHAMP,30,15 Jul 2000,19 Sep 2010,Challenging Mini-Satellite Payload,"DLR
+",DRIFT,470 km,,87°,,Inactive,"ASC
+BlackJack (CHAMP)
+DIDM
+LRR (DLR)
+MIAS
+STAR",0-20009-0-041,,2015-08-24 18:55:52
+CHIME-A,912,≥2029,≥2034,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,786 km,,,10:30 desc,Planned,CHIME,,,2023-11-15 16:54:20
+CHIME-B,1037,≥2031,≥2037,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,786 km,,,10:30 desc,Planned,CHIME,,,2023-11-15 16:54:04
+CICERO,828,23 Jun 2017,≥2026,Community Initiative for Continuing Earth Radio Occultation,"GeoOptics
+",SunSync,550 km,,,,Operational,CION,0-20009-0-265,,2026-02-02 16:34:23
+CICERO-2,950,25 May 2022,≥2035,Community Initiative for Continuing Earth Radio Occultation,"GeoOptics
+",SunSync,,,,,Operational,CION-2,0-20009-0-266,,2022-07-04 08:00:02
+CIMR-A,886,≥2029,≥2036,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,832 km,,,06:00 desc,Planned,CIMR,0-20009-0-,,2025-03-31 09:52:28
+CIMR-B,1041,≥2035,≥2042,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,820 km,,,06:00 desc,Planned,CIMR,0-20009-0-,,2025-02-26 11:43:49
+CIRCE,978,09 Jan 2023,09 Jan 2023,Coordinated Ionospheric Reconstruction CubeSat Experiment,"UKSA
+NRL",DRIFT,555 km,,90°,,Lost at launch,"INMS
+RadMon
+TOPCAT-II
+Tri-TIP",0-20009-0-,,2026-02-02 17:23:06
+CLARREO-1A,31,TBD,TBD,Climate Absolute Radiance and Refractivity Observatory ,"NASA
+",DRIFT,609 km,,90°,,Mission concept,"GNSS-RO
+IR spectrometer",,,2022-06-23 16:18:29
+CLARREO-1B,560,TBD,TBD,Climate Absolute Radiance and Refractivity Observatory ,"NASA
+",DRIFT,609 km,,90°,,Mission concept,SW spectrometer,,,2016-06-30 01:46:43
+CLARREO-2A,559,TBD,TBD,Climate Absolute Radiance and Refractivity Observatory ,"NASA
+",DRIFT,609 km,,90°,,Mission concept,"GNSS-RO
+IR spectrometer",,,2016-06-30 01:47:21
+CLARREO-2B,561,TBD,TBD,Climate Absolute Radiance and Refractivity Observatory ,"NASA
+",DRIFT,609 km,,90°,,Mission concept,SW spectrometer,,,2016-06-30 01:48:19
+CloudSat,32,28 Apr 2006,01 Aug 2023,CloudSat,"NASA
+",SunSync,689 km,,,13:30 asc,Inactive,CPR (CloudSat),0-20009-0-788,,2024-04-29 07:28:13
+CLUSTER-1,471,09 Aug 2000,22 Oct 2025,Cluster,"ESA
+NASA",MAG,,,90°,,Inactive,"ASPOC
+CIS
+EDI
+EFW (CLUSTER)
+FGM
+PEACE
+RAPID
+STAFF
+WBD
+WHISPER",0-20009-0-,,2025-10-24 14:30:39
+CLUSTER-2,887,16 Jul 2000,08 Sep 2024,Cluster,"ESA
+NASA",MAG,,,90°,,Inactive,"ASPOC
+CIS
+EDI
+EFW (CLUSTER)
+FGM
+PEACE
+RAPID
+STAFF
+WBD
+WHISPER",0-20009-0-,,2025-10-24 14:53:10
+CLUSTER-3,472,16 Jul 2000,08 Sep 2024,Cluster,"ESA
+NASA",MAG,,,90°,,Inactive,"ASPOC
+CIS
+EDI
+EFW (CLUSTER)
+FGM
+PEACE
+RAPID
+STAFF
+WBD
+WHISPER",0-20009-0-,,2025-12-22 11:35:36
+CLUSTER-4,888,09 Aug 2000,08 Sep 2024,Cluster,"ESA
+NASA",MAG,,,90°,,Inactive,"ASPOC
+CIS
+EDI
+EFW (CLUSTER)
+FGM
+PEACE
+RAPID
+STAFF
+WBD
+WHISPER",0-20009-0-,,2025-11-24 10:48:28
+CO2Image,975,≥2026,≥2029,Carbon Dioxide Image,"DLR
+",SunSync,500 km,,,11:00 asc,Considered,COSIS,,,2022-10-24 08:13:53
+CO2M-A,913,≥2027,≥2034,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,735 km,,,11:30 desc,Planned,"CLIM
+CO2I and NO2I
+MAP",0-20009-0-006,,2025-12-22 09:53:23
+CO2M-B,979,≥2028,≥2035,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,735 km,,,11:30 desc,Planned,"CLIM
+CO2I and NO2I
+MAP",0-20009-0-007,,2026-03-23 08:24:23
+CO2M-C,1013,≥2029,≥2036,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,735 km,,,11:30 desc,Planned,"CLIM
+CO2I and NO2I
+MAP",0-20009-0-008,,2026-03-23 08:24:50
+COMPIRA,595,≥2026,≥2029,Coastal and Ocean measurement Mission with Precise and Innovative Radar Altimeter,"JAXA
+",DRIFT,TBD km,,51°,,Planned,"Altimeter (COMPIRA)
+SHIOSAI",0-20009-0-,,2026-02-09 10:23:22
+COMS,33,26 Jun 2010,01 Apr 2021,"Communication, Oceanography and Meteorology Satellite","KMA
+KARI
+ME (NIER)
+MLTM",GEO,35786 km,128.2 ° E,,,Inactive,"GOCI
+MI",0-20009-0-810,,2024-04-15 10:30:46
+Coriolis,36,06 Jan 2003,Dec 2020,Coriolis,"DoD
+NASA",SunSync,838 km,,,06:10 desc,Inactive,"SMEI
+WindSat",0-20009-0-283,,2022-03-21 08:53:49
+Coronas-F,568,31 Jul 2001,06 Dec 2005,Complex Orbital Observations Near-Earth of Activity of the Sun,"Roscosmos
+",DRIFT,550 km,,82.5°,,Inactive,"AVS
+DIFOS
+DIOGENESS
+HELICON
+IMAP-5
+IRIS (Coronas)
+RES-C
+RESIK
+RPS-1
+SKL-particles
+SKL-rad
+SORS
+SPR-N
+SUFR-Sp-C
+TEREK-C
+VUSS",,,2015-07-27 19:59:35
+Coronas-I,567,02 Mar 1994,15 Jul 1994,Complex Orbital Observations Near-Earth of Activity of the Sun,"Roscosmos
+",DRIFT,550 km,,82.5°,,Inactive,"AVS
+DIFOS
+DIOGENESS
+HELICON
+IRIS (Coronas)
+RES-C
+SKL-particles
+SKL-rad
+SORS
+SUFR-Sp-C
+TEREK-C
+VUSS",,,2015-07-27 20:00:42
+Coronas-Photon,473,30 Jan 2009,01 Dec 2009,Complex Orbital Observations Near-Earth of Activity of the Sun,"Roscosmos
+",DRIFT,550 km,,82.5°,,Inactive,"BRM
+Electron-M-PESCA
+Konus-RF
+Natalya-2M-particles
+Natalya-2M-rad
+PHOKA
+Penguin-M
+RT-2
+SM-8M
+STEP-F
+TESIS",,,2015-07-27 20:01:48
+COSMIC-1,37,14 Apr 2006,06 May 2020,"Constellation Observing System for Meteorology, Ionosphere & Climate","NSPO
+NOAA
+UCAR",DRIFT,800 km,,72°,,Inactive,"CERTO/TBB
+IGOR (COSMIC)
+TIP",0-20009-0-740,,2021-05-20 23:07:10
+COSMIC-2,450,25 Jun 2019,≥2026,"Constellation Observing System for Meteorology, Ionosphere & Climate","NSPO
+NOAA
+UCAR",DRIFT,520 km,,24°,,Operational,"RFB
+TGRS (COSMIC-2)
+VIDI",0-20009-0-741,,2025-11-17 12:23:05
+CRISTAL-A,914,≥2028,≥2034,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",DRIFT,717 km,,92°,,Planned,"AMR-CR
+GPS (ESA)
+HRMR
+IRIS (CRISTAL)
+LRR (ESA)",,,2023-11-15 16:59:01
+CRISTAL-B,1038,≥2031,≥2036,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",DRIFT,717 km,,92°,,Planned,"AMR-CR
+GPS (ESA)
+HRMR
+IRIS (CRISTAL)
+LRR (ESA)",,,2023-11-15 17:00:53
+CRRES,710,25 Jul 1990,12 Oct 1991,Combined Release and Radiation Effects Satellite,"NASA
+DoD",DRIFT,3400 km,,18°,,Inactive,MEA,,,2016-10-10 16:55:24
+CryoSat,38,08 Oct 2005,08 Oct 2005,CryoSat,"ESA
+",SunSync,717 km,,92°,,Inactive,"DORIS
+LRR (ESA)
+SIRAL",-20009--,,2024-04-15 09:09:52
+CryoSat-2,39,08 Apr 2010,≥2028,CryoSat,"ESA
+",DRIFT,717 km,,92°,,Operational,"DORIS
+LRR (ESA)
+SIRAL",0-20009-0-047,,2026-01-16 13:40:51
+CSG-1,40,18 Dec 2019,≥2026,COSMO-SkyMed Second Generation,"ASI
+",SunSync,619 km,,,05:46 asc,Operational,CSG-SAR,,,2022-03-01 17:27:18
+CSG-2,41,31 Jan 2022,≥2029,COSMO-SkyMed Second Generation,"ASI
+",SunSync,619 km,,,05:46 asc,Operational,CSG-SAR,,,2022-09-26 08:28:19
+CSG-3,940,03 Jan 2026,≥2032,COSMO-SkyMed Second Generation,"ASI
+",SunSync,619 km,,,,Commissioning,CSG-SAR,-20009--,,2026-01-05 09:04:11
+CSG-4,941,≥2026,≥2033,COSMO-SkyMed Second Generation,"ASI
+",SunSync,,,,,Planned,CSG-SAR,,,2023-11-14 17:50:17
+CSIM,726,03 Dec 2018,Feb 2022,Compact Spectral Irradiance Monitor,"NASA
+",DRIFT,587 km,,97.7°,,Inactive,SIM,,,2022-03-21 09:00:52
+CSK-1,42,08 Jun 2007,≥2026,COSMO-SkyMed,"ASI
+",SunSync,629.5 km,,,05:46 asc,Operational,SAR-2000,,,2026-01-19 13:23:11
+CSK-2,43,09 Dec 2007,≥2026,COSMO-SkyMed,"ASI
+",SunSync,629.5 km,,,05:46 asc,Operational,SAR-2000,,,2026-01-19 13:23:11
+CSK-3,44,25 Oct 2008,≥2026,COSMO-SkyMed,"ASI
+",SunSync,629.5 km,,,05:46 asc,Operational,SAR-2000,,,2026-01-19 13:23:11
+CSK-4,45,06 Nov 2010,≥2026,COSMO-SkyMed,"ASI
+",SunSync,629.5 km,,,05:46 asc,Operational,SAR-2000,,,2026-01-19 13:33:02
+CTIM-FD,961,02 Jul 2022,Jul 2024,Compact Total Irradiance Monitor-Flight Demonstration,"NASA
+",DRIFT,500 km,,44.9°,,Inactive,CTIM-FD,-20009--,,2024-11-04 08:25:02
+CYGNSS (8 sats),547,15 Dec 2016,≥2026,Cyclone Global Navigation Satellite System,"NASA
+",DRIFT,500 km,,35°,,Operational,DDMI,,,2023-12-18 09:05:06
+Deimos-1,46,29 Jul 2009,≥2019,Deimos,"Elecnor-Deimos
+",SunSync,660 km,,,10:30 asc,Presumably inactive,SLIM6,,,2020-01-01 03:14:49
+Deimos-2,629,19 Jun 2014,≥2026,Deimos,"Elecnor-Deimos
+",SunSync,620 km,,,10:30 asc,Operational,HiRAIS,0-20009-0-,,2026-02-02 17:13:01
+DESDynI,47,TBD,TBD,"Deformation, Ecosystem Structure, and Dynamics of Ice","NASA
+",SunSync,400 km,,,06:00 desc,Mission concept,"InSAR
+VCL",,,2018-06-20 23:26:16
+Diadéme-1,636,08 Feb 1967,≥2050,Diadéme,"CNES
+",DRIFT,698 km,,39.9°,,Operational,RRA (CNES),,,2015-07-28 09:56:31
+Diadéme-2,637,15 Feb 1967,≥2050,Diadéme,"CNES
+",DRIFT,990 km,,39.4°,,Operational,RRA (CNES),,,2015-07-28 09:57:00
+DMSP-F01,48,11 Sep 1976,17 Sep 1979,Defense Meteorological Satellite Program - Block 5D-1,"DoD
+NOAA",SunSync,820 km,,,06:20 desc,Inactive,"OLS
+SEM/SSB/X-2
+SEM/SSJ4
+SSH",0-20009-0-746,,2023-03-06 11:22:51
+DMSP-F02,49,04 Jun 1977,19 Mar 1978,Defense Meteorological Satellite Program - Block 5D-1,"DoD
+NOAA",SunSync,832 km,,,10:00 desc,Inactive,"OLS
+SEM/SSB/X-2
+SEM/SSI/ES-2
+SEM/SSJ4
+SSH",0-20009-0-747,,2023-03-06 11:22:42
+DMSP-F03,50,30 Apr 1978,01 Dec 1979,Defense Meteorological Satellite Program - Block 5D-1,"DoD
+NOAA",SunSync,810 km,,,06:20 desc,Inactive,"OLS
+SEM/SSB/X-2
+SEM/SSJ4
+SSH",0-20009-0-748,,2023-03-06 11:22:26
+DMSP-F04,51,06 Jun 1979,09 Aug 1980,Defense Meteorological Satellite Program - Block 5D-1,"DoD
+NOAA",SunSync,840 km,,,10:00 desc,Inactive,"OLS
+SEM/SSI/ES-2
+SEM/SSJ4
+SSH
+SSM/T",0-20009-0-749,,2023-03-06 11:22:02
+DMSP-F05,52,14 Jul 1980,14 Jul 1980,Defense Meteorological Satellite Program - Block 5D-1,"DoD
+NOAA",SunSync,820 km,,,06:20 desc,Inactive,"OLS
+SEM/SSB/X-2
+SEM/SSI/ES-2
+SEM/SSJ4",,,2021-10-29 07:01:45
+DMSP-F06,53,21 Dec 1982,10 Nov 1997,Defense Meteorological Satellite Program - Block 5D-2,"DoD
+NOAA",SunSync,824 km,,,06:20 desc,Inactive,"OLS
+SEM/SSB/X-2
+SEM/SSI/ES-2
+SEM/SSJ4",,,2015-07-28 10:03:42
+DMSP-F07,54,18 Nov 1983,16 May 1988,Defense Meteorological Satellite Program - Block 5D-2,"DoD
+NOAA",SunSync,835 km,,,10:10 desc,Inactive,"OLS
+SEM/SSB/X-2
+SEM/SSI/ES-2
+SEM/SSJ4
+SEM/SSM
+SSM/T",0-20009-0-240,,2015-07-28 10:04:22
+DMSP-F08,55,18 Jun 1987,01 Oct 2006,Defense Meteorological Satellite Program - Block 5D-2,"DoD
+NOAA",SunSync,856 km,,,06:10 desc,Inactive,"OLS
+SEM/SSB/X-2
+SEM/SSI/ES-2
+SEM/SSJ4
+SSM/I
+SSM/T",0-20009-0-241,,2015-07-28 10:05:20
+DMSP-F09,56,03 Feb 1988,01 Aug 1994,Defense Meteorological Satellite Program - Block 5D-2,"DoD
+NOAA",SunSync,832 km,,,09:30 desc,Inactive,"OLS
+SEM/SSI/ES-2
+SEM/SSJ4
+SSM/T",0-20009-0-242,,2015-07-28 10:06:13
+DMSP-F10,57,01 Dec 1990,24 Oct 1997,Defense Meteorological Satellite Program - Block 5D-2,"DoD
+NOAA",SunSync,790 km,,,07:30 desc,Inactive,"OLS
+SEM/SSB/X-2
+SEM/SSI/ES-2
+SEM/SSJ4
+SSM/I
+SSM/T",0-20009-0-243,,2015-07-28 10:07:01
+DMSP-F11,58,28 Nov 1991,07 Aug 2000,Defense Meteorological Satellite Program - Block 5D-2,"DoD
+NOAA",SunSync,853 km,,,05:00 desc,Inactive,"OLS
+SEM/SSB/X-2
+SEM/SSI/ES-2
+SEM/SSJ4
+SSM/I
+SSM/T
+SSM/T-2",0-20009-0-244,,2015-07-28 10:07:58
+DMSP-F12,59,29 Aug 1994,13 Oct 2008,Defense Meteorological Satellite Program - Block 5D-2,"DoD
+NOAA",SunSync,850 km,,,03:35 desc,Inactive,"OLS
+SEM/SSB/X-2
+SEM/SSI/ES-2
+SEM/SSJ4
+SEM/SSM
+SSM/I
+SSM/T
+SSM/T-2",0-20009-0-245,,2015-07-28 10:08:49
+DMSP-F13,60,24 Mar 1995,03 Feb 2015,Defense Meteorological Satellite Program - Block 5D-2,"DoD
+NOAA",SunSync,850 km,,,05:51 desc,Inactive,"OLS
+SEM/SSB/X-2
+SEM/SSI/ES-2
+SEM/SSJ4
+SEM/SSM
+SSM/I
+SSM/T",0-20009-0-246,,2015-07-28 10:09:45
+DMSP-F14,61,04 Apr 1997,11 Feb 2020,Defense Meteorological Satellite Program - Block 5D-2,"DoD
+NOAA",SunSync,852 km,,,05:00 desc,Inactive,"OLS
+SEM/SSI/ES-2
+SEM/SSJ4
+SEM/SSM
+SSM/I
+SSM/T
+SSM/T-2",0-20009-0-247,,2023-06-05 10:24:16
+DMSP-F15,62,12 Dec 1999,Dec 2020,Defense Meteorological Satellite Program - Block 5D-3,"DoD
+NOAA",SunSync,850 km,,,14:50 asc,Inactive,"OLS
+SEM/SSI/ES-2
+SEM/SSJ4
+SESS/SSM-Boom
+SSM/I
+SSM/T
+SSM/T-2",0-20009-0-248,,2021-10-18 10:16:10
+DMSP-F16,63,18 Oct 2003,≥2023,Defense Meteorological Satellite Program - Block 5D-3,"DoD
+NOAA",SunSync,848 km,,,06:20 desc,Inactive,"OLS
+SESS/SSI/ES-3
+SESS/SSJ5
+SESS/SSM-Boom
+SESS/SSULI
+SESS/SSUSI
+SSMIS",0-20009-0-249,,2025-06-30 10:49:52
+DMSP-F17,64,04 Nov 2006,Sep 2026,Defense Meteorological Satellite Program - Block 5D-3,"DoD
+NOAA",SunSync,848 km,,,06:35 desc,Operational,"OLS
+SESS/SSI/ES-3
+SESS/SSJ5
+SESS/SSM-Boom
+SESS/SSULI
+SESS/SSUSI
+SSMIS",0-20009-0-285,,2025-11-17 10:35:22
+DMSP-F18,65,18 Oct 2009,Sep 2026,Defense Meteorological Satellite Program - Block 5D-3,"DoD
+NOAA",SunSync,850 km,,,04:30 desc,Operational,"OLS
+SESS/SSI/ES-3
+SESS/SSJ5
+SESS/SSM-Boom
+SESS/SSULI
+SESS/SSUSI
+SSMIS",0-20009-0-286,,2025-11-17 10:35:55
+DMSP-F19,66,03 Apr 2014,11 Feb 2016,Defense Meteorological Satellite Program - Block 5D-3,"DoD
+NOAA",SunSync,850 km,,,06:36 desc,Inactive,"OLS
+SESS/SSI/ES-3
+SESS/SSJ5
+SESS/SSM-Boom
+SESS/SSULI
+SESS/SSUSI
+SSMIS",0-20009-0-287,,2024-04-12 09:59:27
+DQ-1,937,15 Apr 2022,≥2030,Gao Fen,"CNSA
+",SunSync,705 km,,,13:00 asc,Operational,"ACDL
+DPC-2
+EMI-2
+POSP
+WSI",,,2023-03-06 14:09:25
+DQ-2,946,≥2026,≥2033,Gao Fen,"CNSA
+",SunSync,705 km,,,13:00 asc,Planned,"ACDL
+GAS-2",0-20009-0-,,2025-03-31 09:13:35
+DSCOVR,525,11 Feb 2015,≥2029,Deep Space Climate Observatory,"NOAA
+NASA",L1,1.5e+06 km,N/A ° E,N/A,N/A,Operational,"EPIC (DSCOVR)
+ES
+FC
+MAG (DSCOVR)
+NISTAR",0-20009-0-,,2026-02-02 08:14:21
+DubaiSat-1,68,29 Jul 2009,09 May 2016,DubaiSat,"EIAST
+",SunSync,686 km,,,10:30 desc,Inactive,DMAC,,,2017-08-03 00:31:52
+DubaiSat-2,565,21 Nov 2013,≥2022,DubaiSat,"EIAST
+",SunSync,600 km,,,10:30 desc,Inactive,HiRAIS,0-20009-0-,,2026-02-02 16:58:52
+DubaiSat-3,773,29 Oct 2018,≥2026,DubaiSat,"EIAST
+",SunSync,613 km,,,10:30 desc,Operational,KHCS,0-20009-0-,,2026-02-02 16:58:25
+EarthCARE,71,28 May 2024,≥2034,"Earth Clouds, Aerosol and Radiation Explorer","ESA
+JAXA",SunSync,394 km,,,14:00 desc,Operational,"ATLID
+BBR
+CPR (Earth-CARE)
+MSI",0-20009-0-049,,2026-02-03 13:22:36
+EDGE,1162,≥2030,≥2033,Earth Dynamics Geodetic Explorer,"NASA
+",SunSync,390 km,,,06:00 ,Planned,EDGE LIDAR,0-20009-0-0,,2026-02-16 11:23:34
+EDRS-C,931,06 Aug 2019,≥2034,European Data Relay System,"ESA
+Airbus",GEO,35786 km,31 ° E,,,Operational,RMU,,,2022-03-07 11:39:33
+EgyptSat-1,596,17 Apr 2007,19 Jul 2010,EgyptSat,"NARSS
+",SunSync,668 km,,,10:30 desc,Inactive,"IREI
+MBEI",,,2015-07-27 20:31:46
+EgyptSat-2,597,16 Apr 2014,09 Jun 2015,EgyptSat,"NARSS
+",DRIFT,634 km,,,10:30 desc,Inactive,MSI (EgyptSat),,,2021-11-04 14:02:13
+EgyptSat-A,768,21 Feb 2019,≥2026,EgyptSat,"NARSS
+",SunSync,668 km,,,10:30 desc,Operational,MSI (EgyptSat),0-20009-0-,,2026-02-02 17:25:13
+Electro-GOMS,72,31 Oct 1994,15 Nov 2000,Electro,"RosHydroMet
+Roscosmos",GEO,35786 km,76.5 ° E,,,Inactive,"DCS (Electro)
+RMS-platform
+RMS-solar
+RMS/MAG
+STR (Electro)",,,2015-07-28 10:17:12
+Electro-L N1,73,20 Jan 2011,≥2016,Electro,"RosHydroMet
+Roscosmos",GEO,35786 km,29.6 ° W,,,Inactive,"DCS (Electro)
+GEOS&R (Electro)
+GGAK-E/DIR-E
+GGAK-E/GALS-E
+GGAK-E/SKIF-6
+GGAK-E/SKL-E
+GGAK-E/VUSS-E
+MSU-GS",,,2017-07-18 12:35:53
+Electro-L N2,74,11 Dec 2015,≥2026,Electro,"RosHydroMet
+Roscosmos",GEO,35786 km,14.5 ° W,,,Operational,"DCS (Electro)
+GEOS&R (Electro)
+GGAK-E/DIR-E
+GGAK-E/GALS-E
+GGAK-E/SKIF-6
+GGAK-E/SKL-E
+GGAK-E/VUSS-E
+MSU-GS",-20009--,,2026-01-19 13:33:02
+Electro-L N3,474,24 Dec 2019,≥2029,Electro,"RosHydroMet
+Roscosmos",GEO,35786 km,76 ° E,,,Operational,"DCS (Electro)
+GEOS&R (Electro)
+GGAK-E/DIR-E
+GGAK-E/GALS-E
+GGAK-E/SKIF-6
+GGAK-E/SKL-E
+GGAK-E/VUSS-E
+MSU-GS",-20009--,,2024-09-30 13:00:48
+Electro-L N4,613,05 Feb 2023,≥2033,Electro,"RosHydroMet
+Roscosmos",GEO,35786 km,165.8 ° E,,,Operational,"DCS (Electro)
+GEOS&R (Electro)
+GGAK-E/DIR-E
+GGAK-E/FM-E
+GGAK-E/GALS-E
+GGAK-E/ISP-2M
+GGAK-E/SKIF-6
+GGAK-E/SKL-E
+GGAK-E/VUSS-E
+MSU-GS",-20009--,,2024-09-30 13:01:05
+Electro-L N5,800,12 Feb 2026,≥2035,Electro,"RosHydroMet
+Roscosmos",GEO,35786 km,120 ° E,,,Commissioning,"DCS (Electro)
+GEOS&R (Electro)
+GGAK-E/DIR-E
+GGAK-E/FM-E
+GGAK-E/GALS-E
+GGAK-E/ISP-2M
+GGAK-E/SKIF-6
+GGAK-E/SKL-E
+GGAK-E/VUSS-E
+MSU-GS",-20009--,,2026-02-12 21:14:24
+Electro-L N6,1065,≥2030,≥2039,Electro,"RosHydroMet
+Roscosmos",GEO,35786 km,,,,Planned,"DCS (Electro)
+GEOS&R (Electro)
+GGAK-E/DIR-E
+GGAK-E/FM-E
+GGAK-E/GALS-E
+GGAK-E/ISP-2M
+GGAK-E/SKIF-6
+GGAK-E/SKL-E
+GGAK-E/VUSS-E
+MSU-GS",-20009--,,2025-06-05 09:25:08
+Electro-L N7,1066,≥2033,≥2041,Electro,"RosHydroMet
+Roscosmos",GEO,35786 km,,,,Planned,"DCS (Electro)
+GEOS&R (Electro)
+GGAK-E/DIR-E
+GGAK-E/FM-E
+GGAK-E/GALS-E
+GGAK-E/ISP-2M
+GGAK-E/SKIF-6
+GGAK-E/SKL-E
+GGAK-E/VUSS-E
+MSU-GS",-20009--,,2026-01-23 14:23:49
+Electro-M N1-1,75,≥2036,≥2046,Electro,"RosHydroMet
+Roscosmos",GEO,35786 km,,,,Planned,"DCS (Electro)
+ERBR
+GEOS&R (Electro)
+GGAK-E/DIR-E
+GGAK-E/FM-E
+GGAK-E/GALS-E
+GGAK-E/ISP-2M
+GGAK-E/SKIF-6
+GGAK-E/VUSS-E
+IRFS-GS
+LM
+MSU-GSM",-20009--,,2026-02-02 08:15:49
+Electro-M N1-2,76,≥2036,≥2046,Electro,"RosHydroMet
+Roscosmos",GEO,35786 km,,,,Planned,"DCS (Electro)
+ERBR
+GEOS&R (Electro)
+GGAK-E/DIR-E
+GGAK-E/FM-E
+GGAK-E/GALS-E
+GGAK-E/ISP-2M
+GGAK-E/SKIF-6
+GGAK-E/VUSS-E
+IRFS-GS
+LM
+MSU-GSM",-20009--,,2026-02-02 08:17:03
+EnMAP,77,01 Apr 2022,≥2026,Environmental Mapping and Analysis Programme,"DLR
+",SunSync,653 km,,,11:00 desc,Operational,HSI (EnMAP),,,2023-03-06 14:07:27
+Envisat,78,01 Mar 2002,08 Apr 2012,Environmental Satellite,"ESA
+",SunSync,774 km,,,10:00 desc,Inactive,"AATSR
+ASAR
+DORIS
+GOMOS
+LRR (ESA)
+MERIS
+MIPAS
+MWR (Envisat)
+RA-2
+SCIAMACHY-limb
+SCIAMACHY-nadir",0-20009-0-060,,2019-10-29 21:24:03
+EOS 03,526,11 Aug 2021,11 Aug 2021,Geostationary High Resolution Imager,"ISRO
+",GEO,35786 km,85.5 ° E,,,Lost at launch,"HyS-SWIR
+HyS-VNIR
+MX-LWIR
+MX-VNIR",,,2021-08-13 18:58:57
+EOS-01,805,07 Nov 2020,≥2026,Radar Imaging Satellite,"ISRO
+",DRIFT,555 km,,37°,,Operational,SAR-X (RISAT-2),0-20009-0-,,2026-02-02 15:47:29
+EOS-04,604,14 Feb 2022,≥2027,Radar Imaging Satellite,"ISRO
+",SunSync,529 km,,,06:00 desc,Operational,SAR-C (RISAT),,,2023-07-24 08:50:54
+EOS-07,996,10 Feb 2023,≥2026,Indian Microsat,"ISRO
+",DRIFT,450 km,,37.2°,,Operational,MHS (EOS-07),-20009--,,2026-02-02 16:10:50
+EOS-08,1070,16 Aug 2024,≥2026,Indian Microsat,"ISRO
+",DRIFT,475 km,,37.4°,,Operational,"EOIR
+GNSS-R (MicroSat-2C)
+SiC UV Dosimeter",-20009--,,2025-01-09 11:23:34
+EPS-Aeolus 2,985,≥2034,≥2039,Eumetsat Polar System - Aeolus,"EUMETSAT
+ESA",SunSync,,,,06:00 desc,Considered,,-20009--,,2026-02-04 14:15:01
+EPS-Sterna-1,1008,≥2029,≥2042,Eumetsat Polar System Sterna,"EUMETSAT
+ESA",SunSync,595 km,,,03:30 desc,Planned,MWR (Sterna),-20009--,,2026-03-23 08:36:47
+EPS-Sterna-2,1009,≥2029,≥2042,Eumetsat Polar System Sterna,"EUMETSAT
+ESA",SunSync,595 km,,,07:30 desc,Planned,MWR (Sterna),-20009--,,2025-02-24 16:44:25
+EPS-Sterna-3,1010,≥2029,≥2042,Eumetsat Polar System Sterna,"EUMETSAT
+ESA",SunSync,595 km,,,11:30 desc,Planned,MWR (Sterna),-20009--,,2025-02-24 16:44:45
+ERBS,88,05 Oct 1984,14 Oct 2005,Earth Radiation Budget Satellite,"NASA
+",DRIFT,610 km,,57°,,Inactive,"ERBE
+SAGE-II",0-20009-0-780,,2015-07-27 20:36:18
+ERS-1,89,17 Jul 1991,10 Mar 2000,European Remote-sensing Satellite,"ESA
+",SunSync,785 km,,,10:30 desc,Inactive,"AMI-SAR
+AMI-SCAT
+ATSR
+LRR (ESA)
+PRARE
+RA",0-20009-0-001,,2022-05-13 13:11:01
+ERS-2,90,21 Apr 1995,06 Jul 2011,European Remote-sensing Satellite,"ESA
+",SunSync,785 km,,,10:30 desc,Inactive,"AMI-SAR
+AMI-SCAT
+ATSR-2
+GOME
+LRR (ESA)
+MWR (Envisat)
+PRARE
+RA",0-20009-0-002,,2019-10-30 02:22:16
+ESSA-1,91,03 Feb 1966,08 Mar 1967,TIROS Operational System,"NOAA
+NASA",SunSync,770 km,,,09:30 desc,Inactive,"FPR
+VCS-WA",,,2015-07-27 20:38:40
+ESSA-2,92,28 Feb 1966,16 Oct 1970,TIROS Operational System,"NOAA
+NASA",SunSync,1390 km,,,09:30 desc,Inactive,APT,,,2015-07-27 20:39:09
+ESSA-3,93,02 Oct 1966,02 Dec 1968,TIROS Operational System,"NOAA
+NASA",SunSync,1440 km,,,09:30 desc,Inactive,"AVCS
+FPR",,,2015-07-27 20:39:42
+ESSA-4,94,26 Jan 1967,05 May 1968,TIROS Operational System,"NOAA
+NASA",SunSync,1380 km,,,09:30 desc,Inactive,APT,,,2015-07-27 20:40:14
+ESSA-5,95,20 Apr 1967,20 Feb 1970,TIROS Operational System,"NOAA
+NASA",SunSync,1390 km,,,09:30 desc,Inactive,"AVCS
+FPR",,,2015-07-27 20:41:00
+ESSA-6,96,10 Nov 1967,03 Dec 1969,TIROS Operational System,"NOAA
+NASA",SunSync,1450 km,,,09:30 desc,Inactive,APT,,,2015-07-27 20:41:27
+ESSA-7,97,16 Aug 1968,10 Mar 1970,TIROS Operational System,"NOAA
+NASA",SunSync,1450 km,,,09:30 desc,Inactive,"AVCS
+FPR",,,2015-07-27 20:49:48
+ESSA-8,98,15 Dec 1968,12 Mar 1976,TIROS Operational System,"NOAA
+NASA",SunSync,1440 km,,,09:30 desc,Inactive,APT,,,2015-07-27 20:51:31
+ESSA-9,99,26 Feb 1969,12 Nov 1972,TIROS Operational System,"NOAA
+NASA",SunSync,1470 km,,,09:30 desc,Inactive,"AVCS
+FPR",,,2015-07-27 20:52:19
+EWS-G1,1114,Oct 2019,≥2024,Electro-optical Infrared Weather System-Geostationary mission,"DoD
+NOAA
+USAF",GEO,35786 km,61.5 ° E,,,Inactive,"DCIS
+GEOS&R
+IMAGER (GOES 12-15)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+SOUNDER
+SXI",-20009--,,2025-03-10 14:31:48
+EWS-G2,1113,Dec 2023,≥2027,Electro-optical Infrared Weather System-Geostationary mission,"DoD
+NOAA
+USAF",GEO,35786 km,61.5 ° E,,,Operational,"DCIS
+GEOS&R
+IMAGER (GOES 12-15)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+SOUNDER
+SXI",0-20009-0-,,2025-03-10 14:33:07
+Explorer-VII,713,13 Oct 1959,24 Aug 1961,Explorer-VII,"NASA
+",DRIFT,722 km,,50.28°,,Inactive,FPR,,,2016-10-19 18:12:37
+Falcon-Eye 1,780,11 Jul 2019,11 Jul 2019,Falcon-Eye,"EIAST
+",SunSync,610 km,,,10:30 desc,Inactive,HiRI,,,2019-09-16 17:51:43
+Falcon-Eye 2,781,02 Dec 2020,≥2026,Falcon-Eye,"EIAST
+",SunSync,610 km,,,10:30 desc,Operational,HiRI,0-20009-0-,,2026-02-02 16:30:03
+FireSat-Pathfinder,1100,15 Mar 2025,≥2028,MuSat Constellation,"MUON SPACE
+",SunSync,,,,,Operational,Radiometer(FireSat),0-20009-0-0,,2025-10-16 20:14:53
+FLEX,511,Apr 2026,≥2029,FLuorescence EXplorer,"ESA
+",SunSync,800 km,,,10:00 desc,Planned,FLORIS,,,2023-11-06 09:04:50
+FLOCK,911,09 Jan 2014,≥2040,Planetscope,"Planet
+",SunSync,475 km,,,10:30 desc,Operational,FLOCK,-20009--,,2025-11-29 16:17:53
+FORMOSAT-1,733,26 Jan 1999,17 Jun 2004,FORMOSAT,"NSPO
+UCAR",DRIFT,600 km,,35°,,Inactive,"IPEI
+OCI (FORMOSAT)",,,2017-08-01 11:17:04
+FORMOSAT-2,100,21 May 2004,19 Aug 2016,FORMOSAT,"NSPO
+UCAR",SunSync,891 km,,,09:30 desc,Inactive,"ISUAL
+RSI",,,2017-08-01 01:47:34
+FORMOSAT-5,734,24 Aug 2017,≥2026,FORMOSAT,"NSPO
+UCAR",SunSync,720 km,,,10:00 desc,Operational,"AIP
+RSI (FORMOSAT-5)",0-20009-0-,,2026-02-02 17:18:42
+FORUM,876,≥2028,≥2033,Far-infrared Outgoing Radiation Understanding and Monitoring,"ESA
+",SunSync,835 km,,,09:30 desc,Planned,FSI,0-20009-0-,,2026-02-09 10:53:59
+FY-1A,101,07 Sep 1988,16 Oct 1988,Feng-Yun - 1,"CMA
+NRSCC",SunSync,900 km,,,15:30 asc,Inactive,"MVISR
+SEM/HEPD
+SEM/IMS",,,2021-03-19 22:43:46
+FY-1B,102,03 Sep 1990,05 Aug 1991,Feng-Yun - 1,"CMA
+NRSCC",SunSync,900 km,,,07:50 desc,Inactive,"MVISR
+SEM/HEPD
+SEM/IMS",,,2018-10-11 15:18:05
+FY-1C,103,10 May 1999,26 Apr 2004,Feng-Yun - 1,"CMA
+NRSCC",SunSync,862 km,,,07:00 desc,Inactive,"MVISR
+SEM/HEPD
+SEM/IMS",0-20009-0-500,,2017-12-11 00:47:59
+FY-1D,104,15 May 2002,01 Apr 2012,Feng-Yun - 1,"CMA
+NRSCC",SunSync,866 km,,,09:00 desc,Inactive,"MVISR
+SEM/HEPD
+SEM/IMS",0-20009-0-501,,2017-12-11 00:48:29
+FY-2A,105,10 Jun 1997,08 Apr 1998,Feng-Yun - 2,"CMA
+NRSCC",GEO,35786 km,105 ° E,,,Inactive,"DCS (FY)
+S-VISSR (FY-2A/B)
+SEM (FY-2)",,,2019-05-30 21:01:41
+FY-2B,106,25 Jun 2000,Sep 2004,Feng-Yun - 2,"CMA
+NRSCC",GEO,35786 km,105 ° E,,,Inactive,"DCS (FY)
+S-VISSR (FY-2A/B)
+SEM (FY-2)",0-20009-0-512,,2019-05-30 21:02:21
+FY-2C,107,19 Oct 2004,23 Nov 2009,Feng-Yun - 2,"CMA
+NRSCC",GEO,35786 km,105 ° E,,,Inactive,"DCS (FY)
+S-VISSR (FY-2C/D/E)
+SEM (FY-2)",0-20009-0-513,,2019-05-30 21:03:15
+FY-2D,108,08 Dec 2006,Jul 2015,Feng-Yun - 2,"CMA
+NRSCC",GEO,35786 km,86.5 ° E,,,Inactive,"DCS (FY)
+S-VISSR (FY-2C/D/E)
+SEM (FY-2)",0-20009-0-514,,2019-05-30 21:03:58
+FY-2E,109,23 Dec 2008,31 Dec 2018,Feng-Yun - 2,"CMA
+NRSCC",GEO,35786 km,86.5 ° E,,,Inactive,"DCS (FY)
+S-VISSR (FY-2C/D/E)
+SEM (FY-2)",0-20009-0-515,,2019-11-27 04:46:04
+FY-2F,110,13 Jan 2012,01 Apr 2022,Feng-Yun - 2,"CMA
+NRSCC",GEO,35786 km,112 ° E,,,Inactive,"DCS (FY)
+S-VISSR (FY-2F/G/H)
+SEM (FY-2)
+SXM",0-20009-0-516,,2025-12-15 16:42:13
+FY-2G,111,31 Dec 2014,≥2026,Feng-Yun - 2,"CMA
+NRSCC",GEO,35786 km,99.2 ° E,,,Operational,"DCS (FY)
+S-VISSR (FY-2F/G/H)
+SEM (FY-2)
+SXM",0-20009-0-517,,2026-01-19 13:33:02
+FY-2H,112,05 Jun 2018,≥2026,Feng-Yun - 2,"CMA
+NRSCC",GEO,35786 km,79 ° E,,,Operational,"DCS (FY)
+S-VISSR (FY-2F/G/H)
+SEM (FY-2)
+SXM",0-20009-0-518,,2026-01-19 13:33:02
+FY-3A,113,27 May 2008,05 Jan 2015,Feng-Yun - 3,"CMA
+NRSCC",SunSync,834 km,,,09:05 desc,Inactive,"ERM-1
+IRAS
+MERSI-1
+MWHS-1
+MWRI-1
+MWTS-1
+SBUS
+SEM/HEPD
+SEM/IMS
+SIM-1
+TOU
+VIRR (FY-3)",0-20009-0-520,,2022-12-07 08:54:57
+FY-3B,114,04 Nov 2010,09 Dec 2021,Feng-Yun - 3,"CMA
+NRSCC",SunSync,836 km,,,14:45 asc,Inactive,"ERM-1
+IRAS
+MERSI-1
+MWHS-1
+MWRI-1
+MWTS-1
+SBUS
+SEM/HEPD
+SEM/IMS
+SIM-1
+TOU
+VIRR (FY-3)",0-20009-0-521,,2023-11-13 16:32:38
+FY-3C,115,23 Sep 2013,28 Nov 2024,Feng-Yun - 3,"CMA
+NRSCC",SunSync,836 km,,,08:20 desc,Inactive,"ERM-1
+GNOS
+IRAS
+MERSI-1
+MWHS-2
+MWRI-1
+MWTS-2
+SBUS
+SEM/HEPD
+SEM/IMS
+SIM-1
+TOU
+VIRR (FY-3)",0-20009-0-522,,2025-04-07 10:57:20
+FY-3D,116,14 Nov 2017,≥2026,Feng-Yun - 3,"CMA
+NRSCC",SunSync,836 km,,,14:00 asc,Operational,"GAS
+GNOS
+HIRAS
+MERSI-2
+MWHS-2
+MWRI-1
+MWTS-2
+SEM/HEPD
+SWS/IPM
+SWS/WAI",0-20009-0-523,,2026-01-26 09:29:57
+FY-3E,117,04 Jul 2021,≥2029,Feng-Yun - 3,"CMA
+NRSCC",SunSync,836 km,,,05:40 desc,Operational,"GNOS-2
+HIRAS-2
+MERSI-LL
+MWHS-2
+MWTS-3
+SIM-2
+SSIM
+SWS/SEM/HEPD
+SWS/Tri-IPM
+WindRAD
+XEUVI",0-20009-0-524,,2026-01-26 09:31:00
+FY-3F,119,03 Aug 2023,≥2031,Feng-Yun - 3,"CMA
+NRSCC",SunSync,836 km,,,10:00 desc,Operational,"ERM-2
+GNOS-2
+HIRAS-2
+MERSI-3
+MWHS-2
+MWRI-2
+MWTS-3
+OMS-limb
+OMS-nadir
+SIM-2",0-20009-0-525,,2026-01-26 09:32:45
+FY-3G,520,16 Apr 2023,≥2029,Feng-Yun - 3,"CMA
+NRSCC",DRIFT,407 km,,50°,,Operational,"GNOS-2
+HAOC
+MERSI-RM
+MWRI-RM
+PMAI
+PMR (FY-3)",0-20009-0-526,,2025-11-03 08:45:01
+FY-3H,118,27 Sep 2025,≥2033,Feng-Yun - 3,"CMA
+NRSCC",SunSync,836 km,,,14:00 asc,Commissioning,"GAS-2
+GNOS-2
+HIRAS-2
+MERSI-3
+MWHS-2
+MWRI-2
+MWTS-3
+SWS/IPM
+SWS/WAI",-20009--,,2025-11-03 08:46:31
+FY-3I,521,≥2027,≥2033,Feng-Yun - 3,"CMA
+NRSCC",DRIFT,407 km,,50°,,Planned,"GNOS-2
+HAOC
+MERSI-RM
+MWRI-RM
+PMR (FY-3)
+SWS/SEM/NADD",0-20009-0-,,2025-11-03 08:47:20
+FY-3J,678,≥2026,≥2034,Feng-Yun - 3,"CMA
+NRSCC",SunSync,836 km,,,05:20 desc,Planned,"ENAI
+GNOS-2
+HIRAS-2
+MERSI-LL
+MWHS-2
+MWTS-3
+SIM-2
+SSIM
+SWS/SEM/FGM
+SWS/SEM/HEPD
+SWS/SEM/IMS
+SWS/Tri-IPM
+WindRAD
+XEUVI",-20009--,,2025-11-03 08:48:19
+FY-4A,120,10 Dec 2016,≥2026,Feng-Yun - 4,"CMA
+NRSCC",GEO,35786 km,123.5 ° E,,,Operational,"AGRI
+DCS (FY)
+GIIRS
+LMI
+SEP",0-20009-0-530,,2026-01-19 13:33:03
+FY-4B,121,02 Jun 2021,≥2029,Feng-Yun - 4,"CMA
+NRSCC",GEO,35786 km,105 ° E,,,Operational,"AGRI
+DCS (FY)
+GHI
+GIIRS-2
+SEP",0-20009-0-531,,2025-11-03 09:55:01
+FY-4C,122,26 Dec 2025,≥2033,Feng-Yun - 4,"CMA
+NRSCC",GEO,35786 km,133 ° E,,,Commissioning,"AGRI
+DCS (FY)
+GIIRS-2
+LMI
+MUSI
+SEP
+SEUVI (FY-4)
+SXEUV
+SXUS",-20009--,,2026-02-02 08:19:33
+FY-4D,123,≥2026,≥2034,Feng-Yun - 4,"CMA
+NRSCC",GEO,35786 km,,,,Planned,"AGRI
+DCS (FY)
+GIIRS-2
+LMI
+SEP
+SEUVI (FY-4)",-20009--,,2025-11-04 15:56:36
+FY-4E,124,≥2027,≥2035,Feng-Yun - 4,"CMA
+NRSCC",GEO,35786 km,,,,Planned,"AGRI
+DCS (FY)
+FGM (FY4)
+GHI
+GIIRS-2
+MUSI",-20009--,,2025-02-06 08:59:50
+FY-4F,1102,≥2029,≥2037,Feng-Yun - 4,"CMA
+NRSCC",GEO,35786 km,,,,Planned,"AGRI
+DCS (FY)
+GIIRS-2
+LMI
+SEP",-20009--,,2025-11-04 15:57:48
+FY-4M1,894,≥2026,≥2033,Feng-Yun - 4,"CMA
+NRSCC",GEO,35786 km,TBD ° E,,,Planned,"ENAI
+MWS (GEO)",0-20009-0-,,2025-10-29 08:52:25
+G20,1152,≥2027,≥2032,G20 Environmental Satellite,"ISRO
+",SunSync,720 km,,,11:35 desc,Planned,"EnSAC
+HyMATHS
+POLSAC
+SACFF",0-20009-0-0,,2025-11-10 17:50:45
+GACM,512,TBD,TBD,Global Atmospheric Composition Mission,"NASA
+",SunSync,,,,,Mission concept,O3 lidar,,,2018-06-20 23:25:00
+Galileo,711,21 Oct 2011,≥2031,Galileo,"ESA
+EC",DRIFT,23222 km,,56°,,Operational,EMU,,,2016-10-11 19:48:03
+GCOM-C,127,23 Dec 2017,≥2026,Global Change Observation Mission,"JAXA
+",SunSync,798 km,,,10:30 desc,Operational,SGLI,0-20009-0-123,,2026-01-19 13:33:03
+GCOM-W,130,17 May 2012,≥2026,Global Change Observation Mission,"JAXA
+",SunSync,700 km,,,13:30 asc,Operational,AMSR2,0-20009-0-122,,2026-01-19 13:33:03
+GEMS2- Amethyst,1120,≥2026,≥2029,Global Environmental Monitoring System – 2nd Generation,"Weatherstream
+",SunSync,,,,,Planned,GEMS2,0-20009-0-0,,2026-02-09 10:37:58
+GEMS2- Beryl,1121,≥2026,≥2029,Global Environmental Monitoring System – 2nd Generation,"Weatherstream
+",SunSync,,,,,Planned,GEMS2,0-20009-0-0,,2026-02-09 10:38:42
+GEO-CAPE,513,TBD,TBD,Geostationary Coastal and Air Pollution Events,"NASA
+",GEO,35786 km,100 ° W,,,Mission concept,,,,2016-06-30 01:55:42
+GEO-KOMPSAT-2A,34,04 Dec 2018,≥2029,"Communication, Oceanography and Meteorology Satellite","KMA
+KARI
+ME (NIER)
+MLTM",GEO,35786 km,128.2 ° E,,,Operational,"AMI
+KSEM/CM
+KSEM/MG (SOSMAG)
+KSEM/PD",0-20009-0-811,,2024-03-06 16:40:55
+GEO-KOMPSAT-2B,35,18 Feb 2020,≥2030,"Communication, Oceanography and Meteorology Satellite","KMA
+KARI
+ME (NIER)
+MLTM",GEO,35786 km,128.2 ° E,,,Operational,"GEMS
+GOCI-II",0-20009-0-814,,2025-01-16 09:15:52
+GEO-KOMPSAT-5,1131,≥2031,≥2041,"Communication, Oceanography and Meteorology Satellite","KMA
+KARI
+ME (NIER)
+MLTM",GEO,35786 km,128.2 ° E,,,Planned,"AMI (GK5)
+KSEM-II/CM
+KSEM-II HEEL
+KSEM-II HEPT
+KSEM-II SOSMAG-II
+KSEM-II SXRD",-20009--,,2026-01-14 17:07:12
+GeoEye-1,494,06 Sep 2008,≥2026,GeoEye,"Maxar
+GeoEye",SunSync,681 km,,,10:30 desc,Unclear,GIS,0-20009-0-,,2026-02-02 17:31:34
+GEOSat,133,12 Mar 1985,31 Jan 1990,Geodetic Satellite,"DoD
+NASA",DRIFT,785 km,,108°,,Inactive,GRA,,,2015-07-27 23:30:13
+GEOTAIL,475,02 Jul 1992,28 Jun 2022,GEOTAIL,"JAXA
+NASA",MAG,,,29°,,Inactive,"CPI
+EFD
+EPIC
+HEP
+LEP
+MGF
+PWI",0-20009-0-,,2025-12-22 11:34:16
+GeoXO 1,988,≥2032,≥2045,Geostationary Extended Observations,"NOAA
+NASA",GEO,35786 km,105 ° W,,,Planned,"ABI
+DCIS
+GLM",0-20009-0-,,2025-10-20 10:09:58
+GeoXO 2,987,≥2033,≥2041,Geostationary Extended Observations,"NOAA
+NASA",GEO,35786 km,105 ° W,,,Planned,"DCIS
+GXI
+GXS",0-20009-0-,,2026-02-02 08:22:26
+GeoXO 3,989,≥2039,≥2050,Geostationary Extended Observations,"NOAA
+NASA",GEO,35786 km,105 ° W,,,Planned,"DCIS
+GHI
+LMX",0-20009-0-,,2025-10-20 10:01:51
+GeoXO 4,1149,≥2043,≥2051,Geostationary Extended Observations,"NOAA
+NASA",GEO,35786 km,105 ° W,,,Planned,"DCIS
+GXI
+GXS",0-20009-0-,,2025-10-20 10:05:09
+GF-1,588,26 Apr 2013,≥2023,Gao Fen,"CNSA
+",SunSync,640 km,,,10:30 desc,Unclear,"PMS
+WFV",,,2023-12-21 10:49:37
+GF-1-02,741,31 Mar 2018,≥2025,Gao Fen,"CNSA
+",SunSync,640 km,,,10:30 desc,Operational,PMS,,,2025-01-09 10:26:29
+GF-1-03,742,31 Mar 2018,≥2025,Gao Fen,"CNSA
+",SunSync,640 km,,,10:30 desc,Operational,PMS,,,2025-01-09 10:26:29
+GF-1-04,743,31 Mar 2018,≥2025,Gao Fen,"CNSA
+",SunSync,640 km,,,10:30 desc,Operational,PMS,,,2025-01-09 10:26:29
+GF-10,798,04 Oct 2019,≥2027,Gao Fen,"CNSA
+",SunSync,613 km,,,10:30 desc,Operational,PMS-2,,,2020-09-08 18:55:30
+GF-11,765,31 Jul 2018,≥2026,Gao Fen,"CNSA
+",SunSync,412 km,,,10:30 desc,Operational,PMS-2,,,2020-09-08 18:47:59
+GF-11-02,879,07 Sep 2020,≥2028,Gao Fen,"CNSA
+",SunSync,415 km,,,10:30 desc,Operational,PMS-2,,,2021-03-02 23:48:44
+GF-11-03,902,20 Nov 2021,≥2028,Gao Fen,"CNSA
+",SunSync,450 km,,,10:30 desc,Operational,PMS-2,,,2022-02-01 16:16:46
+GF-11-04,981,27 Dec 2022,30 Nov 2027,Gao Fen,"CNSA
+",SunSync,450 km,,,10:30 desc,Operational,PMS-2,,,2023-07-10 10:22:47
+GF-11-05,1068,19 Jul 2024,≥2029,Gao Fen,"CNSA
+",SunSync,,,,10:30 desc,Operational,PMS-2,-20009--,,2025-01-09 11:24:47
+GF-12,808,27 Nov 2019,≥2027,Gao Fen,"CNSA
+",SunSync,635 km,,,06:00 desc,Operational,SAR-C (GF-3),,,2020-09-08 18:56:16
+GF-12-02,892,30 Mar 2021,≥2029,Gao Fen,"CNSA
+",SunSync,635 km,,,06:00 desc,Operational,SAR-C (GF-3),,,2021-08-25 17:16:20
+GF-12-03,956,27 Jun 2022,30 Nov 2028,Gao Fen,"CNSA
+",SunSync,635 km,,,06:00 desc,Operational,SAR-C (GF-3),,,2022-12-19 14:14:24
+GF-12-04,1017,20 Aug 2023,≥2029,Gao Fen,"CNSA
+",SunSync,635 km,,,06:00 desc,Operational,SAR-C (GF-3),,,2024-01-02 12:19:28
+GF-12-05,1087,15 Oct 2024,30 Nov 2029,Gao Fen,"CNSA
+",SunSync,635 km,,,06:00 desc,Operational,SAR-C (GF-3),-20009--,,2025-05-12 10:31:41
+GF-13,884,11 Oct 2020,≥2028,Gao Fen,"CNSA
+",GEO,35786 km,118 ° E,,,Operational,GF-4/13 imager,,,2023-03-20 08:30:54
+GF-13-02,986,17 Mar 2023,≥2030,Gao Fen,"CNSA
+",GEO,35786 km,117.9 ° E,,,Operational,GF-4/13 imager,,,2023-11-23 09:15:20
+GF-14,885,06 Dec 2020,≥2028,Gao Fen,"CNSA
+",SunSync,488 km,,,10:30 desc,Operational,PMS-2,,,2021-06-16 15:53:24
+GF-14-02,1150,26 Oct 2025,≥2030,Gao Fen,"CNSA
+",SunSync,488 km,,,10:30 desc,Commissioning,PMS-2,0-20009-0-,,2025-10-26 17:26:46
+GF-2,589,19 Aug 2014,≥2026,Gao Fen,"CNSA
+",SunSync,631 km,,,10:30 desc,Operational,PMS-2,0-20009-0-,,2026-02-09 10:17:25
+GF-3,607,09 Aug 2016,≥2025,Gao Fen,"CNSA
+",SunSync,758 km,,,06:00 desc,Operational,SAR-C (GF-3),,,2025-01-09 10:26:04
+GF-3(02) or CSAR-01,920,22 Nov 2021,≥2029,Gao Fen,"CNSA
+",SunSync,740 km,,,06:00 desc,Operational,"AIS
+SAR-C (GF-3)",0-20009-0-,,2025-02-19 11:25:50
+GF-3(03) or CSAR-02,936,06 Apr 2022,≥2030,Gao Fen,"CNSA
+",SunSync,740 km,,,06:00 desc,Operational,"AIS
+SAR-C (GF-3)",0-20009-0-,,2025-02-19 11:26:25
+GF-4,608,28 Dec 2015,≥2025,Gao Fen,"CNSA
+",GEO,35786 km,106 ° E,,,Operational,GF-4/13 imager,,,2025-01-09 10:26:04
+GF-5,609,08 May 2018,≥2020,Gao Fen,"CNSA
+",SunSync,705 km,,,13:30 asc,Inactive,"AHSI
+AIUS
+DPC
+EMI
+GMI (GF-5)
+VIMS",,,2021-11-18 14:17:21
+GF-5-01A,980,08 Dec 2022,≥2030,Gao Fen,"CNSA
+",SunSync,705 km,,,13:30 asc,Operational,"AHSI
+AIUS
+DPC
+EMI
+GMI (GF-5)
+VIMS",,,2023-07-10 10:20:43
+GF-5-02,910,07 Sep 2021,≥2028,Gao Fen,"CNSA
+",SunSync,705 km,,,13:30 asc,Operational,"AHSI
+AIUS
+DPC
+EMI
+GMI (GF-5)
+VIMS",,,2021-12-20 08:11:52
+GF-6,746,02 Jun 2018,≥2026,Gao Fen,"CNSA
+",SunSync,640 km,,,10:30 desc,Operational,"PMS
+WFV",,,2020-09-08 18:43:18
+GF-7,775,03 Nov 2019,≥2027,Gao Fen,"CNSA
+",SunSync,500 km,,,10:30 desc,Operational,PMS-2,,,2020-09-08 18:51:17
+GF-8,667,26 Jun 2015,≥2025,Gao Fen,"CNSA
+",SunSync,475 km,,,10:30 desc,Operational,PMS-2,,,2025-01-09 10:26:13
+GF-9,696,14 Sep 2015,≥2025,Gao Fen,"CNSA
+",SunSync,650 km,,,10:30 desc,Operational,PMS-2,,,2025-01-09 10:26:13
+GF-9-02,833,31 May 2020,≥2028,Gao Fen,"CNSA
+",SunSync,650 km,,,10:30 desc,Operational,PMS-2,,,2021-03-02 23:34:32
+GF-9-03,834,17 Jun 2020,≥2028,Gao Fen,"CNSA
+",SunSync,650 km,,,10:30 desc,Operational,PMS-2,,,2021-03-02 23:35:16
+GF-9-04,869,06 Aug 2020,≥2028,Gao Fen,"CNSA
+",SunSync,640 km,,,10:30 desc,Operational,PMS-2,,,2021-03-02 23:36:05
+GF-9-05,877,23 Aug 2020,≥2028,Gao Fen,"CNSA
+",SunSync,640 km,,,10:30 desc,Operational,PMS-2,,,2021-03-02 23:36:59
+GFO,134,10 Feb 1998,22 Oct 2008,Geodetic Satellite,"DoD
+NASA",DRIFT,784 km,,108°,,Inactive,"GFO-RA
+LRA (NASA)
+TRSR
+WVR",,,2015-07-27 23:32:42
+GFZ-1,591,19 Apr 1995,23 Jun 1999,GeoForschungsZentrum-1 Geodesy Satellite,"DLR
+",DRIFT,398 km,,51.6°,,Inactive,RRA,,,2015-07-27 23:33:34
+GHGSat,952,22 Jun 2016,≥2030,Greenhouse Gas Satellite,"GHGSat
+",SunSync,500 km,,97.5°,,Operational,"C&A
+GHGSat-Spectrometer",0-20009-0-,,2025-06-30 07:12:53
+GHOSt-1,994,15 Apr 2023,≥2028,Global Hyperspectral Observation Satellite,"OSK
+",SunSync,525 km,,,,Operational,GHOSt-Imager,,,2023-11-23 09:17:50
+GHOSt-2,995,15 Apr 2023,≥2028,Global Hyperspectral Observation Satellite,"OSK
+",SunSync,525 km,,,,Operational,GHOSt-Imager,,,2023-11-23 09:18:04
+GHOSt-3,1004,12 Jun 2023,≥2028,Global Hyperspectral Observation Satellite,"OSK
+",SunSync,525 km,,,,Operational,GHOSt-Imager,,,2023-11-23 09:18:19
+GHOSt-4,1052,04 Mar 2024,≥2029,Global Hyperspectral Observation Satellite,"OSK
+",SunSync,525 km,,,,Operational,GHOSt-Imager,-20009--,,2024-03-05 15:52:28
+GHOSt-5,1054,04 Mar 2024,≥2029,Global Hyperspectral Observation Satellite,"OSK
+",SunSync,525 km,,,,Operational,GHOSt-Imager,-20009--,,2024-03-05 15:54:30
+GLIMR,1067,≥2027,≥2029,Geosynchronous Littoral Imaging and Monitoring Radiometer,"NASA
+",GEO,,,,,Planned,HSI (GLIMR),-20009--,,2024-11-04 08:44:38
+Glory,135,04 Mar 2011,04 Mar 2011,Glory,"NASA
+",SunSync,705 km,,,13:30 asc,Lost at launch,"APS
+CC
+TIM ",,,2015-07-27 23:35:16
+GNOMES-1,901,30 Aug 2020,≥2021,GNSS Navigation and Occultation Measurement Satellites,"PlanetiQ
+",SunSync,600 km,,,TBD,Inactive,Pyxis-RO,,,2022-05-25 14:59:04
+GNOMES-2,947,30 Jun 2021,≥2026,GNSS Navigation and Occultation Measurement Satellites,"PlanetiQ
+",SunSync,525 km,,,TBD,Presumably inactive,Pyxis-RO,0-20009-0-,,2024-11-16 16:27:31
+GNOMES-3,948,01 Apr 2022,≥2027,GNSS Navigation and Occultation Measurement Satellites,"PlanetiQ
+",SunSync,645 km,,,TBD,Presumably inactive,Pyxis-RO,0-20009-0-,,2024-11-16 16:27:51
+GNOMES-4,1042,01 Dec 2023,≥2028,GNSS Navigation and Occultation Measurement Satellites,"PlanetiQ
+",SunSync,645 km,,,TBD,Operational,Pyxis-RO,0-20009-0-,,2025-11-17 12:20:49
+GNOMES-5,1073,16 Aug 2024,≥2028,GNSS Navigation and Occultation Measurement Satellites,"PlanetiQ
+",SunSync,645 km,,,TBD,Operational,Pyxis-RO,-20009--,,2025-11-17 12:21:08
+GOCE,136,17 Mar 2009,21 Oct 2013,Gravity Field and Steady-State Ocean Circulation Explorer,"ESA
+",SunSync,230 km,,,06:00 asc,Inactive,"EGG
+LRR (ESA)
+SSTI",,,2015-07-27 23:39:52
+GOES-1,137,16 Oct 1975,07 Mar 1985,Geostationary Operational Environmental Satellite - 1st generation,"NOAA
+NASA",GEO,35786 km,135 ° W,,,Inactive,"DCIS
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+VISSR",0-20009-0-731,,2015-07-28 10:52:00
+GOES-10,146,25 Apr 1997,01 Dec 2006,Geostationary Operational Environmental Satellite - 2nd generation,"NOAA
+NASA",GEO,35786 km,135 ° W,,,Inactive,"DCIS
+GEOS&R
+IMAGER (GOES 8-11)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+SOUNDER",0-20009-0-254,,2021-03-20 22:10:37
+GOES-10 (S-America),537,01 Dec 2006,02 Dec 2009,Geostationary Operational Environmental Satellite - 2nd generation,"NOAA
+NASA",GEO,35786 km,60 ° W,,,Inactive,"DCIS
+GEOS&R
+IMAGER (GOES 8-11)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+SOUNDER",,,2021-03-20 22:11:34
+GOES-11,147,03 May 2000,05 Dec 2011,Geostationary Operational Environmental Satellite - 2nd generation,"NOAA
+NASA",GEO,35786 km,135 ° W,,,Inactive,"DCIS
+GEOS&R
+IMAGER (GOES 8-11)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+SOUNDER",0-20009-0-255,,2021-03-20 22:12:28
+GOES-12,148,23 Jul 2001,10 May 2010,Geostationary Operational Environmental Satellite - 2nd generation,"NOAA
+NASA",GEO,35786 km,75 ° W,,,Inactive,"DCIS
+GEOS&R
+IMAGER (GOES 12-15)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+SOUNDER
+SXI",0-20009-0-256,,2021-03-20 22:13:24
+GOES-12 (S-America),538,10 May 2010,16 Aug 2013,Geostationary Operational Environmental Satellite - 2nd generation,"NOAA
+NASA",GEO,35786 km,60 ° W,,,Inactive,"DCIS
+GEOS&R
+IMAGER (GOES 12-15)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SOUNDER",,,2021-03-20 22:14:15
+GOES-13,149,24 May 2006,Oct 2019,Geostationary Operational Environmental Satellite - 2nd generation,"NOAA
+NASA",GEO,35786 km,61.5 ° E,,,Inactive,"DCIS
+GEOS&R
+IMAGER (GOES 12-15)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+SOUNDER
+SXI",0-20009-0-257,,2024-04-15 10:38:50
+GOES-14,150,27 Jun 2009,≥2027,Geostationary Operational Environmental Satellite - 2nd generation,"NOAA
+NASA",GEO,35786 km,108 ° W,,,Stand-by,"DCIS
+GEOS&R
+IMAGER (GOES 12-15)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+SOUNDER
+SXI",0-20009-0-258,,2024-04-15 10:40:13
+GOES-15,151,04 Mar 2010,Jun 2023,Geostationary Operational Environmental Satellite - 2nd generation,"NOAA
+NASA",GEO,35786 km,61.5 ° E,,,Inactive,"DCIS
+GEOS&R
+IMAGER (GOES 12-15)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+SOUNDER
+SXI",0-20009-0-259,,2023-09-25 07:00:46
+GOES-16,152,19 Nov 2016,≥2032,Geostationary Operational Environmental Satellite - 3rd generation,"NOAA
+NASA",GEO,35786 km,75.2 ° W,,,Back-up,"ABI
+DCIS
+EXIS
+GEOS&R
+GLM
+SEISS/EHIS
+SEISS/MPS
+SEISS/SGPS
+SEM/MAG
+SUVI",0-20009-0-270,,2025-08-08 13:44:18
+GOES-17,664,01 Mar 2018,≥2029,Geostationary Operational Environmental Satellite - 3rd generation,"NOAA
+NASA",GEO,35786 km,104.7 ° W,,,Stand-by,"ABI
+DCIS
+EXIS
+GEOS&R
+GLM
+SEISS/EHIS
+SEISS/MPS
+SEISS/SGPS
+SEM/MAG
+SUVI",0-20009-0-271,,2023-07-10 12:19:09
+GOES-18,665,01 Mar 2022,≥2041,Geostationary Operational Environmental Satellite - 3rd generation,"NOAA
+NASA",GEO,35786 km,137 ° W,,,Operational,"ABI
+DCIS
+EXIS
+GEOS&R
+GLM
+SEISS/EHIS
+SEISS/MPS
+SEISS/SGPS
+SEM/MAG
+SUVI",0-20009-0-272,,2026-02-02 08:23:20
+GOES-19,666,25 Jun 2024,≥2043,Geostationary Operational Environmental Satellite - 3rd generation,"NOAA
+NASA",GEO,35786 km,75.2 ° W,,,Operational,"ABI
+CCOR-1
+DCIS
+EXIS
+GEOS&R
+GLM
+SEISS/EHIS
+SEISS/MPS
+SEISS/SGPS
+SEM/MAG
+SUVI",0-20009-0-273,,2026-02-02 08:24:14
+GOES-2,138,16 Jun 1977,01 Jul 1993,Geostationary Operational Environmental Satellite - 1st generation,"NOAA
+NASA",GEO,35786 km,75 ° W,,,Inactive,"DCIS
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+VISSR",0-20009-0-732,,2015-07-28 11:03:33
+GOES-3,139,16 Jun 1978,01 Jul 1993,Geostationary Operational Environmental Satellite - 1st generation,"NOAA
+NASA",GEO,35786 km,135 ° W,,,Inactive,"DCIS
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+VISSR",0-20009-0-733,,2015-07-28 11:04:18
+GOES-4,140,09 Sep 1980,22 Nov 1988,Geostationary Operational Environmental Satellite - 1st generation,"NOAA
+NASA",GEO,35786 km,135 ° W,,,Inactive,"DCIS
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+VAS",0-20009-0-734,,2015-07-28 11:05:09
+GOES-5,141,22 May 1981,18 Jul 1990,Geostationary Operational Environmental Satellite - 1st generation,"NOAA
+NASA",GEO,35786 km,75 ° W,,,Inactive,"DCIS
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+VAS",0-20009-0-735,,2015-07-28 11:06:09
+GOES-6,142,28 Apr 1983,01 Jul 1989,Geostationary Operational Environmental Satellite - 1st generation,"NOAA
+NASA",GEO,35786 km,135 ° W,,,Inactive,"DCIS
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+VAS",0-20009-0-250,,2015-07-28 11:07:18
+GOES-7,143,26 Feb 1987,11 Jan 1996,Geostationary Operational Environmental Satellite - 1st generation,"NOAA
+NASA",GEO,35786 km,75 ° W,,,Inactive,"DCIS
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+VAS",0-20009-0-251,,2015-07-28 11:08:36
+GOES-8,144,13 Apr 1994,05 May 2004,Geostationary Operational Environmental Satellite - 2nd generation,"NOAA
+NASA",GEO,35786 km,75 ° W,,,Inactive,"DCIS
+GEOS&R
+IMAGER (GOES 8-11)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+SOUNDER",0-20009-0-252,,2021-03-20 22:07:16
+GOES-9,145,23 May 1995,22 May 2003,Geostationary Operational Environmental Satellite - 2nd generation,"NOAA
+NASA",GEO,35786 km,135 ° W,,,Inactive,"DCIS
+GEOS&R
+IMAGER (GOES 8-11)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+SOUNDER",0-20009-0-253,,2021-03-20 22:08:24
+GOES-9 (GMS backup),536,22 May 2003,24 Jul 2006,Geostationary Operational Environmental Satellite - 2nd generation,"NOAA
+NASA",GEO,35786 km,155 ° E,,,Inactive,"DCIS
+GEOS&R
+IMAGER (GOES 8-11)
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+SOUNDER",,,2021-03-20 22:09:18
+Göktürk-1A,714,05 Dec 2016,≥2026,Göktürk,"TÜBITAK-UZAY
+",SunSync,700 km,,,10:30 asc,Operational,HiRI,0-20009-0-,,2026-02-02 15:35:50
+Göktürk-2,550,18 Dec 2012,≥2023,Göktürk,"TÜBITAK-UZAY
+",SunSync,679 km,,,10:30 asc,Unclear,EOS-C,0-20009-0-,,2025-09-01 16:06:13
+GOSAT,154,23 Jan 2009,≥2026,Greenhouse gas Observing Satellite,"JAXA
+MOE",SunSync,666 km,,,13:00 desc,Operational,"TANSO-CAI
+TANSO-FTS",0-20009-0-140,,2026-01-19 13:33:03
+GOSAT-2,606,29 Oct 2018,≥2026,Greenhouse gas Observing Satellite,"JAXA
+MOE",SunSync,613 km,,,13:00 desc,Operational,"TANSO-CAI/2
+TANSO-FTS/2",0-20009-0-141,,2026-02-02 08:25:38
+GOSAT-GW,752,28 Jun 2025,≥2032,Greenhouse gas Observing Satellite,"JAXA
+MOE",SunSync,666 km,,,13:30 asc,Commissioning,"AMSR3
+TANSO-3",0-20009-0-142,,2025-09-09 14:17:21
+GPM Core Observatory,156,27 Feb 2014,≥2030,Global Precipitation Measurement mission,"NASA
+JAXA",DRIFT,442 km,,65°,,Operational,"DPR
+GMI (core)",0-20009-0-288,,2025-11-17 11:46:57
+GRACE A,158,17 Mar 2002,27 Oct 2017,Gravity Recovery and Climate Experiment,"NASA
+DLR",DRIFT,337 km,,89°,,Inactive,"BlackJack (GRACE)
+HAIRS
+LRR (DLR)
+SCA (GRACE)
+SuperSTAR",0-20009-0-722,,2025-10-06 09:12:18
+GRACE B,1146,17 Mar 2002,27 Oct 2017,Gravity Recovery and Climate Experiment,"NASA
+DLR",DRIFT,337 km,,89°,,Inactive,"BlackJack (GRACE)
+HAIRS
+LRR (DLR)
+SCA (GRACE)
+SuperSTAR",0-20009-0-723,,2025-10-06 09:11:07
+GRACE C (GRACE-FO),159,22 May 2018,≥2028,Gravity Recovery and Climate Experiment,"NASA
+DLR",DRIFT,490 km,,89°,,Operational,"HAIRS
+LRR (DLR)
+SCA (GRACE)
+SuperSTAR
+Tri-G (GRACE-FO)",0-20009-0-803,,2025-11-17 12:25:14
+GRACE D (GRACE-FO),1147,22 May 2018,≥2028,Gravity Recovery and Climate Experiment,"NASA
+DLR",DRIFT,490 km,,89°,,Operational,"HAIRS
+LRR (DLR)
+SCA (GRACE)
+SuperSTAR
+Tri-G (GRACE-FO)",0-20009-0-804,,2025-11-17 12:24:45
+GRACE-Continuity,1117,≥2028,≥2035,Gravity Recovery and Climate Experiment,"NASA
+DLR",DRIFT,490 km,,89°,,Planned,"HAIRS
+LRR (DLR)
+SCA (GRACE)
+SuperSTAR
+Tri-G (GRACE-FO)",-20009--,,2025-10-20 10:37:02
+Harmony-1,1002,≥2029,≥2034,Harmony,"ESA
+",SunSync,693 km,,,06:00 desc,Planned,,,,2023-06-12 13:04:19
+Harmony-2,1003,≥2029,≥2034,Harmony,"ESA
+",SunSync,693 km,,,06:00 desc,Planned,,,,2023-06-12 13:07:06
+HCMM,586,26 Apr 1978,30 Sep 1980,Heat Capacity Mapping Mission,"NASA
+",SunSync,620 km,,,14:00 asc,Inactive,HCMR,,,2015-07-27 23:53:22
+Himawari-1 (GMS-1),160,14 Jul 1977,30 Jun 1989,Himawari 1st generation (Geostationary Meteorological Satellite),"JMA
+JAXA",GEO,35786 km,140 ° E,,,Inactive,"DCS (Himawari)
+RMS (Himawari)
+VISSR (Himawari 1-4)",0-20009-0-153,,2021-03-11 15:40:27
+Himawari-10,992,≥2030,≥2046,Himawari 4th Generation ,"JMA
+",GEO,35786 km,140.7 ° E,,,Planned,"DCS (Himawari)
+GHMI
+GHMS
+RMS (Himawari)",-20009--,,2025-08-29 09:13:50
+Himawari-2 (GMS-2),161,11 Aug 1981,20 Nov 1987,Himawari 1st generation (Geostationary Meteorological Satellite),"JMA
+JAXA",GEO,35786 km,140 ° E,,,Inactive,"DCS (Himawari)
+RMS (Himawari)
+VISSR (Himawari 1-4)",0-20009-0-154,,2021-03-11 15:40:54
+Himawari-3 (GMS-3),162,03 Aug 1984,22 Jun 1995,Himawari 1st generation (Geostationary Meteorological Satellite),"JMA
+JAXA",GEO,35786 km,140 ° E,,,Inactive,"DCS (Himawari)
+RMS (Himawari)
+VISSR (Himawari 1-4)",0-20009-0-150,,2021-03-11 15:41:59
+Himawari-4 (GMS-4),163,06 Sep 1989,24 Feb 2000,Himawari 1st generation (Geostationary Meteorological Satellite),"JMA
+JAXA",GEO,35786 km,140 ° E,,,Inactive,"DCS (Himawari)
+RMS (Himawari)
+VISSR (Himawari 1-4)",0-20009-0-151,,2021-03-11 15:42:54
+Himawari-5 (GMS-5),164,18 Mar 1995,22 May 2003,Himawari 1st generation (Geostationary Meteorological Satellite),"JMA
+JAXA",GEO,35786 km,140 ° E,,,Inactive,"DCS (Himawari)
+VISSR (Himawari-5)",0-20009-0-152,,2021-03-11 15:43:23
+Himawari-6 (MTSAT-1R),165,26 Feb 2005,04 Dec 2015,Himawari 2nd generation (Multifunction Transport Satellite),"JMA
+JCAB",GEO,35786 km,140 ° E,,,Inactive,"DCS (Himawari)
+JAMI",0-20009-0-171,,2021-03-11 15:44:09
+Himawari-7 (MTSAT-2),166,18 Feb 2006,10 May 2016,Himawari 2nd generation (Multifunction Transport Satellite),"JMA
+JCAB",GEO,35786 km,145 ° E,,,Inactive,"DCS (Himawari)
+IMAGER (MTSAT-2)",0-20009-0-172,,2021-03-11 15:44:35
+Himawari-8,167,07 Oct 2014,≥2030,Himawari 3rd generation,"JMA
+",GEO,35786 km,140.7 ° E,,,Stand-by,"AHI
+DCS (Himawari)",0-20009-0-173,,2025-11-26 08:57:30
+Himawari-9,671,02 Nov 2016,≥2034,Himawari 3rd generation,"JMA
+",GEO,35786 km,140.7 ° E,,,Operational,"AHI
+DCS (Himawari)",0-20009-0-174,,2025-11-26 08:59:23
+HJ-1A,169,06 Sep 2008,≥2018,Huan Jing,"CRESDA
+CAST",SunSync,650 km,,,10:30 desc,Inactive,"HSI
+WVC",,,2019-12-28 20:13:00
+HJ-1B,170,06 Sep 2008,≥2018,Huan Jing,"CRESDA
+CAST",SunSync,650 km,,,10:30 desc,Presumably inactive,"IRMSS (HJ)
+WVC",,,2019-12-28 20:11:57
+HJ-1C,171,18 Nov 2012,≥2023,Huan Jing,"CRESDA
+CAST",SunSync,502 km,,,06:00 desc,Inactive,SAR-S,0-20009-0-,,2025-08-18 15:06:10
+HJ-2A,880,27 Sep 2020,≥2026,Huan Jing,"CRESDA
+CAST",SunSync,650 km,,,10:30 desc,Operational,"HSI-2
+IRMSS-2 (HJ)
+WVC-2",0-20009-0-,,2026-02-02 16:16:37
+HJ-2B,882,27 Sep 2020,≥2026,Huan Jing,"CRESDA
+CAST",SunSync,650 km,,,10:30 desc,Operational,"HSI-2
+IRMSS-2 (HJ)
+WVC-2",0-20009-0-,,2026-02-02 16:17:39
+HJ-2E,973,13 Oct 2022,≥2030,Huan Jing,"CRESDA
+CAST",SunSync,500 km,,,07:00 desc,Operational,SAR-S,,,2023-03-06 14:13:53
+HJ-2F,974,08 Aug 2023,≥2031,Huan Jing,"CRESDA
+CAST",SunSync,506 km,,,06:00 desc,Operational,SAR-S,-20009--,,2024-03-25 11:58:44
+HOTBIRD 13F,1098,15 Oct 2022,≥2037,European Data Relay System,"ESA
+Airbus",GEO,35786 km,13 ° E,,,Operational,ICARE-NG,0-20009-0-,,2025-01-27 11:08:12
+HOTBIRD 13G,1099,03 Nov 2022,≥2037,European Data Relay System,"ESA
+Airbus",GEO,35786 km,13 ° E,,,Operational,ICARE-NG,0-20009-0-,,2025-01-27 11:10:39
+HOTSAT-1,1020,12 Jun 2023,Dec 2023,HOTSAT,"SSTL
+UKSA",SunSync,536 km,,,12:00 desc,Operational,HotSat Imager,,,2023-12-15 19:14:26
+HRMIS,1043,03 Jul 2020,≥2030,High Resolution Multi-mode Imaging Satellite,"CAST
+",SunSync,,,,10:30 desc,Operational,"HRC(HRMIS)
+SMAC",,,2023-12-04 09:51:16
+HRSAT-1A,749,≥2027,≥2029,High Resolution Satellite - 1,"ISRO
+",SunSync,660 km,,,09:30 desc,Planned,HRSAT-1,0-20009-0-,,2024-11-25 14:41:36
+HRSAT-1B,792,≥2027,≥2029,High Resolution Satellite - 1,"ISRO
+",SunSync,660 km,,,09:30 desc,Planned,HRSAT-1,0-20009-0-,,2024-11-25 14:41:51
+HRWS-SAR,638,≥2029,≥2036,TerraSAR,"DLR
+",SunSync,515 km,,,06:00 desc,Planned,HRWS-SAR,,,2023-08-31 08:57:19
+HY-1A,172,15 May 2002,30 Mar 2004,Hai Yang 1,"NSOAS
+CAST",SunSync,795 km,,,10:30 desc,Inactive,"COCTS
+CZI",,,2020-06-11 10:44:45
+HY-1B,173,11 Apr 2007,13 Feb 2016,Hai Yang 1,"NSOAS
+CAST",SunSync,798 km,,,10:30 desc,Inactive,"COCTS
+CZI",,,2020-09-17 11:49:36
+HY-1C,174,07 Sep 2018,≥2026,Hai Yang 1,"NSOAS
+CAST",SunSync,785 km,,,10:30 desc,Operational,"AIS
+COCTS
+CZI
+SCS
+UVI(HY)",-20009--,,2026-01-19 13:33:03
+HY-1D,175,10 Jun 2020,≥2026,Hai Yang 1,"NSOAS
+CAST",SunSync,798 km,,,13:30 asc,Operational,"AIS
+COCTS
+CZI
+SCS
+UVI(HY)",-20009--,,2024-09-02 10:47:35
+HY-1F,681,≥2028,≥2036,Hai Yang 1,"NSOAS
+CAST",SunSync,798 km,,,13:30 asc,Planned,"AIS
+COCTS2
+CZI2
+PMRIS",0-20009-0-,,2024-11-16 16:24:29
+HY-2A,176,16 Aug 2011,≥2022,Hai Yang 2,"NSOAS
+CAST",SunSync,975 km,,,06:00 desc,Presumably inactive,"ALT (sso)
+CMR
+DORIS
+HSCAT
+LRA (NASA)
+MWRI (HY-2)",0-20009-0-502,,2023-12-11 08:20:22
+HY-2B,555,25 Oct 2018,≥2026,Hai Yang 2,"NSOAS
+CAST",SunSync,973 km,,,06:00 desc,Operational,"ALT (sso)
+CMR
+HSCAT
+LRA (NASA)
+MWRI (HY-2)",0-20009-0-503,,2026-02-02 15:43:18
+HY-2C,556,21 Sep 2020,≥2026,Hai Yang 2,"NSOAS
+CAST",DRIFT,1336 km,,66°,,Operational,"ALT (high)
+CMR
+DORIS
+HSCAT
+LRA (NASA)",0-20009-0-504,,2026-02-02 16:20:32
+HY-2D,557,19 May 2021,≥2026,Hai Yang 2,"NSOAS
+CAST",DRIFT,973 km,,66°,,Operational,"ALT (high)
+CMR
+DORIS
+HSCAT
+LRA (NASA)",0-20009-0-505,,2023-11-20 11:34:02
+HY-2E,682,≥2026,≥2031,Hai Yang 2,"NSOAS
+CAST",SunSync,973 km,,,06:00 desc,Planned,"ALT (sso)
+CMR
+HSCAT
+LRA (NASA)
+MWRI (HY-2)",0-20009-0-,,2024-11-16 12:00:59
+HY-2F,683,≥2026,≥2031,Hai Yang 2,"NSOAS
+CAST",DRIFT,1336 km,,66°,,Planned,"ALT (high)
+CMR
+DORIS
+HSCAT
+LRA (NASA)",0-20009-0-,,2024-11-16 11:58:59
+HY-2L (CFOSAT-FO),688,≥2030,≥2038,Chinese-French Oceanography Satellite,"NSOAS
+CNES",SunSync,500 km,,,07:00 desc,Planned,"CSCAT
+SWIM",0-20009-0-,,2024-11-18 13:33:43
+HY-2N,685,≥2028,≥2033,Hai Yang 2,"NSOAS
+CAST",DRIFT,1336 km,,66°,,Planned,,0-20009-0-,,2024-11-16 12:00:23
+HY-3A (HY-1E),680,16 Nov 2023,≥2031,Hai Yang 3,"NSOAS
+CAST",SunSync,781 km,,,10:30 desc,Operational,"AIS
+COCTS2
+CZI2
+PMRIS",-20009--,,2025-05-12 09:06:10
+HY-3B,1122,≥2027,≥2035,Hai Yang 3,"NSOAS
+CAST",SunSync,,,,,Planned,"AIS
+COCTS2
+CZI2
+PMRIS",-20009--,,2025-05-12 09:51:09
+HY-3C,643,≥2028,≥2038,Hai Yang 3,"NSOAS
+CAST",GEO,35786 km,TBD ° E,,,Planned,,0-20009-0-,,2025-05-12 09:02:40
+HY-3D,687,≥2028,≥2036,Hai Yang 3,"NSOAS
+CAST",GEO,35786 km,TBD ° E,,,Planned,,0-20009-0-,,2024-11-16 12:15:17
+HY-4A (or HY-2S),686,13 Nov 2024,≥2033,Hai Yang 4,"NSOAS
+",SunSync,654 km,,,06:00 desc,Operational,"IMR
+MICAP",0-20009-0-,,2026-03-25 09:47:30
+HydroGNSS-1,999,28 Nov 2025,≥2029,Hydro Global Navigation Satellite System,"ESA
+SSTL
+UKSA",SunSync,550 km,,,10:30 ,Commissioning,GNSS-R,-20009--,,2025-11-29 16:12:51
+HydroGNSS-2,1000,28 Nov 2025,≥2029,Hydro Global Navigation Satellite System,"ESA
+SSTL
+UKSA",SunSync,550 km,,,10:30 ,Commissioning,GNSS-R,-20009--,,2025-11-29 16:13:43
+HYMS IOD,993,11 Jan 2026,≥2028,Hyperspectral Microwave Sounder,"SPIRE
+",SunSync,550 km,,,,Commissioning,HYMS,0-20009-0-,,2026-01-12 09:18:26
+HySIS,769,29 Nov 2018,≥2026,Hyper Spectral Imaging Spectrometer,"ISRO
+",SunSync,630 km,,,10:34 desc,Operational,HySIS,0-20009-0-,,2026-02-02 17:28:54
+HyspIRI,514,TBD,TBD,Hyperspectral Infra-Red Imager,"NASA
+",SunSync,TBD km,,,,Mission concept,,,,2016-06-30 01:54:05
+IBEX,575,19 Oct 2008,≥2023,Interstellar Boundary Explorer,"NASA
+",MAG,,,11°,,Unclear,IBEX,0-20009-0-,,2025-12-22 11:52:49
+ICESat,177,12 Jan 2003,14 Aug 2010,"Ice, Cloud and land Elevation Satellite","NASA
+",DRIFT,600 km,,94°,,Inactive,"GLAS
+LRA (NASA)
+TRSR",,,2015-07-28 00:17:52
+ICESat-2,178,15 Sep 2018,≥2034,"Ice, Cloud and land Elevation Satellite","NASA
+",DRIFT,481 km,,94°,,Operational,"ATLAS
+LRA (NASA)
+TRSR",0-20009-0-,,2025-04-07 15:15:51
+ICEYE,829,03 Dec 2018,≥2040,ICEYE,"ICEYE
+ESA",SunSync,600 km,,,TBD,Operational,ICEYE SAR,-20009--,,2026-01-12 09:12:56
+ICON,632,11 Oct 2019,≥2026, Ionospheric Connection Explorer ,"NASA
+",DRIFT,575 km,,27°,,Operational,"EUV (ICON)
+FUV (ICON)
+IVM
+MIGHTI",0-20009-0-,,2026-02-02 15:47:00
+Ikonos,502,24 Sep 1999,31 Mar 2015,GeoEye,"Maxar
+GeoEye",SunSync,686 km,,,10:30 desc,Inactive,OSA,,,2017-08-03 10:33:23
+IMAGE,599,25 Mar 2000,15 Dec 2005,Imager for Magnetopause-to-Aurora Global Exploration,"NASA
+",MAG,6782 km,,90°,,Inactive,"EUV
+FUV/GEO
+FUV/SI
+FUV/WIC
+HENA
+LENA
+MENA
+RPI",,,2015-07-28 11:39:42
+IMAP,984,24 Sep 2025,≥2029,Interstellar Mapping and Acceleration Probe,"NASA
+",L1,1.5e+06 km,,,N/A,Commissioning,"CoDICE
+GLOWS
+HIT
+IDEX
+IMAP-Hi
+IMAP-Lo
+IMAP-Ultra
+MAG
+SWAPI
+SWE (IMAP)",0-20009-0-,,2026-03-06 11:24:10
+IMS-1,179,28 Apr 2008,20 Sep 2012,Indian Mini-Satellite,"ISRO
+",SunSync,632 km,,,09:30 desc,Inactive,"HySI-T
+Mx-T",,,2018-03-20 12:29:30
+INCUS-1,1048,≥2027,≥2029,INvestigation of Convective Updrafts,"NASA
+",DRIFT,,,,,Planned,INCUS-radar,-20009--,,2024-06-10 10:35:23
+INCUS-2,1049,≥2027,≥2029,INvestigation of Convective Updrafts,"NASA
+",DRIFT,,,,,Planned,"INCUS-radar
+MM Radiometer",-20009--,,2024-06-10 10:35:41
+INCUS-3,1050,≥2027,≥2029,INvestigation of Convective Updrafts,"NASA
+",DRIFT,,,,,Planned,INCUS-radar,-20009--,,2024-06-10 10:36:04
+INSAT-1A,181,10 Apr 1982,06 Sep 1982,Indian National Satellite - 1,"ISRO
+",GEO,35786 km,74 ° E,,,Inactive,"DCS (INSAT)
+VHRR (INSAT)",,,2015-07-28 12:23:57
+INSAT-1B,182,30 Aug 1983,15 Jul 1993,Indian National Satellite - 1,"ISRO
+",GEO,35786 km,74 ° E,,,Inactive,"DCS (INSAT)
+VHRR (INSAT)",0-20009-0-430,,2015-07-28 12:24:40
+INSAT-1C,183,22 Jul 1988,22 Nov 1989,Indian National Satellite - 1,"ISRO
+",GEO,35786 km,93.5 ° E,,,Inactive,"DCS (INSAT)
+VHRR (INSAT)",0-20009-0-431,,2015-07-28 12:25:13
+INSAT-1D,184,12 Jun 1990,14 May 2002,Indian National Satellite - 1,"ISRO
+",GEO,35786 km,74 ° E,,,Inactive,"DCS (INSAT)
+VHRR (INSAT)",0-20009-0-432,,2015-07-28 12:25:50
+INSAT-2A,185,10 Jul 1992,30 May 2002,Indian National Satellite - 2,"ISRO
+",GEO,35786 km,74 ° E,,,Inactive,"DCS (INSAT)
+SAS&R
+VHRR (INSAT)",0-20009-0-450,,2015-07-28 12:26:29
+INSAT-2B,186,23 Jul 1993,01 Jul 2004,Indian National Satellite - 2,"ISRO
+",GEO,35786 km,93.5 ° E,,,Inactive,"DCS (INSAT)
+SAS&R
+VHRR (INSAT)",0-20009-0-451,,2015-07-28 12:27:14
+INSAT-2C,187,07 Dec 1995,15 Apr 2002,Indian National Satellite - 2,"ISRO
+",GEO,35786 km,93.5 ° E,,,Inactive,,,,2015-07-28 12:27:58
+INSAT-2D,188,04 Jun 1997,04 Oct 1997,Indian National Satellite - 2,"ISRO
+",GEO,35786 km,93.5 ° E,,,Inactive,"DCS (INSAT)
+SAS&R
+VHRR (INSAT)",,,2015-07-28 12:28:35
+INSAT-2E,189,03 Apr 1999,15 Apr 2012,Indian National Satellite - 2,"ISRO
+",GEO,35786 km,83 ° E,,,Inactive,"CCD
+DCS (INSAT)
+SAS&R
+VHRR (INSAT)",0-20009-0-452,,2015-07-28 12:29:33
+INSAT-3A,190,10 Apr 2003,Sep 2016,Indian National Satellite - 3,"IMD
+ISRO",GEO,35786 km,93.5 ° E,,,Inactive,"CCD
+DCS (INSAT)
+SAS&R
+VHRR (INSAT)",0-20009-0-470,,2017-07-17 17:09:14
+INSAT-3B,191,22 Mar 2000,02 Nov 2010,Indian National Satellite - 3,"IMD
+ISRO",GEO,35786 km,83 ° E,,,Inactive,,,,2017-01-20 10:45:19
+INSAT-3C,192,24 Jan 2002,≥2014,Indian National Satellite - 3,"IMD
+ISRO",GEO,35786 km,74 ° E,,,Inactive,,,,2017-07-17 17:18:07
+INSAT-3D,193,25 Jul 2013,01 Oct 2024,Indian National Satellite - 3,"IMD
+ISRO",GEO,35786 km,129.5 ° E,,,Back-up,"DCS (INSAT)
+IMAGER (INSAT)
+SAS&R
+SOUNDER (INSAT)",0-20009-0-471,,2025-12-15 10:56:26
+INSAT-3DR,194,08 Sep 2016,≥2026,Indian National Satellite - 3,"IMD
+ISRO",GEO,35786 km,74 ° E,,,Operational,"DCS (INSAT)
+IMAGER (INSAT)
+SAS&R
+SOUNDER (INSAT)",0-20009-0-473,,2022-03-21 14:49:09
+INSAT-3DS,603,17 Feb 2024,≥2034,Indian National Satellite - 3,"IMD
+ISRO",GEO,35786 km,82 ° E,,,Operational,"DCS (INSAT)
+IMAGER (INSAT)
+SAS&R
+SOUNDER (INSAT)",0-20009-0-474,,2025-01-22 15:54:07
+Ionosfera-M N1 & N2,522,04 Nov 2024,≥2032,Ionozond,"Roscosmos
+",SunSync,820 km,,,09:30 asc,Operational,"ESEP
+GALS/1
+LAERTES
+MAYAK
+NBK/2
+Ozonometer-TM
+PES
+SPER/1
+ST/1",-20009--,,2025-12-01 11:46:56
+Ionosfera-M N3 & N4,523,25 Jul 2025,≥2033,Ionozond,"Roscosmos
+",SunSync,820 km,,,16:00 asc,Commissioning,"ESEP
+GALS/1
+LAERTES
+MAYAK
+NBK/2
+Ozonometer-TM
+PES
+SPER/1
+ST/1",0-20009-0-,,2025-12-01 11:47:20
+IRIS,572,28 Jun 2013,≥2026,Interface Region Imaging Spectrograph,"NASA
+",SunSync,649 km,,,06:00 asc,Operational,IRIS (IRIS),0-20009-0-,,2026-02-02 16:19:05
+IRS-1A,196,17 Mar 1988,01 Jul 1992,Indian Remote-sensing Satellite,"ISRO
+",SunSync,904 km,,,10:30 desc,Inactive,"LISS-1
+LISS-2",,,2015-07-28 12:33:59
+IRS-1B,197,29 Aug 1991,01 Jul 2001,Indian Remote-sensing Satellite,"ISRO
+",SunSync,904 km,,,10:30 desc,Inactive,"LISS-1
+LISS-2",,,2015-07-28 12:34:49
+IRS-1C,198,28 Dec 1995,21 Sep 2005,Indian Remote-sensing Satellite,"ISRO
+",SunSync,817 km,,,10:30 desc,Inactive,"LISS-3 (IRS-1)
+PAN (IRS)
+WiFS",,,2015-07-28 12:35:39
+IRS-1D,199,29 Sep 1997,15 Jan 2010,Indian Remote-sensing Satellite,"ISRO
+",SunSync,778 km,,,10:30 desc,Inactive,"LISS-3 (IRS-1)
+PAN (IRS)
+WiFS",,,2015-07-28 12:36:27
+IRS-1E (IRS-P1),200,20 Sep 1993,20 Sep 1993,Indian Remote-sensing Satellite,"ISRO
+",SunSync,904 km,,,10:30 desc,Lost at launch,"LISS-1
+MEOSS",,,2015-07-28 12:37:52
+IRS-P2,201,15 Oct 1994,15 Sep 1997,Indian Remote-sensing Satellite,"ISRO
+",SunSync,817 km,,,10:30 desc,Inactive,LISS-2M,,,2015-07-28 12:38:32
+IRS-P3,202,21 Mar 1996,15 Oct 2004,Indian Remote-sensing Satellite,"ISRO
+",SunSync,817 km,,,10:30 desc,Inactive,"IXAE
+MOS
+WiFS (IRS-P3)",,,2015-07-28 12:39:15
+ISS ASIM,745,02 Apr 2018,≥2026,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Operational,"MMIA
+MXGS",0-20009-0-,,2026-02-02 17:08:21
+ISS CATS,622,10 Jan 2015,≥2017,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Inactive,CATS,,,2018-12-28 01:22:51
+ISS CLARREO-PF,689,≥2027,≥2028,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Planned,HySICS,-20009--,,2024-11-04 08:33:20
+ISS COWVR,806,21 Dec 2021,≥2026,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Operational,COWVR,0-20009-0-801,,2026-02-02 15:51:19
+ISS DESIS,628,29 Jun 2018,≥2026,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,,,51.6°,,Operational,DESIS,0-20009-0-,,2026-02-02 16:03:13
+ISS ECOSTRESS,634,29 Jun 2018,≥2026,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Operational,ECOSTRESS,-20009--,,2024-09-30 09:59:55
+ISS EMIT,874,15 Jul 2022,≥2026,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Operational,EMIT,-20009--,,2024-11-04 08:34:04
+ISS GARI,924,21 Dec 2021,10 Jan 2023,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Inactive,GARI,0-20009-0-,,2025-12-15 16:33:00
+ISS GEDI,633,05 Dec 2018,≥2030,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Operational,GEDI Lidar,-20009--,,2024-09-30 10:08:41
+ISS HICO,625,25 Sep 2009,24 Sep 2014,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Inactive,HICO,,,2015-07-28 12:40:46
+ISS HISUI,807,05 Dec 2019,≥2026,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Operational,HISUI,0-20009-0-,,2026-02-02 15:52:35
+ISS LIS,623,19 Feb 2017,16 Nov 2023,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Inactive,LIS (ISS),-20009--,,2024-09-30 10:22:40
+ISS MOLI,772,≥2027,≥2028,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Planned,"MOLI imager
+MOLI lidar",0-20009-0-,,2025-10-13 07:08:08
+ISS OCO-3,624,04 May 2019,≥2026,Orbiting Carbon Observatory ,"NASA
+",DRIFT,407 km,,51.6°,,Operational,OCO (ISS) spectrometer,-20009--,,2025-01-15 10:59:47
+ISS RainCube,789,21 May 2018,22 Dec 2020,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Inactive,RainCube,,,2022-01-03 19:00:21
+ISS RapidScat,621,21 Sep 2014,19 Aug 2016,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Inactive,RapidScat,0-20009-0-801,,2024-05-28 13:34:04
+ISS SAGE-III,478,19 Feb 2017,≥2026,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Operational,SAGE-III,-20009--,,2024-09-30 10:50:28
+ISS TEMPEST-1,923,21 Dec 2021,Jun 2024,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,400 km,,51.6°,,Inactive,MM Radiometer,-20009--,,2024-11-04 08:37:56
+ISS TEMPEST-D,922,21 May 2018,22 Jun 2021,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,400 km,,51.6°,,Inactive,MM Radiometer,,,2023-06-05 08:51:53
+ISS TSIS-1,529,15 Dec 2017,≥2026,International Space Station,"NASA
+CSA
+DLR
+ESA
+JAXA
+Roscosmos",DRIFT,407 km,,51.6°,,Operational,TSIS,-20009--,,2024-09-30 11:10:14
+ITOS-1 (TIROS-M),203,23 Jan 1970,18 Jun 1971,NOAA 3rd generation / Improved TIROS Operational System,"NOAA
+NASA",SunSync,1470 km,,,14:30 asc,Inactive,"APT
+AVCS
+FPR
+SPM
+SR",,,2015-07-28 12:42:22
+JASON-1,204,07 Dec 2001,01 Jul 2013,Joint Altimetry Satellite Oceanography Network,"NOAA
+CNES
+EUMETSAT",DRIFT,1324 km,,66°,,Inactive,"DORIS
+JMR
+LRA (NASA)
+Poseidon-2
+TRSR",0-20009-0-260,,2024-04-15 10:10:24
+JASON-2,205,20 Jun 2008,01 Oct 2019,Joint Altimetry Satellite Oceanography Network,"NOAA
+CNES
+EUMETSAT",DRIFT,1309.5 km,,66°,,Inactive,"AMR
+CARMEN
+DORIS
+LPT
+LRA (NASA)
+Poseidon-3
+TRSR",0-20009-0-261,,2024-04-15 10:09:50
+JASON-3,206,17 Jan 2016,≥2027,Joint Altimetry Satellite Oceanography Network,"NOAA
+CNES
+EUMETSAT",DRIFT,1336 km,,66°,,Operational,"AMR
+CARMEN
+DORIS
+LPT
+LRA (NASA)
+Poseidon-3B
+TRSR",0-20009-0-262,,2025-11-17 11:51:15
+JERS,207,11 Feb 1992,11 Oct 1998,Japanese Earth Resources Satellite,"JAXA
+",SunSync,568 km,,,10:45 desc,Inactive,"OPS (JERS)
+SAR (JERS)",,,2015-07-28 12:45:03
+Jilin-1,674,05 Jun 2019,≥2030,Jilin,"CRESDA
+",SunSync,528 km,,,10:30 asc,Operational,Jilin Imager,-20009--,,2026-01-19 09:39:17
+JPSS-3,662,31 Dec 2032,≥2041,Joint Polar Satellite System,"NOAA
+NASA",SunSync,824 km,,,13:30 asc,Planned,"ATMS
+CrIS
+OMPS-limb
+OMPS-nadir
+VIIRS",-20009--,,2025-02-24 12:25:41
+JPSS-4,663,31 Dec 2027,≥2036,Joint Polar Satellite System,"NOAA
+NASA",SunSync,824 km,,,13:30 asc,Planned,"ATMS
+CrIS
+Libera
+OMPS-limb
+OMPS-nadir
+VIIRS",-20009--,,2025-02-24 12:25:01
+Kalpana-1,210,12 Sep 2002,Sep 2017,Kalpana,"ISRO
+IMD",GEO,35786 km,74 ° E,,,Inactive,"DCS (INSAT)
+VHRR (INSAT)",0-20009-0-410,,2018-10-06 12:54:37
+KANOPUS-V-IK-1,212,14 Jul 2017,≥2026,KANOPUS Vulkan,"Roscosmos
+RosHydroMet",SunSync,510 km,,,10:30 asc,Operational,"MSS (KANOPUS)
+MSU-IK-SR
+PSS",,,2026-01-19 13:33:03
+KANOPUS-V1,211,22 Jul 2012,01 Jul 2020,KANOPUS Vulkan,"Roscosmos
+RosHydroMet",SunSync,510 km,,,10:30 asc,Inactive,"MSS (KANOPUS)
+MSU-200
+PSS",,,2022-01-12 20:23:07
+KANOPUS-V3,730,01 Feb 2018,≥2026,KANOPUS Vulkan,"Roscosmos
+RosHydroMet",SunSync,510 km,,,10:30 asc,Operational,"MSS (KANOPUS)
+MSU-200
+PSS",0-20009-0-,,2026-02-02 17:09:32
+KANOPUS-V4,732,01 Feb 2018,≥2026,KANOPUS Vulkan,"Roscosmos
+RosHydroMet",SunSync,510 km,,,10:30 asc,Operational,"MSS (KANOPUS)
+MSU-200
+PSS",0-20009-0-,,2026-02-02 17:09:56
+KANOPUS-V5,770,27 Dec 2018,≥2026,KANOPUS Vulkan,"Roscosmos
+RosHydroMet",SunSync,510 km,,,10:30 asc,Operational,"MSS (KANOPUS)
+MSU-200
+PSS",0-20009-0-,,2026-02-02 17:10:16
+KANOPUS-V6,771,27 Dec 2018,≥2026,KANOPUS Vulkan,"Roscosmos
+RosHydroMet",SunSync,510 km,,,10:30 asc,Operational,"MSS (KANOPUS)
+MSU-200
+PSS",0-20009-0-,,2026-02-02 17:10:37
+KazEOSat-1,600,30 Apr 2014,≥2022,Kazakhstan Earth Observation Satellite,"Kazcosmos
+",SunSync,759 km,,,10:15 desc,Unclear,NAOMI (KazEOSat),,,2022-01-03 15:31:35
+KazEOSat-2,601,19 Jun 2014,≥2022,Kazakhstan Earth Observation Satellite,"Kazcosmos
+",SunSync,630 km,,,10:30 asc,Unclear,KEIS,,,2022-01-03 15:31:56
+KOMPSAT-1,213,20 Dec 1999,31 Jan 2008,Korea Multi-Purpose Satellite,"KARI
+",SunSync,685 km,,,10:50 asc,Inactive,"EOC
+OSMI
+SPS/HEPD
+SPS/IMS",,,2015-07-28 12:51:10
+KOMPSAT-2,214,28 Jul 2006,≥2026,Korea Multi-Purpose Satellite,"KARI
+",SunSync,685 km,,,10:50 asc,Operational,MSC,,,2026-01-19 13:33:03
+KOMPSAT-3,215,17 May 2012,≥2026,Korea Multi-Purpose Satellite,"KARI
+",SunSync,675 km,,,13:30 asc,Operational,AEISS,,,2026-01-19 13:33:03
+KOMPSAT-3A,481,26 Mar 2015,≥2026,Korea Multi-Purpose Satellite,"KARI
+",SunSync,528 km,,,13:30 asc,Operational,"AEISS
+IIP",0-20009-0-,,2026-02-02 16:57:08
+KOMPSAT-5,216,22 Aug 2013,≥2026,Korea Multi-Purpose Satellite,"KARI
+",SunSync,550 km,,,06:00 asc,Operational,"AOPOD
+COSI
+LRR (DLR)",0-20009-0-825,,2026-01-19 13:33:03
+KOMPSAT-6,810,Mar 2026,≥2029,Korea Multi-Purpose Satellite,"KARI
+",SunSync,505 km,,,06:00 asc,Planned,COSI,-20009--,,2026-01-20 10:35:57
+KOMPSAT-7,811,01 Dec 2025,≥2029,Korea Multi-Purpose Satellite,"KARI
+",SunSync,685 km,,,10:50 asc,Commissioning,AEISS-HR,0-20009-0-,,2025-12-04 14:48:58
+Kondor-E,672,27 Jun 2013,≥2014,Kondor-Experimental SAR Spacecraft,"NPOMash
+",DRIFT,500 km,,74.75°,,Inactive,SAR-10,,,2019-10-27 13:29:47
+Kondor-E1,635,19 Dec 2014,≥2019,Kondor-Experimental SAR Spacecraft,"NPOMash
+",DRIFT,500 km,,74.75°,,Presumably inactive,SAR-10,,,2020-01-01 03:19:51
+Kondor-FKA 1,1006,26 May 2023,≥2028,Kondor-Experimental SAR Spacecraft,"NPOMash
+",SunSync,510 km,,97.4°,,Operational,SAR-10,,,2024-01-02 12:18:45
+Kondor-FKA 2,1007,29 Nov 2024,≥2029,Kondor-Experimental SAR Spacecraft,"NPOMash
+",SunSync,510 km,,97.4°,,Operational,SAR-10,-20009--,,2025-09-15 13:53:41
+LAGEOS-1,217,04 May 1976,≥2026,Laser Geodynamics Satellite,"ASI
+NASA",DRIFT,5900 km,,109.8°,,Operational,LRA (ASI),,,2018-12-28 15:53:38
+LAGEOS-2,218,22 Oct 1992,≥2042,Laser Geodynamics Satellite,"ASI
+NASA",DRIFT,5780 km,,52.6°,,Operational,LRA (ASI),,,2018-12-28 15:54:44
+Landsat Next-A,1079,≥2031,≥2036,Landsat Next,"NASA
+",SunSync,653 km,,,10:10 desc,Planned,LandIS,-20009--,,2024-09-30 15:50:32
+Landsat Next-B,1080,≥2031,≥2036,Landsat Next,"NASA
+",SunSync,653 km,,,18:10 desc,Planned,LandIS,-20009--,,2024-09-30 14:07:26
+Landsat Next-C,1081,≥2031,≥2036,Landsat Next,"NASA
+",SunSync,653 km,,,02:10 desc,Planned,LandIS,-20009--,,2024-09-30 14:08:20
+Landsat-1 (ERTS),219,23 Jul 1972,02 Jan 1978,Landsat,"USGS
+NASA",SunSync,907 km,,,10:00 desc,Inactive,"DCS (Landsat)
+MSS
+RBV",,,2015-07-28 18:39:13
+Landsat-2,220,22 Jan 1975,25 Feb 1982,Landsat,"USGS
+NASA",SunSync,908 km,,,10:00 desc,Inactive,"DCS (Landsat)
+MSS
+RBV",,,2015-07-28 18:40:09
+Landsat-3,221,05 Mar 1978,31 Mar 1983,Landsat,"USGS
+NASA",SunSync,915 km,,,10:00 desc,Inactive,"DCS (Landsat)
+MSS
+RBV",,,2015-07-28 18:41:07
+Landsat-4,222,16 Jul 1982,≥1993,Landsat,"USGS
+NASA",SunSync,705 km,,,10:00 desc,Inactive,"GPS (NASA)
+MSS
+TM",0-20009-0-221,,2015-07-28 18:50:17
+Landsat-5,223,01 Mar 1984,18 Nov 2011,Landsat,"USGS
+NASA",SunSync,705 km,,,09:45 desc,Inactive,"GPS (NASA)
+MSS
+TM",0-20009-0-220,,2015-07-28 18:58:27
+Landsat-6,224,05 Oct 1993,05 Oct 1993,Landsat,"USGS
+NASA",SunSync,705 km,,,09:45 desc,Lost at launch,ETM,,,2015-07-28 18:59:33
+Landsat-7,225,15 Apr 1999,≥2024,Landsat,"USGS
+NASA",SunSync,705 km,,,08:30 desc,Inactive,ETM+,0-20009-0-222,,2025-04-09 16:29:36
+Landsat-8,227,11 Feb 2013,≥2026,Landsat Data Continuity Mission,"USGS
+NASA",SunSync,705 km,,,10:11 desc,Operational,"OLI
+TIRS",,,2026-01-19 13:33:03
+Landsat-9,724,27 Sep 2021,≥2031,Landsat Data Continuity Mission,"USGS
+NASA",SunSync,705 km,,,10:00 desc,Operational,"OLI
+TIRS",-20009--,,2024-09-30 10:20:15
+LARES-1,226,13 Feb 2012,≥2050,Laser RElativity Satellite,"ASI
+NASA",DRIFT,1450 km,,69.5°,,Operational,LRA (ASI),-20009--,,2024-08-12 12:27:01
+LARES-2,809,13 Jul 2022,≥2050,Laser RElativity Satellite,"ASI
+NASA",DRIFT,5899 km,,70.16°,,Operational,LRA (ASI),-20009--,,2024-08-12 12:27:28
+Lemur-2,827,28 Sep 2015,≥2040,Low Earth Multi-Use Receiver,"SPIRE
+",SunSync,550 km,,,,Operational,STRATOS,0-20009-0-269,,2026-01-12 09:20:34
+LIST,515,TBD,TBD,Lidar Surface Topography,"NASA
+",SunSync,,,,,Mission concept,,,,2018-06-20 23:23:11
+LOTUSat-1,1088,≥2026,≥2030,"Vietnam Natural Resources, Environment and Disaster-monitoring Satellite
+
+","STI-VAST
+",SunSync,505 km,,,06:00 desc,Planned,SAR-X (LOTUSat),-20009--,,2026-02-09 10:35:40
+LSTM-A,915,≥2029,≥2034,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,640 km,,,13:30 asc,Planned,LSTM,0-20009-0-,,2025-01-13 16:20:06
+LSTM-B,1039,≥2031,≥2038,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,640 km,,,13:30 asc,Planned,LSTM,0-20009-0-,,2025-01-13 16:21:11
+Ludi-Tance 1 01A,959,26 Jan 2022,≥2032,L-band differential interferometric synthetic aperture radar satellites,"CNSA
+CASC",SunSync,600 km,,97.8°,,Operational,L band SAR (Ludi-Tance),,,2023-11-27 15:47:09
+Ludi-Tance 1 01B,960,26 Feb 2022,≥2032,L-band differential interferometric synthetic aperture radar satellites,"CNSA
+CASC",SunSync,600 km,,97.8°,,Operational,L band SAR (Ludi-Tance),,,2023-11-27 15:48:04
+Ludi-Tance 4 01A,1016,12 Aug 2023,≥2040,L-band differential interferometric synthetic aperture radar satellites,"CNSA
+CASC",GeoSync,36000 km,89.5 ° E,,,Operational,L band SAR (Ludi-Tance),0-20009-0-,,2025-01-09 11:27:33
+MAGIC-1,1027,≥2028,≥2040,The Mass-Change and Geosciences International Constellation,"NASA
+",DRIFT,397 km,,70°,,Planned,"LTI
+MicroSTAR",,,2023-10-30 11:23:05
+MAGIC-2,1028,≥2028,≥2040,The Mass-Change and Geosciences International Constellation,"NASA
+",DRIFT,397 km,,70°,,Planned,"LTI
+MicroSTAR",,,2023-10-30 11:24:48
+MAIA,690,≥2026,≥2029,Multi-Angle Imager for Aerosols,"NASA
+",SunSync,740 km,,,TBD,Planned,MAIA,-20009--,,2025-05-20 10:31:36
+MATS,764,04 Nov 2022,≥2026,Mesospheric Airglow/Aerosol Tomography and Spectroscopy,"SNSA
+",SunSync,585 km,,,06:00 desc,Operational,MATS,0-20009-0-,,2026-02-02 17:03:02
+Megha-Tropiques,228,12 Oct 2011,Jan 2022,Megha-Tropiques,"ISRO
+CNES",DRIFT,867 km,,20°,,Inactive,"MADRAS
+ROSA
+SAPHIR
+ScaRaB",0-20009-0-440,,2022-06-27 14:44:44
+MERLIN,592,≥2028,≥2031,Methane Remote Sensing Mission,"CNES
+DLR",SunSync,506 km,,,06:00 asc,Planned,IPDA lidar,,,2023-08-31 09:06:00
+Meteor-1-1,229,26 Mar 1969,26 Jan 1970,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,560 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:13:55
+Meteor-1-10,238,29 Dec 1971,29 Sep 1972,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,870 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:17:23
+Meteor-1-11,239,30 Mar 1972,30 Dec 1972,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,870 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:17:50
+Meteor-1-12,240,30 Jun 1972,30 Mar 1973,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,880 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:18:15
+Meteor-1-13,241,26 Oct 1972,26 Jul 1973,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,860 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:18:37
+Meteor-1-14,242,20 Mar 1973,20 Dec 1973,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,850 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:18:57
+Meteor-1-15,243,29 May 1973,28 Feb 1974,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,860 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:19:18
+Meteor-1-16,244,05 Mar 1974,05 Dec 1974,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,850 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:19:43
+Meteor-1-17,245,24 Apr 1974,24 Jan 1975,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,870 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:20:06
+Meteor-1-19,246,28 Oct 1974,01 Dec 1975,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,860 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 18:16:18
+Meteor-1-2,230,06 Oct 1969,06 Jul 1970,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,530 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:14:14
+Meteor-1-20,247,17 Dec 1974,17 Sep 1975,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,860 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:20:52
+Meteor-1-21,248,01 Apr 1975,01 Jul 1976,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,870 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2014-01-24 19:50:44
+Meteor-1-22,249,18 Sep 1975,01 Dec 1976,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,850 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:21:35
+Meteor-1-23,250,25 Dec 1975,25 Sep 1976,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,860 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:22:00
+Meteor-1-24,251,07 Apr 1976,07 Jan 1977,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,860 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:22:22
+Meteor-1-26,252,15 Oct 1976,15 Jul 1977,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,860 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 18:17:36
+Meteor-1-27,253,05 Apr 1977,05 Jan 1978,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,860 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2023-03-06 12:24:33
+Meteor-1-3,231,17 Mar 1970,17 Dec 1970,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,680 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:14:33
+Meteor-1-4,232,28 Apr 1970,28 Jan 1971,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,560 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:14:51
+Meteor-1-5,233,23 Jun 1970,23 Mar 1971,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,840 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:15:14
+Meteor-1-6,234,15 Oct 1970,15 Jul 1971,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,440 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:15:33
+Meteor-1-7,235,20 Jan 1971,20 Oct 1971,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,540 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:16:09
+Meteor-1-8,236,17 Apr 1971,17 Jan 1972,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,250 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:16:32
+Meteor-1-9,237,16 Jul 1971,16 Apr 1972,Meteor-1,"RosHydroMet
+Roscosmos",DRIFT,350 km,,81.2°,,Inactive,"AC
+IR (Meteor-1)
+TV (Meteor-1)",,,2013-02-13 17:16:57
+Meteor-2-1,254,11 Jul 1975,11 Jan 1977,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,860 km,,81.3°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:24:21
+Meteor-2-10,263,28 Oct 1983,28 Apr 1985,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,810 km,,81.2°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:26:55
+Meteor-2-11,264,05 Jul 1984,05 Jan 1986,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,950 km,,82.5°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:27:13
+Meteor-2-12,265,06 Feb 1985,06 Jul 1986,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,940 km,,82.5°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:27:28
+Meteor-2-13,266,26 Dec 1985,26 Jun 1987,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,950 km,,82.5°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:27:45
+Meteor-2-14,267,27 May 1986,27 Nov 1987,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,950 km,,82.5°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:28:04
+Meteor-2-15,268,05 Jan 1987,05 Jul 1988,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,950 km,,82.5°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:28:21
+Meteor-2-16,269,18 Aug 1987,18 Feb 1989,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,950 km,,82.5°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:28:39
+Meteor-2-17,270,30 Jan 1988,30 Jul 1990,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,950 km,,82.5°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:28:57
+Meteor-2-18,271,28 Feb 1989,28 Aug 1990,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,940 km,,82.5°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:29:11
+Meteor-2-19,272,27 Jun 1990,27 Dec 1991,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,950 km,,82.5°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:29:27
+Meteor-2-2,255,06 Jan 1977,06 Jul 1978,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,880 km,,81.3°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:24:43
+Meteor-2-20,273,28 Sep 1990,28 Mar 1992,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,950 km,,82.5°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:30:01
+Meteor-2-21,274,31 Aug 1993,28 Feb 1995,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,950 km,,82.5°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",0-20009-0-320,,2013-02-13 17:30:18
+Meteor-2-3,256,14 Dec 1977,14 Jun 1979,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,860 km,,81.2°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:25:00
+Meteor-2-4,257,01 Mar 1979,01 Sep 1980,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,850 km,,81.2°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:25:14
+Meteor-2-5,258,31 Oct 1979,30 Apr 1981,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,870 km,,81.2°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:25:31
+Meteor-2-6,259,09 Sep 1980,09 Mar 1982,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,860 km,,81.2°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:25:49
+Meteor-2-7,260,14 May 1981,14 Nov 1982,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,860 km,,81.3°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:26:04
+Meteor-2-8,261,25 Mar 1982,25 Sep 1983,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,940 km,,82.5°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:26:19
+Meteor-2-9,262,14 Dec 1982,14 Jun 1984,Meteor-2,"RosHydroMet
+Roscosmos",DRIFT,840 km,,81.3°,,Inactive,"IR (Meteor-2)
+RMK-2
+SM (Meteor-2)
+TV (Meteor-2)",,,2013-02-13 17:26:36
+Meteor-3-1,276,24 Oct 1985,24 Oct 1987,Meteor-3,"RosHydroMet
+Roscosmos",DRIFT,1200 km,,82.5°,,Inactive,"Klimat
+MR-900B
+MR-2000M
+RMK-2
+SM (Meteor-3)",,,2013-02-13 17:10:02
+Meteor-3-2,277,26 Jul 1988,26 Jul 1990,Meteor-3,"RosHydroMet
+Roscosmos",DRIFT,1200 km,,82.5°,,Inactive,"Klimat
+MR-900B
+MR-2000M
+RMK-2
+SM (Meteor-3)",,,2013-02-13 17:10:33
+Meteor-3-3,278,24 Oct 1989,24 Oct 1991,Meteor-3,"RosHydroMet
+Roscosmos",DRIFT,1240 km,,82.5°,,Inactive,"Klimat
+MR-900B
+MR-2000M
+RMK-2
+SM (Meteor-3)",,,2013-02-13 17:11:03
+Meteor-3-4,279,24 Apr 1991,24 Apr 1993,Meteor-3,"RosHydroMet
+Roscosmos",DRIFT,1200 km,,82.5°,,Inactive,"Klimat
+MR-900B
+MR-2000M
+RMK-2
+SM (Meteor-3)",,,2013-02-13 17:11:41
+Meteor-3-5,280,15 Aug 1991,15 Aug 1993,Meteor-3,"RosHydroMet
+Roscosmos",DRIFT,1200 km,,82.5°,,Inactive,"Klimat
+MR-900B
+MR-2000M
+RMK-2
+SM (Meteor-3)
+TOMS",0-20009-0-321,,2013-02-13 17:12:15
+Meteor-3-6,281,25 Jan 1994,25 Jan 1996,Meteor-3,"RosHydroMet
+Roscosmos",DRIFT,1210 km,,82.5°,,Inactive,"Klimat
+MR-900B
+MR-2000M
+PRARE
+RMK-2
+SM (Meteor-3)
+ScaRaB",,,2013-02-13 17:12:46
+Meteor-3M,282,10 Dec 2001,05 Apr 2006,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,1020 km,,,09:15 asc,Inactive,"GGAK-M/KGI-4C
+GGAK-M/MSGI-MKA
+Klimat
+MIVZA
+MR-2000M1
+MSU-E
+MTVZA
+OCS
+SAGE-III
+SFM-2",,,2015-07-28 19:11:58
+Meteor-M N1,283,17 Sep 2009,23 Sep 2014,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,826 km,,,09:30 desc,Inactive,"GGAK-E/GALS-E (Meteor)
+GGAK-E/SKIF-6 (Meteor)
+GGAK-M/RIMS-M
+IKOR-M
+KMSS
+MSU-MR
+MTVZA-GY
+SSPD
+Severjanin-M",,,2021-04-19 13:40:13
+Meteor-M N2,284,08 Jul 2014,01 Jun 2024,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,820 km,,,09:30 asc,Inactive,"GGAK-E/GALS-E (Meteor)
+GGAK-E/SKIF-6 (Meteor)
+GGAK-M/RIMS-M
+IKFS-2
+IKOR-M
+KMSS
+MSU-MR
+MTVZA-GY
+SSPD
+Severjanin-M",0-20009-0-324,,2025-12-22 11:37:21
+Meteor-M N2-1,482,28 Nov 2017,28 Nov 2017,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,816.4 km,,,15:09 asc,Inactive,"GGAK-E/GALS-E (Meteor)
+GGAK-E/SKIF-6 (Meteor)
+GGAK-M/RIMS-M
+IKFS-2
+IKOR-M
+KMSS
+MSU-MR
+MTVZA-GY
+S&RSAT
+SSPD
+Severjanin-M",,,2021-04-19 13:45:34
+Meteor-M N2-2,483,05 Jul 2019,Jan 2025,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,821 km,,,15:15 asc,Inactive,"GGAK-E/GALS-E (Meteor)
+GGAK-E/SKIF-6 (Meteor)
+GGAK-M/RIMS-M
+IKFS-2
+IKOR-M
+KMSS
+MSU-MR
+MTVZA-GY
+SSPD
+Severjanin-M",0-20009-0-325,,2025-06-05 09:12:43
+Meteor-M N2-3,615,27 Jun 2023,≥2028,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,820 km,,,15:00 asc,Operational,"GGAK-E/GALS-E (Meteor)
+GGAK-E/SKIF-6 (Meteor)
+GGAK-M/RIMS-M
+IKFS-2
+KMSS
+MSU-MR
+MTVZA-GY
+MeteoSAR
+SAS&R (Meteor)",-20009--,,2026-01-23 14:31:52
+Meteor-M N2-4,616,29 Feb 2024,≥2029,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,820.7 km,,,09:00 desc,Operational,"GGAK-E/GALS-E (Meteor)
+GGAK-E/SKIF-6 (Meteor)
+GGAK-M/RIMS-M
+IKFS-2
+IKOR-M
+KMSS
+MSU-MR
+MTVZA-GY
+MeteoSAR
+SAS&R (Meteor)
+SSPD",-20009--,,2026-01-23 14:31:13
+Meteor-M N2-5,617,≥2027,≥2032,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,820.7 km,,,15:00 desc,Planned,"GGAK-E/GALS-E (Meteor)
+GGAK-E/SKIF-6 (Meteor)
+GGAK-M/RIMS-M
+IKFS-2
+IKOR-M
+KMSS
+MSU-MR
+MTVZA-GY
+MeteoSAR
+SAS&R (Meteor)
+SSPD",-20009--,,2026-01-23 14:30:31
+Meteor-M N2-6,801,≥2028,≥2033,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,820.7 km,,,09:00 asc,Planned,"GGAK-E/GALS-E (Meteor)
+GGAK-E/SKIF-6 (Meteor)
+GGAK-M/RIMS-M
+IKFS-2
+IKOR-M
+KMSS
+MSU-MR
+MTVZA-GY
+MeteoSAR
+SAS&R (Meteor)
+SSPD",0-20009-0-,,2026-01-23 14:29:35
+Meteor-M N2-7,1125,≥2034,≥2039,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,820.7 km,,,,Planned,"GGAK-E/GALS-E (Meteor)
+GGAK-E/SKIF-6 (Meteor)
+GGAK-M/RIMS-M
+IKFS-2
+IKOR-M
+KMSS
+MSU-MR
+MTVZA-GY
+MeteoSAR
+SAS&R (Meteor)
+SSPD",0-20009-0-,,2026-01-23 14:33:01
+Meteor-M N2-8,1126,≥2035,≥2040,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,820.7 km,,,,Planned,"GGAK-E/GALS-E (Meteor)
+GGAK-E/SKIF-6 (Meteor)
+GGAK-M/RIMS-M
+IKFS-2
+IKOR-M
+KMSS
+MSU-MR
+MTVZA-GY
+MeteoSAR
+SAS&R (Meteor)
+SSPD",0-20009-0-,,2026-01-23 14:34:32
+Meteor-MP N1,286,≥2036,≥2043,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,830 km,,,15:30 asc,Planned,"ARMA-MP
+GGAK-E/GALS-E (Meteor)
+GGAK-E/SKIF-6 (Meteor)
+GGAK-M/RIMS-M
+IKFS-3
+MSU-MR-MP
+MTVZA-GY-MP
+SAS&R (Meteor)
+SCAT-MP
+SSPD
+TGSP",-20009--,,2026-01-23 14:35:36
+Meteor-MP N2,287,≥2037,≥2044,Meteor-3M,"RosHydroMet
+Roscosmos",SunSync,830 km,,,09:30 desc,Planned,"ARMA-MP
+GGAK-E/GALS-E (Meteor)
+GGAK-E/SKIF-6 (Meteor)
+GGAK-M/RIMS-M
+IKFS-3
+IKOR-M
+MSU-MR-MP
+MTVZA-GY-MP
+SAS&R (Meteor)
+SCAT-MP
+SSPD
+TGSP",-20009--,,2026-01-23 14:36:33
+Meteor-P1,580,09 Jul 1974,09 Jul 1976,Meteor-Priroda,"Roscosmos
+RosHydroMet",DRIFT,890 km,,81.2°,,Inactive,"IR (Meteor-1)
+MSU-M
+MSU-S
+SHF
+TV (Meteor-1)",,,2013-02-13 19:37:41
+Meteor-P2,581,15 May 1976,15 May 1978,Meteor-Priroda,"Roscosmos
+RosHydroMet",DRIFT,890 km,,81.2°,,Inactive,"IR (Meteor-1)
+MSU-M
+MSU-S
+R10-M
+SHF
+SI-1",,,2023-03-06 12:40:33
+Meteor-P3,582,29 Jul 1977,29 Jul 1979,Meteor-Priroda,"Roscosmos
+RosHydroMet",SunSync,640 km,,,10:15 asc,Inactive,"MSU-M
+MSU-S
+R10-M
+SHF
+SI-1",,,2023-03-06 13:49:35
+Meteor-P4,583,25 Jan 1979,25 Jan 1981,Meteor-Priroda,"Roscosmos
+RosHydroMet",SunSync,640 km,,,10:15 asc,Inactive,"MSU-M
+MSU-S
+R10-M
+SI-1",,,2023-03-06 13:50:02
+Meteor-P5,584,18 Jun 1980,18 Jun 1982,Meteor-Priroda,"Roscosmos
+RosHydroMet",SunSync,630 km,,,10:15 asc,Inactive,"MSS Fragment
+MSU-E (Resurs-O1)
+MSU-M
+MSU-S
+MSU-SK (Resurs)
+R10-M",,,2023-03-06 13:51:45
+Meteor-P6,585,10 Jul 1981,10 Jul 1983,Meteor-Priroda,"Roscosmos
+RosHydroMet",SunSync,650 km,,,10:15 asc,Inactive,"MSU-M
+MSU-S
+R10-M
+SHF",,,2023-03-06 13:52:21
+Meteosat-1,295,23 Nov 1977,24 Nov 1979,Meteosat First Generation,"EUMETSAT
+ESA",GEO,35786 km,,,,Inactive,"DCS (Meteosat)
+MVIRI",0-20009-0-058,,2024-04-15 09:38:20
+Meteosat-10,304,05 Jul 2012,≥2030,Meteosat Second Generation (MSG),"EUMETSAT
+ESA",GEO,35786 km,0.0 °,,,Operational,"DCS (Meteosat)
+GEOS&R
+GERB
+SEVIRI",0-20009-0-057,,2025-11-17 11:52:21
+Meteosat-11,305,15 Jul 2015,≥2033,Meteosat Second Generation (MSG),"EUMETSAT
+ESA",GEO,35786 km,9.5 ° E,,,Operational,"DCS (Meteosat)
+GEOS&R
+GERB
+SEVIRI",0-20009-0-070,,2024-11-11 12:13:43
+Meteosat-12,289,13 Dec 2022,≥2033,"Meteosat Third Generation (MTG) - “I” imaging, “S” sounding","EUMETSAT
+EC
+ESA",GEO,35786 km,0.3 ° W,,,Operational,"DCS (Meteosat)
+FCI
+GEOS&R
+LI
+RMU",0-20009-0-071,,2026-03-19 09:27:36
+Meteosat-2,296,19 Jun 1981,02 Dec 1991,Meteosat First Generation,"EUMETSAT
+ESA",GEO,35786 km,,,,Inactive,"DCS (Meteosat)
+MVIRI",0-20009-0-059,,2024-04-15 09:38:56
+Meteosat-3,297,15 Jun 1988,01 Aug 1991,Meteosat First Generation,"EUMETSAT
+ESA",GEO,35786 km,,,,Inactive,"DCS (Meteosat)
+MVIRI",0-20009-0-050,,2024-04-15 09:39:16
+Meteosat-3 (ADC),531,01 Aug 1991,01 Feb 1993,Meteosat First Generation,"EUMETSAT
+ESA",GEO,35786 km,50 ° W,,,Inactive,"DCS (Meteosat)
+MVIRI",-20009--,,2024-04-15 09:39:43
+Meteosat-3 (X-ADC),532,01 Feb 1993,22 Nov 1995,Meteosat First Generation,"EUMETSAT
+ESA",GEO,35786 km,75 ° W,,,Inactive,"DCS (Meteosat)
+MVIRI",-20009--,,2024-04-15 09:40:00
+Meteosat-4,298,06 Mar 1989,08 Nov 1995,Meteosat First Generation,"EUMETSAT
+ESA",GEO,35786 km,,,,Inactive,"DCS (Meteosat)
+MVIRI",0-20009-0-051,,2024-04-15 09:40:21
+Meteosat-5,299,02 Mar 1991,01 Jun 1998,Meteosat First Generation,"EUMETSAT
+ESA",GEO,35786 km,,,,Inactive,"DCS (Meteosat)
+MVIRI",0-20009-0-052,,2024-04-15 09:40:51
+Meteosat-5 (IODC),533,01 Jun 1998,26 Apr 2007,Meteosat First Generation,"EUMETSAT
+ESA",GEO,35786 km,63 ° E,,,Inactive,"DCS (Meteosat)
+MVIRI",-20009--,,2024-04-15 09:41:07
+Meteosat-6,300,20 Nov 1993,27 Apr 2007,Meteosat First Generation,"EUMETSAT
+ESA",GEO,35786 km,,,,Inactive,"DCS (Meteosat)
+MVIRI",0-20009-0-053,,2024-04-15 09:41:24
+Meteosat-6 (IODC),534,27 Apr 2007,15 Apr 2011,Meteosat First Generation,"EUMETSAT
+ESA",GEO,35786 km,67.5 ° E,,,Inactive,"DCS (Meteosat)
+MVIRI",-20009--,,2024-04-15 09:41:45
+Meteosat-7,535,02 Sep 1997,05 Dec 2006,Meteosat First Generation,"EUMETSAT
+ESA",GEO,35786 km,,,,Inactive,"DCS (Meteosat)
+MVIRI",0-20009-0-054,,2024-04-15 09:42:05
+Meteosat-7 (IODC),301,05 Dec 2006,01 Feb 2017,Meteosat First Generation,"EUMETSAT
+ESA",GEO,35786 km,58 ° E,,,Inactive,"DCS (Meteosat)
+MVIRI",-20009--,,2024-04-15 09:42:23
+Meteosat-8,302,28 Aug 2002,04 Jul 2016,Meteosat Second Generation (MSG),"EUMETSAT
+ESA",GEO,35786 km,3.7 ° E,,,Inactive,"DCS (Meteosat)
+GEOS&R
+GERB
+SEVIRI",0-20009-0-055,,2024-04-15 09:44:35
+Meteosat-8 (IODC),684,15 Sep 2016,Jun 2022,Meteosat Second Generation (MSG),"EUMETSAT
+ESA",GEO,35786 km,41.5 ° E,,,Inactive,"DCS (Meteosat)
+GEOS&R
+GERB
+SEVIRI",-20009--,,2024-04-15 09:45:45
+Meteosat-9,303,21 Dec 2005,01 Apr 2022,Meteosat Second Generation (MSG),"EUMETSAT
+ESA",GEO,35786 km,3.5 ° E,,,Inactive,"DCS (Meteosat)
+GEOS&R
+GERB
+SEVIRI",0-20009-0-056,,2024-04-15 09:46:13
+Meteosat-9 (IODC),918,01 Jul 2022,≥2027,Meteosat Second Generation (MSG),"EUMETSAT
+ESA",GEO,35786 km,45.5 ° E,,,Operational,"DCS (Meteosat)
+GEOS&R
+GERB
+SEVIRI",0-20009-0-056,,2025-11-17 11:51:56
+MethaneSAT,1055,04 Mar 2024,20 Jun 2025,MethaneSAT,"NZSA
+",SunSync,600 km,,,13:00 desc,Inactive,"MethaneSAT Spectrometer-1
+MethaneSAT Spectrometer-2",-20009--,,2025-07-07 07:06:57
+Metop-A,306,19 Oct 2006,15 Nov 2021,EUMETSAT Polar System,"EUMETSAT
+ESA",SunSync,827 km,,,07:50 desc,Inactive,"A-DCS
+AMSU-A
+ASCAT
+AVHRR/3
+GOME-2
+GRAS
+HIRS/4
+IASI
+MHS
+S&RSAT
+SEM/MEPED
+SEM/TED",0-20009-0-004,,2024-04-15 09:58:46
+Metop-B,307,17 Sep 2012,≥2027,EUMETSAT Polar System,"EUMETSAT
+ESA",SunSync,830 km,,,09:00 desc,Operational,"A-DCS
+AMSU-A
+ASCAT
+AVHRR/3
+GOME-2
+GRAS
+HIRS/4
+IASI
+MHS
+S&RSAT
+SEM/MEPED
+SEM/TED",0-20009-0-003,,2026-03-23 08:58:12
+Metop-C,308,07 Nov 2018,≥2027,EUMETSAT Polar System,"EUMETSAT
+ESA",SunSync,827 km,,,09:31 desc,Operational,"A-DCS
+AMSU-A
+ASCAT
+AVHRR/3
+GOME-2
+GRAS
+IASI
+MHS
+SEM/MEPED
+SEM/TED",0-20009-0-005,,2025-11-17 12:27:09
+Metop-SG-A1,840,13 Aug 2025,≥2034,EPS Second Generation,"EUMETSAT
+ESA",SunSync,835 km,,,09:30 desc,Commissioning,"3MI
+IASI-NG
+METimage
+MWS
+RMU
+RO
+Sentinel-5",0-20009-0-024,,2025-12-22 09:43:14
+Metop-SG-A2,83,≥2033,≥2042,EPS Second Generation,"EUMETSAT
+ESA",SunSync,835 km,,,09:30 desc,Planned,"3MI
+IASI-NG
+METimage
+MWS
+RMU
+RO
+Sentinel-5",0-20009-0-026,,2025-12-22 09:44:04
+Metop-SG-A3,84,≥2039,≥2047,EPS Second Generation,"EUMETSAT
+ESA",SunSync,835 km,,,09:30 desc,Planned,"3MI
+IASI-NG
+METimage
+MWS
+RMU
+RO
+Sentinel-5",0-20009-0-028,,2024-06-03 12:24:17
+Metop-SG-B1,85,≥2026,≥2035,EPS Second Generation,"EUMETSAT
+ESA",SunSync,835 km,,,09:30 desc,Planned,"A-DCS
+ICI
+MWI (MetOp-SG)
+RMU
+RO
+SCA (Scatterometer)",0-20009-0-025,,2025-12-22 09:45:13
+Metop-SG-B2,86,≥2033,≥2041,EPS Second Generation,"EUMETSAT
+ESA",SunSync,835 km,,,09:30 desc,Planned,"A-DCS
+ICI
+MWI (MetOp-SG)
+RMU
+RO
+SCA (Scatterometer)",0-20009-0-027,,2024-06-03 11:00:09
+Metop-SG-B3,87,≥2040,≥2048,EPS Second Generation,"EUMETSAT
+ESA",SunSync,835 km,,,09:30 desc,Planned,"A-DCS
+ICI
+MWI (MetOp-SG)
+RMU
+RO
+SCA (Scatterometer)",0-20009-0-029,,2024-06-03 11:03:20
+MicroCarb,825,26 Jul 2025,≥2030,MicroCarb,"CNES
+EUMETSAT
+UKSA",SunSync,650 km,,,10:30 desc,Commissioning,MicroCarb,0-20009-0-009,,2026-03-16 09:28:48
+MIMAN,954,21 Jun 2022,≥2026,Monochrome Imaging for Monitoring Aerosol by Nanosatellite (Cubesatyonsei),"KARI
+",SunSync,710 km,,,04:00 asc,Operational,MIMAN,0-20009-0-,,2026-02-02 17:01:55
+MISTiC Winds,692,TBD,TBD,Midwave Infrared Sounding of Temperature and humidity in a Constellation for Winds,"NASA
+",SunSync,705 km,,,13:30 asc,Mission concept,,,,2016-06-30 21:43:40
+MMS-A,456,13 Mar 2015,≥2026,Magnetospheric MultiScale mission,"NASA
+",MAG,,,28°,,Operational,"AFG
+ASPOC (MMS)
+DFG
+DP
+EDI (MMS)
+EIS (MSS)
+FEEPS
+FPI
+HPCA
+SCM (MMS)",0-20009-0-,,2026-02-02 15:45:57
+MMS-B,815,13 Mar 2015,≥2026,Magnetospheric MultiScale mission,"NASA
+",MAG,,,28°,,Operational,"AFG
+ASPOC (MMS)
+DFG
+DP
+EDI (MMS)
+EIS (MSS)
+FEEPS
+FPI
+HPCA
+SCM (MMS)",0-20009-0-,,2026-02-02 15:45:14
+MMS-C,816,13 Mar 2015,≥2026,Magnetospheric MultiScale mission,"NASA
+",MAG,,,28°,,Operational,"AFG
+ASPOC (MMS)
+DFG
+DP
+EDI (MMS)
+EIS (MSS)
+FEEPS
+FPI
+HPCA
+SCM (MMS)",0-20009-0-,,2026-02-02 15:44:53
+MMS-D,817,13 Mar 2015,≥2026,Magnetospheric MultiScale mission,"NASA
+",MAG,,,28°,,Operational,"AFG
+ASPOC (MMS)
+DFG
+DP
+EDI (MMS)
+EIS (MSS)
+FEEPS
+FPI
+HPCA
+SCM (MMS)",0-20009-0-,,2026-02-02 15:44:20
+Mohammed VI-A,736,08 Nov 2017,≥2026,Mohammed VI,"CRTS
+",SunSync,620 km,,,10:30 desc,Operational,HiRI,0-20009-0-,,2026-02-02 17:06:00
+Mohammed VI-B,737,21 Nov 2018,≥2026,Mohammed VI,"CRTS
+",SunSync,620 km,,,10:30 desc,Operational,HiRI,0-20009-0-,,2026-02-02 17:06:18
+Monitor-E,310,26 Aug 2005,15 Aug 2008,Monitor - Experimental,"Roscosmos
+",SunSync,540 km,,,10:30 asc,Inactive,"MS (Monitor)
+PAN (Monitor-E)",,,2015-07-28 19:52:00
+MOS-1,311,19 Feb 1987,29 Nov 1995,Marine Observatory Satellite ,"JAXA
+",SunSync,908 km,,,10:15 desc,Inactive,"MESSR
+MSR
+VTIR",,,2015-07-28 19:53:25
+MOS-1B,312,07 Feb 1990,25 Apr 1996,Marine Observatory Satellite ,"JAXA
+",SunSync,908 km,,,10:35 desc,Inactive,"MESSR
+MSR
+VTIR",,,2013-02-22 17:12:36
+MTG-I2,290,≥2026,≥2037,"Meteosat Third Generation (MTG) - “I” imaging, “S” sounding","EUMETSAT
+EC
+ESA",GEO,35786 km,,,,Planned,"DCS (Meteosat)
+FCI
+GEOS&R
+LI
+RMU",0-20009-0-073,,2025-12-22 09:47:15
+MTG-I3,291,≥2033,≥2044,"Meteosat Third Generation (MTG) - “I” imaging, “S” sounding","EUMETSAT
+EC
+ESA",GEO,35786 km,,,,Planned,"DCS (Meteosat)
+FCI
+GEOS&R
+LI
+RMU",0-20009-0-074,,2025-12-22 09:47:55
+MTG-I4,292,≥2036,≥2047,"Meteosat Third Generation (MTG) - “I” imaging, “S” sounding","EUMETSAT
+EC
+ESA",GEO,35786 km,,,,Planned,"DCS (Meteosat)
+FCI
+GEOS&R
+LI
+RMU",0-20009-0-076,,2025-12-22 09:48:16
+MTG-S1,293,01 Jul 2025,≥2036,"Meteosat Third Generation (MTG) - “I” imaging, “S” sounding","EUMETSAT
+EC
+ESA",GEO,35786 km,3.4 ° E,,,Commissioning,"IRS
+RMU
+Sentinel-4",0-20009-0-072,,2026-03-23 08:30:07
+MTG-S2,294,≥2035,≥2046,"Meteosat Third Generation (MTG) - “I” imaging, “S” sounding","EUMETSAT
+EC
+ESA",GEO,35786 km,,,,Planned,"IRS
+RMU
+Sentinel-4",0-20009-0-075,,2025-12-22 09:49:08
+MuSat-1,1057,12 Jun 2023,Dec 2024,MuSat Constellation,"MUON SPACE
+",SunSync,,,,,Inactive,,-20009--,,2025-01-29 14:25:16
+MuSat-2,1058,04 Mar 2024,≥2031,MuSat Constellation,"MUON SPACE
+",SunSync,622 km,,,12:00 desc,Operational,GNSS-R (MuSat),-20009--,,2025-03-17 07:55:07
+NACHOS-1,957,19 Feb 2022,Jul 2024,Nano-satellite Atmospheric Chemistry Hyperspectral Observation System,"LANL
+NASA",DRIFT,400 km,,51.6°,,Inactive,NACHOS-Imager,-20009--,,2024-11-04 08:40:04
+NACHOS-2,958,02 Jul 2022,≥2026,Nano-satellite Atmospheric Chemistry Hyperspectral Observation System,"LANL
+NASA",DRIFT,500 km,,51.6°,,Operational,NACHOS-Imager,,,2023-03-06 14:11:24
+NEMO-AM,1111,≥2026,≥2030,Nanosatellite for Earth Monitoring and Observation-Aerosol Monitoring,"ISRO
+",SunSync,650 km,,,09:30 desc,Planned,Imager (NEMO),0-20009-0-0,,2026-02-09 10:36:51
+NigeriaSat-1,313,27 Sep 2003,15 Nov 2011,NigeriaSat,"NASRDA
+",SunSync,686 km,,,10:30 asc,Inactive,SLIM6,,,2015-07-28 19:54:35
+NigeriaSat-2,314,17 Aug 2011,≥2023,NigeriaSat,"NASRDA
+",SunSync,718 km,,,10:30 asc,Unclear,"MRI
+VHRI",,,2023-12-21 11:12:46
+NigeriaSat-X,564,17 Aug 2011,≥2023,NigeriaSat,"NASRDA
+",SunSync,681 km,,,10:15 asc,Unclear,SLIM6,,,2023-12-21 11:13:00
+Nimbus-1,315,28 Aug 1964,23 Sep 1964,Nimbus,"NASA
+",SunSync,634 km,,,12:00 desc,Inactive,"APT
+AVCS
+HRIR",0-20009-0-761,,2015-07-28 19:58:16
+Nimbus-2,316,15 May 1966,17 Jan 1969,Nimbus,"NASA
+",SunSync,1140 km,,,11:30 desc,Inactive,"APT
+AVCS
+HRIR
+MRIR",0-20009-0-762,,2015-07-28 20:00:06
+Nimbus-3,317,13 Apr 1969,22 Jan 1972,Nimbus,"NASA
+",SunSync,1100 km,,,12:00 desc,Inactive,"HRIR
+IDCS
+IRIS-B
+IRLS
+MRIR
+MUSE
+SIRS-A",0-20009-0-763,,2023-11-16 18:00:51
+Nimbus-4,318,08 Apr 1970,30 Sep 1980,Nimbus,"NASA
+",SunSync,1100 km,,,12:00 desc,Inactive,"BUV
+FWS
+IDCS
+IRIS-D
+IRLS
+MUSE
+SCR (Nimbus-4)
+SIRS-B
+THIR",0-20009-0-764,,2015-07-28 20:15:28
+Nimbus-5,319,10 Dec 1972,29 Mar 1983,Nimbus,"NASA
+",SunSync,1100 km,,,12:00 desc,Inactive,"ESMR (Nimbus-5)
+ITPR
+NEMS
+SCMR
+SCR (Nimbus-5)
+THIR",0-20009-0-765,,2015-07-28 20:16:32
+Nimbus-6,320,12 Jun 1975,29 Mar 1983,Nimbus,"NASA
+",SunSync,1100 km,,,12:00 desc,Inactive,"ERB
+ESMR (Nimbus-6)
+HIRS
+LRIR
+PMR
+SCAMS
+THIR
+TWERLE",0-20009-0-766,,2025-01-15 11:39:58
+Nimbus-7,321,24 Oct 1978,01 Aug 1994,Nimbus,"NASA
+",SunSync,947 km,,,12:00 desc,Inactive,"CZCS
+ERB
+LIMS
+SAM-II
+SAMS
+SBUV
+SMMR
+THIR
+TOMS",0-20009-0-767,,2025-01-15 11:36:03
+NISAR,639,30 Jul 2025,≥2029,NASA-ISRO Synthetic Aperture Radar,"NASA
+ISRO",SunSync,747 km,,,06:00 desc,Operational,"SAR-L (NISAR)
+SAR-S (NISAR) ",-20009--,,2026-02-23 08:51:53
+NMP-EO-1,322,21 Nov 2000,30 Mar 2017,New Millennium Program - Earth Observing -1,"NASA
+USGS",SunSync,691 km,,,09:45 desc,Inactive,"ALI
+Hyperion
+LAC",,,2017-07-19 13:26:18
+NOAA-1,323,11 Dec 1970,19 Aug 1971,NOAA 3rd generation / Improved TIROS Operational System,"NOAA
+NASA",SunSync,1450 km,,,13:30 asc,Inactive,"APT
+AVCS
+FPR
+SPM
+SR",0-20009-0-701,,2015-07-28 20:20:45
+NOAA-10,332,17 Sep 1986,30 Aug 2001,NOAA 4th generation / Polar Operational Environmental Satellites,"NOAA
+NASA",SunSync,810 km,,,07:30 desc,Inactive,"AVHRR
+Argos
+ERBE (NOAA)
+HIRS/2
+MSU
+S&RSAT
+SBUV/2
+SEM/MEPED
+SEM/TED",0-20009-0-202,,2020-03-23 17:31:36
+NOAA-11,333,24 Sep 1988,16 Jun 2004,NOAA 4th generation / Polar Operational Environmental Satellites,"NOAA
+NASA",SunSync,843 km,,,14:10 asc,Inactive,"AVHRR/2
+Argos
+HIRS/2
+MSU
+S&RSAT
+SBUV/2
+SSU",0-20009-0-203,,2021-03-19 07:14:50
+NOAA-12,334,14 May 1991,10 Aug 2007,NOAA 4th generation / Polar Operational Environmental Satellites,"NOAA
+NASA",SunSync,804 km,,,05:10 desc,Inactive,"AVHRR/2
+Argos
+HIRS/2
+MSU
+SEM/MEPED
+SEM/TED",0-20009-0-204,,2020-03-23 17:32:23
+NOAA-13,335,09 Aug 1993,21 Aug 1993,NOAA 4th generation / Polar Operational Environmental Satellites,"NOAA
+NASA",SunSync,820 km,,,14:00 asc,Inactive,"AVHRR/2
+Argos
+HIRS/2
+MSU
+S&RSAT
+SBUV/2
+SEM/MEPED
+SEM/TED",,,2021-03-19 00:49:31
+NOAA-14,336,30 Dec 1994,23 May 2007,NOAA 4th generation / Polar Operational Environmental Satellites,"NOAA
+NASA",SunSync,844 km,,,09:30 desc,Inactive,"AVHRR/2
+Argos
+HIRS/2
+HIRS/3
+MSU
+S&RSAT
+SBUV/2
+SEM/MEPED
+SEM/TED
+SSU",0-20009-0-205,,2019-11-29 22:46:29
+NOAA-15,337,13 May 1998,19 Aug 2025,NOAA 5th generation / Polar Operational Environmental Satellites,"NOAA
+NASA",SunSync,813 km,,,07:29 desc,Inactive,"AMSU-A
+AMSU-B
+AVHRR/3
+DCS/2
+HIRS/3
+S&RSAT
+SEM/MEPED
+SEM/TED",0-20009-0-206,,2025-08-18 14:07:40
+NOAA-16,338,21 Sep 2000,09 Jun 2014,NOAA 5th generation / Polar Operational Environmental Satellites,"NOAA
+NASA",SunSync,849 km,,,09:01 desc,Inactive,"AMSU-A
+AMSU-B
+AVHRR/3
+DCS/2
+HIRS/3
+S&RSAT
+SBUV/2
+SEM/MEPED
+SEM/TED",0-20009-0-207,,2019-10-25 17:35:56
+NOAA-17,339,24 Jun 2002,10 Apr 2013,NOAA 5th generation / Polar Operational Environmental Satellites,"NOAA
+NASA",SunSync,810 km,,,07:03 desc,Inactive,"AMSU-A
+AMSU-B
+AVHRR/3
+DCS/2
+HIRS/3
+S&RSAT
+SBUV/2
+SEM/MEPED
+SEM/TED",0-20009-0-208,,2019-10-25 18:26:54
+NOAA-18,340,20 May 2005,06 Jun 2025,NOAA 5th generation / Polar Operational Environmental Satellites,"NOAA
+NASA",SunSync,854 km,,,10:34 desc,Inactive,"AMSU-A
+AVHRR/3
+DCS/2
+HIRS/4
+MHS
+S&RSAT
+SBUV/2
+SEM/MEPED
+SEM/TED",0-20009-0-209,,2025-06-06 08:38:33
+NOAA-19,341,06 Feb 2009,13 Aug 2025,NOAA 5th generation / Polar Operational Environmental Satellites,"NOAA
+NASA",SunSync,870 km,,,08:22 desc,Inactive,"A-DCS
+AMSU-A
+AVHRR/3
+HIRS/4
+MHS
+S&RSAT
+SBUV/2
+SEM/MEPED
+SEM/TED",0-20009-0-223,,2025-08-18 14:11:05
+NOAA-2,324,13 Oct 1972,30 Jan 1975,NOAA 3rd generation / Improved TIROS Operational System,"NOAA
+NASA",SunSync,1450 km,,,14:30 asc,Inactive,"SPM
+SR
+VHRR (NOAA)
+VTPR",0-20009-0-702,,2015-07-28 20:34:44
+NOAA-20,208,18 Nov 2017,≥2032,Joint Polar Satellite System,"NOAA
+NASA",SunSync,824 km,,,13:25 asc,Operational,"ATMS
+CERES
+CrIS
+OMPS-nadir
+VIIRS",0-20009-0-225,,2026-02-02 08:31:15
+NOAA-21,209,10 Nov 2022,≥2030,Joint Polar Satellite System,"NOAA
+NASA",SunSync,824 km,,,13:25 asc,Operational,"ATMS
+CrIS
+OMPS-limb
+OMPS-nadir
+VIIRS",0-20009-0-226,,2026-02-02 15:55:51
+NOAA-3,325,06 Nov 1973,31 Aug 1976,NOAA 3rd generation / Improved TIROS Operational System,"NOAA
+NASA",SunSync,1500 km,,,14:30 asc,Inactive,"SPM
+SR
+VHRR (NOAA)
+VTPR",0-20009-0-703,,2015-07-28 20:35:25
+NOAA-4,326,15 Nov 1974,18 Nov 1978,NOAA 3rd generation / Improved TIROS Operational System,"NOAA
+NASA",SunSync,1450 km,,,14:30 asc,Inactive,"SPM
+SR
+VHRR (NOAA)
+VTPR",0-20009-0-704,,2015-07-28 20:36:09
+NOAA-5,327,29 Jul 1976,16 Jul 1979,NOAA 3rd generation / Improved TIROS Operational System,"NOAA
+NASA",SunSync,1510 km,,,14:30 asc,Inactive,"SPM
+SR
+VHRR (NOAA)
+VTPR",0-20009-0-705,,2015-07-28 20:37:15
+NOAA-6,328,27 Jun 1979,31 Mar 1987,National Oceanic and Atmospheric Administration - 4th generation,"NOAA
+NASA",SunSync,840 km,,,07:30 desc,Inactive,"AVHRR
+Argos
+HIRS/2
+MSU
+SEM/MEPED
+SEM/TED
+SSU",0-20009-0-706,,2015-07-28 20:38:17
+NOAA-7,329,23 Jun 1981,07 Jun 1986,National Oceanic and Atmospheric Administration - 4th generation,"NOAA
+NASA",SunSync,860 km,,,14:30 asc,Inactive,"AVHRR/2
+Argos
+HIRS/2
+MSU
+SEM/MEPED
+SEM/TED
+SSU",0-20009-0-707,,2015-07-28 20:39:21
+NOAA-8,330,28 Mar 1983,29 Dec 1985,NOAA 4th generation / Polar Operational Environmental Satellites,"NOAA
+NASA",SunSync,820 km,,,07:30 desc,Inactive,"AVHRR
+Argos
+HIRS/2
+MSU
+S&RSAT
+SEM/MEPED
+SEM/TED
+SSU",0-20009-0-200,,2015-07-28 20:40:30
+NOAA-9,331,12 Dec 1984,13 Feb 1998,NOAA 4th generation / Polar Operational Environmental Satellites,"NOAA
+NASA",SunSync,850 km,,,14:30 asc,Inactive,"AVHRR/2
+Argos
+ERBE (NOAA)
+HIRS/2
+MSU
+S&RSAT
+SBUV/2
+SEM/MEPED
+SEM/TED
+SSU",0-20009-0-201,,2015-07-28 20:41:35
+NovaSAR-S,767,16 Sep 2018,≥2026,NovaSAR-S,"SSTL
+UKSA",SunSync,580 km,,,10:30 asc,Operational,S-SAR,0-20009-0-,,2026-02-02 17:24:21
+ÑuSat     ,935,30 May 2016,≥2040,ÑuSat Earth Observation Microsatellite Constellation,"Satellogic
+",DRIFT,500 km,,,,Operational,ÑuSat-Imager,-20009--,,2025-11-29 16:10:15
+Obzor-O N1,648,≥2026,≥2031,Operative Monitoring Satellite - Optical,"Roscosmos
+",SunSync,700 km,,,10:30 desc,Planned,,0-20009-0-,,2026-02-09 10:30:25
+Obzor-O N2,649,≥2026,≥2032,Operative Monitoring Satellite - Optical,"Roscosmos
+",SunSync,700 km,,,10:30 desc,Planned,,0-20009-0-,,2026-02-09 10:31:02
+Obzor-O N3,650,≥2026,≥2033,Operative Monitoring Satellite - Optical,"Roscosmos
+",SunSync,700 km,,,10:30 desc,Planned,,,,2017-03-12 13:44:27
+Obzor-O N4,651,≥2027,≥2034,Operative Monitoring Satellite - Optical,"Roscosmos
+",SunSync,700 km,,,10:30 desc,Planned,,,,2017-03-12 13:45:58
+Obzor-R N1,644,25 Dec 2025,≥2029,Operative Monitoring Satellite - Radar,"Roscosmos
+",SunSync,650 km,,,06:00 desc,Commissioning,ASAR (MP),-20009--,,2025-12-27 12:28:35
+Obzor-R N2,645,≥2026,≥2029,Operative Monitoring Satellite - Radar,"Roscosmos
+",SunSync,650 km,,,TBD,Planned,ASAR (MP),0-20009-0-,,2026-02-09 10:27:39
+Obzor-R N3,646,≥2026,≥2030,Operative Monitoring Satellite - Radar,"Roscosmos
+",SunSync,650 km,,,TBD,Planned,ASAR (MP),0-20009-0-,,2026-02-09 10:28:26
+Obzor-R N4,647,≥2027,≥2034,Operative Monitoring Satellite - Radar,"Roscosmos
+",SunSync,650 km,,,TBD,Planned,ASAR (MP),,,2022-01-12 17:44:03
+OceanSat-1 (IRS-P4),343,26 May 1999,08 Aug 2010,Satellite for the Ocean,"ISRO
+",SunSync,723 km,,,12:00 desc,Inactive,"MSMR
+OCM (OceanSat-1)",,,2019-10-29 15:53:58
+OceanSat-2,344,23 Sep 2009,Jul 2023,Satellite for the Ocean,"ISRO
+",SunSync,730 km,,,11:53 desc,Inactive,"OCM (OceanSat-2)
+OSCAT
+ROSA (OceanSat)",0-20009-0-421,,2023-12-21 10:09:28
+OceanSat-3 (EOS-06),345,26 Nov 2022,≥2027,Satellite for the Ocean,"ISRO
+",SunSync,723 km,,,12:00 desc,Operational,"Argos-4
+OCM (OceanSat-3)
+OSCAT-3",0-20009-0-423,,2025-11-17 11:49:07
+OceanSat-3A,722,Jun 2026,≥2030,Satellite for the Ocean,"ISRO
+",SunSync,723 km,,,12:00 desc,Planned,"MATHS
+OCM (OceanSat-3)
+OSCAT-3
+SSTM",-20009--,,2026-01-20 10:39:44
+OCO,346,24 Feb 2009,24 Feb 2009,Orbiting Carbon Observatory ,"NASA
+",SunSync,705 km,,,13:15 asc,Lost at launch,OCO spectrometer,,,2015-07-28 20:47:53
+OCO-2,347,02 Jul 2014,≥2026,Orbiting Carbon Observatory ,"NASA
+",SunSync,705 km,,,13:36 asc,Operational,OCO spectrometer,0-20009-0-289,,2025-09-01 14:12:36
+Odin,348,20 Feb 2001,≥2026,Odin,"SNSA
+CNES
+CSA",SunSync,552 km,,,06:42 desc,Operational,"OSIRIS
+SMR",0-20009-0-813,,2026-01-19 13:33:03
+Okean-O-1,349,17 Jul 1999,15 Sep 2000,Okean-O,"NSAU
+Roscosmos
+RosHydroMet",DRIFT,648 km,,82.5°,,Inactive,"Delta-2D
+Kondor-2
+MSU-M
+MSU-SK (Okean)
+MSU-V
+R225
+R600
+RLSBO
+Trasser",,,2015-07-28 20:50:27
+Okean-O1-1,350,29 Jul 1986,29 Jul 1988,Okean Operational 1,"NSAU
+Roscosmos
+RosHydroMet",DRIFT,660 km,,82.5°,,Inactive,"Kondor
+MSU-SK (Okean)
+MWR (Okean)
+RLSBO
+RM-08  (Okean)",,,2019-10-22 01:49:33
+Okean-O1-2,351,16 Jul 1987,16 Jul 1989,Okean Operational 1,"NSAU
+Roscosmos
+RosHydroMet",DRIFT,660 km,,82.5°,,Inactive,"Kondor
+MSU-SK (Okean)
+MWR (Okean)
+RLSBO
+RM-08  (Okean)",,,2019-10-22 01:50:18
+Okean-O1-3,352,05 Jul 1988,05 Jul 1990,Okean Operational 1,"NSAU
+Roscosmos
+RosHydroMet",DRIFT,660 km,,82.5°,,Inactive,"Kondor
+MSU-SK (Okean)
+MWR (Okean)
+RLSBO
+RM-08  (Okean)
+Trasser",,,2019-10-22 01:51:18
+Okean-O1-4,353,09 Jun 1989,09 Jun 1989,Okean Operational 1,"NSAU
+Roscosmos
+RosHydroMet",DRIFT,660 km,,82.5°,,Inactive,"Kondor
+MSU-SK (Okean)
+MWR (Okean)
+RLSBO
+RM-08  (Okean)",,,2019-10-22 01:51:55
+Okean-O1-5,354,28 Feb 1990,28 Feb 1992,Okean Operational 1,"NSAU
+Roscosmos
+RosHydroMet",DRIFT,660 km,,82.5°,,Inactive,"Kondor
+MSU-SK (Okean)
+MWR (Okean)
+RLSBO
+RM-08  (Okean)",,,2019-10-22 01:52:31
+Okean-O1-6,355,04 Jun 1991,04 Jun 1993,Okean Operational 1,"NSAU
+Roscosmos
+RosHydroMet",DRIFT,660 km,,82.5°,,Inactive,"Kondor
+MSU-SK (Okean)
+MWR (Okean)
+RLSBO
+RM-08  (Okean)",,,2019-10-22 01:53:01
+Okean-O1-7,356,11 Oct 1994,11 Oct 1996,Okean Operational 1,"NSAU
+Roscosmos
+RosHydroMet",DRIFT,660 km,,82.5°,,Inactive,"Kondor
+MSU-SK (Okean)
+MWR (Okean)
+RLSBO
+RM-08  (Okean)",,,2019-10-22 01:53:32
+OrbView-1/MicroLab,309,01 Apr 1995,03 Apr 2000,Orbview-1 (former: MicroLab),"NASA
+UCAR",DRIFT,785 km,,70°,,Inactive,"GPS/MET
+OTD",,,2015-08-24 18:58:23
+OrbView-2/SeaStar,395,01 Aug 1997,11 Dec 2010,OrbView-2 (former: SeaStar),"GeoEye
+",SunSync,705 km,,,12:00 desc,Inactive,SeaWiFS,,,2015-07-28 20:59:34
+OrbView-3,501,26 Jun 2003,23 Apr 2007,GeoEye,"Maxar
+GeoEye",SunSync,470 km,,,10:30 desc,Inactive,OHRIS,,,2015-07-28 21:00:20
+OrbView-4,563,21 Sep 2001,21 Sep 2001,GeoEye,"Maxar
+GeoEye",SunSync,470 km,,,10:30 desc,Lost at launch,"OHIS
+OHRIS",,,2015-07-28 21:01:45
+Ørsted,357,23 Feb 1999,Jan 2014,Ørsted (Oersted),"DNSC
+CNES
+NASA",DRIFT,750 km,,96.5°,,Inactive,"ASC
+CPD
+FVM
+OVM
+TRSR (Ørsted)",,,2017-07-22 17:23:30
+PACE,358,08 Feb 2024,≥2027,Pre-ACE (ACE = Aerosol-Cloud Ecosystems),"NASA
+CNES",SunSync,676 km,,,13:00 desc,Operational,"HARP2
+OCI
+SPEXone",-20009--,,2024-11-04 08:27:33
+PARASOL,359,18 Dec 2004,18 Dec 2013,"Polarisation et Anisotropie des Réflectances au sommet de l'Atmosphère, couplées avec un Satellite d'Observation emportant un Lidar","CNES
+",SunSync,700 km,,,15:20 asc,Inactive,POLDER,,,2015-07-28 21:35:09
+Parker Solar Probe,577,12 Aug 2018,≥2026,Parker Solar Probe,"NASA
+",Solar,,,3.4°,,Operational,"FIELDS
+ISIS-EPI
+SWEAPI
+WISPR",0-20009-0-,,2026-02-02 16:25:53
+PATH,516,TBD,TBD,Precipitation and All-weather Temperature and Humidity,"NASA
+",GEO,35786 km,,,,Mission concept,GeoSTAR,,,2018-06-20 23:22:21
+Pelican,1035,11 Nov 2023,≥2039,Pelican,"Planet
+",SunSync,475 km,,,,Operational,Pelican Imager,-20009--,,2025-11-29 16:28:06
+PeruSat-1,707,16 Sep 2016,≥2026,PeruSat,"CONIDA
+",SunSync,705 km,,,10:30 desc,Operational,NAOMI (KazEOSat),,,2017-08-03 12:14:28
+Picard,486,15 Jun 2010,04 Apr 2014,Picard,"CNES
+",SunSync,725 km,,,06:00 asc,Inactive,"PREMOS
+SODISM
+SOVAP",,,2017-01-05 01:09:31
+PIESAT-1,1015,30 Mar 2023,≥2033,NUWA-1 SAR Constellation,"CASC
+",SunSync,530 km,,97.5°,06:00 asc,Operational,X-SAR (PIESAT),0-20009-0-,,2024-11-11 11:05:07
+PIESAT-2,1089,09 Nov 2024,≥2034,NUWA-1 SAR Constellation,"CASC
+",SunSync,530 km,,97.5°,10:00 desc,Operational,X-SAR (PIESAT),0-20009-0-,,2025-05-12 10:30:44
+PLATiNO-1,1143,≥2026,≥2029,PLATiNO,"ASI
+",SunSync,740 km,,,05:45 asc,Planned,SAR-X (PLATiNO),0-20009-0-0,,2025-09-08 10:59:17
+PLATiNO-2,1142,≥2026,≥2029,PLATiNO,"ASI
+",SunSync,740 km,,,,Planned,"MAIA
+PLATiNO TIR",0-20009-0-0,,2025-09-08 10:31:42
+Pléiades-1A,361,17 Dec 2011,≥2028,Pléiades,"CNES
+",SunSync,705 km,,,10:30 desc,Operational,HiRI,0-20009-0-,,2026-02-02 16:28:30
+Pléiades-1B,362,02 Dec 2012,≥2028,Pléiades,"CNES
+",SunSync,694 km,,,10:30 desc,Operational,HiRI,0-20009-0-,,2026-02-02 16:28:56
+Pléiades-Neo 3,821,29 Apr 2021,≥2031,Pléiades Neo,"Airbus
+",SunSync,620 km,,,10:30 desc,Operational,Pléiades-Neo,,,2021-08-25 16:50:07
+Pléiades-Neo 4,822,17 Aug 2021,≥2031,Pléiades Neo,"Airbus
+",SunSync,620 km,,,10:30 desc,Operational,Pléiades-Neo,,,2022-02-01 16:15:26
+Pléiades-Neo 5,823,21 Dec 2022,21 Dec 2022,Pléiades Neo,"Airbus
+",SunSync,620 km,,,10:30 desc,Lost at launch,Pléiades-Neo,,,2022-12-21 13:59:03
+Pléiades-Neo 6,824,21 Dec 2022,21 Dec 2022,Pléiades Neo,"Airbus
+",SunSync,620 km,,,10:30 desc,Lost at launch,Pléiades-Neo,,,2022-12-21 13:58:27
+Polar,487,24 Feb 1996,15 Apr 2008,Polar,"NASA
+",MAG,,,86°,,Inactive,"CAMMICE
+CEPPAD
+EFI (Polar)
+HYDRA
+MFE
+PIXIE
+PWI (Polar)
+TIDE/PSI
+TIMAS
+UVI
+VIS",,,2015-07-28 21:48:30
+PolSIR-1,1033,≥2027,≥2030,Polarized Submillimeter Ice-cloud Radiometer,"NASA
+",DRIFT,475 km,,51°,,Planned,PolSIR radiometer,-20009--,,2025-09-18 13:42:27
+PolSIR-2,1034,≥2027,≥2030,Polarized Submillimeter Ice-cloud Radiometer,"NASA
+",DRIFT,475 km,,51°,,Planned,PolSIR radiometer,-20009--,,2025-09-18 13:43:08
+PREFIRE-1,875,05 Jun 2024,≥2026,Polar Radiant Energy in the Far-InfraRed Experiment,"NASA
+",SunSync,544 km,,90°,15:45 desc,Operational,TIRS (PREFIRE),-20009--,,2026-02-02 16:15:05
+PREFIRE-2,1063,25 May 2024,≥2026,Polar Radiant Energy in the Far-InfraRed Experiment,"NASA
+",SunSync,530 km,,90°,08:03 asc,Operational,TIRS (PREFIRE),-20009--,,2026-02-02 16:15:26
+PRETTY,1001,06 Oct 2023,≥2026,Passive Reflectometry and Dosimetry,"ESA
+",SunSync,579 km,,,11:00 desc,Operational,"Dosimeter
+GNSS-R (PRETTY)",-20009--,,2026-02-02 16:09:24
+PRISMA,363,22 Mar 2019,≥2026,PRecursore IperSpettrale della Missione Applicativa,"ASI
+",SunSync,615 km,,,10:30 desc,Operational,"HYC
+PAN",0-20009-0-,,2026-02-02 16:59:52
+PRISMA2GEN,1026,≥2028,≥2035,PRecursore IperSpettrale della Missione Applicativa,"ASI
+",SunSync,515 km,,,10:30 desc,Planned,"HYC
+PAN",,,2023-11-14 17:51:46
+PROBA-1,364,22 Oct 2001,≥2026,Project for On-Board Autonomy,"ESA
+",SunSync,615 km,,,07:30 desc,Operational,"CHRIS
+HRC
+SREM-dose
+SREM-particles",0-20009-0-,,2026-02-02 16:53:22
+PROBA-2,490,02 Nov 2009,≥2026,Project for On-Board Autonomy,"ESA
+",SunSync,730 km,,,06:00 asc,Operational,"DSLP
+LYRA
+SWAP
+TPMU",0-20009-0-,,2026-02-02 16:52:07
+PROBA-3C,1046,05 Dec 2024,≥2030,Project for On-Board Autonomy,"ESA
+",Molniya,,,,,Operational,ASPIICS,-20009--,https://www.esa.int/Enabling_Support/Space_Engineering_Technology/Proba_Missions/About_Proba-3,2025-09-15 13:47:12
+PROBA-3O,1047,05 Dec 2024,≥2030,Project for On-Board Autonomy,"ESA
+",Molniya,,,,,Operational,Occulter,-20009--,https://www.esa.int/Enabling_Support/Space_Engineering_Technology/Proba_Missions/About_Proba-3,2025-09-15 13:50:36
+PROBA-V,562,07 May 2013,31 Oct 2021,Project for On-Board Autonomy,"ESA
+",SunSync,820 km,,,11:00 asc,Unclear,"EPD (PROBA-V)
+Végétation-P",-20009--,,2024-09-23 10:31:46
+PROBA-V-CC,1021,09 Oct 2023,≥2026,Project for On-Board Autonomy,"ESA
+",SunSync,574 km,,,11:00 desc,Operational,Végétation-P,-20009--,,2026-02-02 16:04:24
+PUNCH,928,12 Mar 2025,≥2028,Polarimeter to UNify the Corona and Heliosphere,"NASA
+NRL",SunSync,570 km,,,06:00 asc,Operational,"NFI
+STEAM
+WFI (PUNCH)",0-20009-0-,,2025-12-15 09:05:55
+QPS-SAR 10,1137,17 May 2025,≥2029,Q-shu Pioneers of Space - Synthetic Aperture Radar,"iQPS
+",DRIFT,580 km,,42°,,Operational,QPS-SAR,0-20009-0-0,,2026-02-23 08:45:41
+QPS-SAR 11,1138,11 Jun 2025,≥2029,Q-shu Pioneers of Space - Synthetic Aperture Radar,"iQPS
+",DRIFT,580 km,,42°,,Operational,QPS-SAR,0-20009-0-0,,2026-02-23 08:45:59
+QPS-SAR 12,1140,05 Aug 2025,≥2029,Q-shu Pioneers of Space - Synthetic Aperture Radar,"iQPS
+",DRIFT,580 km,,42°,,Operational,QPS-SAR,0-20009-0-0,,2026-02-23 08:46:13
+QPS-SAR 14,1151,05 Nov 2025,30 Nov 2028,Q-shu Pioneers of Space - Synthetic Aperture Radar,"iQPS
+",DRIFT,580 km,,42°,,Commissioning,QPS-SAR,0-20009-0-0,,2025-11-07 09:08:23
+QPS-SAR 15,1157,21 Dec 2025,30 Nov 2028,Q-shu Pioneers of Space - Synthetic Aperture Radar,"iQPS
+",DRIFT,580 km,,42°,,Commissioning,QPS-SAR,0-20009-0-0,,2025-12-22 09:24:23
+QPS-SAR 5,1132,15 Dec 2023,≥2028,Q-shu Pioneers of Space - Synthetic Aperture Radar,"iQPS
+",DRIFT,580 km,,42°,,Operational,QPS-SAR,0-20009-0-0,,2025-06-16 09:51:52
+QPS-SAR 6,1133,12 Jun 2023,≥2028,Q-shu Pioneers of Space - Synthetic Aperture Radar,"iQPS
+",SunSync,500 km,,97.5°,,Operational,QPS-SAR,0-20009-0-0,,2025-06-16 09:51:41
+QPS-SAR 7,1134,08 Apr 2024,≥2029,Q-shu Pioneers of Space - Synthetic Aperture Radar,"iQPS
+",DRIFT,590 km,,45.6°,,Operational,QPS-SAR,0-20009-0-0,,2025-06-16 09:52:59
+QPS-SAR 8,1135,16 Aug 2024,≥2029,Q-shu Pioneers of Space - Synthetic Aperture Radar,"iQPS
+",SunSync,550 km,,97.5°,,Operational,QPS-SAR,0-20009-0-0,,2025-06-16 09:55:49
+QPS-SAR 9,1136,15 Mar 2025,≥2029,Q-shu Pioneers of Space - Synthetic Aperture Radar,"iQPS
+",DRIFT,573 km,,42°,,Operational,QPS-SAR,0-20009-0-0,,2025-06-16 10:05:25
+QuickBird,497,18 Oct 2001,27 Jan 2015,WorldView,"Maxar
+DigitalGlobe",SunSync,482 km,,,10:30 desc,Inactive,BGIS-2000,,,2015-07-28 21:52:49
+QuickSounder,949,Apr 2026,≥2029,Near Earth Orbit Network,"NOAA
+NASA",SunSync,824 km,,,17:30 asc,Planned,ATMS,-20009--,,2025-06-11 07:26:24
+QuikSCAT,365,19 Jun 1999,23 Nov 2009,Quick Scatterometer Mission,"NASA
+",SunSync,803 km,,,06:00 asc,Inactive,SeaWinds,0-20009-0-281,,2019-10-22 16:50:07
+RadarSat-1,366,04 Nov 1995,29 Mar 2013,RadarSat,"CSA
+",SunSync,798 km,,,06:00 desc,Inactive,SAR (RadarSat-1),,,2019-10-27 14:02:59
+RadarSat-2,367,14 Dec 2007,≥2027,RadarSat,"CSA
+",SunSync,798 km,,,05:59 desc,Operational,SAR (RadarSat-1),-20009--,,2025-11-13 11:38:42
+RapidEye (5 sats),368,29 Aug 2008,Mar 2020,RapidEye,"Planet
+DLR
+RapidEye",SunSync,630 km,,,11:00 desc,Presumably inactive,REIS,,,2022-01-02 22:16:02
+RASAT,369,17 Aug 2011,≥2026,Remote Sensing Satellite,"TÜBITAK-UZAY
+",SunSync,690 km,,,10:15 asc,Operational,OIS,0-20009-0-,,2026-02-02 17:19:52
+RCM-1,370,12 Jun 2019,≥2031,RadarSat Constellation Mission,"CSA
+",SunSync,592 km,,,06:01 desc,Operational,"AIS
+SAR RCM",-20009--,,2025-11-13 11:40:22
+RCM-2,1085,12 Jun 2019,≥2031,RadarSat Constellation Mission,"CSA
+",SunSync,592 km,,,06:01 desc,Operational,"AIS
+SAR RCM",-20009--,,2025-11-13 11:40:34
+RCM-3,1086,12 Jun 2019,≥2031,RadarSat Constellation Mission,"CSA
+",SunSync,592 km,,,06:01 desc,Operational,"AIS
+SAR RCM",-20009--,,2025-11-13 11:40:56
+ResourceSat-1 (IRS-P6),373,17 Oct 2003,07 Dec 2013,Satellite for Earth Resources,"ISRO
+",SunSync,817 km,,,10:42 desc,Inactive,"AWiFS
+LISS-3 (ResourceSat)
+LISS-4",,,2022-10-24 10:45:46
+ResourceSat-2,374,20 Apr 2011,≥2026,Satellite for Earth Resources,"ISRO
+",SunSync,817 km,,,10:33 desc,Operational,"AWiFS
+LISS-3 (ResourceSat)
+LISS-4",-20009--,,2026-02-02 16:05:59
+ResourceSat-2A,602,07 Dec 2016,≥2026,Satellite for Earth Resources,"ISRO
+",SunSync,817 km,,,10:20 desc,Operational,"AWiFS
+LISS-3 (ResourceSat)
+LISS-4",0-20009-0-,,2026-02-02 16:05:34
+ResourceSat-3,720,≥2026,≥2030,Satellite for Earth Resources,"ISRO
+",SunSync,795 km,,,10:30 desc,Planned,"ALISS-3
+ATCOR",0-20009-0-,,2026-02-09 10:32:23
+ResourceSat-3A,721,≥2026,≥2030,Satellite for Earth Resources,"ISRO
+",SunSync,795 km,,,10:30 desc,Planned,"ALISS-3
+ATCOR",,,2023-07-24 08:39:35
+ResourceSat-3S,747,≥2026,≥2029,Satellite for Earth Resources,"ISRO
+",SunSync,633 km,,,10:30 desc,Planned,"APAN (ResourceSat-3S)
+LISS-V",0-20009-0-,,2026-02-09 10:33:19
+ResourceSat-3SA,748,≥2026,≥2031,Satellite for Earth Resources,"ISRO
+",SunSync,633 km,,,10:30 desc,Planned,"APAN (ResourceSat-3S)
+LISS-V",,,2023-07-24 08:41:09
+Resurs-DK,375,15 Jun 2006,≥2016,Resurs-P,"Roscosmos
+",DRIFT,570 km,,70.4°,,Inactive,"ARINA
+Geoton-1
+PAMELA",,,2018-08-12 11:18:14
+Resurs-O1-1,376,03 Oct 1985,11 Nov 1986,Resurs Operational - 1,"Roscosmos
+RosHydroMet",SunSync,620 km,,,10:15 asc,Inactive,"MSU-E (Resurs-O1)
+MSU-SK (Resurs)
+SAR-Travers",,,2015-07-29 11:09:40
+Resurs-O1-2,377,20 Apr 1988,01 Jun 1999,Resurs Operational - 1,"Roscosmos
+RosHydroMet",SunSync,650 km,,,10:15 asc,Inactive,"MSU-E (Resurs-O1)
+MSU-SK (Resurs)",,,2015-07-29 11:10:28
+Resurs-O1-3,378,04 Nov 1994,15 May 2001,Resurs Operational - 1,"Roscosmos
+RosHydroMet",SunSync,675 km,,,10:15 asc,Inactive,"MSU-E (Resurs-O1)
+MSU-SK (Resurs)",,,2015-07-29 11:11:06
+Resurs-O1-4,379,10 Jul 1998,15 Jan 2002,Resurs Operational - 1,"Roscosmos
+RosHydroMet",SunSync,835 km,,,10:15 asc,Inactive,"MP-900B
+MSU-E (Resurs-O1)
+MSU-SK1
+ScaRaB",,,2015-07-29 11:11:46
+Resurs-P1,452,25 Jun 2013,Oct 2021,Resurs-P,"Roscosmos
+",SunSync,473 km,,,10:30 desc,Inactive,"GSA
+Geoton-L1
+ShMSA-SR
+ShMSA-VR ",,,2022-08-23 10:07:44
+Resurs-P2,558,26 Dec 2014,10 Oct 2018,Resurs-P,"Roscosmos
+",SunSync,475 km,,,10:30 desc,Inactive,"GSA
+Geoton-L1
+Nucleon
+ShMSA-SR
+ShMSA-VR ",,,2022-01-12 17:36:15
+Resurs-P3,640,13 Mar 2016,16 May 2017,Resurs-P,"Roscosmos
+",SunSync,477 km,,,10:30 desc,Inactive,"GSA
+Geoton-L1
+ShMSA-SR
+ShMSA-VR ",,,2022-01-12 17:38:05
+Resurs-P4,786,31 Mar 2024,≥2029,Resurs-P,"Roscosmos
+",SunSync,477 km,,,10:30 desc,Operational,"GSA
+Geoton-L1
+ShMSA-SR
+ShMSA-VR ",-20009--,,2024-10-21 07:35:18
+Resurs-P5,787,25 Dec 2024,≥2029,Resurs-P,"Roscosmos
+",SunSync,477 km,,,10:30 desc,Operational,"GSA
+Geoton-L1
+ShMSA-VR ",-20009--,,2026-02-23 08:58:14
+RHESSI,573,05 Feb 2002,16 Aug 2018,Reuven Ramaty High Energy Solar Spectroscopic Imager,"NASA
+",DRIFT,600 km,,38°,,Inactive,RHESSI,,,2020-02-27 19:41:17
+RISAT-1,380,26 Apr 2012,31 Mar 2017,Radar Imaging Satellite,"ISRO
+",SunSync,546 km,,,06:00 desc,Inactive,SAR-C (RISAT),,,2020-01-04 13:53:08
+RISAT-1B (EOS-09),1012,18 May 2025,≥2029,Radar Imaging Satellite,"ISRO
+",SunSync,529 km,,,06:00 desc,Lost at launch,SAR-C (RISAT),-20009--,,2025-05-20 09:07:56
+RISAT-2,381,20 Apr 2009,30 Oct 2022,Radar Imaging Satellite,"ISRO
+",DRIFT,440 km,,41°,,Inactive,SAR-X (RISAT-2),,,2024-01-23 15:32:48
+RISAT-2B,778,22 May 2019,≥2026,Radar Imaging Satellite,"ISRO
+",DRIFT,555 km,,37°,,Operational,SAR-X (RISAT-2),0-20009-0-,,2026-02-02 16:32:41
+RISAT-2BR1,783,11 Dec 2019,≥2026,Radar Imaging Satellite,"ISRO
+",DRIFT,555 km,,37°,,Operational,SAR-X (RISAT-2),0-20009-0-,,2026-02-02 16:33:06
+ROSE-L A,916,≥2030,≥2035,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,693 km,,,06:00 desc,Planned,ROSE-L,,,2023-11-15 17:09:56
+ROSE-L B,1040,≥2032,≥2037,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,693 km,,,06:00 desc,Planned,ROSE-L,,,2023-11-15 17:09:42
+S3NG-TOPO A,1118,≥2032,≥2040,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,810 km,,,18:00 asc,Considered,Poseidon-5,-20009--,,2025-04-14 13:48:53
+S3NG-TOPO B,1119,≥2032,≥2040,Copernicus Sentinel Expansion Missions,"ESA
+EC
+EUMETSAT",SunSync,810 km,,,18:00 asc,Considered,Poseidon-5,-20009--,,2025-04-14 13:49:14
+SAC-A,382,04 Dec 1998,15 Aug 1999,Satélite de Aplicaciones Cientificas,"CONAE
+AEB
+INPE
+NASA",DRIFT,395 km,,51.6°,,Inactive,,,,2015-07-29 11:16:35
+SAC-B,383,04 Nov 1996,04 Nov 1996,Satélite de Aplicaciones Cientificas,"CONAE
+AEB
+INPE
+NASA",DRIFT,550 km,,38°,,Lost at launch,"CUBIC
+GXRE/GRaBS
+GXRE/SOXS
+HXRS
+ISENA",,,2015-07-29 11:19:54
+SAC-C,384,21 Nov 2000,15 Aug 2013,Satélite de Aplicaciones Cientificas,"CONAE
+AEB
+INPE
+NASA",SunSync,705 km,,,10:20 desc,Inactive,"DCS (SAC)
+FVM
+GOLPE
+HRTC
+HSTC
+ICARE
+IST
+MMRS
+OVM",0-20009-0-820,,2015-07-29 11:21:01
+SAC-D,385,10 Jun 2011,07 Jun 2015,Satélite de Aplicaciones Cientificas,"CONAE
+AEB
+INPE
+NASA",SunSync,661 km,,,06:00 desc,Inactive,"Aquarius
+DCS (SAC)
+HSC
+ICARE
+MWR (SAC-D)
+NIRST
+ROSA",0-20009-0-821,,2017-01-05 01:08:23
+SAC-E/SABIA-MAR A,626,≥2026,≥2029,Satélite de Aplicaciones Cientificas,"CONAE
+AEB
+INPE
+NASA",SunSync,645 km,,,10:30 desc,Planned,"DCS (SAC)
+HSC
+MUS-nir/swir",0-20009-0-,,2026-02-09 10:24:46
+SAC-E/SABIA-MAR B,627,≥2026,≥2029,Satélite de Aplicaciones Cientificas,"CONAE
+AEB
+INPE
+NASA",SunSync,645 km,,,10:30 desc,Planned,"DCS (SAC)
+HSC
+MUS-uv/vis/nir",0-20009-0-,,2026-02-09 10:25:48
+SAMPEX,598,03 Jul 1992,13 Nov 2012,Solar Anomalous and Magnetospheric Particle Explorer,"NASA
+",DRIFT,590 km,,82°,,Inactive,"HILT
+LEICA
+MAST
+PET",,,2015-07-29 11:24:55
+SAOCOM-1A,386,08 Oct 2018,≥2026,SAtélite Argentino de Observación COn Microondas,"CONAE
+",SunSync,620 km,,,06:00 asc,Operational,SAR-L,0-20009-0-,,2026-02-02 17:30:03
+SAOCOM-1B,387,30 Aug 2020,≥2026,SAtélite Argentino de Observación COn Microondas,"CONAE
+",SunSync,620 km,,,06:00 asc,Operational,SAR-L,0-20009-0-,,2026-02-02 17:30:24
+SAOCOM-2A,388,≥2026,≥2030,SAtélite Argentino de Observación COn Microondas,"CONAE
+",SunSync,620 km,,,06:00 asc,Planned,SAR-L,0-20009-0-,,2026-02-09 10:20:53
+SAOCOM-2B,389,≥2026,≥2031,SAtélite Argentino de Observación COn Microondas,"CONAE
+",SunSync,620 km,,,06:00 asc,Planned,SAR-L,,,2021-11-25 15:15:21
+SARAL,390,25 Feb 2013,≥2026,Satellite with ARgos and ALtiKa,"CNES
+ISRO",SunSync,800 km,,,05:56 asc,Operational,"A-DCS
+AltiKa
+DORIS
+LRA (CNES)",0-20009-0-441,,2026-02-02 17:26:06
+ScatSat-1,605,26 Sep 2016,28 Feb 2021,Satellite for the Ocean,"ISRO
+",SunSync,732 km,,,08:45 desc,Inactive,OSCAT,0-20009-0-422,,2021-06-10 16:21:34
+SCD-1,391,09 Feb 1993,≥2026,Satélite de Coleta de Dados,"INPE
+AEB",DRIFT,750 km,,25°,,Operational,DCS (CBERS),0-20009-0-,,2026-02-02 17:27:15
+SCD-2,392,22 Oct 1998,≥2026,Satélite de Coleta de Dados,"INPE
+AEB",DRIFT,750 km,,25°,,Operational,DCS (CBERS),0-20009-0-,,2026-02-02 17:27:40
+SCISAT-1,393,13 Aug 2003,≥2027,Science Satellite / Atmospheric Chemistry Experiment,"CSA
+NASA",DRIFT,650 km,,73.9°,,Operational,"ACE-FTS
+MAESTRO",0-20009-0-812,,2025-11-13 11:33:38
+SCLP,518,TBD,TBD,Snow and Cold Land Processes,"NASA
+",SunSync,TBD km,,,TBD,Mission concept,SAR-X/Ku,,,2018-06-20 23:21:14
+SDGSAT-1,1011,05 Nov 2021,≥2026,Sustainable Development Science Satellite,"CAS
+",SunSync,505 km,,97.5°,10:00 desc,Operational,"GLIMMER
+MSI (SDGSAT)
+TIR",0-20009-0-,,2026-02-02 16:07:22
+SDO,457,11 Feb 2010,≥2026,Solar Dynamics Observatory,"NASA
+",GeoSync,35756 km,105 ° W,29.6°,,Operational,"AIA
+EVE
+HMI",0-20009-0-,,2026-02-02 17:16:19
+SeaSat,394,27 Jun 1978,10 Oct 1978,SeaSat,"NASA
+",DRIFT,785 km,,108°,,Inactive,"ALT (SeaSat)
+LRR (NASA)
+SAR
+SASS
+SMMR
+VIRR (Seasat)",,,2015-07-29 11:27:26
+Sentinel-1A,396,03 Apr 2014,≥2026,Sentinel-1,"ESA
+EC",SunSync,693 km,,,06:00 desc,Operational,SAR-C (Sentinel-1),0-20009-0-062,,2025-04-14 07:55:33
+Sentinel-1B,397,25 Apr 2016,03 Aug 2022,Sentinel-1,"ESA
+EC",SunSync,693 km,,,06:00 desc,Inactive,SAR-C (Sentinel-1),0-20009-0-063,,2023-11-06 08:53:58
+Sentinel-1C,754,05 Dec 2024,≥2034,Sentinel-1,"ESA
+EC",SunSync,693 km,,,06:00 desc,Operational,"AIS
+SAR-C (Sentinel-1)",0-20009-0-068,,2025-10-24 14:25:32
+Sentinel-1D,755,04 Nov 2025,≥2035,Sentinel-1,"ESA
+EC",SunSync,693 km,,,06:00 desc,Commissioning,SAR-C (Sentinel-1),0-20009-0-069,,2025-11-05 09:01:45
+Sentinel-2A,398,23 Jun 2015,May 2026,Sentinel-2,"ESA
+EC",SunSync,786 km,,,10:30 desc,Operational,MSI (Sentinel-2A),-20009--,,2026-01-16 13:39:01
+Sentinel-2B,399,07 Mar 2017,≥2027,Sentinel-2,"ESA
+EC",SunSync,786 km,,,10:30 desc,Operational,MSI (Sentinel-2A),-20009--,,2025-01-27 08:35:22
+Sentinel-2C,756,04 Sep 2024,≥2034,Sentinel-2,"ESA
+EC",SunSync,786 km,,,10:30 desc,Operational,MSI (Sentinel-2A),-20009--,,2025-06-09 10:59:46
+Sentinel-2D,757,≥2028,≥2038,Sentinel-2,"ESA
+EC",SunSync,786 km,,,10:30 desc,Planned,MSI (Sentinel-2A),-20009--,,2025-01-27 08:34:08
+Sentinel-3A,400,16 Feb 2016,≥2027,Sentinel-3,"ESA
+EC
+EUMETSAT",SunSync,814.5 km,,,10:00 desc,Operational,"DORIS
+GPS (ESA)
+LRR (ESA)
+MWR (Sentinel-3)
+OLCI
+SLSTR
+SRAL",0-20009-0-061,,2026-03-23 08:22:37
+Sentinel-3B,802,25 Apr 2018,≥2028,Sentinel-3,"ESA
+EC
+EUMETSAT",SunSync,814.5 km,,,10:00 desc,Operational,"DORIS
+GPS (ESA)
+LRR (ESA)
+MWR (Sentinel-3)
+OLCI
+SLSTR
+SRAL",0-20009-0-065,,2025-11-17 12:03:29
+Sentinel-3C,803,≥2026,≥2035,Sentinel-3,"ESA
+EC
+EUMETSAT",SunSync,810 km,,,10:00 desc,Planned,"DORIS
+GPS (ESA)
+LRR (ESA)
+MWR (Sentinel-3)
+OLCI
+SLSTR
+SRAL",-20009--,,2026-03-23 08:23:15
+Sentinel-3D,804,≥2028,≥2037,Sentinel-3,"ESA
+EC
+EUMETSAT",SunSync,810 km,,,10:00 desc,Planned,"DORIS
+GPS (ESA)
+LRR (ESA)
+MWR (Sentinel-3)
+OLCI
+SLSTR
+SRAL",-20009--,,2026-03-23 08:23:38
+Sentinel-5P,402,13 Oct 2017,≥2027,Sentinel-5 precursor,"ESA
+NSO",SunSync,824 km,,,13:30 asc,Operational,TROPOMI,0-20009-0-064,,2025-01-27 08:31:15
+Sentinel-6A,479,21 Nov 2020,≥2027,Sentinel-6,"EUMETSAT
+CNES
+EC
+ESA
+NASA
+NOAA",DRIFT,1336 km,,66°,,Operational,"AMR-C
+DORIS
+GNSS-RO (Sentinel-6)
+GPS (ESA)
+HRMR
+LRA (NASA)
+Poseidon-4
+RMU",0-20009-0-066,,2026-03-23 08:21:08
+Sentinel-6B,480,17 Nov 2025,≥2032,Sentinel-6,"EUMETSAT
+CNES
+EC
+ESA
+NASA
+NOAA",DRIFT,1336 km,,66°,,Commissioning,"AMR-C
+DORIS
+GNSS-RO (Sentinel-6)
+GPS (ESA)
+HRMR
+LRA (NASA)
+Poseidon-4
+RMU",0-20009-0-067,,2025-11-17 07:53:00
+Sentinel-6C,1036,≥2030,≥2036,Sentinel-6,"EUMETSAT
+CNES
+EC
+ESA
+NASA
+NOAA",DRIFT,1336 km,,66°,,Planned,"AMR-C
+DORIS
+GNSS-RO (Sentinel-6)
+GPS (ESA)
+HRMR
+LRA (NASA)
+Poseidon-4
+RMU",-20009--,,2026-03-23 08:21:49
+SEOSAR/Paz,360,22 Feb 2018,≥2026,Satélite Español de Observación SAR (also Paz),"MDE
+CDTI",SunSync,514 km,,,06:00 asc,Operational,"LRR (DLR)
+ROHPP
+SAR-X (Paz (SEOSAR))",0-20009-0-044,,2026-01-19 13:33:03
+SEOSat/Ingenio,180,17 Nov 2020,17 Nov 2020,Spanish Earth Observation Satellite (also Ingenio),"CDTI
+ESA",SunSync,668 km,,,10:30 desc,Lost at launch,"MS (Ingenio)
+PAN (Ingenio)
+UVAS",,,2021-06-16 11:47:18
+SES-14,712,25 Jan 2018,≥2022,Société Européenne des Satellites,"SES
+",GEO,35786 km,47.5 ° W,,,Presumably inactive,GOLD,,,2023-06-05 09:19:25
+SICH-1,403,31 Aug 1995,14 Dec 2001,Okean Operational 1,"NSAU
+Roscosmos
+RosHydroMet",DRIFT,650 km,,82.5°,,Inactive,"Kondor
+MSU-SK (Okean)
+MWR (Okean)
+RLSBO
+RM-08  (Okean)",,,2019-10-22 01:54:11
+SICH-1M,404,24 Dec 2004,15 Apr 2006,Okean Operational 1,"NSAU
+Roscosmos
+RosHydroMet",DRIFT,650 km,,82.5°,,Inactive,"MSU-EU
+MTVZA-OK (MW)
+MTVZA-OK (optical)
+RLSBO
+RM-08  (Okean)",,,2019-10-22 01:54:37
+SICH-2,405,17 Aug 2011,12 Dec 2012,SICH 2,"NSAU
+",SunSync,700 km,,,10:50 desc,Inactive,"IREI
+MBEI
+Potential",,,2017-01-05 01:06:33
+SICH-2-30,927,13 Jan 2022,≥2027,SICH 2,"NSAU
+",SunSync,700 km,,,10:50 desc,Operational,"IREI
+MBEI
+Potential",,,2022-05-16 09:48:56
+SJ-9A,652,14 Oct 2012,≥2022,Shijian 9,"CRESDA
+CAST",SunSync,645 km,,,10:30 desc,Unclear,"MUX (SJ-9)
+PAN (SJ-9)",,,2022-01-03 15:43:28
+SJ-9B,653,14 Oct 2012,≥2022,Shijian 9,"CRESDA
+CAST",SunSync,645 km,,,10:30 desc,Unclear,IRS (SJ-9),,,2022-01-03 15:43:44
+SkySat-1,630,21 Nov 2013,≥2023,Sky Satellite,"Planet
+",SunSync,587 km,,,10:30 desc,Unclear,SkySat,,,2023-12-21 10:52:09
+SkySat-10,703,31 Oct 2017,≥2025,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,,,2025-01-09 10:26:21
+SkySat-11,704,31 Oct 2017,≥2025,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,,,2025-01-09 10:26:21
+SkySat-12,705,31 Oct 2017,≥2025,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,,,2025-01-09 10:26:21
+SkySat-13,706,31 Oct 2017,≥2025,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,,,2025-01-09 10:26:21
+SkySat-14,739,03 Dec 2018,≥2025,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,,,2025-01-09 10:26:21
+SkySat-15,740,03 Dec 2018,≥2025,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,,,2025-01-09 10:26:29
+SkySat-16,835,13 Jun 2020,≥2025,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,,,2021-06-17 18:00:49
+SkySat-17,837,13 Jun 2020,≥2025,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,,,2021-06-17 18:01:20
+SkySat-18,838,13 Jun 2020,≥2026,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,0-20009-0-,,2026-02-02 15:50:09
+SkySat-19,865,18 Aug 2020,≥2026,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,0-20009-0-,,2026-02-02 15:49:44
+SkySat-2,631,08 Jul 2014,≥2025,Sky Satellite,"Planet
+",SunSync,600 km,,,10:30 desc,Operational,SkySat,,,2025-01-09 10:26:13
+SkySat-20,866,18 Aug 2020,≥2026,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,0-20009-0-,,2026-02-02 15:48:40
+SkySat-21,867,18 Aug 2020,≥2026,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,0-20009-0-,,2026-02-02 15:49:19
+SkySat-3,679,22 Jun 2016,≥2025,Sky Satellite,"Planet
+",SunSync,500 km,,,10:30 desc,Operational,SkySat,,,2025-01-09 10:26:13
+SkySat-4,697,16 Sep 2016,≥2025,Sky Satellite,"Planet
+",SunSync,507 km,,,10:30 desc,Operational,SkySat,,,2025-01-09 10:26:13
+SkySat-5,698,16 Sep 2016,≥2025,Sky Satellite,"Planet
+",SunSync,507 km,,,10:30 desc,Operational,SkySat,,,2025-01-09 10:26:13
+SkySat-6,699,16 Sep 2016,≥2025,Sky Satellite,"Planet
+",SunSync,507 km,,,10:30 desc,Operational,SkySat,,,2025-01-09 10:26:13
+SkySat-7,700,16 Sep 2016,≥2025,Sky Satellite,"Planet
+",SunSync,509 km,,,10:30 desc,Operational,SkySat,,,2025-01-09 10:26:13
+SkySat-8,701,31 Oct 2017,≥2025,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,,,2025-01-09 10:26:21
+SkySat-9,702,31 Oct 2017,≥2025,Sky Satellite,"Planet
+",SunSync,500 km,,,13:30 asc,Operational,SkySat,,,2025-01-09 10:26:21
+SMAP,406,31 Jan 2015,≥2026,Soil Moisture Active-Passive,"NASA
+",SunSync,685 km,,,06:00 desc,Operational,SMAP,0-20009-0-789,,2023-12-18 09:01:43
+SME,997,06 Oct 1981,04 Apr 1989,Solar Mesosphere Explorer,"NASA
+",SunSync,540 km,,97.5°,03:00 ,Inactive,"SME (IR)
+SME (SPA)
+SME (SUM)
+SME (UVOE)
+SME (VND)",,,2023-05-15 10:39:17
+SMILE,1155,≥2026,≥2029,Solar Wind Magnetosphere Ionosphere Link Explorer ,"ESA
+CAS",MAG,121000 km,,,,Planned,"LIA
+MAG (SMILE)
+SXI (SMILE)
+UVI (SMILE)",0-20009-0-0,,2025-11-24 10:11:03
+SMM,407,14 Feb 1980,24 Nov 1989,Solar Maximum Mission,"NASA
+",DRIFT,510 km,,28.5°,,Inactive,"ACRIM-I
+CP
+GRS
+HXIS
+HXRBS
+UVSP
+XRP",,,2015-07-29 11:53:50
+SMOS,408,02 Nov 2009,≥2028,Soil Moisture and Ocean Salinity,"ESA
+CDTI
+CNES",SunSync,755 km,,,06:00 asc,Operational,"GPS (ESA)
+MIRAS
+STA",0-20009-0-046,,2025-03-24 17:40:29
+SMS-1,409,17 May 1974,21 Jan 1981,Synchronous Meteorological Satellite,"NASA
+NOAA",GEO,35786 km,75 ° W,,,Inactive,"DCIS
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+VISSR",,,2015-07-29 11:55:25
+SMS-2,410,06 Feb 1975,05 Aug 1982,Synchronous Meteorological Satellite,"NASA
+NOAA",GEO,35786 km,135 ° W,,,Inactive,"DCIS
+SEM/EPS
+SEM/HEPAD
+SEM/MAG
+SEM/XRS-EUV
+VISSR",,,2015-07-29 11:56:12
+SNPP,342,28 Oct 2011,≥2029,Joint Polar Satellite System,"NOAA
+NASA",SunSync,824 km,,,13:25 asc,Operational,"ATMS
+CERES
+CrIS
+OMPS-limb
+OMPS-nadir
+VIIRS",0-20009-0-224,,2026-02-02 08:32:48
+SOHO,458,02 Dec 1995,≥2027,Solar and Heliospheric Observatory,"ESA
+NASA",L1,1.5e+06 km,,,,Operational,"CDS
+CELIAS
+COSTEP
+EIT
+ERNE
+GOLF
+LASCO
+MDI
+SEM (SOHO)
+SUMER
+SWAN
+UVCS
+VIRGO",0-20009-0-,,2025-02-26 12:25:21
+Solar Orbiter,548,10 Feb 2020,≥2030,Solar Orbiter,"ESA
+NASA",Solar,N/A km,,25°,,Operational,"EPD
+EUI
+MAG (Solar Orbiter)
+METIS
+PHI
+RPW
+SPICE
+STIX
+SWA
+SoloHI",0-20009-0-,,2025-06-11 16:04:49
+Solar-A (Yohkoh),566,30 Aug 1991,15 Dec 2001,Solar,"JAXA
+",DRIFT,645 km,,31.3°,,Inactive,"BCS
+HXT
+SXT
+WBS",,,2015-07-29 12:02:29
+Solar-B (Hinode),455,23 Sep 2006,≥2026,Solar,"JAXA
+",SunSync,680 km,,,06:00 asc,Operational,"EIS
+SOT
+XRT",0-20009-0-,,2025-04-07 08:59:02
+SORCE,411,25 Jan 2003,25 Feb 2020,Solar Radiation and Climate Experiment,"NASA
+",DRIFT,640 km,,40°,,Inactive,"SIM
+SOLSTICE
+TIM
+XPS",,,2020-04-12 10:28:08
+SPOT-1,412,22 Feb 1986,02 Aug 2003,Satellite Pour l’Observation de la Terre,"CNES
+Spot Image",SunSync,822 km,,,10:30 desc,Inactive,HRV,0-20009-0-020,,2015-07-29 12:04:36
+SPOT-2,413,22 Jan 1990,01 Jul 2009,Satellite Pour l’Observation de la Terre,"CNES
+Spot Image",SunSync,822 km,,,10:30 desc,Inactive,"DORIS
+HRV",0-20009-0-021,,2015-07-29 12:09:06
+SPOT-3,414,26 Sep 1993,14 Nov 1996,Satellite Pour l’Observation de la Terre,"CNES
+Spot Image",SunSync,822 km,,,10:30 desc,Inactive,"DORIS
+HRV
+POAM",0-20009-0-022,,2015-07-29 12:09:46
+SPOT-4,415,24 Mar 1998,11 Jan 2013,Satellite Pour l’Observation de la Terre,"CNES
+Spot Image",SunSync,832 km,,,10:30 desc,Inactive,"DORIS
+HRVIR
+PASTEC
+POAM
+Végétation ",0-20009-0-023,,2017-01-05 01:21:03
+SPOT-5,416,04 May 2002,27 Mar 2015,Satellite Pour l’Observation de la Terre,"CNES
+Spot Image",SunSync,832 km,,,10:30 desc,Inactive,"DORIS
+HRG
+HRS
+Végétation ",,,2015-07-29 12:15:16
+SPOT-6,417,09 Sep 2012,≥2026,Satellite Pour l’Observation de la Terre - Follow-on,"Spot Image
+CNES",SunSync,695 km,,,10:30 desc,Operational,NAOMI (SPOT),0-20009-0-,,2026-02-02 15:37:33
+SPOT-7,418,30 Jun 2014,≥2026,Satellite Pour l’Observation de la Terre - Follow-on,"Spot Image
+CNES",SunSync,695 km,,,10:30 desc,Operational,NAOMI (SPOT),0-20009-0-,,2025-04-14 08:23:29
+SSOT,493,17 Dec 2011,≥2022,Sistema Satellital para Observation de la Tierra,"ACE
+",SunSync,630 km,,,10:30 desc,Unclear,NAOMI (SSOT),,,2022-01-03 12:49:39
+SSTL-S1 1,668,10 Jul 2015,≥2026,Beijing-2 Constellation,"SSTL
+21AT
+UKSA",SunSync,630 km,,,10:30 asc,Operational,VHRI-100,0-20009-0-,,2026-02-02 16:22:01
+SSTL-S1 2,669,10 Jul 2015,≥2026,Beijing-2 Constellation,"SSTL
+21AT
+UKSA",SunSync,630 km,,,10:30 asc,Operational,VHRI-100,0-20009-0-,,2026-02-02 16:22:23
+SSTL-S1 3,670,10 Jul 2015,≥2026,Beijing-2 Constellation,"SSTL
+21AT
+UKSA",SunSync,630 km,,,10:30 asc,Operational,VHRI-100,0-20009-0-,,2026-02-02 16:22:50
+SSTL-S1 4,766,16 Sep 2018,≥2026,Beijing-2 Constellation,"SSTL
+21AT
+UKSA",SunSync,630 km,,,10:30 asc,Operational,VHRI-100,0-20009-0-,,2026-02-02 16:23:13
+STARLETTE,419,06 Feb 1975,≥2050,Satellite de Taille Adaptée avec Réflecteurs Laser pour les Etudes de la Terre,"CNES
+",DRIFT,812 km,,49.8°,,Operational,LR,,,2015-07-29 12:26:50
+STELLA,420,30 Sep 1993,≥2050,Satellite de Taille Adaptée avec Réflecteurs Laser pour les Etudes de la Terre,"CNES
+",DRIFT,800 km,,98.6°,,Operational,LR,,,2015-07-29 12:27:30
+STEREO-A,818,26 Oct 2006,≥2026,Solar-TErrestrial RElations Observatory,"NASA
+",Ecliptic,,,23.44°,,Operational,"IMPACT/MAG
+IMPACT/SEP
+IMPACT/STE
+IMPACT/SWEA
+PLASTIC
+S/WAVES
+SECCHI/COR-1
+SECCHI/COR-2
+SECCHI/EUVI
+SECCHI/HI-1
+SECCHI/HI-2",0-20009-0-,,2026-02-02 15:59:04
+STEREO-B,459,26 Oct 2006,01 Oct 2014,Solar-TErrestrial RElations Observatory,"NASA
+",Ecliptic,,,23.44°,,Inactive,"IMPACT/MAG
+IMPACT/SEP
+IMPACT/STE
+IMPACT/SWEA
+PLASTIC
+S/WAVES
+SECCHI/COR-1
+SECCHI/COR-2
+SECCHI/EUVI
+SECCHI/HI-1
+SECCHI/HI-2",,,2020-02-27 23:55:07
+STPSat-1,542,09 Mar 2007,07 Oct 2009,Space Test Program Satellite,"DoD
+",DRIFT,550 km,,37.4°,,Inactive,"CITRIS
+SHIMMER",,,2015-07-29 12:28:41
+STPSat-2,543,20 Nov 2010,≥2019,Space Test Program Satellite,"DoD
+",DRIFT,647 km,,72°,,Presumably inactive,ODTML,,,2020-01-01 03:19:10
+STPSat-3,541,20 Nov 2013,≥2022,Space Test Program Satellite,"DoD
+",DRIFT,500 km,,40.5°,,Unclear,"SWATS
+TIM
+iMESA-R",,,2022-01-03 13:02:55
+STRIVE,1161,≥2030,≥2033,Stratosphere Troposphere Response using Infrared Vertically-resolved light Explorer,"NASA
+",SunSync,,,,,Planned,"ALICE
+ARGOS (STRIVE)",0-20009-0-0,,2026-02-16 10:03:07
+StriX-1,964,15 Sep 2022,30 Nov 2031,StriX,"Synspective
+",SunSync,574 km,,97.3°,10:00 desc,Operational,X-SAR,-20009--,,2024-05-28 14:03:43
+StriX-2,1094,21 Dec 2024,30 Nov 2031,StriX,"Synspective
+",SunSync,570 km,,97.3°,,Operational,X-SAR,-20009--,,2025-09-15 13:49:31
+StriX-3,1056,12 Mar 2024,≥2029,StriX,"Synspective
+",SunSync,580 km,,97.3°,16:00 asc,Operational,X-SAR,-20009--,,2024-08-05 07:09:30
+StriX-4,1069,02 Aug 2024,≥2028,StriX,"Synspective
+",DRIFT,545 km,,35°,,Operational,X-SAR,-20009--,,2025-01-09 11:24:24
+StriX-5,1148,14 Oct 2025,≥2028,StriX,"Synspective
+",DRIFT,583 km,,35°,,Commissioning,X-SAR,-20009--,,2025-10-16 16:36:24
+StriX-6,1093,20 Mar 2026,≥2029,StriX,"Synspective
+",DRIFT,545 km,,35°,,Commissioning,X-SAR,-20009--,,2026-03-23 08:14:16
+StriX-α,929,15 Dec 2020,≥2024,StriX,"Synspective
+",SunSync,500 km,,97.3°,10:00 asc,Inactive,X-SAR,-20009--,,2025-12-22 13:52:24
+StriX-β,930,28 Feb 2022,≥2032,StriX,"Synspective
+",SunSync,500 km,,97.3°,10:00 desc,Operational,X-SAR,,,2022-09-26 08:18:21
+STSat-1,569,27 Sep 2003,15 Oct 2005,Science and Technology Satellite,"KARI
+",SunSync,690 km,,,10:30 asc,Inactive,"FIMS
+SPP-fields
+SPP-particles",,,2015-07-29 12:31:22
+STSat-2,570,25 Aug 2009,25 Aug 2009,Science and Technology Satellite,"KARI
+",MAG,670 km,,80°,,Lost at launch,"DREAM
+LRA (KARI)",,,2015-07-29 12:32:15
+STSat-2C,578,30 Jan 2013,15 Sep 2014,Science and Technology Satellite,"KARI
+",MAG,670 km,,80°,,Inactive,"LP
+LRA (KARI)
+SREM-dose
+SREM-particles",,,2015-07-29 12:33:18
+STSat-3,571,21 Nov 2013,≥2023,Science and Technology Satellite,"KARI
+",SunSync,700 km,,,17:30 asc,Unclear,"COMIS
+MIRIS/MEOC
+MIRIS/MSOC",,,2023-12-21 10:46:55
+SumbandilaSat,421,17 Sep 2009,15 Jul 2011,SumbandilaSat,"SANSA
+",SunSync,504 km,,,09:00 desc,Inactive,MSI (Sansa),,,2015-07-29 12:35:04
+SuperView Neo-1 01,938,29 Apr 2022,≥2028,SuperView also known as GaoJing,"CAST
+SpacEyes",SunSync,495 km,,,,Operational,PMS-3,,,2022-05-03 15:54:38
+SuperView Neo-1 02,939,29 Apr 2022,≥2028,SuperView also known as GaoJing,"CAST
+SpacEyes",SunSync,495 km,,,,Operational,PMS-3,,,2022-05-03 15:53:50
+SuperView Neo-2 01,962,15 Jul 2022,≥2027,SuperView also known as GaoJing,"CAST
+SpacEyes",SunSync,495 km,,,07:00 desc,Operational,SAR (Superview),,,2022-09-26 08:21:42
+SuperView Neo-2 02,963,15 Jul 2022,≥2027,SuperView also known as GaoJing,"CAST
+SpacEyes",SunSync,495 km,,,07:00 desc,Operational,SAR (Superview),,,2022-09-26 08:22:51
+SuperView Neo-2 03,1091,24 Nov 2024,≥2029,SuperView also known as GaoJing,"CAST
+SpacEyes",SunSync,495 km,,,07:00 desc,Operational,SAR (Superview),0-20009-0-,,2025-05-12 10:29:03
+SuperView Neo-2 04,1092,24 Nov 2024,≥2029,SuperView also known as GaoJing,"CAST
+SpacEyes",SunSync,495 km,,,07:00 desc,Operational,SAR (Superview),0-20009-0-,,2025-05-12 10:28:37
+SuperView Neo-3-01,1059,15 Apr 2024,≥2029,SuperView also known as GaoJing,"CAST
+SpacEyes",SunSync,500 km,,,10:30 desc,Operational,PMS-3,-20009--,,2024-11-29 17:26:51
+SuperView-1,716,28 Dec 2016,≥2026,SuperView also known as GaoJing,"CAST
+SpacEyes",SunSync,534 km,,,10:30 desc,Operational,PMS-3,0-20009-0-,,2026-02-02 17:14:08
+SuperView-2,717,28 Dec 2016,≥2026,SuperView also known as GaoJing,"CAST
+SpacEyes",SunSync,534 km,,,10:30 desc,Operational,PMS-3,0-20009-0-,,2026-02-02 17:14:35
+SuperView-3,718,09 Jan 2018,≥2026,SuperView also known as GaoJing,"CAST
+SpacEyes",SunSync,500 km,,,10:30 desc,Operational,PMS-3,0-20009-0-,,2026-02-02 17:14:57
+SuperView-4,719,09 Jan 2018,≥2026,SuperView also known as GaoJing,"CAST
+SpacEyes",SunSync,500 km,,,10:30 desc,Operational,PMS-3,0-20009-0-,,2026-02-02 17:15:22
+SWARM-A,658,22 Nov 2013,≥2026,The Earth’s Magnetic Field and Environment Explorers,"ESA
+CNES
+CSA",DRIFT,460 km,,87.35°,,Operational,"ACC
+ASM
+EFI (SWARM)
+GPS (ESA)
+LRR (DLR)
+STR (SWARM)
+VFM",0-20009-0-,,2026-02-02 15:56:48
+SWARM-B,423,22 Nov 2013,≥2026,The Earth’s Magnetic Field and Environment Explorers,"ESA
+CNES
+CSA",DRIFT,530 km,,87.75°,,Operational,"ACC
+ASM
+EFI (SWARM)
+GPS (ESA)
+LRR (DLR)
+STR (SWARM)
+VFM",0-20009-0-,,2026-02-02 15:57:07
+SWARM-C,422,22 Nov 2013,≥2026,The Earth’s Magnetic Field and Environment Explorers,"ESA
+CNES
+CSA",DRIFT,460 km,,87.35°,,Operational,"ACC
+ASM
+EFI (SWARM)
+GPS (ESA)
+LRR (DLR)
+STR (SWARM)
+VFM",0-20009-0-,,2026-02-02 15:57:43
+SWFO-L1,784,24 Sep 2025,≥2030,Space Weather Follow-On,"NOAA
+ESA
+NASA",L1,1.5e+06 km,,,,Commissioning,"CCOR-2
+SWIS/MAG
+SWIS/STIS
+SWIS/SWiPS",-20009--,,2025-09-25 07:59:09
+SWNext SOL-A,1024,≥2029,≥2033,Space Weather Follow-On,"NOAA
+ESA
+NASA",L1,1.5e+06 km,,,,Planned,"CCOR-2
+SWIS/MAG
+SWIS/STIS
+SWIS/SWiPS
+XFM",-20009--,,2025-03-12 08:37:49
+SWNext SOL-B,1025,≥2033,≥2038,Space Weather Follow-On,"NOAA
+ESA
+NASA",L1,1.5e+06 km,,,,Planned,"CCOR-2
+SWIS/MAG
+SWIS/STIS
+SWIS/SWiPS
+XFM",-20009--,,2025-06-11 07:28:32
+SWOT,424,16 Dec 2022,≥2026,Surface Water and Ocean Topography,"NASA
+CNES",DRIFT,891 km,,78°,,Operational,"DORIS
+GPS (NASA)
+KaRIN
+LRA (NASA)
+MW radiometer
+Poseidon-3C",0-20009-0-280,,2025-06-30 13:35:12
+TacSat-2,425,12 Dec 2006,21 Dec 2007,Tactical Satellite,"DoD
+",DRIFT,418 km,,40°,,Inactive,IGOR (TacSat-2),,,2015-07-29 12:37:42
+Tanager-1,1018,16 Aug 2024,≥2029,Tanager,"Planet
+",SunSync,520 km,,,12:00 desc,Operational,Carbon Mapper,-20009--,,2025-05-12 10:34:45
+Tanager-2,1019,≥2026,≥2029,Tanager,"Planet
+",SunSync,405 km,,,,Planned,Carbon Mapper,0-20009-0-,,2026-02-09 10:34:37
+Tandem-L,428,≥2028,≥2040,TerraSAR,"DLR
+",SunSync,745 km,,,06:00 desc,Considered,L-SAR,,,2023-08-31 09:07:26
+TanDEM-X,426,21 Jun 2010,≥2026,TerraSAR,"DLR
+",SunSync,515 km,,,06:00 desc,Operational,"SAR-X
+TOR",0-20009-0-043,,2025-11-17 12:28:23
+TANSAT,676,21 Dec 2016,01 Feb 2022,Scientific Exploratory Satellite for Atmospheric CO2,"MOST
+CAS
+CMA",SunSync,712 km,,,13:30 asc,Inactive,"ACGS
+CAPI",-20009--,,2025-03-31 08:45:16
+TANSAT-2,1116,≥2026,≥2032,Scientific Exploratory Satellite for Atmospheric CO2,"MOST
+CAS
+CMA",Molniya,702 km,,116.5°,13:05 ,Planned,"CAPHI
+DuSIFIS
+H3Imager
+Uwhigo",-20009--,,2025-08-11 09:12:27
+TEMPO,590,07 Apr 2023,≥2026,"Tropospheric Emissions: Monitoring of Pollution
+
+","NASA
+",GEO,35786 km,91 ° W,,,Operational,TEMPO,0-20009-0-790,,2026-02-02 16:01:32
+Terra,81,18 Dec 1999,≥2026,Earth Observation System,"NASA
+",SunSync,705 km,,,09:40 asc,Operational,"ASTER
+CERES
+MISR
+MODIS
+MOPITT",0-20009-0-783,,2025-09-01 14:10:44
+TerraSAR-X,427,15 Jun 2007,≥2026,TerraSAR,"DLR
+",SunSync,515 km,,,06:00 desc,Operational,"SAR-X
+TOR",0-20009-0-042,,2026-02-02 17:04:46
+TH-1A,527,24 Aug 2010,≥2018,Tian Hui - 1,"PLA
+CAST",SunSync,503 km,,,13:30 desc,Presumably inactive,"MS (TH)
+PAN (TH)",,,2019-12-29 16:00:45
+TH-1B,528,06 May 2012,≥2023,Tian Hui - 1,"PLA
+CAST",SunSync,498 km,,,13:30 desc,Unclear,"MS (TH)
+PAN (TH)",,,2022-10-28 09:57:23
+TH-1C,673,26 Oct 2015,≥2026,Tian Hui - 1,"PLA
+CAST",SunSync,498 km,,,13:30 desc,Operational,"MS (TH)
+PAN (TH)",0-20009-0-,,2026-02-02 16:08:32
+THEMIS-A,819,17 Feb 2007,≥2026,Time History of Events and Macroscale Interactions during Substorms,"NASA
+",MAG,,,6°,,Operational,"EFI (THEMIS)
+ESA
+FGM (THEMIS)
+SCM
+SST",-20009--,,2026-02-02 16:38:13
+THEMIS-D,460,17 Feb 2007,≥2026,Time History of Events and Macroscale Interactions during Substorms,"NASA
+",MAG,,,6°,,Operational,"EFI (THEMIS)
+ESA
+FGM (THEMIS)
+SCM
+SST",-20009--,,2026-02-02 16:37:39
+THEMIS-E,820,17 Feb 2007,≥2026,Time History of Events and Macroscale Interactions during Substorms,"NASA
+",MAG,,,6°,,Operational,"EFI (THEMIS)
+ESA
+FGM (THEMIS)
+SCM
+SST",-20009--,,2026-02-02 16:37:15
+THEOS-1,429,01 Oct 2008,≥2026,Thailand Earth Observation System,"GISTDA
+",SunSync,822 km,,,21:35 asc,Operational,"MS (THEOS)
+PAN (THEOS)",0-20009-0-,,2026-02-02 17:03:51
+THEOS-2 Main,889,09 Oct 2023,≥2033,Thailand Earth Observation System,"GISTDA
+",SunSync,621 km,,,22:15 asc,Operational,"MS (THEOS-2)
+PAN (THEOS-2)",-20009--,,2025-10-31 10:50:18
+THEOS-2A Small,890,12 Jan 2026,≥2026,Thailand Earth Observation System,"GISTDA
+",SunSync,590 km,,,10:30 asc,Lost at launch,CERIA,-20009--,,2026-01-12 09:23:51
+Tianmu-1,1014,09 Jan 2023,≥2040,Tianmu Beidou radio occultation programme.,"CASIC
+",SunSync,520 km,,,,Operational,TGNOS-M,0-20009-0-540,,2024-02-26 09:52:44
+TIMED,430,07 Dec 2001,≥2026,"Thermosphere, Ionosphere, Mesosphere Energetics and Dynamics mission","NASA
+",DRIFT,625 km,,74°,,Operational,"GUVI
+SABER
+SEE
+TIDI ",0-20009-0-,,2026-02-02 17:17:54
+TIROS-1,431,01 Apr 1960,17 Jun 1960,Television and Infra-Red Observation Satellite,"NASA
+",DRIFT,720 km,,48.4°,,Inactive,"VCS-NA
+VCS-WA",,,2015-07-29 12:57:14
+TIROS-10,440,02 Jul 1965,01 Jul 1967,Television and Infra-Red Observation Satellite,"NASA
+",SunSync,790 km,,,09:30 desc,Inactive,VCS-WA,,,2015-07-29 12:58:19
+TIROS-2,432,23 Nov 1960,24 Dec 1961,Television and Infra-Red Observation Satellite,"NASA
+",DRIFT,670 km,,48.6°,,Inactive,"FPR
+MRIR
+VCS-NA
+VCS-WA",,,2015-07-29 12:59:35
+TIROS-3,433,12 Jul 1961,27 Feb 1962,Television and Infra-Red Observation Satellite,"NASA
+",DRIFT,780 km,,47.9°,,Inactive,"FPR
+MRIR
+VCS-WA",,,2015-07-29 13:00:26
+TIROS-4,434,02 Feb 1962,19 Jul 1962,Television and Infra-Red Observation Satellite,"NASA
+",DRIFT,770 km,,48.3°,,Inactive,"FPR
+MRIR
+VCS-MA
+VCS-WA",,,2015-07-29 13:01:08
+TIROS-5,435,19 Jun 1962,27 Nov 1963,Television and Infra-Red Observation Satellite,"NASA
+",DRIFT,750 km,,58.1°,,Inactive,"VCS-MA
+VCS-WA",,,2015-07-29 13:01:58
+TIROS-6,436,18 Sep 1962,12 Oct 1963,Television and Infra-Red Observation Satellite,"NASA
+",DRIFT,700 km,,58.3°,,Inactive,"VCS-MA
+VCS-WA",,,2015-07-29 13:05:44
+TIROS-7,437,19 Jun 1963,03 Jun 1968,Television and Infra-Red Observation Satellite,"NASA
+",DRIFT,680 km,,58.2°,,Inactive,"FPR
+LP
+MRIR
+VCS-WA",,,2015-07-29 13:06:43
+TIROS-8,438,21 Dec 1963,01 Jul 1967,Television and Infra-Red Observation Satellite,"NASA
+",DRIFT,730 km,,58.5°,,Inactive,"APT
+VCS-WA",,,2015-07-29 13:07:30
+TIROS-9,439,22 Jan 1965,12 Jun 1968,Television and Infra-Red Observation Satellite,"NASA
+",SunSync,1350 km,,,09:30 desc,Inactive,VCS-WA,,,2015-07-29 13:08:10
+TIROS-N,441,13 Oct 1978,27 Feb 1981,National Oceanic and Atmospheric Administration - 4th generation,"NOAA
+NASA",SunSync,850 km,,,14:30 asc,Inactive,"AVHRR
+Argos
+HIRS/2
+MSU
+SEM/MEPED
+SEM/TED
+SSU",0-20009-0-708,,2015-07-29 13:09:18
+Tomorrow-R1,998,15 Apr 2023,≥2028,Tomorrow.io constellation,"Tomorrow.io
+",SunSync,550 km,,,08:00 asc,Operational,Tomorrow.io radar,-20009--,,2024-08-19 08:41:16
+Tomorrow-R2,1005,12 Jun 2023,≥2028,Tomorrow.io constellation,"Tomorrow.io
+",SunSync,550 km,,,12:00 desc,Operational,Tomorrow.io radar,-20009--,,2024-03-18 10:08:50
+Tomorrow-S1,1074,16 Aug 2024,≥2027,Tomorrow.io constellation,"Tomorrow.io
+",SunSync,487 km,,,22:47 asc,Operational,TMS (Tomorrow),0-20009-0-769,,2026-01-13 16:09:51
+Tomorrow-S10,1110,11 Jan 2026,≥2029,Tomorrow.io constellation,"Tomorrow.io
+",SunSync,510 km,,,17:27 asc,Commissioning,TMS (Tomorrow),0-20009-0-769,,2026-01-13 16:14:49
+Tomorrow-S11,1158,11 Jan 2026,≥2029,Tomorrow.io constellation,"Tomorrow.io
+",SunSync,510 km,,,17:27 asc,Commissioning,TMS (Tomorrow),0-20009-0-769,,2026-01-13 16:15:29
+Tomorrow-S2,1077,16 Aug 2024,≥2027,Tomorrow.io constellation,"Tomorrow.io
+",SunSync,487 km,,,22:47 asc,Operational,TMS (Tomorrow),0-20009-0-769,,2026-01-13 16:10:19
+Tomorrow-S3,1095,21 Dec 2024,≥2028,Tomorrow.io constellation,"Tomorrow.io
+",DRIFT,495 km,,45°,,Operational,TMS (Tomorrow),0-20009-0-769,,2026-01-13 16:10:46
+Tomorrow-S4,1096,21 Dec 2024,≥2028,Tomorrow.io constellation,"Tomorrow.io
+",DRIFT,495 km,,45°,,Operational,TMS (Tomorrow),0-20009-0-769,,2026-01-13 16:11:14
+Tomorrow-S5,1105,15 Mar 2025,≥2028,Tomorrow.io constellation,"Tomorrow.io
+",SunSync,514 km,,,10:23 asc,Operational,TMS (Tomorrow),0-20009-0-769,,2026-01-13 16:11:54
+Tomorrow-S6,1106,15 Mar 2025,≥2028,Tomorrow.io constellation,"Tomorrow.io
+",SunSync,514 km,,,10:23 asc,Operational,TMS (Tomorrow),0-20009-0-769,,2026-01-13 16:12:35
+Tomorrow-S7,1107,22 Apr 2025,≥2028,Tomorrow.io constellation,"Tomorrow.io
+",DRIFT,577 km,,45°,,Operational,TMS (Tomorrow),0-20009-0-769,,2026-01-13 16:12:56
+Tomorrow-S8,1108,02 Nov 2025,≥2028,Tomorrow.io constellation,"Tomorrow.io
+",DRIFT,517 km,,45°,,Commissioning,TMS (Tomorrow),0-20009-0-769,,2026-01-13 16:13:27
+Tomorrow-S9,1109,02 Nov 2025,≥2028,Tomorrow.io constellation,"Tomorrow.io
+",DRIFT,517 km,,45°,,Commissioning,TMS (Tomorrow),0-20009-0-769,,2026-01-13 16:13:48
+TOMS Earth Probe,442,02 Jul 1996,02 Dec 2006,Total Ozone Mapping Spectrometer - Earth Probe,"NASA
+",SunSync,750 km,,,12:00 desc,Inactive,TOMS,,,2015-07-29 13:10:04
+TOPEX-Poseidon,443,10 Aug 1992,09 Oct 2005,Topography Experiment + Poseidon,"NASA
+CNES",DRIFT,1336 km,,66°,,Inactive,"DORIS
+GPSDR
+LRA (NASA)
+NRA
+SSALT
+TMR",,,2015-07-29 13:11:03
+TopSat,444,27 Oct 2005,17 Aug 2008,TopSat,"UKSA
+",SunSync,686 km,,,10:30 asc,Inactive,RALCam-1,,,2015-07-29 13:11:41
+TRACE,461,02 Apr 1998,21 Jun 2010,Transition Region and Coronal Explorer,"NASA
+",SunSync,627 km,,,06:00 asc,Inactive,TRACE,,,2015-07-29 13:13:04
+TRACERS,1139,23 Jul 2025,≥2026,Tandem Reconnection and Cusp Electrodynamics Reconnaissance Satellites,"NASA
+",SunSync,500 km,,,10:00 desc,Operational,"ACE (TRACERS)
+ACI
+EFI
+MAG (TRACERS)
+MAGIC
+MSC (Tracers)",0-20009-0-0,,2025-12-01 11:49:48
+TRISHNA,750,≥2026,≥2031,TRISHA,"ISRO
+CNES",SunSync,761 km,,,13:00 asc,Planned,TRISHNA,,,2023-07-24 09:06:22
+TRITON ,451,09 Oct 2023,≥2029,"Constellation Observing System for Meteorology, Ionosphere & Climate","NSPO
+NOAA
+UCAR",SunSync,628 km,,,10:00 desc,Operational,GPSR,-20009--,,2024-03-18 16:37:08
+TRMM,445,27 Nov 1997,08 Apr 2015,Tropical Rainfall Measuring Mission,"NASA
+JAXA",DRIFT,402 km,,35°,,Inactive,"CERES
+LIS
+PR
+TMI
+VIRS",0-20009-0-282,,2019-10-30 18:23:55
+TROPICS-01 (Pathfinder),933,30 Jun 2021,≥2023,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats,"NASA
+",SunSync,550 km,,,13:30 asc,Inactive,TMS,0-20009-0-709,,2024-11-04 08:11:21
+TROPICS-02,895,12 Jun 2022,12 Jun 2022,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats,"NASA
+",DRIFT,550 km,,30°,,Lost at launch,TMS,0-20009-0-227,,2023-11-01 17:37:29
+TROPICS-03,896,08 May 2023,12 Nov 2025,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats,"NASA
+",DRIFT,550 km,,30°,,Inactive,TMS,0-20009-0-228,,2025-11-18 16:38:53
+TROPICS-04,966,12 Jun 2022,12 Jun 2022,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats,"NASA
+",DRIFT,550 km,,30°,,Lost at launch,TMS,0-20009-0-229,,2023-11-01 17:36:59
+TROPICS-05,967,08 May 2023,12 Nov 2025,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats,"NASA
+",DRIFT,550 km,,30°,,Inactive,TMS,0-20009-0-263,,2025-11-18 16:39:57
+TROPICS-06,968,26 May 2023,Jul 2025,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats,"NASA
+",DRIFT,550 km,,30°,,Inactive,TMS,0-20009-0-264,,2025-11-18 16:41:48
+TROPICS-07,969,26 May 2023,≥2023,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats,"NASA
+",DRIFT,550 km,,30°,,Inactive,TMS,0-20009-0-284,,2024-11-04 08:22:23
+TRUTHS,921,TBD,TBD,Traceable Radiometry Underpinning Terrestrial- and Helio- Studies,"ESA
+UKSA",DRIFT,610 km,,90°,,Mission concept,"CSAR
+HIS",0-20009-0-,,2026-02-04 12:35:52
+TSIS-2,725,≥2026,≥2028,Earth Systematic Missions,"NASA
+",DRIFT,407 km,,51.6°,,Planned,TSIS,-20009--,,2026-01-19 14:19:31
+TWINS (2 sats),574,28 Jun 2006,≥2020,Two Wide-angle Imaging Neutral-atom Spectrometers,"NASA
+USAF",Molniya,,,63.4°,,Inactive,"LAD
+TWINS",,,2022-03-21 08:46:29
+UARS,446,12 Sep 1991,14 Dec 2005,Upper Atmosphere Research Satellite,"NASA
+",DRIFT,570 km,,57°,,Inactive,"ACRIM-II
+CLAES
+HALOE
+HRDI
+ISAMS
+MLS
+PEM/AXIS
+PEM/EPS
+PEM/VMAG
+SOLSTICE
+SUSIM
+WINDII",0-20009-0-781,,2015-07-29 13:23:29
+UK-DMC-1,447,27 Sep 2003,15 Nov 2011,UK contribution to the Disaster Monitoring Constellation,"SSTL
+UKSA",SunSync,686 km,,,10:30 asc,Inactive,SLIM6,,,2015-07-29 13:24:50
+UK-DMC-2,448,29 Jul 2009,≥2019,UK contribution to the Disaster Monitoring Constellation,"SSTL
+UKSA",SunSync,686 km,,,10:30 asc,Presumably inactive,SLIM6,,,2020-01-01 03:16:51
+UMBRA,951,≥2021,≥2035,UMBRA Lab inc.,"UMBRA
+",SunSync,500 km,,,,Operational,UMBRA-SAR,-20009--,,2026-01-12 09:14:01
+UVSQ-NG,1101,15 Mar 2025,≥2030,International Satellite Program in Research and Education ,"LASP
+LATMOS",SunSync,550 km,,,10:30 ,Operational,"ERS (UVSQ)
+UNIS",0-20009-0-0,,2026-02-23 08:59:36
+VAP (2 sat),491,30 Aug 2012,18 Oct 2019,Van Allen Probes,"NASA
+",MAG,,,18°,,Inactive,"ECT/HOPE
+ECT/MagEIS
+ECT/REPT
+EFW (VAP)
+EMFISIS
+RBSPICE
+RPS",,,2019-10-25 11:34:46
+VENµS,449,02 Aug 2017,≥2026,Vegetation and Environment monitoring on a New Micro-Satellite,"CNES
+ISA",SunSync,720 km,,,10:30 desc,Operational,VSSC,0-20009-0-,,2026-02-02 17:17:13
+Vigil-L5,932,≥2031,≥2038,ESA Space Situational Awareness programme,"ESA
+",L4-L5,,,,,Planned,"CCOR-2
+HI1-Vigil
+HI2-Vigil
+JEDI
+Magnetometer (Vigil)
+PLA
+PMI",-20009--,,2026-03-06 11:28:13
+VNREDSat-1,587,07 May 2013,≥2022,"Vietnam Natural Resources, Environment and Disaster-monitoring Satellite
+
+","STI-VAST
+",SunSync,704 km,,,10:30 desc,Unclear,NAOMI (AlSat),,,2022-01-03 15:27:55
+VRSS-1,540,29 Sep 2012,≥2022,Venezuelan Remote Sensing Satellite,"ABAE
+CAST",SunSync,645 km,,,10:30 desc,Unclear,"PMC
+WMC",,,2022-01-03 13:01:06
+VRSS-2,735,09 Oct 2017,≥2023,Venezuelan Remote Sensing Satellite,"ABAE
+CAST",SunSync,636 km,,,10:30 desc,Unclear,,,,2023-12-21 11:04:59
+WFS-1,1153,≥2029,≥2034,WildFireSat,"CSA
+",SunSync,480 km,,,18:00 asc,Planned,WFS Radiometer,0-20009-0-0,,2025-11-14 12:41:00
+WIND,488,01 Nov 1994,≥2026,Wind ,"NASA
+",L1,1.5e+06 km,,,,Operational,"EPACT
+KONUS
+MFI
+PLASMA
+SMS
+SWE
+TGRS
+WAVES",0-20009-0-,,2026-02-02 16:56:13
+WIVERN,1145,≥2033,≥2038,Wind Velocity Radar Nephoscope,"ESA
+",SunSync,500 km,,,,Planned,"WIVERN Doppler Radar
+WIVERN Radiometer",0-20009-0-0,,2025-09-29 13:34:27
+WorldView Legion-1,976,02 May 2024,≥2030,WorldView,"Maxar
+DigitalGlobe",SunSync,524 km,,,10:30 desc,Operational,Spaceview-NG,-20009--,,2025-02-10 12:09:33
+WorldView Legion-2,977,02 May 2024,≥2030,WorldView,"Maxar
+DigitalGlobe",SunSync,540 km,,,10:30 desc,Operational,Spaceview-NG,-20009--,,2025-02-10 12:08:14
+WorldView Legion-3,1071,15 Aug 2024,≥2030,WorldView,"Maxar
+DigitalGlobe",DRIFT,540 km,,45°,,Operational,Spaceview-NG,-20009--,,2025-02-10 12:06:38
+WorldView Legion-4,1072,15 Aug 2024,≥2030,WorldView,"Maxar
+DigitalGlobe",DRIFT,528 km,,45°,,Operational,Spaceview-NG,-20009--,,2025-02-10 12:05:37
+WorldView Legion-5,1103,04 Feb 2025,≥2030,WorldView,"Maxar
+DigitalGlobe",DRIFT,710 km,,45°,,Operational,Spaceview-NG,-20009--,,2025-09-15 13:44:21
+WorldView Legion-6,1104,04 Feb 2025,≥2030,WorldView,"Maxar
+DigitalGlobe",DRIFT,455 km,,45°,,Operational,Spaceview-NG,-20009--,,2025-09-15 13:45:04
+WorldView-1,498,18 Sep 2007,≥2026,WorldView,"Maxar
+DigitalGlobe",SunSync,499 km,,,13:30 desc,Operational,WV60,0-20009-0-,,2026-02-02 16:48:12
+WorldView-2,499,01 Oct 2009,≥2026,WorldView,"Maxar
+DigitalGlobe",SunSync,770 km,,,10:30 desc,Operational,WV110,0-20009-0-,,2026-02-02 16:48:37
+WorldView-3,500,13 Aug 2014,≥2026,WorldView,"Maxar
+DigitalGlobe",SunSync,770 km,,,10:30 desc,Operational,WV110,0-20009-0-,,2026-02-02 16:50:19
+WorldView-4,675,11 Nov 2016,07 Jan 2019,WorldView,"Maxar
+DigitalGlobe",SunSync,617 km,,,10:30 desc,Inactive,SpaceView-110,,,2021-09-17 14:24:09
+WSF-M1,953,11 Apr 2024,≥2030,Weather System Follow-on,"DoD
+",SunSync,854 km,,,06:00 desc,Operational,"ECP
+MWI (WSF-M)",0-20009-0-760,,2026-03-16 10:00:28
+WSF-M2,983,≥2028,≥2035,Weather System Follow-on,"DoD
+",SunSync,833 km,,,,Planned,"ECP
+MWI (WSF-M)",,,2023-01-13 18:16:39
+X-Sat,453,20 Apr 2011,≥2019,X-Sat,"NTU
+",SunSync,820 km,,,10:20 desc,Presumably inactive,IRIS (X-Sat),,,2020-01-01 03:17:28
+XCUBE-1,1141,21 Dec 2024,≥2029,XCUBE,"XPLORE
+",DRIFT,508 km,,45°,,Operational,HyperScape100,0-20009-0-0,,2025-08-18 10:25:58
+XMM-Newton,709,10 Dec 1999,≥2026,X-ray Multi-Mirror Mission Observatory - Newton,"ESA
+",DRIFT,40000 km,,40°,,Operational,"EPIC (XMM)
+OM
+RGS",,,2023-11-06 09:11:51
+XOVWM,519,TBD,TBD,Extended Ocean Vector Winds Mission,"NOAA
+",SunSync,TBD km,,,TBD,Mission concept,,,,2018-06-21 01:46:30
+Yunhai-1,1062,11 Nov 2016,≥2028,Yunhai,"CNSA
+CASC",SunSync,780 km,,,,Operational,,-20009--,,2024-05-13 10:25:37
+Yunhai-2,1060,29 Dec 2018,≥2028,Yunhai,"CNSA
+CASC",DRIFT,800 km,,50°,,Operational,,-20009--,,2024-05-13 08:45:44
+Yunhai-3,1061,11 Nov 2022,≥2028,Yunhai,"CNSA
+CASC",SunSync,870 km,,,,Operational,,-20009--,,2024-05-13 10:27:52
+YunYao-1,1051,11 Jan 2024,≥2030,YunYao Aerospace Constellation,"CASC
+",SunSync,535 km,,,,Operational,YunYao-receiver,-20009--,,2025-09-08 08:47:38
+Zond-M,524,≥2027,≥2030,Ionozond,"Roscosmos
+",SunSync,600 km,,,TBD,Considered,"FM-G
+LETITsIYA-Camera
+NBK/2
+Ozonometer-3
+RESPEKT
+RIMS-A
+SOLIST
+SRF
+ST/2
+STEK
+SUF",0-20009-0-,,2026-01-05 09:02:33
+ZY-1-2C,492,22 Dec 2011,≥2019,Zi Yuan 1-2,"CAST
+CRESDA",SunSync,781 km,,,10:30 desc,Presumably inactive,"HRCC-2
+HRPC-2",,,2020-01-01 03:18:12
+ZY-1-2D,790,12 Sep 2019,≥2026,Zi Yuan 1-2,"CAST
+CRESDA",SunSync,781 km,,,10:30 desc,Operational,,0-20009-0-,,2026-02-02 16:35:42
+ZY-3-01,489,09 Jan 2012,≥2022,Zi Yuan - 3,"CAST
+CRESDA",SunSync,506 km,,,10:30 desc,Inactive,"MSC (ZY)
+TAC",0-20009-0-,,2025-08-18 15:09:38
+ZY-3-02,677,30 May 2016,≥2026,Zi Yuan - 3,"CAST
+CRESDA",SunSync,506 km,,,10:30 desc,Operational,"MSC (ZY)
+TAC",0-20009-0-,,2026-02-02 16:24:06
+ZY-3-03,863,25 Jul 2020,≥2026,Zi Yuan - 3,"CAST
+CRESDA",SunSync,506 km,,,10:30 desc,Operational,"MSC (ZY)
+TAC",0-20009-0-,,2026-02-02 16:24:45
+Φsat-2,1076,16 Aug 2024,≥2028,Development of innovative technologies,"ESA
+",SunSync,510 km,,,,Operational,HyperScout-2,-20009--,,2025-05-12 10:32:57

@@ -3,36 +3,74 @@
   "instrument_acronym": "SpaceView-110",
   "instrument_fullname": "SpaceView-110 Imaging System",
   "url": "https://space.oscar.wmo.int/instruments/view/spaceview-110",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "N/A (PAN)",
-      "Spectral interval": "450 - 800 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": "N/A (PAN)",
+      "bandwidth": {
+        "min": 450.0,
+        "max": 800.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     },
     {
-      "Central wavelength": "480 nm",
-      "Spectral interval": "450 - 510 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 480.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 450.0,
+        "max": 510.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     },
     {
-      "Central wavelength": "545 nm",
-      "Spectral interval": "510 - 580 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 545.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 510.0,
+        "max": 580.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     },
     {
-      "Central wavelength": "672 nm",
-      "Spectral interval": "655 - 690 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 672.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 655.0,
+        "max": 690.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     },
     {
-      "Central wavelength": "850 nm",
-      "Spectral interval": "780 - 920 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 850.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 780.0,
+        "max": 920.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     }
   ]
 }

@@ -3,7 +3,8 @@
   "instrument_acronym": "SAR-X/Ku",
   "instrument_fullname": "Synthetic Aperture Radar in X- and Ku- bands",
   "url": "https://space.oscar.wmo.int/instruments/view/sar-x/ku",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -12,25 +13,55 @@
   ],
   "channels": [
     {
-      "Operation mode": "Spotlight",
-      "Resolution": "1 m",
-      "Swath": "10 km",
-      "Field of regard": "463 km, either right or left",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_01",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": {
+        "value": 1.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 10.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 463.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "Stripmap",
-      "Resolution": "3 m",
-      "Swath": "30 km",
-      "Field of regard": "287 km, either left or right",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_02",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "value": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 30.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 287.0,
+        "unit": "km, either left or right"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "ScanSAR",
-      "Resolution": "16 m",
-      "Swath": "100 km",
-      "Field of regard": "287 km, either left or right",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_03",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": {
+        "value": 16.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 100.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 287.0,
+        "unit": "km, either left or right"
+      },
+      "polarisation": "HH or VV or HV or VH"
     }
   ]
 }

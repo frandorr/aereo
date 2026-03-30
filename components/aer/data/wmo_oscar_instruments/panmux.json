@@ -3,36 +3,53 @@
   "instrument_acronym": "PANMUX",
   "instrument_fullname": "Panchromatic and Multispectral imager",
   "url": "https://space.oscar.wmo.int/instruments/view/panmux",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Centralwavelength",
     "Spectralinterval",
     "SNR @ specified input spectral radiance"
   ],
   "channels": [
     {
-      "Centralwavelength": "",
-      "Spectralinterval": "",
-      "SNR @ specified input spectral radiance": "Low signal"
+      "channel_name": "Band_01",
+      "central_wavelength": "Low signal",
+      "bandwidth": ""
     },
     {
-      "Centralwavelength": "N/A (PAN)",
-      "Spectralinterval": "0.51 - 0.85 µm",
-      "SNR @ specified input spectral radiance": "25 @ 18 W m-2sr-1µm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": "25 @ 18 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.51,
+        "max": 0.85,
+        "unit": "µm"
+      }
     },
     {
-      "Centralwavelength": "0.555 µm",
-      "Spectralinterval": "0.52 - 0.59 µm",
-      "SNR @ specified input spectral radiance": "26 @ 28 W m-2sr-1µm-1"
+      "channel_name": "Band_03",
+      "central_wavelength": "26 @ 28 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.59,
+        "unit": "µm"
+      }
     },
     {
-      "Centralwavelength": "0.660 µm",
-      "Spectralinterval": "0.63 - 0.69 µm",
-      "SNR @ specified input spectral radiance": "21 @ 18 W m-2sr-1µm-1"
+      "channel_name": "Band_04",
+      "central_wavelength": "21 @ 18 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.63,
+        "max": 0.69,
+        "unit": "µm"
+      }
     },
     {
-      "Centralwavelength": "0.830 µm",
-      "Spectralinterval": "0.77 - 0.89 µm",
-      "SNR @ specified input spectral radiance": "20 @ 10 W m-2sr-1µm-1"
+      "channel_name": "Band_05",
+      "central_wavelength": "20 @ 10 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.77,
+        "max": 0.89,
+        "unit": "µm"
+      }
     }
   ]
 }

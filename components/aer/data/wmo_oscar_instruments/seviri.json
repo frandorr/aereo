@@ -3,71 +3,189 @@
   "instrument_acronym": "SEVIRI",
   "instrument_fullname": "Spinning Enhanced Visible Infra-Red Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/seviri",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectralinterval(99 % encircled energy)",
     "SNR or NEΔT @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "N/A (broad bandwidth channel)",
-      "Spectralinterval(99 % encircled energy)": "0.6 - 0.9 µm",
-      "SNR or NEΔT @ specified input": "4.3 @ 1 % albedo"
+      "channel_name": "VIS 0.6",
+      "central_wavelength": "N/A (broad bandwidth channel)",
+      "bandwidth": {
+        "min": 0.6,
+        "max": 0.9,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "4.3 @ 1 % albedo"
     },
     {
-      "Central wavelength": "0.635 µm",
-      "Spectralinterval(99 % encircled energy)": "0.56 - 0.71 µm",
-      "SNR or NEΔT @ specified input": "10.1 @ 1 % albedo"
+      "channel_name": "VIS 0.8",
+      "central_wavelength": {
+        "value": 0.635,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.56,
+        "max": 0.71,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "10.1 @ 1 % albedo"
     },
     {
-      "Central wavelength": "0.81 µm",
-      "Spectralinterval(99 % encircled energy)": "0.74 - 0.88 µm",
-      "SNR or NEΔT @ specified input": "7.28 @ 1 % albedo"
+      "channel_name": "NIR 1.6",
+      "central_wavelength": {
+        "value": 0.81,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.74,
+        "max": 0.88,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "7.28 @ 1 % albedo"
     },
     {
-      "Central wavelength": "1.64 µm",
-      "Spectralinterval(99 % encircled energy)": "1.50 - 1.78 µm",
-      "SNR or NEΔT @ specified input": "3 @ 1 % albedo"
+      "channel_name": "IR 3.9",
+      "central_wavelength": {
+        "value": 1.64,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 1.5,
+        "max": 1.78,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "3 @ 1 % albedo"
     },
     {
-      "Central wavelength": "3.92 µm",
-      "Spectralinterval(99 % encircled energy)": "3.48 - 4.36 µm",
-      "SNR or NEΔT @ specified input": "0.35 K @ 300 K"
+      "channel_name": "WV 6.2",
+      "central_wavelength": {
+        "value": 3.92,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 3.48,
+        "max": 4.36,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.35,
+        "unit": "K @ 300 K"
+      }
     },
     {
-      "Central wavelength": "6.25 µm",
-      "Spectralinterval(99 % encircled energy)": "5.35 - 7.15 µm",
-      "SNR or NEΔT @ specified input": "0.75 K @ 250 K"
+      "channel_name": "WV 7.3",
+      "central_wavelength": {
+        "value": 6.25,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 5.35,
+        "max": 7.15,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.75,
+        "unit": "K @ 250 K"
+      }
     },
     {
-      "Central wavelength": "7.35 µm",
-      "Spectralinterval(99 % encircled energy)": "6.85 - 7.85 µm",
-      "SNR or NEΔT @ specified input": "0.75 K @ 250 K"
+      "channel_name": "IR 8.7",
+      "central_wavelength": {
+        "value": 7.35,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 6.85,
+        "max": 7.85,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.75,
+        "unit": "K @ 250 K"
+      }
     },
     {
-      "Central wavelength": "8.70 µm",
-      "Spectralinterval(99 % encircled energy)": "8.30 - 9.10 µm",
-      "SNR or NEΔT @ specified input": "0.28 K @ 300 K"
+      "channel_name": "IR 9.7",
+      "central_wavelength": {
+        "value": 8.7,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 8.3,
+        "max": 9.1,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.28,
+        "unit": "K @ 300 K"
+      }
     },
     {
-      "Central wavelength": "9.66 µm",
-      "Spectralinterval(99 % encircled energy)": "9.38 - 9.94 µm",
-      "SNR or NEΔT @ specified input": "1.50 K @ 255 K"
+      "channel_name": "IR 10.8",
+      "central_wavelength": {
+        "value": 9.66,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 9.38,
+        "max": 9.94,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 1.5,
+        "unit": "K @ 255 K"
+      }
     },
     {
-      "Central wavelength": "10.8 µm",
-      "Spectralinterval(99 % encircled energy)": "9.80 - 11.8 µm",
-      "SNR or NEΔT @ specified input": "0.25 K @ 300 K"
+      "channel_name": "IR 12.0",
+      "central_wavelength": {
+        "value": 10.8,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 9.8,
+        "max": 11.8,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.25,
+        "unit": "K @ 300 K"
+      }
     },
     {
-      "Central wavelength": "12.0 µm",
-      "Spectralinterval(99 % encircled energy)": "11.0 - 13.0 µm",
-      "SNR or NEΔT @ specified input": "0.37 K @ 300 K"
+      "channel_name": "IR 13.4",
+      "central_wavelength": {
+        "value": 12.0,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 11.0,
+        "max": 13.0,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.37,
+        "unit": "K @ 300 K"
+      }
     },
     {
-      "Central wavelength": "13.4 µm",
-      "Spectralinterval(99 % encircled energy)": "12.4 - 14.4 µm",
-      "SNR or NEΔT @ specified input": "1.80 K @ 270 K"
+      "channel_name": "HRV",
+      "central_wavelength": {
+        "value": 13.4,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 12.4,
+        "max": 14.4,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 1.8,
+        "unit": "K @ 270 K"
+      }
     }
   ]
 }

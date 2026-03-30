@@ -3,7 +3,8 @@
   "instrument_acronym": "IRAS",
   "instrument_fullname": "Infra Red Atmospheric Sounder",
   "url": "https://space.oscar.wmo.int/instruments/view/iras",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Wavelength",
     "Wave number",
     "Bandwidth",
@@ -11,160 +12,462 @@
   ],
   "channels": [
     {
-      "Wavelength": "14.95 µm",
-      "Wave number": "669 cm-1",
-      "Bandwidth": "3 cm-1",
-      "SNR or NEΔT @ specified input": "2.50 K @ 290 K"
+      "channel_name": "Band_01",
+      "Wavelength": {
+        "value": 14.95,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 669.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 3.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 2.5,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "14.71 µm",
-      "Wave number": "680 cm-1",
-      "Bandwidth": "10 cm-1",
-      "SNR or NEΔT @ specified input": "0.50 K @ 290 K"
+      "channel_name": "Band_02",
+      "Wavelength": {
+        "value": 14.71,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 680.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 10.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.5,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "14.49 µm",
-      "Wave number": "690 cm-1",
-      "Bandwidth": "12 cm-1",
-      "SNR or NEΔT @ specified input": "0.37 K @ 290 K"
+      "channel_name": "Band_03",
+      "Wavelength": {
+        "value": 14.49,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 690.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 12.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.37,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "14.22 µm",
-      "Wave number": "703 cm-1",
-      "Bandwidth": "16 cm-1",
-      "SNR or NEΔT @ specified input": "0.22 K @ 290 K"
+      "channel_name": "Band_04",
+      "Wavelength": {
+        "value": 14.22,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 703.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 16.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.22,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "13.97 µm",
-      "Wave number": "716 cm-1",
-      "Bandwidth": "16 cm-1",
-      "SNR or NEΔT @ specified input": "0.20 K @ 290 K"
+      "channel_name": "Band_05",
+      "Wavelength": {
+        "value": 13.97,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 716.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 16.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.2,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "13.64 µm",
-      "Wave number": "733 cm-1",
-      "Bandwidth": "16 cm-1",
-      "SNR or NEΔT @ specified input": "0.22 K @ 290 K"
+      "channel_name": "Band_06",
+      "Wavelength": {
+        "value": 13.64,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 733.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 16.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.22,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "13.35 µm",
-      "Wave number": "749 cm-1",
-      "Bandwidth": "16 cm-1",
-      "SNR or NEΔT @ specified input": "0.18 K @ 290 K"
+      "channel_name": "Band_07",
+      "Wavelength": {
+        "value": 13.35,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 749.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 16.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.18,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "12.47 µm",
-      "Wave number": "802 cm-1",
-      "Bandwidth": "30 cm-1",
-      "SNR or NEΔT @ specified input": "0.12 K @ 290 K"
+      "channel_name": "Band_08",
+      "Wavelength": {
+        "value": 12.47,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 802.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 30.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.12,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "11.11 µm",
-      "Wave number": "900 cm-1",
-      "Bandwidth": "35 cm-1",
-      "SNR or NEΔT @ specified input": "0.10 K @ 290 K"
+      "channel_name": "Band_09",
+      "Wavelength": {
+        "value": 11.11,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 900.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 35.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.1,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "9.71 µm",
-      "Wave number": "1030 cm-1",
-      "Bandwidth": "25 cm-1",
-      "SNR or NEΔT @ specified input": "0.14 K @ 290 K"
+      "channel_name": "Band_10",
+      "Wavelength": {
+        "value": 9.71,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 1030.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 25.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.14,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "7.43 µm",
-      "Wave number": "1345 cm-1",
-      "Bandwidth": "50 cm-1",
-      "SNR or NEΔT @ specified input": "0.27 K @ 290 K"
+      "channel_name": "Band_11",
+      "Wavelength": {
+        "value": 7.43,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 1345.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 50.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.27,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "7.33 µm",
-      "Wave number": "1365 cm-1",
-      "Bandwidth": "40 cm-1",
-      "SNR or NEΔT @ specified input": "0.37 K @ 290 K"
+      "channel_name": "Band_12",
+      "Wavelength": {
+        "value": 7.33,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 1365.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 40.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.37,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "6.52 µm",
-      "Wave number": "1533 cm-1",
-      "Bandwidth": "55 cm-1",
-      "SNR or NEΔT @ specified input": "0.53 K @ 290 K"
+      "channel_name": "Band_13",
+      "Wavelength": {
+        "value": 6.52,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 1533.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 55.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.53,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "4.57 µm",
-      "Wave number": "2188 cm-1",
-      "Bandwidth": "23 cm-1",
-      "SNR or NEΔT @ specified input": "0.10 K @ 290 K"
+      "channel_name": "Band_14",
+      "Wavelength": {
+        "value": 4.57,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2188.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 23.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.1,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "4.52 µm",
-      "Wave number": "2210 cm-1",
-      "Bandwidth": "23 cm-1",
-      "SNR or NEΔT @ specified input": "0.05 K @ 290 K"
+      "channel_name": "Band_15",
+      "Wavelength": {
+        "value": 4.52,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2210.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 23.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.05,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "4.47 µm",
-      "Wave number": "2235 cm-1",
-      "Bandwidth": "23 cm-1",
-      "SNR or NEΔT @ specified input": "0.08 K @ 290 K"
+      "channel_name": "Band_16",
+      "Wavelength": {
+        "value": 4.47,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2235.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 23.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.08,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "4.45 µm",
-      "Wave number": "2245 cm-1",
-      "Bandwidth": "23 cm-1",
-      "SNR or NEΔT @ specified input": "0.08 K @ 290 K"
+      "channel_name": "Band_17",
+      "Wavelength": {
+        "value": 4.45,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2245.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 23.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.08,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "4.19 µm",
-      "Wave number": "2388 cm-1",
-      "Bandwidth": "25 cm-1",
-      "SNR or NEΔT @ specified input": "0.06 K @ 290 K"
+      "channel_name": "Band_18",
+      "Wavelength": {
+        "value": 4.19,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2388.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 25.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.06,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "3.98 µm",
-      "Wave number": "2515 cm-1",
-      "Bandwidth": "35 cm-1",
-      "SNR or NEΔT @ specified input": "0.10 K @ 290 K"
+      "channel_name": "Band_19",
+      "Wavelength": {
+        "value": 3.98,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2515.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 35.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.1,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "3.76 µm",
-      "Wave number": "2660 cm-1",
-      "Bandwidth": "100 cm-1",
-      "SNR or NEΔT @ specified input": "0.11 K @ 290 K"
+      "channel_name": "Band_20",
+      "Wavelength": {
+        "value": 3.76,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2660.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 100.0,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": {
+        "value": 0.11,
+        "unit": "K @ 290 K"
+      }
     },
     {
-      "Wavelength": "1.64 µm",
-      "Wave number": "n/a",
-      "Bandwidth": "120 nm",
-      "SNR or NEΔT @ specified input": "…..  @ ..... % albedo"
+      "channel_name": "Band_21",
+      "Wavelength": {
+        "value": 1.64,
+        "unit": "µm"
+      },
+      "wave_number_range": "n/a",
+      "Bandwidth": {
+        "value": 120.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…..  @ ..... % albedo"
     },
     {
-      "Wavelength": "1.24 µm",
-      "Wave number": "n/a",
-      "Bandwidth": "100 nm",
-      "SNR or NEΔT @ specified input": "…..  @ ..... % albedo"
+      "channel_name": "Band_22",
+      "Wavelength": {
+        "value": 1.24,
+        "unit": "µm"
+      },
+      "wave_number_range": "n/a",
+      "Bandwidth": {
+        "value": 100.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…..  @ ..... % albedo"
     },
     {
-      "Wavelength": "0.94 µm",
-      "Wave number": "n/a",
-      "Bandwidth": "18 nm",
-      "SNR or NEΔT @ specified input": "…..  @ ..... % albedo"
+      "channel_name": "Band_23",
+      "Wavelength": {
+        "value": 0.94,
+        "unit": "µm"
+      },
+      "wave_number_range": "n/a",
+      "Bandwidth": {
+        "value": 18.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…..  @ ..... % albedo"
     },
     {
-      "Wavelength": "0.94 µm",
-      "Wave number": "n/a",
-      "Bandwidth": "49 nm",
-      "SNR or NEΔT @ specified input": "…..  @ ..... % albedo"
+      "channel_name": "Band_24",
+      "Wavelength": {
+        "value": 0.94,
+        "unit": "µm"
+      },
+      "wave_number_range": "n/a",
+      "Bandwidth": {
+        "value": 49.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…..  @ ..... % albedo"
     },
     {
-      "Wavelength": "0.885 µm",
-      "Wave number": "n/a",
-      "Bandwidth": "30 nm",
-      "SNR or NEΔT @ specified input": "…..  @ ..... % albedo"
+      "channel_name": "Band_25",
+      "Wavelength": {
+        "value": 0.885,
+        "unit": "µm"
+      },
+      "wave_number_range": "n/a",
+      "Bandwidth": {
+        "value": 30.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…..  @ ..... % albedo"
     },
     {
-      "Wavelength": "0.69 µm",
-      "Wave number": "n/a",
-      "Bandwidth": "48 nm",
-      "SNR or NEΔT @ specified input": "…..  @ ..... % albedo"
+      "channel_name": "Band_26",
+      "Wavelength": {
+        "value": 0.69,
+        "unit": "µm"
+      },
+      "wave_number_range": "n/a",
+      "Bandwidth": {
+        "value": 48.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…..  @ ..... % albedo"
     }
   ]
 }

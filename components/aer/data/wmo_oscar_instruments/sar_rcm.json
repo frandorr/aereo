@@ -3,7 +3,8 @@
   "instrument_acronym": "SAR RCM",
   "instrument_fullname": "Synthetic Aperture Radar (C-band) for RadarSat constellation",
   "url": "https://space.oscar.wmo.int/instruments/view/sar%20rcm",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -12,60 +13,141 @@
   ],
   "channels": [
     {
-      "Operation mode": "Low resolution",
-      "Resolution": "100 m",
-      "Swath": "500 km",
-      "Field of regard": "500 km,  either right or left",
-      "Polarisation": "HH/HV or VV/VH"
+      "channel_name": "Band_01",
+      "operation_mode": "Low resolution",
+      "spatial_resolution": {
+        "value": 100.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 500.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 500.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "HH/HV or VV/VH"
     },
     {
-      "Operation mode": "Medium resolution (marittime)",
-      "Resolution": "50 m",
-      "Swath": "350 km",
-      "Field of regard": "500 km,  either right or left",
-      "Polarisation": "HH/HV or VV/VH"
+      "channel_name": "Band_02",
+      "operation_mode": "Medium resolution (marittime)",
+      "spatial_resolution": {
+        "value": 50.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 350.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 500.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "HH/HV or VV/VH"
     },
     {
-      "Operation mode": "Medium resolution (land ScanSAR )",
-      "Resolution": "30 m",
-      "Swath": "125 km",
-      "Field of regard": "350 km,  either right or left",
-      "Polarisation": "VV/HH, HH/HV, VV/VH"
+      "channel_name": "Band_03",
+      "operation_mode": "Medium resolution (land ScanSAR )",
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 125.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 350.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "VV/HH, HH/HV, VV/VH"
     },
     {
-      "Operation mode": "Medium resolution land",
-      "Resolution": "16 m",
-      "Swath": "30 km",
-      "Field of regard": "350 km,  either right or left",
-      "Polarisation": "VV/HH, HH/HV, VV/VH"
+      "channel_name": "Band_04",
+      "operation_mode": "Medium resolution land",
+      "spatial_resolution": {
+        "value": 16.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 30.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 350.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "VV/HH, HH/HV, VV/VH"
     },
     {
-      "Operation mode": "High resolution",
-      "Resolution": "5 m",
-      "Swath": "30 km",
-      "Field of regard": "500 km,  either right or left",
-      "Polarisation": "HH or VV"
+      "channel_name": "Band_05",
+      "operation_mode": "High resolution",
+      "spatial_resolution": {
+        "value": 5.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 30.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 500.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "HH or VV"
     },
     {
-      "Operation mode": "Very high resolution",
-      "Resolution": "3 m",
-      "Swath": "20 km",
-      "Field of regard": "500 km,  either right or left",
-      "Polarisation": "HH or VV"
+      "channel_name": "Band_06",
+      "operation_mode": "Very high resolution",
+      "spatial_resolution": {
+        "value": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 20.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 500.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "HH or VV"
     },
     {
-      "Operation mode": "Ice/oil low noise",
-      "Resolution": "100 m",
-      "Swath": "350 km",
-      "Field of regard": "500 km,  either right or left",
-      "Polarisation": "HH/HV or VV/VH"
+      "channel_name": "Band_07",
+      "operation_mode": "Ice/oil low noise",
+      "spatial_resolution": {
+        "value": 100.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 350.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 500.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "HH/HV or VV/VH"
     },
     {
-      "Operation mode": "Ship detection",
-      "Resolution": "16-100 m",
-      "Swath": "350 km",
-      "Field of regard": "500 km,  either right or left",
-      "Polarisation": "N/A"
+      "channel_name": "Band_08",
+      "operation_mode": "Ship detection",
+      "spatial_resolution": {
+        "min": 16.0,
+        "max": 100.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 350.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 500.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "N/A"
     }
   ]
 }

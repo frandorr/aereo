@@ -3,41 +3,66 @@
   "instrument_acronym": "PREMOS",
   "instrument_fullname": "Precision Monitoring of Solar variability",
   "url": "https://space.oscar.wmo.int/instruments/view/premos",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR or NEΔT @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "210 nm",
-      "Spectral interval": "",
-      "SNR or NEΔT @ specified input": ""
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 210.0,
+        "unit": "nm"
+      },
+      "bandwidth": "",
+      "snr_or_nedt": ""
     },
     {
-      "Central wavelength": "215 nm",
-      "Spectral interval": "",
-      "SNR or NEΔT @ specified input": ""
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 215.0,
+        "unit": "nm"
+      },
+      "bandwidth": "",
+      "snr_or_nedt": ""
     },
     {
-      "Central wavelength": "268 nm",
-      "Spectral interval": "",
-      "SNR or NEΔT @ specified input": ""
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 268.0,
+        "unit": "nm"
+      },
+      "bandwidth": "",
+      "snr_or_nedt": ""
     },
     {
-      "Central wavelength": "535 nm",
-      "Spectral interval": "",
-      "SNR or NEΔT @ specified input": ""
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 535.0,
+        "unit": "nm"
+      },
+      "bandwidth": "",
+      "snr_or_nedt": ""
     },
     {
-      "Central wavelength": "607 nm",
-      "Spectral interval": "",
-      "SNR or NEΔT @ specified input": ""
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 607.0,
+        "unit": "nm"
+      },
+      "bandwidth": "",
+      "snr_or_nedt": ""
     },
     {
-      "Central wavelength": "782 nm",
-      "Spectral interval": "",
-      "SNR or NEΔT @ specified input": ""
+      "channel_name": "Band_06",
+      "central_wavelength": {
+        "value": 782.0,
+        "unit": "nm"
+      },
+      "bandwidth": "",
+      "snr_or_nedt": ""
     }
   ]
 }

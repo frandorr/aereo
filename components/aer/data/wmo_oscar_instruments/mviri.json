@@ -3,26 +3,57 @@
   "instrument_acronym": "MVIRI",
   "instrument_fullname": "Meteosat Visible Infra-Red Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/mviri",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR or NEΔT @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "0.70 µm",
-      "Spectral interval": "0.50 - 0.90 µm",
-      "SNR or NEΔT @ specified input": "3.0 @ 1 % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.7,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.5,
+        "max": 0.9,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "3.0 @ 1 % albedo"
     },
     {
-      "Central wavelength": "6.40 µm",
-      "Spectral interval": "5.70 - 7.10 µm",
-      "SNR or NEΔT @ specified input": "1.0 K @ 250 K"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 6.4,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 5.7,
+        "max": 7.1,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 1.0,
+        "unit": "K @ 250 K"
+      }
     },
     {
-      "Central wavelength": "11.5 µm",
-      "Spectral interval": "10.5 - 12.5 µm",
-      "SNR or NEΔT @ specified input": "0.5 K @ 300 K"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 11.5,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 10.5,
+        "max": 12.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.5,
+        "unit": "K @ 300 K"
+      }
     }
   ]
 }

@@ -3,26 +3,51 @@
   "instrument_acronym": "MSU-EU",
   "instrument_fullname": "Multispectral VNIR radiometer",
   "url": "https://space.oscar.wmo.int/instruments/view/msu-eu",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.55 μm",
-      "Spectral interval": "0.50 - 0.59 μm",
-      "SNR @ specified albedo": "100 @ 100 % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.55,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.5,
+        "max": 0.59,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "100 @ 100 % albedo"
     },
     {
-      "Central wavelength": "0.65 μm",
-      "Spectral interval": "0.61 - 0.69 μm",
-      "SNR @ specified albedo": "100 @ 100 % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.65,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.61,
+        "max": 0.69,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "100 @ 100 % albedo"
     },
     {
-      "Central wavelength": "0.85 μm",
-      "Spectral interval": "0.79 - 0.92 μm",
-      "SNR @ specified albedo": "100 @ 100 % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.85,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.79,
+        "max": 0.92,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "100 @ 100 % albedo"
     }
   ]
 }

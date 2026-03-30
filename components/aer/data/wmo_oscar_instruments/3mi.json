@@ -3,7 +3,8 @@
   "instrument_acronym": "3MI",
   "instrument_fullname": "Multi-viewing Multi-channel Multi-polarisation Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/3mi",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Channel",
     "Centralwavelength",
     "Bandwidth",
@@ -12,88 +13,208 @@
   ],
   "channels": [
     {
-      "Channel": "3MI-2b",
-      "Centralwavelength": "410 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "CH01",
+      "Channel": {
+        "value": 3.0,
+        "unit": "MI-2b"
+      },
+      "central_wavelength": {
+        "value": 410.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "Polarisation": "Y",
-      "SNR @ specified input": "200 @ 46.64 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 46.64 W m-2sr-1µm-1"
     },
     {
-      "Channel": "3MI-3",
-      "Centralwavelength": "443 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "CH02",
+      "Channel": {
+        "value": 3.0,
+        "unit": "MI-3"
+      },
+      "central_wavelength": {
+        "value": 443.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "Polarisation": "Y",
-      "SNR @ specified input": "200 @ 56.61W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 56.61W m-2sr-1µm-1"
     },
     {
-      "Channel": "3MI-4",
-      "Centralwavelength": "490 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "CH03",
+      "Channel": {
+        "value": 3.0,
+        "unit": "MI-4"
+      },
+      "central_wavelength": {
+        "value": 490.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "Polarisation": "Y",
-      "SNR @ specified input": "200 @ 57.74 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 57.74 W m-2sr-1µm-1"
     },
     {
-      "Channel": "3MI-5",
-      "Centralwavelength": "555 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "CH04",
+      "Channel": {
+        "value": 3.0,
+        "unit": "MI-5"
+      },
+      "central_wavelength": {
+        "value": 555.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "Polarisation": "Y",
-      "SNR @ specified input": "200 @ 55.24 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 55.24 W m-2sr-1µm-1"
     },
     {
-      "Channel": "3MI-6",
-      "Centralwavelength": "670 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "CH05",
+      "Channel": {
+        "value": 3.0,
+        "unit": "MI-6"
+      },
+      "central_wavelength": {
+        "value": 670.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "Polarisation": "Y",
-      "SNR @ specified input": "200 @ 44.57 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 44.57 W m-2sr-1µm-1"
     },
     {
-      "Channel": "3MI -7",
-      "Centralwavelength": "763 nm",
-      "Bandwidth": "10 nm",
+      "channel_name": "CH06",
+      "Channel": {
+        "value": 3.0,
+        "unit": "MI -7"
+      },
+      "central_wavelength": {
+        "value": 763.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      },
       "Polarisation": "N",
-      "SNR @ specified input": "200 @ 36.11 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 36.11 W m-2sr-1µm-1"
     },
     {
-      "Channel": "3MI -8",
-      "Centralwavelength": "765 nm",
-      "Bandwidth": "40 nm",
+      "channel_name": "CH07",
+      "Channel": {
+        "value": 3.0,
+        "unit": "MI -8"
+      },
+      "central_wavelength": {
+        "value": 765.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 40.0,
+        "unit": "nm"
+      },
       "Polarisation": "N",
-      "SNR @ specified input": "200 @ 36.11 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 36.11 W m-2sr-1µm-1"
     },
     {
-      "Channel": "3MI -9",
-      "Centralwavelength": "865 nm",
-      "Bandwidth": "40 nm",
+      "channel_name": "CH08",
+      "Channel": {
+        "value": 3.0,
+        "unit": "MI -9"
+      },
+      "central_wavelength": {
+        "value": 865.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 40.0,
+        "unit": "nm"
+      },
       "Polarisation": "Y",
-      "SNR @ specified input": "200 @ 28.20 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 28.20 W m-2sr-1µm-1"
     },
     {
-      "Channel": "3MI-9a",
-      "Centralwavelength": "910 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "CH09",
+      "Channel": {
+        "value": 3.0,
+        "unit": "MI-9a"
+      },
+      "central_wavelength": {
+        "value": 910.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "Polarisation": "N",
-      "SNR @ specified input": "200 @ 25.18 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 25.18 W m-2sr-1µm-1"
     },
     {
-      "Channel": "3MI -10",
-      "Centralwavelength": "1370 nm",
-      "Bandwidth": "40 nm",
+      "channel_name": "CH10",
+      "Channel": {
+        "value": 3.0,
+        "unit": "MI -10"
+      },
+      "central_wavelength": {
+        "value": 1370.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 40.0,
+        "unit": "nm"
+      },
       "Polarisation": "Y",
-      "SNR @ specified input": "200 @ 10.73 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 10.73 W m-2sr-1µm-1"
     },
     {
-      "Channel": "3MI -11",
-      "Centralwavelength": "1650 nm",
-      "Bandwidth": "40 nm",
+      "channel_name": "CH11",
+      "Channel": {
+        "value": 3.0,
+        "unit": "MI -11"
+      },
+      "central_wavelength": {
+        "value": 1650.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 40.0,
+        "unit": "nm"
+      },
       "Polarisation": "Y",
-      "SNR @ specified input": "200 @ 6.80 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 6.80 W m-2sr-1µm-1"
     },
     {
-      "Channel": "3MI -12",
-      "Centralwavelength": "2130 nm",
-      "Bandwidth": "40 nm",
+      "channel_name": "CH12",
+      "Channel": {
+        "value": 3.0,
+        "unit": "MI -12"
+      },
+      "central_wavelength": {
+        "value": 2130.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 40.0,
+        "unit": "nm"
+      },
       "Polarisation": "Y",
-      "SNR @ specified input": "200 @ 2.50 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 2.50 W m-2sr-1µm-1"
     }
   ]
 }

@@ -3,7 +3,8 @@
   "instrument_acronym": "HIRAS",
   "instrument_fullname": "Hyperspectral Infrared Atmospheric Sounder",
   "url": "https://space.oscar.wmo.int/instruments/view/hiras",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range(µm)",
     "Spectral range(cm-1)",
     "Spectral resolution(unapodised)",
@@ -11,22 +12,70 @@
   ],
   "channels": [
     {
-      "Spectral range(µm)": "8.80-15.39 µm",
-      "Spectral range(cm-1)": "650-1136 cm-1",
-      "Spectral resolution(unapodised)": "0.625 cm-1",
-      "NEΔT @ specified scene temperature": "0.15-0.4 K @ 250 K"
+      "channel_name": "LWIR",
+      "Spectral range(µm)": {
+        "min": 8.8,
+        "max": 15.39,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "min": 650.0,
+        "max": 1136.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.625,
+        "unit": "cm-1"
+      },
+      "NEΔT @ specified scene temperature": {
+        "min": 0.15,
+        "max": 0.4,
+        "unit": "K @ 250 K"
+      }
     },
     {
-      "Spectral range(µm)": "5.71-8.26 µm",
-      "Spectral range(cm-1)": "1210-1750 cm-1",
-      "Spectral resolution(unapodised)": "1.25 cm-1",
-      "NEΔT @ specified scene temperature": "0.1-0.7 K @ 250 K"
+      "channel_name": "MWIR",
+      "Spectral range(µm)": {
+        "min": 5.71,
+        "max": 8.26,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "min": 1210.0,
+        "max": 1750.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 1.25,
+        "unit": "cm-1"
+      },
+      "NEΔT @ specified scene temperature": {
+        "min": 0.1,
+        "max": 0.7,
+        "unit": "K @ 250 K"
+      }
     },
     {
-      "Spectral range(µm)": "3.92-4.64 µm",
-      "Spectral range(cm-1)": "2155-2550 cm-1",
-      "Spectral resolution(unapodised)": "2.5 cm-1",
-      "NEΔT @ specified scene temperature": "0.3-1.2 K @ 250 K"
+      "channel_name": "SWIR",
+      "Spectral range(µm)": {
+        "min": 3.92,
+        "max": 4.64,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "min": 2155.0,
+        "max": 2550.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 2.5,
+        "unit": "cm-1"
+      },
+      "NEΔT @ specified scene temperature": {
+        "min": 0.3,
+        "max": 1.2,
+        "unit": "K @ 250 K"
+      }
     }
   ]
 }

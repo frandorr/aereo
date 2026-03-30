@@ -3,7 +3,8 @@
   "instrument_acronym": "SMMR",
   "instrument_fullname": "Scanning Multichannel Microwave Radiometer)",
   "url": "https://space.oscar.wmo.int/instruments/view/smmr",
-  "columns": [
+  "schema_type": "microwave",
+  "original_columns": [
     "Central frequency (GHz)",
     "Bandwidth (MHz)",
     "Polarisations",
@@ -13,44 +14,109 @@
   ],
   "channels": [
     {
-      "Central frequency (GHz)": "6.6",
-      "Bandwidth (MHz)": "250",
-      "Polarisations": "V, H",
-      "NEΔT": "0.9 K",
-      "IFOV": "95x160 km",
-      "Pixel": "40x26 km"
+      "channel_name": "Band_01",
+      "central_frequency": {
+        "value": 6.6,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 250,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.9,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 40.0,
+        "y": 26.0,
+        "unit": "km"
+      }
     },
     {
-      "Central frequency (GHz)": "10.7",
-      "Bandwidth (MHz)": "250",
-      "Polarisations": "V, H",
-      "NEΔT": "0.9 K",
-      "IFOV": "60x100 km",
-      "Pixel": "20x26 km"
+      "channel_name": "Band_02",
+      "central_frequency": {
+        "value": 10.7,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 250,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.9,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 20.0,
+        "y": 26.0,
+        "unit": "km"
+      }
     },
     {
-      "Central frequency (GHz)": "18.0",
-      "Bandwidth (MHz)": "250",
-      "Polarisations": "V, H",
-      "NEΔT": "1.2 K",
-      "IFOV": "35x60 km",
-      "Pixel": "20x26 km"
+      "channel_name": "Band_03",
+      "central_frequency": {
+        "value": 18.0,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 250,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 1.2,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 20.0,
+        "y": 26.0,
+        "unit": "km"
+      }
     },
     {
-      "Central frequency (GHz)": "21.0",
-      "Bandwidth (MHz)": "250",
-      "Polarisations": "V, H",
-      "NEΔT": "1.5 K",
-      "IFOV": "30x50 km",
-      "Pixel": "20x26 km"
+      "channel_name": "Band_04",
+      "central_frequency": {
+        "value": 21.0,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 250,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 1.5,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 20.0,
+        "y": 26.0,
+        "unit": "km"
+      }
     },
     {
-      "Central frequency (GHz)": "37.0",
-      "Bandwidth (MHz)": "250",
-      "Polarisations": "V, H",
-      "NEΔT": "1.5 K",
-      "IFOV": "17x29 km",
-      "Pixel": "10x26 km"
+      "channel_name": "Band_05",
+      "central_frequency": {
+        "value": 37.0,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 250,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 1.5,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 10.0,
+        "y": 26.0,
+        "unit": "km"
+      }
     }
   ]
 }

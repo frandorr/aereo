@@ -3,7 +3,8 @@
   "instrument_acronym": "POLDER",
   "instrument_fullname": "Polarization and Directionality of the Earth’s Reflectances",
   "url": "https://space.oscar.wmo.int/instruments/view/polder",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Bandwidth",
     "No. of pol.",
@@ -11,58 +12,85 @@
   ],
   "channels": [
     {
-      "Central wavelength": "443.5 nm",
-      "Bandwidth": "13.4 nm",
-      "No. of pol.": "-",
-      "SNR at specified input spectral radiance": "200 @ 61.9 W m-2sr-1µm-1"
+      "channel_name": "Band_01",
+      "central_wavelength": "200 @ 61.9 W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 13.4,
+        "unit": "nm"
+      },
+      "No. of pol.": "-"
     },
     {
-      "Central wavelength": "490.9 nm",
-      "Bandwidth": "16.3 nm",
-      "No. of pol.": "three",
-      "SNR at specified input spectral radiance": "200 @ 63.2 W m-2sr-1µm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": "200 @ 63.2 W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 16.3,
+        "unit": "nm"
+      },
+      "No. of pol.": "three"
     },
     {
-      "Central wavelength": "563.8 nm",
-      "Bandwidth": "15.4 nm",
-      "No. of pol.": "-",
-      "SNR at specified input spectral radiance": "200 @ 58.1 W m-2sr-1µm-1"
+      "channel_name": "Band_03",
+      "central_wavelength": "200 @ 58.1 W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 15.4,
+        "unit": "nm"
+      },
+      "No. of pol.": "-"
     },
     {
-      "Central wavelength": "669.9 nm",
-      "Bandwidth": "15.1 nm",
-      "No. of pol.": "-",
-      "SNR at specified input spectral radiance": "200 @ 48.7 W m-2sr-1µm-1"
+      "channel_name": "Band_04",
+      "central_wavelength": "200 @ 48.7 W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 15.1,
+        "unit": "nm"
+      },
+      "No. of pol.": "-"
     },
     {
-      "Central wavelength": "762.9 nm",
-      "Bandwidth": "10.9 nm",
-      "No. of pol.": "three",
-      "SNR at specified input spectral radiance": "200 @ 38.9 W m-2sr-1µm-1"
+      "channel_name": "Band_05",
+      "central_wavelength": "200 @ 38.9 W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 10.9,
+        "unit": "nm"
+      },
+      "No. of pol.": "three"
     },
     {
-      "Central wavelength": "762.7 nm",
-      "Bandwidth": "38.1 nm",
-      "No. of pol.": "-",
-      "SNR at specified input spectral radiance": "200 @ 38.9 W m-2sr-1µm-1"
+      "channel_name": "Band_06",
+      "central_wavelength": "200 @ 38.9 W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 38.1,
+        "unit": "nm"
+      },
+      "No. of pol.": "-"
     },
     {
-      "Central wavelength": "863.7 nm",
-      "Bandwidth": "33.7 nm",
-      "No. of pol.": "-",
-      "SNR at specified input spectral radiance": "200 @ 30.8 W m-2sr-1µm-1"
+      "channel_name": "Band_07",
+      "central_wavelength": "200 @ 30.8 W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 33.7,
+        "unit": "nm"
+      },
+      "No. of pol.": "-"
     },
     {
-      "Central wavelength": "907.1 nm",
-      "Bandwidth": "21.1 nm",
-      "No. of pol.": "three",
-      "SNR at specified input spectral radiance": "200 @ 27.5 W m-2sr-1µm-1"
+      "channel_name": "Band_08",
+      "central_wavelength": "200 @ 27.5 W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 21.1,
+        "unit": "nm"
+      },
+      "No. of pol.": "three"
     },
     {
-      "Central wavelength": "1019.6 nm",
-      "Bandwidth": "17.1 nm",
-      "No. of pol.": "-",
-      "SNR at specified input spectral radiance": "200 @ 22.6 W m-2sr-1µm-1"
+      "channel_name": "Band_09",
+      "central_wavelength": "200 @ 22.6 W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 17.1,
+        "unit": "nm"
+      },
+      "No. of pol.": "-"
     }
   ]
 }

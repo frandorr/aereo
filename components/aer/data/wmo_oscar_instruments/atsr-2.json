@@ -3,46 +3,108 @@
   "instrument_acronym": "ATSR-2",
   "instrument_fullname": "Along-Track Scanning Radiometer - 2",
   "url": "https://space.oscar.wmo.int/instruments/view/atsr-2",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Bandwidth",
     "SNR or NEΔT @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "550 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "20 @ 0.5 % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 550.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "20 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "659 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "20 @ 0.5 % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 659.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "20 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "865 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "20 @ 0.5 % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 865.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "20 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "1610 nm",
-      "Bandwidth": "300 nm",
-      "SNR or NEΔT @ specified input": "20 @ 0.5 % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 1610.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 300.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "20 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "3.70 µm",
-      "Bandwidth": "3.55 - 3.85 µm",
-      "SNR or NEΔT @ specified input": "0.08 K @ 270 K"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 3.7,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 3.55,
+        "max": 3.85,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.08,
+        "unit": "K @ 270 K"
+      }
     },
     {
-      "Central wavelength": "10.85 µm",
-      "Bandwidth": "10.35 - 11.35 µm",
-      "SNR or NEΔT @ specified input": "0.05 K @ 270 K"
+      "channel_name": "Band_06",
+      "central_wavelength": {
+        "value": 10.85,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 10.35,
+        "max": 11.35,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.05,
+        "unit": "K @ 270 K"
+      }
     },
     {
-      "Central wavelength": "12.00 µm",
-      "Bandwidth": "11.50 - 12.50 µm",
-      "SNR or NEΔT @ specified input": "0.05 K @ 270 K"
+      "channel_name": "Band_07",
+      "central_wavelength": {
+        "value": 12.0,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 11.5,
+        "max": 12.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.05,
+        "unit": "K @ 270 K"
+      }
     }
   ]
 }

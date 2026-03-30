@@ -3,86 +3,132 @@
   "instrument_acronym": "MERIS",
   "instrument_fullname": "Medium Resolution Imaging Spectrometer ",
   "url": "https://space.oscar.wmo.int/instruments/view/meris",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Bandwidth",
     "SNR @ specified input spectral radiance"
   ],
   "channels": [
     {
-      "Central wavelength": "412.5 nm",
-      "Bandwidth": "10 nm",
-      "SNR @ specified input spectral radiance": "1871 @ 47.9 W m-2sr-1μm-1"
+      "channel_name": "Band_01",
+      "central_wavelength": "1871 @ 47.9 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "442.5 nm",
-      "Bandwidth": "10 nm",
-      "SNR @ specified input spectral radiance": "1650 @ 41.9 W m-2sr-1μm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": "1650 @ 41.9 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "490 nm",
-      "Bandwidth": "10 nm",
-      "SNR @ specified input spectral radiance": "1418 @ 31.2 W m-2sr-1μm-1"
+      "channel_name": "Band_03",
+      "central_wavelength": "1418 @ 31.2 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "510 nm",
-      "Bandwidth": "10 nm",
-      "SNR @ specified input spectral radiance": "1222 @ 23.7 W m-2sr-1μm-1"
+      "channel_name": "Band_04",
+      "central_wavelength": "1222 @ 23.7 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "560 nm",
-      "Bandwidth": "10 nm",
-      "SNR @ specified input spectral radiance": "1156 @ 18.5 W m-2sr-1μm-1"
+      "channel_name": "Band_05",
+      "central_wavelength": "1156 @ 18.5 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "620 nm",
-      "Bandwidth": "10 nm",
-      "SNR @ specified input spectral radiance": "863 @ 12.0 W m-2sr-1μm-1"
+      "channel_name": "Band_06",
+      "central_wavelength": "863 @ 12.0 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "665 nm",
-      "Bandwidth": "10 nm",
-      "SNR @ specified input spectral radiance": "708 @ 9.2 W m-2sr-1μm-1"
+      "channel_name": "Band_07",
+      "central_wavelength": "708 @ 9.2 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "681.25 nm",
-      "Bandwidth": "7.5 nm",
-      "SNR @ specified input spectral radiance": "589 @ 8.3 W m-2sr-1μm-1"
+      "channel_name": "Band_08",
+      "central_wavelength": "589 @ 8.3 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 7.5,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "708.75 nm",
-      "Bandwidth": "10 nm",
-      "SNR @ specified input spectral radiance": "631 @ 6.9 W m-2sr-1μm-1"
+      "channel_name": "Band_09",
+      "central_wavelength": "631 @ 6.9 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "753.75 nm",
-      "Bandwidth": "7.5 nm",
-      "SNR @ specified input spectral radiance": "486 @ 5.6 W m-2sr-1μm-1"
+      "channel_name": "Band_10",
+      "central_wavelength": "486 @ 5.6 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 7.5,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "760.625 nm",
-      "Bandwidth": "3.75 nm",
-      "SNR @ specified input spectral radiance": "205 @ 3.4 W m-2sr-1μm-1"
+      "channel_name": "Band_11",
+      "central_wavelength": "205 @ 3.4 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 3.75,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "778.75 nm",
-      "Bandwidth": "15 nm",
-      "SNR @ specified input spectral radiance": "628 @ 4.9 W m-2sr-1μm-1"
+      "channel_name": "Band_12",
+      "central_wavelength": "628 @ 4.9 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 15.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "865 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified input spectral radiance": "457@ 3.2 W m-2sr-1μm-1"
+      "channel_name": "Band_13",
+      "central_wavelength": "457@ 3.2 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "885 nm",
-      "Bandwidth": "10 nm",
-      "SNR @ specified input spectral radiance": "271 @ 3.1 W m-2sr-1μm-1"
+      "channel_name": "Band_14",
+      "central_wavelength": "271 @ 3.1 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "900 nm",
-      "Bandwidth": "10 nm",
-      "SNR @ specified input spectral radiance": "211 @ 2.4 W m-2sr-1μm-1"
+      "channel_name": "Band_15",
+      "central_wavelength": "211 @ 2.4 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      }
     }
   ]
 }

@@ -3,7 +3,8 @@
   "instrument_acronym": "IMG",
   "instrument_fullname": "Interferometric Monitor for Greenhouse gases",
   "url": "https://space.oscar.wmo.int/instruments/view/img",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range(µm)",
     "Spectral range(cm-1)",
     "Spectral resolution(apodised)",
@@ -11,22 +12,67 @@
   ],
   "channels": [
     {
-      "Spectral range(µm)": "5.0-14.0 µm",
-      "Spectral range(cm-1)": "714-2000 cm-1",
-      "Spectral resolution(apodised)": "0.1 cm-1",
-      "NESR": "0.230 mW·m-2·cm"
+      "channel_name": "Band_01",
+      "Spectral range(µm)": {
+        "min": 5.0,
+        "max": 14.0,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "min": 714.0,
+        "max": 2000.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.1,
+        "unit": "cm-1"
+      },
+      "NESR": {
+        "value": 0.23,
+        "unit": "mW·m-2·cm"
+      }
     },
     {
-      "Spectral range(µm)": "4.3-5.0 µm",
-      "Spectral range(cm-1)": "2000-2325 cm-1",
-      "Spectral resolution(apodised)": "0.25 cm-1",
-      "NESR": "0.020 mW·m-2·cm"
+      "channel_name": "Band_02",
+      "Spectral range(µm)": {
+        "min": 4.3,
+        "max": 5.0,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "min": 2000.0,
+        "max": 2325.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.25,
+        "unit": "cm-1"
+      },
+      "NESR": {
+        "value": 0.02,
+        "unit": "mW·m-2·cm"
+      }
     },
     {
-      "Spectral range(µm)": "3.3-4.3 µm",
-      "Spectral range(cm-1)": "2325-3030 cm-1",
-      "Spectral resolution(apodised)": "0.15 cm-1",
-      "NESR": "0.014 mW·m-2·cm"
+      "channel_name": "Band_03",
+      "Spectral range(µm)": {
+        "min": 3.3,
+        "max": 4.3,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "min": 2325.0,
+        "max": 3030.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.15,
+        "unit": "cm-1"
+      },
+      "NESR": {
+        "value": 0.014,
+        "unit": "mW·m-2·cm"
+      }
     }
   ]
 }

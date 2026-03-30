@@ -3,100 +3,227 @@
   "instrument_acronym": "COCTS2",
   "instrument_fullname": "China Ocean Colour & Temperature Scanner 2",
   "url": "https://space.oscar.wmo.int/instruments/view/cocts2",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Bandwidth",
     "S/N"
   ],
   "channels": [
     {
-      "Central wavelength": "360 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 360.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "S/N": ">1000"
     },
     {
-      "Central wavelength": "385 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 385.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "S/N": ">1000"
     },
     {
-      "Central wavelength": "412 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 412.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "S/N": ">1000"
     },
     {
-      "Central wavelength": "443 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 443.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "S/N": ">1000"
     },
     {
-      "Central wavelength": "490 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 490.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "S/N": ">1000"
     },
     {
-      "Central wavelength": "520 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_06",
+      "central_wavelength": {
+        "value": 520.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "S/N": ">1000"
     },
     {
-      "Central wavelength": "565 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_07",
+      "central_wavelength": {
+        "value": 565.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "S/N": ">1000"
     },
     {
-      "Central wavelength": "620 nm",
-      "Bandwidth": "15 nm",
+      "channel_name": "Band_08",
+      "central_wavelength": {
+        "value": 620.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 15.0,
+        "unit": "nm"
+      },
       "S/N": ">1000"
     },
     {
-      "Central wavelength": "665 nm",
-      "Bandwidth": "15 nm",
+      "channel_name": "Band_09",
+      "central_wavelength": {
+        "value": 665.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 15.0,
+        "unit": "nm"
+      },
       "S/N": ">1000"
     },
     {
-      "Central wavelength": "681 nm",
-      "Bandwidth": "15 nm",
+      "channel_name": "Band_10",
+      "central_wavelength": {
+        "value": 681.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 15.0,
+        "unit": "nm"
+      },
       "S/N": ">1400"
     },
     {
-      "Central wavelength": "705 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_11",
+      "central_wavelength": {
+        "value": 705.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "S/N": ">1000"
     },
     {
-      "Central wavelength": "744 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_12",
+      "central_wavelength": {
+        "value": 744.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "S/N": ">400"
     },
     {
-      "Central wavelength": "865 nm",
-      "Bandwidth": "40 nm",
+      "channel_name": "Band_13",
+      "central_wavelength": {
+        "value": 865.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 40.0,
+        "unit": "nm"
+      },
       "S/N": ">600"
     },
     {
-      "Central wavelength": "1245 nm",
-      "Bandwidth": "40 nm",
+      "channel_name": "Band_14",
+      "central_wavelength": {
+        "value": 1245.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 40.0,
+        "unit": "nm"
+      },
       "S/N": ">250"
     },
     {
-      "Central wavelength": "1640 nm",
-      "Bandwidth": "80 nm",
+      "channel_name": "Band_15",
+      "central_wavelength": {
+        "value": 1640.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 80.0,
+        "unit": "nm"
+      },
       "S/N": ">180"
     },
     {
-      "Central wavelength": "3.74 μm",
-      "Bandwidth": "190 nm",
+      "channel_name": "Band_16",
+      "central_wavelength": {
+        "value": 3.74,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "value": 190.0,
+        "unit": "nm"
+      },
       "S/N": ""
     },
     {
-      "Central wavelength": "11.0 μm",
-      "Bandwidth": "1.0 μm",
+      "channel_name": "Band_17",
+      "central_wavelength": {
+        "value": 11.0,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "value": 1.0,
+        "unit": "μm"
+      },
       "S/N": ""
     },
     {
-      "Central wavelength": "12.0 μm",
-      "Bandwidth": "1.1 μm",
+      "channel_name": "Band_18",
+      "central_wavelength": {
+        "value": 12.0,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "value": 1.1,
+        "unit": "μm"
+      },
       "S/N": ""
     }
   ]

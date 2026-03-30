@@ -3,51 +3,116 @@
   "instrument_acronym": "COBAN",
   "instrument_fullname": "Multiband Camera",
   "url": "https://space.oscar.wmo.int/instruments/view/coban",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.400 μm",
-      "Spectral interval": "0.38 - 0.42 μm",
-      "SNR @ specified albedo": "…… @ ….. % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.4,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.38,
+        "max": 0.42,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.450 µm",
-      "Spectral interval": "0.41 - 0.49 µm",
-      "SNR @ specified albedo": "…… @ ….. % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.45,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.41,
+        "max": 0.49,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.500 µm",
-      "Spectral interval": "0.46 - 0.54 µm",
-      "SNR @ specified albedo": "…… @ ….. % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.5,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.46,
+        "max": 0.54,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.550 µm",
-      "Spectral interval": "0.51 - 0.59 µm",
-      "SNR @ specified albedo": "…… @ ….. % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.55,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.51,
+        "max": 0.59,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.600 µm",
-      "Spectral interval": "0.56 - 0.64 µm",
-      "SNR @ specified albedo": "…… @ ….. % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 0.6,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.56,
+        "max": 0.64,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.650 µm",
-      "Spectral interval": "0.61 - 0.69 µm",
-      "SNR @ specified albedo": "…… @ ….. % albedo"
+      "channel_name": "Band_06",
+      "central_wavelength": {
+        "value": 0.65,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.61,
+        "max": 0.69,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.700 µm",
-      "Spectral interval": "0.66 - 0.74 µm",
-      "SNR @ specified albedo": "…… @ ….. % albedo"
+      "channel_name": "Band_07",
+      "central_wavelength": {
+        "value": 0.7,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.66,
+        "max": 0.74,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.925 µm",
-      "Spectral interval": "0.85 - 1.00 µm",
-      "SNR @ specified albedo": "…… @ ….. % albedo"
+      "channel_name": "Band_08",
+      "central_wavelength": {
+        "value": 0.925,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.85,
+        "max": 1.0,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     }
   ]
 }

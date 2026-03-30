@@ -3,7 +3,8 @@
   "instrument_acronym": "ACGS",
   "instrument_fullname": "Atmospheric Carbon-dioxide Grating Spectrometer",
   "url": "https://space.oscar.wmo.int/instruments/view/acgs",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range",
     "No. of channels",
     "Spectral resolution",
@@ -11,22 +12,55 @@
   ],
   "channels": [
     {
-      "Spectral range": "758-776 nm",
-      "No. of channels": "1024",
-      "Spectral resolution": "0.044 nm",
-      "SNR @ specified input spectral radiance": "360 @ 5.8 1019photons s-1m-2sr-1μm-1"
+      "channel_name": "Band_01",
+      "Spectral range": {
+        "min": 758.0,
+        "max": 776.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1024,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.044,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "360 @ 5.8 1019photons s-1m-2sr-1μm-1"
     },
     {
-      "Spectral range": "1594-1624 nm",
-      "No. of channels": "512",
-      "Spectral resolution": "0.125 nm",
-      "SNR @ specified input spectral radiance": "250 @ 2.1 1019photons s-1m-2sr-1μm-1"
+      "channel_name": "Band_02",
+      "Spectral range": {
+        "min": 1594.0,
+        "max": 1624.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 512,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.125,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "250 @ 2.1 1019photons s-1m-2sr-1μm-1"
     },
     {
-      "Spectral range": "2041-2081 nm",
-      "No. of channels": "512",
-      "Spectral resolution": "0.165 nm",
-      "SNR @ specified input spectral radiance": "180 @ 1.1 1019photons s-1m-2sr-1μm-1"
+      "channel_name": "Band_03",
+      "Spectral range": {
+        "min": 2041.0,
+        "max": 2081.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 512,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.165,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "180 @ 1.1 1019photons s-1m-2sr-1μm-1"
     }
   ]
 }

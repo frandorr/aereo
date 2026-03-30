@@ -3,36 +3,74 @@
   "instrument_acronym": "AVNIR",
   "instrument_fullname": "Advanced Visible and Near-Infrared Radiometer",
   "url": "https://space.oscar.wmo.int/instruments/view/avnir",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.46 µm",
-      "Spectral interval": "0.42 - 0.50 µm",
-      "SNR @ specified albedo": "200 @ 25 % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.46,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.42,
+        "max": 0.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 25 % albedo"
     },
     {
-      "Central wavelength": "0.56 µm",
-      "Spectral interval": "0.52 - 0.60 µm",
-      "SNR @ specified albedo": "200 @ 29 % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.56,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.6,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 29 % albedo"
     },
     {
-      "Central wavelength": "0.65 µm",
-      "Spectral interval": "0.61 - 0.69 µm",
-      "SNR @ specified albedo": "200 @ 41 % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.65,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.61,
+        "max": 0.69,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 41 % albedo"
     },
     {
-      "Central wavelength": "0.825 µm",
-      "Spectral interval": "0.76 - 0.89 µm",
-      "SNR @ specified albedo": "200 @ 59 % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.825,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.76,
+        "max": 0.89,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 59 % albedo"
     },
     {
-      "Central wavelength": "Panchromatic",
-      "Spectral interval": "0.52 - 0.69 µm",
-      "SNR @ specified albedo": "100 @ 100 % albedo or 5 @ 3.3 % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": "Panchromatic",
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.69,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "100 @ 100 % albedo or 5 @ 3.3 % albedo"
     }
   ]
 }

@@ -3,7 +3,8 @@
   "instrument_acronym": "CSG-SAR",
   "instrument_fullname": "COSMO-SkyMed Second Generation Synthetic Aperture Radar",
   "url": "https://space.oscar.wmo.int/instruments/view/csg-sar",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Mode",
     "Resolution",
     "Swath",
@@ -12,53 +13,130 @@
   ],
   "channels": [
     {
-      "Mode": "Spotlight",
-      "Resolution": "0.50x0.35 m",
-      "Swath": "7.3x3.1",
-      "Field-of-Regard": "600 km, either right or left",
-      "Polarisations": "Single: HH or VV or HV or VH"
+      "channel_name": "Spotlight-2A",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": {
+        "x": 0.5,
+        "y": 0.35,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 7.3,
+        "unit": "x3.1"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "Single: HH or VV or HV or VH"
     },
     {
-      "Mode": "Spotlight",
-      "Resolution": "0.63x0.63 m",
-      "Swath": "10 km",
-      "Field-of-Regard": "600 km, either right or left",
-      "Polarisations": "Double: HH & HV or VV &VH"
+      "channel_name": "Spotlight-2B",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": {
+        "x": 0.63,
+        "y": 0.63,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 10.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "Double: HH & HV or VV &VH"
     },
     {
-      "Mode": "Stripmap",
-      "Resolution": "3.0x3.0 m",
-      "Swath": "40 km",
-      "Field-of-Regard": "600 km, either right or left",
-      "Polarisations": "Single: HH or VV or HV or VH"
+      "channel_name": "Stripmap",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "x": 3.0,
+        "y": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 40.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "Single: HH or VV or HV or VH"
     },
     {
-      "Mode": "Stripmap",
-      "Resolution": "3.0x3.0 m",
-      "Swath": "30 km",
-      "Field-of-Regard": "600 km, either right or left",
-      "Polarisations": "Double: HH & HV or VV &VH"
+      "channel_name": "PingPong",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "x": 3.0,
+        "y": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 30.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "Double: HH & HV or VV &VH"
     },
     {
-      "Mode": "Stripmap",
-      "Resolution": "3.0x3.0 m",
-      "Swath": "15 km",
-      "Field-of-Regard": "600 km, either right or left",
-      "Polarisations": "Quadruple: HH & VV & HV & VH"
+      "channel_name": "ScanSAR",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "x": 3.0,
+        "y": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 15.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "Quadruple: HH & VV & HV & VH"
     },
     {
-      "Mode": "ScanSAR",
-      "Resolution": "4x20 m",
-      "Swath": "100 km",
-      "Field-of-Regard": "600 km, either right or left",
-      "Polarisations": "Single: HH or VV or HV or VH"
+      "channel_name": "Band_06",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": {
+        "x": 4.0,
+        "y": 20.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 100.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "Single: HH or VV or HV or VH"
     },
     {
-      "Mode": "ScanSAR",
-      "Resolution": "6x40 m",
-      "Swath": "200 km",
-      "Field-of-Regard": "600 km, either right or left",
-      "Polarisations": "Double: HH & HV or VV &VH"
+      "channel_name": "Band_07",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": {
+        "x": 6.0,
+        "y": 40.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 200.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "Double: HH & HV or VV &VH"
     }
   ]
 }

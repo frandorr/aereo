@@ -3,7 +3,8 @@
   "instrument_acronym": "EMI-2",
   "instrument_fullname": "Environment Monitoring Instrument-2",
   "url": "https://space.oscar.wmo.int/instruments/view/emi-2",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range",
     "No. of channels",
     "Spectral resolution",
@@ -11,28 +12,72 @@
   ],
   "channels": [
     {
-      "Spectral range": "240-315 nm",
-      "No. of channels": "256",
-      "Spectral resolution": "0.3 nm",
-      "SNR @ specified input spectral radiance": "200 @ 1.27 mW cm-2sr-1nm-1"
+      "channel_name": "Band_01",
+      "Spectral range": {
+        "min": 240.0,
+        "max": 315.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 256,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.3,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "200 @ 1.27 mW cm-2sr-1nm-1"
     },
     {
-      "Spectral range": "311-403 nm",
-      "No. of channels": "256",
-      "Spectral resolution": "0.3 nm",
-      "SNR @ specified input spectral radiance": "200 @ 1.27 mW cm-2sr-1nm-1"
+      "channel_name": "Band_02",
+      "Spectral range": {
+        "min": 311.0,
+        "max": 403.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 256,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.3,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "200 @ 1.27 mW cm-2sr-1nm-1"
     },
     {
-      "Spectral range": "401-600 nm",
-      "No. of channels": "512",
-      "Spectral resolution": "0.5 nm",
-      "SNR @ specified input spectral radiance": "2000 @ 10.89 mW cm-2sr-1nm-1"
+      "channel_name": "Band_03",
+      "Spectral range": {
+        "min": 401.0,
+        "max": 600.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 512,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.5,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "2000 @ 10.89 mW cm-2sr-1nm-1"
     },
     {
-      "Spectral range": "590-790 nm",
-      "No. of channels": "512",
-      "Spectral resolution": "0.5 nm",
-      "SNR @ specified input spectral radiance": "2000 @ 10.89 mW cm-2sr-1nm-1"
+      "channel_name": "Band_04",
+      "Spectral range": {
+        "min": 590.0,
+        "max": 790.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 512,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.5,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "2000 @ 10.89 mW cm-2sr-1nm-1"
     }
   ]
 }

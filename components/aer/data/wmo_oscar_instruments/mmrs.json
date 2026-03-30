@@ -3,36 +3,77 @@
   "instrument_acronym": "MMRS",
   "instrument_fullname": "Multispectral Medium Resolution Scanner",
   "url": "https://space.oscar.wmo.int/instruments/view/mmrs",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "490 nm",
-      "Spectral interval": "480 - 500 nm",
-      "SNR @ specified albedo": "…….. @ ….. % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 490.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 480.0,
+        "max": 500.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ….. % albedo"
     },
     {
-      "Central wavelength": "550 nm",
-      "Spectral interval": "540 - 560 nm",
-      "SNR @ specified albedo": "…….. @ ….. % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 550.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 540.0,
+        "max": 560.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ….. % albedo"
     },
     {
-      "Central wavelength": "660 nm",
-      "Spectral interval": "630 - 690 nm",
-      "SNR @ specified albedo": "…….. @ ….. % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 660.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 630.0,
+        "max": 690.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ….. % albedo"
     },
     {
-      "Central wavelength": "815 nm",
-      "Spectral interval": "795 - 835 nm",
-      "SNR @ specified albedo": "…….. @ ….. % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 815.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 795.0,
+        "max": 835.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ….. % albedo"
     },
     {
-      "Central wavelength": "1625 nm",
-      "Spectral interval": "1550 - 1700 nm",
-      "SNR @ specified albedo": "…….. @ ….. % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 1625.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 1550.0,
+        "max": 1700.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ….. % albedo"
     }
   ]
 }

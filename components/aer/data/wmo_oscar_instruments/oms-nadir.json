@@ -3,7 +3,8 @@
   "instrument_acronym": "OMS-nadir",
   "instrument_fullname": "Ozone Monitoring Suite - nadir scanning unit",
   "url": "https://space.oscar.wmo.int/instruments/view/oms-nadir",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range",
     "No. of channels",
     "Spectral resolution",
@@ -11,22 +12,68 @@
   ],
   "channels": [
     {
-      "Spectral range": "250-300 nm",
-      "No. of channels": "50",
-      "Spectral resolution": "1 nm",
-      "IFOV Along x Across Track": "21 x 28 km"
+      "channel_name": "Band_01",
+      "Spectral range": {
+        "min": 250.0,
+        "max": 300.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 50,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 1.0,
+        "unit": "nm"
+      },
+      "IFOV Along x Across Track": {
+        "x": 21.0,
+        "y": 28.0,
+        "unit": "km"
+      }
     },
     {
-      "Spectral range": "300-320 nm",
-      "No. of channels": "40",
-      "Spectral resolution": "0.5 nm",
-      "IFOV Along x Across Track": "7 x 7 km"
+      "channel_name": "Band_02",
+      "Spectral range": {
+        "min": 300.0,
+        "max": 320.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 40,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.5,
+        "unit": "nm"
+      },
+      "IFOV Along x Across Track": {
+        "x": 7.0,
+        "y": 7.0,
+        "unit": "km"
+      }
     },
     {
-      "Spectral range": "320 - 500 nm",
-      "No. of channels": "327",
-      "Spectral resolution": "0.5-0.6 nm",
-      "IFOV Along x Across Track": "7 x 7 km"
+      "channel_name": "Band_03",
+      "Spectral range": {
+        "min": 320.0,
+        "max": 500.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 327,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "min": 0.5,
+        "max": 0.6,
+        "unit": "nm"
+      },
+      "IFOV Along x Across Track": {
+        "x": 7.0,
+        "y": 7.0,
+        "unit": "km"
+      }
     }
   ]
 }

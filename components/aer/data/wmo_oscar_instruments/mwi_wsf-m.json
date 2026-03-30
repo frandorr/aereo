@@ -1,0 +1,154 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MWI (WSF-M)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/mwi_wsf-m",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "10.85V",
+      "Channel": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 10.85,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 500,
+        "unit": null
+      },
+      "polarisations": "V,H,3rd,4th",
+      "Beamwidth (deg)": {
+        "value": 1.06,
+        "unit": null
+      },
+      "3dB footprint(km)": {
+        "value": 38.0,
+        "unit": "x23"
+      },
+      "NEΔT": ""
+    },
+    {
+      "channel_name": "10.85H",
+      "Channel": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 18.85,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 500,
+        "unit": null
+      },
+      "polarisations": "V,H,3rd,4th",
+      "Beamwidth (deg)": {
+        "value": 0.66,
+        "unit": null
+      },
+      "3dB footprint(km)": {
+        "value": 23.0,
+        "unit": "x15"
+      },
+      "NEΔT": ""
+    },
+    {
+      "channel_name": "10.85_3",
+      "Channel": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 23.8,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 370,
+        "unit": null
+      },
+      "polarisations": "V,H",
+      "Beamwidth (deg)": {
+        "value": 0.58,
+        "unit": null
+      },
+      "3dB footprint(km)": {
+        "value": 21.0,
+        "unit": "x13"
+      },
+      "NEΔT": ""
+    },
+    {
+      "channel_name": "10.85_4",
+      "Channel": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 36.75,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 500,
+        "unit": null
+      },
+      "polarisations": "V,H,3rd,4th",
+      "Beamwidth (deg)": {
+        "value": 0.43,
+        "unit": null
+      },
+      "3dB footprint(km)": {
+        "value": 15.0,
+        "unit": "x10"
+      },
+      "NEΔT": ""
+    },
+    {
+      "channel_name": "18.85V",
+      "Channel": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 37.3,
+        "unit": null
+      },
+      "bandwidth": "<2500",
+      "polarisations": "V,H",
+      "Beamwidth (deg)": {
+        "value": 0.43,
+        "unit": null
+      },
+      "3dB footprint(km)": {
+        "value": 15.0,
+        "unit": "x10"
+      },
+      "NEΔT": ""
+    },
+    {
+      "channel_name": "18.85H",
+      "Channel": {
+        "value": 6,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 89,
+        "unit": null
+      },
+      "bandwidth": "<6000",
+      "polarisations": "V,H",
+      "Beamwidth (deg)": {
+        "value": 0.43,
+        "unit": null
+      },
+      "3dB footprint(km)": {
+        "value": 15.0,
+        "unit": "x10"
+      },
+      "NEΔT": ""
+    }
+  ]
+}

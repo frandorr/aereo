@@ -3,7 +3,8 @@
   "instrument_acronym": "MERSI-RM",
   "instrument_fullname": "MERSI-Rainfall Measurement",
   "url": "https://space.oscar.wmo.int/instruments/view/mersi-rm",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Center wavelength",
     "Bandwidth",
     "SNR or NEΔT @ specified input",
@@ -11,52 +12,141 @@
   ],
   "channels": [
     {
-      "Center wavelength": "650 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "150 @ 22 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "500 m"
+      "channel_name": "CH01",
+      "central_wavelength": {
+        "value": 650.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "150 @ 22 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 500.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "865 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "150 @ 25 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "500 m"
+      "channel_name": "CH02",
+      "central_wavelength": {
+        "value": 865.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "150 @ 25 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 500.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "940 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "150 @ 15.0 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "500 m"
+      "channel_name": "CH03",
+      "central_wavelength": {
+        "value": 940.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "150 @ 15.0 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 500.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "1380 nm",
-      "Bandwidth": "30 nm",
-      "SNR or NEΔT @ specified input": "150 @ 6 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "500 m"
+      "channel_name": "CH04",
+      "central_wavelength": {
+        "value": 1380.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 30.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "150 @ 6 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 500.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "1640 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "340 @ 7.3 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "500 m"
+      "channel_name": "CH05",
+      "central_wavelength": {
+        "value": 1640.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "340 @ 7.3 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 500.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "3.80 μm",
-      "Bandwidth": "0.18 μm",
-      "SNR or NEΔT @ specified input": "0.15 K @ 300 K",
-      "IFOV at s.s.p.": "500 m"
+      "channel_name": "CH06",
+      "central_wavelength": {
+        "value": 3.8,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "value": 0.18,
+        "unit": "μm"
+      },
+      "snr_or_nedt": {
+        "value": 0.15,
+        "unit": "K @ 300 K"
+      },
+      "spatial_resolution": {
+        "value": 500.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "10.8 μm",
-      "Bandwidth": "1.0 μm",
-      "SNR or NEΔT @ specified input": "0.10 K @ 300 K",
-      "IFOV at s.s.p.": "500 m"
+      "channel_name": "CH07",
+      "central_wavelength": {
+        "value": 10.8,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "value": 1.0,
+        "unit": "μm"
+      },
+      "snr_or_nedt": {
+        "value": 0.1,
+        "unit": "K @ 300 K"
+      },
+      "spatial_resolution": {
+        "value": 500.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "12.0 μm",
-      "Bandwidth": "1.0 μm",
-      "SNR or NEΔT @ specified input": "0.10 K @ 300 K",
-      "IFOV at s.s.p.": "500 m"
+      "channel_name": "CH08",
+      "central_wavelength": {
+        "value": 12.0,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "value": 1.0,
+        "unit": "μm"
+      },
+      "snr_or_nedt": {
+        "value": 0.1,
+        "unit": "K @ 300 K"
+      },
+      "spatial_resolution": {
+        "value": 500.0,
+        "unit": "m"
+      }
     }
   ]
 }

@@ -1,0 +1,62 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "HSI (EnMAP)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/hsi_enmap",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": "500 @ 175 W m-2sr-1μm-1at 495 nm",
+      "bandwidth": {
+        "min": 420.0,
+        "max": 1000.0,
+        "unit": "nm"
+      },
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m x 30 m"
+      }
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": "",
+      "bandwidth": {
+        "min": 900.0,
+        "max": 1390.0,
+        "unit": "nm"
+      },
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m x 30 m"
+      }
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": "",
+      "bandwidth": {
+        "min": 1480.0,
+        "max": 1760.0,
+        "unit": "nm"
+      },
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m x 30 m"
+      }
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": "150 @ 5 W m-2sr-1μm-1at 2200 nm",
+      "bandwidth": {
+        "min": 1950.0,
+        "max": 2450.0,
+        "unit": "nm"
+      },
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m x 30 m"
+      }
+    }
+  ]
+}

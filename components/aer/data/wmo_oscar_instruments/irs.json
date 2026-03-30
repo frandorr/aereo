@@ -3,7 +3,8 @@
   "instrument_acronym": "IRS",
   "instrument_fullname": "InfraRed Sounder",
   "url": "https://space.oscar.wmo.int/instruments/view/irs",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Wavelength",
     "Wave number",
     "Spectral resolution (unapodised)",
@@ -11,15 +12,29 @@
   ],
   "channels": [
     {
+      "channel_name": "Band_01",
       "Wavelength": "4.44–6.25 µm",
-      "Wave number": "1600 to 2250 cm-1",
-      "Spectral resolution (unapodised)": "0.604 cm-1",
+      "wave_number_range": {
+        "value": 1600.0,
+        "unit": "to 2250 cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.604,
+        "unit": "cm-1"
+      },
       "NE∆T @ specified scene temperature": "Between"
     },
     {
+      "channel_name": "Band_02",
       "Wavelength": "8.26–14.70 µm",
-      "Wave number": "680 to 1210 cm-1",
-      "Spectral resolution (unapodised)": "0.604 cm-1",
+      "wave_number_range": {
+        "value": 680.0,
+        "unit": "to 1210 cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.604,
+        "unit": "cm-1"
+      },
       "NE∆T @ specified scene temperature": "Between"
     }
   ]

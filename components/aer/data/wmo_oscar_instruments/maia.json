@@ -3,7 +3,8 @@
   "instrument_acronym": "MAIA",
   "instrument_fullname": " Multi-Angle Imager for Aerosols ",
   "url": "https://space.oscar.wmo.int/instruments/view/maia",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Centralwavelength",
     "Bandwidth",
     "Polarisations(Stokes parameters)",
@@ -11,88 +12,130 @@
   ],
   "channels": [
     {
-      "Centralwavelength": "367 nm",
-      "Bandwidth": "38 nm",
-      "Polarisations(Stokes parameters)": "",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_01",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 38.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": ""
     },
     {
-      "Centralwavelength": "389 nm",
-      "Bandwidth": "39 nm",
-      "Polarisations(Stokes parameters)": "",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 39.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": ""
     },
     {
-      "Centralwavelength": "415 nm",
-      "Bandwidth": "39 nm",
-      "Polarisations(Stokes parameters)": "",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_03",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 39.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": ""
     },
     {
-      "Centralwavelength": "445 nm",
-      "Bandwidth": "54 nm",
-      "Polarisations(Stokes parameters)": "Q and U",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_04",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 54.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": "Q and U"
     },
     {
-      "Centralwavelength": "551 nm",
-      "Bandwidth": "45 nm",
-      "Polarisations(Stokes parameters)": "",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_05",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 45.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": ""
     },
     {
-      "Centralwavelength": "645 nm",
-      "Bandwidth": "73 nm",
-      "Polarisations(Stokes parameters)": "Q and U",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_06",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 73.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": "Q and U"
     },
     {
-      "Centralwavelength": "749 nm",
-      "Bandwidth": "18 nm",
-      "Polarisations(Stokes parameters)": "",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_07",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 18.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": ""
     },
     {
-      "Centralwavelength": "762.5 nm",
-      "Bandwidth": "6 nm",
-      "Polarisations(Stokes parameters)": "",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_08",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 6.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": ""
     },
     {
-      "Centralwavelength": "864 nm",
-      "Bandwidth": "51 nm",
-      "Polarisations(Stokes parameters)": "",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_09",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 51.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": ""
     },
     {
-      "Centralwavelength": "943 nm",
-      "Bandwidth": "47 nm",
-      "Polarisations(Stokes parameters)": "",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_10",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 47.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": ""
     },
     {
-      "Centralwavelength": "1039 nm",
-      "Bandwidth": "97 nm",
-      "Polarisations(Stokes parameters)": "Q and U",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_11",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 97.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": "Q and U"
     },
     {
-      "Centralwavelength": "1607 nm",
-      "Bandwidth": "72 nm",
-      "Polarisations(Stokes parameters)": "",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_12",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 72.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": ""
     },
     {
-      "Centralwavelength": "1880 nm",
-      "Bandwidth": "87 nm",
-      "Polarisations(Stokes parameters)": "",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_13",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 87.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": ""
     },
     {
-      "Centralwavelength": "2126 nm",
-      "Bandwidth": "124 nm",
-      "Polarisations(Stokes parameters)": "",
-      "SNR at specifiedinput spectral radiance": "…. @ …. W m-2sr-1µm-1"
+      "channel_name": "Band_14",
+      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 124.0,
+        "unit": "nm"
+      },
+      "Polarisations(Stokes parameters)": ""
     }
   ]
 }

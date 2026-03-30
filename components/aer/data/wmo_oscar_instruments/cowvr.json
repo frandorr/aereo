@@ -3,7 +3,8 @@
   "instrument_acronym": "COWVR",
   "instrument_fullname": "Compact Ocean Wind Vector Radiometer",
   "url": "https://space.oscar.wmo.int/instruments/view/cowvr",
-  "columns": [
+  "schema_type": "microwave",
+  "original_columns": [
     "No.",
     "Central frequency (GHz)",
     "Bandwidth (MHz)",
@@ -14,31 +15,79 @@
   ],
   "channels": [
     {
-      "No.": "1",
-      "Central frequency (GHz)": "18.7",
-      "Bandwidth (MHz)": "780",
-      "Polarisations (*)": "V, H, P, M, L, R",
-      "NEΔT": "0.23 K",
-      "IFOV": "31x20 km",
-      "Pixel": "30x30 km"
+      "channel_name": "CH01",
+      "No.": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 18.7,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 780,
+        "unit": null
+      },
+      "polarisations": "V, H, P, M, L, R",
+      "NEΔT": {
+        "value": 0.23,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 30.0,
+        "y": 30.0,
+        "unit": "km"
+      }
     },
     {
-      "No.": "2",
-      "Central frequency (GHz)": "23.8",
-      "Bandwidth (MHz)": "475",
-      "Polarisations (*)": "V, H, P, M, L, R",
-      "NEΔT": "0.19 K",
-      "IFOV": "25x15 km",
-      "Pixel": "30x30 km"
+      "channel_name": "CH02",
+      "No.": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 23.8,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 475,
+        "unit": null
+      },
+      "polarisations": "V, H, P, M, L, R",
+      "NEΔT": {
+        "value": 0.19,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 30.0,
+        "y": 30.0,
+        "unit": "km"
+      }
     },
     {
-      "No.": "3",
-      "Central frequency (GHz)": "33.9",
-      "Bandwidth (MHz)": "1975",
-      "Polarisations (*)": "V, H, P, M, L, R",
-      "NEΔT": "0.13 K",
-      "IFOV": "18x11 km",
-      "Pixel": "30x30 km"
+      "channel_name": "CH03",
+      "No.": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 33.9,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 1975,
+        "unit": null
+      },
+      "polarisations": "V, H, P, M, L, R",
+      "NEΔT": {
+        "value": 0.13,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 30.0,
+        "y": 30.0,
+        "unit": "km"
+      }
     }
   ]
 }

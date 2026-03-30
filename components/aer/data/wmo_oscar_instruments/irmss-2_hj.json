@@ -1,0 +1,62 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "IRMSS-2 (HJ)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/irmss-2_hj",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.925,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.75,
+        "max": 1.1,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 1.65,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 1.55,
+        "max": 1.75,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 3.7,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 3.5,
+        "max": 3.9,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 11.5,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 10.5,
+        "max": 12.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "….. K @ …… K"
+    }
+  ]
+}
