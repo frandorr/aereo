@@ -3,7 +3,8 @@
   "instrument_acronym": "SAR-2000",
   "instrument_fullname": "Synthetic Aperture Radar 2000 (X-band) ",
   "url": "https://space.oscar.wmo.int/instruments/view/sar-2000",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -12,39 +13,90 @@
   ],
   "channels": [
     {
-      "Operation mode": "Spotlight",
-      "Resolution": "1 m",
-      "Swath": "10 km",
-      "Field of regard": "600 km, either right or left",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Spotlight",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": {
+        "value": 1.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 10.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "Stripmap",
-      "Resolution": "3-15 m",
-      "Swath": "40 km",
-      "Field of regard": "600 km, either right or left",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Stripmap",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "min": 3.0,
+        "max": 15.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 40.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "ScanSAR wide swath",
-      "Resolution": "30 m",
-      "Swath": "100 km",
-      "Field of regard": "600 km, either right or left",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "ScanSAR huge region",
+      "operation_mode": "ScanSAR wide swath",
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 100.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "ScanSAR huge swath",
-      "Resolution": "100 m",
-      "Swath": "200 km",
-      "Field of regard": "600 km, either right or left",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "ScanSAR wide region",
+      "operation_mode": "ScanSAR huge swath",
+      "spatial_resolution": {
+        "value": 100.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 200.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "Stripmap ping-pong",
-      "Resolution": "15 m",
-      "Swath": "30 km",
-      "Field of regard": "600 km, either right or left",
-      "Polarisation": "HH/HV + VV/VH"
+      "channel_name": "Band_05",
+      "operation_mode": "Stripmap ping-pong",
+      "spatial_resolution": {
+        "value": 15.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 30.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 600.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "HH/HV + VV/VH"
     }
   ]
 }

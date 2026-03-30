@@ -3,31 +3,60 @@
   "instrument_acronym": "TANSO-CAI",
   "instrument_fullname": "Thermal And Near infrared Sensor for carbon Observations - Cloud and Aerosol Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/tanso-cai",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Bandwidth",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "380 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified albedo": "200 @ 15 % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 380.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "200 @ 15 % albedo"
     },
     {
-      "Central wavelength": "674 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified albedo": "200 @ 11 % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 674.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "200 @ 11 % albedo"
     },
     {
-      "Central wavelength": "870 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified albedo": "200 @ 11 % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 870.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "200 @ 11 % albedo"
     },
     {
-      "Central wavelength": "1600 nm",
-      "Bandwidth": "90 nm",
-      "SNR @ specified albedo": "200 @ 10 % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 1600.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 90.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "200 @ 10 % albedo"
     }
   ]
 }

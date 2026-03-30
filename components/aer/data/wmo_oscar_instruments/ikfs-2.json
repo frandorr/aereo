@@ -3,7 +3,8 @@
   "instrument_acronym": "IKFS-2",
   "instrument_fullname": "Infrared Fourier Spectrometer - 2",
   "url": "https://space.oscar.wmo.int/instruments/view/ikfs-2",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range (µm)",
     "Spectral range (cm-1)",
     "Spectral resolution(unapodised)",
@@ -11,10 +12,25 @@
   ],
   "channels": [
     {
-      "Spectral range (µm)": "5-15 µm",
-      "Spectral range (cm-1)": "665-2000 cm-1",
-      "Spectral resolution(unapodised)": "0.5 cm-1",
-      "NEΔT @ specified scene temperature": "0.5 K @ 280 K"
+      "channel_name": "LWIR",
+      "Spectral range (µm)": {
+        "min": 5.0,
+        "max": 15.0,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "min": 665.0,
+        "max": 2000.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.5,
+        "unit": "cm-1"
+      },
+      "NEΔT @ specified scene temperature": {
+        "value": 0.5,
+        "unit": "K @ 280 K"
+      }
     }
   ]
 }

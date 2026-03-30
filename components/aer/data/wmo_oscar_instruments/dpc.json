@@ -3,7 +3,8 @@
   "instrument_acronym": "DPC",
   "instrument_fullname": "Directional Polarization Camera",
   "url": "https://space.oscar.wmo.int/instruments/view/dpc",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Bandwidth",
     "No. of pol.",
@@ -11,52 +12,132 @@
   ],
   "channels": [
     {
-      "Central wavelength": "443 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 443.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "No. of pol.": "-",
-      "SNR at the expected input radiance": "500"
+      "snr_or_nedt": {
+        "value": 500,
+        "unit": null
+      }
     },
     {
-      "Central wavelength": "490 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 490.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "No. of pol.": "three",
-      "SNR at the expected input radiance": "500"
+      "snr_or_nedt": {
+        "value": 500,
+        "unit": null
+      }
     },
     {
-      "Central wavelength": "565 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 565.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "No. of pol.": "-",
-      "SNR at the expected input radiance": "500"
+      "snr_or_nedt": {
+        "value": 500,
+        "unit": null
+      }
     },
     {
-      "Central wavelength": "670 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 670.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "No. of pol.": "three",
-      "SNR at the expected input radiance": "500"
+      "snr_or_nedt": {
+        "value": 500,
+        "unit": null
+      }
     },
     {
-      "Central wavelength": "765 nm",
-      "Bandwidth": "40 nm",
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 765.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 40.0,
+        "unit": "nm"
+      },
       "No. of pol.": "-",
-      "SNR at the expected input radiance": "500"
+      "snr_or_nedt": {
+        "value": 500,
+        "unit": null
+      }
     },
     {
-      "Central wavelength": "768 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_06",
+      "central_wavelength": {
+        "value": 768.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "No. of pol.": "-",
-      "SNR at the expected input radiance": "500"
+      "snr_or_nedt": {
+        "value": 500,
+        "unit": null
+      }
     },
     {
-      "Central wavelength": "865 nm",
-      "Bandwidth": "40 nm",
+      "channel_name": "Band_07",
+      "central_wavelength": {
+        "value": 865.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 40.0,
+        "unit": "nm"
+      },
       "No. of pol.": "three",
-      "SNR at the expected input radiance": "500"
+      "snr_or_nedt": {
+        "value": 500,
+        "unit": null
+      }
     },
     {
-      "Central wavelength": "910 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_08",
+      "central_wavelength": {
+        "value": 910.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "No. of pol.": "-",
-      "SNR at the expected input radiance": "500"
+      "snr_or_nedt": {
+        "value": 500,
+        "unit": null
+      }
     }
   ]
 }

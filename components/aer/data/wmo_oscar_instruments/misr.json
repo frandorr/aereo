@@ -3,36 +3,49 @@
   "instrument_acronym": "MISR",
   "instrument_fullname": "Multi-angle Imaging Spectro-Radiometer ",
   "url": "https://space.oscar.wmo.int/instruments/view/misr",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Bandwidth",
     "SNR @ specified input spectral radiance"
   ],
   "channels": [
     {
-      "Central wavelength": "446.4 nm",
-      "Bandwidth": "41.9 nm",
-      "SNR @ specified input spectral radiance": "300 @ 179 W m-2sr-1μm-1"
+      "channel_name": "Blue",
+      "central_wavelength": "300 @ 179 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 41.9,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "557.5 nm",
-      "Bandwidth": "28.6 nm",
-      "SNR @ specified input spectral radiance": "620 @ 177 W m-2sr-1μm-1"
+      "channel_name": "Green",
+      "central_wavelength": "620 @ 177 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 28.6,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "671.7 nm",
-      "Bandwidth": "21.9 nm",
-      "SNR @ specified input spectral radiance": "650 @ 146 W m-2sr-1μm-1"
+      "channel_name": "Red",
+      "central_wavelength": "650 @ 146 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 21.9,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "866.4 nm",
-      "Bandwidth": "39.7 nm",
-      "SNR @ specified input spectral radiance": "740 @   93 W m-2sr-1μm-1"
+      "channel_name": "NIR",
+      "central_wavelength": "740 @   93 W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 39.7,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "",
-      "Bandwidth": "",
-      "SNR @ specified input spectral radiance": "Radiometric accuracy: 3% at maximum signal"
+      "channel_name": "Band_05",
+      "central_wavelength": "Radiometric accuracy: 3% at maximum signal",
+      "bandwidth": ""
     }
   ]
 }

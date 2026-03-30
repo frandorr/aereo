@@ -3,56 +3,120 @@
   "instrument_acronym": "FLORIS",
   "instrument_fullname": "FLuORescence Imaging Spectrometer",
   "url": "https://space.oscar.wmo.int/instruments/view/floris",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Spectral interval",
     "Spectral resolution",
     "SNR @ expected spectral radiance"
   ],
   "channels": [
     {
-      "Spectral interval": "500-600 nm",
-      "Spectral resolution": "2 nm",
-      "SNR @ expected spectral radiance": "245"
+      "channel_name": "Band_01",
+      "bandwidth": {
+        "min": 500.0,
+        "max": 600.0,
+        "unit": "nm"
+      },
+      "central_wavelength": {
+        "value": 245,
+        "unit": null
+      }
     },
     {
-      "Spectral interval": "600-677 nm",
-      "Spectral resolution": "2 nm",
-      "SNR @ expected spectral radiance": "245"
+      "channel_name": "Band_02",
+      "bandwidth": {
+        "min": 600.0,
+        "max": 677.0,
+        "unit": "nm"
+      },
+      "central_wavelength": {
+        "value": 245,
+        "unit": null
+      }
     },
     {
-      "Spectral interval": "697-740 nm",
-      "Spectral resolution": "2 nm",
-      "SNR @ expected spectral radiance": "425"
+      "channel_name": "Band_03",
+      "bandwidth": {
+        "min": 697.0,
+        "max": 740.0,
+        "unit": "nm"
+      },
+      "central_wavelength": {
+        "value": 425,
+        "unit": null
+      }
     },
     {
-      "Spectral interval": "677-686 nm",
-      "Spectral resolution": "0.5 nm",
-      "SNR @ expected spectral radiance": "340"
+      "channel_name": "Band_04",
+      "bandwidth": {
+        "min": 677.0,
+        "max": 686.0,
+        "unit": "nm"
+      },
+      "central_wavelength": {
+        "value": 340,
+        "unit": null
+      }
     },
     {
-      "Spectral interval": "686-697 nm",
-      "Spectral resolution": "0.1 nm",
-      "SNR @ expected spectral radiance": "175"
+      "channel_name": "Band_05",
+      "bandwidth": {
+        "min": 686.0,
+        "max": 697.0,
+        "unit": "nm"
+      },
+      "central_wavelength": {
+        "value": 175,
+        "unit": null
+      }
     },
     {
-      "Spectral interval": "740-755 nm",
-      "Spectral resolution": "0.5 nm",
-      "SNR @ expected spectral radiance": "510-1015"
+      "channel_name": "Band_06",
+      "bandwidth": {
+        "min": 740.0,
+        "max": 755.0,
+        "unit": "nm"
+      },
+      "central_wavelength": {
+        "value": 510.0,
+        "unit": "-1015"
+      }
     },
     {
-      "Spectral interval": "755-759 nm",
-      "Spectral resolution": "0.5 nm",
-      "SNR @ expected spectral radiance": "1015"
+      "channel_name": "Band_07",
+      "bandwidth": {
+        "min": 755.0,
+        "max": 759.0,
+        "unit": "nm"
+      },
+      "central_wavelength": {
+        "value": 1015,
+        "unit": null
+      }
     },
     {
-      "Spectral interval": "759-769 nm",
-      "Spectral resolution": "0.1 nm",
-      "SNR @ expected spectral radiance": "115-455"
+      "channel_name": "Band_08",
+      "bandwidth": {
+        "min": 759.0,
+        "max": 769.0,
+        "unit": "nm"
+      },
+      "central_wavelength": {
+        "value": 115.0,
+        "unit": "-455"
+      }
     },
     {
-      "Spectral interval": "769-780 nm",
-      "Spectral resolution": "0.5 nm",
-      "SNR @ expected spectral radiance": "1015"
+      "channel_name": "Band_09",
+      "bandwidth": {
+        "min": 769.0,
+        "max": 780.0,
+        "unit": "nm"
+      },
+      "central_wavelength": {
+        "value": 1015,
+        "unit": null
+      }
     }
   ]
 }

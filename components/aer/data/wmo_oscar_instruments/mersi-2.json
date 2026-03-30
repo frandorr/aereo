@@ -3,7 +3,8 @@
   "instrument_acronym": "MERSI-2",
   "instrument_fullname": "Medium Resolution Spectral Imager -2",
   "url": "https://space.oscar.wmo.int/instruments/view/mersi-2",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Center wavelength",
     "Bandwidth",
     "SNR or NEΔT @ specified input",
@@ -11,154 +12,422 @@
   ],
   "channels": [
     {
-      "Center wavelength": "412 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "300 @ 44.9 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH01",
+      "central_wavelength": {
+        "value": 412.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "300 @ 44.9 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "443 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "300 @ 41.9 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH02",
+      "central_wavelength": {
+        "value": 443.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "300 @ 41.9 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "470 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "100 @ 35.3 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "250 m"
+      "channel_name": "CH03",
+      "central_wavelength": {
+        "value": 470.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 35.3 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 250.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "490 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "300 @ 32.1 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH04",
+      "central_wavelength": {
+        "value": 490.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "300 @ 32.1 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "550 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "100 @ 29.0 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "250 m"
+      "channel_name": "CH05",
+      "central_wavelength": {
+        "value": 550.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 29.0 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 250.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "555 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "500 @ 21 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH06",
+      "central_wavelength": {
+        "value": 555.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "500 @ 21 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "650 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "100 @ 22 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "250 m"
+      "channel_name": "CH07",
+      "central_wavelength": {
+        "value": 650.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 22 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 250.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "670 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "500 @ 10 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH08",
+      "central_wavelength": {
+        "value": 670.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "500 @ 10 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "709 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "500 @ 6.9 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH09",
+      "central_wavelength": {
+        "value": 709.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "500 @ 6.9 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "746 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "500 @ 9.6 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH10",
+      "central_wavelength": {
+        "value": 746.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "500 @ 9.6 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "865 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "500 @ 6.4 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH11",
+      "central_wavelength": {
+        "value": 865.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "500 @ 6.4 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "865 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "100 @ 25 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "250 m"
+      "channel_name": "CH12",
+      "central_wavelength": {
+        "value": 865.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 25 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 250.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "905 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "200 @ 10.0 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH13",
+      "central_wavelength": {
+        "value": 905.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "200 @ 10.0 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "936 nm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "100 @ 3.6 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH14",
+      "central_wavelength": {
+        "value": 936.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 3.6 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "940 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "200 @ 15.0 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH15",
+      "central_wavelength": {
+        "value": 940.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "200 @ 15.0 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "1240 or 1030 nm(1030 on FY-3F)",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "100 @ 5.4 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH16",
+      "central_wavelength": {
+        "value": 1240.0,
+        "unit": "or 1030 nm(1030 on FY-3F)"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 5.4 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "1380 nm",
-      "Bandwidth": "20 or 30 nm(30 on FY-3F)",
-      "SNR or NEΔT @ specified input": "60/100 @ 6 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH17",
+      "central_wavelength": {
+        "value": 1380.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "or 30 nm(30 on FY-3F)"
+      },
+      "snr_or_nedt": "60/100 @ 6 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "1640 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "200 @ 7.3 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH18",
+      "central_wavelength": {
+        "value": 1640.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "200 @ 7.3 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "2130 nm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "100 @ 1.2 W m-2sr-1μm-1",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH19",
+      "central_wavelength": {
+        "value": 2130.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 1.2 W m-2sr-1μm-1",
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "3.80 μm",
-      "Bandwidth": "0.18 μm",
-      "SNR or NEΔT @ specified input": "0.25 K @ 270 K",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH20",
+      "central_wavelength": {
+        "value": 3.8,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "value": 0.18,
+        "unit": "μm"
+      },
+      "snr_or_nedt": {
+        "value": 0.25,
+        "unit": "K @ 270 K"
+      },
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "4.05 μm",
-      "Bandwidth": "0.155 μm",
-      "SNR or NEΔT @ specified input": "0.25 K @ 300/380 K",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH21",
+      "central_wavelength": {
+        "value": 4.05,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "value": 0.155,
+        "unit": "μm"
+      },
+      "snr_or_nedt": {
+        "value": 0.25,
+        "unit": "K @ 300/380 K"
+      },
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "7.20 μm",
-      "Bandwidth": "0.50 μm",
-      "SNR or NEΔT @ specified input": "0.30 K @ 270 K",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH22",
+      "central_wavelength": {
+        "value": 7.2,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "value": 0.5,
+        "unit": "μm"
+      },
+      "snr_or_nedt": {
+        "value": 0.3,
+        "unit": "K @ 270 K"
+      },
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "8.55 μm",
-      "Bandwidth": "0.30 μm",
-      "SNR or NEΔT @ specified input": "0.25 K @ 270 K",
-      "IFOV at s.s.p.": "1000 m"
+      "channel_name": "CH23",
+      "central_wavelength": {
+        "value": 8.55,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "value": 0.3,
+        "unit": "μm"
+      },
+      "snr_or_nedt": {
+        "value": 0.25,
+        "unit": "K @ 270 K"
+      },
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "10.8 μm",
-      "Bandwidth": "1.0 μm",
-      "SNR or NEΔT @ specified input": "0.4 K @ 300 K",
-      "IFOV at s.s.p.": "250 m"
+      "channel_name": "CH24",
+      "central_wavelength": {
+        "value": 10.8,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "value": 1.0,
+        "unit": "μm"
+      },
+      "snr_or_nedt": {
+        "value": 0.4,
+        "unit": "K @ 300 K"
+      },
+      "spatial_resolution": {
+        "value": 250.0,
+        "unit": "m"
+      }
     },
     {
-      "Center wavelength": "12.0 μm",
-      "Bandwidth": "1.0 μm",
-      "SNR or NEΔT @ specified input": "0.4 K @ 300 K",
-      "IFOV at s.s.p.": "250 m"
+      "channel_name": "CH25",
+      "central_wavelength": {
+        "value": 12.0,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "value": 1.0,
+        "unit": "μm"
+      },
+      "snr_or_nedt": {
+        "value": 0.4,
+        "unit": "K @ 300 K"
+      },
+      "spatial_resolution": {
+        "value": 250.0,
+        "unit": "m"
+      }
     }
   ]
 }

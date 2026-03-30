@@ -1,0 +1,87 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "IMAGER (GOES 12-15)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/imager_goes_12-15",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "B01",
+      "central_wavelength": {
+        "value": 0.65,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.55,
+        "max": 0.75,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "250 @ 100 % albedo"
+    },
+    {
+      "channel_name": "B02",
+      "central_wavelength": {
+        "value": 3.9,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 3.8,
+        "max": 4.0,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.11,
+        "unit": "K @ 300 K"
+      }
+    },
+    {
+      "channel_name": "B03",
+      "central_wavelength": {
+        "value": 6.55,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 5.8,
+        "max": 7.3,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.14,
+        "unit": "K @ 300 K"
+      }
+    },
+    {
+      "channel_name": "B04",
+      "central_wavelength": {
+        "value": 10.7,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 10.2,
+        "max": 11.2,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.09,
+        "unit": "K @ 300 K"
+      }
+    },
+    {
+      "channel_name": "B06",
+      "central_wavelength": {
+        "value": 13.35,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 13.0,
+        "max": 13.7,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.7,
+        "unit": "K @ 300 K"
+      }
+    }
+  ]
+}

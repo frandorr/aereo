@@ -1,0 +1,49 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "SAR-X (Paz (SEOSAR))",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar-x_paz_seosar",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": {
+        "value": 1.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 5.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "channel_name": "Band_02",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "value": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 30.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "channel_name": "Band_03",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": {
+        "value": 15.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 100.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
+    }
+  ]
+}

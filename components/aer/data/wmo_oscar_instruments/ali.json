@@ -3,61 +3,102 @@
   "instrument_acronym": "ALI",
   "instrument_fullname": "Aerosol Limb Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/ali",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified input spectral radiance"
   ],
   "channels": [
     {
-      "Central wavelength": "443 nm",
-      "Spectral interval": "433 - 453 nm",
-      "SNR @ specified input spectral radiance": "339 @ 14.8 mW cm-2sr-1µm-1"
+      "channel_name": "Band_01",
+      "central_wavelength": "339 @ 14.8 mW cm-2sr-1µm-1",
+      "bandwidth": {
+        "min": 433.0,
+        "max": 453.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "482 nm",
-      "Spectral interval": "450 - 515 nm",
-      "SNR @ specified input spectral radiance": "572 @ 17.1 mW cm-2sr-1µm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": "572 @ 17.1 mW cm-2sr-1µm-1",
+      "bandwidth": {
+        "min": 450.0,
+        "max": 515.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "565 nm",
-      "Spectral interval": "525 - 605 nm",
-      "SNR @ specified input spectral radiance": "1001 @ 16.1 mW cm-2sr-1µm-1"
+      "channel_name": "Band_03",
+      "central_wavelength": "1001 @ 16.1 mW cm-2sr-1µm-1",
+      "bandwidth": {
+        "min": 525.0,
+        "max": 605.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "660 nm",
-      "Spectral interval": "630 - 690 nm",
-      "SNR @ specified input spectral radiance": "1039 @ 13.4 mW cm-2sr-1µm-1"
+      "channel_name": "Band_04",
+      "central_wavelength": "1039 @ 13.4 mW cm-2sr-1µm-1",
+      "bandwidth": {
+        "min": 630.0,
+        "max": 690.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "790 nm",
-      "Spectral interval": "775 - 805 nm",
-      "SNR @ specified input spectral radiance": "722 @ 10.4 mW cm-2sr-1µm-1"
+      "channel_name": "Band_05",
+      "central_wavelength": "722 @ 10.4 mW cm-2sr-1µm-1",
+      "bandwidth": {
+        "min": 775.0,
+        "max": 805.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "867 nm",
-      "Spectral interval": "845 - 890 nm",
-      "SNR @ specified input spectral radiance": "710 @ 8.73 mW cm-2sr-1µm-1"
+      "channel_name": "Band_06",
+      "central_wavelength": "710 @ 8.73 mW cm-2sr-1µm-1",
+      "bandwidth": {
+        "min": 845.0,
+        "max": 890.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "1250 nm",
-      "Spectral interval": "1200 - 1300 nm",
-      "SNR @ specified input spectral radiance": "662 @ 4.42 mW cm-2sr-1µm-1"
+      "channel_name": "Band_07",
+      "central_wavelength": "662 @ 4.42 mW cm-2sr-1µm-1",
+      "bandwidth": {
+        "min": 1200.0,
+        "max": 1300.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "1650 nm",
-      "Spectral interval": "1550 - 1750 nm",
-      "SNR @ specified input spectral radiance": "1040 @ 2.15 mW cm-2sr-1µm-1"
+      "channel_name": "Band_08",
+      "central_wavelength": "1040 @ 2.15 mW cm-2sr-1µm-1",
+      "bandwidth": {
+        "min": 1550.0,
+        "max": 1750.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "2215 nm",
-      "Spectral interval": "2080 - 2350 nm",
-      "SNR @ specified input spectral radiance": "912 @ 0.68 mW cm-2sr-1µm-1"
+      "channel_name": "Band_09",
+      "central_wavelength": "912 @ 0.68 mW cm-2sr-1µm-1",
+      "bandwidth": {
+        "min": 2080.0,
+        "max": 2350.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "Panchromatic",
-      "Spectral interval": "480 - 690 nm",
-      "SNR @ specified input spectral radiance": "348 @ 15.0 mW cm-2sr-1µm-1"
+      "channel_name": "Band_10",
+      "central_wavelength": "348 @ 15.0 mW cm-2sr-1µm-1",
+      "bandwidth": {
+        "min": 480.0,
+        "max": 690.0,
+        "unit": "nm"
+      }
     }
   ]
 }

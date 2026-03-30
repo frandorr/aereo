@@ -3,36 +3,89 @@
   "instrument_acronym": "MI",
   "instrument_fullname": "Meteorological Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/mi",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR or NEΔT @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "0.675 µm",
-      "Spectral interval": "0.55 - 0.8 µm",
-      "SNR or NEΔT @ specified input": "10 @ 5 % albedo, 170 @ 100 % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.675,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.55,
+        "max": 0.8,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "10 @ 5 % albedo, 170 @ 100 % albedo"
     },
     {
-      "Central wavelength": "3.75 µm",
-      "Spectral interval": "3.50 - 4.0 µm",
-      "SNR or NEΔT @ specified input": "0.10 K @ 300 K"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 3.75,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 3.5,
+        "max": 4.0,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.1,
+        "unit": "K @ 300 K"
+      }
     },
     {
-      "Central wavelength": "6.75 µm",
-      "Spectral interval": "6.5 - 7.0 µm",
-      "SNR or NEΔT @ specified input": "0.12 K @ 300 K"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 6.75,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 6.5,
+        "max": 7.0,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.12,
+        "unit": "K @ 300 K"
+      }
     },
     {
-      "Central wavelength": "10.8 µm",
-      "Spectral interval": "10.3 - 11.3 µm",
-      "SNR or NEΔT @ specified input": "0.12 K @ 300 K"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 10.8,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 10.3,
+        "max": 11.3,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.12,
+        "unit": "K @ 300 K"
+      }
     },
     {
-      "Central wavelength": "12.0 µm",
-      "Spectral interval": "11.5 - 12.5 µm",
-      "SNR or NEΔT @ specified input": "0.20 K @ 300 K"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 12.0,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 11.5,
+        "max": 12.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.2,
+        "unit": "K @ 300 K"
+      }
     }
   ]
 }

@@ -3,31 +3,61 @@
   "instrument_acronym": "IRMSS",
   "instrument_fullname": "Infrared Multispectral Scanner ",
   "url": "https://space.oscar.wmo.int/instruments/view/irmss",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR or NEΔT @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "N/A (PAN)",
-      "Spectral interval": "0.50 - 1.10 µm",
-      "SNR or NEΔT @ specified input": "…… @ ….. % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": "N/A (PAN)",
+      "bandwidth": {
+        "min": 0.5,
+        "max": 1.1,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "1.650 µm",
-      "Spectral interval": "1.55 - 1.75 µm",
-      "SNR or NEΔT @ specified input": "…… @ ….. % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 1.65,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 1.55,
+        "max": 1.75,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "2.215 µm",
-      "Spectral interval": "2.08 - 2.35 µm",
-      "SNR or NEΔT @ specified input": "…… @ ….. % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 2.215,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 2.08,
+        "max": 2.35,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "11.450 µm",
-      "Spectral interval": "10.4 - 12.5 µm",
-      "SNR or NEΔT @ specified input": "….. K @ …… K"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 11.45,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 10.4,
+        "max": 12.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "….. K @ …… K"
     }
   ]
 }

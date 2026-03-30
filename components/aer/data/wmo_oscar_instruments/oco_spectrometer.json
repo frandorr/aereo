@@ -3,7 +3,8 @@
   "instrument_acronym": "OCO spectrometer",
   "instrument_fullname": "Orbiting Carbon Observatory Spectrometer",
   "url": "https://space.oscar.wmo.int/instruments/view/oco%20spectrometer",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range",
     "No. of channels",
     "Spectral resolution",
@@ -11,22 +12,55 @@
   ],
   "channels": [
     {
-      "Spectral range": "758 - 772 nm",
-      "No. of channels": "1024",
-      "Spectral resolution": "0.04 nm",
-      "SNR @ specified input spectral radiance": "…….. @ ……… W m-2sr-1μm-1"
+      "channel_name": "Band_01",
+      "Spectral range": {
+        "min": 758.0,
+        "max": 772.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1024,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.04,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……… W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "1594 - 1619 nm",
-      "No. of channels": "1024",
-      "Spectral resolution": "0.08 nm",
-      "SNR @ specified input spectral radiance": "…….. @ ……… W m-2sr-1μm-1"
+      "channel_name": "Band_02",
+      "Spectral range": {
+        "min": 1594.0,
+        "max": 1619.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1024,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.08,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……… W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "2042 - 2082 nm",
-      "No. of channels": "1024",
-      "Spectral resolution": "0.10 nm",
-      "SNR @ specified input spectral radiance": "…….. @ ……… W m-2sr-1μm-1"
+      "channel_name": "Band_03",
+      "Spectral range": {
+        "min": 2042.0,
+        "max": 2082.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1024,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.1,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……… W m-2sr-1μm-1"
     }
   ]
 }

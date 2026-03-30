@@ -3,41 +3,87 @@
   "instrument_acronym": "Geoton-L1",
   "instrument_fullname": "Panchromatic and multispectral radiometer - L1",
   "url": "https://space.oscar.wmo.int/instruments/view/geoton-l1",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.505 µm",
-      "Spectral interval": "0.48 - 0.53 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.505,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.48,
+        "max": 0.53,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.565 µm",
-      "Spectral interval": "0.54 - 0.59 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.565,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.54,
+        "max": 0.59,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.650 µm",
-      "Spectral interval": "0.62 - 0.68 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.65,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.62,
+        "max": 0.68,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.760 µm",
-      "Spectral interval": "0.72 - 0.80 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.76,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.72,
+        "max": 0.8,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.845 µm",
-      "Spectral interval": "0.81 - 0.88 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 0.845,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.81,
+        "max": 0.88,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "Panchromatic",
-      "Spectral interval": "0.62 - 0.79 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_06",
+      "central_wavelength": "Panchromatic",
+      "bandwidth": {
+        "min": 0.62,
+        "max": 0.79,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     }
   ]
 }

@@ -3,7 +3,8 @@
   "instrument_acronym": "UMBRA-SAR",
   "instrument_fullname": "SAR instrument for UMBRA satellites",
   "url": "https://space.oscar.wmo.int/instruments/view/umbra-sar",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -11,28 +12,62 @@
   ],
   "channels": [
     {
-      "Operation mode": "Spotlight",
-      "Resolution": "0.25-4 m",
-      "Swath": "4x4 km",
-      "Polarisation": "HH or VV"
+      "channel_name": "Band_01",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": {
+        "min": 0.25,
+        "max": 4.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "x": 4.0,
+        "y": 4.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV"
     },
     {
-      "Operation mode": "Stripmap",
-      "Resolution": "3 m",
-      "Swath": "5-20 km x 50 km",
-      "Polarisation": "HH or VV"
+      "channel_name": "Band_02",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "value": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "min": 5.0,
+        "max": 20.0,
+        "unit": "km x 50 km"
+      },
+      "polarisation": "HH or VV"
     },
     {
-      "Operation mode": "Extended Dwell",
-      "Resolution": "0.25-2 m",
-      "Swath": "4x4 km",
-      "Polarisation": "HH or VV"
+      "channel_name": "Band_03",
+      "operation_mode": "Extended Dwell",
+      "spatial_resolution": {
+        "min": 0.25,
+        "max": 2.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "x": 4.0,
+        "y": 4.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV"
     },
     {
-      "Operation mode": "Scanning",
-      "Resolution": "10 m",
-      "Swath": "100x100 km",
-      "Polarisation": "HH or VV"
+      "channel_name": "Band_04",
+      "operation_mode": "Scanning",
+      "spatial_resolution": {
+        "value": 10.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "x": 100.0,
+        "y": 100.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV"
     }
   ]
 }

@@ -1,0 +1,52 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "OPS (ASNARO)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/ops_asnaro",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": "N/A (PAN)",
+      "bandwidth": "….. - …. μm",
+      "snr_or_nedt": "……….. @ ……… % albedo"
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": "…. μm",
+      "bandwidth": "….. - …. μm",
+      "snr_or_nedt": "……….. @ ……… % albedo"
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": "…. μm",
+      "bandwidth": "….. - …. μm",
+      "snr_or_nedt": "……….. @ ……… % albedo"
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": "…. μm",
+      "bandwidth": "….. - …. μm",
+      "snr_or_nedt": "……….. @ ……… % albedo"
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": "…. μm",
+      "bandwidth": "….. - …. μm",
+      "snr_or_nedt": "……….. @ ……… % albedo"
+    },
+    {
+      "channel_name": "Band_06",
+      "central_wavelength": "…. μm",
+      "bandwidth": "….. - …. μm",
+      "snr_or_nedt": "……….. @ ……… % albedo"
+    },
+    {
+      "channel_name": "Band_07",
+      "central_wavelength": "…. μm",
+      "bandwidth": "….. - …. μm",
+      "snr_or_nedt": "……….. @ ……… % albedo"
+    }
+  ]
+}

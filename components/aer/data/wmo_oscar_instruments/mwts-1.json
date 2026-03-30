@@ -3,7 +3,8 @@
   "instrument_acronym": "MWTS-1",
   "instrument_fullname": "Micro-Wave Temperature Sounder - 1",
   "url": "https://space.oscar.wmo.int/instruments/view/mwts-1",
-  "columns": [
+  "schema_type": "microwave",
+  "original_columns": [
     "No.",
     "Central frequency (GHz)",
     "Bandwidth (MHz)",
@@ -12,32 +13,81 @@
   ],
   "channels": [
     {
-      "No.": "1",
-      "Central frequency (GHz)": "50.30",
-      "Bandwidth (MHz)": "180",
-      "Polarisation": "V",
-      "NEΔT": "0.5 K"
+      "channel_name": "Band_01",
+      "No.": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 50.3,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 180,
+        "unit": null
+      },
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      }
     },
     {
-      "No.": "2",
-      "Central frequency (GHz)": "53.596 ± 0.115",
-      "Bandwidth (MHz)": "340",
-      "Polarisation": "H",
-      "NEΔT": "0.4 K"
+      "channel_name": "Band_02",
+      "No.": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": "53.596 ± 0.115",
+      "bandwidth": {
+        "value": 340,
+        "unit": null
+      },
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      }
     },
     {
-      "No.": "3",
-      "Central frequency (GHz)": "54.94",
-      "Bandwidth (MHz)": "400",
-      "Polarisation": "V",
-      "NEΔT": "0.4 K"
+      "channel_name": "Band_03",
+      "No.": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 54.94,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 400,
+        "unit": null
+      },
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      }
     },
     {
-      "No.": "4",
-      "Central frequency (GHz)": "57.290",
-      "Bandwidth (MHz)": "330",
-      "Polarisation": "H",
-      "NEΔT": "0.4 K"
+      "channel_name": "Band_04",
+      "No.": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 57.29,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 330,
+        "unit": null
+      },
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      }
     }
   ]
 }

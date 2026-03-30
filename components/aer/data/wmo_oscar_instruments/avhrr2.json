@@ -3,31 +3,70 @@
   "instrument_acronym": "AVHRR/2",
   "instrument_fullname": "Advanced Very High Resolution Radiometer / 2",
   "url": "https://space.oscar.wmo.int/instruments/view/avhrr/2",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR or NEΔT @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "0.615 µm",
-      "Spectral interval": "0.55 - 0.68 µm",
-      "SNR or NEΔT @ specified input": "9 @ 0.5 % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.615,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.55,
+        "max": 0.68,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "9 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "0.912 µm",
-      "Spectral interval": "0.725 - 1.10 µm",
-      "SNR or NEΔT @ specified input": "9 @ 0.5 % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.912,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.725,
+        "max": 1.1,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "9 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "3.74 µm",
-      "Spectral interval": "3.55 - 3.93 µm",
-      "SNR or NEΔT @ specified input": "0.12 K @ 300 K"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 3.74,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 3.55,
+        "max": 3.93,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.12,
+        "unit": "K @ 300 K"
+      }
     },
     {
-      "Central wavelength": "11.0 µm",
-      "Spectral interval": "10.5 - 11.5 µm",
-      "SNR or NEΔT @ specified input": "0.12 K @ 300 K"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 11.0,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 10.5,
+        "max": 11.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.12,
+        "unit": "K @ 300 K"
+      }
     }
   ]
 }

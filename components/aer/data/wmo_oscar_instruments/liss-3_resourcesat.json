@@ -1,0 +1,46 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "LISS-3 (ResourceSat)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/liss-3_resourcesat",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": "200 @ 278 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.59,
+        "unit": "µm"
+      }
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": "200 @ 284 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.62,
+        "max": 0.68,
+        "unit": "µm"
+      }
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": "200 @ 320 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.77,
+        "max": 0.86,
+        "unit": "µm"
+      }
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": "200 @ 76.4 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 1.55,
+        "max": 1.75,
+        "unit": "µm"
+      }
+    }
+  ]
+}

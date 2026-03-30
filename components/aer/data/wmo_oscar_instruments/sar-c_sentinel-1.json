@@ -1,0 +1,67 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "SAR-C (Sentinel-1)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar-c_sentinel-1",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "Stripmap",
+      "operation_mode": "Stripmap (SM)",
+      "spatial_resolution": {
+        "x": 4.0,
+        "y": 5.0,
+        "unit": "m2"
+      },
+      "swath_width": {
+        "value": 80.0,
+        "unit": "km"
+      },
+      "polarisation": "VV + VH or HH + HV"
+    },
+    {
+      "channel_name": "Interferometric Wide swath",
+      "operation_mode": "ScanSAR - Interferometric wide-swath (IW)",
+      "spatial_resolution": {
+        "x": 5.0,
+        "y": 20.0,
+        "unit": "m2"
+      },
+      "swath_width": {
+        "value": 240.0,
+        "unit": "km"
+      },
+      "polarisation": "VV + VH or HH + HV"
+    },
+    {
+      "channel_name": "Extra Wide swath",
+      "operation_mode": "ScanSAR - Extra-wide swath (EW)",
+      "spatial_resolution": {
+        "x": 25.0,
+        "y": 80.0,
+        "unit": "m2"
+      },
+      "swath_width": {
+        "value": 400.0,
+        "unit": "km"
+      },
+      "polarisation": "VV + VH or HH + HV"
+    },
+    {
+      "channel_name": "Wave",
+      "operation_mode": "Wave (WV)",
+      "spatial_resolution": {
+        "x": 20.0,
+        "y": 5.0,
+        "unit": "m2"
+      },
+      "swath_width": {
+        "x": 20.0,
+        "y": 20.0,
+        "unit": "km2every 100 km"
+      },
+      "polarisation": "HH or VV"
+    }
+  ]
+}

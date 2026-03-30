@@ -3,7 +3,8 @@
   "instrument_acronym": "CRIS",
   "instrument_fullname": "Cosmic Ray Isotope Spectrometer",
   "url": "https://space.oscar.wmo.int/instruments/view/cris",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range(µm)",
     "Spectral range(cm-1)",
     "Spectral resolution (unapodised) NSR",
@@ -12,25 +13,70 @@
   ],
   "channels": [
     {
-      "Spectral range(µm)": "9.13 - 15.40 µm",
-      "Spectral range(cm-1)": "650 - 1095 cm-1",
-      "Spectral resolution (unapodised) NSR": "0.625 cm-1",
-      "Spectral resolution (unapodised) FSR": "0.625 cm-1",
-      "NEΔT @ specified scene temperature": "0.24-0.39 K @ 287 K"
+      "channel_name": "LWIR",
+      "Spectral range(µm)": {
+        "min": 9.13,
+        "max": 15.4,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "min": 650.0,
+        "max": 1095.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.625,
+        "unit": "cm-1"
+      },
+      "NEΔT @ specified scene temperature": {
+        "min": 0.24,
+        "max": 0.39,
+        "unit": "K @ 287 K"
+      }
     },
     {
-      "Spectral range(µm)": "5.71 - 8.26 µm",
-      "Spectral range(cm-1)": "1210 - 1750 cm-1",
-      "Spectral resolution (unapodised) NSR": "1.25 cm-1",
-      "Spectral resolution (unapodised) FSR": "0.625 cm-1",
-      "NEΔT @ specified scene temperature": "0.19-0.28 K @ 287 K"
+      "channel_name": "MWIR",
+      "Spectral range(µm)": {
+        "min": 5.71,
+        "max": 8.26,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "min": 1210.0,
+        "max": 1750.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.625,
+        "unit": "cm-1"
+      },
+      "NEΔT @ specified scene temperature": {
+        "min": 0.19,
+        "max": 0.28,
+        "unit": "K @ 287 K"
+      }
     },
     {
-      "Spectral range(µm)": "3.92 - 4.64 µm",
-      "Spectral range(cm-1)": "2155 - 2550 cm-1",
-      "Spectral resolution (unapodised) NSR": "2.5 cm-1",
-      "Spectral resolution (unapodised) FSR": "0.625 cm-1",
-      "NEΔT @ specified scene temperature": "0.18-0.21 K @ 287 K"
+      "channel_name": "SWIR",
+      "Spectral range(µm)": {
+        "min": 3.92,
+        "max": 4.64,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "min": 2155.0,
+        "max": 2550.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.625,
+        "unit": "cm-1"
+      },
+      "NEΔT @ specified scene temperature": {
+        "min": 0.18,
+        "max": 0.21,
+        "unit": "K @ 287 K"
+      }
     }
   ]
 }

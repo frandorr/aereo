@@ -3,7 +3,8 @@
   "instrument_acronym": "MeteoSAR",
   "instrument_fullname": "Meteorological Synthetic Aperture Radar",
   "url": "https://space.oscar.wmo.int/instruments/view/meteosar",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -11,34 +12,69 @@
   ],
   "channels": [
     {
-      "Operation mode": "Spotlight",
-      "Resolution": "1 m",
-      "Swath": "10 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_01",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": {
+        "value": 1.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 10.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "Stripmap",
-      "Resolution": "5 m",
-      "Swath": "30 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_02",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "value": 5.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 30.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "ScanSAR (narrow swath)",
-      "Resolution": "50 m",
-      "Swath": "130 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_03",
+      "operation_mode": "ScanSAR (narrow swath)",
+      "spatial_resolution": {
+        "value": 50.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 130.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "ScanSAR (medium swath)",
-      "Resolution": "200 m",
-      "Swath": "600 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_04",
+      "operation_mode": "ScanSAR (medium swath)",
+      "spatial_resolution": {
+        "value": 200.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 600.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "ScanSAR (wide swath)",
-      "Resolution": "500 m",
-      "Swath": "750 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_05",
+      "operation_mode": "ScanSAR (wide swath)",
+      "spatial_resolution": {
+        "value": 500.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 750.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     }
   ]
 }

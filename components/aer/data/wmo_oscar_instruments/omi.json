@@ -1,9 +1,10 @@
 {
   "instrument_id": 377,
-  "instrument_acronym": "OMI ",
+  "instrument_acronym": "OMI",
   "instrument_fullname": "Ozone Monitoring Instrument ",
   "url": "https://space.oscar.wmo.int/instruments/view/omi%20",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range",
     "No. of channels",
     "Spectral resolution",
@@ -11,22 +12,55 @@
   ],
   "channels": [
     {
-      "Spectral range": "270 - 314 nm",
-      "No. of channels": "390",
-      "Spectral resolution": "0.63 nm",
-      "SNR @ specified input spectral radiance": "…….. @ ……… W m-2sr-1μm-1"
+      "channel_name": "Band_01",
+      "Spectral range": {
+        "min": 270.0,
+        "max": 314.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 390,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.63,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……… W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "306 - 380 nm",
-      "No. of channels": "390",
-      "Spectral resolution": "0.42 nm",
-      "SNR @ specified input spectral radiance": "…….. @ ……… W m-2sr-1μm-1"
+      "channel_name": "Band_02",
+      "Spectral range": {
+        "min": 306.0,
+        "max": 380.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 390,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.42,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……… W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "350 - 500 nm",
-      "No. of channels": "780",
-      "Spectral resolution": "0.63 nm",
-      "SNR @ specified input spectral radiance": "…….. @ ……… W m-2sr-1μm-1"
+      "channel_name": "Band_03",
+      "Spectral range": {
+        "min": 350.0,
+        "max": 500.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 780,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.63,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……… W m-2sr-1μm-1"
     }
   ]
 }

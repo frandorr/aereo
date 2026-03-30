@@ -3,7 +3,8 @@
   "instrument_acronym": "LSTM",
   "instrument_fullname": "Land Surface Temperature Monitoring",
   "url": "https://space.oscar.wmo.int/instruments/view/lstm",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Channel",
     "Wavelength",
     "Bandwidth",
@@ -11,148 +12,286 @@
   ],
   "channels": [
     {
+      "channel_name": "VNIR-0",
       "Channel": "VNIR-0",
-      "Wavelength": "0.490 µm",
-      "Bandwidth": "65 nm",
-      "SNR @ reference input L or NEΔT": "162 @ 128.00 W m-2sr-1µm-1"
+      "central_wavelength": {
+        "value": 0.49,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 65.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "162 @ 128.00 W m-2sr-1µm-1"
     },
     {
+      "channel_name": "VNIR-1",
       "Channel": "VNIR-1",
-      "Wavelength": "0.665 µm",
-      "Bandwidth": "30 nm",
-      "SNR @ reference input L or NEΔT": "142 @ 108.00 W m-2sr-1µm-1"
+      "central_wavelength": {
+        "value": 0.665,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 30.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "142 @ 108.00 W m-2sr-1µm-1"
     },
     {
+      "channel_name": "VNIR-2",
       "Channel": "VNIR-2",
-      "Wavelength": "0.865 µm",
-      "Bandwidth": "20 nm",
-      "SNR @ reference input L or NEΔT": "100 @ 52.38 W m-2sr-1µm-1"
+      "central_wavelength": {
+        "value": 0.865,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 52.38 W m-2sr-1µm-1"
     },
     {
+      "channel_name": "VNIR-3",
       "Channel": "VNIR-3",
-      "Wavelength": "0.945 µm",
-      "Bandwidth": "20 nm",
-      "SNR @ reference input L or NEΔT": "114 @ 8.77 W m-2sr-1µm-1"
+      "central_wavelength": {
+        "value": 0.945,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "114 @ 8.77 W m-2sr-1µm-1"
     },
     {
+      "channel_name": "SWIR-1",
       "Channel": "SWIR-1",
-      "Wavelength": "1.380 µm",
-      "Bandwidth": "30 nm",
-      "SNR @ reference input L or NEΔT": "100 @ 6.00 W m-2sr-1µm-1"
+      "central_wavelength": {
+        "value": 1.38,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 30.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 6.00 W m-2sr-1µm-1"
     },
     {
+      "channel_name": "SWIR-2",
       "Channel": "SWIR-2",
-      "Wavelength": "1.610 µm",
-      "Bandwidth": "90 nm",
-      "SNR @ reference input L or NEΔT": "133 @ 4.00 W m-2sr-1µm-1"
+      "central_wavelength": {
+        "value": 1.61,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 90.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "133 @ 4.00 W m-2sr-1µm-1"
     },
     {
+      "channel_name": "TIR-1",
       "Channel": "TIR-1",
-      "Wavelength": "8.6 µm",
-      "Bandwidth": "0.18/0.30 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 8.6,
+        "unit": "µm"
+      },
+      "bandwidth": "0.18/0.30 µm",
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-2",
       "Channel": "TIR-2",
-      "Wavelength": "8.9 µm",
-      "Bandwidth": "0.18/0.30 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 8.9,
+        "unit": "µm"
+      },
+      "bandwidth": "0.18/0.30 µm",
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-3",
       "Channel": "TIR-3",
-      "Wavelength": "9.2 µm",
-      "Bandwidth": "0.18/0.30 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 9.2,
+        "unit": "µm"
+      },
+      "bandwidth": "0.18/0.30 µm",
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-4",
       "Channel": "TIR-4",
-      "Wavelength": "10.9 µm",
-      "Bandwidth": "0.40 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 10.9,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.4,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-5",
       "Channel": "TIR-5",
-      "Wavelength": "12.0 µm",
-      "Bandwidth": "0.47 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 12.0,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.47,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S1",
       "Channel": "TIR-S1",
-      "Wavelength": "8.2 µm",
-      "Bandwidth": "0.20 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 8.2,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.2,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S2",
       "Channel": "TIR-S2",
-      "Wavelength": "9.1 µm",
-      "Bandwidth": "0.20 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 9.1,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.2,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S3",
       "Channel": "TIR-S3",
-      "Wavelength": "8.63 µm",
-      "Bandwidth": "0.10 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 8.63,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.1,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S4",
       "Channel": "TIR-S4",
-      "Wavelength": "12.63 µm",
-      "Bandwidth": "0.10 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 12.63,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.1,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S5",
       "Channel": "TIR-S5",
-      "Wavelength": "7.5 µm",
-      "Bandwidth": "0.1/02 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 7.5,
+        "unit": "µm"
+      },
+      "bandwidth": "0.1/02 µm",
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S6",
       "Channel": "TIR-S6",
-      "Wavelength": "12.2 µm",
-      "Bandwidth": "0.1/02 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 12.2,
+        "unit": "µm"
+      },
+      "bandwidth": "0.1/02 µm",
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S7",
       "Channel": "TIR-S7",
-      "Wavelength": "9.0 µm",
-      "Bandwidth": "0.10 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 9.0,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.1,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S8",
       "Channel": "TIR-S8",
-      "Wavelength": "9.8 µm",
-      "Bandwidth": "0.10 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 9.8,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.1,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S9",
       "Channel": "TIR-S9",
-      "Wavelength": "10.5 µm",
-      "Bandwidth": "0.1/0.2 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 10.5,
+        "unit": "µm"
+      },
+      "bandwidth": "0.1/0.2 µm",
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S10",
       "Channel": "TIR-S10",
-      "Wavelength": "10.95 µm",
-      "Bandwidth": "0.1/02 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 10.95,
+        "unit": "µm"
+      },
+      "bandwidth": "0.1/02 µm",
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S11",
       "Channel": "TIR-S11",
-      "Wavelength": "12.3 µm",
-      "Bandwidth": "0.1/0.2 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 12.3,
+        "unit": "µm"
+      },
+      "bandwidth": "0.1/0.2 µm",
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S12",
       "Channel": "TIR-S12",
-      "Wavelength": "9.3 µm",
-      "Bandwidth": "0.1/0.2 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 9.3,
+        "unit": "µm"
+      },
+      "bandwidth": "0.1/0.2 µm",
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     },
     {
+      "channel_name": "TIR-S13",
       "Channel": "TIR-S13",
-      "Wavelength": "9.53 µm",
-      "Bandwidth": "0.1/0.2 µm",
-      "SNR @ reference input L or NEΔT": "0.1/0.15 K @ 300 K"
+      "central_wavelength": {
+        "value": 9.53,
+        "unit": "µm"
+      },
+      "bandwidth": "0.1/0.2 µm",
+      "snr_or_nedt": "0.1/0.15 K @ 300 K"
     }
   ]
 }

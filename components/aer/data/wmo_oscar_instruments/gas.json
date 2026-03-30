@@ -3,7 +3,8 @@
   "instrument_acronym": "GAS",
   "instrument_fullname": "Greenhouse-gases Absorption Spectrometer",
   "url": "https://space.oscar.wmo.int/instruments/view/gas",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range (μm)",
     "Spectral range (cm-1)",
     "Spectral resolution",
@@ -11,28 +12,76 @@
   ],
   "channels": [
     {
-      "Spectral range (μm)": "0.75-0.77 μm",
-      "Spectral range (cm-1)": "13000-13300 cm-1",
-      "Spectral resolution": "0.60 cm-1",
-      "SNR @ expected input radiance": "> 300"
+      "channel_name": "Band_01",
+      "Spectral range (μm)": {
+        "min": 0.75,
+        "max": 0.77,
+        "unit": "μm"
+      },
+      "wave_number_range": {
+        "min": 13000.0,
+        "max": 13300.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.6,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": "> 300"
     },
     {
-      "Spectral range (μm)": "1.56-1.72 μm",
-      "Spectral range (cm-1)": "5800-6400 cm-1",
-      "Spectral resolution": "0.27 cm-1",
-      "SNR @ expected input radiance": "> 300"
+      "channel_name": "Band_02",
+      "Spectral range (μm)": {
+        "min": 1.56,
+        "max": 1.72,
+        "unit": "μm"
+      },
+      "wave_number_range": {
+        "min": 5800.0,
+        "max": 6400.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.27,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": "> 300"
     },
     {
-      "Spectral range (μm)": "1.92-2.08 μm",
-      "Spectral range (cm-1)": "4800-5200 cm-1",
-      "Spectral resolution": "0.27 cm-1",
-      "SNR @ expected input radiance": "> 300"
+      "channel_name": "Band_03",
+      "Spectral range (μm)": {
+        "min": 1.92,
+        "max": 2.08,
+        "unit": "μm"
+      },
+      "wave_number_range": {
+        "min": 4800.0,
+        "max": 5200.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.27,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": "> 300"
     },
     {
-      "Spectral range (μm)": "2.20-2.38 μm",
-      "Spectral range (cm-1)": "4200-4550 cm-1",
-      "Spectral resolution": "0.27 cm-1",
-      "SNR @ expected input radiance": "> 300"
+      "channel_name": "Band_04",
+      "Spectral range (μm)": {
+        "min": 2.2,
+        "max": 2.38,
+        "unit": "μm"
+      },
+      "wave_number_range": {
+        "min": 4200.0,
+        "max": 4550.0,
+        "unit": "cm-1"
+      },
+      "spectral_resolution": {
+        "value": 0.27,
+        "unit": "cm-1"
+      },
+      "snr_or_nedt": "> 300"
     }
   ]
 }

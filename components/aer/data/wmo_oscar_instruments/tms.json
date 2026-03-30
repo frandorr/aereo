@@ -3,7 +3,8 @@
   "instrument_acronym": "TMS",
   "instrument_fullname": "TROPICS Millimeter-wave Sounder",
   "url": "https://space.oscar.wmo.int/instruments/view/tms",
-  "columns": [
+  "schema_type": "microwave",
+  "original_columns": [
     "No.",
     "Central frequency",
     "Bandwidth",
@@ -12,88 +13,277 @@
   ],
   "channels": [
     {
-      "No.": "1",
-      "Central frequency": "91.655 ± 1.4 GHz",
-      "Bandwidth": "1000 MHz",
-      "Effective resolution across scan": "50.7 km",
-      "NE∆T": "0.95 K"
+      "channel_name": "Band_01",
+      "No.": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": "91.655 ± 1.4 GHz",
+      "bandwidth": {
+        "value": 1000.0,
+        "unit": "MHz"
+      },
+      "spatial_resolution": {
+        "value": 50.7,
+        "unit": "km"
+      },
+      "NE∆T": {
+        "value": 0.95,
+        "unit": "K"
+      }
     },
     {
-      "No.": "2",
-      "Central frequency": "114.50 GHz",
-      "Bandwidth": "1000 MHz",
-      "Effective resolution across scan": "41.2 km",
-      "NE∆T": "0.55 K"
+      "channel_name": "Band_02",
+      "No.": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 114.5,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 1000.0,
+        "unit": "MHz"
+      },
+      "spatial_resolution": {
+        "value": 41.2,
+        "unit": "km"
+      },
+      "NE∆T": {
+        "value": 0.55,
+        "unit": "K"
+      }
     },
     {
-      "No.": "3",
-      "Central frequency": "115.95 GHz",
-      "Bandwidth": "800 MHz",
-      "Effective resolution across scan": "41.2 km",
-      "NE∆T": "0.60 K"
+      "channel_name": "Band_03",
+      "No.": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 115.95,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 800.0,
+        "unit": "MHz"
+      },
+      "spatial_resolution": {
+        "value": 41.2,
+        "unit": "km"
+      },
+      "NE∆T": {
+        "value": 0.6,
+        "unit": "K"
+      }
     },
     {
-      "No.": "4",
-      "Central frequency": "116.65 GHz",
-      "Bandwidth": "600 MHz",
-      "Effective resolution across scan": "41.2 km",
-      "NE∆T": "0.70 K"
+      "channel_name": "Band_04",
+      "No.": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 116.65,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 600.0,
+        "unit": "MHz"
+      },
+      "spatial_resolution": {
+        "value": 41.2,
+        "unit": "km"
+      },
+      "NE∆T": {
+        "value": 0.7,
+        "unit": "K"
+      }
     },
     {
-      "No.": "5",
-      "Central frequency": "117.25 GHz",
-      "Bandwidth": "600 MHz",
-      "Effective resolution across scan": "41.2 km",
-      "NE∆T": "0.70 K"
+      "channel_name": "Band_05",
+      "No.": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 117.25,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 600.0,
+        "unit": "MHz"
+      },
+      "spatial_resolution": {
+        "value": 41.2,
+        "unit": "km"
+      },
+      "NE∆T": {
+        "value": 0.7,
+        "unit": "K"
+      }
     },
     {
-      "No.": "6",
-      "Central frequency": "117.80 GHz",
-      "Bandwidth": "500 MHz",
-      "Effective resolution across scan": "41.2 km",
-      "NE∆T": "0.75 K"
+      "channel_name": "Band_06",
+      "No.": {
+        "value": 6,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 117.8,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 500.0,
+        "unit": "MHz"
+      },
+      "spatial_resolution": {
+        "value": 41.2,
+        "unit": "km"
+      },
+      "NE∆T": {
+        "value": 0.75,
+        "unit": "K"
+      }
     },
     {
-      "No.": "7",
-      "Central frequency": "118.24 GHz",
-      "Bandwidth": "380 MHz",
-      "Effective resolution across scan": "41.2 km",
-      "NE∆T": "0.85 K"
+      "channel_name": "Band_07",
+      "No.": {
+        "value": 7,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 118.24,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 380.0,
+        "unit": "MHz"
+      },
+      "spatial_resolution": {
+        "value": 41.2,
+        "unit": "km"
+      },
+      "NE∆T": {
+        "value": 0.85,
+        "unit": "K"
+      }
     },
     {
-      "No.": "8",
-      "Central frequency": "118.58 GHz",
-      "Bandwidth": "300 MHz",
-      "Effective resolution across scan": "41.2 km",
-      "NE∆T": "1.00 K"
+      "channel_name": "Band_08",
+      "No.": {
+        "value": 8,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 118.58,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 300.0,
+        "unit": "MHz"
+      },
+      "spatial_resolution": {
+        "value": 41.2,
+        "unit": "km"
+      },
+      "NE∆T": {
+        "value": 1.0,
+        "unit": "K"
+      }
     },
     {
-      "No.": "9",
-      "Central frequency": "184.41 GHz",
-      "Bandwidth": "2000 MHz",
-      "Effective resolution across scan": "27.5 km",
-      "NE∆T": "0.60 K"
+      "channel_name": "Band_09",
+      "No.": {
+        "value": 9,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 184.41,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 2000.0,
+        "unit": "MHz"
+      },
+      "spatial_resolution": {
+        "value": 27.5,
+        "unit": "km"
+      },
+      "NE∆T": {
+        "value": 0.6,
+        "unit": "K"
+      }
     },
     {
-      "No.": "10",
-      "Central frequency": "186.51 GHz",
-      "Bandwidth": "2000 MHz",
-      "Effective resolution across scan": "27.5 km",
-      "NE∆T": "0.60 K"
+      "channel_name": "Band_10",
+      "No.": {
+        "value": 10,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 186.51,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 2000.0,
+        "unit": "MHz"
+      },
+      "spatial_resolution": {
+        "value": 27.5,
+        "unit": "km"
+      },
+      "NE∆T": {
+        "value": 0.6,
+        "unit": "K"
+      }
     },
     {
-      "No.": "11",
-      "Central frequency": "190.31 GHz",
-      "Bandwidth": "2000 MHz",
-      "Effective resolution across scan": "27.5 km",
-      "NE∆T": "0.60 K"
+      "channel_name": "Band_11",
+      "No.": {
+        "value": 11,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 190.31,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 2000.0,
+        "unit": "MHz"
+      },
+      "spatial_resolution": {
+        "value": 27.5,
+        "unit": "km"
+      },
+      "NE∆T": {
+        "value": 0.6,
+        "unit": "K"
+      }
     },
     {
-      "No.": "12",
-      "Central frequency": "204.8 GHz",
-      "Bandwidth": "2000 MHz",
-      "Effective resolution across scan": "26.0 km",
-      "NE∆T": "0.60 K"
+      "channel_name": "Band_12",
+      "No.": {
+        "value": 12,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 204.8,
+        "unit": "GHz"
+      },
+      "bandwidth": {
+        "value": 2000.0,
+        "unit": "MHz"
+      },
+      "spatial_resolution": {
+        "value": 26.0,
+        "unit": "km"
+      },
+      "NE∆T": {
+        "value": 0.6,
+        "unit": "K"
+      }
     }
   ]
 }

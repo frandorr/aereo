@@ -3,7 +3,8 @@
   "instrument_acronym": "VTPR",
   "instrument_fullname": "Vertical Temperature Profile Radiometer",
   "url": "https://space.oscar.wmo.int/instruments/view/vtpr",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Wavelength",
     "Wave number",
     "Bandwidth",
@@ -11,51 +12,131 @@
   ],
   "channels": [
     {
-      "Wavelength": "18.69 μm",
-      "Wave number": "535.0 cm-1",
-      "Bandwidth": "18 cm-1",
+      "channel_name": "Band_01",
+      "Wavelength": {
+        "value": 18.69,
+        "unit": "μm"
+      },
+      "wave_number_range": {
+        "value": 535.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 18.0,
+        "unit": "cm-1"
+      },
       "NESR": "< 0.25 mW m-2sr-1cm"
     },
     {
-      "Wavelength": "14.96 μm",
-      "Wave number": "668.5 cm-1",
-      "Bandwidth": "3.5 cm-1",
+      "channel_name": "Band_02",
+      "Wavelength": {
+        "value": 14.96,
+        "unit": "μm"
+      },
+      "wave_number_range": {
+        "value": 668.5,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 3.5,
+        "unit": "cm-1"
+      },
       "NESR": "< 0.25 mW m-2sr-1cm"
     },
     {
-      "Wavelength": "14.77 μm",
-      "Wave number": "677.5 cm-1",
-      "Bandwidth": "10 cm-1",
+      "channel_name": "Band_03",
+      "Wavelength": {
+        "value": 14.77,
+        "unit": "μm"
+      },
+      "wave_number_range": {
+        "value": 677.5,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 10.0,
+        "unit": "cm-1"
+      },
       "NESR": "< 0.25 mW m-2sr-1cm"
     },
     {
-      "Wavelength": "14.38 μm",
-      "Wave number": "695.0 cm-1",
-      "Bandwidth": "10 cm-1",
+      "channel_name": "Band_04",
+      "Wavelength": {
+        "value": 14.38,
+        "unit": "μm"
+      },
+      "wave_number_range": {
+        "value": 695.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 10.0,
+        "unit": "cm-1"
+      },
       "NESR": "< 0.25 mW m-2sr-1cm"
     },
     {
-      "Wavelength": "14.12 μm",
-      "Wave number": "708.0 cm-1",
-      "Bandwidth": "10 cm-1",
+      "channel_name": "Band_05",
+      "Wavelength": {
+        "value": 14.12,
+        "unit": "μm"
+      },
+      "wave_number_range": {
+        "value": 708.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 10.0,
+        "unit": "cm-1"
+      },
       "NESR": "< 0.25 mW m-2sr-1cm"
     },
     {
-      "Wavelength": "13.79 μm",
-      "Wave number": "725.0 cm-1",
-      "Bandwidth": "10 cm-1",
+      "channel_name": "Band_06",
+      "Wavelength": {
+        "value": 13.79,
+        "unit": "μm"
+      },
+      "wave_number_range": {
+        "value": 725.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 10.0,
+        "unit": "cm-1"
+      },
       "NESR": "< 0.25 mW m-2sr-1cm"
     },
     {
-      "Wavelength": "13.38 μm",
-      "Wave number": "747.0 cm-1",
-      "Bandwidth": "10 cm-1",
+      "channel_name": "Band_07",
+      "Wavelength": {
+        "value": 13.38,
+        "unit": "μm"
+      },
+      "wave_number_range": {
+        "value": 747.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 10.0,
+        "unit": "cm-1"
+      },
       "NESR": "< 0.25 mW m-2sr-1cm"
     },
     {
-      "Wavelength": "11.97 μm",
-      "Wave number": "833.0 cm-1",
-      "Bandwidth": "10 cm-1",
+      "channel_name": "Band_08",
+      "Wavelength": {
+        "value": 11.97,
+        "unit": "μm"
+      },
+      "wave_number_range": {
+        "value": 833.0,
+        "unit": "cm-1"
+      },
+      "Bandwidth": {
+        "value": 10.0,
+        "unit": "cm-1"
+      },
       "NESR": "< 0.25 mW m-2sr-1cm"
     }
   ]

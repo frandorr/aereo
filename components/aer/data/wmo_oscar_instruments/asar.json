@@ -3,7 +3,8 @@
   "instrument_acronym": "ASAR",
   "instrument_fullname": "Onboard Radar Complex (X-band)",
   "url": "https://space.oscar.wmo.int/instruments/view/asar",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -12,39 +13,89 @@
   ],
   "channels": [
     {
-      "Operation mode": "Stripmap",
-      "Resolution": "30 m",
-      "Swath": "100 km",
-      "Field of regard": "485 km",
-      "Polarisation": "HH or VV"
+      "channel_name": "Band_01",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 100.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 485.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV"
     },
     {
-      "Operation mode": "ScanSAR alternating pol",
-      "Resolution": "30 m",
-      "Swath": "100 km",
-      "Field of regard": "485 km",
-      "Polarisation": "VV/HH, HH/HV, VV/VH"
+      "channel_name": "Band_02",
+      "operation_mode": "ScanSAR alternating pol",
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 100.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 485.0,
+        "unit": "km"
+      },
+      "polarisation": "VV/HH, HH/HV, VV/VH"
     },
     {
-      "Operation mode": "ScanSAR wide swath",
-      "Resolution": "150 m",
-      "Swath": "405 km",
-      "Field of regard": "405 km",
-      "Polarisation": "HH or VV"
+      "channel_name": "Band_03",
+      "operation_mode": "ScanSAR wide swath",
+      "spatial_resolution": {
+        "value": 150.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 405.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 405.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV"
     },
     {
-      "Operation mode": "ScanSAR wide swath",
-      "Resolution": "150 m",
-      "Swath": "405 km",
-      "Field of regard": "405 km",
-      "Polarisation": "HH or VV"
+      "channel_name": "Band_04",
+      "operation_mode": "ScanSAR wide swath",
+      "spatial_resolution": {
+        "value": 150.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 405.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 405.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV"
     },
     {
-      "Operation mode": "ScanSAR global monitoring",
-      "Resolution": "1 km",
-      "Swath": "405 km",
-      "Field of regard": "405 km",
-      "Polarisation": "HH or VV"
+      "channel_name": "Band_05",
+      "operation_mode": "ScanSAR global monitoring",
+      "spatial_resolution": {
+        "value": 1.0,
+        "unit": "km"
+      },
+      "swath_width": {
+        "value": 405.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 405.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV"
     }
   ]
 }

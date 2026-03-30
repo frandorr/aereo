@@ -3,21 +3,38 @@
   "instrument_acronym": "WFI",
   "instrument_fullname": "Wide Field Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/wfi",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.66 µm",
-      "Spectral interval": "0.63 - 0.69 µm",
-      "SNR @ specified albedo": "8 @ 2 % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.66,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.63,
+        "max": 0.69,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "8 @ 2 % albedo"
     },
     {
-      "Central wavelength": "0.83 µm",
-      "Spectral interval": "0.77 - 0.89 µm",
-      "SNR @ specified albedo": "16 @ 4 % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.83,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.77,
+        "max": 0.89,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "16 @ 4 % albedo"
     }
   ]
 }

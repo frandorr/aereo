@@ -3,26 +3,51 @@
   "instrument_acronym": "CCD",
   "instrument_fullname": "Charge Coupled Device Camera",
   "url": "https://space.oscar.wmo.int/instruments/view/ccd",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.65 µm",
-      "Spectral interval": "0.62 - 0.68 µm",
-      "SNR @ specified albedo": "900  @  100 % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.65,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.62,
+        "max": 0.68,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "900  @  100 % albedo"
     },
     {
-      "Central wavelength": "0.81 µm",
-      "Spectral interval": "0.77 - 0.86 µm",
-      "SNR @ specified albedo": "850  @  100 % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.81,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.77,
+        "max": 0.86,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "850  @  100 % albedo"
     },
     {
-      "Central wavelength": "1.62 µm",
-      "Spectral interval": "1.55 - 1.69 µm",
-      "SNR @ specified albedo": "900  @  100 % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 1.62,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 1.55,
+        "max": 1.69,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "900  @  100 % albedo"
     }
   ]
 }

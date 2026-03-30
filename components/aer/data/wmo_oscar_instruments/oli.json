@@ -3,61 +3,136 @@
   "instrument_acronym": "OLI",
   "instrument_fullname": "Operational Land Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/oli",
-  "columns": [
-    "Central",
-    "Spectral",
-    "SNR at specified input spectral radiance"
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR Low signal",
+    "SNR High signal"
   ],
   "channels": [
     {
-      "Central": "wavelength",
-      "Spectral": "interval",
-      "SNR at specified input spectral radiance": "Low signal"
+      "channel_name": "B1",
+      "central_wavelength": {
+        "value": 443.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 433.0,
+        "max": 453.0,
+        "unit": "nm"
+      },
+      "snr_low": "130 @ 40 W m-2 sr-1 μm-1",
+      "snr_high": "290 @ 190 W m-2 sr-1 μm-1"
     },
     {
-      "Central": "443 nm",
-      "Spectral": "433 - 453 nm",
-      "SNR at specified input spectral radiance": "130 @ 40 W m-2sr-1μm-1"
+      "channel_name": "B2",
+      "central_wavelength": {
+        "value": 482.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 450.0,
+        "max": 515.0,
+        "unit": "nm"
+      },
+      "snr_low": "130 @ 40 W m-2 sr-1 μm-1",
+      "snr_high": "360 @ 190 W m-2 sr-1 μm-1"
     },
     {
-      "Central": "482 nm",
-      "Spectral": "450 - 515 nm",
-      "SNR at specified input spectral radiance": "130 @ 40 W m-2sr-1μm-1"
+      "channel_name": "B3",
+      "central_wavelength": {
+        "value": 565.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 525.0,
+        "max": 600.0,
+        "unit": "nm"
+      },
+      "snr_low": "100 @ 30 W m-2 sr-1 μm-1",
+      "snr_high": "390 @ 194 W m-2 sr-1 μm-1"
     },
     {
-      "Central": "565 nm",
-      "Spectral": "525 - 600 nm",
-      "SNR at specified input spectral radiance": "100 @ 30 W m-2sr-1μm-1"
+      "channel_name": "B4",
+      "central_wavelength": {
+        "value": 660.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 630.0,
+        "max": 680.0,
+        "unit": "nm"
+      },
+      "snr_low": "90 @ 22 W m-2 sr-1 μm-1",
+      "snr_high": "340 @ 150 W m-2 sr-1 μm-1"
     },
     {
-      "Central": "660 nm",
-      "Spectral": "630 - 680 nm",
-      "SNR at specified input spectral radiance": "90 @ 22 W m-2sr-1μm-1"
+      "channel_name": "B5",
+      "central_wavelength": {
+        "value": 867.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 845.0,
+        "max": 885.0,
+        "unit": "nm"
+      },
+      "snr_low": "90 @ 14 W m-2 sr-1 μm-1",
+      "snr_high": "460 @ 150 W m-2 sr-1 μm-1"
     },
     {
-      "Central": "867 nm",
-      "Spectral": "845 - 885 nm",
-      "SNR at specified input spectral radiance": "90 @ 14 W m-2sr-1μm-1"
+      "channel_name": "B9",
+      "central_wavelength": {
+        "value": 1375.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 1360.0,
+        "max": 1390.0,
+        "unit": "nm"
+      },
+      "snr_low": "50 @ 6.0 W m-2 sr-1 μm-1",
+      "snr_high": "50 @ 6.0 W m-2 sr-1 μm-1"
     },
     {
-      "Central": "1375 nm",
-      "Spectral": "1360 - 1390 nm",
-      "SNR at specified input spectral radiance": "50 @ 6.0 W m-2sr-1μm-1"
+      "channel_name": "B6",
+      "central_wavelength": {
+        "value": 1650.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 1560.0,
+        "max": 1660.0,
+        "unit": "nm"
+      },
+      "snr_low": "100 @ 4.0 W m-2 sr-1 μm-1",
+      "snr_high": "540 @ 32 W m-2 sr-1 μm-1"
     },
     {
-      "Central": "1650 nm",
-      "Spectral": "1560 - 1660 nm",
-      "SNR at specified input spectral radiance": "100 @ 4.0 W m-2sr-1μm-1"
+      "channel_name": "B7",
+      "central_wavelength": {
+        "value": 2215.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 2100.0,
+        "max": 2300.0,
+        "unit": "nm"
+      },
+      "snr_low": "100 @ 1.7 W m-2 sr-1 μm-1",
+      "snr_high": "510 @ 11 W m-2 sr-1 μm-1"
     },
     {
-      "Central": "2215 nm",
-      "Spectral": "2100 - 2300 nm",
-      "SNR at specified input spectral radiance": "100 @ 1.7 W m-2sr-1μm-1"
-    },
-    {
-      "Central": "Panchromatic",
-      "Spectral": "500 - 680 nm",
-      "SNR at specified input spectral radiance": "80 @ 23 W m-2sr-1μm-1"
+      "channel_name": "B8",
+      "central_wavelength": "Panchromatic",
+      "bandwidth": {
+        "min": 500.0,
+        "max": 680.0,
+        "unit": "nm"
+      },
+      "snr_low": "80 @ 23 W m-2 sr-1 μm-1",
+      "snr_high": "230 @ 156 W m-2 sr-1 μm-1"
     }
   ]
 }

@@ -3,7 +3,8 @@
   "instrument_acronym": "Delta-2D",
   "instrument_fullname": "Scanning Microwave Radiometer",
   "url": "https://space.oscar.wmo.int/instruments/view/delta-2d",
-  "columns": [
+  "schema_type": "microwave",
+  "original_columns": [
     "Central frequency",
     "Bandwidth",
     "Polarisations",
@@ -13,36 +14,76 @@
   ],
   "channels": [
     {
-      "Central frequency": "6.9 GHz",
-      "Bandwidth": "…. MHz",
-      "Polarisations": "V, H",
-      "NEΔT": "0.1 K",
-      "IFOV": "91x120 km",
-      "Pixel": "40x60 km"
+      "channel_name": "Band_01",
+      "central_frequency": {
+        "value": 6.9,
+        "unit": "GHz"
+      },
+      "bandwidth": "…. MHz",
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.1,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 40.0,
+        "y": 60.0,
+        "unit": "km"
+      }
     },
     {
-      "Central frequency": "13.0 GHz",
-      "Bandwidth": "…. MHz",
-      "Polarisations": "V, H",
-      "NEΔT": "0.1 K",
-      "IFOV": "49x65 km",
-      "Pixel": "20x20 km"
+      "channel_name": "Band_02",
+      "central_frequency": {
+        "value": 13.0,
+        "unit": "GHz"
+      },
+      "bandwidth": "…. MHz",
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.1,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 20.0,
+        "y": 20.0,
+        "unit": "km"
+      }
     },
     {
-      "Central frequency": "22.3 GHz",
-      "Bandwidth": ".... MHz",
-      "Polarisations": "V, H",
-      "NEΔT": "0.15 K",
-      "IFOV": "28x37 km",
-      "Pixel": "10x10 km"
+      "channel_name": "Band_03",
+      "central_frequency": {
+        "value": 22.3,
+        "unit": "GHz"
+      },
+      "bandwidth": ".... MHz",
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.15,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 10.0,
+        "y": 10.0,
+        "unit": "km"
+      }
     },
     {
-      "Central frequency": "37.5 GHz",
-      "Bandwidth": ".... MHz",
-      "Polarisations": "V, H",
-      "NEΔT": "0.15 K",
-      "IFOV": "17x21 km",
-      "Pixel": "10x10 km"
+      "channel_name": "Band_04",
+      "central_frequency": {
+        "value": 37.5,
+        "unit": "GHz"
+      },
+      "bandwidth": ".... MHz",
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.15,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 10.0,
+        "y": 10.0,
+        "unit": "km"
+      }
     }
   ]
 }

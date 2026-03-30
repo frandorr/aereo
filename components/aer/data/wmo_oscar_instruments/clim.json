@@ -3,7 +3,8 @@
   "instrument_acronym": "CLIM",
   "instrument_fullname": "Cloud Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/clim",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Channel",
     "Wavelenght",
     "Bandwidth",
@@ -12,25 +13,55 @@
   ],
   "channels": [
     {
+      "channel_name": "CLIM-1",
       "Channel": "CLIM-1",
-      "Wavelenght": "670 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified input radiance": "… @ … W m-2sr-1µ-1",
-      "IFOV at s.s.p.": "174 m"
+      "Wavelenght": {
+        "value": 670.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "… @ … W m-2sr-1µ-1",
+      "spatial_resolution": {
+        "value": 174.0,
+        "unit": "m"
+      }
     },
     {
+      "channel_name": "CLIM-2",
       "Channel": "CLIM-2",
-      "Wavelenght": "753 nm",
-      "Bandwidth": "9 nm",
-      "SNR @ specified input radiance": "… @ … W m-2sr-1µ-1",
-      "IFOV at s.s.p.": "174 m"
+      "Wavelenght": {
+        "value": 753.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 9.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "… @ … W m-2sr-1µ-1",
+      "spatial_resolution": {
+        "value": 174.0,
+        "unit": "m"
+      }
     },
     {
+      "channel_name": "CLIM-3",
       "Channel": "CLIM-3",
-      "Wavelenght": "1370 nm",
-      "Bandwidth": "15 nm",
-      "SNR @ specified input radiance": "… @ … W m-2sr-1µ-1",
-      "IFOV at s.s.p.": "348 m"
+      "Wavelenght": {
+        "value": 1370.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 15.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "… @ … W m-2sr-1µ-1",
+      "spatial_resolution": {
+        "value": 348.0,
+        "unit": "m"
+      }
     }
   ]
 }

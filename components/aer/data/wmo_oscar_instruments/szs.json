@@ -3,41 +3,60 @@
   "instrument_acronym": "SZS",
   "instrument_fullname": "Shore Zone Scanner",
   "url": "https://space.oscar.wmo.int/instruments/view/szs",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Bandwidth",
     "SNR @ specified input spectral radiance"
   ],
   "channels": [
     {
-      "Central wavelength": "415 nm",
-      "Bandwidth": "10 nm",
-      "SNR @ specified input spectral radiance": "200 @ …..… W m-2sr-1µm-1"
+      "channel_name": "Band_01",
+      "central_wavelength": "200 @ …..… W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "490 nm",
-      "Bandwidth": "10 nm",
-      "SNR @ specified input spectral radiance": "200 @ …..… W m-2sr-1µm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": "200 @ …..… W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 10.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "557.5 nm",
-      "Bandwidth": "15 nm",
-      "SNR @ specified input spectral radiance": "200 @ …..… W m-2sr-1µm-1"
+      "channel_name": "Band_03",
+      "central_wavelength": "200 @ …..… W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 15.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "595 nm",
-      "Bandwidth": "30 nm",
-      "SNR @ specified input spectral radiance": "200 @ …..… W m-2sr-1µm-1"
+      "channel_name": "Band_04",
+      "central_wavelength": "200 @ …..… W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 30.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "665 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified input spectral radiance": "200 @ …..… W m-2sr-1µm-1"
+      "channel_name": "Band_05",
+      "central_wavelength": "200 @ …..… W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "779 nm",
-      "Bandwidth": "14 nm",
-      "SNR @ specified input spectral radiance": "200 @ …..… W m-2sr-1µm-1"
+      "channel_name": "Band_06",
+      "central_wavelength": "200 @ …..… W m-2sr-1µm-1",
+      "bandwidth": {
+        "value": 14.0,
+        "unit": "nm"
+      }
     }
   ]
 }

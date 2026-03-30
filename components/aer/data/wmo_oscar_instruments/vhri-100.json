@@ -3,36 +3,74 @@
   "instrument_acronym": "VHRI-100",
   "instrument_fullname": "Very High Resolution Imager - 100",
   "url": "https://space.oscar.wmo.int/instruments/view/vhri-100",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "475 nm",
-      "Spectral interval": "440 - 510 nm",
-      "SNR @ specified albedo": "100 @ 10 % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 475.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 440.0,
+        "max": 510.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 10 % albedo"
     },
     {
-      "Central wavelength": "550 nm",
-      "Spectral interval": "510 - 590 nm",
-      "SNR @ specified albedo": "100 @ 10 % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 550.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 510.0,
+        "max": 590.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 10 % albedo"
     },
     {
-      "Central wavelength": "635 nm",
-      "Spectral interval": "600 - 670 nm",
-      "SNR @ specified albedo": "100 @ 10 % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 635.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 600.0,
+        "max": 670.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 10 % albedo"
     },
     {
-      "Central wavelength": "835 nm",
-      "Spectral interval": "760 - 910 nm",
-      "SNR @ specified albedo": "100 @ 10 % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 835.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 760.0,
+        "max": 910.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 10 % albedo"
     },
     {
-      "Central wavelength": "PAN",
-      "Spectral interval": "450 - 650 nm",
-      "SNR @ specified albedo": "100 @ 10 % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": "PAN",
+      "bandwidth": {
+        "min": 450.0,
+        "max": 650.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "100 @ 10 % albedo"
     }
   ]
 }

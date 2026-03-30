@@ -3,31 +3,64 @@
   "instrument_acronym": "MRI",
   "instrument_fullname": "Medium Resolution Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/mri",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.485 µm",
-      "Spectral interval": "0.45 - 0.52 µm",
-      "SNR @ specified albedo": "…… @ ….. % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.485,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.52,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.560 µm",
-      "Spectral interval": "0.52 - 0.60 µm",
-      "SNR @ specified albedo": "…… @ ….. % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.56,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.6,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.660 µm",
-      "Spectral interval": "0.63 - 0.69 µm",
-      "SNR @ specified albedo": "…… @ ….. % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.66,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.63,
+        "max": 0.69,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.830 µm",
-      "Spectral interval": "0.76 - 0.90 µm",
-      "SNR @ specified albedo": "…… @ ….. % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.83,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.76,
+        "max": 0.9,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…… @ ….. % albedo"
     }
   ]
 }

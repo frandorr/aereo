@@ -1,0 +1,146 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "SAR (RadarSat-1)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar_radarsat-1",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "Standard",
+      "operation_mode": "Standard",
+      "spatial_resolution": {
+        "value": 25.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 100.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 500.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "HH/HV or VV/VH"
+    },
+    {
+      "channel_name": "Wide",
+      "operation_mode": "Fine",
+      "spatial_resolution": {
+        "value": 10.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 50.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 225.0,
+        "unit": "km, either right or left"
+      },
+      "polarisation": "HH/HV or VV/VH"
+    },
+    {
+      "channel_name": "Fine",
+      "operation_mode": "ScanSAR wide",
+      "spatial_resolution": {
+        "value": 100.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 500.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 500.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "HH/HV or VV/VH"
+    },
+    {
+      "channel_name": "ScanSAR Narrow",
+      "operation_mode": "ScanSAR narrow",
+      "spatial_resolution": {
+        "value": 50.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 300.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 420.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "HH/HV or VV/VH"
+    },
+    {
+      "channel_name": "ScanSAR Wide",
+      "operation_mode": "Polarimetric standard",
+      "spatial_resolution": {
+        "value": 25.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 25.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 350.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "VV/HH, HH/HV, VV/VH"
+    },
+    {
+      "channel_name": "Extended High",
+      "operation_mode": "Polarimetric fine",
+      "spatial_resolution": {
+        "value": 10.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 25.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 200.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "VV/HH, HH/HV, VV/VH"
+    },
+    {
+      "channel_name": "Extended Low",
+      "operation_mode": "Multi-look fine",
+      "spatial_resolution": {
+        "value": 10.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 50.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 350.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "HH or VV"
+    },
+    {
+      "channel_name": "Band_08",
+      "operation_mode": "Ultra-fine",
+      "spatial_resolution": {
+        "value": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 20.0,
+        "unit": "km"
+      },
+      "field_of_regard": {
+        "value": 150.0,
+        "unit": "km,  either right or left"
+      },
+      "polarisation": "HH or VV"
+    }
+  ]
+}

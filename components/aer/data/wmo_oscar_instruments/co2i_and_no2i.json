@@ -3,7 +3,8 @@
   "instrument_acronym": "CO2I and NO2I",
   "instrument_fullname": "Combined Carbon Dioxide and Nitrogen Dioxide Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/co2i%20and%20no2i",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Spectralband",
     "Spectralrange",
     "Spectralresolution",
@@ -11,28 +12,40 @@
   ],
   "channels": [
     {
-      "Spectralband": "VIS",
-      "Spectralrange": "405 - 490 nm",
-      "Spectralresolution": "0.6 nm",
-      "SNR @ specifiedinputspectral radiance": "…. @ … W m-2sr-1μm-1"
+      "channel_name": "Band_01",
+      "central_wavelength": "…. @ … W m-2sr-1μm-1",
+      "bandwidth": {
+        "min": 405.0,
+        "max": 490.0,
+        "unit": "nm"
+      }
     },
     {
-      "Spectralband": "NIR",
-      "Spectralrange": "747 - 773 nm",
-      "Spectralresolution": "0.12 nm",
-      "SNR @ specifiedinputspectral radiance": "... @ … W m-2sr-1μm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": "... @ … W m-2sr-1μm-1",
+      "bandwidth": {
+        "min": 747.0,
+        "max": 773.0,
+        "unit": "nm"
+      }
     },
     {
-      "Spectralband": "SWIR1",
-      "Spectralrange": "1590 - 1675 nm",
-      "Spectralresolution": "0.30 nm",
-      "SNR @ specifiedinputspectral radiance": "... @ … W m-2sr-1μm-1"
+      "channel_name": "Band_03",
+      "central_wavelength": "... @ … W m-2sr-1μm-1",
+      "bandwidth": {
+        "min": 1590.0,
+        "max": 1675.0,
+        "unit": "nm"
+      }
     },
     {
-      "Spectralband": "SWIR2",
-      "Spectralrange": "1990 - 2095 nm",
-      "Spectralresolution": "0.35 nm",
-      "SNR @ specifiedinputspectral radiance": "… @ … W m-2sr-1μm-1"
+      "channel_name": "Band_04",
+      "central_wavelength": "… @ … W m-2sr-1μm-1",
+      "bandwidth": {
+        "min": 1990.0,
+        "max": 2095.0,
+        "unit": "nm"
+      }
     }
   ]
 }

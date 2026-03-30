@@ -3,36 +3,74 @@
   "instrument_acronym": "KEIS",
   "instrument_fullname": "Kazakh Earth Imaging System",
   "url": "https://space.oscar.wmo.int/instruments/view/keis",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.475 μm",
-      "Spectral interval": "0.44 - 0.51 μm",
-      "SNR @ specified albedo": "….. @ ….. % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.475,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.44,
+        "max": 0.51,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "….. @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.555 μm",
-      "Spectral interval": "0.52 - 0.59 μm",
-      "SNR @ specified albedo": "….. @ ….. % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.555,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.59,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "….. @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.657.5 μm",
-      "Spectral interval": "0.63 - 0.685 μm",
-      "SNR @ specified albedo": "….. @ ….. % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": "0.657.5 μm",
+      "bandwidth": {
+        "min": 0.63,
+        "max": 0.685,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "….. @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.710 μm",
-      "Spectral interval": "0.69 - 0.73 μm",
-      "SNR @ specified albedo": "….. @ ….. % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.71,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.69,
+        "max": 0.73,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "….. @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.805 μm",
-      "Spectral interval": "0.76 - 0.85 μm",
-      "SNR @ specified albedo": "….. @ ….. % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 0.805,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.76,
+        "max": 0.85,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "….. @ ….. % albedo"
     }
   ]
 }

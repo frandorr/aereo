@@ -3,36 +3,74 @@
   "instrument_acronym": "DMAC",
   "instrument_fullname": "DubaiSat-1 Medium Aperture Camera",
   "url": "https://space.oscar.wmo.int/instruments/view/dmac",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "465 nm",
-      "Spectral interval": "420 - 510 nm",
-      "SNR @ specified albedo": "……… @ …… % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 465.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 420.0,
+        "max": 510.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……… @ …… % albedo"
     },
     {
-      "Central wavelength": "545 nm",
-      "Spectral interval": "510 - 580 nm",
-      "SNR @ specified albedo": "……… @ …… % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 545.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 510.0,
+        "max": 580.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……… @ …… % albedo"
     },
     {
-      "Central wavelength": "660 nm",
-      "Spectral interval": "600 - 720 nm",
-      "SNR @ specified albedo": "……… @ …… % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 660.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 600.0,
+        "max": 720.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……… @ …… % albedo"
     },
     {
-      "Central wavelength": "825 nm",
-      "Spectral interval": "760 - 890 nm",
-      "SNR @ specified albedo": "……… @ …… % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 825.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 760.0,
+        "max": 890.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……… @ …… % albedo"
     },
     {
-      "Central wavelength": "665 (PAN)",
-      "Spectral interval": "420 - 890 nm",
-      "SNR @ specified albedo": "……… @ …… % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": "665 (PAN)",
+      "bandwidth": {
+        "min": 420.0,
+        "max": 890.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……… @ …… % albedo"
     }
   ]
 }

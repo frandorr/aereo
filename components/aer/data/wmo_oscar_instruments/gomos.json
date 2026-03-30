@@ -3,7 +3,8 @@
   "instrument_acronym": "GOMOS",
   "instrument_fullname": "Global Ozone Monitoring by Occultation of Stars ",
   "url": "https://space.oscar.wmo.int/instruments/view/gomos",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range",
     "No. of channels",
     "Spectral resolution",
@@ -11,34 +12,80 @@
   ],
   "channels": [
     {
-      "Spectral range": "248-693 nm",
+      "channel_name": "Band_01",
+      "Spectral range": {
+        "min": 248.0,
+        "max": 693.0,
+        "unit": "nm"
+      },
       "No. of channels": "~ 500",
-      "Spectral resolution": "0.89 nm",
-      "SNR @ specified input spectral radiance": "................. @ ......... W m-2sr-1μm-1"
+      "spectral_resolution": {
+        "value": 0.89,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "................. @ ......... W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "750-776 nm",
+      "channel_name": "Band_02",
+      "Spectral range": {
+        "min": 750.0,
+        "max": 776.0,
+        "unit": "nm"
+      },
       "No. of channels": "~ 200",
-      "Spectral resolution": "0.12 nm",
-      "SNR @ specified input spectral radiance": "................. @ ......... W m-2sr-1μm-1"
+      "spectral_resolution": {
+        "value": 0.12,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "................. @ ......... W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "915-956 nm",
+      "channel_name": "Band_03",
+      "Spectral range": {
+        "min": 915.0,
+        "max": 956.0,
+        "unit": "nm"
+      },
       "No. of channels": "~ 300",
-      "Spectral resolution": "0.12 nm",
-      "SNR @ specified input spectral radiance": "................. @ ......... W m-2sr-1μm-1"
+      "spectral_resolution": {
+        "value": 0.12,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "................. @ ......... W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "466-582 nm",
-      "No. of channels": "1",
-      "Spectral resolution": "116 nm",
-      "SNR @ specified input spectral radiance": "................. @ ......... W m-2sr-1μm-1"
+      "channel_name": "Band_04",
+      "Spectral range": {
+        "min": 466.0,
+        "max": 582.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 116.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "................. @ ......... W m-2sr-1μm-1"
     },
     {
-      "Spectral range": "644-705 nm",
-      "No. of channels": "1",
-      "Spectral resolution": "61 nm",
-      "SNR @ specified input spectral radiance": "................. @ ......... W m-2sr-1μm-1"
+      "channel_name": "Band_05",
+      "Spectral range": {
+        "min": 644.0,
+        "max": 705.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 61.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "................. @ ......... W m-2sr-1μm-1"
     }
   ]
 }

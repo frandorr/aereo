@@ -3,7 +3,8 @@
   "instrument_acronym": "MWHS-1",
   "instrument_fullname": "Micro-Wave Humidity Sounder -1",
   "url": "https://space.oscar.wmo.int/instruments/view/mwhs-1",
-  "columns": [
+  "schema_type": "microwave",
+  "original_columns": [
     "No.",
     "Central frequency (GHz)",
     "Bandwidth (MHz)",
@@ -12,39 +13,95 @@
   ],
   "channels": [
     {
-      "No.": "1",
-      "Central frequency (GHz)": "150",
-      "Bandwidth (MHz)": "1000",
-      "Polarisation": "V",
-      "NEΔT": "0.9 K"
+      "channel_name": "Band_01",
+      "No.": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 150,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 1000,
+        "unit": null
+      },
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.9,
+        "unit": "K"
+      }
     },
     {
-      "No.": "2",
-      "Central frequency (GHz)": "150",
-      "Bandwidth (MHz)": "1000",
-      "Polarisation": "H",
-      "NEΔT": "0.9 k"
+      "channel_name": "Band_02",
+      "No.": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 150,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 1000,
+        "unit": null
+      },
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.9,
+        "unit": "k"
+      }
     },
     {
-      "No.": "3",
-      "Central frequency (GHz)": "183.31 ± 1.0",
-      "Bandwidth (MHz)": "500",
-      "Polarisation": "H",
-      "NEΔT": "1.1 K"
+      "channel_name": "Band_03",
+      "No.": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": "183.31 ± 1.0",
+      "bandwidth": {
+        "value": 500,
+        "unit": null
+      },
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 1.1,
+        "unit": "K"
+      }
     },
     {
-      "No.": "4",
-      "Central frequency (GHz)": "183.31 ± 3.0",
-      "Bandwidth (MHz)": "1000",
-      "Polarisation": "H",
-      "NEΔT": "0.9 K"
+      "channel_name": "Band_04",
+      "No.": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": "183.31 ± 3.0",
+      "bandwidth": {
+        "value": 1000,
+        "unit": null
+      },
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.9,
+        "unit": "K"
+      }
     },
     {
-      "No.": "5",
-      "Central frequency (GHz)": "183.31 ± 7.0",
-      "Bandwidth (MHz)": "2000",
-      "Polarisation": "H",
-      "NEΔT": "0.9 K"
+      "channel_name": "Band_05",
+      "No.": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": "183.31 ± 7.0",
+      "bandwidth": {
+        "value": 2000,
+        "unit": null
+      },
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.9,
+        "unit": "K"
+      }
     }
   ]
 }
