@@ -3,7 +3,8 @@
   "instrument_acronym": "ASTER",
   "instrument_fullname": "Advanced Spaceborne Thermal Emission and Reflection radiometer ",
   "url": "https://space.oscar.wmo.int/instruments/view/aster",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR or NEΔT @ specified input",
@@ -11,88 +12,257 @@
   ],
   "channels": [
     {
-      "Central wavelength": "0.56 µm",
-      "Spectral interval": "0.52-0.60 µm",
-      "SNR or NEΔT @ specified input": "140 @ 70% albedo",
-      "Resolution s.s.p.": "15 m"
+      "channel_name": "B01",
+      "central_wavelength": {
+        "value": 0.56,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.6,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "140 @ 70% albedo",
+      "spatial_resolution": {
+        "value": 15.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "0.66 µm",
-      "Spectral interval": "0.63-0.69 µm",
-      "SNR or NEΔT @ specified input": "140 @ 70% albedo",
-      "Resolution s.s.p.": "15 m"
+      "channel_name": "B02",
+      "central_wavelength": {
+        "value": 0.66,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.63,
+        "max": 0.69,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "140 @ 70% albedo",
+      "spatial_resolution": {
+        "value": 15.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "0.81 µm",
-      "Spectral interval": "0.76-0.86 µm",
-      "SNR or NEΔT @ specified input": "140 @ 70% albedo",
-      "Resolution s.s.p.": "15 m"
+      "channel_name": "B3N",
+      "central_wavelength": {
+        "value": 0.81,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.76,
+        "max": 0.86,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "140 @ 70% albedo",
+      "spatial_resolution": {
+        "value": 15.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "1.65 µm",
-      "Spectral interval": "1.60-1.70 µm",
-      "SNR or NEΔT @ specified input": "140 @ 70% albedo",
-      "Resolution s.s.p.": "30 m"
+      "channel_name": "B3B",
+      "central_wavelength": {
+        "value": 1.65,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 1.6,
+        "max": 1.7,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "140 @ 70% albedo",
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "2.165 µm",
-      "Spectral interval": "2.145-2.185 µm",
-      "SNR or NEΔT @ specified input": "54 @ 70% albedo",
-      "Resolution s.s.p.": "30 m"
+      "channel_name": "B04",
+      "central_wavelength": {
+        "value": 2.165,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 2.145,
+        "max": 2.185,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "54 @ 70% albedo",
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "2.205 µm",
-      "Spectral interval": "2.185-2.225 µm",
-      "SNR or NEΔT @ specified input": "54 @ 70% albedo",
-      "Resolution s.s.p.": "30 m"
+      "channel_name": "B05",
+      "central_wavelength": {
+        "value": 2.205,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 2.185,
+        "max": 2.225,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "54 @ 70% albedo",
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "2.260 µm",
-      "Spectral interval": "2.235-2.285 µm",
-      "SNR or NEΔT @ specified input": "54 @ 70% albedo",
-      "Resolution s.s.p.": "30 m"
+      "channel_name": "B06",
+      "central_wavelength": {
+        "value": 2.26,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 2.235,
+        "max": 2.285,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "54 @ 70% albedo",
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "2.330 µm",
-      "Spectral interval": "2.295-2.365 µm",
-      "SNR or NEΔT @ specified input": "70 @ 70% albedo",
-      "Resolution s.s.p.": "30 m"
+      "channel_name": "B07",
+      "central_wavelength": {
+        "value": 2.33,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 2.295,
+        "max": 2.365,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "70 @ 70% albedo",
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "2.395 µm",
-      "Spectral interval": "2.360-2.430 µm",
-      "SNR or NEΔT @ specified input": "54 @ 70% albedo",
-      "Resolution s.s.p.": "30 m"
+      "channel_name": "B08",
+      "central_wavelength": {
+        "value": 2.395,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 2.36,
+        "max": 2.43,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "54 @ 70% albedo",
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "8.30 µm",
-      "Spectral interval": "8.125-8.475 µm",
-      "SNR or NEΔT @ specified input": "0.3 K @ 300 K",
-      "Resolution s.s.p.": "90 m"
+      "channel_name": "B09",
+      "central_wavelength": {
+        "value": 8.3,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 8.125,
+        "max": 8.475,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.3,
+        "unit": "K @ 300 K"
+      },
+      "spatial_resolution": {
+        "value": 90.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "8.65 µm",
-      "Spectral interval": "8.475-8.825 µm",
-      "SNR or NEΔT @ specified input": "0.3 K @ 300 K",
-      "Resolution s.s.p.": "90 m"
+      "channel_name": "B10",
+      "central_wavelength": {
+        "value": 8.65,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 8.475,
+        "max": 8.825,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.3,
+        "unit": "K @ 300 K"
+      },
+      "spatial_resolution": {
+        "value": 90.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "9.10 µm",
-      "Spectral interval": "8.925-9.275 µm",
-      "SNR or NEΔT @ specified input": "0.3 K @ 300 K",
-      "Resolution s.s.p.": "90 m"
+      "channel_name": "B11",
+      "central_wavelength": {
+        "value": 9.1,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 8.925,
+        "max": 9.275,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.3,
+        "unit": "K @ 300 K"
+      },
+      "spatial_resolution": {
+        "value": 90.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "10.60 µm",
-      "Spectral interval": "10.25-10.95 µm",
-      "SNR or NEΔT @ specified input": "0.3 K @ 300 K",
-      "Resolution s.s.p.": "90 m"
+      "channel_name": "B12",
+      "central_wavelength": {
+        "value": 10.6,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 10.25,
+        "max": 10.95,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.3,
+        "unit": "K @ 300 K"
+      },
+      "spatial_resolution": {
+        "value": 90.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "11.30 µm",
-      "Spectral interval": "10.95-11.65 µm",
-      "SNR or NEΔT @ specified input": "0.3 K @ 300 K",
-      "Resolution s.s.p.": "90 m"
+      "channel_name": "B13",
+      "central_wavelength": {
+        "value": 11.3,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 10.95,
+        "max": 11.65,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.3,
+        "unit": "K @ 300 K"
+      },
+      "spatial_resolution": {
+        "value": 90.0,
+        "unit": "m"
+      }
     }
   ]
 }

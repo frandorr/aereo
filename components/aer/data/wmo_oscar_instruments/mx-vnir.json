@@ -3,41 +3,90 @@
   "instrument_acronym": "MX-VNIR",
   "instrument_fullname": "Multi-spectral Visible  Near Infrared",
   "url": "https://space.oscar.wmo.int/instruments/view/mx-vnir",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "0.485 µm",
-      "Spectral interval": "0.45-0.52 µm",
-      "SNR @ specified input": "200 @ 100 % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.485,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.52,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 100 % albedo"
     },
     {
-      "Central wavelength": "0.555 µm",
-      "Spectral interval": "0.52-0.59 µm",
-      "SNR @ specified input": "200 @ 100 % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.555,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.59,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 100 % albedo"
     },
     {
-      "Central wavelength": "0.650 µm",
-      "Spectral interval": "0.62-0.68 µm",
-      "SNR @ specified input": "200 @ 100 % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.65,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.62,
+        "max": 0.68,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 100 % albedo"
     },
     {
-      "Central wavelength": "0.725 µm",
-      "Spectral interval": "0.71-0.74 µm",
-      "SNR @ specified input": "200 @ 100 % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.725,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.71,
+        "max": 0.74,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 100 % albedo"
     },
     {
-      "Central wavelength": "0.815 µm",
-      "Spectral interval": "0.77-0.86 µm",
-      "SNR @ specified input": "200 @ 100 % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 0.815,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.77,
+        "max": 0.86,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 100 % albedo"
     },
     {
-      "Central wavelength": "0.860 µm",
-      "Spectral interval": "0.845-0.875 µm",
-      "SNR @ specified input": "200 @ 100 % albedo"
+      "channel_name": "Band_06",
+      "central_wavelength": {
+        "value": 0.86,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.845,
+        "max": 0.875,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 100 % albedo"
     }
   ]
 }

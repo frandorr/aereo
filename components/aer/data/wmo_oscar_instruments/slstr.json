@@ -3,66 +3,161 @@
   "instrument_acronym": "SLSTR",
   "instrument_fullname": "Sea and Land Surface Temperature Radiometer ",
   "url": "https://space.oscar.wmo.int/instruments/view/slstr",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Bandwidth",
     "SNR or NEΔT @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "0.555 µm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "25 @ 0.5 % albedo"
+      "channel_name": "S1",
+      "central_wavelength": {
+        "value": 0.555,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "25 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "0.659 µm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "25 @ 0.5 % albedo"
+      "channel_name": "S2",
+      "central_wavelength": {
+        "value": 0.659,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "25 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "0.865 µm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "21 @ 0.5 % albedo"
+      "channel_name": "S3",
+      "central_wavelength": {
+        "value": 0.865,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "21 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "1.375 µm",
-      "Bandwidth": "20 nm",
-      "SNR or NEΔT @ specified input": "25 @ 0.5 % albedo"
+      "channel_name": "S4",
+      "central_wavelength": {
+        "value": 1.375,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "25 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "1.61 µm",
-      "Bandwidth": "60 nm",
-      "SNR or NEΔT @ specified input": "37 @ 0.5 % albedo"
+      "channel_name": "S5",
+      "central_wavelength": {
+        "value": 1.61,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 60.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "37 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "2.25 µm",
-      "Bandwidth": "50 nm",
-      "SNR or NEΔT @ specified input": "27 @ 0.5 % albedo"
+      "channel_name": "S6",
+      "central_wavelength": {
+        "value": 2.25,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "27 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "3.74 µm",
-      "Bandwidth": "380 nm",
-      "SNR or NEΔT @ specified input": "0.056 K @ 270 K"
+      "channel_name": "S7",
+      "central_wavelength": {
+        "value": 3.74,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 380.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": {
+        "value": 0.056,
+        "unit": "K @ 270 K"
+      }
     },
     {
-      "Central wavelength": "3.74 µm (fire)",
-      "Bandwidth": "380 nm",
-      "SNR or NEΔT @ specified input": "0.680-0.016 K @ 285-500 K"
+      "channel_name": "S8",
+      "central_wavelength": {
+        "value": 3.74,
+        "unit": "µm (fire)"
+      },
+      "bandwidth": {
+        "value": 380.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": {
+        "min": 0.68,
+        "max": 0.016,
+        "unit": "K @ 285-500 K"
+      }
     },
     {
-      "Central wavelength": "10.85 µm",
-      "Bandwidth": "900 nm",
-      "SNR or NEΔT @ specified input": "0.029 K @ 270 K"
+      "channel_name": "S9",
+      "central_wavelength": {
+        "value": 10.85,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 900.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": {
+        "value": 0.029,
+        "unit": "K @ 270 K"
+      }
     },
     {
-      "Central wavelength": "10.85 µm (fire)",
-      "Bandwidth": "900 nm",
-      "SNR or NEΔT @ specified input": "0.079-0.035 K @ 230-400 K"
+      "channel_name": "F1",
+      "central_wavelength": {
+        "value": 10.85,
+        "unit": "µm (fire)"
+      },
+      "bandwidth": {
+        "value": 900.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": {
+        "min": 0.079,
+        "max": 0.035,
+        "unit": "K @ 230-400 K"
+      }
     },
     {
-      "Central wavelength": "12.0 µm",
-      "Bandwidth": "1000 nm",
-      "SNR or NEΔT @ specified input": "0.021 K @ 270 K"
+      "channel_name": "F2",
+      "central_wavelength": {
+        "value": 12.0,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 1000.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": {
+        "value": 0.021,
+        "unit": "K @ 270 K"
+      }
     }
   ]
 }

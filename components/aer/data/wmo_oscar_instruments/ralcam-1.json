@@ -3,31 +3,61 @@
   "instrument_acronym": "RALCam-1",
   "instrument_fullname": "Rutherford Appleton Laboratory Camera - 1",
   "url": "https://space.oscar.wmo.int/instruments/view/ralcam-1",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "485 nm",
-      "Spectral interval": "420-550 nm",
-      "SNR @ specified albedo": "…….. @ ……. % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 485.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 420.0,
+        "max": 550.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……. % albedo"
     },
     {
-      "Central wavelength": "590 nm",
-      "Spectral interval": "550-630 nm",
-      "SNR @ specified albedo": "…….. @ ……. % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 590.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 550.0,
+        "max": 630.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……. % albedo"
     },
     {
-      "Central wavelength": "655 nm",
-      "Spectral interval": "580-730 nm",
-      "SNR @ specified albedo": "…….. @ ……. % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 655.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 580.0,
+        "max": 730.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……. % albedo"
     },
     {
-      "Central wavelength": "N/A  (PAN)",
-      "Spectral interval": "420-730 nm",
-      "SNR @ specified albedo": "…….. @ ……. % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": "N/A  (PAN)",
+      "bandwidth": {
+        "min": 420.0,
+        "max": 730.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……. % albedo"
     }
   ]
 }

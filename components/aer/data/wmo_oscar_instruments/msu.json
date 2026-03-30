@@ -3,7 +3,8 @@
   "instrument_acronym": "MSU",
   "instrument_fullname": "Microwave Sounding Unit",
   "url": "https://space.oscar.wmo.int/instruments/view/msu",
-  "columns": [
+  "schema_type": "microwave",
+  "original_columns": [
     "Channel Number",
     "Central frequency (GHz)",
     "Bandwidth (MHz)",
@@ -12,32 +13,84 @@
   ],
   "channels": [
     {
-      "Channel Number": "1",
-      "Central frequency (GHz)": "50.30",
-      "Bandwidth (MHz)": "200",
-      "Polarisation": "V",
-      "NEΔT": "0.3 K"
+      "channel_name": "CH01",
+      "Channel Number": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 50.3,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 200,
+        "unit": null
+      },
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.3,
+        "unit": "K"
+      }
     },
     {
-      "Channel Number": "2",
-      "Central frequency (GHz)": "53.74",
-      "Bandwidth (MHz)": "200",
-      "Polarisation": "V",
-      "NEΔT": "0.3 K"
+      "channel_name": "CH02",
+      "Channel Number": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 53.74,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 200,
+        "unit": null
+      },
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.3,
+        "unit": "K"
+      }
     },
     {
-      "Channel Number": "3",
-      "Central frequency (GHz)": "54.96",
-      "Bandwidth (MHz)": "200",
-      "Polarisation": "V",
-      "NEΔT": "0.3 K"
+      "channel_name": "CH03",
+      "Channel Number": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 54.96,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 200,
+        "unit": null
+      },
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.3,
+        "unit": "K"
+      }
     },
     {
-      "Channel Number": "4",
-      "Central frequency (GHz)": "57.95",
-      "Bandwidth (MHz)": "200",
-      "Polarisation": "V",
-      "NEΔT": "0.3 K"
+      "channel_name": "CH04",
+      "Channel Number": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 57.95,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 200,
+        "unit": null
+      },
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.3,
+        "unit": "K"
+      }
     }
   ]
 }

@@ -3,36 +3,74 @@
   "instrument_acronym": "RSI",
   "instrument_fullname": "Remote Sensing Instrument ",
   "url": "https://space.oscar.wmo.int/instruments/view/rsi",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.485 μm",
-      "Spectral interval": "0.45 - 0.52 μm",
-      "SNR @ specified albedo": "……... @ ……. % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.485,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.52,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "……... @ ……. % albedo"
     },
     {
-      "Central wavelength": "0.560 μm",
-      "Spectral interval": "0.52 - 0.60 μm",
-      "SNR @ specified albedo": "……... @ ……. % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.56,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.6,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "……... @ ……. % albedo"
     },
     {
-      "Central wavelength": "0.660 μm",
-      "Spectral interval": "0.63 - 0.69 μm",
-      "SNR @ specified albedo": "……... @ ……. % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.66,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.63,
+        "max": 0.69,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "……... @ ……. % albedo"
     },
     {
-      "Central wavelength": "0.830 μm",
-      "Spectral interval": "0.76 - 0.90 μm",
-      "SNR @ specified albedo": "……... @ ……. % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.83,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.76,
+        "max": 0.9,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "……... @ ……. % albedo"
     },
     {
-      "Central wavelength": "PAN",
-      "Spectral interval": "0.45 - 0.90 μm",
-      "SNR @ specified albedo": "……... @ ……. % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": "PAN",
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.9,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "……... @ ……. % albedo"
     }
   ]
 }

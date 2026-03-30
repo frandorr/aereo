@@ -1,0 +1,62 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MS (THEOS-2)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/ms_theos-2",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 490.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 450.0,
+        "max": 530.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……. % albedo"
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 565.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 530.0,
+        "max": 600.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……. % albedo"
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 665.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 630.0,
+        "max": 700.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……. % albedo"
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 815.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 760.0,
+        "max": 870.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…….. @ ……. % albedo"
+    }
+  ]
+}

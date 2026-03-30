@@ -3,36 +3,74 @@
   "instrument_acronym": "HiRI",
   "instrument_fullname": "High-Resolution Imager ",
   "url": "https://space.oscar.wmo.int/instruments/view/hiri",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.49 µm",
-      "Spectral interval": "0.45 - 0.53 µm",
-      "SNR @ specified albedo": "141 @ 50 % albedo, SZA 60°"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.49,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.53,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "141 @ 50 % albedo, SZA 60°"
     },
     {
-      "Central wavelength": "0.55 µm",
-      "Spectral interval": "0.52 - 0.58 µm",
-      "SNR @ specified albedo": "139 @ 50 % albedo, SZA 60°"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.55,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.58,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "139 @ 50 % albedo, SZA 60°"
     },
     {
-      "Central wavelength": "0.66 µm",
-      "Spectral interval": "0.62 - 0.70 µm",
-      "SNR @ specified albedo": "145 @ 50 % albedo, SZA 60°"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.66,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.62,
+        "max": 0.7,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "145 @ 50 % albedo, SZA 60°"
     },
     {
-      "Central wavelength": "0.83 µm",
-      "Spectral interval": "0.78 - 0.89 µm",
-      "SNR @ specified albedo": "184 @ 70 % albedo, SZA 60°"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.83,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.78,
+        "max": 0.89,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "184 @ 70 % albedo, SZA 60°"
     },
     {
-      "Central wavelength": "N/A (PAN)",
-      "Spectral interval": "0.48 - 0.90 µm",
-      "SNR @ specified albedo": "145 @ 50 % albedo, SZA 60°"
+      "channel_name": "Band_05",
+      "central_wavelength": "N/A (PAN)",
+      "bandwidth": {
+        "min": 0.48,
+        "max": 0.9,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "145 @ 50 % albedo, SZA 60°"
     }
   ]
 }

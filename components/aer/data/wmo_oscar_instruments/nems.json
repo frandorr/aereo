@@ -3,7 +3,8 @@
   "instrument_acronym": "NEMS",
   "instrument_fullname": "Nimbus-E Microwave Sounder",
   "url": "https://space.oscar.wmo.int/instruments/view/nems",
-  "columns": [
+  "schema_type": "microwave",
+  "original_columns": [
     "No.",
     "Central frequency (GHz)",
     "Bandwidth (MHz)",
@@ -11,34 +12,99 @@
   ],
   "channels": [
     {
-      "No.": "1",
-      "Central frequency (GHz)": "22.235",
-      "Bandwidth (MHz)": "220",
-      "NEΔT": "0.24 K"
+      "channel_name": "Band_01",
+      "No.": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 22.235,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 220,
+        "unit": null
+      },
+      "NEΔT": {
+        "value": 0.24,
+        "unit": "K"
+      }
     },
     {
-      "No.": "2",
-      "Central frequency (GHz)": "31.400",
-      "Bandwidth (MHz)": "250",
-      "NEΔT": "0.23 K"
+      "channel_name": "Band_02",
+      "No.": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 31.4,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 250,
+        "unit": null
+      },
+      "NEΔT": {
+        "value": 0.23,
+        "unit": "K"
+      }
     },
     {
-      "No.": "3",
-      "Central frequency (GHz)": "53.650",
-      "Bandwidth (MHz)": "250",
-      "NEΔT": "0.29 K"
+      "channel_name": "Band_03",
+      "No.": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 53.65,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 250,
+        "unit": null
+      },
+      "NEΔT": {
+        "value": 0.29,
+        "unit": "K"
+      }
     },
     {
-      "No.": "4",
-      "Central frequency (GHz)": "54.900",
-      "Bandwidth (MHz)": "250",
-      "NEΔT": "0.29 K"
+      "channel_name": "Band_04",
+      "No.": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 54.9,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 250,
+        "unit": null
+      },
+      "NEΔT": {
+        "value": 0.29,
+        "unit": "K"
+      }
     },
     {
-      "No.": "5",
-      "Central frequency (GHz)": "58.800",
-      "Bandwidth (MHz)": "250",
-      "NEΔT": "0.24 K"
+      "channel_name": "Band_05",
+      "No.": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 58.8,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 250,
+        "unit": null
+      },
+      "NEΔT": {
+        "value": 0.24,
+        "unit": "K"
+      }
     }
   ]
 }

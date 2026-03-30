@@ -3,36 +3,80 @@
   "instrument_acronym": "MTVZA-OK (optical)",
   "instrument_fullname": "Combined Microwave-Optical Imaging/Sounding Radiometer (optical component)",
   "url": "https://space.oscar.wmo.int/instruments/view/mtvza-ok%20%28optical%29",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR or NEΔT @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "0.41 µm",
-      "Spectral interval": "0.37-0.45 µm",
-      "SNR or NEΔT @ specified input": "8.1 @ 0.5 % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.41,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.37,
+        "max": 0.45,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "8.1 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "0.51 µm",
-      "Spectral interval": "0.45-0.51 µm",
-      "SNR or NEΔT @ specified input": "8.1 @ 0.5 % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.51,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.51,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "8.1 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "0.63 µm",
-      "Spectral interval": "0.58-0.68 µm",
-      "SNR or NEΔT @ specified input": "8.1 @ 0.5 % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.63,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.58,
+        "max": 0.68,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "8.1 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "0.73 µm",
-      "Spectral interval": "0.68-0.78 µm",
-      "SNR or NEΔT @ specified input": "8.1 @ 0.5 % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.73,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.68,
+        "max": 0.78,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "8.1 @ 0.5 % albedo"
     },
     {
-      "Central wavelength": "3.74 µm",
-      "Spectral interval": "3.55-3.93 µm",
-      "SNR or NEΔT @ specified input": "0.2 K @ 300 K"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 3.74,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 3.55,
+        "max": 3.93,
+        "unit": "µm"
+      },
+      "snr_or_nedt": {
+        "value": 0.2,
+        "unit": "K @ 300 K"
+      }
     }
   ]
 }

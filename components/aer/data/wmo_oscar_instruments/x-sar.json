@@ -3,7 +3,8 @@
   "instrument_acronym": "X-SAR",
   "instrument_fullname": "X-SAR",
   "url": "https://space.oscar.wmo.int/instruments/view/x-sar",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -11,16 +12,30 @@
   ],
   "channels": [
     {
-      "Operation mode": "Spotlight",
-      "Resolution": "1 m",
-      "Swath": "10 km",
-      "Polarisation": "VV"
+      "channel_name": "Band_01",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": {
+        "value": 1.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 10.0,
+        "unit": "km"
+      },
+      "polarisation": "VV"
     },
     {
-      "Operation mode": "Stripmap",
-      "Resolution": "3 m",
-      "Swath": "30 km",
-      "Polarisation": "VV"
+      "channel_name": "Band_02",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "value": 3.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 30.0,
+        "unit": "km"
+      },
+      "polarisation": "VV"
     }
   ]
 }

@@ -3,7 +3,8 @@
   "instrument_acronym": "MADRAS",
   "instrument_fullname": "Microwave Analysis & Detection of Rain & Atmospheric Structures",
   "url": "https://space.oscar.wmo.int/instruments/view/madras",
-  "columns": [
+  "schema_type": "microwave",
+  "original_columns": [
     "No.",
     "Central frequency (GHz)",
     "Bandwidth (MHz)",
@@ -14,49 +15,129 @@
   ],
   "channels": [
     {
-      "No.": "1",
-      "Central frequency (GHz)": "18.7",
-      "Bandwidth (MHz)": "200",
-      "Polarisations": "V, H",
-      "NEΔT": "0.43 K",
-      "IFOV": "40 x 60 km",
-      "Pixel": "40 x16 km"
+      "channel_name": "Band_01",
+      "No.": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 18.7,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 200,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.43,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 40.0,
+        "y": 16.0,
+        "unit": "km"
+      }
     },
     {
-      "No.": "2",
-      "Central frequency (GHz)": "23.8",
-      "Bandwidth (MHz)": "400",
-      "Polarisations": "V",
-      "NEΔT": "0.44  K",
-      "IFOV": "31 x 47 km",
-      "Pixel": "40 x16 km"
+      "channel_name": "Band_02",
+      "No.": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 23.8,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 400,
+        "unit": null
+      },
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.44,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 40.0,
+        "y": 16.0,
+        "unit": "km"
+      }
     },
     {
-      "No.": "3",
-      "Central frequency (GHz)": "36.5",
-      "Bandwidth (MHz)": "1000",
-      "Polarisations": "V, H",
-      "NEΔT": "0.36 K",
-      "IFOV": "20 x 31 km",
-      "Pixel": "40 x16 km"
+      "channel_name": "Band_03",
+      "No.": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 36.5,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 1000,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.36,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 40.0,
+        "y": 16.0,
+        "unit": "km"
+      }
     },
     {
-      "No.": "4",
-      "Central frequency (GHz)": "89.0",
-      "Bandwidth (MHz)": "1700",
-      "Polarisations": "V, H",
-      "NEΔT": "0.42 K",
-      "IFOV": "10 x15 km",
-      "Pixel": "10 x16 km"
+      "channel_name": "Band_04",
+      "No.": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 89.0,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 1700,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.42,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 10.0,
+        "y": 16.0,
+        "unit": "km"
+      }
     },
     {
-      "No.": "5",
-      "Central frequency (GHz)": "157.0",
-      "Bandwidth (MHz)": "1700",
-      "Polarisations": "V, H",
-      "NEΔT": "1.13 K",
-      "IFOV": "6 x 9 km",
-      "Pixel": "6 x16 km"
+      "channel_name": "Band_05",
+      "No.": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 157.0,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 1700,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 1.13,
+        "unit": "K"
+      },
+      "spatial_resolution": {
+        "x": 6.0,
+        "y": 16.0,
+        "unit": "km"
+      }
     }
   ]
 }

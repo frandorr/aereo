@@ -1,33 +1,66 @@
 {
   "instrument_id": 594,
-  "instrument_acronym": "Végétation ",
+  "instrument_acronym": "Végétation",
   "instrument_fullname": "Végétation",
   "url": "https://space.oscar.wmo.int/instruments/view/v%C3%A9g%C3%A9tation%20",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.450 µm",
-      "Spectral interval": "0.43 - 0.47 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.45,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.43,
+        "max": 0.47,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.645 µm",
-      "Spectral interval": "0.61 - 0.68 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.645,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.61,
+        "max": 0.68,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.835 µm",
-      "Spectral interval": "0.78 - 0.89 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.835,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.78,
+        "max": 0.89,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "1.645 µm",
-      "Spectral interval": "1.58 - 1.75 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 1.645,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 1.58,
+        "max": 1.75,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     }
   ]
 }

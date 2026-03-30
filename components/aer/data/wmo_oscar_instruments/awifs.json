@@ -3,31 +3,48 @@
   "instrument_acronym": "AWiFS",
   "instrument_fullname": "Advanced Wide Field Sensor",
   "url": "https://space.oscar.wmo.int/instruments/view/awifs",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified input spectral radiance"
   ],
   "channels": [
     {
-      "Central wavelength": "0.555 µm",
-      "Spectral interval": "0.52 - 0.59 µm",
-      "SNR @ specified input spectral radiance": "752 @ 550 W m-2sr-1µm-1"
+      "channel_name": "Band_01",
+      "central_wavelength": "752 @ 550 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.59,
+        "unit": "µm"
+      }
     },
     {
-      "Central wavelength": "0.650 µm",
-      "Spectral interval": "0.62 - 0.68 µm",
-      "SNR @ specified input spectral radiance": "738 @ 510 W m-2sr-1µm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": "738 @ 510 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.62,
+        "max": 0.68,
+        "unit": "µm"
+      }
     },
     {
-      "Central wavelength": "0.815 µm",
-      "Spectral interval": "0.77 - 0.86 µm",
-      "SNR @ specified input spectral radiance": "753 @ 305 W m-2sr-1µm-1"
+      "channel_name": "Band_03",
+      "central_wavelength": "753 @ 305 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.77,
+        "max": 0.86,
+        "unit": "µm"
+      }
     },
     {
-      "Central wavelength": "1.625 µm",
-      "Spectral interval": "1.55 - 1.70 µm",
-      "SNR @ specified input spectral radiance": "1179 @ 75 W m-2sr-1µm-1"
+      "channel_name": "Band_04",
+      "central_wavelength": "1179 @ 75 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 1.55,
+        "max": 1.7,
+        "unit": "µm"
+      }
     }
   ]
 }

@@ -3,36 +3,74 @@
   "instrument_acronym": "SkySat",
   "instrument_fullname": "SkySat",
   "url": "https://space.oscar.wmo.int/instruments/view/skysat",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "N/A (PAN)",
-      "Spectral interval": "450-900 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": "N/A (PAN)",
+      "bandwidth": {
+        "min": 450.0,
+        "max": 900.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     },
     {
-      "Central wavelength": "482 nm",
-      "Spectral interval": "450-515 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 482.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 450.0,
+        "max": 515.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     },
     {
-      "Central wavelength": "555 nm",
-      "Spectral interval": "515-595 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 555.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 515.0,
+        "max": 595.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     },
     {
-      "Central wavelength": "650 nm",
-      "Spectral interval": "605-695 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 650.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 605.0,
+        "max": 695.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     },
     {
-      "Central wavelength": "820 nm",
-      "Spectral interval": "740-900 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 820.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 740.0,
+        "max": 900.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     }
   ]
 }

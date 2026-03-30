@@ -3,7 +3,8 @@
   "instrument_acronym": "Sentinel-4",
   "instrument_fullname": "UVN: Ultra-violet, Visible and Near-infrared sounder",
   "url": "https://space.oscar.wmo.int/instruments/view/sentinel-4",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral ranges",
     "Number of channels",
     "Spectral resolution",
@@ -11,22 +12,58 @@
   ],
   "channels": [
     {
-      "Spectral ranges": "305-400 nm",
-      "Number of channels": "600",
-      "Spectral resolution": "0.5 nm",
-      "SNR at specified input spectral radiance": "200-1400 @ 40-120 W m-2sr-1μm-1"
+      "channel_name": "Band_01",
+      "Spectral ranges": {
+        "min": 305.0,
+        "max": 400.0,
+        "unit": "nm"
+      },
+      "number_of_channels": {
+        "value": 600,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.5,
+        "unit": "nm"
+      },
+      "snr_or_nedt": {
+        "value": 200.0,
+        "unit": "-1400 @ 40-120 W m-2sr-1μm-1"
+      }
     },
     {
-      "Spectral ranges": "400-500 nm",
-      "Number of channels": "600",
-      "Spectral resolution": "0.5 nm",
-      "SNR at specified input spectral radiance": "1400 @ 140 W m-2sr-1μm-1"
+      "channel_name": "Band_02",
+      "Spectral ranges": {
+        "min": 400.0,
+        "max": 500.0,
+        "unit": "nm"
+      },
+      "number_of_channels": {
+        "value": 600,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.5,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "1400 @ 140 W m-2sr-1μm-1"
     },
     {
-      "Spectral ranges": "755-775 nm",
-      "Number of channels": "300",
-      "Spectral resolution": "0.2 nm",
-      "SNR at specified input spectral radiance": "1200 @ 60 W m-2sr-1μm-1"
+      "channel_name": "Band_03",
+      "Spectral ranges": {
+        "min": 755.0,
+        "max": 775.0,
+        "unit": "nm"
+      },
+      "number_of_channels": {
+        "value": 300,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 0.2,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "1200 @ 60 W m-2sr-1μm-1"
     }
   ]
 }

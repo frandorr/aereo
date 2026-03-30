@@ -3,26 +3,51 @@
   "instrument_acronym": "OLS",
   "instrument_fullname": "Operational Linescan Systerm ",
   "url": "https://space.oscar.wmo.int/instruments/view/ols",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR or NEΔT @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "0.71 µm (day/night)",
-      "Spectral interval": "0.47-0.95 µm",
-      "SNR or NEΔT @ specified input": "… @ … W m-2sr-1µm-1"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.71,
+        "unit": "µm (day/night)"
+      },
+      "bandwidth": {
+        "min": 0.47,
+        "max": 0.95,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "… @ … W m-2sr-1µm-1"
     },
     {
-      "Central wavelength": "0.75 µm",
-      "Spectral interval": "0.40-1.10 µm",
-      "SNR or NEΔT @ specified input": "… @ … W m-2sr-1µm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.75,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.4,
+        "max": 1.1,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "… @ … W m-2sr-1µm-1"
     },
     {
-      "Central wavelength": "11.7 µm",
-      "Spectral interval": "10.0-13.4 µm",
-      "SNR or NEΔT @ specified input": "… K @ 300 K"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 11.7,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 10.0,
+        "max": 13.4,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "… K @ 300 K"
     }
   ]
 }

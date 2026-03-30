@@ -3,7 +3,8 @@
   "instrument_acronym": "PALSAR",
   "instrument_fullname": "Phased-Array L-band Synthetic Aperture Radar",
   "url": "https://space.oscar.wmo.int/instruments/view/palsar",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -12,32 +13,78 @@
   ],
   "channels": [
     {
-      "Operation mode": "Highest resolution",
-      "Resolution": "7-44 m",
-      "Swath": "40-70 km",
-      "Polarisation": "HH or VV",
-      "Incidence angle": "8-60°"
+      "channel_name": "Band_01",
+      "operation_mode": "Highest resolution",
+      "spatial_resolution": {
+        "min": 7.0,
+        "max": 44.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "min": 40.0,
+        "max": 70.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV",
+      "field_of_regard": {
+        "value": 8.0,
+        "unit": "-60°"
+      }
     },
     {
-      "Operation mode": "High resolution",
-      "Resolution": "14-89 m",
-      "Swath": "40-70 km",
-      "Polarisation": "HH/HV or VV/VH",
-      "Incidence angle": "8-60°"
+      "channel_name": "Band_02",
+      "operation_mode": "High resolution",
+      "spatial_resolution": {
+        "min": 14.0,
+        "max": 89.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "min": 40.0,
+        "max": 70.0,
+        "unit": "km"
+      },
+      "polarisation": "HH/HV or VV/VH",
+      "field_of_regard": {
+        "value": 8.0,
+        "unit": "-60°"
+      }
     },
     {
-      "Operation mode": "ScanSAR",
-      "Resolution": "100 m",
-      "Swath": "250-350 km",
-      "Polarisation": "HH or VV",
-      "Incidence angle": "18-43°"
+      "channel_name": "Band_03",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": {
+        "value": 100.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "min": 250.0,
+        "max": 350.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV",
+      "field_of_regard": {
+        "value": 18.0,
+        "unit": "-43°"
+      }
     },
     {
-      "Operation mode": "Polarimetry",
-      "Resolution": "24-89 m",
-      "Swath": "30 km",
-      "Polarisation": "HH/HV + VV/VH",
-      "Incidence angle": "8-30°"
+      "channel_name": "Band_04",
+      "operation_mode": "Polarimetry",
+      "spatial_resolution": {
+        "min": 24.0,
+        "max": 89.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 30.0,
+        "unit": "km"
+      },
+      "polarisation": "HH/HV + VV/VH",
+      "field_of_regard": {
+        "value": 8.0,
+        "unit": "-30°"
+      }
     }
   ]
 }

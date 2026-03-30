@@ -3,51 +3,76 @@
   "instrument_acronym": "OCS",
   "instrument_fullname": "Ocean Colour Scanner",
   "url": "https://space.oscar.wmo.int/instruments/view/ocs",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Bandwidth",
     "SNR @ specified input spectral radiance"
   ],
   "channels": [
     {
-      "Central wavelength": "412 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+      "channel_name": "Band_01",
+      "central_wavelength": "500 @ …….. W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "443 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": "500 @ …….. W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "490 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+      "channel_name": "Band_03",
+      "central_wavelength": "500 @ …….. W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "520 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+      "channel_name": "Band_04",
+      "central_wavelength": "500 @ …….. W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "565 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+      "channel_name": "Band_05",
+      "central_wavelength": "500 @ …….. W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "670 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+      "channel_name": "Band_06",
+      "central_wavelength": "500 @ …….. W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "750 nm",
-      "Bandwidth": "20 nm",
-      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+      "channel_name": "Band_07",
+      "central_wavelength": "500 @ …….. W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      }
     },
     {
-      "Central wavelength": "865 nm",
-      "Bandwidth": "40 nm",
-      "SNR @ specified input spectral radiance": "500 @ …….. W m-2sr-1μm-1"
+      "channel_name": "Band_08",
+      "central_wavelength": "500 @ …….. W m-2sr-1μm-1",
+      "bandwidth": {
+        "value": 40.0,
+        "unit": "nm"
+      }
     }
   ]
 }

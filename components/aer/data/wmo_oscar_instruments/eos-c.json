@@ -3,41 +3,87 @@
   "instrument_acronym": "EOS-C",
   "instrument_fullname": "Earth Observation Satellite - Camera",
   "url": "https://space.oscar.wmo.int/instruments/view/eos-c",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "485 nm",
-      "Spectral interval": "450-520 nm",
-      "SNR @ specified albedo": "... @ ... % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 485.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 450.0,
+        "max": 520.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "... @ ... % albedo"
     },
     {
-      "Central wavelength": "560 nm",
-      "Spectral interval": "520-600 nm",
-      "SNR @ specified albedo": "... @ ... % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 560.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 520.0,
+        "max": 600.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "... @ ... % albedo"
     },
     {
-      "Central wavelength": "660 nm",
-      "Spectral interval": "630-690 nm",
-      "SNR @ specified albedo": "... @ ... % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 660.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 630.0,
+        "max": 690.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "... @ ... % albedo"
     },
     {
-      "Central wavelength": "830 nm",
-      "Spectral interval": "760-900 nm",
-      "SNR @ specified albedo": "... @ ... % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 830.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 760.0,
+        "max": 900.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "... @ ... % albedo"
     },
     {
-      "Central wavelength": "1600 nm",
-      "Spectral interval": "1000-2400 nm",
-      "SNR @ specified albedo": "... @ ... % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 1600.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 1000.0,
+        "max": 2400.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "... @ ... % albedo"
     },
     {
-      "Central wavelength": "PAN",
-      "Spectral interval": "450-900 nm",
-      "SNR @ specified albedo": "... @ ... % albedo"
+      "channel_name": "Band_06",
+      "central_wavelength": "PAN",
+      "bandwidth": {
+        "min": 450.0,
+        "max": 900.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "... @ ... % albedo"
     }
   ]
 }

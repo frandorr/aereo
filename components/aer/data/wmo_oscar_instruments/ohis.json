@@ -3,7 +3,8 @@
   "instrument_acronym": "OHIS",
   "instrument_fullname": "OrbView Hyperspectral Imaging System",
   "url": "https://space.oscar.wmo.int/instruments/view/ohis",
-  "columns": [
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
     "Spectral range",
     "Number of channels",
     "Spectral resolution",
@@ -11,22 +12,55 @@
   ],
   "channels": [
     {
-      "Spectral range": "450 - 905 nm",
-      "Number of channels": "40",
-      "Spectral resolution": "11.4 nm",
-      "SNR @ specified albedo": "….. @ …. % albedo"
+      "channel_name": "Band_01",
+      "Spectral range": {
+        "min": 450.0,
+        "max": 905.0,
+        "unit": "nm"
+      },
+      "number_of_channels": {
+        "value": 40,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 11.4,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "….. @ …. % albedo"
     },
     {
-      "Spectral range": "830 - 1740 nm",
-      "Number of channels": "80",
-      "Spectral resolution": "11.4 nm",
-      "SNR @ specified albedo": "….. @ …. % albedo"
+      "channel_name": "Band_02",
+      "Spectral range": {
+        "min": 830.0,
+        "max": 1740.0,
+        "unit": "nm"
+      },
+      "number_of_channels": {
+        "value": 80,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 11.4,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "….. @ …. % albedo"
     },
     {
-      "Spectral range": "1580 - 2490 nm",
-      "Number of channels": "80",
-      "Spectral resolution": "11.4 nm",
-      "SNR @ specified albedo": "….. @ …. % albedo"
+      "channel_name": "Band_03",
+      "Spectral range": {
+        "min": 1580.0,
+        "max": 2490.0,
+        "unit": "nm"
+      },
+      "number_of_channels": {
+        "value": 80,
+        "unit": null
+      },
+      "spectral_resolution": {
+        "value": 11.4,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "….. @ …. % albedo"
     }
   ]
 }

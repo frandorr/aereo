@@ -1,0 +1,75 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "NAOMI (AlSat)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/naomi_alsat",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.485,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.52,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "….. @ ….. % albedo"
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.565,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.53,
+        "max": 0.6,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "….. @ ….. % albedo"
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.655,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.62,
+        "max": 0.69,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "….. @ ….. % albedo"
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.825,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.76,
+        "max": 0.89,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "….. @ ….. % albedo"
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 0.675,
+        "unit": "μm  (PAN)"
+      },
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.9,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "….. @ ….. % albedo"
+    }
+  ]
+}

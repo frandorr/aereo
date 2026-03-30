@@ -3,31 +3,48 @@
   "instrument_acronym": "Mx-T",
   "instrument_fullname": "Multispectral CCD Camera",
   "url": "https://space.oscar.wmo.int/instruments/view/mx-t",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified input spectral radiance"
   ],
   "channels": [
     {
-      "Central wavelength": "0.485 μm",
-      "Spectral interval": "0.45 - 0.52 µm",
-      "SNR @ specified input spectral radiance": "507 @ 379 W m-2sr-1µm-1"
+      "channel_name": "Band_01",
+      "central_wavelength": "507 @ 379 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.52,
+        "unit": "µm"
+      }
     },
     {
-      "Central wavelength": "0.555 μm",
-      "Spectral interval": "0.52 - 0.59 µm",
-      "SNR @ specified input spectral radiance": "502 @ 300 W m-2sr-1µm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": "502 @ 300 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.59,
+        "unit": "µm"
+      }
     },
     {
-      "Central wavelength": "0.650 μm",
-      "Spectral interval": "0.62 - 0.68 µm",
-      "SNR @ specified input spectral radiance": "517 @ 290 W m-2sr-1µm-1"
+      "channel_name": "Band_03",
+      "central_wavelength": "517 @ 290 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.62,
+        "max": 0.68,
+        "unit": "µm"
+      }
     },
     {
-      "Central wavelength": "0.815 μm",
-      "Spectral interval": "0.77 - 0.86 µm",
-      "SNR @ specified input spectral radiance": "523 @ 220 W m-2sr-1µm-1"
+      "channel_name": "Band_04",
+      "central_wavelength": "523 @ 220 W m-2sr-1µm-1",
+      "bandwidth": {
+        "min": 0.77,
+        "max": 0.86,
+        "unit": "µm"
+      }
     }
   ]
 }

@@ -1,0 +1,115 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MWRI (HY-2)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/mwri_hy-2",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "CH01",
+      "Channel number": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 6.6,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 350,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "….. x …. km"
+    },
+    {
+      "channel_name": "CH02",
+      "Channel number": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 10.7,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 250,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "….. x …. km"
+    },
+    {
+      "channel_name": "CH03",
+      "Channel number": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 18.7,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 250,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "….. x …. km"
+    },
+    {
+      "channel_name": "CH04",
+      "Channel number": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 23.8,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 400,
+        "unit": null
+      },
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "….. x …. km"
+    },
+    {
+      "channel_name": "CH05",
+      "Channel number": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": {
+        "value": 37.0,
+        "unit": null
+      },
+      "bandwidth": {
+        "value": 1000,
+        "unit": null
+      },
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": "….. x …. km"
+    }
+  ]
+}

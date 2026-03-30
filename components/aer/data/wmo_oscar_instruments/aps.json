@@ -3,7 +3,8 @@
   "instrument_acronym": "APS",
   "instrument_fullname": "Aerosol Polarimetry Sensor",
   "url": "https://space.oscar.wmo.int/instruments/view/aps",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Centralλ",
     "Bandwidth",
     "Polarisations",
@@ -11,58 +12,121 @@
   ],
   "channels": [
     {
-      "Centralλ": "412 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_01",
+      "Centralλ": {
+        "value": 412.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
     },
     {
-      "Centralλ": "443 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_02",
+      "Centralλ": {
+        "value": 443.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
     },
     {
-      "Centralλ": "555 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_03",
+      "Centralλ": {
+        "value": 555.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
     },
     {
-      "Centralλ": "672 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_04",
+      "Centralλ": {
+        "value": 672.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
     },
     {
-      "Centralλ": "865 nm",
-      "Bandwidth": "39 nm",
+      "channel_name": "Band_05",
+      "Centralλ": {
+        "value": 865.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 39.0,
+        "unit": "nm"
+      },
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
     },
     {
-      "Centralλ": "910 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_06",
+      "Centralλ": {
+        "value": 910.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "SNR @ specified input spectral radiance": "94 @ ….. W m-2sr-1μm-1"
+      "central_wavelength": "94 @ ….. W m-2sr-1μm-1"
     },
     {
-      "Centralλ": "1378 nm",
-      "Bandwidth": "35 nm",
+      "channel_name": "Band_07",
+      "Centralλ": {
+        "value": 1378.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 35.0,
+        "unit": "nm"
+      },
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "SNR @ specified input spectral radiance": "141 @ ….. W m-2sr-1μm-1"
+      "central_wavelength": "141 @ ….. W m-2sr-1μm-1"
     },
     {
-      "Centralλ": "1610 nm",
-      "Bandwidth": "60 nm",
+      "channel_name": "Band_08",
+      "Centralλ": {
+        "value": 1610.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 60.0,
+        "unit": "nm"
+      },
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
     },
     {
-      "Centralλ": "2250 nm",
-      "Bandwidth": "75 nm",
+      "channel_name": "Band_09",
+      "Centralλ": {
+        "value": 2250.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 75.0,
+        "unit": "nm"
+      },
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "SNR @ specified input spectral radiance": "235 @ ….. W m-2sr-1μm-1"
+      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
     }
   ]
 }

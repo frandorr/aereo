@@ -3,7 +3,8 @@
   "instrument_acronym": "S-SAR",
   "instrument_fullname": "S-band Synthetic Aperture Radar",
   "url": "https://space.oscar.wmo.int/instruments/view/s-sar",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Incidence angle",
@@ -12,32 +13,75 @@
   ],
   "channels": [
     {
-      "Operation mode": "ScanSAR",
-      "Resolution": "20 m",
-      "Incidence angle": "16-30°",
-      "Swath": "50-100 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_01",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": {
+        "value": 20.0,
+        "unit": "m"
+      },
+      "field_of_regard": {
+        "value": 16.0,
+        "unit": "-30°"
+      },
+      "swath_width": {
+        "min": 50.0,
+        "max": 100.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "Maritime Surveillance",
-      "Resolution": "30 m",
-      "Incidence angle": "48-73°",
-      "Swath": "750 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_02",
+      "operation_mode": "Maritime Surveillance",
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m"
+      },
+      "field_of_regard": {
+        "value": 48.0,
+        "unit": "-73°"
+      },
+      "swath_width": {
+        "value": 750.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "Stripmap",
-      "Resolution": "6 m",
-      "Incidence angle": "16-31°",
-      "Swath": "13-20 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_03",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "value": 6.0,
+        "unit": "m"
+      },
+      "field_of_regard": {
+        "value": 16.0,
+        "unit": "-31°"
+      },
+      "swath_width": {
+        "min": 13.0,
+        "max": 20.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "ScanSAR Wide",
-      "Resolution": "30 m",
-      "Incidence angle": "15-32°",
-      "Swath": "55-140 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_04",
+      "operation_mode": "ScanSAR Wide",
+      "spatial_resolution": {
+        "value": 30.0,
+        "unit": "m"
+      },
+      "field_of_regard": {
+        "value": 15.0,
+        "unit": "-32°"
+      },
+      "swath_width": {
+        "min": 55.0,
+        "max": 140.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     }
   ]
 }

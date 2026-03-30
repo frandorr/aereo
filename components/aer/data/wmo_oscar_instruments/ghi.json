@@ -3,7 +3,8 @@
   "instrument_acronym": "GHI",
   "instrument_fullname": "Geostationary High-speed Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/ghi",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR or NEΔT @ specified input",
@@ -11,46 +12,119 @@
   ],
   "channels": [
     {
-      "Central wavelength": "0.675 µm",
-      "Spectral interval": "0.45-0.9",
-      "SNR or NEΔT @ specified input": "> 300 @ 100 % albedo",
-      "IFOV at s.s.p.": "0.25 km"
+      "channel_name": "CH01",
+      "central_wavelength": {
+        "value": 0.675,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.45,
+        "unit": "-0.9"
+      },
+      "snr_or_nedt": "> 300 @ 100 % albedo",
+      "spatial_resolution": {
+        "value": 0.25,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "0.470 µm",
-      "Spectral interval": "0.445-0.495",
-      "SNR or NEΔT @ specified input": "> 300 @ 100 % albedo",
-      "IFOV at s.s.p.": "0.5 km"
+      "channel_name": "CH02",
+      "central_wavelength": {
+        "value": 0.47,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.445,
+        "unit": "-0.495"
+      },
+      "snr_or_nedt": "> 300 @ 100 % albedo",
+      "spatial_resolution": {
+        "value": 0.5,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "0.545 µm",
-      "Spectral interval": "0.52-0.57",
-      "SNR or NEΔT @ specified input": "> 300 @ 100 % albedo",
-      "IFOV at s.s.p.": "0.5 km"
+      "channel_name": "CH03",
+      "central_wavelength": {
+        "value": 0.545,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.52,
+        "unit": "-0.57"
+      },
+      "snr_or_nedt": "> 300 @ 100 % albedo",
+      "spatial_resolution": {
+        "value": 0.5,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "0.645 µm",
-      "Spectral interval": "0.62-0.67",
-      "SNR or NEΔT @ specified input": "> 300 @ 100 % albedo",
-      "IFOV at s.s.p.": "0.5 km"
+      "channel_name": "CH04",
+      "central_wavelength": {
+        "value": 0.645,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 0.62,
+        "unit": "-0.67"
+      },
+      "snr_or_nedt": "> 300 @ 100 % albedo",
+      "spatial_resolution": {
+        "value": 0.5,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "1.378 µm",
-      "Spectral interval": "1.371-1.386",
-      "SNR or NEΔT @ specified input": "> 300 @ 100 % albedo",
-      "IFOV at s.s.p.": "0.5 km"
+      "channel_name": "CH05",
+      "central_wavelength": {
+        "value": 1.378,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 1.371,
+        "unit": "-1.386"
+      },
+      "snr_or_nedt": "> 300 @ 100 % albedo",
+      "spatial_resolution": {
+        "value": 0.5,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "1.61 µm",
-      "Spectral interval": "1.58-1.64",
-      "SNR or NEΔT @ specified input": "> 300 @ 100 % albedo",
-      "IFOV at s.s.p.": "0.5 km"
+      "channel_name": "CH06",
+      "central_wavelength": {
+        "value": 1.61,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 1.58,
+        "unit": "-1.64"
+      },
+      "snr_or_nedt": "> 300 @ 100 % albedo",
+      "spatial_resolution": {
+        "value": 0.5,
+        "unit": "km"
+      }
     },
     {
-      "Central wavelength": "11.4 µm",
-      "Spectral interval": "10.3-12.5",
-      "SNR or NEΔT @ specified input": "0.2 K @ 300 K",
-      "IFOV at s.s.p.": "2.0 km"
+      "channel_name": "CH07",
+      "central_wavelength": {
+        "value": 11.4,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "value": 10.3,
+        "unit": "-12.5"
+      },
+      "snr_or_nedt": {
+        "value": 0.2,
+        "unit": "K @ 300 K"
+      },
+      "spatial_resolution": {
+        "value": 2.0,
+        "unit": "km"
+      }
     }
   ]
 }

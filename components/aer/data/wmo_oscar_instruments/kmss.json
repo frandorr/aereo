@@ -3,7 +3,8 @@
   "instrument_acronym": "KMSS",
   "instrument_fullname": "High-resolution VIS/IR Radiometer ",
   "url": "https://space.oscar.wmo.int/instruments/view/kmss",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo",
@@ -11,40 +12,106 @@
   ],
   "channels": [
     {
-      "Central wavelength": "0.41 µm",
-      "Spectral interval": "0.37 - 0.45 µm",
-      "SNR @ specified albedo": "200 @ 100 % albedo",
-      "Resolution at s.s.p.": "120 m"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.41,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.37,
+        "max": 0.45,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 100 % albedo",
+      "spatial_resolution": {
+        "value": 120.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "0.48 µm",
-      "Spectral interval": "0.45 - 0.51 µm",
-      "SNR @ specified albedo": "200 @ 100 % albedo",
-      "Resolution at s.s.p.": "120 m"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.48,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.51,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 100 % albedo",
+      "spatial_resolution": {
+        "value": 120.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "0.635 µm",
-      "Spectral interval": "0.58 - 0.69 µm",
-      "SNR @ specified albedo": "200 @ 100 % albedo",
-      "Resolution at s.s.p.": "120 m"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.635,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.58,
+        "max": 0.69,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 100 % albedo",
+      "spatial_resolution": {
+        "value": 120.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "0.555 µm",
-      "Spectral interval": "0.535 - 0.575 µm",
-      "SNR @ specified albedo": "200 @ 100 % albedo",
-      "Resolution at s.s.p.": "60 m"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.555,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.535,
+        "max": 0.575,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 100 % albedo",
+      "spatial_resolution": {
+        "value": 60.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "0.655 µm",
-      "Spectral interval": "0.63 - 0.68 µm",
-      "SNR @ specified albedo": "200 @ 100 % albedo",
-      "Resolution at s.s.p.": "60 m"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 0.655,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.63,
+        "max": 0.68,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 100 % albedo",
+      "spatial_resolution": {
+        "value": 60.0,
+        "unit": "m"
+      }
     },
     {
-      "Central wavelength": "0.830 µm",
-      "Spectral interval": "0.76 - 0.90 µm",
-      "SNR @ specified albedo": "200 @ 100 % albedo",
-      "Resolution at s.s.p.": "60 m"
+      "channel_name": "Band_06",
+      "central_wavelength": {
+        "value": 0.83,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.76,
+        "max": 0.9,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "200 @ 100 % albedo",
+      "spatial_resolution": {
+        "value": 60.0,
+        "unit": "m"
+      }
     }
   ]
 }

@@ -3,7 +3,8 @@
   "instrument_acronym": "SAR-X (LOTUSat)",
   "instrument_fullname": "Synthetic Aperture Radar (X-band) for LOTUSat",
   "url": "https://space.oscar.wmo.int/instruments/view/sar-x%20%28lotusat%29",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -11,22 +12,43 @@
   ],
   "channels": [
     {
-      "Operation mode": "Spotlight",
-      "Resolution": "1 m",
-      "Swath": "10 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_01",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": {
+        "value": 1.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 10.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "Stripmap",
-      "Resolution": "2 m",
-      "Swath": "12 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_02",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "value": 2.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 12.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "ScanSAR",
-      "Resolution": "16 m",
-      "Swath": "50 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_03",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": {
+        "value": 16.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 50.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     }
   ]
 }

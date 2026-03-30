@@ -1,0 +1,72 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "RSI (FORMOSAT-5)",
+  "instrument_fullname": "",
+  "url": "https://space.oscar.wmo.int/instruments/view/rsi_formosat-5",
+  "schema_type": "unknown",
+  "original_columns": [],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.485,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.52,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "……... @ ……. % albedo"
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.56,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.52,
+        "max": 0.6,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "……... @ ……. % albedo"
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.66,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.63,
+        "max": 0.69,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "……... @ ……. % albedo"
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 0.83,
+        "unit": "μm"
+      },
+      "bandwidth": {
+        "min": 0.76,
+        "max": 0.9,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "……... @ ……. % albedo"
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": "PAN",
+      "bandwidth": {
+        "min": 0.45,
+        "max": 0.9,
+        "unit": "μm"
+      },
+      "snr_or_nedt": "……... @ ……. % albedo"
+    }
+  ]
+}

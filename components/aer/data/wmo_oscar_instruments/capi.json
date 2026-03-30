@@ -3,7 +3,8 @@
   "instrument_acronym": "CAPI",
   "instrument_fullname": "Cloud and Aerosol Polarization Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/capi",
-  "columns": [
+  "schema_type": "microwave",
+  "original_columns": [
     "Central frequency",
     "Bandwidth",
     "SNR @ typical radiance",
@@ -12,39 +13,89 @@
   ],
   "channels": [
     {
-      "Central frequency": "380 nm",
-      "Bandwidth": "43 nm",
+      "channel_name": "Band_01",
+      "central_frequency": {
+        "value": 380.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 43.0,
+        "unit": "nm"
+      },
       "SNR @ typical radiance": "260 @ 28.0 W·m-2·μm-1·sr-1",
       "Polarization angles": "-",
-      "Resolution at s.s.p.": "250 m"
+      "spatial_resolution": {
+        "value": 250.0,
+        "unit": "m"
+      }
     },
     {
-      "Central frequency": "670 nm",
-      "Bandwidth": "50 nm",
+      "channel_name": "Band_02",
+      "central_frequency": {
+        "value": 670.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 50.0,
+        "unit": "nm"
+      },
       "SNR @ typical radiance": "160 @ 22.0 W·m-2·μm-1·sr-1",
       "Polarization angles": "0°, 60°, 120°",
-      "Resolution at s.s.p.": "250 m"
+      "spatial_resolution": {
+        "value": 250.0,
+        "unit": "m"
+      }
     },
     {
-      "Central frequency": "870 nm",
-      "Bandwidth": "30 nm",
+      "channel_name": "Band_03",
+      "central_frequency": {
+        "value": 870.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 30.0,
+        "unit": "nm"
+      },
       "SNR @ typical radiance": "400 @ 25.0 W·m-2·μm-1·sr-1",
       "Polarization angles": "-",
-      "Resolution at s.s.p.": "250 m"
+      "spatial_resolution": {
+        "value": 250.0,
+        "unit": "m"
+      }
     },
     {
-      "Central frequency": "1375 nm",
-      "Bandwidth": "30 nm",
+      "channel_name": "Band_04",
+      "central_frequency": {
+        "value": 1375.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 30.0,
+        "unit": "nm"
+      },
       "SNR @ typical radiance": "180 @ 6.0 W·m-2·μm-1·sr-1",
       "Polarization angles": "-",
-      "Resolution at s.s.p.": "1000 m"
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     },
     {
-      "Central frequency": "1640 nm",
-      "Bandwidth": "20 nm",
+      "channel_name": "Band_05",
+      "central_frequency": {
+        "value": 1640.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 20.0,
+        "unit": "nm"
+      },
       "SNR @ typical radiance": "110 @ 7.3 W·m-2·μm-1·sr-1",
       "Polarization angles": "0°, 60°, 120°",
-      "Resolution at s.s.p.": "1000 m"
+      "spatial_resolution": {
+        "value": 1000.0,
+        "unit": "m"
+      }
     }
   ]
 }

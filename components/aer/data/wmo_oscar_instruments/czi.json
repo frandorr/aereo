@@ -3,31 +3,60 @@
   "instrument_acronym": "CZI",
   "instrument_fullname": "Coastal Zone Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/czi",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Bandwidth",
     "SNR @ specified input"
   ],
   "channels": [
     {
-      "Central wavelength": "460 nm",
-      "Bandwidth": "80 nm",
-      "SNR @ specified input": "410 @ 45.7 W m-2sr-1µm-1"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 460.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 80.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "410 @ 45.7 W m-2sr-1µm-1"
     },
     {
-      "Central wavelength": "560 nm",
-      "Bandwidth": "80 nm",
-      "SNR @ specified input": "300 @ 24.6 W m-2sr-1µm-1"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 560.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 80.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "300 @ 24.6 W m-2sr-1µm-1"
     },
     {
-      "Central wavelength": "650 nm",
-      "Bandwidth": "80 nm",
-      "SNR @ specified input": "248 @ 10.9 W m-2sr-1µm-1"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 650.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 80.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "248 @ 10.9 W m-2sr-1µm-1"
     },
     {
-      "Central wavelength": "825 nm",
-      "Bandwidth": "130 nm",
-      "SNR @ specified input": "240 @ 10.9 W m-2sr-1µm-1"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 825.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "value": 130.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "240 @ 10.9 W m-2sr-1µm-1"
     }
   ]
 }

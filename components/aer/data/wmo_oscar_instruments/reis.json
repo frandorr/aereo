@@ -3,36 +3,77 @@
   "instrument_acronym": "REIS",
   "instrument_fullname": "RapidEye Earth Imaging System",
   "url": "https://space.oscar.wmo.int/instruments/view/reis",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "475 nm",
-      "Spectral interval": "440 - 510 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 475.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 440.0,
+        "max": 510.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     },
     {
-      "Central wavelength": "555 nm",
-      "Spectral interval": "520 - 590 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 555.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 520.0,
+        "max": 590.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     },
     {
-      "Central wavelength": "657 nm",
-      "Spectral interval": "630 - 685 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 657.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 630.0,
+        "max": 685.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     },
     {
-      "Central wavelength": "710 nm",
-      "Spectral interval": "690 - 730 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 710.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 690.0,
+        "max": 730.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     },
     {
-      "Central wavelength": "805 nm",
-      "Spectral interval": "760 - 850 nm",
-      "SNR @ specified albedo": "……….. @ ……… % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 805.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 760.0,
+        "max": 850.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "……….. @ ……… % albedo"
     }
   ]
 }

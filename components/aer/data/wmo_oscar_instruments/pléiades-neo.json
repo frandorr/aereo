@@ -3,46 +3,100 @@
   "instrument_acronym": "Pléiades-Neo",
   "instrument_fullname": "Pléiades-Neo",
   "url": "https://space.oscar.wmo.int/instruments/view/pl%C3%A9iades-neo",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "425 nm",
-      "Spectral interval": "400-450 nm",
-      "SNR @ specified albedo": "…. @ … % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 425.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 400.0,
+        "max": 450.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…. @ … % albedo"
     },
     {
-      "Central wavelength": "485 nm",
-      "Spectral interval": "450-520 nm",
-      "SNR @ specified albedo": "…. @ … % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 485.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 450.0,
+        "max": 520.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…. @ … % albedo"
     },
     {
-      "Central wavelength": "560 nm",
-      "Spectral interval": "530-590 nm",
-      "SNR @ specified albedo": "…. @ … % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 560.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 530.0,
+        "max": 590.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…. @ … % albedo"
     },
     {
-      "Central wavelength": "655 nm",
-      "Spectral interval": "620-690 nm",
-      "SNR @ specified albedo": "…. @ … % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 655.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 620.0,
+        "max": 690.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…. @ … % albedo"
     },
     {
-      "Central wavelength": "725 nm",
-      "Spectral interval": "700-750 nm",
-      "SNR @ specified albedo": "…. @ … % albedo"
+      "channel_name": "Band_05",
+      "central_wavelength": {
+        "value": 725.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 700.0,
+        "max": 750.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…. @ … % albedo"
     },
     {
-      "Central wavelength": "825 nm",
-      "Spectral interval": "770-880 nm",
-      "SNR @ specified albedo": "…. @ … % albedo"
+      "channel_name": "Band_06",
+      "central_wavelength": {
+        "value": 825.0,
+        "unit": "nm"
+      },
+      "bandwidth": {
+        "min": 770.0,
+        "max": 880.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…. @ … % albedo"
     },
     {
-      "Central wavelength": "N/A (PAN)",
-      "Spectral interval": "450-800 nm",
-      "SNR @ specified albedo": "…. @ … % albedo"
+      "channel_name": "Band_07",
+      "central_wavelength": "N/A (PAN)",
+      "bandwidth": {
+        "min": 450.0,
+        "max": 800.0,
+        "unit": "nm"
+      },
+      "snr_or_nedt": "…. @ … % albedo"
     }
   ]
 }

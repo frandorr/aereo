@@ -3,31 +3,61 @@
   "instrument_acronym": "Geoton-1",
   "instrument_fullname": "Panchromatic and multispectral radiometer 1",
   "url": "https://space.oscar.wmo.int/instruments/view/geoton-1",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.55 µm",
-      "Spectral interval": "0.5 - 0.6 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.55,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.5,
+        "max": 0.6,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.65 µm",
-      "Spectral interval": "0.6 - 0.7 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.65,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.6,
+        "max": 0.7,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.75 µm",
-      "Spectral interval": "0.7 - 0.8 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.75,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.7,
+        "max": 0.8,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "Panchromatic",
-      "Spectral interval": "0.58 - 0.8 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": "Panchromatic",
+      "bandwidth": {
+        "min": 0.58,
+        "max": 0.8,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     }
   ]
 }

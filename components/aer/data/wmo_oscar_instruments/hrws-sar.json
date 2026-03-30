@@ -3,7 +3,8 @@
   "instrument_acronym": "HRWS-SAR",
   "instrument_fullname": "High Resolution Wide Swath X-Band Digital Beamforming SAR",
   "url": "https://space.oscar.wmo.int/instruments/view/hrws-sar",
-  "columns": [
+  "schema_type": "sar_active",
+  "original_columns": [
     "Operation mode",
     "Resolution",
     "Swath",
@@ -11,28 +12,60 @@
   ],
   "channels": [
     {
-      "Operation mode": "Spotlight",
-      "Resolution": "0.25x0.5 m",
-      "Swath": "10 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_01",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": {
+        "x": 0.25,
+        "y": 0.5,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 10.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "HR Stripmap",
-      "Resolution": "0.5x0.5 m",
-      "Swath": "20 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_02",
+      "operation_mode": "HR Stripmap",
+      "spatial_resolution": {
+        "x": 0.5,
+        "y": 0.5,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 20.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "Stripmap",
-      "Resolution": "1x1 m",
-      "Swath": "70 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_03",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": {
+        "x": 1.0,
+        "y": 1.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 70.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     },
     {
-      "Operation mode": "ScanSAR",
-      "Resolution": "25x25 m",
-      "Swath": "800 km",
-      "Polarisation": "HH or VV or HV or VH"
+      "channel_name": "Band_04",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": {
+        "x": 25.0,
+        "y": 25.0,
+        "unit": "m"
+      },
+      "swath_width": {
+        "value": 800.0,
+        "unit": "km"
+      },
+      "polarisation": "HH or VV or HV or VH"
     }
   ]
 }

@@ -3,31 +3,64 @@
   "instrument_acronym": "Végétation-P",
   "instrument_fullname": "Végétation for PROBA",
   "url": "https://space.oscar.wmo.int/instruments/view/v%C3%A9g%C3%A9tation-p",
-  "columns": [
+  "schema_type": "optical_infrared",
+  "original_columns": [
     "Central wavelength",
     "Spectral interval",
     "SNR @ specified albedo"
   ],
   "channels": [
     {
-      "Central wavelength": "0.457 µm",
-      "Spectral interval": "0.415 - 0.500 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_01",
+      "central_wavelength": {
+        "value": 0.457,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.415,
+        "max": 0.5,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.675 µm",
-      "Spectral interval": "0.580 - 0.770 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_02",
+      "central_wavelength": {
+        "value": 0.675,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.58,
+        "max": 0.77,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "0.845 µm",
-      "Spectral interval": "0.730 - 0.960 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_03",
+      "central_wavelength": {
+        "value": 0.845,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 0.73,
+        "max": 0.96,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     },
     {
-      "Central wavelength": "1.620 µm",
-      "Spectral interval": "1.480 - 1.760 µm",
-      "SNR @ specified albedo": "…... @ ….. % albedo"
+      "channel_name": "Band_04",
+      "central_wavelength": {
+        "value": 1.62,
+        "unit": "µm"
+      },
+      "bandwidth": {
+        "min": 1.48,
+        "max": 1.76,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "…... @ ….. % albedo"
     }
   ]
 }
