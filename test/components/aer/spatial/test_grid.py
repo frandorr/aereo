@@ -36,10 +36,13 @@ def test_get_utm_zone_from_latlng():
 
 def test_grid_initialization():
     grid = Grid(
-        name="test_grid", dist=2000, latitude_range=(-30, 30), longitude_range=(-50, 50)
+        name="test_grid",
+        dist=2000000,
+        latitude_range=(-30, 30),
+        longitude_range=(-50, 50),
     )
     assert grid.name == "test_grid"
-    assert grid.dist == 2000
+    assert grid.dist == 2000000
     assert not grid.points.empty
     assert "utm_footprint" in grid.points.columns
     assert len(grid.rows) > 0
@@ -48,7 +51,7 @@ def test_grid_initialization():
 def test_grid_latlon2rowcol():
     grid = Grid(
         name="test_grid",
-        dist=2000,
+        dist=2000000,
         latitude_range=(-80, 80),
         longitude_range=(-180, 180),
     )
@@ -62,7 +65,7 @@ def test_grid_latlon2rowcol():
 def test_grid_rowcol2latlon():
     grid = Grid(
         name="test_grid",
-        dist=2000,
+        dist=2000000,
         latitude_range=(-80, 80),
         longitude_range=(-180, 180),
     )
