@@ -1,6 +1,6 @@
 """Repository component for data persistence and retrieval."""
 
-from aer.repository.models import (
+from aer.spectral import (
     ChannelType,
     Instrument,
     Satellite,
