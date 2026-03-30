@@ -2,7 +2,7 @@
 trigger: always_on
 ---
 
-# Instructions for Antigravity: Running Commands and Tests
+# Instructions that must be followed alway
 
 1. **Always use `uv`**: Whenever running Python scripts, running project commands, or running tests, you MUST use `uv` as the package manager and test runner, rather than executing them with system `python` or naked `pytest`. For example, always run tests with `uv run pytest`.
 
