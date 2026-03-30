@@ -27,13 +27,18 @@ class GridCell:
     - grid_cell (str): Unique identifier for the grid cell (e.g., "0U_0R").
     - utm_footprint (Polygon): The footprint of the grid cell in UTM coordinates.
     - utm_crs (str): The EPSG code for the UTM coordinate reference system.
-    - dist (float): The grid cell size in km (e.g., 100).
+    - dist (int): The grid cell size in meters (e.g., 100000).
     """
 
     grid_cell: str
     utm_footprint: Polygon
     utm_crs: str
-    dist: float
+    dist: int
+
+    @property
+    def footprint(self) -> Polygon:
+        """Return the geometry column (UTM footprint) of the grid cell."""
+        return self.utm_footprint
 
     def area_name(self, resolution: int) -> str:
         """
@@ -44,7 +49,7 @@ class GridCell:
             str: Area name
 
         """
-        return f"{self.grid_cell}_{self.dist}km_{resolution}m"
+        return f"{self.grid_cell}_dist-{self.dist}m_res-{resolution}m"
 
     @lru_cache(maxsize=128)
     def area_def(self, resolution: int) -> AreaDefinition:
@@ -57,7 +62,7 @@ class GridCell:
         """
         bounds = self.utm_footprint.bounds  # minx, miny, maxx, maxy
         area_extent = (bounds[0], bounds[1], bounds[2], bounds[3])
-        width, height = (self.dist * 1000 // resolution, self.dist * 1000 // resolution)
+        width, height = (self.dist // resolution, self.dist // resolution)
         area_name = self.area_name(resolution)
         area_def = AreaDefinition(
             area_id=area_name,
@@ -77,13 +82,13 @@ class GridDefinition:
 
     Attributes:
         name (str): The name of the grid definition.
-        dist (float): The grid cell size or distance metric (e.g., in kilometers).
+        dist (int): The grid cell size or distance metric (e.g., in meters).
         extent (tuple): The spatial extent of the grid defined as
                 (min_lon, min_lat, max_lon, max_lat).
         utm_definition (str): The method for defining UTM zones, either "center" or "bottomleft".
     """
 
     name: str
-    dist: float
+    dist: int
     extent: tuple = (-180, -80, 180, 84)
     utm_definition: Literal["center", "bottomleft"] = "center"

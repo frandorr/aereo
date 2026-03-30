@@ -22,7 +22,7 @@ def sample_grid_cell(sample_polygon):
         grid_cell="A_1",
         utm_footprint=sample_polygon,
         utm_crs="EPSG:32631",
-        dist=100,
+        dist=100000,
     )
 
 
@@ -34,31 +34,31 @@ def test_reproject_polygon(sample_polygon):
 
 def test_grid_cell_area_name(sample_grid_cell):
     name = sample_grid_cell.area_name(resolution=500)
-    assert name == "A_1_100km_500m"
+    assert name == "A_1_dist-100000m_res-500m"
 
 
 def test_grid_cell_area_def(sample_grid_cell):
     area_def = sample_grid_cell.area_def(resolution=500)
     assert isinstance(area_def, AreaDefinition)
-    assert area_def.area_id == "A_1_100km_500m"
-    assert area_def.width == 100 * 1000 // 500
-    assert area_def.height == 100 * 1000 // 500
+    assert area_def.area_id == "A_1_dist-100000m_res-500m"
+    assert area_def.width == 100000 // 500
+    assert area_def.height == 100000 // 500
 
 
 def test_grid_definition_init():
-    grid_def = GridDefinition(name="TestGrid", dist=100, extent=(-180, -90, 180, 90))
+    grid_def = GridDefinition(name="TestGrid", dist=100000, extent=(-180, -90, 180, 90))
     assert grid_def.name == "TestGrid"
-    assert grid_def.dist == 100
+    assert grid_def.dist == 100000
     assert grid_def.extent == (-180, -90, 180, 90)
 
 
 def test_grid_definition_default_utm_definition():
-    grid_def = GridDefinition(name="TestGrid", dist=100)
+    grid_def = GridDefinition(name="TestGrid", dist=100000)
     assert grid_def.utm_definition == "center"
 
 
 def test_grid_definition_custom_utm_definition():
-    grid_def = GridDefinition(name="TestGrid", dist=100, utm_definition="bottomleft")
+    grid_def = GridDefinition(name="TestGrid", dist=100000, utm_definition="bottomleft")
     assert grid_def.utm_definition == "bottomleft"
 
 
@@ -71,7 +71,7 @@ def test_grid_schema_validation():
             "row": ["89D"],
             "col": ["36L"],
             "utm_crs": ["EPSG:32701"],
-            "dist": [100.0],
+            "dist": [100000],
         }
     )
     gdf = gpd.GeoDataFrame(
