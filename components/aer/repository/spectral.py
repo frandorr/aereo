@@ -1,68 +1,27 @@
 import csv
 import json
-from abc import ABC, abstractmethod
+from functools import lru_cache
 from pathlib import Path
 
-from aer.repository.models import (
+from aer.spectral import (
     ChannelType,
     Instrument,
     Satellite,
+    create_channel,
 )
-
-
-class AerSpectralRepository(ABC):
-    """Abstract Base Class defining the Aer data access interface.
-
-    This repository orchestrates persistence and retrieval across several
-    conceptual spaces based on the Aer Entity-Relationship schema.
-    """
-
-    # ==========================================
-    #  Satellites, Instruments & Channels methods
-    # ==========================================
-
-    @abstractmethod
-    def get_satellite(self, acronym: str) -> Satellite:
-        """Retrieve a satellite by its acronym.
-
-        Args:
-            acronym: The unique acronym identifier for the satellite.
-        Returns:
-            A Satellite object corresponding to the provided acronym.
-        Raises:
-            An exception if no satellite with the given acronym is found.
-        """
-        pass
-
-    @abstractmethod
-    def get_instrument(self, acronym: str) -> Instrument:
-        """Retrieve an instrument by its acronym.
-
-        Args:
-            acronym: The unique acronym identifier for the instrument.
-        Returns:
-            An Instrument object corresponding to the provided acronym.
-        Raises:
-            An exception if no instrument with the given acronym is found.
-        """
-        pass
-
-    @abstractmethod
-    def get_channel(self, acronym: str) -> ChannelType:
-        """Retrieve a channel by its acronym.
-
-        Args:
-            acronym: The unique acronym identifier for the channel.
-        Returns:
-            A ChannelType object corresponding to the provided acronym.
-        Raises:
-            An exception if no channel with the given acronym is found.
-        """
-        pass
+from aer.repository.core import AerSpectralRepository
 
 
 class AerLocalSpectralRepository(AerSpectralRepository):
-    """Implementation of AerRepository for local spectral data."""
+    """Implementation of AerRepository for local spectral data.
+    It assumes a specific directory structure and file formats for storing satellite,
+    instrument, and channel data. The repository reads from
+    CSV files for satellite and instrument metadata, and JSON.
+    CSV files were extracted from the WMO OSCAR database, while JSON files for instruments are expected
+    to follow a specific schema that includes the instrument acronym and its channels.
+    The repository provides methods to retrieve satellite,
+    instrument, and channel information based on their acronyms,
+    """
 
     def __init__(self, data_dir: str | Path | None = None):
         if data_dir is None:
@@ -74,8 +33,20 @@ class AerLocalSpectralRepository(AerSpectralRepository):
         self.instruments_csv = self.data_dir / "wmo_oscar_instruments.csv"
         self.satellites_csv = self.data_dir / "wmo_oscar_satellites.csv"
 
+    @lru_cache(maxsize=64)
     def get_satellite(self, acronym: str) -> Satellite:
+        """
+        Retrieve a satellite by its acronym (WMO Oscar format).
+
+        Args:
+            acronym: The unique acronym identifier for the satellite.
+        Returns:
+            A Satellite object corresponding to the provided acronym.
+        Raises:
+            An exception if no satellite with the given acronym is found.
+        """
         acronym = acronym.strip()
+
         sat_data = None
 
         if not self.satellites_csv.exists():
@@ -91,7 +62,7 @@ class AerLocalSpectralRepository(AerSpectralRepository):
                     break
 
         if not sat_data:
-            raise KeyError(f"Satellite '{acronym}' not found.")
+            raise KeyError(f"Satellite with acronym '{acronym}' not found")
 
         payload = []
         if self.instruments_csv.exists():
@@ -135,9 +106,22 @@ class AerLocalSpectralRepository(AerSpectralRepository):
             agencies=agencies,
         )
 
+    @lru_cache(maxsize=64)
     def get_instrument(
         self, acronym: str, satellite_acronym: str | None = None
     ) -> Instrument:
+        """
+        Retrieve an instrument by its acronym (WMO Oscar format).
+        If satellite_acronym is provided, it will be used to narrow down the search for the instrument's JSON file.
+
+        Args:
+            acronym: The unique acronym identifier for the instrument.
+            satellite_acronym: Optional acronym of the satellite to which the instrument belongs, used for disambiguation when multiple instruments have similar acronyms.
+        Returns:
+            An Instrument object corresponding to the provided acronym.
+        Raises:
+            An exception if no instrument with the given acronym is found.
+        """
         acronym = acronym.strip()
 
         if satellite_acronym is None:
@@ -188,17 +172,16 @@ class AerLocalSpectralRepository(AerSpectralRepository):
                             pass
 
             if not json_path:
-                raise KeyError(f"Instrument '{acronym}' not found.")
+                raise KeyError(f"Instrument with acronym '{acronym}' not found")
 
         with open(json_path, "r", encoding="utf-8") as jf:
             data = json.load(jf)
 
         real_acronym = data.get("instrument_acronym", "").strip()
         if real_acronym.lower() != acronym.lower():
-            raise KeyError(f"Instrument '{acronym}' not found.")
+            raise KeyError(f"Instrument with acronym '{acronym}' not found")
 
         schema_type = data.get("schema_type", "")
-        from aer.repository.models import create_channel
 
         channels = []
         for ch in data.get("channels", []):
@@ -210,16 +193,43 @@ class AerLocalSpectralRepository(AerSpectralRepository):
             channels=channels,
         )
 
-    def get_channel(self, acronym: str) -> ChannelType:
-        if "_" not in acronym:
-            raise KeyError(
-                f"Channel acronym must be INSTRUMENT_CHANNEL, got '{acronym}'"
+    def get_channel(
+        self,
+        acronym: str,
+        channel_name: str | None = None,
+        channel_number: int | None = None,
+    ) -> ChannelType:
+        """
+        Retrieve a channel by its instrument acronym and channel name or number.
+        Args:
+            acronym: The unique acronym identifier for the channel,
+            channel_name: Optional name of the channel to retrieve.
+                        If provided, it will be used to find by channel name within the instrument.
+            channel_number: Optional number of the channel to retrieve (from 1 to N).
+                        If provided, it will be used to find by channel position within the instrument.
+        """
+        if channel_name is None and channel_number is None:
+            raise ValueError("Either channel_name or channel_number must be provided.")
+        if channel_name is not None and channel_number is not None:
+            raise ValueError(
+                "Only one of channel_name or channel_number should be provided."
             )
-        inst_acro, ch_name = acronym.split("_", 1)
 
-        inst = self.get_instrument(inst_acro)
-        for ch in inst.channels:
-            if ch.channel_name == ch_name:
-                return ch
+        inst = self.get_instrument(acronym)
+
+        if channel_name is not None:
+            for ch in inst.channels:
+                if ch.channel_name.strip().lower() == channel_name.strip().lower():
+                    return ch
+            raise KeyError(
+                f"Channel name '{channel_name}' not found in instrument '{acronym}'."
+            )
+        if channel_number is not None:
+            if 1 <= channel_number <= len(inst.channels):
+                return inst.channels[channel_number - 1]
+            else:
+                raise KeyError(
+                    f"Channel number {channel_number} is out of range for instrument '{acronym}'."
+                )
 
         raise KeyError(f"Channel '{acronym}' not found.")
