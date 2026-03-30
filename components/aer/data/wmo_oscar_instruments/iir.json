@@ -12,51 +12,45 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": {
-        "value": 8.65,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 8.25,
-        "max": 9.05,
-        "unit": "µm"
-      },
+      "central_wavelength": 8.65,
+      "bandwidth": 8.25,
       "NEΔT @ specified scene temperature": {
         "value": 0.3,
         "unit": "K @ 300 K"
-      }
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": {
-        "value": 10.6,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 10.2,
-        "max": 11.0,
-        "unit": "µm"
-      },
+      "central_wavelength": 10.6,
+      "bandwidth": 10.2,
       "NEΔT @ specified scene temperature": {
         "value": 0.3,
         "unit": "K @ 300 K"
-      }
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": {
-        "value": 12.0,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 11.6,
-        "max": 12.4,
-        "unit": "µm"
-      },
+      "central_wavelength": 12.0,
+      "bandwidth": 11.6,
       "NEΔT @ specified scene temperature": {
         "value": 0.3,
         "unit": "K @ 300 K"
-      }
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     }
   ]
 }

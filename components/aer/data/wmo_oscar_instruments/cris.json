@@ -24,15 +24,17 @@
         "max": 1095.0,
         "unit": "cm-1"
       },
-      "spectral_resolution": {
-        "value": 0.625,
-        "unit": "cm-1"
-      },
+      "spectral_resolution": 0.625,
       "NEΔT @ specified scene temperature": {
         "min": 0.24,
         "max": 0.39,
         "unit": "K @ 287 K"
-      }
+      },
+      "unit": "cm-1",
+      "wave_number_min": 650.0,
+      "wave_number_max": 1095.0,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "MWIR",
@@ -46,15 +48,17 @@
         "max": 1750.0,
         "unit": "cm-1"
       },
-      "spectral_resolution": {
-        "value": 0.625,
-        "unit": "cm-1"
-      },
+      "spectral_resolution": 0.625,
       "NEΔT @ specified scene temperature": {
         "min": 0.19,
         "max": 0.28,
         "unit": "K @ 287 K"
-      }
+      },
+      "unit": "cm-1",
+      "wave_number_min": 1210.0,
+      "wave_number_max": 1750.0,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "SWIR",
@@ -68,15 +72,17 @@
         "max": 2550.0,
         "unit": "cm-1"
       },
-      "spectral_resolution": {
-        "value": 0.625,
-        "unit": "cm-1"
-      },
+      "spectral_resolution": 0.625,
       "NEΔT @ specified scene temperature": {
         "min": 0.18,
         "max": 0.21,
         "unit": "K @ 287 K"
-      }
+      },
+      "unit": "cm-1",
+      "wave_number_min": 2155.0,
+      "wave_number_max": 2550.0,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     }
   ]
 }

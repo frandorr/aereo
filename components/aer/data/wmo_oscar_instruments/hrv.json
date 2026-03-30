@@ -12,55 +12,43 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": {
-        "value": 0.545,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.5,
-        "max": 0.59,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "…... @ 50 % albedo, SZA=60°"
+      "central_wavelength": 0.545,
+      "bandwidth": 0.5,
+      "snr_or_nedt": "…... @ 50 % albedo, SZA=60°",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": {
-        "value": 0.645,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.61,
-        "max": 0.68,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "…... @ 50 % albedo, SZA=60°"
+      "central_wavelength": 0.645,
+      "bandwidth": 0.61,
+      "snr_or_nedt": "…... @ 50 % albedo, SZA=60°",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": {
-        "value": 0.84,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.79,
-        "max": 0.89,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "…... @ 70 % albedo, SZA=60°"
+      "central_wavelength": 0.84,
+      "bandwidth": 0.79,
+      "snr_or_nedt": "…... @ 70 % albedo, SZA=60°",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": {
-        "value": 0.62,
-        "unit": "µm (PAN)"
-      },
-      "bandwidth": {
-        "min": 0.51,
-        "max": 0.73,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "…... @ 50 % albedo, SZA=60°"
+      "central_wavelength": 0.62,
+      "bandwidth": 0.51,
+      "snr_or_nedt": "…... @ 50 % albedo, SZA=60°",
+      "unit": "µm (PAN)",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

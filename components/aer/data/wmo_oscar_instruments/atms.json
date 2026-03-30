@@ -18,19 +18,16 @@
         "value": 1,
         "unit": null
       },
-      "central_frequency": {
-        "value": 23.8,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 270,
-        "unit": null
-      },
+      "central_frequency": 23.8,
+      "bandwidth": 270.0,
       "polarisations": "QV",
       "NEΔT": {
         "value": 0.9,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH02",
@@ -38,19 +35,16 @@
         "value": 2,
         "unit": null
       },
-      "central_frequency": {
-        "value": 31.4,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 180,
-        "unit": null
-      },
+      "central_frequency": 31.4,
+      "bandwidth": 180.0,
       "polarisations": "QV",
       "NEΔT": {
         "value": 0.9,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH03",
@@ -58,19 +52,16 @@
         "value": 3,
         "unit": null
       },
-      "central_frequency": {
-        "value": 50.3,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 180,
-        "unit": null
-      },
+      "central_frequency": 50.3,
+      "bandwidth": 180.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 1.2,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH04",
@@ -78,19 +69,16 @@
         "value": 4,
         "unit": null
       },
-      "central_frequency": {
-        "value": 51.76,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 400,
-        "unit": null
-      },
+      "central_frequency": 51.76,
+      "bandwidth": 400.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.75,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH05",
@@ -98,19 +86,16 @@
         "value": 5,
         "unit": null
       },
-      "central_frequency": {
-        "value": 52.8,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 400,
-        "unit": null
-      },
+      "central_frequency": 52.8,
+      "bandwidth": 400.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.75,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH06",
@@ -119,15 +104,14 @@
         "unit": null
       },
       "central_frequency": "53.596 ± 0.115",
-      "bandwidth": {
-        "value": 170,
-        "unit": null
-      },
+      "bandwidth": 170.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.75,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH07",
@@ -135,19 +119,16 @@
         "value": 7,
         "unit": null
       },
-      "central_frequency": {
-        "value": 54.4,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 400,
-        "unit": null
-      },
+      "central_frequency": 54.4,
+      "bandwidth": 400.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.75,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH08",
@@ -155,19 +136,16 @@
         "value": 8,
         "unit": null
       },
-      "central_frequency": {
-        "value": 54.94,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 400,
-        "unit": null
-      },
+      "central_frequency": 54.94,
+      "bandwidth": 400.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.75,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH09",
@@ -175,19 +153,16 @@
         "value": 9,
         "unit": null
       },
-      "central_frequency": {
-        "value": 55.5,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 330,
-        "unit": null
-      },
+      "central_frequency": 55.5,
+      "bandwidth": 330.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.75,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH10",
@@ -196,15 +171,14 @@
         "unit": null
       },
       "central_frequency": "f0 = 57.290344",
-      "bandwidth": {
-        "value": 330,
-        "unit": null
-      },
+      "bandwidth": 330.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.75,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH11",
@@ -213,15 +187,14 @@
         "unit": null
       },
       "central_frequency": "f0 ± 0.217",
-      "bandwidth": {
-        "value": 78,
-        "unit": null
-      },
+      "bandwidth": 78.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 1.2,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH12",
@@ -230,15 +203,14 @@
         "unit": null
       },
       "central_frequency": "f0 ± 0.3222  ± 0.048",
-      "bandwidth": {
-        "value": 36,
-        "unit": null
-      },
+      "bandwidth": 36.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 1.2,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH13",
@@ -247,15 +219,14 @@
         "unit": null
       },
       "central_frequency": "f0 ± 0.3222  ± 0.022",
-      "bandwidth": {
-        "value": 16,
-        "unit": null
-      },
+      "bandwidth": 16.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 1.5,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH14",
@@ -264,15 +235,14 @@
         "unit": null
       },
       "central_frequency": "f0 ± 0.3222  ± 0.010",
-      "bandwidth": {
-        "value": 8,
-        "unit": null
-      },
+      "bandwidth": 8.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 2.4,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH15",
@@ -281,15 +251,14 @@
         "unit": null
       },
       "central_frequency": "f0 ± 0.3222  ± 0.0045",
-      "bandwidth": {
-        "value": 3,
-        "unit": null
-      },
+      "bandwidth": 3.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 3.6,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH16",
@@ -297,19 +266,16 @@
         "value": 16,
         "unit": null
       },
-      "central_frequency": {
-        "value": 88.2,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 2000,
-        "unit": null
-      },
+      "central_frequency": 88.2,
+      "bandwidth": 2000.0,
       "polarisations": "QV",
       "NEΔT": {
         "value": 0.5,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH17",
@@ -317,19 +283,16 @@
         "value": 17,
         "unit": null
       },
-      "central_frequency": {
-        "value": 165.5,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 3000,
-        "unit": null
-      },
+      "central_frequency": 165.5,
+      "bandwidth": 3000.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.6,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH18",
@@ -338,15 +301,14 @@
         "unit": null
       },
       "central_frequency": "183.31 ± 7.0",
-      "bandwidth": {
-        "value": 2000,
-        "unit": null
-      },
+      "bandwidth": 2000.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.8,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH19",
@@ -355,15 +317,14 @@
         "unit": null
       },
       "central_frequency": "183.31 ± 4.5",
-      "bandwidth": {
-        "value": 2000,
-        "unit": null
-      },
+      "bandwidth": 2000.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.8,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH20",
@@ -372,15 +333,14 @@
         "unit": null
       },
       "central_frequency": "183.31 ± 3.0",
-      "bandwidth": {
-        "value": 1000,
-        "unit": null
-      },
+      "bandwidth": 1000.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.8,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH21",
@@ -389,15 +349,14 @@
         "unit": null
       },
       "central_frequency": "183.31 ± 1.8",
-      "bandwidth": {
-        "value": 1000,
-        "unit": null
-      },
+      "bandwidth": 1000.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.8,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH22",
@@ -406,15 +365,14 @@
         "unit": null
       },
       "central_frequency": "183.31 ± 1.0",
-      "bandwidth": {
-        "value": 500,
-        "unit": null
-      },
+      "bandwidth": 500.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.9,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     }
   ]
 }

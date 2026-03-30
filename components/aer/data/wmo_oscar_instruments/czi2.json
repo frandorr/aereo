@@ -12,111 +12,102 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": {
-        "value": 425.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 50.0,
-        "unit": "nm"
-      },
-      "S/N": ">300"
+      "central_wavelength": 425.0,
+      "bandwidth": 50.0,
+      "S/N": ">300",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": {
-        "value": 485.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 70.0,
-        "unit": "nm"
-      },
-      "S/N": ">300"
+      "central_wavelength": 485.0,
+      "bandwidth": 70.0,
+      "S/N": ">300",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": {
-        "value": 555.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 70.0,
-        "unit": "nm"
-      },
-      "S/N": ">300"
+      "central_wavelength": 555.0,
+      "bandwidth": 70.0,
+      "S/N": ">300",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": {
-        "value": 605.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 40.0,
-        "unit": "nm"
-      },
-      "S/N": ">300"
+      "central_wavelength": 605.0,
+      "bandwidth": 40.0,
+      "S/N": ">300",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_05",
-      "central_wavelength": {
-        "value": 660.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 60.0,
-        "unit": "nm"
-      },
-      "S/N": ">300"
+      "central_wavelength": 660.0,
+      "bandwidth": 60.0,
+      "S/N": ">300",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_06",
-      "central_wavelength": {
-        "value": 725.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 40.0,
-        "unit": "nm"
-      },
-      "S/N": ">200"
+      "central_wavelength": 725.0,
+      "bandwidth": 40.0,
+      "S/N": ">200",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_07",
-      "central_wavelength": {
-        "value": 830.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 120.0,
-        "unit": "nm"
-      },
-      "S/N": ">200"
+      "central_wavelength": 830.0,
+      "bandwidth": 120.0,
+      "S/N": ">200",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_08",
-      "central_wavelength": {
-        "value": 950.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 180.0,
-        "unit": "nm"
-      },
-      "S/N": ">200"
+      "central_wavelength": 950.0,
+      "bandwidth": 180.0,
+      "S/N": ">200",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_09",
-      "central_wavelength": {
-        "value": 625.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 350.0,
-        "unit": "nm"
-      },
-      "S/N": ">200"
+      "central_wavelength": 625.0,
+      "bandwidth": 350.0,
+      "S/N": ">200",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     }
   ]
 }

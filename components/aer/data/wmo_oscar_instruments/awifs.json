@@ -12,39 +12,43 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": "752 @ 550 W m-2sr-1µm-1",
-      "bandwidth": {
-        "min": 0.52,
-        "max": 0.59,
-        "unit": "µm"
-      }
+      "central_wavelength": 0.555,
+      "bandwidth": 0.52,
+      "snr_or_nedt": "752 @ 550 W m-2sr-1µm-1",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": "738 @ 510 W m-2sr-1µm-1",
-      "bandwidth": {
-        "min": 0.62,
-        "max": 0.68,
-        "unit": "µm"
-      }
+      "central_wavelength": 0.65,
+      "bandwidth": 0.62,
+      "snr_or_nedt": "738 @ 510 W m-2sr-1µm-1",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": "753 @ 305 W m-2sr-1µm-1",
-      "bandwidth": {
-        "min": 0.77,
-        "max": 0.86,
-        "unit": "µm"
-      }
+      "central_wavelength": 0.815,
+      "bandwidth": 0.77,
+      "snr_or_nedt": "753 @ 305 W m-2sr-1µm-1",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": "1179 @ 75 W m-2sr-1µm-1",
-      "bandwidth": {
-        "min": 1.55,
-        "max": 1.7,
-        "unit": "µm"
-      }
+      "central_wavelength": 1.625,
+      "bandwidth": 1.55,
+      "snr_or_nedt": "1179 @ 75 W m-2sr-1µm-1",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

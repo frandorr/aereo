@@ -23,11 +23,13 @@
         "max": 900.0,
         "unit": "cm-1"
       },
-      "spectral_resolution": {
-        "value": 0.015,
-        "unit": "cm-1"
-      },
-      "NEΔT @ specified scene temperature": "…. K @ 220 K"
+      "spectral_resolution": 0.015,
+      "NEΔT @ specified scene temperature": "…. K @ 220 K",
+      "unit": "cm-1",
+      "wave_number_min": 650.0,
+      "wave_number_max": 900.0,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_02",
@@ -41,11 +43,13 @@
         "max": 1150.0,
         "unit": "cm-1"
       },
-      "spectral_resolution": {
-        "value": 0.015,
-        "unit": "cm-1"
-      },
-      "NEΔT @ specified scene temperature": "…. K @ 220 K"
+      "spectral_resolution": 0.015,
+      "NEΔT @ specified scene temperature": "…. K @ 220 K",
+      "unit": "cm-1",
+      "wave_number_min": 820.0,
+      "wave_number_max": 1150.0,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_03",
@@ -59,11 +63,13 @@
         "max": 1950.0,
         "unit": "cm-1"
       },
-      "spectral_resolution": {
-        "value": 0.015,
-        "unit": "cm-1"
-      },
-      "NEΔT @ specified scene temperature": "…. K @ 220 K"
+      "spectral_resolution": 0.015,
+      "NEΔT @ specified scene temperature": "…. K @ 220 K",
+      "unit": "cm-1",
+      "wave_number_min": 1100.0,
+      "wave_number_max": 1950.0,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_04",
@@ -77,11 +83,13 @@
         "max": 3050.0,
         "unit": "cm-1"
       },
-      "spectral_resolution": {
-        "value": 0.015,
-        "unit": "cm-1"
-      },
-      "NEΔT @ specified scene temperature": "…. K @ 220 K"
+      "spectral_resolution": 0.015,
+      "NEΔT @ specified scene temperature": "…. K @ 220 K",
+      "unit": "cm-1",
+      "wave_number_min": 1900.0,
+      "wave_number_max": 3050.0,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     }
   ]
 }

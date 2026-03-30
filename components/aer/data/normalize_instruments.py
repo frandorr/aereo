@@ -114,7 +114,14 @@ def normalize_keys(channel, category):
         parsed = parse_value(v)
 
         if category == "optical_infrared":
-            if "wavelength" in kl or "spectral" in kl or "band" in kl:
+            if "snr" in kl or "neΔt" in kl:
+                if "low" in kl:
+                    norm["snr_low"] = parsed
+                elif "high" in kl:
+                    norm["snr_high"] = parsed
+                else:
+                    norm["snr_or_nedt"] = parsed
+            elif "wavelength" in kl or "spectral" in kl or "band" in kl:
                 if (
                     "interval" in kl
                     or "bandwidth" in kl
@@ -124,13 +131,6 @@ def normalize_keys(channel, category):
                     norm["bandwidth"] = parsed
                 else:
                     norm["central_wavelength"] = parsed
-            elif "snr" in kl or "neΔt" in kl:
-                if "low" in kl:
-                    norm["snr_low"] = parsed
-                elif "high" in kl:
-                    norm["snr_high"] = parsed
-                else:
-                    norm["snr_or_nedt"] = parsed
             elif "resolution" in kl or "ifov" in kl:
                 norm["spatial_resolution"] = parsed
             else:
@@ -533,6 +533,96 @@ def assign_channel_names(instrument_acronym, norm_channels):
     return norm_channels
 
 
+def flatten_parsed_value(val, to_meters=False):
+    if val is None:
+        return None
+
+    if isinstance(val, dict):
+        unit = val.get("unit")
+        res = None
+
+        if "value" in val:
+            res = float(val["value"])
+        elif "min" in val:
+            res = float(val["min"])
+        elif "x" in val and "y" in val:
+            res = [float(val["x"]), float(val["y"])]
+        elif "x" in val:
+            res = float(val["x"])
+        else:
+            return None
+
+        if to_meters and isinstance(unit, str):
+            ul = unit.lower()
+            multiplier = 1.0
+            if "km" in ul:
+                multiplier = 1000.0
+            elif "cm" in ul:
+                multiplier = 1.0 / 100.0
+            elif "mm" in ul:
+                multiplier = 1.0 / 1000.0
+
+            if isinstance(res, list):
+                res = [r * multiplier for r in res]
+            else:
+                res *= multiplier
+
+        return res
+
+    if isinstance(val, (int, float)):
+        return float(val)
+
+    return val
+
+
+def finalize_channel(ch, category):
+    out = dict(ch)
+
+    # Extract unit once
+    for k in ["central_wavelength", "central_frequency", "wave_number_range"]:
+        if k in ch and isinstance(ch[k], dict):
+            out["unit"] = ch[k].get("unit")
+            break
+
+    # Flatten fields depending on schema
+    if category == "optical_infrared":
+        out["central_wavelength"] = flatten_parsed_value(ch.get("central_wavelength"))
+        out["bandwidth"] = flatten_parsed_value(ch.get("bandwidth"))
+        out["spatial_resolution"] = flatten_parsed_value(
+            ch.get("spatial_resolution"), to_meters=True
+        )
+        out["snr_low"] = flatten_parsed_value(ch.get("snr_low"))
+        out["snr_high"] = flatten_parsed_value(ch.get("snr_high"))
+        out["snr_or_nedt"] = flatten_parsed_value(ch.get("snr_or_nedt"))
+
+    elif category == "microwave":
+        out["central_frequency"] = flatten_parsed_value(ch.get("central_frequency"))
+        out["bandwidth"] = flatten_parsed_value(ch.get("bandwidth"))
+        out["spatial_resolution"] = flatten_parsed_value(
+            ch.get("spatial_resolution"), to_meters=True
+        )
+        out["nedt"] = flatten_parsed_value(ch.get("nedt"))
+
+    elif category == "sar_active":
+        out["spatial_resolution"] = flatten_parsed_value(
+            ch.get("spatial_resolution"), to_meters=True
+        )
+        out["swath_width"] = flatten_parsed_value(ch.get("swath_width"), to_meters=True)
+        out["field_of_regard"] = flatten_parsed_value(ch.get("field_of_regard"))
+
+    elif category == "spectrometer_sounder":
+        wn = ch.get("wave_number_range", {})
+        if isinstance(wn, dict):
+            out["wave_number_min"] = wn.get("min")
+            out["wave_number_max"] = wn.get("max")
+
+        out["spectral_resolution"] = flatten_parsed_value(ch.get("spectral_resolution"))
+        out["number_of_channels"] = flatten_parsed_value(ch.get("number_of_channels"))
+        out["snr_or_nedt"] = flatten_parsed_value(ch.get("snr_or_nedt"))
+
+    return out
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Normalize WMO OSCAR JSON instruments and map genuine channel names."
@@ -577,13 +667,20 @@ def main():
             print(f"Skipping {os.path.basename(f)}: invalid JSON")
             continue
 
-        cols = data.get("columns", [])
-        category = classify_instrument(cols)
+        cols = data.get("original_columns") or data.get("columns", [])
+        if not cols and data.get("channels"):
+            cols = list(data["channels"][0].keys())
+
+        category = data.get("schema_type")
+        if not category or category == "unknown":
+            category = classify_instrument(cols)
         acronym = data.get("instrument_acronym", "").strip()
 
         norm_channels = []
         for ch in data.get("channels", []):
-            norm_channels.append(normalize_keys(ch, category))
+            norm = normalize_keys(ch, category)
+            norm = finalize_channel(norm, category)
+            norm_channels.append(norm)
 
         # Assign specific channel names
         norm_channels = assign_channel_names(acronym, norm_channels)

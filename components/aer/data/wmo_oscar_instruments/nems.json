@@ -17,18 +17,15 @@
         "value": 1,
         "unit": null
       },
-      "central_frequency": {
-        "value": 22.235,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 220,
-        "unit": null
-      },
+      "central_frequency": 22.235,
+      "bandwidth": 220.0,
       "NEΔT": {
         "value": 0.24,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_02",
@@ -36,18 +33,15 @@
         "value": 2,
         "unit": null
       },
-      "central_frequency": {
-        "value": 31.4,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 250,
-        "unit": null
-      },
+      "central_frequency": 31.4,
+      "bandwidth": 250.0,
       "NEΔT": {
         "value": 0.23,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_03",
@@ -55,18 +49,15 @@
         "value": 3,
         "unit": null
       },
-      "central_frequency": {
-        "value": 53.65,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 250,
-        "unit": null
-      },
+      "central_frequency": 53.65,
+      "bandwidth": 250.0,
       "NEΔT": {
         "value": 0.29,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_04",
@@ -74,18 +65,15 @@
         "value": 4,
         "unit": null
       },
-      "central_frequency": {
-        "value": 54.9,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 250,
-        "unit": null
-      },
+      "central_frequency": 54.9,
+      "bandwidth": 250.0,
       "NEΔT": {
         "value": 0.29,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_05",
@@ -93,18 +81,15 @@
         "value": 5,
         "unit": null
       },
-      "central_frequency": {
-        "value": 58.8,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 250,
-        "unit": null
-      },
+      "central_frequency": 58.8,
+      "bandwidth": 250.0,
       "NEΔT": {
         "value": 0.24,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     }
   ]
 }

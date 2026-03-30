@@ -12,52 +12,42 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": {
-        "value": 485.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "min": 420.0,
-        "max": 550.0,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "…….. @ ……. % albedo"
+      "central_wavelength": 485.0,
+      "bandwidth": 420.0,
+      "snr_or_nedt": "…….. @ ……. % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": {
-        "value": 590.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "min": 550.0,
-        "max": 630.0,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "…….. @ ……. % albedo"
+      "central_wavelength": 590.0,
+      "bandwidth": 550.0,
+      "snr_or_nedt": "…….. @ ……. % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": {
-        "value": 655.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "min": 580.0,
-        "max": 730.0,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "…….. @ ……. % albedo"
+      "central_wavelength": 655.0,
+      "bandwidth": 580.0,
+      "snr_or_nedt": "…….. @ ……. % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
       "central_wavelength": "N/A  (PAN)",
-      "bandwidth": {
-        "min": 420.0,
-        "max": 730.0,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "…….. @ ……. % albedo"
+      "bandwidth": 420.0,
+      "snr_or_nedt": "…….. @ ……. % albedo",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

@@ -3,70 +3,63 @@
   "instrument_acronym": "NAOMI (SPOT)",
   "instrument_fullname": "",
   "url": "https://space.oscar.wmo.int/instruments/view/naomi_spot",
-  "schema_type": "unknown",
-  "original_columns": [],
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "channel_name",
+    "central_wavelength",
+    "bandwidth",
+    "snr_or_nedt",
+    "unit"
+  ],
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": {
-        "value": 0.485,
-        "unit": "μm"
-      },
-      "bandwidth": {
-        "min": 0.45,
-        "max": 0.52,
-        "unit": "μm"
-      },
-      "snr_or_nedt": "….. @ ….. % albedo"
+      "central_wavelength": 0.485,
+      "bandwidth": 0.45,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": {
-        "value": 0.565,
-        "unit": "μm"
-      },
-      "bandwidth": {
-        "min": 0.53,
-        "max": 0.6,
-        "unit": "μm"
-      },
-      "snr_or_nedt": "….. @ ….. % albedo"
+      "central_wavelength": 0.565,
+      "bandwidth": 0.53,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": {
-        "value": 0.655,
-        "unit": "μm"
-      },
-      "bandwidth": {
-        "min": 0.62,
-        "max": 0.69,
-        "unit": "μm"
-      },
-      "snr_or_nedt": "….. @ ….. % albedo"
+      "central_wavelength": 0.655,
+      "bandwidth": 0.62,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": {
-        "value": 0.825,
-        "unit": "μm"
-      },
-      "bandwidth": {
-        "min": 0.76,
-        "max": 0.89,
-        "unit": "μm"
-      },
-      "snr_or_nedt": "….. @ ….. % albedo"
+      "central_wavelength": 0.825,
+      "bandwidth": 0.76,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_05",
       "central_wavelength": "N/A  (PAN)",
-      "bandwidth": {
-        "min": 0.45,
-        "max": 0.75,
-        "unit": "μm"
-      },
-      "snr_or_nedt": "….. @ ….. % albedo"
+      "bandwidth": 0.45,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

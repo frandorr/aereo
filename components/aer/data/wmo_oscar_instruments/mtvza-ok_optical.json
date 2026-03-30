@@ -12,71 +12,53 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": {
-        "value": 0.41,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.37,
-        "max": 0.45,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "8.1 @ 0.5 % albedo"
+      "central_wavelength": 0.41,
+      "bandwidth": 0.37,
+      "snr_or_nedt": "8.1 @ 0.5 % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": {
-        "value": 0.51,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.45,
-        "max": 0.51,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "8.1 @ 0.5 % albedo"
+      "central_wavelength": 0.51,
+      "bandwidth": 0.45,
+      "snr_or_nedt": "8.1 @ 0.5 % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": {
-        "value": 0.63,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.58,
-        "max": 0.68,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "8.1 @ 0.5 % albedo"
+      "central_wavelength": 0.63,
+      "bandwidth": 0.58,
+      "snr_or_nedt": "8.1 @ 0.5 % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": {
-        "value": 0.73,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.68,
-        "max": 0.78,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "8.1 @ 0.5 % albedo"
+      "central_wavelength": 0.73,
+      "bandwidth": 0.68,
+      "snr_or_nedt": "8.1 @ 0.5 % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_05",
-      "central_wavelength": {
-        "value": 3.74,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 3.55,
-        "max": 3.93,
-        "unit": "µm"
-      },
-      "snr_or_nedt": {
-        "value": 0.2,
-        "unit": "K @ 300 K"
-      }
+      "central_wavelength": 3.74,
+      "bandwidth": 3.55,
+      "snr_or_nedt": 0.2,
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

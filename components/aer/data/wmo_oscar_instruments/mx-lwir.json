@@ -12,99 +12,87 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": {
-        "value": 7.35,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 7.1,
-        "max": 7.6,
-        "unit": "µm"
-      },
+      "central_wavelength": 7.35,
+      "bandwidth": 7.1,
       "NEΔT @ specified input": {
         "value": 0.15,
         "unit": "K @ 300 K"
-      }
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": {
-        "value": 8.5,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 8.3,
-        "max": 8.7,
-        "unit": "µm"
-      },
+      "central_wavelength": 8.5,
+      "bandwidth": 8.3,
       "NEΔT @ specified input": {
         "value": 0.15,
         "unit": "K @ 300 K"
-      }
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": {
-        "value": 9.6,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 9.4,
-        "max": 9.8,
-        "unit": "µm"
-      },
+      "central_wavelength": 9.6,
+      "bandwidth": 9.4,
       "NEΔT @ specified input": {
         "value": 0.15,
         "unit": "K @ 300 K"
-      }
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": {
-        "value": 10.8,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 10.0,
-        "max": 3.0,
-        "unit": "-11.3 µm"
-      },
+      "central_wavelength": 10.8,
+      "bandwidth": 10.0,
       "NEΔT @ specified input": {
         "value": 0.15,
         "unit": "K @ 300 K"
-      }
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_05",
-      "central_wavelength": {
-        "value": 12.0,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 11.5,
-        "max": 12.5,
-        "unit": "µm"
-      },
+      "central_wavelength": 12.0,
+      "bandwidth": 11.5,
       "NEΔT @ specified input": {
         "value": 0.15,
         "unit": "K @ 300 K"
-      }
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_06",
-      "central_wavelength": {
-        "value": 13.25,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 13.0,
-        "max": 13.5,
-        "unit": "µm"
-      },
+      "central_wavelength": 13.25,
+      "bandwidth": 13.0,
       "NEΔT @ specified input": {
         "value": 0.15,
         "unit": "K @ 300 K"
-      }
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
     }
   ]
 }

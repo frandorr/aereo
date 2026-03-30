@@ -12,274 +12,306 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": {
-        "min": 400.0,
-        "max": 430.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 400.0,
       "NEΔL  (for land)": {
         "value": 0.4,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": {
-        "value": 400.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 400.0,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "2188 @ 62.95 W sr-1m-2µm-1"
+      "snr_or_nedt": "2188 @ 62.95 W sr-1m-2µm-1",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": {
-        "value": 412.5,
-        "unit": "nm"
-      },
+      "central_wavelength": 412.5,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "2061 @ 74.14 W sr-1m-2µm-1"
+      "snr_or_nedt": "2061 @ 74.14 W sr-1m-2µm-1",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": {
-        "min": 430.0,
-        "max": 450.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 430.0,
       "NEΔL  (for land)": {
         "value": 0.4,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_05",
-      "central_wavelength": {
-        "value": 442.5,
-        "unit": "nm"
-      },
+      "central_wavelength": 442.5,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "1811 @ 65.61 W sr-1m-2µm-1"
+      "snr_or_nedt": "1811 @ 65.61 W sr-1m-2µm-1",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_06",
-      "central_wavelength": {
-        "value": 490.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 490.0,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "1541 @ 51.21 W sr-1m-2µm-1"
+      "snr_or_nedt": "1541 @ 51.21 W sr-1m-2µm-1",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_07",
-      "central_wavelength": {
-        "min": 500.0,
-        "max": 600.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 500.0,
       "NEΔL  (for land)": {
         "value": 0.28,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_08",
-      "central_wavelength": {
-        "value": 510.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 510.0,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "1488 @ 44.39 W sr-1m-2µm-1"
+      "snr_or_nedt": "1488 @ 44.39 W sr-1m-2µm-1",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_09",
-      "central_wavelength": {
-        "value": 560.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 560.0,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "1280 @ 31.49 W sr-1m-2µm-1"
+      "snr_or_nedt": "1280 @ 31.49 W sr-1m-2µm-1",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_10",
-      "central_wavelength": {
-        "min": 600.0,
-        "max": 830.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 600.0,
       "NEΔL  (for land)": {
         "value": 0.21,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_11",
-      "central_wavelength": {
-        "value": 753.5,
-        "unit": "nm"
-      },
+      "central_wavelength": 753.5,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "605 @ 10.33 W sr-1m-2µm-1"
+      "snr_or_nedt": "605 @ 10.33 W sr-1m-2µm-1",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_12",
-      "central_wavelength": {
-        "value": 778.75,
-        "unit": "nm"
-      },
+      "central_wavelength": 778.75,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "812 @ 9.18 W sr-1m-2µm-1"
+      "snr_or_nedt": "812 @ 9.18 W sr-1m-2µm-1",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_13",
-      "central_wavelength": {
-        "min": 830.0,
-        "max": 890.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 830.0,
       "NEΔL  (for land)": {
         "value": 0.19,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_14",
-      "central_wavelength": {
-        "min": 890.0,
-        "max": 940.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 890.0,
       "NEΔL  (for land)": {
         "value": 0.17,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_15",
-      "central_wavelength": {
-        "min": 940.0,
-        "max": 1130.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 940.0,
       "NEΔL  (for land)": {
         "value": 0.14,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_16",
-      "central_wavelength": {
-        "min": 1130.0,
-        "max": 1280.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 1130.0,
       "NEΔL  (for land)": {
         "value": 0.1,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_17",
-      "central_wavelength": {
-        "min": 1280.0,
-        "max": 1330.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 1280.0,
       "NEΔL  (for land)": {
         "value": 0.085,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_18",
-      "central_wavelength": {
-        "min": 1330.0,
-        "max": 1480.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 1330.0,
       "NEΔL  (for land)": "best effort",
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_19",
-      "central_wavelength": {
-        "min": 1480.0,
-        "max": 1520.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 1480.0,
       "NEΔL  (for land)": {
         "value": 0.05,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_20",
-      "central_wavelength": {
-        "min": 1520.0,
-        "max": 1760.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 1520.0,
       "NEΔL  (for land)": {
         "value": 0.065,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_21",
-      "central_wavelength": {
-        "min": 1760.0,
-        "max": 1950.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 1760.0,
       "NEΔL  (for land)": "best effort",
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_22",
-      "central_wavelength": {
-        "min": 1950.0,
-        "max": 2050.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 1950.0,
       "NEΔL  (for land)": {
         "value": 0.05,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_23",
-      "central_wavelength": {
-        "min": 2050.0,
-        "max": 2450.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 2050.0,
       "NEΔL  (for land)": {
         "value": 0.035,
         "unit": "W sr-1m-2µm-1"
       },
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_24",
-      "central_wavelength": {
-        "min": 2450.0,
-        "max": 2500.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 2450.0,
       "NEΔL  (for land)": "best effort",
-      "snr_or_nedt": ""
+      "snr_or_nedt": "",
+      "unit": "nm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }
