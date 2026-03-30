@@ -20,24 +20,16 @@
         "value": 1,
         "unit": null
       },
-      "central_frequency": {
-        "value": 6.9,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 350,
-        "unit": null
-      },
+      "central_frequency": 6.9,
+      "bandwidth": 350.0,
       "polarisations": "V, H",
       "NEΔT": {
         "value": 0.3,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_02",
@@ -45,24 +37,16 @@
         "value": 2,
         "unit": null
       },
-      "central_frequency": {
-        "value": 10.6,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 100,
-        "unit": null
-      },
+      "central_frequency": 10.6,
+      "bandwidth": 100.0,
       "polarisations": "V, H, P,M",
       "NEΔT": {
         "value": 0.5,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_03",
@@ -70,24 +54,16 @@
         "value": 3,
         "unit": null
       },
-      "central_frequency": {
-        "value": 18.7,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 200,
-        "unit": null
-      },
+      "central_frequency": 18.7,
+      "bandwidth": 200.0,
       "polarisations": "V, H.P.M. R, L",
       "NEΔT": {
         "value": 0.4,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_04",
@@ -95,24 +71,16 @@
         "value": 4,
         "unit": null
       },
-      "central_frequency": {
-        "value": 23.8,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 400,
-        "unit": null
-      },
+      "central_frequency": 23.8,
+      "bandwidth": 400.0,
       "polarisations": "V, H",
       "NEΔT": {
         "value": 0.3,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_05",
@@ -120,24 +88,16 @@
         "value": 5,
         "unit": null
       },
-      "central_frequency": {
-        "value": 31.5,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 1000,
-        "unit": null
-      },
+      "central_frequency": 31.5,
+      "bandwidth": 1000.0,
       "polarisations": "V, H, P, M",
       "NEΔT": {
         "value": 0.3,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_06",
@@ -145,24 +105,16 @@
         "value": 6,
         "unit": null
       },
-      "central_frequency": {
-        "value": 36.7,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 1000,
-        "unit": null
-      },
+      "central_frequency": 36.7,
+      "bandwidth": 1000.0,
       "polarisations": "V, H",
       "NEΔT": {
         "value": 0.4,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_07",
@@ -170,24 +122,16 @@
         "value": 7,
         "unit": null
       },
-      "central_frequency": {
-        "value": 42,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 1000,
-        "unit": null
-      },
+      "central_frequency": 42.0,
+      "bandwidth": 1000.0,
       "polarisations": "V, H",
       "NEΔT": {
         "value": 0.4,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_08",
@@ -195,24 +139,16 @@
         "value": 8,
         "unit": null
       },
-      "central_frequency": {
-        "value": 48,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 1000,
-        "unit": null
-      },
+      "central_frequency": 48.0,
+      "bandwidth": 1000.0,
       "polarisations": "V, H",
       "NEΔT": {
         "value": 0.4,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_09",
@@ -220,24 +156,16 @@
         "value": 9,
         "unit": null
       },
-      "central_frequency": {
-        "value": 52.8,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 400,
-        "unit": null
-      },
+      "central_frequency": 52.8,
+      "bandwidth": 400.0,
       "polarisations": "V",
       "NEΔT": {
         "value": 0.4,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_10",
@@ -245,24 +173,16 @@
         "value": 10,
         "unit": null
       },
-      "central_frequency": {
-        "value": 53.3,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 400,
-        "unit": null
-      },
+      "central_frequency": 53.3,
+      "bandwidth": 400.0,
       "polarisations": "V",
       "NEΔT": {
         "value": 0.4,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_11",
@@ -270,24 +190,16 @@
         "value": 11,
         "unit": null
       },
-      "central_frequency": {
-        "value": 53.8,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 400,
-        "unit": null
-      },
+      "central_frequency": 53.8,
+      "bandwidth": 400.0,
       "polarisations": "V",
       "NEΔT": {
         "value": 0.4,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_12",
@@ -295,24 +207,16 @@
         "value": 12,
         "unit": null
       },
-      "central_frequency": {
-        "value": 54.64,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 400,
-        "unit": null
-      },
+      "central_frequency": 54.64,
+      "bandwidth": 400.0,
       "polarisations": "V",
       "NEΔT": {
         "value": 0.4,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_13",
@@ -320,24 +224,16 @@
         "value": 13,
         "unit": null
       },
-      "central_frequency": {
-        "value": 55.63,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 400,
-        "unit": null
-      },
+      "central_frequency": 55.63,
+      "bandwidth": 400.0,
       "polarisations": "V",
       "NEΔT": {
         "value": 0.4,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_14",
@@ -346,20 +242,14 @@
         "unit": null
       },
       "central_frequency": "57.290344±0.3222±0.1",
-      "bandwidth": {
-        "value": 50,
-        "unit": null
-      },
+      "bandwidth": 50.0,
       "polarisations": "H",
       "NEΔT": {
         "value": 0.4,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 57.0,
-        "y": 57.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 57000.0,
+      "nedt": null
     },
     {
       "channel_name": "Band_15",
@@ -368,20 +258,14 @@
         "unit": null
       },
       "central_frequency": "57.290344±0.3222±0.05",
-      "bandwidth": {
-        "value": 20,
-        "unit": null
-      },
+      "bandwidth": 20.0,
       "polarisations": "H",
       "NEΔT": {
         "value": 0.7,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 57.0,
-        "y": 57.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 57000.0,
+      "nedt": null
     },
     {
       "channel_name": "Band_16",
@@ -390,20 +274,14 @@
         "unit": null
       },
       "central_frequency": "57.290344±0.3222±0.025",
-      "bandwidth": {
-        "value": 10,
-        "unit": null
-      },
+      "bandwidth": 10.0,
       "polarisations": "H",
       "NEΔT": {
         "value": 0.9,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 57.0,
-        "y": 57.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 57000.0,
+      "nedt": null
     },
     {
       "channel_name": "Band_17",
@@ -412,20 +290,14 @@
         "unit": null
       },
       "central_frequency": "57.290344±0.3222±0.01",
-      "bandwidth": {
-        "value": 5,
-        "unit": null
-      },
+      "bandwidth": 5.0,
       "polarisations": "H",
       "NEΔT": {
         "value": 1.3,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 57.0,
-        "y": 57.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 57000.0,
+      "nedt": null
     },
     {
       "channel_name": "Band_18",
@@ -434,20 +306,14 @@
         "unit": null
       },
       "central_frequency": "57.290344±0.3222±0.005",
-      "bandwidth": {
-        "value": 3,
-        "unit": null
-      },
+      "bandwidth": 3.0,
       "polarisations": "H",
       "NEΔT": {
         "value": 1.7,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 57.0,
-        "y": 57.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 57000.0,
+      "nedt": null
     },
     {
       "channel_name": "Band_19",
@@ -455,24 +321,16 @@
         "value": 19,
         "unit": null
       },
-      "central_frequency": {
-        "value": 91.65,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 2000,
-        "unit": null
-      },
+      "central_frequency": 91.65,
+      "bandwidth": 2000.0,
       "polarisations": "V, H",
       "NEΔT": {
         "value": 0.6,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 19.0,
-        "y": 19.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 19000.0,
+      "unit": null,
+      "nedt": null
     },
     {
       "channel_name": "Band_20",
@@ -481,20 +339,14 @@
         "unit": null
       },
       "central_frequency": "183.31±7.0",
-      "bandwidth": {
-        "value": 1500,
-        "unit": null
-      },
+      "bandwidth": 1500.0,
       "polarisations": "V",
       "NEΔT": {
         "value": 0.5,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "nedt": null
     },
     {
       "channel_name": "Band_21",
@@ -503,20 +355,14 @@
         "unit": null
       },
       "central_frequency": "183.31±3.0",
-      "bandwidth": {
-        "value": 1000,
-        "unit": null
-      },
+      "bandwidth": 1000.0,
       "polarisations": "V",
       "NEΔT": {
         "value": 0.6,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "nedt": null
     },
     {
       "channel_name": "Band_22",
@@ -525,20 +371,14 @@
         "unit": null
       },
       "central_frequency": "183.31±1.0",
-      "bandwidth": {
-        "value": 500,
-        "unit": null
-      },
+      "bandwidth": 500.0,
       "polarisations": "V",
       "NEΔT": {
         "value": 0.8,
         "unit": null
       },
-      "spatial_resolution": {
-        "x": 38.0,
-        "y": 38.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 38000.0,
+      "nedt": null
     }
   ]
 }

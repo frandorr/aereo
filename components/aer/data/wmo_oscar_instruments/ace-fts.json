@@ -19,11 +19,11 @@
         "unit": "µm"
       },
       "No. of channels": "160,000",
-      "spectral_resolution": {
-        "value": 0.02,
-        "unit": "cm-1"
-      },
-      "snr_or_nedt": "1000 @ ......... W m-2sr-1µm-1"
+      "spectral_resolution": 0.02,
+      "snr_or_nedt": "1000 @ ......... W m-2sr-1µm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_02",
@@ -33,11 +33,11 @@
         "unit": "µm"
       },
       "No. of channels": "50,000",
-      "spectral_resolution": {
-        "value": 0.02,
-        "unit": "cm-1"
-      },
-      "snr_or_nedt": "1000 @ ......... W m-2sr-1µm-1"
+      "spectral_resolution": 0.02,
+      "snr_or_nedt": "1000 @ ......... W m-2sr-1µm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     }
   ]
 }

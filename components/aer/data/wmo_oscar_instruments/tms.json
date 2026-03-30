@@ -19,18 +19,13 @@
         "unit": null
       },
       "central_frequency": "91.655 ± 1.4 GHz",
-      "bandwidth": {
-        "value": 1000.0,
-        "unit": "MHz"
-      },
-      "spatial_resolution": {
-        "value": 50.7,
-        "unit": "km"
-      },
+      "bandwidth": 1000.0,
+      "spatial_resolution": 50700.0,
       "NE∆T": {
         "value": 0.95,
         "unit": "K"
-      }
+      },
+      "nedt": null
     },
     {
       "channel_name": "Band_02",
@@ -38,22 +33,15 @@
         "value": 2,
         "unit": null
       },
-      "central_frequency": {
-        "value": 114.5,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 1000.0,
-        "unit": "MHz"
-      },
-      "spatial_resolution": {
-        "value": 41.2,
-        "unit": "km"
-      },
+      "central_frequency": 114.5,
+      "bandwidth": 1000.0,
+      "spatial_resolution": 41200.0,
       "NE∆T": {
         "value": 0.55,
         "unit": "K"
-      }
+      },
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "Band_03",
@@ -61,22 +49,15 @@
         "value": 3,
         "unit": null
       },
-      "central_frequency": {
-        "value": 115.95,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 800.0,
-        "unit": "MHz"
-      },
-      "spatial_resolution": {
-        "value": 41.2,
-        "unit": "km"
-      },
+      "central_frequency": 115.95,
+      "bandwidth": 800.0,
+      "spatial_resolution": 41200.0,
       "NE∆T": {
         "value": 0.6,
         "unit": "K"
-      }
+      },
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "Band_04",
@@ -84,22 +65,15 @@
         "value": 4,
         "unit": null
       },
-      "central_frequency": {
-        "value": 116.65,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 600.0,
-        "unit": "MHz"
-      },
-      "spatial_resolution": {
-        "value": 41.2,
-        "unit": "km"
-      },
+      "central_frequency": 116.65,
+      "bandwidth": 600.0,
+      "spatial_resolution": 41200.0,
       "NE∆T": {
         "value": 0.7,
         "unit": "K"
-      }
+      },
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "Band_05",
@@ -107,22 +81,15 @@
         "value": 5,
         "unit": null
       },
-      "central_frequency": {
-        "value": 117.25,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 600.0,
-        "unit": "MHz"
-      },
-      "spatial_resolution": {
-        "value": 41.2,
-        "unit": "km"
-      },
+      "central_frequency": 117.25,
+      "bandwidth": 600.0,
+      "spatial_resolution": 41200.0,
       "NE∆T": {
         "value": 0.7,
         "unit": "K"
-      }
+      },
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "Band_06",
@@ -130,22 +97,15 @@
         "value": 6,
         "unit": null
       },
-      "central_frequency": {
-        "value": 117.8,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 500.0,
-        "unit": "MHz"
-      },
-      "spatial_resolution": {
-        "value": 41.2,
-        "unit": "km"
-      },
+      "central_frequency": 117.8,
+      "bandwidth": 500.0,
+      "spatial_resolution": 41200.0,
       "NE∆T": {
         "value": 0.75,
         "unit": "K"
-      }
+      },
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "Band_07",
@@ -153,22 +113,15 @@
         "value": 7,
         "unit": null
       },
-      "central_frequency": {
-        "value": 118.24,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 380.0,
-        "unit": "MHz"
-      },
-      "spatial_resolution": {
-        "value": 41.2,
-        "unit": "km"
-      },
+      "central_frequency": 118.24,
+      "bandwidth": 380.0,
+      "spatial_resolution": 41200.0,
       "NE∆T": {
         "value": 0.85,
         "unit": "K"
-      }
+      },
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "Band_08",
@@ -176,22 +129,15 @@
         "value": 8,
         "unit": null
       },
-      "central_frequency": {
-        "value": 118.58,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 300.0,
-        "unit": "MHz"
-      },
-      "spatial_resolution": {
-        "value": 41.2,
-        "unit": "km"
-      },
+      "central_frequency": 118.58,
+      "bandwidth": 300.0,
+      "spatial_resolution": 41200.0,
       "NE∆T": {
         "value": 1.0,
         "unit": "K"
-      }
+      },
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "Band_09",
@@ -199,22 +145,15 @@
         "value": 9,
         "unit": null
       },
-      "central_frequency": {
-        "value": 184.41,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 2000.0,
-        "unit": "MHz"
-      },
-      "spatial_resolution": {
-        "value": 27.5,
-        "unit": "km"
-      },
+      "central_frequency": 184.41,
+      "bandwidth": 2000.0,
+      "spatial_resolution": 27500.0,
       "NE∆T": {
         "value": 0.6,
         "unit": "K"
-      }
+      },
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "Band_10",
@@ -222,22 +161,15 @@
         "value": 10,
         "unit": null
       },
-      "central_frequency": {
-        "value": 186.51,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 2000.0,
-        "unit": "MHz"
-      },
-      "spatial_resolution": {
-        "value": 27.5,
-        "unit": "km"
-      },
+      "central_frequency": 186.51,
+      "bandwidth": 2000.0,
+      "spatial_resolution": 27500.0,
       "NE∆T": {
         "value": 0.6,
         "unit": "K"
-      }
+      },
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "Band_11",
@@ -245,22 +177,15 @@
         "value": 11,
         "unit": null
       },
-      "central_frequency": {
-        "value": 190.31,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 2000.0,
-        "unit": "MHz"
-      },
-      "spatial_resolution": {
-        "value": 27.5,
-        "unit": "km"
-      },
+      "central_frequency": 190.31,
+      "bandwidth": 2000.0,
+      "spatial_resolution": 27500.0,
       "NE∆T": {
         "value": 0.6,
         "unit": "K"
-      }
+      },
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "Band_12",
@@ -268,22 +193,15 @@
         "value": 12,
         "unit": null
       },
-      "central_frequency": {
-        "value": 204.8,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 2000.0,
-        "unit": "MHz"
-      },
-      "spatial_resolution": {
-        "value": 26.0,
-        "unit": "km"
-      },
+      "central_frequency": 204.8,
+      "bandwidth": 2000.0,
+      "spatial_resolution": 26000.0,
       "NE∆T": {
         "value": 0.6,
         "unit": "K"
-      }
+      },
+      "unit": "GHz",
+      "nedt": null
     }
   ]
 }

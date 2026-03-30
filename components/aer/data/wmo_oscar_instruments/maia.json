@@ -13,129 +13,157 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 38.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": ""
+      "central_wavelength": 367.0,
+      "bandwidth": 38.0,
+      "Polarisations(Stokes parameters)": "",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 39.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": ""
+      "central_wavelength": 389.0,
+      "bandwidth": 39.0,
+      "Polarisations(Stokes parameters)": "",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 39.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": ""
+      "central_wavelength": 415.0,
+      "bandwidth": 39.0,
+      "Polarisations(Stokes parameters)": "",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 54.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": "Q and U"
+      "central_wavelength": 445.0,
+      "bandwidth": 54.0,
+      "Polarisations(Stokes parameters)": "Q and U",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_05",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 45.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": ""
+      "central_wavelength": 551.0,
+      "bandwidth": 45.0,
+      "Polarisations(Stokes parameters)": "",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_06",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 73.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": "Q and U"
+      "central_wavelength": 645.0,
+      "bandwidth": 73.0,
+      "Polarisations(Stokes parameters)": "Q and U",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_07",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 18.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": ""
+      "central_wavelength": 749.0,
+      "bandwidth": 18.0,
+      "Polarisations(Stokes parameters)": "",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_08",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 6.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": ""
+      "central_wavelength": 762.5,
+      "bandwidth": 6.0,
+      "Polarisations(Stokes parameters)": "",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_09",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 51.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": ""
+      "central_wavelength": 864.0,
+      "bandwidth": 51.0,
+      "Polarisations(Stokes parameters)": "",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_10",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 47.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": ""
+      "central_wavelength": 943.0,
+      "bandwidth": 47.0,
+      "Polarisations(Stokes parameters)": "",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_11",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 97.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": "Q and U"
+      "central_wavelength": 1039.0,
+      "bandwidth": 97.0,
+      "Polarisations(Stokes parameters)": "Q and U",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_12",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 72.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": ""
+      "central_wavelength": 1607.0,
+      "bandwidth": 72.0,
+      "Polarisations(Stokes parameters)": "",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_13",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 87.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": ""
+      "central_wavelength": 1880.0,
+      "bandwidth": 87.0,
+      "Polarisations(Stokes parameters)": "",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_14",
-      "central_wavelength": "…. @ …. W m-2sr-1µm-1",
-      "bandwidth": {
-        "value": 124.0,
-        "unit": "nm"
-      },
-      "Polarisations(Stokes parameters)": ""
+      "central_wavelength": 2126.0,
+      "bandwidth": 124.0,
+      "Polarisations(Stokes parameters)": "",
+      "snr_or_nedt": "…. @ …. W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

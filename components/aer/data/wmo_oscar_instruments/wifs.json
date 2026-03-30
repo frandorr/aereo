@@ -12,21 +12,23 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": "200 @ 263 W m-2sr-1µm-1",
-      "bandwidth": {
-        "min": 0.62,
-        "max": 0.68,
-        "unit": "µm"
-      }
+      "central_wavelength": 0.65,
+      "bandwidth": 0.62,
+      "snr_or_nedt": "200 @ 263 W m-2sr-1µm-1",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": "200 @ 285 W m-2sr-1µm-1",
-      "bandwidth": {
-        "min": 0.77,
-        "max": 0.86,
-        "unit": "µm"
-      }
+      "central_wavelength": 0.815,
+      "bandwidth": 0.77,
+      "snr_or_nedt": "200 @ 285 W m-2sr-1µm-1",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

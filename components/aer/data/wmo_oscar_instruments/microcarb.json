@@ -18,15 +18,12 @@
         "max": 768.0,
         "unit": "nm"
       },
-      "spectral_resolution": {
-        "value": 25000,
-        "unit": null
-      },
-      "snr_or_nedt": {
-        "value": 600,
-        "unit": null
-      },
-      "Species": "O2"
+      "spectral_resolution": 25000.0,
+      "snr_or_nedt": 600.0,
+      "Species": "O2",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_02",
@@ -35,15 +32,12 @@
         "max": 1282.0,
         "unit": "nm"
       },
-      "spectral_resolution": {
-        "value": 25000,
-        "unit": null
-      },
-      "snr_or_nedt": {
-        "value": 900,
-        "unit": null
-      },
-      "Species": "O2"
+      "spectral_resolution": 25000.0,
+      "snr_or_nedt": 900.0,
+      "Species": "O2",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_03",
@@ -52,15 +46,12 @@
         "max": 1609.0,
         "unit": "nm"
       },
-      "spectral_resolution": {
-        "value": 25000,
-        "unit": null
-      },
-      "snr_or_nedt": {
-        "value": 600,
-        "unit": null
-      },
-      "Species": "CO2"
+      "spectral_resolution": 25000.0,
+      "snr_or_nedt": 600.0,
+      "Species": "CO2",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_04",
@@ -69,15 +60,12 @@
         "max": 1672.0,
         "unit": "nm"
       },
-      "spectral_resolution": {
-        "value": 25000,
-        "unit": null
-      },
-      "snr_or_nedt": {
-        "value": 670,
-        "unit": null
-      },
-      "Species": "CH4"
+      "spectral_resolution": 25000.0,
+      "snr_or_nedt": 670.0,
+      "Species": "CH4",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     },
     {
       "channel_name": "Band_05",
@@ -86,15 +74,12 @@
         "max": 2065.0,
         "unit": "nm"
       },
-      "spectral_resolution": {
-        "value": 25000,
-        "unit": null
-      },
-      "snr_or_nedt": {
-        "value": 280,
-        "unit": null
-      },
-      "Species": "CO2"
+      "spectral_resolution": 25000.0,
+      "snr_or_nedt": 280.0,
+      "Species": "CO2",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
     }
   ]
 }

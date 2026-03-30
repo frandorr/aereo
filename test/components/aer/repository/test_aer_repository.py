@@ -12,7 +12,8 @@ Example:
 
 import pytest
 
-from aer.repository import Channel, Instrument, Satellite
+from aer.repository import Instrument, Satellite
+from aer.repository.models import OpticalChannel
 
 
 @pytest.mark.skip(reason="Abstract base class - subclass and provide repo fixture")
@@ -34,12 +35,13 @@ class TestAerRepositoryBase:
             satellite_acronym="SENTINEL-2",
             acronym="MSI",
             channels=[
-                Channel(
+                OpticalChannel(
+                    channel_name="B01",
                     instrument_acronym="MSI",
+                    unit="um",
                     central_wavelength=0.5,
                     bandwidth=0.1,
-                    unit="um",
-                    resolution_m=20.0,
+                    spatial_resolution=20.0,
                 )
             ],
         )
@@ -63,12 +65,13 @@ class TestAerRepositoryBase:
         satellite = Satellite(acronym="AQUA", payload=[])
         repo.store_satellite(satellite)
 
-        channel = Channel(
+        channel = OpticalChannel(
+            channel_name="Band 1",
             instrument_acronym="AIRS",
+            unit="um",
             central_wavelength=11.0,
             bandwidth=1.0,
-            unit="um",
-            resolution_m=1000.0,
+            spatial_resolution=1000.0,
         )
         instrument = Instrument(
             satellite_acronym="AQUA", acronym="AIRS", channels=[channel]
@@ -111,29 +114,31 @@ class TestAerRepositoryBase:
         )
         repo.store_instrument(instrument)
 
-        channel = Channel(
+        channel = OpticalChannel(
+            channel_name="Band 1",
             instrument_acronym="MODIS",
+            unit="um",
             central_wavelength=0.65,
             bandwidth=0.05,
-            unit="um",
-            resolution_m=10.0,
+            spatial_resolution=10.0,
         )
 
         returned_key = repo.store_channel(channel)
 
-        assert returned_key == "0.65"
-        retrieved = repo.get_channel("0.65")
+        assert returned_key == "MODIS_Band 1"
+        retrieved = repo.get_channel("MODIS_Band 1")
         assert retrieved.central_wavelength == channel.central_wavelength
         assert retrieved.instrument_acronym == channel.instrument_acronym
 
     def test_store_channel_missing_instrument(self, repo):
         """Test that KeyError is raised when storing channel without instrument."""
-        channel = Channel(
+        channel = OpticalChannel(
+            channel_name="Band 1",
             instrument_acronym="NONEXISTENT",
+            unit="um",
             central_wavelength=0.65,
             bandwidth=0.05,
-            unit="um",
-            resolution_m=10.0,
+            spatial_resolution=10.0,
         )
 
         with pytest.raises(KeyError, match="Instrument 'NONEXISTENT' not found"):
@@ -141,5 +146,7 @@ class TestAerRepositoryBase:
 
     def test_get_channel_not_found(self, repo):
         """Test that KeyError is raised for non-existent channel."""
-        with pytest.raises(KeyError, match="Channel with identifier '99.0' not found"):
-            repo.get_channel("99.0")
+        with pytest.raises(
+            KeyError, match="Channel with identifier 'NONEXISTENT_99.0' not found"
+        ):
+            repo.get_channel("NONEXISTENT_99.0")

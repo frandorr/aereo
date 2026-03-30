@@ -18,19 +18,16 @@
         "value": 1,
         "unit": null
       },
-      "central_frequency": {
-        "value": 89.0,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 2800,
-        "unit": null
-      },
+      "central_frequency": 89.0,
+      "bandwidth": 2800.0,
       "polarisations": "QV",
       "NEΔT": {
         "value": 0.22,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH02",
@@ -38,19 +35,16 @@
         "value": 2,
         "unit": null
       },
-      "central_frequency": {
-        "value": 157.0,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 2800,
-        "unit": null
-      },
+      "central_frequency": 157.0,
+      "bandwidth": 2800.0,
       "polarisations": "QV",
       "NEΔT": {
         "value": 0.38,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH03",
@@ -59,15 +53,14 @@
         "unit": null
       },
       "central_frequency": "183.31 ± 1.0",
-      "bandwidth": {
-        "value": 1000,
-        "unit": null
-      },
+      "bandwidth": 1000.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.57,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH04",
@@ -76,15 +69,14 @@
         "unit": null
       },
       "central_frequency": "183.31 ± 3.0",
-      "bandwidth": {
-        "value": 2000,
-        "unit": null
-      },
+      "bandwidth": 2000.0,
       "polarisations": "QH",
       "NEΔT": {
         "value": 0.42,
         "unit": "K"
-      }
+      },
+      "spatial_resolution": null,
+      "nedt": null
     },
     {
       "channel_name": "CH05",
@@ -92,19 +84,16 @@
         "value": 5,
         "unit": null
       },
-      "central_frequency": {
-        "value": 190.311,
-        "unit": null
-      },
-      "bandwidth": {
-        "value": 2000,
-        "unit": null
-      },
+      "central_frequency": 190.311,
+      "bandwidth": 2000.0,
       "polarisations": "QV",
       "NEΔT": {
         "value": 0.45,
         "unit": "K"
-      }
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
     }
   ]
 }

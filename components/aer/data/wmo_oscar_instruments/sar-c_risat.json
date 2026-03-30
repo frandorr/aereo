@@ -3,92 +3,54 @@
   "instrument_acronym": "SAR-C (RISAT)",
   "instrument_fullname": "",
   "url": "https://space.oscar.wmo.int/instruments/view/sar-c_risat",
-  "schema_type": "unknown",
-  "original_columns": [],
+  "schema_type": "sar_active",
+  "original_columns": [
+    "channel_name",
+    "operation_mode",
+    "spatial_resolution",
+    "swath_width",
+    "field_of_regard",
+    "polarisation"
+  ],
   "channels": [
     {
       "channel_name": "Band_01",
       "operation_mode": "HRS(High Resolution Spotlight)",
-      "spatial_resolution": {
-        "value": 1.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 10.0,
-        "unit": "km"
-      },
-      "field_of_regard": {
-        "value": 659.0,
-        "unit": "km, either right or left"
-      },
+      "spatial_resolution": 1.0,
+      "swath_width": 10000.0,
+      "field_of_regard": 659.0,
       "polarisation": "HH or VV or HH/HV or VV/VH"
     },
     {
       "channel_name": "Band_02",
       "operation_mode": "FRS-1(Fine Resolution Stripmap-1)",
-      "spatial_resolution": {
-        "value": 3.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 30.0,
-        "unit": "km"
-      },
-      "field_of_regard": {
-        "value": 659.0,
-        "unit": "km, either right or left"
-      },
+      "spatial_resolution": 3.0,
+      "swath_width": 30000.0,
+      "field_of_regard": 659.0,
       "polarisation": "HH or VV or HH/HV or VV/VH"
     },
     {
       "channel_name": "Band_03",
       "operation_mode": "FRS-2(Fine Resolution Stripmap-2)",
-      "spatial_resolution": {
-        "value": 9.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 30.0,
-        "unit": "km"
-      },
-      "field_of_regard": {
-        "value": 659.0,
-        "unit": "km, either right or left"
-      },
+      "spatial_resolution": 9.0,
+      "swath_width": 30000.0,
+      "field_of_regard": 659.0,
       "polarisation": "VV/HH, HH/HV, VV/VH"
     },
     {
       "channel_name": "Band_04",
       "operation_mode": "MRS(Medium Resolution ScanSAR)",
-      "spatial_resolution": {
-        "value": 25.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 120.0,
-        "unit": "km"
-      },
-      "field_of_regard": {
-        "value": 659.0,
-        "unit": "km, either right or left"
-      },
+      "spatial_resolution": 25.0,
+      "swath_width": 120000.0,
+      "field_of_regard": 659.0,
       "polarisation": "HH or VV or HH/HV or VV/VH"
     },
     {
       "channel_name": "Band_05",
       "operation_mode": "CRS(Coarse Resolution ScanSAR)",
-      "spatial_resolution": {
-        "value": 50.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 240.0,
-        "unit": "km"
-      },
-      "field_of_regard": {
-        "value": 659.0,
-        "unit": "km, either right or left"
-      },
+      "spatial_resolution": 50.0,
+      "swath_width": 240000.0,
+      "field_of_regard": 659.0,
       "polarisation": "HH or VV or HH/HV or VV/VH"
     }
   ]

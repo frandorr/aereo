@@ -15,11 +15,7 @@
     {
       "channel_name": "SW",
       "Channel": "Short-wave",
-      "bandwidth": {
-        "min": 0.3,
-        "max": 5.0,
-        "unit": "µm"
-      },
+      "bandwidth": 0.3,
       "Noise Equivalent Radiance": {
         "value": 0.3,
         "unit": "W m-2sr-1"
@@ -28,19 +24,16 @@
         "value": 0.8,
         "unit": "W m-2sr-1"
       },
-      "snr_or_nedt": {
-        "value": 225,
-        "unit": null
-      }
+      "snr_or_nedt": 225.0,
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Total",
       "Channel": "Total radiance",
-      "bandwidth": {
-        "min": 0.3,
-        "max": 100.0,
-        "unit": "µm"
-      },
+      "bandwidth": 0.3,
       "Noise Equivalent Radiance": {
         "value": 0.3,
         "unit": "W m-2sr-1"
@@ -49,19 +42,16 @@
         "value": 0.6,
         "unit": "W m-2sr-1"
       },
-      "snr_or_nedt": {
-        "value": 750,
-        "unit": null
-      }
+      "snr_or_nedt": 750.0,
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Window",
       "Channel": "TIR",
-      "bandwidth": {
-        "min": 8.0,
-        "max": 12.0,
-        "unit": "µm"
-      },
+      "bandwidth": 8.0,
       "Noise Equivalent Radiance": {
         "value": 0.3,
         "unit": "W m-2sr-1"
@@ -70,10 +60,11 @@
         "value": 0.3,
         "unit": "W m-2sr-1"
       },
-      "snr_or_nedt": {
-        "value": 750,
-        "unit": null
-      }
+      "snr_or_nedt": 750.0,
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

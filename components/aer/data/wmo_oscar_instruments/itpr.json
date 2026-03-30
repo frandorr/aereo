@@ -28,7 +28,13 @@
       "NEN": {
         "value": 0.195,
         "unit": "mW m-2sr-1cm"
-      }
+      },
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_02",
@@ -47,7 +53,13 @@
       "NEN": {
         "value": 0.5,
         "unit": "mW m-2sr-1cm"
-      }
+      },
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_03",
@@ -66,7 +78,13 @@
       "NEN": {
         "value": 0.187,
         "unit": "mW m-2sr-1cm"
-      }
+      },
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_04",
@@ -85,7 +103,13 @@
       "NEN": {
         "value": 0.192,
         "unit": "mW m-2sr-1cm"
-      }
+      },
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_05",
@@ -104,7 +128,13 @@
       "NEN": {
         "value": 0.192,
         "unit": "mW m-2sr-1cm"
-      }
+      },
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_06",
@@ -123,7 +153,13 @@
       "NEN": {
         "value": 0.192,
         "unit": "mW m-2sr-1cm"
-      }
+      },
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_07",
@@ -142,7 +178,13 @@
       "NEN": {
         "value": 0.004,
         "unit": "mW m-2sr-1cm"
-      }
+      },
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     }
   ]
 }

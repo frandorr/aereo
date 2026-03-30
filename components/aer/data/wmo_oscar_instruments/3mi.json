@@ -18,16 +18,14 @@
         "value": 3.0,
         "unit": "MI-2b"
       },
-      "central_wavelength": {
-        "value": 410.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 410.0,
+      "bandwidth": 20.0,
       "Polarisation": "Y",
-      "snr_or_nedt": "200 @ 46.64 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 46.64 W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH02",
@@ -35,16 +33,14 @@
         "value": 3.0,
         "unit": "MI-3"
       },
-      "central_wavelength": {
-        "value": 443.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 443.0,
+      "bandwidth": 20.0,
       "Polarisation": "Y",
-      "snr_or_nedt": "200 @ 56.61W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 56.61W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH03",
@@ -52,16 +48,14 @@
         "value": 3.0,
         "unit": "MI-4"
       },
-      "central_wavelength": {
-        "value": 490.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 490.0,
+      "bandwidth": 20.0,
       "Polarisation": "Y",
-      "snr_or_nedt": "200 @ 57.74 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 57.74 W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH04",
@@ -69,16 +63,14 @@
         "value": 3.0,
         "unit": "MI-5"
       },
-      "central_wavelength": {
-        "value": 555.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 555.0,
+      "bandwidth": 20.0,
       "Polarisation": "Y",
-      "snr_or_nedt": "200 @ 55.24 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 55.24 W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH05",
@@ -86,16 +78,14 @@
         "value": 3.0,
         "unit": "MI-6"
       },
-      "central_wavelength": {
-        "value": 670.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 670.0,
+      "bandwidth": 20.0,
       "Polarisation": "Y",
-      "snr_or_nedt": "200 @ 44.57 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 44.57 W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH06",
@@ -103,16 +93,14 @@
         "value": 3.0,
         "unit": "MI -7"
       },
-      "central_wavelength": {
-        "value": 763.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 10.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 763.0,
+      "bandwidth": 10.0,
       "Polarisation": "N",
-      "snr_or_nedt": "200 @ 36.11 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 36.11 W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH07",
@@ -120,16 +108,14 @@
         "value": 3.0,
         "unit": "MI -8"
       },
-      "central_wavelength": {
-        "value": 765.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 40.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 765.0,
+      "bandwidth": 40.0,
       "Polarisation": "N",
-      "snr_or_nedt": "200 @ 36.11 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 36.11 W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH08",
@@ -137,16 +123,14 @@
         "value": 3.0,
         "unit": "MI -9"
       },
-      "central_wavelength": {
-        "value": 865.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 40.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 865.0,
+      "bandwidth": 40.0,
       "Polarisation": "Y",
-      "snr_or_nedt": "200 @ 28.20 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 28.20 W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH09",
@@ -154,16 +138,14 @@
         "value": 3.0,
         "unit": "MI-9a"
       },
-      "central_wavelength": {
-        "value": 910.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 910.0,
+      "bandwidth": 20.0,
       "Polarisation": "N",
-      "snr_or_nedt": "200 @ 25.18 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 25.18 W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH10",
@@ -171,16 +153,14 @@
         "value": 3.0,
         "unit": "MI -10"
       },
-      "central_wavelength": {
-        "value": 1370.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 40.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 1370.0,
+      "bandwidth": 40.0,
       "Polarisation": "Y",
-      "snr_or_nedt": "200 @ 10.73 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 10.73 W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH11",
@@ -188,16 +168,14 @@
         "value": 3.0,
         "unit": "MI -11"
       },
-      "central_wavelength": {
-        "value": 1650.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 40.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 1650.0,
+      "bandwidth": 40.0,
       "Polarisation": "Y",
-      "snr_or_nedt": "200 @ 6.80 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 6.80 W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH12",
@@ -205,16 +183,14 @@
         "value": 3.0,
         "unit": "MI -12"
       },
-      "central_wavelength": {
-        "value": 2130.0,
-        "unit": "nm"
-      },
-      "bandwidth": {
-        "value": 40.0,
-        "unit": "nm"
-      },
+      "central_wavelength": 2130.0,
+      "bandwidth": 40.0,
       "Polarisation": "Y",
-      "snr_or_nedt": "200 @ 2.50 W m-2sr-1µm-1"
+      "snr_or_nedt": "200 @ 2.50 W m-2sr-1µm-1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

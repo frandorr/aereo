@@ -14,58 +14,34 @@
     {
       "channel_name": "Band_01",
       "operation_mode": "Spotlight",
-      "spatial_resolution": {
-        "x": 0.25,
-        "y": 0.5,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 10.0,
-        "unit": "km"
-      },
-      "polarisation": "HH or VV or HV or VH"
+      "spatial_resolution": 0.25,
+      "swath_width": 10000.0,
+      "polarisation": "HH or VV or HV or VH",
+      "field_of_regard": null
     },
     {
       "channel_name": "Band_02",
       "operation_mode": "HR Stripmap",
-      "spatial_resolution": {
-        "x": 0.5,
-        "y": 0.5,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 20.0,
-        "unit": "km"
-      },
-      "polarisation": "HH or VV or HV or VH"
+      "spatial_resolution": 0.5,
+      "swath_width": 20000.0,
+      "polarisation": "HH or VV or HV or VH",
+      "field_of_regard": null
     },
     {
       "channel_name": "Band_03",
       "operation_mode": "Stripmap",
-      "spatial_resolution": {
-        "x": 1.0,
-        "y": 1.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 70.0,
-        "unit": "km"
-      },
-      "polarisation": "HH or VV or HV or VH"
+      "spatial_resolution": 1.0,
+      "swath_width": 70000.0,
+      "polarisation": "HH or VV or HV or VH",
+      "field_of_regard": null
     },
     {
       "channel_name": "Band_04",
       "operation_mode": "ScanSAR",
-      "spatial_resolution": {
-        "x": 25.0,
-        "y": 25.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 800.0,
-        "unit": "km"
-      },
-      "polarisation": "HH or VV or HV or VH"
+      "spatial_resolution": 25.0,
+      "swath_width": 800000.0,
+      "polarisation": "HH or VV or HV or VH",
+      "field_of_regard": null
     }
   ]
 }

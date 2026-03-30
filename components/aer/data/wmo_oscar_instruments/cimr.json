@@ -20,24 +20,16 @@
         "value": 1,
         "unit": null
       },
-      "central_frequency": {
-        "value": 1.4135,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 25.0,
-        "unit": "MHz"
-      },
+      "central_frequency": 1.4135,
+      "bandwidth": 25.0,
       "polarisations": "V, H, P, M, L, R",
       "NEΔT": {
         "value": 0.3,
         "unit": "K"
       },
-      "spatial_resolution": {
-        "x": 58.0,
-        "y": 58.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 58000.0,
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "CH02",
@@ -45,24 +37,16 @@
         "value": 2,
         "unit": null
       },
-      "central_frequency": {
-        "value": 6.875,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 400.0,
-        "unit": "MHz"
-      },
+      "central_frequency": 6.875,
+      "bandwidth": 400.0,
       "polarisations": "V, H, P, M, L, R",
       "NEΔT": {
         "value": 0.2,
         "unit": "K"
       },
-      "spatial_resolution": {
-        "x": 15.0,
-        "y": 15.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 15000.0,
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "CH03",
@@ -70,24 +54,16 @@
         "value": 3,
         "unit": null
       },
-      "central_frequency": {
-        "value": 10.65,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 100.0,
-        "unit": "MHz"
-      },
+      "central_frequency": 10.65,
+      "bandwidth": 100.0,
       "polarisations": "V, H, P, M, L, R",
       "NEΔT": {
         "value": 0.3,
         "unit": "K"
       },
-      "spatial_resolution": {
-        "x": 15.0,
-        "y": 15.0,
-        "unit": "km"
-      }
+      "spatial_resolution": 15000.0,
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "CH04",
@@ -95,24 +71,16 @@
         "value": 4,
         "unit": null
       },
-      "central_frequency": {
-        "value": 18.7,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 200.0,
-        "unit": "MHz"
-      },
+      "central_frequency": 18.7,
+      "bandwidth": 200.0,
       "polarisations": "V, H, P, M, L, R",
       "NEΔT": {
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": {
-        "x": 5.5,
-        "y": 5.5,
-        "unit": "km"
-      }
+      "spatial_resolution": 5500.0,
+      "unit": "GHz",
+      "nedt": null
     },
     {
       "channel_name": "CH05",
@@ -120,24 +88,16 @@
         "value": 5,
         "unit": null
       },
-      "central_frequency": {
-        "value": 36.5,
-        "unit": "GHz"
-      },
-      "bandwidth": {
-        "value": 300.0,
-        "unit": "MHz"
-      },
+      "central_frequency": 36.5,
+      "bandwidth": 300.0,
       "polarisations": "V, H, P, M, L, R",
       "NEΔT": {
         "value": 0.7,
         "unit": "K"
       },
-      "spatial_resolution": {
-        "x": 4.5,
-        "y": 4.5,
-        "unit": "km"
-      }
+      "spatial_resolution": 4500.0,
+      "unit": "GHz",
+      "nedt": null
     }
   ]
 }

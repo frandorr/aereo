@@ -12,90 +12,63 @@
   "channels": [
     {
       "channel_name": "CH1",
-      "central_wavelength": {
-        "value": 0.6,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.5,
-        "max": 0.7,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "1000 @ 80 % albedo"
+      "central_wavelength": 0.6,
+      "bandwidth": 0.5,
+      "snr_or_nedt": "1000 @ 80 % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH2",
-      "central_wavelength": {
-        "value": 0.9,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.7,
-        "max": 1.1,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "1000 @ 80 % albedo"
+      "central_wavelength": 0.9,
+      "bandwidth": 0.7,
+      "snr_or_nedt": "1000 @ 80 % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH3",
-      "central_wavelength": {
-        "value": 1.7,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 1.6,
-        "max": 1.8,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "1000 @ 80 % albedo"
+      "central_wavelength": 1.7,
+      "bandwidth": 1.6,
+      "snr_or_nedt": "1000 @ 80 % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH4",
-      "central_wavelength": {
-        "value": 3.8,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 3.5,
-        "max": 4.1,
-        "unit": "µm"
-      },
-      "snr_or_nedt": {
-        "value": 0.5,
-        "unit": "K @ 300 K"
-      }
+      "central_wavelength": 3.8,
+      "bandwidth": 3.5,
+      "snr_or_nedt": 0.5,
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH5",
-      "central_wavelength": {
-        "value": 11.0,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 10.5,
-        "max": 11.5,
-        "unit": "µm"
-      },
-      "snr_or_nedt": {
-        "value": 0.15,
-        "unit": "K @ 300 K"
-      }
+      "central_wavelength": 11.0,
+      "bandwidth": 10.5,
+      "snr_or_nedt": 0.15,
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH6",
-      "central_wavelength": {
-        "value": 12.0,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 11.5,
-        "max": 12.5,
-        "unit": "µm"
-      },
-      "snr_or_nedt": {
-        "value": 0.15,
-        "unit": "K @ 300 K"
-      }
+      "central_wavelength": 12.0,
+      "bandwidth": 11.5,
+      "snr_or_nedt": 0.15,
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

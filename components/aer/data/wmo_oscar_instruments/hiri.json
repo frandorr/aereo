@@ -12,65 +12,52 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": {
-        "value": 0.49,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.45,
-        "max": 0.53,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "141 @ 50 % albedo, SZA 60°"
+      "central_wavelength": 0.49,
+      "bandwidth": 0.45,
+      "snr_or_nedt": "141 @ 50 % albedo, SZA 60°",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": {
-        "value": 0.55,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.52,
-        "max": 0.58,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "139 @ 50 % albedo, SZA 60°"
+      "central_wavelength": 0.55,
+      "bandwidth": 0.52,
+      "snr_or_nedt": "139 @ 50 % albedo, SZA 60°",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": {
-        "value": 0.66,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.62,
-        "max": 0.7,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "145 @ 50 % albedo, SZA 60°"
+      "central_wavelength": 0.66,
+      "bandwidth": 0.62,
+      "snr_or_nedt": "145 @ 50 % albedo, SZA 60°",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": {
-        "value": 0.83,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.78,
-        "max": 0.89,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "184 @ 70 % albedo, SZA 60°"
+      "central_wavelength": 0.83,
+      "bandwidth": 0.78,
+      "snr_or_nedt": "184 @ 70 % albedo, SZA 60°",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_05",
       "central_wavelength": "N/A (PAN)",
-      "bandwidth": {
-        "min": 0.48,
-        "max": 0.9,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "145 @ 50 % albedo, SZA 60°"
+      "bandwidth": 0.48,
+      "snr_or_nedt": "145 @ 50 % albedo, SZA 60°",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

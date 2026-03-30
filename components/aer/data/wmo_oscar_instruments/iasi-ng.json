@@ -25,7 +25,12 @@
       "NEΔT after apodisation": {
         "value": 0.39,
         "unit": "K @ 280 K0.26 K @ 280 K0.225 K @ 280 K0.225 K @ 280 K"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "IAS-2",
@@ -43,7 +48,12 @@
       "NEΔT after apodisation": {
         "value": 0.13,
         "unit": "K @ 280 K"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "IAS-3",
@@ -61,7 +71,12 @@
       "NEΔT after apodisation": {
         "value": 0.13,
         "unit": "K @ 280 K"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "IAS-4",
@@ -79,7 +94,12 @@
       "NEΔT after apodisation": {
         "value": 0.195,
         "unit": "K @ 280 K"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "IAS-5",
@@ -97,7 +117,12 @@
       "NEΔT after apodisation": {
         "value": 0.195,
         "unit": "K @ 280 K"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "IAS-6",
@@ -115,7 +140,12 @@
       "NEΔT after apodisation": {
         "value": 0.13,
         "unit": "K @ 280 K"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "IAS-7",
@@ -133,7 +163,12 @@
       "NEΔT after apodisation": {
         "value": 0.449,
         "unit": "K @ 280 K"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "IAS-8",
@@ -151,7 +186,12 @@
       "NEΔT after apodisation": {
         "value": 0.156,
         "unit": "K @ 280 K"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "IAS-9",
@@ -169,7 +209,12 @@
       "NEΔT after apodisation": {
         "value": 0.26,
         "unit": "K @ 280 K"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "IAS-10",
@@ -187,7 +232,12 @@
       "NEΔT after apodisation": {
         "value": 0.26,
         "unit": "K @ 280 K"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "IAS-11",
@@ -203,7 +253,12 @@
       "NEΔT after apodisation": {
         "value": 0.26,
         "unit": "K @ 280 K0.26 K @ 280 K0.65 K @ 280 K1.138 K @ 280 K"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "IAS-12",
@@ -219,7 +274,12 @@
       "NEΔT after apodisation": {
         "value": 1.138,
         "unit": "K @ 280 K1.43 K @ 280 K"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     }
   ]
 }

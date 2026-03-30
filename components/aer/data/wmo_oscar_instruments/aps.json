@@ -17,12 +17,13 @@
         "value": 412.0,
         "unit": "nm"
       },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "bandwidth": 20.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
+      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
@@ -30,12 +31,13 @@
         "value": 443.0,
         "unit": "nm"
       },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "bandwidth": 20.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
+      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
@@ -43,12 +45,13 @@
         "value": 555.0,
         "unit": "nm"
       },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "bandwidth": 20.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
+      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
@@ -56,12 +59,13 @@
         "value": 672.0,
         "unit": "nm"
       },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "bandwidth": 20.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
+      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_05",
@@ -69,12 +73,13 @@
         "value": 865.0,
         "unit": "nm"
       },
-      "bandwidth": {
-        "value": 39.0,
-        "unit": "nm"
-      },
+      "bandwidth": 39.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
+      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_06",
@@ -82,12 +87,13 @@
         "value": 910.0,
         "unit": "nm"
       },
-      "bandwidth": {
-        "value": 20.0,
-        "unit": "nm"
-      },
+      "bandwidth": 20.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "central_wavelength": "94 @ ….. W m-2sr-1μm-1"
+      "snr_or_nedt": "94 @ ….. W m-2sr-1μm-1",
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_07",
@@ -95,12 +101,13 @@
         "value": 1378.0,
         "unit": "nm"
       },
-      "bandwidth": {
-        "value": 35.0,
-        "unit": "nm"
-      },
+      "bandwidth": 35.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "central_wavelength": "141 @ ….. W m-2sr-1μm-1"
+      "snr_or_nedt": "141 @ ….. W m-2sr-1μm-1",
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_08",
@@ -108,12 +115,13 @@
         "value": 1610.0,
         "unit": "nm"
       },
-      "bandwidth": {
-        "value": 60.0,
-        "unit": "nm"
-      },
+      "bandwidth": 60.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
+      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_09",
@@ -121,12 +129,13 @@
         "value": 2250.0,
         "unit": "nm"
       },
-      "bandwidth": {
-        "value": 75.0,
-        "unit": "nm"
-      },
+      "bandwidth": 75.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "central_wavelength": "235 @ ….. W m-2sr-1μm-1"
+      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

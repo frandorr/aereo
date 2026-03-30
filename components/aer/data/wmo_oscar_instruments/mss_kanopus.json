@@ -3,60 +3,54 @@
   "instrument_acronym": "MSS (KANOPUS)",
   "instrument_fullname": "",
   "url": "https://space.oscar.wmo.int/instruments/view/mss_kanopus",
-  "schema_type": "unknown",
-  "original_columns": [],
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "channel_name",
+    "central_wavelength",
+    "bandwidth",
+    "snr_or_nedt",
+    "unit"
+  ],
   "channels": [
     {
       "channel_name": "Band_01",
-      "central_wavelength": {
-        "value": 0.55,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.5,
-        "max": 0.6,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "…… @ ….. % albedo"
+      "central_wavelength": 0.55,
+      "bandwidth": 0.5,
+      "snr_or_nedt": "…… @ ….. % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_02",
-      "central_wavelength": {
-        "value": 0.65,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.6,
-        "max": 0.7,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "…… @ ….. % albedo"
+      "central_wavelength": 0.65,
+      "bandwidth": 0.6,
+      "snr_or_nedt": "…… @ ….. % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_03",
-      "central_wavelength": {
-        "value": 0.75,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.7,
-        "max": 0.8,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "…… @ ….. % albedo"
+      "central_wavelength": 0.75,
+      "bandwidth": 0.7,
+      "snr_or_nedt": "…… @ ….. % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "Band_04",
-      "central_wavelength": {
-        "value": 0.85,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.8,
-        "max": 0.9,
-        "unit": "µm"
-      },
-      "snr_or_nedt": "…… @ ….. % albedo"
+      "central_wavelength": 0.85,
+      "bandwidth": 0.8,
+      "snr_or_nedt": "…… @ ….. % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

@@ -18,15 +18,11 @@
         "max": 905.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 40,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "value": 11.4,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "….. @ …. % albedo"
+      "number_of_channels": 40.0,
+      "spectral_resolution": 11.4,
+      "snr_or_nedt": "….. @ …. % albedo",
+      "wave_number_min": null,
+      "wave_number_max": null
     },
     {
       "channel_name": "Band_02",
@@ -35,15 +31,11 @@
         "max": 1740.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 80,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "value": 11.4,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "….. @ …. % albedo"
+      "number_of_channels": 80.0,
+      "spectral_resolution": 11.4,
+      "snr_or_nedt": "….. @ …. % albedo",
+      "wave_number_min": null,
+      "wave_number_max": null
     },
     {
       "channel_name": "Band_03",
@@ -52,15 +44,11 @@
         "max": 2490.0,
         "unit": "nm"
       },
-      "number_of_channels": {
-        "value": 80,
-        "unit": null
-      },
-      "spectral_resolution": {
-        "value": 11.4,
-        "unit": "nm"
-      },
-      "snr_or_nedt": "….. @ …. % albedo"
+      "number_of_channels": 80.0,
+      "spectral_resolution": 11.4,
+      "snr_or_nedt": "….. @ …. % albedo",
+      "wave_number_min": null,
+      "wave_number_max": null
     }
   ]
 }

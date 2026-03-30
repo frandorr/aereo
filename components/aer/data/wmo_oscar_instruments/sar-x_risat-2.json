@@ -3,75 +3,46 @@
   "instrument_acronym": "SAR-X (RISAT-2)",
   "instrument_fullname": "",
   "url": "https://space.oscar.wmo.int/instruments/view/sar-x_risat-2",
-  "schema_type": "unknown",
-  "original_columns": [],
+  "schema_type": "sar_active",
+  "original_columns": [
+    "channel_name",
+    "operation_mode",
+    "spatial_resolution",
+    "swath_width",
+    "field_of_regard",
+    "polarisation"
+  ],
   "channels": [
     {
       "channel_name": "Band_01",
       "operation_mode": "Super-Stripmap",
-      "spatial_resolution": {
-        "value": 1.8,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 10.0,
-        "unit": "km"
-      },
-      "field_of_regard": {
-        "value": 650.0,
-        "unit": "km, either right or left"
-      },
+      "spatial_resolution": 1.8,
+      "swath_width": 10000.0,
+      "field_of_regard": 650.0,
       "polarisation": "HH or VV or HV or VH"
     },
     {
       "channel_name": "Band_02",
       "operation_mode": "Stripmap",
-      "spatial_resolution": {
-        "value": 3.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 10.0,
-        "unit": "km"
-      },
-      "field_of_regard": {
-        "value": 650.0,
-        "unit": "km, either right or left"
-      },
+      "spatial_resolution": 3.0,
+      "swath_width": 10000.0,
+      "field_of_regard": 650.0,
       "polarisation": "HH or VV or HV or VH"
     },
     {
       "channel_name": "Band_03",
       "operation_mode": "ScanSAR",
-      "spatial_resolution": {
-        "value": 8.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 50.0,
-        "unit": "km"
-      },
-      "field_of_regard": {
-        "value": 650.0,
-        "unit": "km, either right or left"
-      },
+      "spatial_resolution": 8.0,
+      "swath_width": 50000.0,
+      "field_of_regard": 650.0,
       "polarisation": "HH or VV or HV or VH"
     },
     {
       "channel_name": "Band_04",
       "operation_mode": "Spotlight",
-      "spatial_resolution": {
-        "value": 2.0,
-        "unit": "m"
-      },
-      "swath_width": {
-        "value": 10.0,
-        "unit": "km"
-      },
-      "field_of_regard": {
-        "value": 650.0,
-        "unit": "km either left or right"
-      },
+      "spatial_resolution": 2.0,
+      "swath_width": 10000.0,
+      "field_of_regard": 650.0,
       "polarisation": "HH or VV or HV or VH"
     }
   ]

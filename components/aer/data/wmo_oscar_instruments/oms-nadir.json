@@ -22,15 +22,16 @@
         "value": 50,
         "unit": null
       },
-      "spectral_resolution": {
-        "value": 1.0,
-        "unit": "nm"
-      },
+      "spectral_resolution": 1.0,
       "IFOV Along x Across Track": {
         "x": 21.0,
         "y": 28.0,
         "unit": "km"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_02",
@@ -43,15 +44,16 @@
         "value": 40,
         "unit": null
       },
-      "spectral_resolution": {
-        "value": 0.5,
-        "unit": "nm"
-      },
+      "spectral_resolution": 0.5,
       "IFOV Along x Across Track": {
         "x": 7.0,
         "y": 7.0,
         "unit": "km"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_03",
@@ -64,16 +66,16 @@
         "value": 327,
         "unit": null
       },
-      "spectral_resolution": {
-        "min": 0.5,
-        "max": 0.6,
-        "unit": "nm"
-      },
+      "spectral_resolution": 0.5,
       "IFOV Along x Across Track": {
         "x": 7.0,
         "y": 7.0,
         "unit": "km"
-      }
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     }
   ]
 }

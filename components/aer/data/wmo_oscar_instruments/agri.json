@@ -14,289 +14,168 @@
   "channels": [
     {
       "channel_name": "CH01",
-      "central_wavelength": {
-        "value": 0.47,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.45,
-        "max": 0.49,
-        "unit": "µm"
-      },
+      "central_wavelength": 0.47,
+      "bandwidth": 0.45,
       "snr_or_nedt": "≥90 @ 100% albedo",
-      "spatial_resolution": {
-        "value": 1.0,
-        "unit": "km"
-      },
-      "Comment": ""
+      "spatial_resolution": 1000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH02",
-      "central_wavelength": {
-        "value": 0.65,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.55,
-        "max": 0.75,
-        "unit": "µm"
-      },
+      "central_wavelength": 0.65,
+      "bandwidth": 0.55,
       "snr_or_nedt": "≥150 @ 100% albedo",
-      "spatial_resolution": {
-        "value": 0.5,
-        "unit": "km"
-      },
-      "Comment": ""
+      "spatial_resolution": 500.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH03",
-      "central_wavelength": {
-        "value": 0.825,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 0.75,
-        "max": 0.9,
-        "unit": "µm"
-      },
+      "central_wavelength": 0.825,
+      "bandwidth": 0.75,
       "snr_or_nedt": "≥200 @ 100% albedo or ≥3 @ 1% albedo",
-      "spatial_resolution": {
-        "value": 1.0,
-        "unit": "km"
-      },
-      "Comment": ""
+      "spatial_resolution": 1000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH04",
-      "central_wavelength": {
-        "value": 1.378,
-        "unit": "µm"
-      },
+      "central_wavelength": 1.378,
       "bandwidth": "1.371~1.386 µm",
       "snr_or_nedt": "≥120 @ 100% albedo or ≥2 @ 1% albedo",
-      "spatial_resolution": {
-        "value": 2.0,
-        "unit": "km"
-      },
-      "Comment": ""
+      "spatial_resolution": 2000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH05",
-      "central_wavelength": {
-        "value": 1.61,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 1.58,
-        "max": 1.64,
-        "unit": "µm"
-      },
+      "central_wavelength": 1.61,
+      "bandwidth": 1.58,
       "snr_or_nedt": "≥200 @ 100% albedo or ≥3 @ 1% albedo",
-      "spatial_resolution": {
-        "value": 2.0,
-        "unit": "km"
-      },
-      "Comment": ""
+      "spatial_resolution": 2000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH06",
-      "central_wavelength": {
-        "value": 2.25,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 2.1,
-        "max": 2.35,
-        "unit": "µm"
-      },
+      "central_wavelength": 2.25,
+      "bandwidth": 2.1,
       "snr_or_nedt": "≥200 @ 100% albedo or ≥2 @ 1% albedo",
-      "spatial_resolution": {
-        "value": 2.0,
-        "unit": "km"
-      },
-      "Comment": ""
+      "spatial_resolution": 2000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH07",
-      "central_wavelength": {
-        "value": 3.75,
-        "unit": "µm (high)"
-      },
-      "bandwidth": {
-        "min": 3.5,
-        "max": 4.0,
-        "unit": "µm"
-      },
+      "central_wavelength": 3.75,
+      "bandwidth": 3.5,
       "snr_or_nedt": "≤ 0.7 K @ 315 K",
-      "spatial_resolution": {
-        "value": 2.0,
-        "unit": "km"
-      },
-      "Comment": ""
+      "spatial_resolution": 2000.0,
+      "Comment": "",
+      "unit": "µm (high)",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH08",
-      "central_wavelength": {
-        "value": 3.75,
-        "unit": "µm (low)"
-      },
-      "bandwidth": {
-        "min": 3.5,
-        "max": 4.0,
-        "unit": "µm"
-      },
-      "snr_or_nedt": {
-        "value": 0.2,
-        "unit": "K @ 300 K or 2.0 K @ 240 K"
-      },
-      "spatial_resolution": {
-        "value": 4.0,
-        "unit": "km"
-      },
-      "Comment": ""
+      "central_wavelength": 3.75,
+      "bandwidth": 3.5,
+      "snr_or_nedt": 0.2,
+      "spatial_resolution": 4000.0,
+      "Comment": "",
+      "unit": "µm (low)",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH09",
-      "central_wavelength": {
-        "value": 6.25,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 5.8,
-        "max": 6.7,
-        "unit": "µm"
-      },
-      "snr_or_nedt": {
-        "value": 0.2,
-        "unit": "K @ 300 K or 0.9 K @ 240 K"
-      },
-      "spatial_resolution": {
-        "value": 4.0,
-        "unit": "km"
-      },
-      "Comment": ""
+      "central_wavelength": 6.25,
+      "bandwidth": 5.8,
+      "snr_or_nedt": 0.2,
+      "spatial_resolution": 4000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH10",
-      "central_wavelength": {
-        "value": 6.95,
-        "unit": null
-      },
+      "central_wavelength": 6.95,
       "bandwidth": "6.75~7.15",
-      "snr_or_nedt": {
-        "value": 0.25,
-        "unit": "K @ 300K or 0.9 K @ 240 K"
-      },
-      "spatial_resolution": {
-        "value": 4.0,
-        "unit": "km"
-      },
-      "Comment": "Not on FY-4A"
+      "snr_or_nedt": 0.25,
+      "spatial_resolution": 4000.0,
+      "Comment": "Not on FY-4A",
+      "unit": null,
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH11",
-      "central_wavelength": {
-        "value": 7.1,
-        "unit": "µm/7.42 µm"
-      },
-      "bandwidth": {
-        "min": 6.9,
-        "max": 7.3,
-        "unit": "µm/7.24-7.60 µm"
-      },
-      "snr_or_nedt": {
-        "value": 0.25,
-        "unit": "K @ 300 K or 0.9 K @ 240 K"
-      },
-      "spatial_resolution": {
-        "value": 4.0,
-        "unit": "km"
-      },
-      "Comment": "FY-4A/FY-4B"
+      "central_wavelength": 7.1,
+      "bandwidth": 6.9,
+      "snr_or_nedt": 0.25,
+      "spatial_resolution": 4000.0,
+      "Comment": "FY-4A/FY-4B",
+      "unit": "µm/7.42 µm",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH12",
-      "central_wavelength": {
-        "value": 8.55,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 8.3,
-        "max": 8.8,
-        "unit": "µm"
-      },
-      "snr_or_nedt": {
-        "value": 0.2,
-        "unit": "K @ 300 K or 0.4 K @ 240 K"
-      },
-      "spatial_resolution": {
-        "value": 4.0,
-        "unit": "km"
-      },
-      "Comment": ""
+      "central_wavelength": 8.55,
+      "bandwidth": 8.3,
+      "snr_or_nedt": 0.2,
+      "spatial_resolution": 4000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH13",
-      "central_wavelength": {
-        "value": 10.8,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 10.3,
-        "max": 11.3,
-        "unit": "µm"
-      },
-      "snr_or_nedt": {
-        "value": 0.2,
-        "unit": "K @ 300 K or 0.4 K @ 240 K"
-      },
-      "spatial_resolution": {
-        "value": 4.0,
-        "unit": "km"
-      },
-      "Comment": ""
+      "central_wavelength": 10.8,
+      "bandwidth": 10.3,
+      "snr_or_nedt": 0.2,
+      "spatial_resolution": 4000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH14",
-      "central_wavelength": {
-        "value": 12.0,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 11.5,
-        "max": 12.5,
-        "unit": "µm"
-      },
-      "snr_or_nedt": {
-        "value": 0.2,
-        "unit": "K @ 300 K or 0.4 K @ 240 K"
-      },
-      "spatial_resolution": {
-        "value": 4.0,
-        "unit": "km"
-      },
-      "Comment": ""
+      "central_wavelength": 12.0,
+      "bandwidth": 11.5,
+      "snr_or_nedt": 0.2,
+      "spatial_resolution": 4000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
     },
     {
       "channel_name": "CH15",
-      "central_wavelength": {
-        "value": 13.5,
-        "unit": "µm"
-      },
-      "bandwidth": {
-        "min": 13.2,
-        "max": 13.8,
-        "unit": "µm"
-      },
-      "snr_or_nedt": {
-        "value": 0.5,
-        "unit": "K @ 300 K or 0.9 K @ 240 K"
-      },
-      "spatial_resolution": {
-        "value": 4.0,
-        "unit": "km"
-      },
-      "Comment": ""
+      "central_wavelength": 13.5,
+      "bandwidth": 13.2,
+      "snr_or_nedt": 0.5,
+      "spatial_resolution": 4000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
     }
   ]
 }

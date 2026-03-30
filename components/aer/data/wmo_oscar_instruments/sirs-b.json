@@ -25,7 +25,13 @@
         "value": 7.86,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_02",
@@ -41,7 +47,13 @@
         "value": 8.32,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_03",
@@ -57,7 +69,13 @@
         "value": 8.1,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_04",
@@ -73,7 +91,13 @@
         "value": 8.3,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_05",
@@ -89,7 +113,13 @@
         "value": 8.47,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_06",
@@ -105,7 +135,13 @@
         "value": 10.14,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_07",
@@ -121,7 +157,13 @@
         "value": 10.42,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_08",
@@ -137,7 +179,13 @@
         "value": 10.61,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_09",
@@ -153,7 +201,13 @@
         "value": 10.81,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_10",
@@ -169,7 +223,13 @@
         "value": 10.96,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_11",
@@ -185,7 +245,13 @@
         "value": 11.13,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_12",
@@ -201,7 +267,13 @@
         "value": 11.7,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_13",
@@ -217,7 +289,13 @@
         "value": 11.83,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     },
     {
       "channel_name": "Band_14",
@@ -233,7 +311,13 @@
         "value": 12.36,
         "unit": "cm-1"
       },
-      "NEΔT @ specified scene temperature": ".... K @ 250 K"
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm-1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
     }
   ]
 }
