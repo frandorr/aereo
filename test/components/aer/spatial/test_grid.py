@@ -41,7 +41,7 @@ def test_grid_initialization():
     assert grid.name == "test_grid"
     assert grid.dist == 2000
     assert not grid.points.empty
-    assert "cell_bounds" in grid.points.columns
+    assert "utm_footprint" in grid.points.columns
     assert len(grid.rows) > 0
 
 
