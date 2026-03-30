@@ -11,7 +11,7 @@ from pandera.typing.geopandas import GeoSeries
 from shapely.geometry import Polygon
 from structlog import get_logger
 
-from .utils import get_utm_zone_from_latlng
+from .utils import get_utm_zone_from_latlng, reproject_geom
 
 logger = get_logger(__name__)
 
@@ -26,14 +26,14 @@ class GridSchema(pa.DataFrameModel):  # type: ignore[misc]
     col: The column identifier for the grid cell.
     utm_crs: The EPSG code for the UTM coordinate reference system corresponding to the grid cell's location,
             which can be used for spatial analysis and transformations.
-    dist: The distance in kilometers that defines the size of each grid cell, which can be used for spatial analysis and transformations.
+    dist: The distance in meters that defines the size of each grid cell, which can be used for spatial analysis and transformations.
 
     """
 
     grid_cell: Series[str]
     utm_footprint: GeoSeries
     utm_crs: Series[str]
-    dist: Series[float]
+    dist: Series[int]
 
 
 class Grid:
@@ -42,21 +42,27 @@ class Grid:
     def __init__(
         self,
         name: str,
-        dist: int | float,
+        dist: int,
         latitude_range=(-80, 84),
         longitude_range=(-180, 180),
         utm_definition="center",
     ):
         self.name = name
         self.dist = dist
+        self.dist_km = dist / 1000  # Convert meters to km for calculations
         self.latitude_range = latitude_range
         self.longitude_range = longitude_range
         self.utm_definition = utm_definition
         self.rows, self.lats = self.get_rows()
         self.points, self.points_by_row = self.get_points()
+        # Store original point geometries before computing footprints
+        self.points["point_geometry"] = self.points.geometry.copy()
         # apply footprint method to each point
+        self.points["geometry"] = self.points.apply(self.get_bounded_footprint, axis=1)
+        self.points.set_geometry("geometry", inplace=True)
         self.points["utm_footprint"] = self.points.apply(
-            self.get_bounded_footprint, axis=1
+            lambda row: reproject_geom(row.geometry, "EPSG:4326", row["utm_crs"]),
+            axis=1,
         )
         # validate self.points with grid schema
         GridSchema.validate(self.points)
@@ -64,7 +70,7 @@ class Grid:
     def get_rows(self):
         # Define set of latitudes to use, based on the grid distance
         arc_pole_to_pole = math.pi * self.RADIUS_EQUATOR
-        num_divisions_in_hemisphere = math.ceil(arc_pole_to_pole / self.dist)
+        num_divisions_in_hemisphere = math.ceil(arc_pole_to_pole / self.dist_km)
 
         latitudes = np.linspace(-90, 90, num_divisions_in_hemisphere + 1)[:-1]
         latitudes = np.mod(latitudes, 180) - 90
@@ -101,7 +107,7 @@ class Grid:
         # into equal parts as close as possible to dist
 
         circumference = self.get_circumference_at_latitude(lat)
-        num_divisions = math.ceil(circumference / self.dist)
+        num_divisions = math.ceil(circumference / self.dist_km)
         longitudes = np.linspace(-180, 180, num_divisions + 1)[:-1]
         longitudes = np.mod(longitudes, 360) - 180
         longitudes = np.sort(longitudes)
@@ -140,9 +146,9 @@ class Grid:
                 if self.utm_definition == "bottomleft":
                     utm_zones.append(get_utm_zone_from_latlng([lat, lon]))
                 elif self.utm_definition == "center":
-                    center_lat = lat + (1000 * self.dist / 2) / 111_120
+                    center_lat = lat + (self.dist / 2) / 111_120
                     center_lat = max(min(center_lat, 84), -80)
-                    center_lon = lon + (1000 * self.dist / 2) / (
+                    center_lon = lon + (self.dist / 2) / (
                         111_120 * math.cos(center_lat * math.pi / 180)
                     )
                     center_lon = ((center_lon + 180) % 360) - 180
@@ -157,7 +163,7 @@ class Grid:
                     "row": grid_row_names,
                     "col": grid_col_names,
                     "utm_crs": utm_zones,
-                    "dist": [float(self.dist)] * len(point_names),
+                    "dist": [int(self.dist)] * len(point_names),
                 },
                 geometry=gpd.points_from_xy(grid_lons, grid_lats),  # pyright: ignore[reportUnknownArgumentType]
             )
@@ -220,7 +226,7 @@ class Grid:
     def rowcol2latlon(self, rows, cols):
         point_geoms = [
             self.points.loc[
-                (self.points.row == row) & (self.points.col == col), "geometry"
+                (self.points.row == row) & (self.points.col == col), "point_geometry"
             ].values[0]  # pyright: ignore[reportUnknownMemberType]
             for row, col in zip(rows, cols)
         ]
@@ -294,7 +300,10 @@ class Grid:
         output_path = (
             output_path if isinstance(output_path, Path) else Path(output_path)
         )
-        output_path.mkdir(parents=True, exist_ok=True)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        gdf = self.points.reset_index(drop=True)
+        # set geometry column to utm_footprint centroid for better compatibility with parquet (since some formats don't support complex geometries)
+        gdf.set_geometry(gdf["utm_footprint"].centroid, inplace=True)  # pyright: ignore[reportUnknownMemberType]
         self.points.reset_index(drop=True).to_parquet(output_path)  # pyright: ignore[reportUnknownMemberType]
         logger.info(
             "Grid saved to parquet",

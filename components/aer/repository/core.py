@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
 
+from aer.spatial import GridCell, GridDefinition, OverlapMode
 from aer.spectral import (
     ChannelType,
     Instrument,
     Satellite,
 )
+from shapely.geometry.base import BaseGeometry
 
 
 class AerSpectralRepository(ABC):
@@ -61,5 +63,37 @@ class AerSpectralRepository(ABC):
             A ChannelType object corresponding to the provided instrument acronym.
         Raises:
             An exception if no channel with the given name or position is found.
+        """
+        pass
+
+
+class AerSpatialRepository(ABC):
+    """Abstract Base Class defining the Aer spatial data access interface.
+
+    This repository orchestrates persistence and retrieval of spatial data,
+    particularly grid cells, based on the Aer Entity-Relationship schema.
+    """
+
+    @abstractmethod
+    def get_grid_cells(
+        self,
+        grid_def: GridDefinition,
+        geometry: BaseGeometry | None = None,
+        overlap_mode: OverlapMode | None = None,
+    ) -> list[GridCell]:
+        """
+        Retrieve grid cells that intersect with a given geometry
+        based on a specified grid definition and overlap mode.
+        Args:
+            grid_def (GridDefinition): The grid definition to use.
+            geometry (BaseGeometry | None): The shapely geometry to check for intersections.
+                If no geometry is provided, all grid cells defined by the grid definition will be returned.
+            overlap_mode (OverlapMode | None): The mode of overlap to determine how grid cells
+                are selected based on their intersection with the geometry.
+                Only used if geometry is provided.
+        Returns:
+            A list of GridCell objects that intersect with the provided geometry.
+        Raises:
+            An exception if no grid cells are found intersecting the geometry.
         """
         pass
