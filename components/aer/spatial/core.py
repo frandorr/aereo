@@ -25,20 +25,17 @@ class GridCell:
 
     Attributes:
     - grid_cell (str): Unique identifier for the grid cell (e.g., "0U_0R").
+    - footprint (Polygon): The footprint of the grid cell in epsg:4326 (WGS84).
     - utm_footprint (Polygon): The footprint of the grid cell in UTM coordinates.
     - utm_crs (str): The EPSG code for the UTM coordinate reference system.
     - dist (int): The grid cell size in meters (e.g., 100000).
     """
 
     grid_cell: str
+    footprint: Polygon
     utm_footprint: Polygon
     utm_crs: str
     dist: int
-
-    @property
-    def footprint(self) -> Polygon:
-        """Return the geometry column (UTM footprint) of the grid cell."""
-        return self.utm_footprint
 
     def area_name(self, resolution: int) -> str:
         """
