@@ -1,3 +1,9 @@
+"""Tests for the spatial component core models.
+
+Verifies GridCell, GridDefinition, GridSchema validation, polygon reprojection,
+and pyresample AreaDefinition generation.
+"""
+
 import pytest
 from shapely.geometry import Polygon, Point
 from pyresample.geometry import AreaDefinition

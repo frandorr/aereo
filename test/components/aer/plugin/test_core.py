@@ -1,3 +1,5 @@
+"""Tests for the plugin registry core functionality."""
+
 from aer.plugin import core
 
 

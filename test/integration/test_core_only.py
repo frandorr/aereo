@@ -1,3 +1,9 @@
+"""Integration tests verifying core-only installation.
+
+Ensures that when only the aer core package is installed (without plugins),
+external plugins like earthaccess are not registered in the plugin registry.
+"""
+
 from unittest.mock import patch
 import pytest
 from aer.plugin import plugin_registry

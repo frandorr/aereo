@@ -1,3 +1,11 @@
+"""Scrape missing instrument data from WMO OSCAR website.
+
+Fetches instrument channel tables from the WMO OSCAR space website
+for operational satellites, parses the HTML to extract channel
+characteristics, and saves them as JSON files for use by the
+normalize_instruments script.
+"""
+
 #!/usr/bin/env python3
 import argparse
 import json

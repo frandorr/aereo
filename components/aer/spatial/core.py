@@ -1,3 +1,10 @@
+"""Core spatial models for grid cells and grid definitions.
+
+Defines GridCell, GridDefinition, and OverlapMode for representing
+spatial grid systems, coordinate transformations, and pyresample
+AreaDefinition generation.
+"""
+
 from enum import Enum
 from functools import lru_cache
 from typing import Literal

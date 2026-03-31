@@ -29,13 +29,13 @@ class PluginInfo:
         self,
         name: str,
         category: str,
-        func: Callable[..., Any],
+        plugin_class: type[Any],
         input_type: type[Any],
         return_type: type[Any],
     ):
         self.name = name
         self.category = category
-        self.func = func
+        self.plugin_class = plugin_class
         self.input_type = input_type
         self.return_type = return_type
 
@@ -44,8 +44,9 @@ class PluginInfo:
         out_name = getattr(self.return_type, "__name__", str(self.return_type))
         return f"<Plugin '{self.name}' ({self.category}): {in_name} -> {out_name}>"
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        return self.func(*args, **kwargs)
+    def instantiate(self, *args: Any, **kwargs: Any) -> Any:
+        """Instantiate the plugin class and return the instance."""
+        return self.plugin_class(*args, **kwargs)
 
 
 class PluginRegistry:
@@ -80,34 +81,56 @@ class PluginRegistry:
 
         self._plugins_loaded = True
 
-    def register(self, name: str, category: str, func: Callable[..., Any]) -> None:
-        """Registers a function as a plugin in the capability graph.
+    def _resolve_method(
+        self, plugin_class: type[Any], category: str
+    ) -> Callable[..., Any]:
+        """Resolve the method to inspect for type hints based on category."""
+        method_name = category
+        method = getattr(plugin_class, method_name, None)
+        if method is not None:
+            return method
 
-        The function must have type hints for its first argument (input) and return type.
+        for fallback in ("__call__", "execute", "run"):
+            method = getattr(plugin_class, fallback, None)
+            if method is not None:
+                return method
+
+        raise ValueError(
+            f"Plugin class {plugin_class.__name__} has no method matching "
+            f"category '{category}' or any fallback (__call__, execute, run)."
+        )
+
+    def register(self, name: str, category: str, plugin_class: type[Any]) -> None:
+        """Registers a class as a plugin in the capability graph.
+
+        The class must have a method matching the category name (or a fallback
+        like __call__, execute, run) with type hints for its first argument (input)
+        and return type.
         """
         key = (name, category)
         if key in self.plugins:
-            if self.plugins[key].func is not func:
+            if self.plugins[key].plugin_class is not plugin_class:
                 raise ValueError(
-                    f"Plugin '{name}' (category '{category}') is already registered with a different function."
+                    f"Plugin '{name}' (category '{category}') is already registered with a different class."
                 )
             return
 
+        method = self._resolve_method(plugin_class, category)
+
         try:
-            # get_type_hints evaluates string annotations if possible
-            hints = get_type_hints(func)
+            hints = get_type_hints(method)
         except Exception as exc:
             logger.warning(
                 "plugin_type_hint_resolution_failed", plugin=name, error=str(exc)
             )
-            hints = func.__annotations__
+            hints = method.__annotations__
 
-        signature = inspect.signature(func)
+        signature = inspect.signature(method)
         params = list(signature.parameters.values())
 
         if not params:
             raise ValueError(
-                f"Plugin '{name}' must take at least one argument (the input state)."
+                f"Plugin '{name}' method must take at least one argument (the input state)."
             )
 
         input_param_name = params[0].name
@@ -117,7 +140,7 @@ class PluginRegistry:
         info = PluginInfo(
             name=name,
             category=category,
-            func=func,
+            plugin_class=plugin_class,
             input_type=input_type,
             return_type=return_type,
         )
@@ -199,22 +222,23 @@ class PluginRegistry:
 # The global singleton instance
 plugin_registry = PluginRegistry()
 
-F = TypeVar("F", bound=Callable[..., Any])
+T = TypeVar("T", bound=type[Any])
 
 
-def plugin(name: str, category: str) -> Callable[[F], F]:
-    """Decorator to register a plugin.
+def plugin(name: str, category: str) -> Callable[[T], T]:
+    """Decorator to register a class-based plugin.
 
     Usage::
 
         @plugin(name="my_plugin", category="search")
-        def my_search(query: SearchQuery) -> gpd.GeoDataFrame:
-            ...
+        class MySearchPlugin:
+            def search(self, query: SearchQuery) -> gpd.GeoDataFrame:
+                ...
     """
 
-    def decorator(func: F) -> F:
-        plugin_registry.register(name, category, func)
-        return func
+    def decorator(cls: T) -> T:
+        plugin_registry.register(name, category, cls)
+        return cls
 
     return decorator
 
@@ -278,12 +302,19 @@ class Pipeline:
     def run(self, initial_input: Any, **kwargs: Any) -> Any:
         """Execute the pipeline sequentially."""
         data = initial_input
-        # First step might take extra kwargs like max_concurrent depending on the plugin
-        if self.steps:
-            data = self.steps[0](data, **kwargs)
-
-        for step in self.steps[1:]:
-            data = step(data)
+        for step in self.steps:
+            instance = step.instantiate()
+            method = getattr(instance, step.category, None)
+            if method is None:
+                method = getattr(instance, "__call__", None)
+            if method is None:
+                method = getattr(instance, "execute", None)
+            if method is None:
+                raise AttributeError(
+                    f"Plugin '{step.name}' has no callable method for category '{step.category}'."
+                )
+            data = method(data, **kwargs)
+            kwargs = {}
 
         return data
 
@@ -291,8 +322,9 @@ class Pipeline:
 def run_search(plugin_name: str, query: Any, **kwargs: Any) -> Any:
     """Run a search plugin by name and return results.
 
-    Looks up the plugin registered under category ``"search"`` and invokes it
-    with the given *query* and any extra keyword arguments.
+    Looks up the plugin registered under category ``"search"``, instantiates
+    the class, and invokes its ``search`` method with the given *query* and
+    any extra keyword arguments.
 
     Parameters
     ----------
@@ -301,7 +333,7 @@ def run_search(plugin_name: str, query: Any, **kwargs: Any) -> Any:
     query:
         A :class:`SearchQuery` (or compatible) object.
     **kwargs:
-        Forwarded to the plugin function.
+        Forwarded to the plugin method.
 
     Returns
     -------
@@ -309,7 +341,15 @@ def run_search(plugin_name: str, query: Any, **kwargs: Any) -> Any:
         Search results conforming to :class:`SearchResultSchema`.
     """
     info = plugin_registry.get(plugin_name, "search")
-    return info(query, **kwargs)
+    instance = info.instantiate()
+    method = getattr(instance, "search", None)
+    if method is None:
+        method = getattr(instance, "__call__", None)
+    if method is None:
+        method = getattr(instance, "execute", None)
+    if method is None:
+        raise AttributeError(f"Search plugin '{plugin_name}' has no callable method.")
+    return method(query, **kwargs)
 
 
 def run_extract(
@@ -320,9 +360,9 @@ def run_extract(
 ) -> Any:
     """Run an extract plugin by name on search results.
 
-    Looks up the plugin registered under category ``"extract"`` and invokes it
-    with the given GeoDataFrame, output directory, and any extra keyword
-    arguments.
+    Looks up the plugin registered under category ``"extract"``, instantiates
+    the class, and invokes its ``extract`` method with the given GeoDataFrame,
+    output directory, and any extra keyword arguments.
 
     Parameters
     ----------
@@ -333,7 +373,7 @@ def run_extract(
     output_dir:
         Directory (local path or S3 prefix) where extracted files are written.
     **kwargs:
-        Forwarded to the plugin function.
+        Forwarded to the plugin method.
 
     Returns
     -------
@@ -341,4 +381,12 @@ def run_extract(
         Extraction results conforming to :class:`ExtractedResultSchema`.
     """
     info = plugin_registry.get(plugin_name, "extract")
-    return info(gdf, output_dir, **kwargs)
+    instance = info.instantiate()
+    method = getattr(instance, "extract", None)
+    if method is None:
+        method = getattr(instance, "__call__", None)
+    if method is None:
+        method = getattr(instance, "execute", None)
+    if method is None:
+        raise AttributeError(f"Extract plugin '{plugin_name}' has no callable method.")
+    return method(gdf, output_dir, **kwargs)
