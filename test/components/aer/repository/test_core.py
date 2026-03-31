@@ -1,3 +1,5 @@
+"""Tests for the repository component core interfaces."""
+
 from aer.repository import core
 
 

@@ -1,3 +1,10 @@
+"""MajorTom-compliant grid generation and validation.
+
+Implements the Grid class for creating global spatial grids with
+configurable cell sizes, latitude/longitude ranges, and UTM zone
+definitions. Includes GridSchema for validating grid GeoDataFrames.
+"""
+
 import math
 from pathlib import Path
 from typing import cast

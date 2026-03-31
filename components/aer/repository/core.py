@@ -1,3 +1,9 @@
+"""Abstract repository interfaces for spectral and spatial data access.
+
+Defines AerSpectralRepository for satellite/instrument/channel retrieval
+and AerSpatialRepository for grid cell queries with spatial filtering.
+"""
+
 from abc import ABC, abstractmethod
 
 from aer.spatial import GridCell, GridDefinition, OverlapMode

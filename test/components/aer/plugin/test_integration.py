@@ -7,7 +7,7 @@ import geopandas as gpd
 import pandas as pd
 from shapely.geometry import Point
 
-from aer.extract.core import ExtractedResultSchema
+from aer.extract.core import ExtractedResultSchema  # type: ignore[attr-defined]
 from aer.plugin import plugin, run_extract, run_search
 
 
@@ -17,48 +17,53 @@ from aer.plugin import plugin, run_extract, run_search
 
 
 @plugin(name="dummy-search", category="search")
-def _dummy_search(query: Any, **kwargs: Any) -> gpd.GeoDataFrame:
+class DummySearchPlugin:
     """Return a minimal SearchResultSchema-compliant GeoDataFrame."""
-    from shapely.geometry import Polygon
 
-    test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
-    data = {
-        "unique_id": ["U1"],
-        "product_id": ["GOES-ABI-L2-CMIP"],
-        "granule_id": ["G16_s20250101_e20250102"],
-        "start_time": [datetime(2025, 1, 1)],
-        "end_time": [datetime(2025, 1, 2)],
-        "s3_url": ["s3://noaa-goes16/test.nc"],
-        "https_url": [None],
-        "size_mb": [42.0],
-        "name": ["10U_20R"],
-        "row": ["10U"],
-        "col": ["20R"],
-        "row_idx": [0],
-        "col_idx": [0],
-        "utm_zone": ["31N"],
-        "epsg": ["EPSG:32615"],
-        "dist": [100],
-        "cell_bounds": [test_geom],
-        "channel": ["C01"],
-        "overlap_mode": ["contains"],
-    }
-    return gpd.GeoDataFrame(data, geometry=[Point(-75.0, 40.0)])
+    def search(self, query: Any, **kwargs: Any) -> gpd.GeoDataFrame:
+        from shapely.geometry import Polygon
+
+        test_geom = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
+        data = {
+            "unique_id": ["U1"],
+            "product_id": ["GOES-ABI-L2-CMIP"],
+            "granule_id": ["G16_s20250101_e20250102"],
+            "start_time": [datetime(2025, 1, 1)],
+            "end_time": [datetime(2025, 1, 2)],
+            "s3_url": ["s3://noaa-goes16/test.nc"],
+            "https_url": [None],
+            "size_mb": [42.0],
+            "name": ["10U_20R"],
+            "row": ["10U"],
+            "col": ["20R"],
+            "row_idx": [0],
+            "col_idx": [0],
+            "utm_zone": ["31N"],
+            "epsg": ["EPSG:32615"],
+            "dist": [100],
+            "cell_bounds": [test_geom],
+            "channel": ["C01"],
+            "overlap_mode": ["contains"],
+        }
+        return gpd.GeoDataFrame(data, geometry=[Point(-75.0, 40.0)])
 
 
 @plugin(name="dummy-extract", category="extract")
-def _dummy_extract(
-    gdf: gpd.GeoDataFrame,
-    output_dir: str,
-    **kwargs: Any,
-) -> gpd.GeoDataFrame:
+class DummyExtractPlugin:
     """Transform search results into ExtractedResultSchema by adding extract columns."""
-    result = gdf.copy()
-    result["reprojected_path"] = [
-        f"{output_dir}/{gid}.tif" for gid in result["granule_id"]
-    ]
-    result["resolution"] = 2000.0
-    return result
+
+    def extract(
+        self,
+        gdf: gpd.GeoDataFrame,
+        output_dir: str,
+        **kwargs: Any,
+    ) -> gpd.GeoDataFrame:
+        result = gdf.copy()
+        result["reprojected_path"] = [
+            f"{output_dir}/{gid}.tif" for gid in result["granule_id"]
+        ]
+        result["resolution"] = 2000.0
+        return result
 
 
 # ---------------------------------------------------------------------------

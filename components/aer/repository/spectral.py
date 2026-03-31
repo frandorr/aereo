@@ -1,3 +1,10 @@
+"""Local file-based implementation of AerSpectralRepository.
+
+Reads satellite, instrument, and channel data from CSV and JSON files
+extracted from the WMO OSCAR database, providing cached retrieval
+by acronym with disambiguation support.
+"""
+
 import csv
 import json
 from functools import lru_cache
