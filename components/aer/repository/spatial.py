@@ -1,3 +1,9 @@
+"""Parquet-based implementation of AerSpatialRepository.
+
+Stores and retrieves grid cells from Parquet files, supporting spatial
+filtering with different overlap modes (intersects, contains, within).
+"""
+
 from functools import lru_cache
 from pathlib import Path
 from typing import cast

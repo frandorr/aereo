@@ -1,3 +1,5 @@
+"""Tests for the bootstrap component."""
+
 from aer.bootstrap import core
 
 

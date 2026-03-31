@@ -1,3 +1,9 @@
+"""Tests for the temporal component.
+
+Verifies TimeRange creation, intersection, overlap detection, partitioning,
+and datetime rounding utilities.
+"""
+
 from datetime import datetime, timedelta
 import pytest
 from returns.maybe import Nothing

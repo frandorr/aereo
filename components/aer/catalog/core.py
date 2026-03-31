@@ -1,3 +1,10 @@
+"""Core domain models for the catalog component.
+
+Defines Product, AssetVariable, and Asset data classes that represent
+satellite data products, their variables, and associated assets with
+spatial coverage and metadata.
+"""
+
 from typing import Any
 
 import attrs

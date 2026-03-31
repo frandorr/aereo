@@ -1,3 +1,9 @@
+"""Tests for the spatial Grid class and UTM utilities.
+
+Verifies grid initialization, lat/lon to row/col conversion,
+and UTM EPSG code derivation from geometries.
+"""
+
 import pytest
 from shapely.geometry import Point, Polygon, GeometryCollection
 from aer.spatial import Grid, get_utm_epsg_from_geometry, get_utm_zone_from_latlng

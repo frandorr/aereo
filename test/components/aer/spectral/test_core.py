@@ -1,4 +1,10 @@
-from aer.spectral import (
+"""Tests for the spectral component models.
+
+Verifies instrument channel counts, channel uniqueness, band wavelength validity,
+immutability, instrument consistency, and BandType enum values.
+"""
+
+from aer.spectral import (  # type: ignore[attr-defined]
     Band,
     BandType,
     Channel,

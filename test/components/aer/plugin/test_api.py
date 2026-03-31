@@ -1,3 +1,9 @@
+"""Tests for the plugin API dispatch functions.
+
+Verifies run_search and run_extract correctly route to registered plugins
+and raise appropriate errors for unregistered plugin names.
+"""
+
 from typing import Any
 
 import pytest
@@ -6,20 +12,24 @@ from aer.plugin import plugin, run_extract, run_search
 
 
 @plugin(name="mock-search", category="search")
-def _mock_search(query: Any, **kwargs: Any) -> dict[str, Any]:
+class MockSearchPlugin:
     """A mock search plugin for testing."""
-    return {"query": query, "kwargs": kwargs, "result": "search_ok"}
+
+    def search(self, query: Any, **kwargs: Any) -> dict[str, Any]:
+        return {"query": query, "kwargs": kwargs, "result": "search_ok"}
 
 
 @plugin(name="mock-extract", category="extract")
-def _mock_extract(gdf: Any, output_dir: str, **kwargs: Any) -> dict[str, Any]:
+class MockExtractPlugin:
     """A mock extract plugin for testing."""
-    return {
-        "gdf": gdf,
-        "output_dir": output_dir,
-        "kwargs": kwargs,
-        "result": "extract_ok",
-    }
+
+    def extract(self, gdf: Any, output_dir: str, **kwargs: Any) -> dict[str, Any]:
+        return {
+            "gdf": gdf,
+            "output_dir": output_dir,
+            "kwargs": kwargs,
+            "result": "extract_ok",
+        }
 
 
 def test_run_search() -> None:

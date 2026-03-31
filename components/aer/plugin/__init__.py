@@ -1,3 +1,8 @@
+"""
+Plugin component providing the plugin registry, capability-based routing,
+pipeline orchestration, and decorators for registering search and extract plugins.
+"""
+
 from aer.plugin.core import (
     PluginRegistry,
     plugin,

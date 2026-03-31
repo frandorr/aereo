@@ -1,3 +1,11 @@
+"""Normalize WMO OSCAR instrument data from scraped JSON files.
+
+Parses raw instrument channel data, classifies instruments by type
+(optical, microwave, SAR, spectrometer), normalizes field names,
+assigns canonical channel names from explicit mappings, and outputs
+cleaned JSON files ready for repository consumption.
+"""
+
 import argparse
 import glob
 import json

@@ -1,3 +1,10 @@
+"""Core temporal utilities for time range operations.
+
+Provides TimeRange for representing time periods with intersection,
+overlap detection, and partitioning, plus ceil_to_next_t_minutes()
+for rounding datetimes to time boundaries.
+"""
+
 import attrs
 from datetime import datetime, timedelta
 from returns import maybe

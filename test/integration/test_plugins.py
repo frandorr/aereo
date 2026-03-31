@@ -1,3 +1,9 @@
+"""Integration tests for plugin registration.
+
+Verifies that dummy plugins are correctly registered and discoverable
+through the plugin registry after bootstrap.
+"""
+
 import pytest
 from aer.plugin import plugin_registry
 
