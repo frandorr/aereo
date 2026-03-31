@@ -46,18 +46,21 @@ def main():
 from aer.plugin import plugin
 
 @plugin(name="{name}", category="{category}")
-def {name}_plugin(input_data: Any) -> Any:
+class {name.capitalize()}Plugin:
     """Implementation for {name} plugin."""
-    return input_data
+
+    def {category}(self, input_data: Any) -> Any:
+        """Process input data and return results."""
+        return input_data
 '''
     with open(core_path, "w") as f:
         f.write(core_content)
 
     # 3. Expose the plugin via __init__.py
     init_path = f"components/aer/{component_name}/__init__.py"
-    init_content = f'''from aer.{component_name}.core import {name}_plugin
+    init_content = f'''from aer.{component_name}.core import {name.capitalize()}Plugin
 
-__all__ = ["{name}_plugin"]
+__all__ = ["{name.capitalize()}Plugin"]
 '''
     with open(init_path, "w") as f:
         f.write(init_content)
@@ -68,7 +71,7 @@ __all__ = ["{name}_plugin"]
     )
 
     # 5. Add plugin entry points to pyproject files
-    entry_point_line = f'entry-points."aer.plugins".{component_name} = "aer.{component_name}.core:{name}_plugin"\n'
+    entry_point_line = f'entry-points."aer.plugins".{component_name} = "aer.{component_name}.core:{name.capitalize()}Plugin"\n'
 
     print("Adding entry point to root pyproject.toml...")
     add_entry_point("pyproject.toml", entry_point_line)
