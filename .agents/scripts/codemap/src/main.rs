@@ -231,7 +231,7 @@ fn parse_components(
 
         let mut comp_deps = init_deps;
 
-        // Parse all .py files inside the component
+        // Parse all .py files inside the component (skip __init__.py — already used for component summary)
         let mut py_files: Vec<_> = fs::read_dir(&comp_dir)
             .unwrap()
             .filter_map(|e| e.ok())
@@ -326,12 +326,15 @@ fn parse_standalone_files(
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| {
+            let path = e.path();
+            let name = path
+                .file_name()
+                .map(|n| n.to_string_lossy())
+                .unwrap_or_default();
             e.file_type().is_file()
-                && e.path()
-                    .extension()
-                    .map(|ext| ext == "py")
-                    .unwrap_or(false)
-                && !e.path().to_string_lossy().contains("__pycache__")
+                && path.extension().map(|ext| ext == "py").unwrap_or(false)
+                && name != "__init__.py"
+                && !path.to_string_lossy().contains("__pycache__")
         })
     {
         let path = entry.path();
@@ -417,8 +420,16 @@ fn extract_all_names(content: &str) -> Vec<String> {
 }
 
 /// Extract the module docstring (first triple-quoted string or class/def docstring).
+/// Returns the full docstring text, not just the first line.
 fn extract_docstring(content: &str) -> String {
     let trimmed = content.trim_start();
+
+    // Skip shebang line if present
+    let trimmed = if trimmed.starts_with("#!") {
+        trimmed.lines().nth(1).unwrap_or("").trim_start()
+    } else {
+        trimmed
+    };
 
     // Try triple-quoted docstring at file level
     for quote in &["\"\"\"", "'''"] {
@@ -426,8 +437,7 @@ fn extract_docstring(content: &str) -> String {
             let rest = &trimmed[3..];
             if let Some(end_idx) = rest.find(quote) {
                 let doc = rest[..end_idx].trim();
-                let summary = first_line_or_paragraph(doc);
-                return escape_csv(&summary);
+                return escape_csv(doc);
             }
         }
     }
@@ -450,8 +460,7 @@ fn extract_docstring(content: &str) -> String {
                     let rest = &remaining[3..];
                     if let Some(end_idx) = rest.find(quote) {
                         let doc = rest[..end_idx].trim();
-                        let summary = first_line_or_paragraph(doc);
-                        return escape_csv(&summary);
+                        return escape_csv(doc);
                     }
                 }
             }
@@ -460,16 +469,6 @@ fn extract_docstring(content: &str) -> String {
         break;
     }
 
-    String::new()
-}
-
-fn first_line_or_paragraph(doc: &str) -> String {
-    for line in doc.lines() {
-        let trimmed = line.trim();
-        if !trimmed.is_empty() {
-            return trimmed.to_string();
-        }
-    }
     String::new()
 }
 
@@ -499,8 +498,9 @@ fn extract_dependencies(
         // Match: import <project>.<component>
         else if trimmed.starts_with(import_prefix_abs) {
             let rest = &trimmed[prefix_skip_import..];
-            if let Some(component) =
-                rest.split(|c: char| c == '.' || c == ' ' || c == ',').next()
+            if let Some(component) = rest
+                .split(|c: char| c == '.' || c == ' ' || c == ',')
+                .next()
             {
                 if !component.is_empty() {
                     deps.insert(component.to_string());
@@ -518,11 +518,7 @@ fn escape_csv(s: &str) -> String {
     s.replace('\n', " ").replace('\r', "").replace('"', "'")
 }
 
-fn write_csv(
-    path: &Path,
-    components: &[ComponentInfo],
-    modules: &[ModuleInfo],
-) -> io::Result<()> {
+fn write_csv(path: &Path, components: &[ComponentInfo], modules: &[ModuleInfo]) -> io::Result<()> {
     let mut file = fs::File::create(path)?;
 
     writeln!(file, "filepath|summary|public_api|dependencies")?;
