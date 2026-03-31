@@ -70,6 +70,7 @@ class AerParquetSpatialRepository(AerSpatialRepository):
         return [
             GridCell(
                 grid_cell=cast(str, row["grid_cell"]),
+                footprint=cast(Polygon, row["geometry"]),
                 utm_footprint=cast(Polygon, row["utm_footprint"]),
                 utm_crs=cast(str, row["utm_crs"]),
                 dist=cast(int, row["dist"]),

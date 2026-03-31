@@ -20,6 +20,7 @@ def sample_polygon():
 def sample_grid_cell(sample_polygon):
     return GridCell(
         grid_cell="A_1",
+        footprint=sample_polygon,
         utm_footprint=sample_polygon,
         utm_crs="EPSG:32631",
         dist=100000,
