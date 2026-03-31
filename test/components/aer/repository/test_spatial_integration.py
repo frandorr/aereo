@@ -47,6 +47,7 @@ class TestGridCellCreation:
         footprint = Polygon([(0, 0), (0, 100000), (100000, 100000), (100000, 0)])
         cell = GridCell(
             grid_cell="0U_0R",
+            footprint=footprint,
             utm_footprint=footprint,
             utm_crs="EPSG:32631",
             dist=100000,
@@ -62,6 +63,7 @@ class TestGridCellCreation:
         footprint = Polygon([(0, 0), (0, 100000), (100000, 100000), (100000, 0)])
         cell = GridCell(
             grid_cell="0U_0R",
+            footprint=footprint,
             utm_footprint=footprint,
             utm_crs="EPSG:32631",
             dist=100000,
@@ -76,6 +78,7 @@ class TestGridCellCreation:
         footprint = Polygon([(0, 0), (0, 100000), (100000, 100000), (100000, 0)])
         cell = GridCell(
             grid_cell="0U_0R",
+            footprint=footprint,
             utm_footprint=footprint,
             utm_crs="EPSG:32631",
             dist=200000,
@@ -94,6 +97,7 @@ class TestGridCellAreaName:
         footprint = Polygon([(0, 0), (0, 100000), (100000, 100000), (100000, 0)])
         cell = GridCell(
             grid_cell="0U_0R",
+            footprint=footprint,
             utm_footprint=footprint,
             utm_crs="EPSG:32631",
             dist=200000,
@@ -108,6 +112,7 @@ class TestGridCellAreaName:
         footprint = Polygon([(0, 0), (0, 100000), (100000, 100000), (100000, 0)])
         cell = GridCell(
             grid_cell="1U_2R",
+            footprint=footprint,
             utm_footprint=footprint,
             utm_crs="EPSG:32632",
             dist=500000,
@@ -128,6 +133,7 @@ class TestGridCellAreaDef:
         footprint = Polygon([(0, 0), (0, 200000), (200000, 200000), (200000, 0)])
         cell = GridCell(
             grid_cell="0U_0R",
+            footprint=footprint,
             utm_footprint=footprint,
             utm_crs="EPSG:32631",
             dist=200000,
@@ -142,6 +148,7 @@ class TestGridCellAreaDef:
         footprint = Polygon([(0, 0), (0, 200000), (200000, 200000), (200000, 0)])
         cell = GridCell(
             grid_cell="0U_0R",
+            footprint=footprint,
             utm_footprint=footprint,
             utm_crs="EPSG:32631",
             dist=200000,
@@ -157,6 +164,7 @@ class TestGridCellAreaDef:
         footprint = Polygon([(0, 0), (0, 200000), (200000, 200000), (200000, 0)])
         cell = GridCell(
             grid_cell="0U_0R",
+            footprint=footprint,
             utm_footprint=footprint,
             utm_crs="EPSG:32631",
             dist=200000,
@@ -178,6 +186,7 @@ class TestGridCellAreaDef:
         )
         cell = GridCell(
             grid_cell="0U_0R",
+            footprint=footprint,
             utm_footprint=footprint,
             utm_crs="EPSG:32631",
             dist=200000,
@@ -193,6 +202,7 @@ class TestGridCellAreaDef:
         footprint = Polygon([(0, 0), (0, 200000), (200000, 200000), (200000, 0)])
         cell = GridCell(
             grid_cell="0U_0R",
+            footprint=footprint,
             utm_footprint=footprint,
             utm_crs="EPSG:32633",
             dist=200000,
@@ -207,6 +217,7 @@ class TestGridCellAreaDef:
         footprint = Polygon([(0, 0), (0, 200000), (200000, 200000), (200000, 0)])
         cell = GridCell(
             grid_cell="0U_0R",
+            footprint=footprint,
             utm_footprint=footprint,
             utm_crs="EPSG:32631",
             dist=200000,
@@ -416,7 +427,7 @@ class TestEndToEndWorkflow:
         assert area_def.height > 0
 
     def test_footprint_property_matches_utm_footprint(self, temp_grid_store):
-        """footprint property returns the same geometry as utm_footprint."""
+        """footprint and utm_footprint are the same shape in different CRS."""
         repo = AerParquetSpatialRepository(grid_store=temp_grid_store)
 
         grid_def = GridDefinition(
@@ -428,5 +439,6 @@ class TestEndToEndWorkflow:
         cells = repo.get_grid_cells(grid_def)
         cell = cells[0]
 
-        assert cell.footprint.equals(cell.utm_footprint)
         assert cell.footprint.geom_type == "Polygon"
+        assert cell.utm_footprint.geom_type == "Polygon"
+        assert cell.footprint != cell.utm_footprint
