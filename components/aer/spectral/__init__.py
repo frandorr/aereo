@@ -9,12 +9,8 @@ It encodes structure and invariants only.
 """
 
 from aer.spectral.core import (
-    Band,
-    BandType,
-    Channel,
     ChannelType,
     Instrument,
-    Product,
     Satellite,
     create_channel,
     BaseChannel,
@@ -25,12 +21,8 @@ from aer.spectral.core import (
 )
 
 __all__ = [
-    "Band",
-    "BandType",
-    "Channel",
     "ChannelType",
     "Instrument",
-    "Product",
     "Satellite",
     "create_channel",
     "BaseChannel",
