@@ -1,7 +1,6 @@
 """Tests for the catalog component core models."""
 
 import pytest
-import attrs
 from shapely.geometry import Polygon
 
 from aer.catalog.core import Asset, AssetVariable, Product
@@ -91,8 +90,9 @@ class TestProduct:
             instruments=[sample_instrument],
             satellites=[sample_satellite],
         )
+        # Direct assignment to frozen attrs class raises FrozenAttributeError
         with pytest.raises(Exception):
-            attrs.evolve(product, product_id="new-id")
+            product.product_id = "new-id"  # pyright: ignore[reportAttributeAccessIssue]
 
     def test_product_multiple_instruments_and_satellites(
         self, sample_instrument, sample_satellite
@@ -141,8 +141,9 @@ class TestAssetVariable:
     def test_asset_variable_is_immutable(self):
         """AssetVariable is frozen and cannot be modified."""
         var = AssetVariable(name="CMI", role="channel")
+        # Direct assignment to frozen attrs class raises FrozenAttributeError
         with pytest.raises(Exception):
-            attrs.evolve(var, name="new-name")
+            var.name = "new-name"  # pyright: ignore[reportAttributeAccessIssue]
 
     def test_asset_variable_various_roles(self):
         """AssetVariable supports different role types."""
@@ -220,8 +221,9 @@ class TestAsset:
             url="https://example.com/data.nc",
             spatial_coverage=sample_polygon,
         )
+        # Direct assignment to frozen attrs class raises FrozenAttributeError
         with pytest.raises(Exception):
-            attrs.evolve(asset, url="https://new-url.com")
+            asset.url = "https://new-url.com"  # pyright: ignore[reportAttributeAccessIssue]
 
     def test_asset_spatial_coverage_is_polygon(self, sample_product, sample_polygon):
         """Asset spatial_coverage is a Polygon."""
