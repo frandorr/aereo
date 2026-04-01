@@ -1,8 +1,8 @@
 {
-  "instrument_id": 1253,
+  "instrument_id": null,
   "instrument_acronym": "Capella SAR",
   "instrument_fullname": "Capella SAR",
-  "url": "https://space.oscar.wmo.int/instruments/view/capella%20sar",
+  "url": "https://space.oscar.wmo.int/instruments/view/capella_sar",
   "schema_type": "sar_active",
   "original_columns": [
     "Operation mode",

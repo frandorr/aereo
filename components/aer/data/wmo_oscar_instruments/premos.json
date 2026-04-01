@@ -1,5 +1,5 @@
 {
-  "instrument_id": 661,
+  "instrument_id": null,
   "instrument_acronym": "PREMOS",
   "instrument_fullname": "Precision Monitoring of Solar variability",
   "url": "https://space.oscar.wmo.int/instruments/view/premos",
@@ -7,7 +7,7 @@
   "original_columns": [
     "Central wavelength",
     "Spectral interval",
-    "SNR or NEΔT @ specified input"
+    "SNR or NE Δ T @ specified input"
   ],
   "channels": [
     {

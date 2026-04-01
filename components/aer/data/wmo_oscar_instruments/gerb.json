@@ -1,5 +1,5 @@
 {
-  "instrument_id": 153,
+  "instrument_id": null,
   "instrument_acronym": "GERB",
   "instrument_fullname": "Geostationary Earth Radiation Budget",
   "url": "https://space.oscar.wmo.int/instruments/view/gerb",
@@ -18,11 +18,11 @@
       "bandwidth": 0.32,
       "Noise Equivalent Radiance": {
         "value": 0.8,
-        "unit": "W m-2sr-1"
+        "unit": "W m -2 sr -1"
       },
       "Absolute accuracy": {
         "value": 2.4,
-        "unit": "W m-2sr-1"
+        "unit": "W m -2 sr -1"
       },
       "snr_or_nedt": 1250.0,
       "central_wavelength": null,
@@ -36,11 +36,11 @@
       "bandwidth": 0.32,
       "Noise Equivalent Radiance": {
         "value": 0.15,
-        "unit": "W m-2sr-1"
+        "unit": "W m -2 sr -1"
       },
       "Absolute accuracy": {
         "value": 0.4,
-        "unit": "W m-2sr-1"
+        "unit": "W m -2 sr -1"
       },
       "snr_or_nedt": 400.0,
       "central_wavelength": null,

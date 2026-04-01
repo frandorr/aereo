@@ -2,6 +2,6 @@
 A component for managing catalogs, products and assets
 """
 
-from aer.catalog import core
+from aer.catalog.core import Asset, AssetVariable, Product
 
-__all__ = ["core"]
+__all__ = ["Asset", "AssetVariable", "Product"]

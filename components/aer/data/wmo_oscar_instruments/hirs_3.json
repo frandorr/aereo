@@ -1,0 +1,430 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "HIRS/3",
+  "instrument_fullname": "High-resolution Infra Red Sounder / 3",
+  "url": "https://space.oscar.wmo.int/instruments/view/hirs_3",
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
+    "Wavelength",
+    "Wave number",
+    "Bandwidth",
+    "SNR @ specified input (for expected maximum temperature)",
+    "SNR @ specified input (for reference 300 K)"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "Wavelength": {
+        "value": 14.95,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 669.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 3.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "50 @ 150 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_02",
+      "Wavelength": {
+        "value": 14.71,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 680.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 10.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "223 @ 149 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_03",
+      "Wavelength": {
+        "value": 14.49,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 690.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 12.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "297 @ 148 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_04",
+      "Wavelength": {
+        "value": 14.22,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 703.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 16.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "475 @ 147 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_05",
+      "Wavelength": {
+        "value": 13.97,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 716.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 16.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "694 @ 146 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_06",
+      "Wavelength": {
+        "value": 13.64,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 733.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 16.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "599 @ 144 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_07",
+      "Wavelength": {
+        "value": 13.35,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 749.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 16.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "709 @ 142 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_08",
+      "Wavelength": {
+        "value": 12.47,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 802.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 16.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "894 @ 134 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_09",
+      "Wavelength": {
+        "value": 11.11,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 900.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 35.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "1175 @ 117 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_10",
+      "Wavelength": {
+        "value": 9.71,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 1030.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 25.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "625 @ 94 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_11",
+      "Wavelength": {
+        "value": 7.33,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 1364.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 40.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "218 @ 43 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_12",
+      "Wavelength": {
+        "value": 6.52,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 1534.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 55.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "138 @ 27 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_13",
+      "Wavelength": {
+        "value": 4.57,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2188.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 23.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "577 @ 3.5 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_14",
+      "Wavelength": {
+        "value": 4.52,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2210.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 23.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "1070 @ 3.2 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_15",
+      "Wavelength": {
+        "value": 4.47,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2237.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 23.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "735 @ 2.9 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_16",
+      "Wavelength": {
+        "value": 4.45,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2247.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 23.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "710 @ 2.8 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_17",
+      "Wavelength": {
+        "value": 4.13,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2420.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 28.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "770 @ 1.5 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_18",
+      "Wavelength": {
+        "value": 4.0,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2500.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 35.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "545 @ 1.1 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_19",
+      "Wavelength": {
+        "value": 3.76,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2660.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 100.0,
+        "unit": "cm -1"
+      },
+      "snr_or_nedt": "650 @ 0.65 mW m -2 sr -1 cm",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_20",
+      "Wavelength": {
+        "value": 0.69,
+        "unit": "µm"
+      },
+      "wave_number_range": "N/A",
+      "Bandwidth": {
+        "value": 0.05,
+        "unit": "µm"
+      },
+      "snr_or_nedt": "1000 @ 100 % albedo",
+      "spectral_resolution": null,
+      "number_of_channels": null
+    }
+  ]
+}

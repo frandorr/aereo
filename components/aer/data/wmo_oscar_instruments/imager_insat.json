@@ -1,16 +1,14 @@
 {
   "instrument_id": null,
   "instrument_acronym": "IMAGER (INSAT)",
-  "instrument_fullname": "",
+  "instrument_fullname": "INSAT imager",
   "url": "https://space.oscar.wmo.int/instruments/view/imager_insat",
   "schema_type": "optical_infrared",
   "original_columns": [
-    "channel_name",
-    "central_wavelength",
-    "bandwidth",
-    "spatial_resolution",
-    "snr_or_nedt",
-    "unit"
+    "Central wavelength",
+    "Spectral interval",
+    "Spatial resolution at nadir",
+    "SNR or NE Δ T @ specified input"
   ],
   "channels": [
     {

@@ -1,0 +1,98 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MX-LWIR",
+  "instrument_fullname": "Multispectral - Long Wave Infrared",
+  "url": "https://space.oscar.wmo.int/instruments/view/mx_lwir",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": 7.35,
+      "bandwidth": 7.1,
+      "NEΔT @ specified input": {
+        "value": 0.15,
+        "unit": "K @ 300 K"
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": 8.5,
+      "bandwidth": 8.3,
+      "NEΔT @ specified input": {
+        "value": 0.15,
+        "unit": "K @ 300 K"
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": 9.6,
+      "bandwidth": 9.4,
+      "NEΔT @ specified input": {
+        "value": 0.15,
+        "unit": "K @ 300 K"
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": 10.8,
+      "bandwidth": 10.0,
+      "NEΔT @ specified input": {
+        "value": 0.15,
+        "unit": "K @ 300 K"
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": 12.0,
+      "bandwidth": 11.5,
+      "NEΔT @ specified input": {
+        "value": 0.15,
+        "unit": "K @ 300 K"
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_06",
+      "central_wavelength": 13.25,
+      "bandwidth": 13.0,
+      "NEΔT @ specified input": {
+        "value": 0.15,
+        "unit": "K @ 300 K"
+      },
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null,
+      "snr_or_nedt": null
+    }
+  ]
+}

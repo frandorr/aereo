@@ -1,5 +1,5 @@
 {
-  "instrument_id": 166,
+  "instrument_id": null,
   "instrument_acronym": "GOME",
   "instrument_fullname": "Global Ozone Monitoring Experiment ",
   "url": "https://space.oscar.wmo.int/instruments/view/gome",
@@ -23,7 +23,7 @@
         "unit": null
       },
       "spectral_resolution": 0.22,
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "snr_or_nedt": "......... @ ...... W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -40,7 +40,7 @@
         "unit": null
       },
       "spectral_resolution": 0.24,
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "snr_or_nedt": "......... @ ...... W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -57,7 +57,7 @@
         "unit": null
       },
       "spectral_resolution": 0.4,
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "snr_or_nedt": "......... @ ...... W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -74,7 +74,7 @@
         "unit": null
       },
       "spectral_resolution": 0.4,
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "snr_or_nedt": "......... @ ...... W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -91,7 +91,7 @@
         "unit": null
       },
       "spectral_resolution": 110.0,
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "snr_or_nedt": "......... @ ...... W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -108,7 +108,7 @@
         "unit": null
       },
       "spectral_resolution": 195.0,
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "snr_or_nedt": "......... @ ...... W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -125,7 +125,7 @@
         "unit": null
       },
       "spectral_resolution": 193.0,
-      "snr_or_nedt": "......... @ ...... W m-2sr-1μm-1",
+      "snr_or_nedt": "......... @ ...... W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null

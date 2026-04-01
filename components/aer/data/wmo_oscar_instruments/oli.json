@@ -1,5 +1,5 @@
 {
-  "instrument_id": 375,
+  "instrument_id": null,
   "instrument_acronym": "OLI",
   "instrument_fullname": "Operational Land Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/oli",
@@ -27,7 +27,7 @@
         "unit": "nm"
       },
       "central_wavelength": 433.0,
-      "snr_or_nedt": "130 @ 40 W m-2sr-1μm-1",
+      "snr_or_nedt": "130 @ 40 W m -2 sr -1 μm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -41,7 +41,7 @@
         "unit": "nm"
       },
       "central_wavelength": 450.0,
-      "snr_or_nedt": "130 @ 40 W m-2sr-1μm-1",
+      "snr_or_nedt": "130 @ 40 W m -2 sr -1 μm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -55,7 +55,7 @@
         "unit": "nm"
       },
       "central_wavelength": 525.0,
-      "snr_or_nedt": "100 @ 30 W m-2sr-1μm-1",
+      "snr_or_nedt": "100 @ 30 W m -2 sr -1 μm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -69,7 +69,7 @@
         "unit": "nm"
       },
       "central_wavelength": 630.0,
-      "snr_or_nedt": "90 @ 22 W m-2sr-1μm-1",
+      "snr_or_nedt": "90 @ 22 W m -2 sr -1 μm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -83,7 +83,7 @@
         "unit": "nm"
       },
       "central_wavelength": 845.0,
-      "snr_or_nedt": "90 @ 14 W m-2sr-1μm-1",
+      "snr_or_nedt": "90 @ 14 W m -2 sr -1 μm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -97,7 +97,7 @@
         "unit": "nm"
       },
       "central_wavelength": 1360.0,
-      "snr_or_nedt": "50 @ 6.0 W m-2sr-1μm-1",
+      "snr_or_nedt": "50 @ 6.0 W m -2 sr -1 μm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -111,7 +111,7 @@
         "unit": "nm"
       },
       "central_wavelength": 1560.0,
-      "snr_or_nedt": "100 @ 4.0 W m-2sr-1μm-1",
+      "snr_or_nedt": "100 @ 4.0 W m -2 sr -1 μm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -125,7 +125,7 @@
         "unit": "nm"
       },
       "central_wavelength": 2100.0,
-      "snr_or_nedt": "100 @ 1.7 W m-2sr-1μm-1",
+      "snr_or_nedt": "100 @ 1.7 W m -2 sr -1 μm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -136,7 +136,7 @@
       "channel_name": "Band_10",
       "Central": "Panchromatic",
       "central_wavelength": 500.0,
-      "snr_or_nedt": "80 @ 23 W m-2sr-1μm-1",
+      "snr_or_nedt": "80 @ 23 W m -2 sr -1 μm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,

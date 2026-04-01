@@ -1,0 +1,62 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "SAR-C (Sentinel-1)",
+  "instrument_fullname": "Synthetic Aperture Radar (C-band)",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar_c_sentinel_1",
+  "schema_type": "sar_active",
+  "original_columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "channel_name": "Stripmap",
+      "operation_mode": "Stripmap (SM)",
+      "spatial_resolution": [
+        4.0,
+        5.0
+      ],
+      "swath_width": 80000.0,
+      "polarisation": "VV + VH or HH + HV",
+      "field_of_regard": null
+    },
+    {
+      "channel_name": "Interferometric Wide swath",
+      "operation_mode": "ScanSAR - Interferometric wide-swath (IW)",
+      "spatial_resolution": [
+        5.0,
+        20.0
+      ],
+      "swath_width": 240000.0,
+      "polarisation": "VV + VH or HH + HV",
+      "field_of_regard": null
+    },
+    {
+      "channel_name": "Extra Wide swath",
+      "operation_mode": "ScanSAR - Extra-wide swath (EW)",
+      "spatial_resolution": [
+        25.0,
+        80.0
+      ],
+      "swath_width": 400000.0,
+      "polarisation": "VV + VH or HH + HV",
+      "field_of_regard": null
+    },
+    {
+      "channel_name": "Wave",
+      "operation_mode": "Wave (WV)",
+      "spatial_resolution": [
+        20.0,
+        5.0
+      ],
+      "swath_width": [
+        20000.0,
+        20000.0
+      ],
+      "polarisation": "HH or VV",
+      "field_of_regard": null
+    }
+  ]
+}

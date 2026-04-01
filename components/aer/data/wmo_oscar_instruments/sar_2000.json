@@ -1,0 +1,56 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "SAR-2000",
+  "instrument_fullname": "Synthetic Aperture Radar 2000 (X-band) ",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar_2000",
+  "schema_type": "sar_active",
+  "original_columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Field of regard",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "channel_name": "Spotlight",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": 1.0,
+      "swath_width": 10000.0,
+      "field_of_regard": 600.0,
+      "polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "channel_name": "Stripmap",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": 3.0,
+      "swath_width": 40000.0,
+      "field_of_regard": 600.0,
+      "polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "channel_name": "ScanSAR huge region",
+      "operation_mode": "ScanSAR wide swath",
+      "spatial_resolution": 30.0,
+      "swath_width": 100000.0,
+      "field_of_regard": 600.0,
+      "polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "channel_name": "ScanSAR wide region",
+      "operation_mode": "ScanSAR huge swath",
+      "spatial_resolution": 100.0,
+      "swath_width": 200000.0,
+      "field_of_regard": 600.0,
+      "polarisation": "HH or VV or HV or VH"
+    },
+    {
+      "channel_name": "Band_05",
+      "operation_mode": "Stripmap ping-pong",
+      "spatial_resolution": 15.0,
+      "swath_width": 30000.0,
+      "field_of_regard": 600.0,
+      "polarisation": "HH/HV + VV/VH"
+    }
+  ]
+}

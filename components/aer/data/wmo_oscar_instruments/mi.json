@@ -1,5 +1,5 @@
 {
-  "instrument_id": 283,
+  "instrument_id": null,
   "instrument_acronym": "MI",
   "instrument_fullname": "Meteorological Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/mi",
@@ -7,7 +7,7 @@
   "original_columns": [
     "Central wavelength",
     "Spectral interval",
-    "SNR or NEΔT @ specified input"
+    "SNR or NE Δ T @ specified input"
   ],
   "channels": [
     {

@@ -1,0 +1,64 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "NAOMI (SSOT)",
+  "instrument_fullname": "New AstroSat Optical Modular Instrument",
+  "url": "https://space.oscar.wmo.int/instruments/view/naomi_ssot",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": 0.485,
+      "bandwidth": 0.45,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": 0.565,
+      "bandwidth": 0.53,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": 0.655,
+      "bandwidth": 0.62,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": 0.825,
+      "bandwidth": 0.76,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": 0.675,
+      "bandwidth": 0.45,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm  (PAN)",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

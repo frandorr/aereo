@@ -1,5 +1,5 @@
 {
-  "instrument_id": 1215,
+  "instrument_id": null,
   "instrument_acronym": "COWVR",
   "instrument_fullname": "Compact Ocean Wind Vector Radiometer",
   "url": "https://space.oscar.wmo.int/instruments/view/cowvr",
@@ -27,7 +27,10 @@
         "value": 0.23,
         "unit": "K"
       },
-      "spatial_resolution": 30000.0,
+      "spatial_resolution": [
+        30000.0,
+        30000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -44,7 +47,10 @@
         "value": 0.19,
         "unit": "K"
       },
-      "spatial_resolution": 30000.0,
+      "spatial_resolution": [
+        30000.0,
+        30000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -61,7 +67,10 @@
         "value": 0.13,
         "unit": "K"
       },
-      "spatial_resolution": 30000.0,
+      "spatial_resolution": [
+        30000.0,
+        30000.0
+      ],
       "unit": null,
       "nedt": null
     }

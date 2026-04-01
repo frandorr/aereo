@@ -1,5 +1,5 @@
 {
-  "instrument_id": 314,
+  "instrument_id": null,
   "instrument_acronym": "MSMR",
   "instrument_fullname": "Multi-frequency Scanning Microwave Radiometer",
   "url": "https://space.oscar.wmo.int/instruments/view/msmr",
@@ -24,7 +24,10 @@
       "bandwidth": 350.0,
       "polarisations": "V, H",
       "NEΔT": "< 1.0 K",
-      "spatial_resolution": 50000.0,
+      "spatial_resolution": [
+        50000.0,
+        36000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -38,7 +41,10 @@
       "bandwidth": 100.0,
       "polarisations": "V, H",
       "NEΔT": "< 1.0 K",
-      "spatial_resolution": 50000.0,
+      "spatial_resolution": [
+        50000.0,
+        36000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -52,7 +58,10 @@
       "bandwidth": 200.0,
       "polarisations": "V, H",
       "NEΔT": "< 1.0 K",
-      "spatial_resolution": 25000.0,
+      "spatial_resolution": [
+        25000.0,
+        36000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -66,7 +75,10 @@
       "bandwidth": 400.0,
       "polarisations": "V, H",
       "NEΔT": "< 1.0 K",
-      "spatial_resolution": 25000.0,
+      "spatial_resolution": [
+        25000.0,
+        36000.0
+      ],
       "unit": "GHz",
       "nedt": null
     }

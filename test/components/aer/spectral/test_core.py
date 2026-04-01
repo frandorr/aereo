@@ -5,18 +5,16 @@ and the create_channel factory for all schema types.
 """
 
 import pytest
-
 from aer.spectral import (
     BaseChannel,
-    OpticalChannel,
-    MicrowaveChannel,
-    SARChannel,
-    SpectrometerChannel,
     Instrument,
+    MicrowaveChannel,
+    OpticalChannel,
+    SARChannel,
     Satellite,
+    SpectrometerChannel,
     create_channel,
 )
-
 
 # ==========================================
 #  Channel model tests
@@ -27,13 +25,11 @@ def test_optical_channel_creation():
     """OpticalChannel can be created with required fields."""
     ch = OpticalChannel(
         channel_name="B1",
-        instrument_acronym="VIIRS",
         central_wavelength=0.64,
         bandwidth=0.02,
         spatial_resolution=371.0,
     )
     assert ch.channel_name == "B1"
-    assert ch.instrument_acronym == "VIIRS"
     assert ch.central_wavelength == 0.64
     assert ch.bandwidth == 0.02
     assert ch.spatial_resolution == 371.0
@@ -45,7 +41,6 @@ def test_optical_channel_with_optional_fields():
     """OpticalChannel accepts optional SNR fields."""
     ch = OpticalChannel(
         channel_name="B1",
-        instrument_acronym="VIIRS",
         central_wavelength=0.64,
         bandwidth=0.02,
         spatial_resolution=371.0,
@@ -64,7 +59,6 @@ def test_microwave_channel_creation():
     """MicrowaveChannel uses central_frequency instead of wavelength."""
     ch = MicrowaveChannel(
         channel_name="B1",
-        instrument_acronym="AMSR2",
         central_frequency=6.925,
         bandwidth=0.35,
         spatial_resolution=62.0,
@@ -78,7 +72,6 @@ def test_sar_channel_creation():
     """SARChannel has operation_mode and resolution fields."""
     ch = SARChannel(
         channel_name="IW",
-        instrument_acronym="SAR-C",
         operation_mode="IW",
         spatial_resolution=(5.0, 20.0),
         swath_width=250.0,
@@ -93,7 +86,6 @@ def test_sar_channel_single_resolution():
     """SARChannel accepts a single float for spatial_resolution."""
     ch = SARChannel(
         channel_name="SM",
-        instrument_acronym="SAR-C",
         operation_mode="SM",
         spatial_resolution=5.0,
     )
@@ -104,7 +96,6 @@ def test_spectrometer_channel_creation():
     """SpectrometerChannel uses wave numbers and spectral resolution."""
     ch = SpectrometerChannel(
         channel_name="Band1",
-        instrument_acronym="IASI",
         wave_number_min=645.0,
         wave_number_max=2760.0,
         spectral_resolution=0.5,
@@ -119,7 +110,6 @@ def test_all_channels_are_frozen():
     """All channel types are immutable (attrs.frozen)."""
     ch = OpticalChannel(
         channel_name="B1",
-        instrument_acronym="VIIRS",
         central_wavelength=0.64,
         bandwidth=0.02,
         spatial_resolution=371.0,
@@ -130,7 +120,7 @@ def test_all_channels_are_frozen():
 
 def test_base_channel_is_frozen():
     """BaseChannel is immutable."""
-    ch = BaseChannel(channel_name="B1", instrument_acronym="TEST")
+    ch = BaseChannel(channel_name="B1")
     with pytest.raises(AttributeError):
         ch.channel_name = "modified"  # type: ignore[misc]
 
@@ -148,9 +138,8 @@ def test_create_channel_optical():
         "bandwidth": 0.02,
         "spatial_resolution": 371.0,
     }
-    ch = create_channel("optical_infrared", data, "VIIRS")
+    ch = create_channel("optical_infrared", data)
     assert isinstance(ch, OpticalChannel)
-    assert ch.instrument_acronym == "VIIRS"
     assert ch.central_wavelength == 0.64
 
 
@@ -162,7 +151,7 @@ def test_create_channel_microwave():
         "bandwidth": 0.35,
         "spatial_resolution": 62.0,
     }
-    ch = create_channel("microwave", data, "AMSR2")
+    ch = create_channel("microwave", data)
     assert isinstance(ch, MicrowaveChannel)
     assert ch.central_frequency == 6.925
 
@@ -175,7 +164,7 @@ def test_create_channel_sar():
         "spatial_resolution": 5.0,
         "swath_width": 250.0,
     }
-    ch = create_channel("sar_active", data, "SAR-C")
+    ch = create_channel("sar_active", data)
     assert isinstance(ch, SARChannel)
     assert ch.operation_mode == "IW"
 
@@ -188,7 +177,7 @@ def test_create_channel_spectrometer():
         "wave_number_max": 2760.0,
         "spectral_resolution": 0.5,
     }
-    ch = create_channel("spectrometer_sounder", data, "IASI")
+    ch = create_channel("spectrometer_sounder", data)
     assert isinstance(ch, SpectrometerChannel)
     assert ch.wave_number_min == 645.0
 
@@ -196,7 +185,7 @@ def test_create_channel_spectrometer():
 def test_create_channel_unknown_schema():
     """create_channel raises ValueError for unknown schema_type."""
     with pytest.raises(ValueError, match="Unknown schema_type"):
-        create_channel("unknown", {}, "TEST")
+        create_channel("unknown", {})
 
 
 def test_create_channel_float_str_conversion():
@@ -207,7 +196,7 @@ def test_create_channel_float_str_conversion():
         "bandwidth": "0.02",
         "spatial_resolution": "371.0",
     }
-    ch = create_channel("optical_infrared", data, "VIIRS")
+    ch = create_channel("optical_infrared", data)
     assert isinstance(ch, OpticalChannel)
     assert ch.central_wavelength == 0.64
     assert ch.bandwidth == 0.02
@@ -223,7 +212,7 @@ def test_create_channel_snr_accepts_string():
         "spatial_resolution": 371.0,
         "snr_low": "100",
     }
-    ch = create_channel("optical_infrared", data, "VIIRS")
+    ch = create_channel("optical_infrared", data)
     assert isinstance(ch, OpticalChannel)
     assert ch.snr_low == "100"
 
@@ -238,28 +227,25 @@ def test_instrument_creation():
     channels = [
         OpticalChannel(
             channel_name="B1",
-            instrument_acronym="VIIRS",
             central_wavelength=0.64,
             bandwidth=0.02,
             spatial_resolution=371.0,
         ),
         OpticalChannel(
             channel_name="B2",
-            instrument_acronym="VIIRS",
             central_wavelength=0.86,
             bandwidth=0.02,
             spatial_resolution=371.0,
         ),
     ]
-    inst = Instrument(satellite_acronym="NPP", acronym="VIIRS", channels=channels)
+    inst = Instrument(acronym="VIIRS", channels=channels)
     assert inst.acronym == "VIIRS"
-    assert inst.satellite_acronym == "NPP"
     assert len(inst.channels) == 2
 
 
 def test_instrument_repr():
     """Instrument repr includes acronym and channel count."""
-    inst = Instrument(satellite_acronym="NPP", acronym="VIIRS", channels=[])
+    inst = Instrument(acronym="VIIRS", channels=[])
     repr_str = repr(inst)
     assert "VIIRS" in repr_str
     assert "Channels (0)" in repr_str
@@ -267,7 +253,7 @@ def test_instrument_repr():
 
 def test_instrument_is_frozen():
     """Instrument is immutable."""
-    inst = Instrument(satellite_acronym="NPP", acronym="VIIRS", channels=[])
+    inst = Instrument(acronym="VIIRS", channels=[])
     with pytest.raises(AttributeError):
         inst.acronym = "modified"  # type: ignore[misc]
 
@@ -279,30 +265,20 @@ def test_instrument_is_frozen():
 
 def test_satellite_creation():
     """Satellite can be created with payload instruments."""
-    inst = Instrument(satellite_acronym="NPP", acronym="VIIRS", channels=[])
+    inst = Instrument(acronym="VIIRS", channels=[])
     sat = Satellite(
-        acronym="NPP",
-        payload=[inst],
-        orbit="Sun-Synchronous",
-        altitude_km=824.0,
-        status="Operational",
-        agencies=["NOAA", "NASA"],
+        acronym="NPP", payload=[inst], metadata={"orbit": "Sun-Synchronous"}
     )
     assert sat.acronym == "NPP"
     assert len(sat.payload) == 1
-    assert sat.orbit == "Sun-Synchronous"
-    assert sat.altitude_km == 824.0
-    assert sat.status == "Operational"
-    assert sat.agencies == ["NOAA", "NASA"]
+    assert sat.metadata is not None
+    assert sat.metadata["orbit"] == "Sun-Synchronous"
 
 
 def test_satellite_with_optional_defaults():
     """Satellite can be created with minimal fields."""
     sat = Satellite(acronym="TEST", payload=[])
-    assert sat.orbit is None
-    assert sat.altitude_km is None
-    assert sat.status is None
-    assert sat.agencies is None
+    assert sat.metadata is None
 
 
 def test_satellite_repr():

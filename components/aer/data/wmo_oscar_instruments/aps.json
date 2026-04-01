@@ -1,11 +1,11 @@
 {
-  "instrument_id": 35,
+  "instrument_id": null,
   "instrument_acronym": "APS",
   "instrument_fullname": "Aerosol Polarimetry Sensor",
   "url": "https://space.oscar.wmo.int/instruments/view/aps",
   "schema_type": "optical_infrared",
   "original_columns": [
-    "Centralλ",
+    "Central λ",
     "Bandwidth",
     "Polarisations",
     "SNR @ specified input spectral radiance"
@@ -13,13 +13,13 @@
   "channels": [
     {
       "channel_name": "Band_01",
-      "Centralλ": {
+      "Central λ": {
         "value": 412.0,
         "unit": "nm"
       },
       "bandwidth": 20.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "snr_or_nedt": "235 @ ….. W m -2 sr -1 μm -1",
       "central_wavelength": null,
       "spatial_resolution": null,
       "snr_low": null,
@@ -27,13 +27,13 @@
     },
     {
       "channel_name": "Band_02",
-      "Centralλ": {
+      "Central λ": {
         "value": 443.0,
         "unit": "nm"
       },
       "bandwidth": 20.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "snr_or_nedt": "235 @ ….. W m -2 sr -1 μm -1",
       "central_wavelength": null,
       "spatial_resolution": null,
       "snr_low": null,
@@ -41,13 +41,13 @@
     },
     {
       "channel_name": "Band_03",
-      "Centralλ": {
+      "Central λ": {
         "value": 555.0,
         "unit": "nm"
       },
       "bandwidth": 20.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "snr_or_nedt": "235 @ ….. W m -2 sr -1 μm -1",
       "central_wavelength": null,
       "spatial_resolution": null,
       "snr_low": null,
@@ -55,13 +55,13 @@
     },
     {
       "channel_name": "Band_04",
-      "Centralλ": {
+      "Central λ": {
         "value": 672.0,
         "unit": "nm"
       },
       "bandwidth": 20.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "snr_or_nedt": "235 @ ….. W m -2 sr -1 μm -1",
       "central_wavelength": null,
       "spatial_resolution": null,
       "snr_low": null,
@@ -69,13 +69,13 @@
     },
     {
       "channel_name": "Band_05",
-      "Centralλ": {
+      "Central λ": {
         "value": 865.0,
         "unit": "nm"
       },
       "bandwidth": 39.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "snr_or_nedt": "235 @ ….. W m -2 sr -1 μm -1",
       "central_wavelength": null,
       "spatial_resolution": null,
       "snr_low": null,
@@ -83,13 +83,13 @@
     },
     {
       "channel_name": "Band_06",
-      "Centralλ": {
+      "Central λ": {
         "value": 910.0,
         "unit": "nm"
       },
       "bandwidth": 20.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "snr_or_nedt": "94 @ ….. W m-2sr-1μm-1",
+      "snr_or_nedt": "94 @ ….. W m -2 sr -1 μm -1",
       "central_wavelength": null,
       "spatial_resolution": null,
       "snr_low": null,
@@ -97,13 +97,13 @@
     },
     {
       "channel_name": "Band_07",
-      "Centralλ": {
+      "Central λ": {
         "value": 1378.0,
         "unit": "nm"
       },
       "bandwidth": 35.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "snr_or_nedt": "141 @ ….. W m-2sr-1μm-1",
+      "snr_or_nedt": "141 @ ….. W m -2 sr -1 μm -1",
       "central_wavelength": null,
       "spatial_resolution": null,
       "snr_low": null,
@@ -111,13 +111,13 @@
     },
     {
       "channel_name": "Band_08",
-      "Centralλ": {
+      "Central λ": {
         "value": 1610.0,
         "unit": "nm"
       },
       "bandwidth": 60.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "snr_or_nedt": "235 @ ….. W m -2 sr - 1 μm -1",
       "central_wavelength": null,
       "spatial_resolution": null,
       "snr_low": null,
@@ -125,13 +125,13 @@
     },
     {
       "channel_name": "Band_09",
-      "Centralλ": {
+      "Central λ": {
         "value": 2250.0,
         "unit": "nm"
       },
       "bandwidth": 75.0,
       "Polarisations": "0, 45, 90 and 135 degrees",
-      "snr_or_nedt": "235 @ ….. W m-2sr-1μm-1",
+      "snr_or_nedt": "235 @ ….. W m -2 sr -1 μm -1",
       "central_wavelength": null,
       "spatial_resolution": null,
       "snr_low": null,

@@ -1,0 +1,67 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "TANSO-FTS",
+  "instrument_fullname": "Thermal And Near infrared Sensor for carbon Observations - Fourier Transform Spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/tanso_fts",
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
+    "Spectral range",
+    "Spectral range",
+    "Spectral resolution (unapodised)",
+    "SNR or NE Δ T @ specified input"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band 1",
+      "Spectral range": {
+        "min": 700.0,
+        "max": 1800.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": 0.2,
+      "snr_or_nedt": 0.3,
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band 2",
+      "Spectral range": {
+        "min": 4800.0,
+        "max": 5200.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": 0.2,
+      "snr_or_nedt": "300 @ 30 % albedo",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band 3",
+      "Spectral range": {
+        "min": 5800.0,
+        "max": 6400.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": 0.2,
+      "snr_or_nedt": "300 @ 30 % albedo",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band 4",
+      "Spectral range": {
+        "min": 12900.0,
+        "max": 13200.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": 0.2,
+      "snr_or_nedt": "300 @ 30 % albedo",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    }
+  ]
+}

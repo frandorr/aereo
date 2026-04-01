@@ -1,8 +1,8 @@
 {
-  "instrument_id": 136,
-  "instrument_acronym": "ETM+",
-  "instrument_fullname": "Enhanced Thematic Mapper +",
-  "url": "https://space.oscar.wmo.int/instruments/view/etm%2B",
+  "instrument_id": null,
+  "instrument_acronym": "ETM",
+  "instrument_fullname": "Enhanced Thematic Mapper",
+  "url": "https://space.oscar.wmo.int/instruments/view/etm",
   "schema_type": "optical_infrared",
   "original_columns": [
     "Central",
@@ -27,7 +27,7 @@
         "unit": "µm"
       },
       "central_wavelength": 0.45,
-      "snr_or_nedt": "36 @ 40 W m-2sr-1μm-1",
+      "snr_or_nedt": "36 @ 40 W m -2 sr -1 μm -1",
       "unit": "µm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -41,7 +41,7 @@
         "unit": "µm"
       },
       "central_wavelength": 0.52,
-      "snr_or_nedt": "37 @ 30 W m-2sr-1μm-1",
+      "snr_or_nedt": "37 @ 30 W m -2 sr -1 μm -1",
       "unit": "µm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -55,7 +55,7 @@
         "unit": "µm"
       },
       "central_wavelength": 0.63,
-      "snr_or_nedt": "24 @ 21.7 W m-2sr-1μm-1",
+      "snr_or_nedt": "24 @ 21.7 W m -2 sr -1 μm -1",
       "unit": "µm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -69,7 +69,7 @@
         "unit": "µm"
       },
       "central_wavelength": 0.76,
-      "snr_or_nedt": "33 @ 13.6 W m-2sr-1μm-1",
+      "snr_or_nedt": "33 @ 13.6 W m -2 sr -1 μm -1",
       "unit": "µm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -83,7 +83,7 @@
         "unit": "µm"
       },
       "central_wavelength": 1.55,
-      "snr_or_nedt": "34 @ 4.0 W m-2sr-1μm-1",
+      "snr_or_nedt": "34 @ 4.0 W m -2 sr -1 μm -1",
       "unit": "µm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -97,7 +97,7 @@
         "unit": "µm"
       },
       "central_wavelength": 2.08,
-      "snr_or_nedt": "27 @ 1.7 W m-2sr-1μm-1",
+      "snr_or_nedt": "27 @ 1.7 W m -2 sr -1 μm -1",
       "unit": "µm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -108,7 +108,7 @@
       "channel_name": "Band_08",
       "Central": "Panchromatic",
       "central_wavelength": 0.5,
-      "snr_or_nedt": "14 @ 22.9 W m-2sr-1μm-1",
+      "snr_or_nedt": "14 @ 22.9 W m -2 sr -1 μm -1",
       "unit": "µm",
       "bandwidth": null,
       "spatial_resolution": null,

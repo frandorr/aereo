@@ -1,5 +1,5 @@
 {
-  "instrument_id": 271,
+  "instrument_id": null,
   "instrument_acronym": "MADRAS",
   "instrument_fullname": "Microwave Analysis & Detection of Rain & Atmospheric Structures",
   "url": "https://space.oscar.wmo.int/instruments/view/madras",
@@ -27,7 +27,10 @@
         "value": 0.43,
         "unit": "K"
       },
-      "spatial_resolution": 40000.0,
+      "spatial_resolution": [
+        40000.0,
+        16000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -44,7 +47,10 @@
         "value": 0.44,
         "unit": "K"
       },
-      "spatial_resolution": 40000.0,
+      "spatial_resolution": [
+        40000.0,
+        16000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -61,7 +67,10 @@
         "value": 0.36,
         "unit": "K"
       },
-      "spatial_resolution": 40000.0,
+      "spatial_resolution": [
+        40000.0,
+        16000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -78,7 +87,10 @@
         "value": 0.42,
         "unit": "K"
       },
-      "spatial_resolution": 10000.0,
+      "spatial_resolution": [
+        10000.0,
+        16000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -95,7 +107,10 @@
         "value": 1.13,
         "unit": "K"
       },
-      "spatial_resolution": 6000.0,
+      "spatial_resolution": [
+        6000.0,
+        16000.0
+      ],
       "unit": null,
       "nedt": null
     }

@@ -1,5 +1,5 @@
 {
-  "instrument_id": 1263,
+  "instrument_id": null,
   "instrument_acronym": "CHIME",
   "instrument_fullname": "Copernicus Hyperspectral Imaging Mission for the Environment",
   "url": "https://space.oscar.wmo.int/instruments/view/chime",
@@ -15,7 +15,7 @@
       "central_wavelength": 400.0,
       "NEΔL  (for land)": {
         "value": 0.4,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
@@ -28,7 +28,7 @@
       "channel_name": "Band_02",
       "central_wavelength": 400.0,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "2188 @ 62.95 W sr-1m-2µm-1",
+      "snr_or_nedt": "2188 @ 62.95 W sr -1 m -2 µm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -39,7 +39,7 @@
       "channel_name": "Band_03",
       "central_wavelength": 412.5,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "2061 @ 74.14 W sr-1m-2µm-1",
+      "snr_or_nedt": "2061 @ 74.14 W sr -1 m -2 µm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -51,7 +51,7 @@
       "central_wavelength": 430.0,
       "NEΔL  (for land)": {
         "value": 0.4,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
@@ -64,7 +64,7 @@
       "channel_name": "Band_05",
       "central_wavelength": 442.5,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "1811 @ 65.61 W sr-1m-2µm-1",
+      "snr_or_nedt": "1811 @ 65.61 W sr -1 m -2 µm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -75,7 +75,7 @@
       "channel_name": "Band_06",
       "central_wavelength": 490.0,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "1541 @ 51.21 W sr-1m-2µm-1",
+      "snr_or_nedt": "1541 @ 51.21 W sr -1 m -2 µm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -87,7 +87,7 @@
       "central_wavelength": 500.0,
       "NEΔL  (for land)": {
         "value": 0.28,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
@@ -100,7 +100,7 @@
       "channel_name": "Band_08",
       "central_wavelength": 510.0,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "1488 @ 44.39 W sr-1m-2µm-1",
+      "snr_or_nedt": "1488 @ 44.39 W sr -1 m -2 µm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -111,7 +111,7 @@
       "channel_name": "Band_09",
       "central_wavelength": 560.0,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "1280 @ 31.49 W sr-1m-2µm-1",
+      "snr_or_nedt": "1280 @ 31.49 W sr -1 m -2 µm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -123,7 +123,7 @@
       "central_wavelength": 600.0,
       "NEΔL  (for land)": {
         "value": 0.21,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
@@ -136,7 +136,7 @@
       "channel_name": "Band_11",
       "central_wavelength": 753.5,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "605 @ 10.33 W sr-1m-2µm-1",
+      "snr_or_nedt": "605 @ 10.33 W sr -1 m -2 µm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -147,7 +147,7 @@
       "channel_name": "Band_12",
       "central_wavelength": 778.75,
       "NEΔL  (for land)": "",
-      "snr_or_nedt": "812 @ 9.18 W sr-1m-2µm-1",
+      "snr_or_nedt": "812 @ 9.18 W sr -1 m -2 µm -1",
       "unit": "nm",
       "bandwidth": null,
       "spatial_resolution": null,
@@ -159,7 +159,7 @@
       "central_wavelength": 830.0,
       "NEΔL  (for land)": {
         "value": 0.19,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
@@ -173,7 +173,7 @@
       "central_wavelength": 890.0,
       "NEΔL  (for land)": {
         "value": 0.17,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
@@ -187,7 +187,7 @@
       "central_wavelength": 940.0,
       "NEΔL  (for land)": {
         "value": 0.14,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
@@ -201,7 +201,7 @@
       "central_wavelength": 1130.0,
       "NEΔL  (for land)": {
         "value": 0.1,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
@@ -215,7 +215,7 @@
       "central_wavelength": 1280.0,
       "NEΔL  (for land)": {
         "value": 0.085,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
@@ -240,7 +240,7 @@
       "central_wavelength": 1480.0,
       "NEΔL  (for land)": {
         "value": 0.05,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
@@ -254,7 +254,7 @@
       "central_wavelength": 1520.0,
       "NEΔL  (for land)": {
         "value": 0.065,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
@@ -279,7 +279,7 @@
       "central_wavelength": 1950.0,
       "NEΔL  (for land)": {
         "value": 0.05,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
@@ -293,7 +293,7 @@
       "central_wavelength": 2050.0,
       "NEΔL  (for land)": {
         "value": 0.035,
-        "unit": "W sr-1m-2µm-1"
+        "unit": "W sr -1 m -2 µm -1"
       },
       "snr_or_nedt": "",
       "unit": "nm",
