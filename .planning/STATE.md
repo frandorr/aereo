@@ -56,7 +56,7 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260336-refa | Refactor Plugin System to Support Class-Based Plugins | 2026-03-31 | pending | [260336-refactor-plugin-system-to-support-class-](./quick/260336-refactor-plugin-system-to-support-class-) |
 | 260337-update-agents-md-to-mention-codemap-usag | Update AGENTS.md to mention codemap usage for code exploration | 2026-03-31 | f2d241f | [260337-update-agents-md-to-mention-codemap-usag](./quick/260337-update-agents-md-to-mention-codemap-usag/) |
 | 260338-extract-url-data-from-payload-and-acrony | Extract URL data from Payload and Acronym column hyperlinks in Excel file | 2026-04-01 | 7afe9d8 | [260338-extract-url-data-from-payload-and-acrony](./quick/260338-extract-url-data-from-payload-and-acrony/) |
-| 260339-create-oscar-api-consumer-functions-to-f | Create OSCAR API consumer functions to fetch satellites and instruments data into dataframes | 2026-04-01 | 4d090c5 | [260339-create-oscar-api-consumer-functions-to-f](./quick/260339-create-oscar-api-consumer-functions-to-f/) |
+| 260339-create-oscar-api-consumer-functions-to-f | Create OSCAR API consumer functions to fetch satellites and instruments data into dataframes | 2026-04-01 | 51e8e6b | [260339-create-oscar-api-consumer-functions-to-f](./quick/260339-create-oscar-api-consumer-functions-to-f/) |
 
 ## Progress
 

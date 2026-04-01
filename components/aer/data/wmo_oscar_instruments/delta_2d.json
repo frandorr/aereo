@@ -1,0 +1,81 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "Delta-2D",
+  "instrument_fullname": "Scanning Microwave Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/delta_2d",
+  "schema_type": "microwave",
+  "original_columns": [
+    "Central frequency",
+    "Bandwidth",
+    "Polarisations",
+    "NEΔT",
+    "IFOV",
+    "Pixel"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_frequency": 6.9,
+      "bandwidth": "…. MHz",
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.1,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        40000.0,
+        60000.0
+      ],
+      "unit": "GHz",
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_frequency": 13.0,
+      "bandwidth": "…. MHz",
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.1,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        20000.0,
+        20000.0
+      ],
+      "unit": "GHz",
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_frequency": 22.3,
+      "bandwidth": ".... MHz",
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.15,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        10000.0,
+        10000.0
+      ],
+      "unit": "GHz",
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_frequency": 37.5,
+      "bandwidth": ".... MHz",
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.15,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        10000.0,
+        10000.0
+      ],
+      "unit": "GHz",
+      "nedt": null
+    }
+  ]
+}

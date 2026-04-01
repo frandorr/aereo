@@ -2,11 +2,21 @@
 
 This directory contains scripts and tools for processing and normalizing satellite instrument metadata scraped from the WMO OSCAR (Observing Systems Capability Analysis and Review Tool) database.
 
-## 1. Scraping Missing Satellite Instruments
+## 1. Fetching OSCAR Data
 
-Sometimes the original WMO CSVs do not provide direct URLs for all active satellite payloads, leading to missing JSON files (e.g. payloads like "CRIS (ACE)").
+The `oscar_fetcher.py` script automatically fetches satellite and instrument metadata directly from the WMO OSCAR API, avoiding the need for manual CSV exports. When run, it handles API pagination and generates two files in the current directory: `wmo_oscar_satellites.csv` and `wmo_oscar_instruments.csv`.
 
-The `scrape_missing_instruments.py` script automatically reads `wmo_oscar_satellites.csv`, identifies Operational payloads that lack a corresponding JSON file, formats their names into the exact URL structure WMO OSCAR expects (e.g., `cris_ace`), and scrapes their channel tables.
+**Usage:**
+
+```bash
+uv run python oscar_fetcher.py
+```
+
+## 2. Scraping Missing Satellite Instruments
+
+Sometimes the original WMO data does not provide complete channel tables in a structured format for all payloads.
+
+The `scrape_missing_instruments.py` script automatically reads `wmo_oscar_instruments.csv`, identifies instruments that lack a corresponding JSON file, and scrapes their channel tables directly from the OSCAR web pages.
 
 **Usage:**
 
@@ -15,11 +25,11 @@ uv run python scrape_missing_instruments.py
 ```
 
 Options:
-- `--sat-csv`: Path to the input satellites CSV (default: `wmo_oscar_satellites.csv`)
+- `--instruments-csv`: Path to the input instruments CSV (default: `wmo_oscar_instruments.csv`)
 - `--out-dir`: The directory to write scraped `.json` files (default: `wmo_oscar_instruments`)
-- `--all`: Scrape all payloads, not just 'Operational' ones.
+- `--status`: Scrape instruments with a specific status, e.g. 'Operational' (default: `all`)
 
-## 2. Normalizing Instrument Schemas
+## 3. Normalizing Instrument Schemas
 
 The raw JSON files scraped for instruments (found in the `wmo_oscar_instruments` directory) inherently possess varying, unstructured column schemas due to the varying technological specs of optical, microwave, SAR, and spectrometer instruments.
 

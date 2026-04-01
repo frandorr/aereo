@@ -1,16 +1,14 @@
 """Tests for the catalog component core models."""
 
 import pytest
-from shapely.geometry import Polygon
-
 from aer.catalog.core import Asset, AssetVariable, Product
 from aer.spectral import Instrument, Satellite
+from shapely.geometry import Polygon
 
 
 @pytest.fixture
 def sample_instrument():
     return Instrument(
-        satellite_acronym="GOES-16",
         acronym="ABI",
         channels=[],
     )
@@ -21,10 +19,6 @@ def sample_satellite(sample_instrument):
     return Satellite(
         acronym="GOES-16",
         payload=[sample_instrument],
-        orbit="GEO",
-        altitude_km=35786.0,
-        status="operational",
-        agencies=["NOAA", "NASA"],
     )
 
 
@@ -99,7 +93,6 @@ class TestProduct:
     ):
         """Product can have multiple instruments and satellites."""
         instrument2 = Instrument(
-            satellite_acronym="GOES-18",
             acronym="ABI",
             channels=[],
         )

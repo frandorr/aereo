@@ -1,13 +1,13 @@
 {
-  "instrument_id": 1038,
+  "instrument_id": null,
   "instrument_acronym": "IRMSS",
-  "instrument_fullname": "Infrared Multispectral Scanner ",
+  "instrument_fullname": "Infrared Multispectral Scanner",
   "url": "https://space.oscar.wmo.int/instruments/view/irmss",
   "schema_type": "optical_infrared",
   "original_columns": [
     "Central wavelength",
     "Spectral interval",
-    "SNR or NEΔT @ specified input"
+    "SNR or NE Δ T @ specified input"
   ],
   "channels": [
     {

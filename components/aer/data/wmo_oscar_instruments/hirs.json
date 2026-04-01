@@ -1,5 +1,5 @@
 {
-  "instrument_id": 181,
+  "instrument_id": null,
   "instrument_acronym": "HIRS",
   "instrument_fullname": "High-resolution Infra-Red Sounder",
   "url": "https://space.oscar.wmo.int/instruments/view/hirs",
@@ -19,14 +19,14 @@
       },
       "wave_number_range": {
         "value": 668.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 2.8,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -40,14 +40,14 @@
       },
       "wave_number_range": {
         "value": 679.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 13.7,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -61,14 +61,14 @@
       },
       "wave_number_range": {
         "value": 690.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 12.6,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -82,14 +82,14 @@
       },
       "wave_number_range": {
         "value": 702.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 15.9,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -103,14 +103,14 @@
       },
       "wave_number_range": {
         "value": 716.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 17.5,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -124,14 +124,14 @@
       },
       "wave_number_range": {
         "value": 733.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 17.6,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -145,14 +145,14 @@
       },
       "wave_number_range": {
         "value": 749.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 18.4,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -166,14 +166,14 @@
       },
       "wave_number_range": {
         "value": 900.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 34.6,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -187,14 +187,14 @@
       },
       "wave_number_range": {
         "value": 1224.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 63.4,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -208,14 +208,14 @@
       },
       "wave_number_range": {
         "value": 1496.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 87.6,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -229,14 +229,14 @@
       },
       "wave_number_range": {
         "value": 2190.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 20.6,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -250,14 +250,14 @@
       },
       "wave_number_range": {
         "value": 2212.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 22.5,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -271,14 +271,14 @@
       },
       "wave_number_range": {
         "value": 2242.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 21.6,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -292,14 +292,14 @@
       },
       "wave_number_range": {
         "value": 2275.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 35.2,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -313,14 +313,14 @@
       },
       "wave_number_range": {
         "value": 2357.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 23.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -334,14 +334,14 @@
       },
       "wave_number_range": {
         "value": 2692.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 297.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
-      "snr_or_nedt": "…. @ ….. mW m-2sr-1μm-1",
-      "unit": "cm-1",
+      "snr_or_nedt": "…. @ ….. mW m -2 sr -1 μm -1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -353,10 +353,10 @@
         "value": 0.69,
         "unit": "µm"
       },
-      "wave_number_range": "14,443 cm-1",
+      "wave_number_range": "14,443 cm -1",
       "Bandwidth": {
         "value": 892.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "snr_or_nedt": "…. @ …. % albedo",
       "spectral_resolution": null,

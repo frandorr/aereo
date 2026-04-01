@@ -1,8 +1,8 @@
 {
-  "instrument_id": 446,
+  "instrument_id": null,
   "instrument_acronym": "SAR RCM",
   "instrument_fullname": "Synthetic Aperture Radar (C-band) for RadarSat constellation",
-  "url": "https://space.oscar.wmo.int/instruments/view/sar%20rcm",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar_rcm",
   "schema_type": "sar_active",
   "original_columns": [
     "Operation mode",

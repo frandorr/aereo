@@ -1,0 +1,64 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "IMAGER (GOES 8-11)",
+  "instrument_fullname": "GOES Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/imager_goes_8_11",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NE Δ T @ specified input"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": 0.65,
+      "bandwidth": 0.55,
+      "snr_or_nedt": "250 @ 100 % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": 3.9,
+      "bandwidth": 3.8,
+      "snr_or_nedt": 0.11,
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": 6.75,
+      "bandwidth": 6.5,
+      "snr_or_nedt": 0.14,
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": 10.7,
+      "bandwidth": 10.2,
+      "snr_or_nedt": 0.09,
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": 11.95,
+      "bandwidth": 11.5,
+      "snr_or_nedt": 0.7,
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

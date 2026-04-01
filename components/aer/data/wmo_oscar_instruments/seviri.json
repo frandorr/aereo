@@ -1,13 +1,13 @@
 {
-  "instrument_id": 503,
+  "instrument_id": null,
   "instrument_acronym": "SEVIRI",
   "instrument_fullname": "Spinning Enhanced Visible Infra-Red Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/seviri",
   "schema_type": "optical_infrared",
   "original_columns": [
     "Central wavelength",
-    "Spectralinterval(99 % encircled energy)",
-    "SNR or NEΔT @ specified input"
+    "Spectral interval (99 % encircled energy)",
+    "SNR or NE Δ T @ specified input"
   ],
   "channels": [
     {

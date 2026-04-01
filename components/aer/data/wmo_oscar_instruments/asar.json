@@ -1,7 +1,7 @@
 {
-  "instrument_id": 635,
+  "instrument_id": null,
   "instrument_acronym": "ASAR",
-  "instrument_fullname": "Onboard Radar Complex (X-band)",
+  "instrument_fullname": "Advanced Synthetic Aperture Radar",
   "url": "https://space.oscar.wmo.int/instruments/view/asar",
   "schema_type": "sar_active",
   "original_columns": [

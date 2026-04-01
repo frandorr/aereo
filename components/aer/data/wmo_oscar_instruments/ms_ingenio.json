@@ -1,0 +1,54 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MS (Ingenio)",
+  "instrument_fullname": "Multispectral imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/ms_ingenio",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": 485.0,
+      "bandwidth": 450.0,
+      "snr_or_nedt": "120 @ ……. % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": 560.0,
+      "bandwidth": 520.0,
+      "snr_or_nedt": "120 @ ……. % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": 660.0,
+      "bandwidth": 630.0,
+      "snr_or_nedt": "120 @ ……. % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": 830.0,
+      "bandwidth": 760.0,
+      "snr_or_nedt": "120 @ ……. % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

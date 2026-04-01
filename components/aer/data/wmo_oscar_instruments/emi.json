@@ -1,5 +1,5 @@
 {
-  "instrument_id": 1179,
+  "instrument_id": null,
   "instrument_acronym": "EMI",
   "instrument_fullname": "Environment Monitoring Instrument",
   "url": "https://space.oscar.wmo.int/instruments/view/emi",
@@ -23,7 +23,7 @@
         "unit": null
       },
       "spectral_resolution": 0.3,
-      "snr_or_nedt": "200 @ 1.27 mW cm-2sr-1nm-1",
+      "snr_or_nedt": "200 @ 1.27 mW cm -2 sr -1 nm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -40,7 +40,7 @@
         "unit": null
       },
       "spectral_resolution": 0.3,
-      "snr_or_nedt": "200 @ 1.27 mW cm-2sr-1nm-1",
+      "snr_or_nedt": "200 @ 1.27 mW cm -2 sr -1 nm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -57,7 +57,7 @@
         "unit": null
       },
       "spectral_resolution": 0.5,
-      "snr_or_nedt": "2000 @ 10.89 mW cm-2sr-1nm-1",
+      "snr_or_nedt": "2000 @ 10.89 mW cm -2 sr -1 nm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -74,7 +74,7 @@
         "unit": null
       },
       "spectral_resolution": 0.5,
-      "snr_or_nedt": "2000 @ 10.89 mW cm-2sr-1nm-1",
+      "snr_or_nedt": "2000 @ 10.89 mW cm -2 sr -1 nm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null

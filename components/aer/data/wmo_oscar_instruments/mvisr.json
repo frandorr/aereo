@@ -1,5 +1,5 @@
 {
-  "instrument_id": 338,
+  "instrument_id": null,
   "instrument_acronym": "MVISR",
   "instrument_fullname": "Multichannel Visible Infrared Scanning Radiometer",
   "url": "https://space.oscar.wmo.int/instruments/view/mvisr",
@@ -7,7 +7,7 @@
   "original_columns": [
     "Central wavelength",
     "Spectral interval",
-    "SNR or NEΔT @ specified input"
+    "SNR or NE Δ T @ specified input"
   ],
   "channels": [
     {

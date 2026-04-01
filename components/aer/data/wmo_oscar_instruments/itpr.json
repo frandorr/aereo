@@ -1,5 +1,5 @@
 {
-  "instrument_id": 235,
+  "instrument_id": null,
   "instrument_acronym": "ITPR",
   "instrument_fullname": "Infrared Temperature Profile Radiometer",
   "url": "https://space.oscar.wmo.int/instruments/view/itpr",
@@ -19,17 +19,17 @@
       },
       "wave_number_range": {
         "value": 507.3,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 84.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "NEN": {
         "value": 0.195,
-        "unit": "mW m-2sr-1cm"
+        "unit": "mW m -2 sr -1 cm"
       },
-      "unit": "cm-1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -44,17 +44,17 @@
       },
       "wave_number_range": {
         "value": 668.3,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 5.3,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "NEN": {
         "value": 0.5,
-        "unit": "mW m-2sr-1cm"
+        "unit": "mW m -2 sr -1 cm"
       },
-      "unit": "cm-1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -69,17 +69,17 @@
       },
       "wave_number_range": {
         "value": 689.5,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 15.2,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "NEN": {
         "value": 0.187,
-        "unit": "mW m-2sr-1cm"
+        "unit": "mW m -2 sr -1 cm"
       },
-      "unit": "cm-1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -94,17 +94,17 @@
       },
       "wave_number_range": {
         "value": 713.8,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 17.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "NEN": {
         "value": 0.192,
-        "unit": "mW m-2sr-1cm"
+        "unit": "mW m -2 sr -1 cm"
       },
-      "unit": "cm-1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -119,17 +119,17 @@
       },
       "wave_number_range": {
         "value": 747.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 17.2,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "NEN": {
         "value": 0.192,
-        "unit": "mW m-2sr-1cm"
+        "unit": "mW m -2 sr -1 cm"
       },
-      "unit": "cm-1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -144,17 +144,17 @@
       },
       "wave_number_range": {
         "value": 899.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 39.5,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "NEN": {
         "value": 0.192,
-        "unit": "mW m-2sr-1cm"
+        "unit": "mW m -2 sr -1 cm"
       },
-      "unit": "cm-1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,
@@ -169,17 +169,17 @@
       },
       "wave_number_range": {
         "value": 2683.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "Bandwidth": {
         "value": 430.0,
-        "unit": "cm-1"
+        "unit": "cm -1"
       },
       "NEN": {
         "value": 0.004,
-        "unit": "mW m-2sr-1cm"
+        "unit": "mW m -2 sr -1 cm"
       },
-      "unit": "cm-1",
+      "unit": "cm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "spectral_resolution": null,

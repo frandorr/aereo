@@ -1,5 +1,5 @@
 {
-  "instrument_id": 1266,
+  "instrument_id": null,
   "instrument_acronym": "CLIM",
   "instrument_fullname": "Cloud Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/clim",
@@ -20,7 +20,7 @@
         "unit": "nm"
       },
       "bandwidth": 20.0,
-      "snr_or_nedt": "… @ … W m-2sr-1µ-1",
+      "snr_or_nedt": "… @ … W m -2 sr -1 µ -1",
       "spatial_resolution": 174.0,
       "central_wavelength": null,
       "snr_low": null,
@@ -34,7 +34,7 @@
         "unit": "nm"
       },
       "bandwidth": 9.0,
-      "snr_or_nedt": "… @ … W m-2sr-1µ-1",
+      "snr_or_nedt": "… @ … W m -2 sr -1 µ -1",
       "spatial_resolution": 174.0,
       "central_wavelength": null,
       "snr_low": null,
@@ -48,7 +48,7 @@
         "unit": "nm"
       },
       "bandwidth": 15.0,
-      "snr_or_nedt": "… @ … W m-2sr-1µ-1",
+      "snr_or_nedt": "… @ … W m -2 sr -1 µ -1",
       "spatial_resolution": 348.0,
       "central_wavelength": null,
       "snr_low": null,

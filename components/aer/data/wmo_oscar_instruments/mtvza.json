@@ -1,5 +1,5 @@
 {
-  "instrument_id": 332,
+  "instrument_id": null,
   "instrument_acronym": "MTVZA",
   "instrument_fullname": "Imaging/Sounding Microwave Radiometer",
   "url": "https://space.oscar.wmo.int/instruments/view/mtvza",
@@ -27,7 +27,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -44,7 +47,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -61,7 +67,10 @@
         "value": 0.3,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -78,7 +87,10 @@
         "value": 0.3,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -95,7 +107,10 @@
         "value": 0.3,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -112,7 +127,10 @@
         "value": 0.3,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -129,7 +147,10 @@
         "value": 0.3,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -146,7 +167,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -163,7 +187,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -180,7 +207,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -197,7 +227,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -214,7 +247,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 48000.0,
+      "spatial_resolution": [
+        48000.0,
+        48000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -231,7 +267,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 48000.0,
+      "spatial_resolution": [
+        48000.0,
+        48000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -248,7 +287,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 48000.0,
+      "spatial_resolution": [
+        48000.0,
+        48000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -265,7 +307,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 48000.0,
+      "spatial_resolution": [
+        48000.0,
+        48000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -282,7 +327,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 48000.0,
+      "spatial_resolution": [
+        48000.0,
+        48000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -299,7 +347,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 48000.0,
+      "spatial_resolution": [
+        48000.0,
+        48000.0
+      ],
       "nedt": null
     },
     {
@@ -315,7 +366,10 @@
         "value": 0.7,
         "unit": "K"
       },
-      "spatial_resolution": 48000.0,
+      "spatial_resolution": [
+        48000.0,
+        48000.0
+      ],
       "nedt": null
     },
     {
@@ -331,7 +385,10 @@
         "value": 0.9,
         "unit": "K"
       },
-      "spatial_resolution": 48000.0,
+      "spatial_resolution": [
+        48000.0,
+        48000.0
+      ],
       "nedt": null
     },
     {
@@ -347,7 +404,10 @@
         "value": 1.3,
         "unit": "K"
       },
-      "spatial_resolution": 48000.0,
+      "spatial_resolution": [
+        48000.0,
+        48000.0
+      ],
       "nedt": null
     },
     {
@@ -363,7 +423,10 @@
         "value": 1.7,
         "unit": "K"
       },
-      "spatial_resolution": 48000.0,
+      "spatial_resolution": [
+        48000.0,
+        48000.0
+      ],
       "nedt": null
     },
     {
@@ -379,7 +442,10 @@
         "value": 0.6,
         "unit": "K"
       },
-      "spatial_resolution": 16000.0,
+      "spatial_resolution": [
+        16000.0,
+        16000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -396,7 +462,10 @@
         "value": 0.6,
         "unit": "K"
       },
-      "spatial_resolution": 16000.0,
+      "spatial_resolution": [
+        16000.0,
+        16000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -413,7 +482,10 @@
         "value": 0.5,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "nedt": null
     },
     {
@@ -429,7 +501,10 @@
         "value": 0.6,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "nedt": null
     },
     {
@@ -445,7 +520,10 @@
         "value": 0.8,
         "unit": "K"
       },
-      "spatial_resolution": 32000.0,
+      "spatial_resolution": [
+        32000.0,
+        32000.0
+      ],
       "nedt": null
     }
   ]

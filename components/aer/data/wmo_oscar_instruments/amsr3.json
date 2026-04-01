@@ -1,5 +1,5 @@
 {
-  "instrument_id": 1236,
+  "instrument_id": null,
   "instrument_acronym": "AMSR3",
   "instrument_fullname": "Advanced Microwave Scanning Radiometer 3",
   "url": "https://space.oscar.wmo.int/instruments/view/amsr3",
@@ -27,7 +27,10 @@
         "value": 0.34,
         "unit": "K"
       },
-      "spatial_resolution": 10000.0,
+      "spatial_resolution": [
+        10000.0,
+        10000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -44,7 +47,10 @@
         "value": 0.34,
         "unit": "K"
       },
-      "spatial_resolution": 10000.0,
+      "spatial_resolution": [
+        10000.0,
+        10000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -61,7 +67,10 @@
         "value": 0.34,
         "unit": "K"
       },
-      "spatial_resolution": 10000.0,
+      "spatial_resolution": [
+        10000.0,
+        10000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -78,7 +87,10 @@
         "value": 0.7,
         "unit": "K"
       },
-      "spatial_resolution": 10000.0,
+      "spatial_resolution": [
+        10000.0,
+        10000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -95,7 +107,10 @@
         "value": 0.7,
         "unit": "K"
       },
-      "spatial_resolution": 10000.0,
+      "spatial_resolution": [
+        10000.0,
+        10000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -112,7 +127,10 @@
         "value": 0.6,
         "unit": "K"
       },
-      "spatial_resolution": 10000.0,
+      "spatial_resolution": [
+        10000.0,
+        10000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -129,7 +147,10 @@
         "value": 0.7,
         "unit": "K"
       },
-      "spatial_resolution": 10000.0,
+      "spatial_resolution": [
+        10000.0,
+        10000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -146,7 +167,10 @@
         "value": 1.2,
         "unit": "K"
       },
-      "spatial_resolution": 5000.0,
+      "spatial_resolution": [
+        5000.0,
+        5000.0
+      ],
       "unit": "GHz (A)",
       "nedt": null
     },
@@ -163,7 +187,10 @@
         "value": 1.2,
         "unit": "K"
       },
-      "spatial_resolution": 5000.0,
+      "spatial_resolution": [
+        5000.0,
+        5000.0
+      ],
       "unit": "GHz (B)",
       "nedt": null
     },
@@ -180,7 +207,10 @@
         "value": 1.5,
         "unit": "K"
       },
-      "spatial_resolution": 5000.0,
+      "spatial_resolution": [
+        5000.0,
+        5000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -197,7 +227,10 @@
         "value": 1.5,
         "unit": "K"
       },
-      "spatial_resolution": 5000.0,
+      "spatial_resolution": [
+        5000.0,
+        5000.0
+      ],
       "nedt": null
     },
     {
@@ -213,7 +246,10 @@
         "value": 1.5,
         "unit": "K"
       },
-      "spatial_resolution": 5000.0,
+      "spatial_resolution": [
+        5000.0,
+        5000.0
+      ],
       "nedt": null
     }
   ]

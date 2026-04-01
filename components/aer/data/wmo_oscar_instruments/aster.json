@@ -1,5 +1,5 @@
 {
-  "instrument_id": 50,
+  "instrument_id": null,
   "instrument_acronym": "ASTER",
   "instrument_fullname": "Advanced Spaceborne Thermal Emission and Reflection radiometer ",
   "url": "https://space.oscar.wmo.int/instruments/view/aster",

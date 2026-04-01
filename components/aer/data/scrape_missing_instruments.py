@@ -14,8 +14,10 @@ import re
 import time
 import urllib.parse
 from pathlib import Path
-import pandas as pd
+from typing import cast
+
 import httpx
+import pandas as pd
 from bs4 import BeautifulSoup
 
 # Setup logging
@@ -31,17 +33,6 @@ def slugify(text: str) -> str:
     text = re.sub(r"[^\w\s-]", "", text)
     text = re.sub(r"[\s_]+", "_", text)
     return text.strip("_")
-
-
-def normalize_payload_for_url(payload: str) -> str:
-    """
-    Apply exact URL formatting for WMO OSCAR payload URLs.
-    Many payload strings in the Satellites CSV look like "CRIS (ACE)",
-    but the OSCAR URL endpoint uses "cris_ace".
-    """
-    n = payload.lower().strip()
-    n = n.replace(" (", "_").replace(")", "").replace(" ", "_").replace("/", "")
-    return n
 
 
 def fetch_page(client: httpx.Client, normalized_acronym: str) -> str | None:
@@ -100,34 +91,20 @@ def parse_characteristics(html: str) -> tuple[list[str], list[dict[str, str]]]:
     return columns, channels
 
 
-def run(sat_csv: Path, output_dir: Path, all_status: bool = False):
+def run(instruments_csv: Path, output_dir: Path, status: str = "all"):
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    satellites = pd.read_csv(sat_csv)
-    if all_status:
-        payloads = (
-            satellites["Payload"]
-            .dropna()
-            .str.split("\n")
-            .explode()
-            .str.strip()
-            .replace("", pd.NA)
-            .dropna()
-            .unique()
+    instruments = pd.read_csv(instruments_csv)
+    if status == "all":
+        instruments = instruments.drop_duplicates(subset=["slug"]).reset_index(
+            drop=True
         )
     else:
-        payloads = (
-            satellites.loc[satellites["Sat status"] == "Operational", "Payload"]
-            .dropna()
-            .str.split("\n")
-            .explode()
-            .str.strip()
-            .replace("", pd.NA)
-            .dropna()
-            .unique()
+        instruments = (
+            cast(pd.DataFrame, instruments[instruments["status"] == status])
+            .drop_duplicates(subset=["slug"])
+            .reset_index(drop=True)
         )
-
-    log.info(f"Checking {len(payloads)} unique payloads from satellite records...")
 
     existing_files = set(f.name for f in output_dir.glob("*.json"))
 
@@ -141,43 +118,31 @@ def run(sat_csv: Path, output_dir: Path, all_status: bool = False):
     no_channels = 0
 
     try:
-        for payload in payloads:
-            slug = slugify(payload)
+        for _, row in instruments.iterrows():
+            slug = cast(str, row["slug"])
+            name = row["name"]
+            fullname = row["fullname"]
+            instrument_type = row["instrument_type"]
+            classification = row["classification"]
             filename = f"{slug}.json"
 
             if filename in existing_files:
                 skipped += 1
                 continue
 
-            # WMO often translates "Instrument (Satellite)" into "instrument_satellite"
-            search_acronym = normalize_payload_for_url(payload)
-
-            # Check if this alternate slug already exists just to be safe
-            alt_slug = slugify(search_acronym)
-            if f"{alt_slug}.json" in existing_files:
-                skipped += 1
-                continue
-
-            html = fetch_page(client, search_acronym)
-
-            # If standard string formatting didn't work, try stripping the satellite name completely
-            if not html and " (" in payload:
-                base_acronym = normalize_payload_for_url(payload.split(" (")[0])
-                html = fetch_page(client, base_acronym)
-                search_acronym = base_acronym
-
+            html = fetch_page(client, slug)
             if not html:
-                time.sleep(0.3)
                 continue
 
             cols, channels = parse_characteristics(html)
 
             if channels:
                 data = {
-                    "instrument_id": None,
-                    "instrument_acronym": payload,
-                    "instrument_fullname": "",
-                    "url": BASE_URL + search_acronym,
+                    "instrument_acronym": name,
+                    "instrument_fullname": fullname,
+                    "instrument_type": instrument_type,
+                    "instrument_classification": classification,
+                    "url": BASE_URL + slug,
                     "columns": cols,
                     "channels": channels,
                 }
@@ -186,14 +151,14 @@ def run(sat_csv: Path, output_dir: Path, all_status: bool = False):
                     json.dump(data, f, indent=2, ensure_ascii=False)
 
                 log.info(
-                    f"[SUCCESS] Scraped {len(channels)} channels for {payload} ({filename})"
+                    f"[SUCCESS] Scraped {len(channels)} channels for {slug} ({filename})"
                 )
                 added += 1
                 existing_files.add(filename)
-                existing_files.add(f"{alt_slug}.json")
+                existing_files.add(f"{slug}.json")
             else:
                 log.debug(
-                    f"[NO DATA] No channels table found for {payload} at OSCAR URL: {search_acronym}"
+                    f"[NO DATA] No channels table found for {slug} at OSCAR URL: {BASE_URL + slug}"
                 )
                 no_channels += 1
 
@@ -212,10 +177,10 @@ def main():
         description="Fetch missing scraped JSON payloads based on operational satellites list."
     )
     parser.add_argument(
-        "--sat-csv",
+        "--instruments-csv",
         type=str,
-        default="wmo_oscar_satellites.csv",
-        help="Path to wmo_oscar_satellites.csv",
+        default="wmo_oscar_instruments.csv",
+        help="Path to wmo_oscar_instruments.csv",
     )
     parser.add_argument(
         "--out-dir",
@@ -224,21 +189,22 @@ def main():
         help="Directory where JSONs are saved",
     )
     parser.add_argument(
-        "--all",
-        action="store_true",
-        help="Scrape all payloads, not just 'Operational' ones",
+        "--status",
+        type=str,
+        default="all",
+        help="Scrape instruments with the specified status",
     )
 
     args = parser.parse_args()
 
-    sat_csv = Path(args.sat_csv)
+    instruments_csv = Path(args.instruments_csv)
     out_dir = Path(args.out_dir)
 
-    if not sat_csv.exists():
-        log.error(f"Provided satellite CSV path doesn't exist: {sat_csv}")
+    if not instruments_csv.exists():
+        log.error(f"Provided satellite CSV path doesn't exist: {instruments_csv}")
         return
 
-    run(sat_csv, out_dir, args.all)
+    run(instruments_csv, out_dir, args.status)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,91 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "TES-limb",
+  "instrument_fullname": "Tropospheric Emission Spectrometer ",
+  "url": "https://space.oscar.wmo.int/instruments/view/tes_limb",
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
+    "Spectral range (µm)",
+    "Spectral range (cm -1 )",
+    "Spectral resolution (unapodised)",
+    "NEΔT @ specified scene temperature"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "Spectral range (µm)": {
+        "min": 11.11,
+        "max": 15.38,
+        "unit": "µm"
+      },
+      "Spectral range (cm -1 )": {
+        "min": 650.0,
+        "max": 900.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": 0.015,
+      "NEΔT @ specified scene temperature": "…. K @ 220 K",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_02",
+      "Spectral range (µm)": {
+        "min": 8.7,
+        "max": 12.2,
+        "unit": "µm"
+      },
+      "Spectral range (cm -1 )": {
+        "min": 820.0,
+        "max": 1150.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": 0.015,
+      "NEΔT @ specified scene temperature": "…. K @ 220 K",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_03",
+      "Spectral range (µm)": {
+        "min": 5.13,
+        "max": 9.09,
+        "unit": "µm"
+      },
+      "Spectral range (cm -1 )": {
+        "min": 1100.0,
+        "max": 1950.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": 0.015,
+      "NEΔT @ specified scene temperature": "…. K @ 220 K",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_04",
+      "Spectral range (µm)": {
+        "min": 3.28,
+        "max": 5.26,
+        "unit": "µm"
+      },
+      "Spectral range (cm -1 )": {
+        "min": 1900.0,
+        "max": 3050.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": 0.015,
+      "NEΔT @ specified scene temperature": "…. K @ 220 K",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    }
+  ]
+}

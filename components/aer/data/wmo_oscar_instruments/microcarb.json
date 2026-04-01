@@ -1,12 +1,12 @@
 {
-  "instrument_id": 1221,
+  "instrument_id": null,
   "instrument_acronym": "MicroCarb",
   "instrument_fullname": "MicroCarb",
   "url": "https://space.oscar.wmo.int/instruments/view/microcarb",
   "schema_type": "spectrometer_sounder",
   "original_columns": [
     "Spectral bands",
-    "Resolving power (λ/∆λ)",
+    "Resolving power (λ/∆λ )",
     "SNR",
     "Species"
   ],

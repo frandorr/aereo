@@ -1,8 +1,8 @@
 {
-  "instrument_id": 569,
+  "instrument_id": null,
   "instrument_acronym": "TMI",
   "instrument_fullname": "TRMM Microwave Imager ",
-  "url": "https://space.oscar.wmo.int/instruments/view/tmi%20",
+  "url": "https://space.oscar.wmo.int/instruments/view/tmi",
   "schema_type": "microwave",
   "original_columns": [
     "No.",
@@ -27,7 +27,10 @@
         "value": 0.6,
         "unit": "K"
       },
-      "spatial_resolution": 9200.0,
+      "spatial_resolution": [
+        9200.0,
+        13700.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -44,7 +47,10 @@
         "value": 0.6,
         "unit": "K"
       },
-      "spatial_resolution": 9200.0,
+      "spatial_resolution": [
+        9200.0,
+        13700.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -61,7 +67,10 @@
         "value": 0.7,
         "unit": "K"
       },
-      "spatial_resolution": 9200.0,
+      "spatial_resolution": [
+        9200.0,
+        13700.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -78,7 +87,10 @@
         "value": 0.7,
         "unit": "K"
       },
-      "spatial_resolution": 9200.0,
+      "spatial_resolution": [
+        9200.0,
+        13700.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -112,7 +124,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 9200.0,
+      "spatial_resolution": [
+        9200.0,
+        13700.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -129,7 +144,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 9200.0,
+      "spatial_resolution": [
+        9200.0,
+        13700.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -146,7 +164,10 @@
         "value": 0.7,
         "unit": "K"
       },
-      "spatial_resolution": 4600.0,
+      "spatial_resolution": [
+        4600.0,
+        13700.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -163,7 +184,10 @@
         "value": 0.7,
         "unit": "K"
       },
-      "spatial_resolution": 4600.0,
+      "spatial_resolution": [
+        4600.0,
+        13700.0
+      ],
       "unit": null,
       "nedt": null
     }

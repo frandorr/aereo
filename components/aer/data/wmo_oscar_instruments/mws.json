@@ -1,7 +1,7 @@
 {
-  "instrument_id": 1367,
+  "instrument_id": null,
   "instrument_acronym": "MWS",
-  "instrument_fullname": "Microwave Sounder for Geostationary Orbit.",
+  "instrument_fullname": "Micro-Wave Sounder",
   "url": "https://space.oscar.wmo.int/instruments/view/mws",
   "schema_type": "microwave",
   "original_columns": [
@@ -308,10 +308,7 @@
         "unit": "K"
       },
       "spatial_resolution": 17000.0,
-      "unit": {
-        "value": -167,
-        "unit": null
-      },
+      "unit": "-167",
       "nedt": null
     },
     {
