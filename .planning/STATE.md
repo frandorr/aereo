@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 02
 status: unknown
-last_updated: "2026-03-19T20:35:02.158Z"
+last_updated: "2026-04-01T14:48:13.961Z"
 progress:
   total_phases: 3
   completed_phases: 3
@@ -52,7 +52,11 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260331-refa | refactor Instrument/Satellite to many-to- | 2026-03-28 | c357c95 | [260331-refactor-satellite-instrument-channel-re](./quick/260331-refactor-satellite-instrument-channel-re/) |
 | 260332-creat | Create InMemoryRepository and tests | 2026-03-29 | 6fd997d | [260332-create-tests-subclassing-aerrepository-w](./quick/260332-create-tests-subclassing-aerrepository-w/) |
 | 260334-pars | Parse WMO OSCAR instrument channels to JSON | 2026-03-29 | aaa84cf | [260334-parse-wmo-oscar-instrument-channels-from](./quick/260334-parse-wmo-oscar-instrument-channels-from/) |
-| 260335-fix | Fix GridCell tests to use both footprint and utm_footprint, add catalog component tests | 2026-03-31 | pending | [260335-fix-gridcell-tests-to-use-both-footprint](./quick/260335-fix-gridcell-tests-to-use-both-footprint/) |
+| 260335-fix | Fix GridCell tests to use both footprint and utm_footprint, add catalog component tests | 2026-03-31 | fcff7f5 | [260335-fix-gridcell-tests-to-use-both-footprint](./quick/260335-fix-gridcell-tests-to-use-both-footprint/) |
+| 260336-refa | Refactor Plugin System to Support Class-Based Plugins | 2026-03-31 | pending | [260336-refactor-plugin-system-to-support-class-](./quick/260336-refactor-plugin-system-to-support-class-) |
+| 260337-update-agents-md-to-mention-codemap-usag | Update AGENTS.md to mention codemap usage for code exploration | 2026-03-31 | f2d241f | [260337-update-agents-md-to-mention-codemap-usag](./quick/260337-update-agents-md-to-mention-codemap-usag/) |
+| 260338-extract-url-data-from-payload-and-acrony | Extract URL data from Payload and Acronym column hyperlinks in Excel file | 2026-04-01 | 7afe9d8 | [260338-extract-url-data-from-payload-and-acrony](./quick/260338-extract-url-data-from-payload-and-acrony/) |
+| 260339-create-oscar-api-consumer-functions-to-f | Create OSCAR API consumer functions to fetch satellites and instruments data into dataframes | 2026-04-01 | pending | [260339-create-oscar-api-consumer-functions-to-f](./quick/260339-create-oscar-api-consumer-functions-to-f/) |
 
 ## Progress
 
@@ -61,4 +65,4 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 - Current: Phase 1 context captured, ready to plan
 
 ---
-*Last activity: 2026-03-31 - Completed quick task 260335: Fix GridCell tests to use both footprint and utm_footprint, add catalog component tests*
+*Last activity: 2026-04-01 - Completed quick task 260339: Create OSCAR API consumer functions to fetch satellites and instruments data into dataframes*
