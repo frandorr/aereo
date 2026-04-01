@@ -1,0 +1,274 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MWRI-2",
+  "instrument_fullname": "Micro-Wave Radiation Imager 2",
+  "url": "https://space.oscar.wmo.int/instruments/view/mwri_2",
+  "schema_type": "microwave",
+  "original_columns": [
+    "Channel Number",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisations",
+    "NEΔT",
+    "IFOV",
+    "Pixel"
+  ],
+  "channels": [
+    {
+      "channel_name": "CH01",
+      "Channel Number": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": 10.65,
+      "bandwidth": 180.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH02",
+      "Channel Number": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": 18.7,
+      "bandwidth": 200.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH03",
+      "Channel Number": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": 23.8,
+      "bandwidth": 400.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH04",
+      "Channel Number": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": 36.5,
+      "bandwidth": 900.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH05",
+      "Channel Number": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": 50.3,
+      "bandwidth": 400.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH06",
+      "Channel Number": {
+        "value": 6,
+        "unit": null
+      },
+      "central_frequency": 52.61,
+      "bandwidth": 400.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH07",
+      "Channel Number": {
+        "value": 7,
+        "unit": null
+      },
+      "central_frequency": 53.24,
+      "bandwidth": 400.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH08",
+      "Channel Number": {
+        "value": 8,
+        "unit": null
+      },
+      "central_frequency": 53.75,
+      "bandwidth": 400.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH09",
+      "Channel Number": {
+        "value": 9,
+        "unit": null
+      },
+      "central_frequency": 89.0,
+      "bandwidth": 3000.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH10",
+      "Channel Number": {
+        "value": 10,
+        "unit": null
+      },
+      "central_frequency": "118.7503±3.2",
+      "bandwidth": 2.0,
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "nedt": null
+    },
+    {
+      "channel_name": "CH11",
+      "Channel Number": {
+        "value": 11,
+        "unit": null
+      },
+      "central_frequency": "118.7503±2.1",
+      "bandwidth": 2.0,
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "nedt": null
+    },
+    {
+      "channel_name": "CH12",
+      "Channel Number": {
+        "value": 12,
+        "unit": null
+      },
+      "central_frequency": "118.7503±1.4",
+      "bandwidth": 2.0,
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "nedt": null
+    },
+    {
+      "channel_name": "CH13",
+      "Channel Number": {
+        "value": 13,
+        "unit": null
+      },
+      "central_frequency": "118.7503±1.2",
+      "bandwidth": 2.0,
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        4000.0,
+        14000.0
+      ],
+      "nedt": null
+    }
+  ]
+}

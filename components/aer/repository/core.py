@@ -6,6 +6,7 @@ and AerSpatialRepository for grid cell queries with spatial filtering.
 
 from abc import ABC, abstractmethod
 
+from aer.catalog import Product
 from aer.spatial import GridCell, GridDefinition, OverlapMode
 from aer.spectral import (
     ChannelType,
@@ -44,7 +45,7 @@ class AerSpectralRepository(ABC):
         """Retrieve an instrument by its acronym.
 
         Args:
-            acronym: The unique acronym identifier for the instrument.
+            acronym (str): The unique acronym identifier for the instrument.
         Returns:
             An Instrument object corresponding to the provided acronym.
         Raises:
@@ -55,16 +56,16 @@ class AerSpectralRepository(ABC):
     @abstractmethod
     def get_channel(
         self,
-        acronym: str,
+        instrument: Instrument,
         channel_name: str | None = None,
         channel_number: int | None = None,
     ) -> ChannelType:
         """Retrieve a channel by its acronym.
 
         Args:
-            acronym: The unique acronym identifier for the instrument channel.
-                channel_name: Optional name of the channel to disambiguate if multiple channels share the same acronym.
-                channel_number: Optional number of the channel to disambiguate if multiple channels share the same acronym.
+            instrument: The instrument the channel belongs to.
+            channel_name: Optional name of the channel to disambiguate if multiple channels share the same acronym.
+            channel_number: Optional number of the channel to disambiguate if multiple channels share the same acronym.
         Returns:
             A ChannelType object corresponding to the provided instrument acronym.
         Raises:
@@ -101,5 +102,39 @@ class AerSpatialRepository(ABC):
             A list of GridCell objects that intersect with the provided geometry.
         Raises:
             An exception if no grid cells are found intersecting the geometry.
+        """
+        pass
+
+
+class AerCatalogRepository(ABC):
+    """
+    Abstract Base Class defining the Aer catalog data access interface.
+    This repository orchestrates persistence and retrieval of catalog data,
+    particularly for Product, AssetVariable, and Asset entities.
+    """
+
+    @abstractmethod
+    def store_product(self, product: Product) -> None:
+        """Store a Product object in the repository.
+
+        Args:
+            product: The Product object to be stored.
+        Returns:
+            None
+        Raises:
+            An exception if the product cannot be stored.
+        """
+        pass
+
+    @abstractmethod
+    def get_product(self, product_id: str) -> Product:
+        """Retrieve a product by its unique identifier.
+
+        Args:
+            product_id: The unique identifier for the product.
+        Returns:
+            A Product object corresponding to the provided identifier.
+        Raises:
+            An exception if no product with the given identifier is found.
         """
         pass

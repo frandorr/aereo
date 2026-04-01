@@ -1,8 +1,8 @@
 {
-  "instrument_id": 1135,
+  "instrument_id": null,
   "instrument_acronym": "OCO (ISS) spectrometer",
   "instrument_fullname": "Orbiting Carbon Observatory ISS spectrometer",
-  "url": "https://space.oscar.wmo.int/instruments/view/oco%20%28iss%29%20spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/oco_iss_spectrometer",
   "schema_type": "spectrometer_sounder",
   "original_columns": [
     "Spectral range",
@@ -23,7 +23,7 @@
         "unit": null
       },
       "spectral_resolution": 0.04,
-      "snr_or_nedt": "…….. @ ……… W m-2sr-1μm-1",
+      "snr_or_nedt": "…….. @ ……… W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -40,7 +40,7 @@
         "unit": null
       },
       "spectral_resolution": 0.08,
-      "snr_or_nedt": "…….. @ ……… W m-2sr-1μm-1",
+      "snr_or_nedt": "…….. @ ……… W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -57,7 +57,7 @@
         "unit": null
       },
       "spectral_resolution": 0.1,
-      "snr_or_nedt": "…….. @ ……… W m-2sr-1μm-1",
+      "snr_or_nedt": "…….. @ ……… W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null

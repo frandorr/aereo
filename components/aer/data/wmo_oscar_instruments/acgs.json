@@ -1,5 +1,5 @@
 {
-  "instrument_id": 1129,
+  "instrument_id": null,
   "instrument_acronym": "ACGS",
   "instrument_fullname": "Atmospheric Carbon-dioxide Grating Spectrometer",
   "url": "https://space.oscar.wmo.int/instruments/view/acgs",
@@ -23,7 +23,7 @@
         "unit": null
       },
       "spectral_resolution": 0.044,
-      "snr_or_nedt": "360 @ 5.8 1019photons s-1m-2sr-1μm-1",
+      "snr_or_nedt": "360 @ 5.8 10 19 photons s -1 m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -40,7 +40,7 @@
         "unit": null
       },
       "spectral_resolution": 0.125,
-      "snr_or_nedt": "250 @ 2.1 1019photons s-1m-2sr-1μm-1",
+      "snr_or_nedt": "250 @ 2.1 10 19 photons s -1 m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -57,7 +57,7 @@
         "unit": null
       },
       "spectral_resolution": 0.165,
-      "snr_or_nedt": "180 @ 1.1 1019photons s-1m-2sr-1μm-1",
+      "snr_or_nedt": "180 @ 1.1 10 19 photons s -1 m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null

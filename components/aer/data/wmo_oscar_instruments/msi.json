@@ -1,7 +1,7 @@
 {
-  "instrument_id": 1056,
+  "instrument_id": null,
   "instrument_acronym": "MSI",
-  "instrument_fullname": "Multispectral imager\n",
+  "instrument_fullname": "Multi-Spectral Imager for Earth-CARE",
   "url": "https://space.oscar.wmo.int/instruments/view/msi",
   "schema_type": "optical_infrared",
   "original_columns": [

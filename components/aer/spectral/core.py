@@ -18,7 +18,6 @@ import cattrs
 @attrs.frozen(kw_only=True)
 class BaseChannel:
     channel_name: str
-    instrument_acronym: str
     unit: str | None = None
 
 
@@ -67,12 +66,14 @@ ChannelType = Union[OpticalChannel, MicrowaveChannel, SARChannel, SpectrometerCh
 # ==========================================
 @attrs.frozen(repr=False)
 class Instrument:
-    satellite_acronym: str
     acronym: str
     channels: Sequence[ChannelType]
+    metadata: dict[str, Any] | None = None
 
     def __repr__(self) -> str:
         lines = [f"Instrument: {self.acronym}"]
+        for key, value in (self.metadata or {}).items():
+            lines.append(f"  {key.capitalize()}: {value}")
         lines.append(f"└─ Channels ({len(self.channels)}):")
         for ch in self.channels:
             lines.append(f"   - {repr(ch)}")
@@ -83,24 +84,18 @@ class Instrument:
 class Satellite:
     acronym: str
     payload: list[Instrument]
-    orbit: str | None = None
-    altitude_km: float | None = None
-    status: str | None = None
-    agencies: list[str] | None = None
+    metadata: dict[str, Any] | None = None
 
     def __repr__(self) -> str:
         lines = [f"Satellite({self.acronym})"]
-        lines.append(
-            f"  Orbit: {self.orbit} | Altitude: {self.altitude_km} km | Status: {self.status}"
-        )
-        agencies_str = ", ".join(self.agencies) if self.agencies else "Unknown"
-        lines.append(f"  Agencies: {agencies_str}")
         lines.append(f"  └─ Payload ({len(self.payload)} instruments):")
 
         for inst in self.payload:
             inst_repr = repr(inst)
             indented_inst = "\n".join(f"     {line}" for line in inst_repr.split("\n"))
             lines.append(indented_inst)
+        for key, value in (self.metadata or {}).items():
+            lines.append(f"  {key.capitalize()}: {value}")
 
         return "\n".join(lines)
 
@@ -157,11 +152,8 @@ converter.register_structure_hook(
 )
 
 
-def create_channel(
-    schema_type: str, data: dict[str, Any], instrument_acronym: str
-) -> ChannelType:
+def create_channel(schema_type: str, data: dict[str, Any]) -> ChannelType:
     struct_data = dict(data)
-    struct_data["instrument_acronym"] = instrument_acronym
 
     if schema_type == "optical_infrared":
         return converter.structure(struct_data, OpticalChannel)

@@ -1,8 +1,8 @@
 {
-  "instrument_id": 1224,
+  "instrument_id": null,
   "instrument_acronym": "ICEYE SAR",
   "instrument_fullname": "ICEYE SAR",
-  "url": "https://space.oscar.wmo.int/instruments/view/iceye%20sar",
+  "url": "https://space.oscar.wmo.int/instruments/view/iceye_sar",
   "schema_type": "sar_active",
   "original_columns": [
     "Operation mode",

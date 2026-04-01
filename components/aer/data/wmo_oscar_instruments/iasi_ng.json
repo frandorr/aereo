@@ -1,0 +1,285 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "IASI-NG",
+  "instrument_fullname": "Infrared Atmospheric Sounder Interferometer - New Generation",
+  "url": "https://space.oscar.wmo.int/instruments/view/iasi_ng",
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
+    "Band",
+    "Wavelength",
+    "Wavenumber",
+    "NEΔT after apodisation"
+  ],
+  "channels": [
+    {
+      "channel_name": "IAS-1",
+      "Band": "IAS-1",
+      "Wavelength": {
+        "value": 15.5,
+        "unit": "μm 15.27 μm 15.08 μm 14.49 μm"
+      },
+      "Wavenumber": {
+        "value": 645.0,
+        "unit": "cm -1 655 cm -1 663 cm -1 690 cm -1"
+      },
+      "NEΔT after apodisation": {
+        "value": 0.39,
+        "unit": "K @ 280 K 0.26 K @ 280 K 0.225 K @ 280 K 0.225 K @ 280 K"
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "IAS-2",
+      "Band": "IAS-2",
+      "Wavelength": {
+        "min": 12.99,
+        "max": 14.49,
+        "unit": "μm"
+      },
+      "Wavenumber": {
+        "min": 690.0,
+        "max": 770.0,
+        "unit": "cm -1"
+      },
+      "NEΔT after apodisation": {
+        "value": 0.13,
+        "unit": "K @ 280 K"
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "IAS-3",
+      "Band": "IAS-3",
+      "Wavelength": {
+        "min": 10.0,
+        "max": 12.99,
+        "unit": "μm"
+      },
+      "Wavenumber": {
+        "min": 770.0,
+        "max": 1000.0,
+        "unit": "cm -1"
+      },
+      "NEΔT after apodisation": {
+        "value": 0.13,
+        "unit": "K @ 280 K"
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "IAS-4",
+      "Band": "IAS-4",
+      "Wavelength": {
+        "min": 9.35,
+        "max": 10.0,
+        "unit": "μm"
+      },
+      "Wavenumber": {
+        "min": 1000.0,
+        "max": 1070.0,
+        "unit": "cm -1"
+      },
+      "NEΔT after apodisation": {
+        "value": 0.195,
+        "unit": "K @ 280 K"
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "IAS-5",
+      "Band": "IAS-5",
+      "Wavelength": {
+        "min": 8.7,
+        "max": 10.0,
+        "unit": "μm"
+      },
+      "Wavenumber": {
+        "min": 1070.0,
+        "max": 1150.0,
+        "unit": "cm -1"
+      },
+      "NEΔT after apodisation": {
+        "value": 0.195,
+        "unit": "K @ 280 K"
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "IAS-6",
+      "Band": "IAS-6",
+      "Wavelength": {
+        "min": 6.06,
+        "max": 8.7,
+        "unit": "μm"
+      },
+      "Wavenumber": {
+        "min": 1150.0,
+        "max": 1650.0,
+        "unit": "cm -1"
+      },
+      "NEΔT after apodisation": {
+        "value": 0.13,
+        "unit": "K @ 280 K"
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "IAS-7",
+      "Band": "IAS-7",
+      "Wavelength": {
+        "min": 4.76,
+        "max": 6.06,
+        "unit": "μm"
+      },
+      "Wavenumber": {
+        "min": 1650.0,
+        "max": 2100.0,
+        "unit": "cm -1"
+      },
+      "NEΔT after apodisation": {
+        "value": 0.449,
+        "unit": "K @ 280 K"
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "IAS-8",
+      "Band": "IAS-8",
+      "Wavelength": {
+        "min": 4.59,
+        "max": 4.76,
+        "unit": "μm"
+      },
+      "Wavenumber": {
+        "min": 2100.0,
+        "max": 2180.0,
+        "unit": "cm -1"
+      },
+      "NEΔT after apodisation": {
+        "value": 0.156,
+        "unit": "K @ 280 K"
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "IAS-9",
+      "Band": "IAS-9",
+      "Wavelength": {
+        "min": 4.44,
+        "max": 4.59,
+        "unit": "μm"
+      },
+      "Wavenumber": {
+        "min": 2180.0,
+        "max": 2250.0,
+        "unit": "cm -1"
+      },
+      "NEΔT after apodisation": {
+        "value": 0.26,
+        "unit": "K @ 280 K"
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "IAS-10",
+      "Band": "IAS-10",
+      "Wavelength": {
+        "min": 4.13,
+        "max": 4.44,
+        "unit": "μm"
+      },
+      "Wavenumber": {
+        "min": 2250.0,
+        "max": 2420.0,
+        "unit": "cm -1"
+      },
+      "NEΔT after apodisation": {
+        "value": 0.26,
+        "unit": "K @ 280 K"
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "IAS-11",
+      "Band": "IAS-11",
+      "Wavelength": {
+        "value": 4.13,
+        "unit": "μm 4.08 μm 3.85 μm 3.70 μm"
+      },
+      "Wavenumber": {
+        "value": 2420.0,
+        "unit": "cm -1 2450 cm -1 2600 cm -1 2700 cm -1"
+      },
+      "NEΔT after apodisation": {
+        "value": 0.26,
+        "unit": "K @ 280 K 0.26 K @ 280 K 0.65 K @ 280 K 1.138 K @ 280 K"
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "IAS-12",
+      "Band": "IAS-12",
+      "Wavelength": {
+        "value": 3.7,
+        "unit": "μm 3.62 μm"
+      },
+      "Wavenumber": {
+        "value": 2700.0,
+        "unit": "cm -1 2760 cm -1"
+      },
+      "NEΔT after apodisation": {
+        "value": 1.138,
+        "unit": "K @ 280 K 1.43 K @ 280 K"
+      },
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "instrument_id": 1247,
+  "instrument_id": null,
   "instrument_acronym": "CIMR",
   "instrument_fullname": "Copernicus Imaging Microwave Radiometer",
   "url": "https://space.oscar.wmo.int/instruments/view/cimr",
@@ -27,7 +27,10 @@
         "value": 0.3,
         "unit": "K"
       },
-      "spatial_resolution": 58000.0,
+      "spatial_resolution": [
+        58000.0,
+        58000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -44,7 +47,10 @@
         "value": 0.2,
         "unit": "K"
       },
-      "spatial_resolution": 15000.0,
+      "spatial_resolution": [
+        15000.0,
+        15000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -61,7 +67,10 @@
         "value": 0.3,
         "unit": "K"
       },
-      "spatial_resolution": 15000.0,
+      "spatial_resolution": [
+        15000.0,
+        15000.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -78,7 +87,10 @@
         "value": 0.4,
         "unit": "K"
       },
-      "spatial_resolution": 5500.0,
+      "spatial_resolution": [
+        5500.0,
+        5500.0
+      ],
       "unit": "GHz",
       "nedt": null
     },
@@ -95,7 +107,10 @@
         "value": 0.7,
         "unit": "K"
       },
-      "spatial_resolution": 4500.0,
+      "spatial_resolution": [
+        4500.0,
+        4500.0
+      ],
       "unit": "GHz",
       "nedt": null
     }

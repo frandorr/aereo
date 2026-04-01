@@ -1,5 +1,5 @@
 {
-  "instrument_id": 168,
+  "instrument_id": null,
   "instrument_acronym": "GOMOS",
   "instrument_fullname": "Global Ozone Monitoring by Occultation of Stars ",
   "url": "https://space.oscar.wmo.int/instruments/view/gomos",
@@ -20,7 +20,7 @@
       },
       "No. of channels": "~ 500",
       "spectral_resolution": 0.89,
-      "snr_or_nedt": "................. @ ......... W m-2sr-1μm-1",
+      "snr_or_nedt": "................. @ ......... W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -34,7 +34,7 @@
       },
       "No. of channels": "~ 200",
       "spectral_resolution": 0.12,
-      "snr_or_nedt": "................. @ ......... W m-2sr-1μm-1",
+      "snr_or_nedt": "................. @ ......... W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -48,7 +48,7 @@
       },
       "No. of channels": "~ 300",
       "spectral_resolution": 0.12,
-      "snr_or_nedt": "................. @ ......... W m-2sr-1μm-1",
+      "snr_or_nedt": "................. @ ......... W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -65,7 +65,7 @@
         "unit": null
       },
       "spectral_resolution": 116.0,
-      "snr_or_nedt": "................. @ ......... W m-2sr-1μm-1",
+      "snr_or_nedt": "................. @ ......... W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null
@@ -82,7 +82,7 @@
         "unit": null
       },
       "spectral_resolution": 61.0,
-      "snr_or_nedt": "................. @ ......... W m-2sr-1μm-1",
+      "snr_or_nedt": "................. @ ......... W m -2 sr -1 μm -1",
       "wave_number_min": null,
       "wave_number_max": null,
       "number_of_channels": null

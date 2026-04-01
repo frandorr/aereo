@@ -1,0 +1,103 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MWRI (HY-2)",
+  "instrument_fullname": "Microwave Radiometer Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/mwri_hy_2",
+  "schema_type": "microwave",
+  "original_columns": [
+    "Channel number",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisations",
+    "NEΔT",
+    "IFOV",
+    "Pixel"
+  ],
+  "channels": [
+    {
+      "channel_name": "CH01",
+      "Channel number": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": 6.6,
+      "bandwidth": 350.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "….. x …. km",
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH02",
+      "Channel number": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": 10.7,
+      "bandwidth": 250.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "….. x …. km",
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH03",
+      "Channel number": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": 18.7,
+      "bandwidth": 250.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "….. x …. km",
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH04",
+      "Channel number": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": 23.8,
+      "bandwidth": 400.0,
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": "….. x …. km",
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH05",
+      "Channel number": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": 37.0,
+      "bandwidth": 1000.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.8,
+        "unit": "K"
+      },
+      "spatial_resolution": "….. x …. km",
+      "unit": null,
+      "nedt": null
+    }
+  ]
+}

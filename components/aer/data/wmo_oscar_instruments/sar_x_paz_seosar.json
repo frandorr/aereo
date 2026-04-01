@@ -1,0 +1,39 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "SAR-X (Paz (SEOSAR))",
+  "instrument_fullname": "Synthetic Aperture Radar (X-band)",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar_x_paz_seosar",
+  "schema_type": "sar_active",
+  "original_columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": 1.0,
+      "swath_width": 5000.0,
+      "polarisation": "HH or VV or HV or VH",
+      "field_of_regard": null
+    },
+    {
+      "channel_name": "Band_02",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": 3.0,
+      "swath_width": 30000.0,
+      "polarisation": "HH or VV or HV or VH",
+      "field_of_regard": null
+    },
+    {
+      "channel_name": "Band_03",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": 15.0,
+      "swath_width": 100000.0,
+      "polarisation": "HH or VV or HV or VH",
+      "field_of_regard": null
+    }
+  ]
+}

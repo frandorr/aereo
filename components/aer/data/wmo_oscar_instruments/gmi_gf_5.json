@@ -1,0 +1,89 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "GMI (GF-5)",
+  "instrument_fullname": "Greenhouse-gases Monitoring Instrument",
+  "url": "https://space.oscar.wmo.int/instruments/view/gmi_gf_5",
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
+    "Channel number",
+    "Central wavelength",
+    "Spectral range",
+    "Spectral resolution",
+    "SNR @ 30 % albedo",
+    "Species"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "number_of_channels": 1.0,
+      "Central wavelength": {
+        "value": 765.0,
+        "unit": "nm"
+      },
+      "Spectral range": {
+        "min": 759.0,
+        "max": 769.0,
+        "unit": "nm"
+      },
+      "spectral_resolution": 0.027,
+      "snr_or_nedt": 300.0,
+      "Species": "O 2",
+      "wave_number_min": null,
+      "wave_number_max": null
+    },
+    {
+      "channel_name": "Band_02",
+      "number_of_channels": 2.0,
+      "Central wavelength": {
+        "value": 1575.0,
+        "unit": "nm"
+      },
+      "Spectral range": {
+        "min": 1568.0,
+        "max": 1583.0,
+        "unit": "nm"
+      },
+      "spectral_resolution": 0.067,
+      "snr_or_nedt": 300.0,
+      "Species": "CO 2",
+      "wave_number_min": null,
+      "wave_number_max": null
+    },
+    {
+      "channel_name": "Band_03",
+      "number_of_channels": 3.0,
+      "Central wavelength": {
+        "value": 1650.0,
+        "unit": "nm"
+      },
+      "Spectral range": {
+        "min": 1642.0,
+        "max": 1658.0,
+        "unit": "nm"
+      },
+      "spectral_resolution": 0.067,
+      "snr_or_nedt": 250.0,
+      "Species": "CH 4",
+      "wave_number_min": null,
+      "wave_number_max": null
+    },
+    {
+      "channel_name": "Band_04",
+      "number_of_channels": 4.0,
+      "Central wavelength": {
+        "value": 2050.0,
+        "unit": "nm"
+      },
+      "Spectral range": {
+        "min": 2043.0,
+        "max": 2058.0,
+        "unit": "nm"
+      },
+      "spectral_resolution": 0.113,
+      "snr_or_nedt": 250.0,
+      "Species": "CO 2",
+      "wave_number_min": null,
+      "wave_number_max": null
+    }
+  ]
+}

@@ -1,18 +1,17 @@
 {
   "instrument_id": null,
   "instrument_acronym": "GMI (core)",
-  "instrument_fullname": "",
+  "instrument_fullname": "GPM Microwave Imager",
   "url": "https://space.oscar.wmo.int/instruments/view/gmi_core",
   "schema_type": "microwave",
   "original_columns": [
-    "channel_name",
     "No.",
-    "central_frequency",
-    "bandwidth",
-    "polarisations",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
     "NEΔT",
-    "spatial_resolution",
-    "unit"
+    "IFOV",
+    "Pixel"
   ],
   "channels": [
     {

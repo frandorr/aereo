@@ -1,7 +1,7 @@
 {
-  "instrument_id": 1239,
+  "instrument_id": null,
   "instrument_acronym": "TIRS",
-  "instrument_fullname": "Thermal IR Spectrometer",
+  "instrument_fullname": "Thermal Infra-Red Sensor",
   "url": "https://space.oscar.wmo.int/instruments/view/tirs",
   "schema_type": "optical_infrared",
   "original_columns": [

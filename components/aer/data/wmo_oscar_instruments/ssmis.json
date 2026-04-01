@@ -1,5 +1,5 @@
 {
-  "instrument_id": 536,
+  "instrument_id": null,
   "instrument_acronym": "SSMIS",
   "instrument_fullname": "Special Sensor Microwave - Imager/Sounder",
   "url": "https://space.oscar.wmo.int/instruments/view/ssmis",
@@ -27,7 +27,10 @@
         "value": 0.34,
         "unit": "K"
       },
-      "spatial_resolution": 25000.0,
+      "spatial_resolution": [
+        25000.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -44,7 +47,10 @@
         "value": 0.34,
         "unit": "K"
       },
-      "spatial_resolution": 25000.0,
+      "spatial_resolution": [
+        25000.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -61,7 +67,10 @@
         "value": 0.45,
         "unit": "K"
       },
-      "spatial_resolution": 25000.0,
+      "spatial_resolution": [
+        25000.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -78,7 +87,10 @@
         "value": 0.24,
         "unit": "K"
       },
-      "spatial_resolution": 25000.0,
+      "spatial_resolution": [
+        25000.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -95,7 +107,10 @@
         "value": 0.24,
         "unit": "K"
       },
-      "spatial_resolution": 25000.0,
+      "spatial_resolution": [
+        25000.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -112,7 +127,10 @@
         "value": 0.21,
         "unit": "K"
       },
-      "spatial_resolution": 37500.0,
+      "spatial_resolution": [
+        37500.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -129,7 +147,10 @@
         "value": 0.2,
         "unit": "K"
       },
-      "spatial_resolution": 37500.0,
+      "spatial_resolution": [
+        37500.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -146,7 +167,10 @@
         "value": 0.21,
         "unit": "K"
       },
-      "spatial_resolution": 37500.0,
+      "spatial_resolution": [
+        37500.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -163,7 +187,10 @@
         "value": 0.2,
         "unit": "K"
       },
-      "spatial_resolution": 37500.0,
+      "spatial_resolution": [
+        37500.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -180,7 +207,10 @@
         "value": 0.22,
         "unit": "K"
       },
-      "spatial_resolution": 37500.0,
+      "spatial_resolution": [
+        37500.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -197,7 +227,10 @@
         "value": 0.26,
         "unit": "K"
       },
-      "spatial_resolution": 37500.0,
+      "spatial_resolution": [
+        37500.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -214,7 +247,10 @@
         "value": 0.25,
         "unit": "K"
       },
-      "spatial_resolution": 37500.0,
+      "spatial_resolution": [
+        37500.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -231,7 +267,10 @@
         "value": 0.38,
         "unit": "K"
       },
-      "spatial_resolution": 75000.0,
+      "spatial_resolution": [
+        75000.0,
+        12500.0
+      ],
       "nedt": null
     },
     {
@@ -247,7 +286,10 @@
         "value": 0.37,
         "unit": "K"
       },
-      "spatial_resolution": 75000.0,
+      "spatial_resolution": [
+        75000.0,
+        12500.0
+      ],
       "nedt": null
     },
     {
@@ -263,7 +305,10 @@
         "value": 0.58,
         "unit": "K"
       },
-      "spatial_resolution": 75000.0,
+      "spatial_resolution": [
+        75000.0,
+        12500.0
+      ],
       "nedt": null
     },
     {
@@ -279,7 +324,10 @@
         "value": 0.86,
         "unit": "K"
       },
-      "spatial_resolution": 75000.0,
+      "spatial_resolution": [
+        75000.0,
+        12500.0
+      ],
       "nedt": null
     },
     {
@@ -295,7 +343,10 @@
         "value": 1.18,
         "unit": "K"
       },
-      "spatial_resolution": 75000.0,
+      "spatial_resolution": [
+        75000.0,
+        12500.0
+      ],
       "nedt": null
     },
     {
@@ -311,7 +362,10 @@
         "value": 1.23,
         "unit": "K"
       },
-      "spatial_resolution": 75000.0,
+      "spatial_resolution": [
+        75000.0,
+        12500.0
+      ],
       "nedt": null
     },
     {
@@ -327,7 +381,10 @@
         "value": 0.19,
         "unit": "K"
       },
-      "spatial_resolution": 12500.0,
+      "spatial_resolution": [
+        12500.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -344,7 +401,10 @@
         "value": 0.19,
         "unit": "K"
       },
-      "spatial_resolution": 12500.0,
+      "spatial_resolution": [
+        12500.0,
+        12500.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -361,7 +421,10 @@
         "value": 0.53,
         "unit": "K"
       },
-      "spatial_resolution": 12500.0,
+      "spatial_resolution": [
+        12500.0,
+        12500.0
+      ],
       "nedt": null
     },
     {
@@ -377,7 +440,10 @@
         "value": 0.56,
         "unit": "K"
       },
-      "spatial_resolution": 12500.0,
+      "spatial_resolution": [
+        12500.0,
+        12500.0
+      ],
       "nedt": null
     },
     {
@@ -393,7 +459,10 @@
         "value": 0.39,
         "unit": "K"
       },
-      "spatial_resolution": 12500.0,
+      "spatial_resolution": [
+        12500.0,
+        12500.0
+      ],
       "nedt": null
     },
     {
@@ -409,7 +478,10 @@
         "value": 0.38,
         "unit": "K"
       },
-      "spatial_resolution": 12500.0,
+      "spatial_resolution": [
+        12500.0,
+        12500.0
+      ],
       "nedt": null
     }
   ]

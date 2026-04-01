@@ -1,16 +1,15 @@
 {
   "instrument_id": null,
   "instrument_acronym": "TMS (Tomorrow)",
-  "instrument_fullname": "",
+  "instrument_fullname": "Tomorrow Microwave Sounder",
   "url": "https://space.oscar.wmo.int/instruments/view/tms_tomorrow",
   "schema_type": "microwave",
   "original_columns": [
-    "channel_name",
     "No.",
-    "central_frequency",
-    "bandwidth",
+    "Central frequency",
+    "Bandwidth",
     "NE∆T",
-    "spatial_resolution"
+    "Nadir IFOV"
   ],
   "channels": [
     {

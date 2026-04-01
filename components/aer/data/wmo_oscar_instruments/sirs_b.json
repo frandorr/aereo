@@ -1,0 +1,323 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "SIRS-B",
+  "instrument_fullname": "Satellite Infra-Red Spectrometer - B",
+  "url": "https://space.oscar.wmo.int/instruments/view/sirs_b",
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
+    "Wavelength",
+    "Wave number",
+    "Bandwidth",
+    "NEΔT @ specified scene temperature"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "Wavelength": {
+        "value": 35.71,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 280.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 7.86,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_02",
+      "Wavelength": {
+        "value": 33.11,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 302.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 8.32,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_03",
+      "Wavelength": {
+        "value": 25.54,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 391.5,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 8.1,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_04",
+      "Wavelength": {
+        "value": 23.5,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 425.5,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 8.3,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_05",
+      "Wavelength": {
+        "value": 22.91,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 436.5,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 8.47,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_06",
+      "Wavelength": {
+        "value": 18.81,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 531.5,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 10.14,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_07",
+      "Wavelength": {
+        "value": 14.95,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 668.7,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 10.42,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_08",
+      "Wavelength": {
+        "value": 14.71,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 679.8,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 10.61,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_09",
+      "Wavelength": {
+        "value": 14.45,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 692.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 10.81,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_10",
+      "Wavelength": {
+        "value": 14.26,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 701.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 10.96,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_11",
+      "Wavelength": {
+        "value": 14.1,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 709.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 11.13,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_12",
+      "Wavelength": {
+        "value": 13.62,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 734.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 11.7,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_13",
+      "Wavelength": {
+        "value": 13.33,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 750.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 11.83,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_14",
+      "Wavelength": {
+        "value": 11.12,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 899.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 12.36,
+        "unit": "cm -1"
+      },
+      "NEΔT @ specified scene temperature": ".... K @ 250 K",
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    }
+  ]
+}

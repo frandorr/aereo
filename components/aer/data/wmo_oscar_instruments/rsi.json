@@ -1,7 +1,7 @@
 {
-  "instrument_id": 1172,
+  "instrument_id": null,
   "instrument_acronym": "RSI",
-  "instrument_fullname": "Remote Sensing Instrument ",
+  "instrument_fullname": "Remote Sensing Instrument",
   "url": "https://space.oscar.wmo.int/instruments/view/rsi",
   "schema_type": "optical_infrared",
   "original_columns": [

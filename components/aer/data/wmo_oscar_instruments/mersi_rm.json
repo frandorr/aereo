@@ -1,0 +1,95 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MERSI-RM",
+  "instrument_fullname": "MERSI-Rainfall Measurement",
+  "url": "https://space.oscar.wmo.int/instruments/view/mersi_rm",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Center wavelength",
+    "Bandwidth",
+    "SNR or NEΔT @ specified input",
+    "IFOV at s.s.p."
+  ],
+  "channels": [
+    {
+      "channel_name": "CH01",
+      "central_wavelength": 650.0,
+      "bandwidth": 50.0,
+      "snr_or_nedt": "150 @ 22 W m -2 sr -1 μm -1",
+      "spatial_resolution": 500.0,
+      "unit": "nm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH02",
+      "central_wavelength": 865.0,
+      "bandwidth": 50.0,
+      "snr_or_nedt": "150 @ 25 W m -2 sr -1 μm -1",
+      "spatial_resolution": 500.0,
+      "unit": "nm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH03",
+      "central_wavelength": 940.0,
+      "bandwidth": 50.0,
+      "snr_or_nedt": "150 @ 15.0 W m -2 sr -1 μm -1",
+      "spatial_resolution": 500.0,
+      "unit": "nm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH04",
+      "central_wavelength": 1380.0,
+      "bandwidth": 30.0,
+      "snr_or_nedt": "150 @ 6 W m -2 sr -1 μm -1",
+      "spatial_resolution": 500.0,
+      "unit": "nm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH05",
+      "central_wavelength": 1640.0,
+      "bandwidth": 50.0,
+      "snr_or_nedt": "340 @ 7.3 W m -2 sr -1 μm -1",
+      "spatial_resolution": 500.0,
+      "unit": "nm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH06",
+      "central_wavelength": 3.8,
+      "bandwidth": 0.18,
+      "snr_or_nedt": 0.15,
+      "spatial_resolution": 500.0,
+      "unit": "μm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH07",
+      "central_wavelength": 10.8,
+      "bandwidth": 1.0,
+      "snr_or_nedt": 0.1,
+      "spatial_resolution": 500.0,
+      "unit": "μm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH08",
+      "central_wavelength": 12.0,
+      "bandwidth": 1.0,
+      "snr_or_nedt": 0.1,
+      "spatial_resolution": 500.0,
+      "unit": "μm",
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

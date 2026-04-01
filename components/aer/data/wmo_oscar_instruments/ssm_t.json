@@ -1,0 +1,135 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "SSM/T",
+  "instrument_fullname": "Special Sensor Microwave - Temperature",
+  "url": "https://space.oscar.wmo.int/instruments/view/ssm_t",
+  "schema_type": "microwave",
+  "original_columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "No.": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": 50.5,
+      "bandwidth": 400.0,
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.6,
+        "unit": "K"
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_02",
+      "No.": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": 53.2,
+      "bandwidth": 400.0,
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_03",
+      "No.": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": 54.35,
+      "bandwidth": 400.0,
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_04",
+      "No.": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": 54.9,
+      "bandwidth": 400.0,
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_05",
+      "No.": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": 58.4,
+      "bandwidth": 350.0,
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_06",
+      "No.": {
+        "value": 6,
+        "unit": null
+      },
+      "central_frequency": 58.825,
+      "bandwidth": 300.0,
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_07",
+      "No.": {
+        "value": 7,
+        "unit": null
+      },
+      "central_frequency": 59.4,
+      "bandwidth": 250.0,
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
+    }
+  ]
+}

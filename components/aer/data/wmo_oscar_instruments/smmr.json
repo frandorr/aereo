@@ -1,5 +1,5 @@
 {
-  "instrument_id": 522,
+  "instrument_id": null,
   "instrument_acronym": "SMMR",
   "instrument_fullname": "Scanning Multichannel Microwave Radiometer)",
   "url": "https://space.oscar.wmo.int/instruments/view/smmr",
@@ -22,7 +22,10 @@
         "value": 0.9,
         "unit": "K"
       },
-      "spatial_resolution": 40000.0,
+      "spatial_resolution": [
+        40000.0,
+        26000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -35,7 +38,10 @@
         "value": 0.9,
         "unit": "K"
       },
-      "spatial_resolution": 20000.0,
+      "spatial_resolution": [
+        20000.0,
+        26000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -48,7 +54,10 @@
         "value": 1.2,
         "unit": "K"
       },
-      "spatial_resolution": 20000.0,
+      "spatial_resolution": [
+        20000.0,
+        26000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -61,7 +70,10 @@
         "value": 1.5,
         "unit": "K"
       },
-      "spatial_resolution": 20000.0,
+      "spatial_resolution": [
+        20000.0,
+        26000.0
+      ],
       "unit": null,
       "nedt": null
     },
@@ -74,7 +86,10 @@
         "value": 1.5,
         "unit": "K"
       },
-      "spatial_resolution": 10000.0,
+      "spatial_resolution": [
+        10000.0,
+        26000.0
+      ],
       "unit": null,
       "nedt": null
     }
