@@ -12,6 +12,7 @@ from aer.plugin.core import (
     run_search,
     run_extract,
 )
+from aer.plugin.search import SearchPlugin
 
 __all__ = [
     "PluginRegistry",
@@ -21,4 +22,5 @@ __all__ = [
     "PluginInfo",
     "run_search",
     "run_extract",
+    "SearchPlugin",
 ]
