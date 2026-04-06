@@ -51,6 +51,7 @@ from aer.plugin.core import (
     hookimpl,
     hookspec,
     PROJECT_NAME,
+    SearchResultSchema,
 )
 
 __all__ = [
@@ -58,4 +59,5 @@ __all__ = [
     "hookimpl",
     "hookspec",
     "PROJECT_NAME",
+    "SearchResultSchema",
 ]
