@@ -59,6 +59,7 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260339-create-oscar-api-consumer-functions-to-f | Create OSCAR API consumer functions to fetch satellites and instruments data into dataframes | 2026-04-01 | 51e8e6b | [260339-create-oscar-api-consumer-functions-to-f](./quick/260339-create-oscar-api-consumer-functions-to-f/) |
 | 260340-create-abstract-searchplugin-class-in-co | Create abstract SearchPlugin class in components/aer/plugin/search.py | 2026-04-04 | 6352fa0 | [260340-create-abstract-searchplugin-class-in-co](./quick/260340-create-abstract-searchplugin-class-in-co/) |
 | 260342-remove-old-plugin-architecture-and-add-p | Remove old plugin architecture and add pluggy hooks tests | 2026-04-06 | 76b3706 | [260342-remove-old-plugin-architecture-and-add-p](./quick/260342-remove-old-plugin-architecture-and-add-p/) |
+| 260343-remove-abcs | Remove SearchPlugin ABCs, standardize on pluggy only | 2026-04-06 | e8067d1 | - |
 
 ## Progress
 
@@ -67,4 +68,4 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 - Current: Phase 1 context captured, ready to plan
 
 ---
-*Last activity: 2026-04-06 - Completed quick task 260342: Remove old plugin architecture and add pluggy hooks tests*
+*Last activity: 2026-04-06 - Removed SearchPlugin ABCs, standardized on pluggy hookspecs only (e8067d1)*
