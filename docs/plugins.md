@@ -1,100 +1,227 @@
 # aer Plugin System
 
-`aer` uses a **unified plugin registry** with a type-aware **Capability Graph**. This allows third-party developers to register new search backends, download backends, or data transformations using a single `@plugin` decorator — no base classes, no config files.
+`aer` uses **pluggy**, the battle-tested plugin system from pytest, to enable third-party extensions. This allows developers to register new search backends, extract backends, and data transformations using simple `@hookimpl` decorators.
 
 ## How it Works
 
-The plugin system has two layers:
+The plugin system provides **hookspecs** (specifications) that define the interface, and **hookimpls** (implementations) provided by external packages:
 
-1. **Spectral Registry** — `Instrument`, `Satellite`, `BandType`, and `Product` are immutable frozen dataclasses backed by class-level registries. When you call `.register()`, it instantiates your new element and adds it to the global namespace.
+```python
+# In aer - the hookspec
+class AerSpec:
+    @hookspec
+    def search(self, query: SearchQuery) -> GeoDataFrame:
+        """Search for satellite data."""
 
-2. **Plugin Registry** — The `PluginRegistry` provides a unified registry for all functional plugins (search, extract, download, transform, etc.). It automatically infers input/output types from function annotations, building a **Capability Graph** of all available data pipelines.
+# In your plugin - the hookimpl
+class MySearchPlugin:
+    @hookimpl
+    def search(self, query: SearchQuery) -> GeoDataFrame:
+        # Your implementation
+        return results
+```
 
 ## Writing a Plugin
 
-### The `@plugin` Decorator
+### Search Plugins
 
-Creating a plugin is just decorating a typed function:
+Create a class that implements the `search` hook:
 
 ```python
-from aer.plugin import plugin
-import geopandas as gpd
+from pandera.typing.geopandas import GeoDataFrame
+from aer.plugin import hookimpl
+from aer.search import SearchQuery
 
-@plugin(name="my_filter", category="transform")
-def filter_large_granules(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    """Keep only granules above 50 MB."""
-    return gdf[gdf["size_mb"] > 50]
+class EarthAccessSearchPlugin:
+    """Search plugin using NASA Earthdata."""
+
+    @hookimpl
+    def search(self, query: SearchQuery) -> GeoDataFrame:
+        """Search NASA Earthdata for satellite imagery.
+
+        Parameters
+        ----------
+        query : SearchQuery
+            Search parameters including collections, time range,
+            and spatial extent.
+
+        Returns
+        -------
+        GeoDataFrame
+            Search results with columns: collection, id, datetime,
+            geometry, plus any provider-specific metadata.
+        """
+        # Example implementation
+        import earthaccess
+
+        results = earthaccess.search_data(
+            short_name=query.collections[0],
+            temporal=(query.datetime),
+            bounding_box=query.intersects.bounds,
+        )
+
+        # Convert to GeoDataFrame with SearchResultSchema
+        return GeoDataFrame(results)
 ```
-
-That's it. The registry automatically:
-1. Extracts the input type (`GeoDataFrame`) and return type (`GeoDataFrame`) from annotations.
-2. Registers the function in the global plugin registry.
-3. Adds an edge to the Capability Graph so the plugin can be discovered and chained.
 
 ### Extract Plugins
 
-Extract plugins are responsible for downloading and reprojecting data to the **majortom grid**. They follow the same `@plugin` pattern but use the `category="extract"`:
+Create a class that implements the `extract` hook:
 
 ```python
-from aer.plugin import plugin
-from aer.extract import ExtractedResultSchema
-import geopandas as gpd
+from aer.plugin import hookimpl
+from aer.extract import ExtractionTask
 
-@plugin(name="my_extractor", category="extract")
-def extract_data(gdf: gpd.GeoDataFrame, output_dir: str) -> gpd.GeoDataFrame:
-    """Extract and reproject granules to the majortom grid."""
-    # 1. Download data from S3/HTTPS
-    # 2. Reproject to the grid cell specified in 'overlapping_spatial_extent'
-    # 3. Save to output_dir
-    # 4. Return GeoDataFrame[ExtractedResultSchema]
-    return gpd.GeoDataFrame(...)
+class EarthAccessExtractPlugin:
+    """Extract plugin for NASA Earthdata."""
+
+    @hookimpl
+    def extract(self, task: ExtractionTask) -> ExtractionTask:
+        """Download and process satellite data.
+
+        Parameters
+        ----------
+        task : ExtractionTask
+            Task containing source URL, output path, and processing
+            parameters. The target grid cell is in
+            'overlapping_spatial_extent'.
+
+        Returns
+        -------
+        ExtractionTask
+            Task with updated status (SUCCESS or FAILED) and
+            output_files populated.
+        """
+        try:
+            # Download the data
+            download_file(task.source_url, task.output_path)
+
+            # Reproject to target grid if needed
+            if task.target_grid:
+                reproject(task.output_path, task.target_grid)
+
+            task.status = "SUCCESS"
+            task.output_files = [task.output_path]
+        except Exception as e:
+            task.status = "FAILED"
+            task.error = str(e)
+
+        return task
 ```
 
-### Using Plugins
+### Prepare Tasks Plugins
+
+Create a class that implements the `prepare_tasks` hook:
 
 ```python
-from aer.plugin import plugin_registry
-
-# Discover all plugins
-for p in plugin_registry.all():
-    print(p)  # <Plugin 'earthaccess' (search): SearchQuery -> GeoDataFrame>
-
-# Use the simplified public API
-from aer.plugin import run_search, run_extract
-
-# 1. Search
-results = run_search("earthaccess", query)
-
-# 2. Extract (calls the 'extract' category plugin by name)
-extracted = run_extract("my_extractor", results, "/tmp/output")
-
-# Visualise possible type transitions
+from aer.plugin import hookimpl
+from aer.extract import ExtractionTask
 from aer.search import SearchQuery
-plugin_registry.show_capabilities(SearchQuery)
-# [*] SearchQuery
-#  └── (earthaccess) -> GeoDataFrame
-#       └── (my_extractor) -> GeoDataFrame
+
+class MyPreparePlugin:
+    """Prepare extraction tasks from search results."""
+
+    @hookimpl
+    def prepare_tasks(self, query: SearchQuery) -> list[ExtractionTask]:
+        """Convert search results to extraction tasks.
+
+        Parameters
+        ----------
+        query : SearchQuery
+            The search query, typically with results attached.
+
+        Returns
+        -------
+        list[ExtractionTask]
+            List of extraction tasks ready for processing.
+        """
+        return [
+            ExtractionTask(
+                source_url=item.s3_url,
+                output_path=f"/data/{item.id}.nc",
+                parameters={"channels": query.channels},
+            )
+            for item in query.results
+        ]
 ```
 
-### Chaining Plugins with Pipeline
+## Using Plugins
+
+### Loading Plugins
+
+Plugins are automatically discovered via Python entry points:
 
 ```python
-from aer.plugin import Pipeline
+import pluggy
+from aer.plugin import AerSpec, PROJECT_NAME
 
-# Type transitions are validated at construction time
-pipe = Pipeline("earthaccess", "my_filter")
-result = pipe.run(query)
+# Create plugin manager
+pm = pluggy.PluginManager(PROJECT_NAME)
+pm.add_hookspecs(AerSpec)
+
+# Load all plugins from entry points
+pm.load_setuptools_entrypoints("aer.plugins")
+
+# Now all @hookimpl plugins are registered
+```
+
+### Calling Hooks
+
+Once plugins are loaded, call hooks by name:
+
+```python
+from aer.search import SearchQuery
+
+# Create a query
+query = SearchQuery(
+    collections=["HLSL30"],
+    datetime="2024-01-01/2024-02-01",
+    intersects=my_geometry,
+)
+
+# Call the search hook - all registered plugins will be invoked
+results = pm.hook.search(query=query)
+
+# results is a list of return values from all plugins
+# (combine them or pick the first based on your needs)
+combined_results = pd.concat(results)
+```
+
+## Registering Your Plugin
+
+Add an entry point to your `pyproject.toml`:
+
+```toml
+[project.entry-points."aer.plugins"]
+my_plugin = "my_package.module:MyPluginClass"
+```
+
+Multiple hooks can be implemented by the same class:
+
+```toml
+[project.entry-points."aer.plugins"]
+earthaccess = "aer_earthaccess.plugin:EarthAccessPlugin"
+```
+
+Where `EarthAccessPlugin` implements multiple hooks:
+
+```python
+class EarthAccessPlugin:
+    @hookimpl
+    def search(self, query): ...
+
+    @hookimpl
+    def extract(self, task): ...
 ```
 
 ## Spectral Definitions (Instruments, Satellites, Products)
 
-The spectral registry allows third-party packages to define entirely custom satellite, sensor, and product taxonomies. Because these taxonomies are pure metadata, `aer` supports an extensible **YAML Configuration System**.
+The spectral registry allows third-party packages to define custom satellite, sensor, and product taxonomies via YAML configuration or programmatic registration.
 
 ### 1. YAML Configuration (Recommended)
 
-You can define custom instruments, satellites, bands, and products in a `.yaml` file. The framework will parse and register these objects automatically at runtime.
+Define instruments, satellites, and products in YAML:
 
-Create a file `custom_sensor.yaml`:
 ```yaml
 instruments:
   - name: "OLI"
@@ -117,27 +244,23 @@ products:
           bandwidth: 0.016
 ```
 
-Then point the environment variable to your file or directory of files:
+Point to your config:
 ```bash
 export AER_SPECTRAL_CONFIG_PATH=/path/to/custom_sensor.yaml
 ```
 
-The config loader will instantly pre-register all objects globally in `Product.all()`, so components like search plugins can use it immediately without requiring code changes.
-
 ### 2. Python API (Programmatic)
 
-If you must define elements programmatically, use `.register()` on the core typestate markers. Always capture the return value of `.register()` for type safety:
-
-Because plugins extend the namespace dynamically, always capture the return value of `.register()` for type safety:
+Register elements programmatically:
 
 ```python
-from aer.spectral import Instrument, Satellite, BandType, Band, Channel, Product
+from aer.spectral import Instrument, Satellite, Product, Channel, Band, BandType
 
-# Register new instruments and satellites
+# Register instruments and satellites
 OLI = Instrument.register("OLI", "https://landsat.gsfc.nasa.gov/...")
 LANDSAT_8 = Satellite.register("LANDSAT_8")
 
-# Define channels using standard aer interfaces
+# Define channels
 L8_BAND_1 = Channel(
     c_id="B1",
     instrument=OLI,
@@ -164,22 +287,20 @@ assert Product.get("LC08_L1TP") is LC08_PRODUCT
 
 ## The API Surface
 
-### Plugin Registry
+### Plugin System
 
 | Operation | API |
-|---|---|
-| Register | `@plugin(name="...", category="...")` |
-| Get by name | `plugin_registry.get("name")` |
-| List all | `plugin_registry.all()` |
-| Show graph | `plugin_registry.show_capabilities(StartType)` |
-| Chain | `Pipeline("step1", "step2").run(input)` |
-| Search API | `run_search("name", query)` |
-| Extract API | `run_extract("name", gdf, out_dir)` |
+|-----------|-----|
+| Implement hook | `@hookimpl` decorator |
+| Define spec | `@hookspec` decorator + `AerSpec` class |
+| Load plugins | `pm.load_setuptools_entrypoints("aer.plugins")` |
+| Call hooks | `pm.hook.search(query=...)` |
+| Project name | `PROJECT_NAME = "aer"` |
 
 ### Spectral Registry
 
 | Class | Registration | Query | Iterator |
-|---|---|---|---|
+|-------|------------|-------|----------|
 | `Instrument` | `Instrument.register("NAME", url="...")` | `Instrument.get("NAME")` | `Instrument.all()` |
 | `Satellite` | `Satellite.register("NAME", url="...")` | `Satellite.get("NAME")` | `Satellite.all()` |
 | `BandType` | `BandType.register("Name")` | `BandType.get("Name")` | `BandType.all()` |
@@ -189,29 +310,20 @@ assert Product.get("LC08_L1TP") is LC08_PRODUCT
 
 ## Entry Points & Discovery
 
-Functional plugins (search, download, etc.) are discovered automatically via **Python Entry Points**. The `PluginRegistry` scans for entry points in the `aer.plugins` group.
-
-### The Bootstrap Mechanism
-
-To eagerly load all installed plugins, call `bootstrap()`:
-
-```python
-from aer.bootstrap import bootstrap
-bootstrap()
-```
-
-Alternatively, `plugin_registry.get()` and `plugin_registry.all()` trigger lazy loading on first access.
-
-### Plugin Discovery (Entry Points)
-
-Plugins are declared in the `[project.entry-points]` section of your `pyproject.toml`:
+Plugins are discovered automatically via **Python Entry Points**. Declare them in `pyproject.toml`:
 
 ```toml
 [project.entry-points."aer.plugins"]
-earthaccess = "aer.search_earthaccess.core:search_earthaccess"
+my_plugin = "my_package.module:PluginClass"
 ```
+
+### Loading Behavior
+
+- **Lazy loading**: `load_setuptools_entrypoints()` is called when you create a PluginManager
+- **Multiple plugins**: Any number of plugins can implement the same hook
+- **No conflicts**: Plugins don't conflict - they're all called in sequence (respecting tryfirst/trylast)
 
 > [!IMPORTANT]
 > **Workspace Discovery Root**: In a Polylith development environment, `importlib.metadata` reads discovery metadata from the package currently installed in the environment (the root `pyproject.toml` when using `uv sync` at the workspace root).
 >
-> If you add a new plugin to a `projects/` sub-package but **do not** add it to the root `pyproject.toml`, it will be missing from the registry during development, leading to `KeyError: "Plugin '...' is not registered."`. Always mirror your plugin entry points in the root configuration during active development.
+> If you add a new plugin to a `projects/` sub-package but **do not** add it to the root `pyproject.toml`, it will be missing during development. Always mirror your plugin entry points in the root configuration during active development.

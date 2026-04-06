@@ -26,10 +26,15 @@ Quick Start for Plugin Developers
 
 3. Users can now use your plugin::
 
-    from aer.bootstrap import bootstrap
-    bootstrap()  # Loads all plugins
+    import pluggy
+    from aer.plugin import AerSpec, PROJECT_NAME
+
+    pm = pluggy.PluginManager(PROJECT_NAME)
+    pm.add_hookspecs(AerSpec)
+    pm.load_setuptools_entrypoints("aer.plugins")
 
     # Your plugin is automatically available via the hook system
+    results = pm.hook.search(query=my_query)
 
 Available Hooks
 ---------------
