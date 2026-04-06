@@ -4,6 +4,7 @@ Verifies GridCell, GridDefinition, GridSchema validation, polygon reprojection,
 and pyresample AreaDefinition generation.
 """
 
+import json
 import pytest
 from shapely.geometry import Polygon, Point
 from pyresample.geometry import AreaDefinition
@@ -14,6 +15,7 @@ from aer.spatial import (
     GridCell,
     GridDefinition,
     GridSchema,
+    format_intersects,
 )
 
 
@@ -31,6 +33,28 @@ def sample_grid_cell(sample_polygon):
         utm_crs="EPSG:32631",
         dist=100000,
     )
+
+
+@pytest.fixture
+def sample_geojson_feature():
+    """A GeoJSON Feature object."""
+    return {
+        "type": "Feature",
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]],
+        },
+        "properties": {"name": "test"},
+    }
+
+
+@pytest.fixture
+def sample_geojson_polygon():
+    """A plain GeoJSON Polygon (not a Feature)."""
+    return {
+        "type": "Polygon",
+        "coordinates": [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]],
+    }
 
 
 def test_reproject_polygon(sample_polygon):
@@ -93,3 +117,82 @@ def test_grid_schema_validation():
     assert not validated_gdf.empty
     assert "grid_cell" in validated_gdf.columns
     assert validated_gdf.iloc[0]["grid_cell"] == "89D_36L"
+
+
+class TestFormatIntersects:
+    """Tests for format_intersects function."""
+
+    def test_format_intersects_none(self):
+        """Test that None returns None."""
+        result = format_intersects(None)
+        assert result is None
+
+    def test_format_intersects_geojson_feature(self, sample_geojson_feature):
+        """Test that GeoJSON Feature extracts geometry."""
+        result = format_intersects(sample_geojson_feature)
+        assert result is not None
+        assert result["type"] == "Polygon"
+        assert "coordinates" in result
+
+    def test_format_intersects_geojson_polygon(self, sample_geojson_polygon):
+        """Test that plain GeoJSON Polygon is returned as-is."""
+        result = format_intersects(sample_geojson_polygon)
+        assert result is not None
+        assert result["type"] == "Polygon"
+        assert result == sample_geojson_polygon
+
+    def test_format_intersects_json_string(self, sample_geojson_polygon):
+        """Test that JSON string is parsed and returned as dict."""
+        json_str = json.dumps(sample_geojson_polygon)
+        result = format_intersects(json_str)
+
+        assert result is not None
+        assert result["type"] == "Polygon"
+        assert result == sample_geojson_polygon
+
+    def test_format_intersects_geo_interface(self):
+        """Test that objects with __geo_interface__ are handled."""
+
+        class GeoInterfaceObj:
+            @property
+            def __geo_interface__(self):
+                return {
+                    "type": "Polygon",
+                    "coordinates": [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]],
+                }
+
+        obj = GeoInterfaceObj()
+        result = format_intersects(obj)
+
+        assert result is not None
+        assert result["type"] == "Polygon"
+
+    def test_format_intersects_invalid_type_raises(self):
+        """Test that invalid types raise an exception."""
+        with pytest.raises(Exception, match="intersects must be"):
+            format_intersects(12345)  # type: ignore[arg-type]
+
+    def test_format_intersects_returns_deep_copy(self):
+        """Test that returned dict is a deep copy (not mutated on input change)."""
+        original = {
+            "type": "Polygon",
+            "coordinates": [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]],
+        }
+        result = format_intersects(original)
+
+        assert result is not None  # type: ignore[assert]
+
+        # Modify original
+        original["type"] = "Point"
+
+        # Result should be unchanged (deep copy)
+        assert result["type"] == "Polygon"
+
+    def test_format_intersects_polygon_shapely(self):
+        """Test that Shapely Polygon objects with __geo_interface__ work."""
+        polygon = Polygon([(0, 0), (0, 1), (1, 1), (1, 0), (0, 0)])
+        result = format_intersects(polygon)
+
+        assert result is not None
+        assert result["type"] == "Polygon"
+        assert "coordinates" in result

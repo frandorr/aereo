@@ -5,9 +5,11 @@ spatial grid systems, coordinate transformations, and pyresample
 AreaDefinition generation.
 """
 
+import json
+from copy import deepcopy
 from enum import Enum
 from functools import lru_cache
-from typing import Literal
+from typing import Any, Literal, Mapping, Protocol
 
 import attrs
 from pyresample.geometry import AreaDefinition
@@ -15,6 +17,56 @@ from shapely.geometry import Polygon
 from structlog import get_logger
 
 logger = get_logger()
+
+
+# Define a protocol for objects that have a __geo_interface__ property
+# like pystac-client https://github.com/stac-utils/pystac-client/blob/main/pystac_client/item_search.py#L54
+class GeoInterface(Protocol):
+    @property
+    def __geo_interface__(self) -> dict[str, Any]: ...
+
+
+def _format_geom(
+    value: str | dict[str, Any] | GeoInterface | None,
+) -> dict[str, Any] | None:
+    if value is None:
+        return None
+    if isinstance(value, dict):
+        if value.get("type") == "Feature":
+            geom = deepcopy(value.get("geometry"))
+            if geom is None:
+                raise Exception("Feature must have a geometry")
+            return geom
+        else:
+            return deepcopy(value)
+    if isinstance(value, str):
+        return dict(json.loads(value))
+    if hasattr(value, "__geo_interface__"):
+        return dict(deepcopy(getattr(value, "__geo_interface__")))
+    raise Exception(
+        "intersects must be of type None, str, dict, or an object that "
+        "implements __geo_interface__"
+    )
+
+
+# Alias for backward compatibility
+format_intersects = _format_geom
+
+
+@attrs.frozen
+class GeomLike(Mapping):
+    """A simple wrapper for geometric objects that behaves like a read-only geojson dict."""
+
+    _geom: dict[str, Any] = attrs.field(converter=_format_geom)
+
+    def __getitem__(self, key: str) -> Any:
+        return self._geom[key]
+
+    def __iter__(self):
+        return iter(self._geom)
+
+    def __len__(self) -> int:
+        return len(self._geom)
 
 
 class OverlapMode(Enum):

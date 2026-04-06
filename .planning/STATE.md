@@ -68,4 +68,4 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 - Current: Phase 1 context captured, ready to plan
 
 ---
-*Last activity: 2026-04-06 - Removed SearchPlugin ABCs, standardized on pluggy hookspecs only (e8067d1)*
+*Last activity: 2026-04-06 - Removed bootstrap component, updated all docs for pluggy-only architecture (3fbe61a)*
