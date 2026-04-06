@@ -28,9 +28,9 @@ class GeoInterface(Protocol):
 
 def _format_geom(
     value: str | dict[str, Any] | GeoInterface | None,
-) -> dict[str, Any] | None:
+) -> dict[str, Any]:
     if value is None:
-        return None
+        raise Exception("GEom value cannot be None")
     if isinstance(value, dict):
         if value.get("type") == "Feature":
             geom = deepcopy(value.get("geometry"))
@@ -44,13 +44,9 @@ def _format_geom(
     if hasattr(value, "__geo_interface__"):
         return dict(deepcopy(getattr(value, "__geo_interface__")))
     raise Exception(
-        "intersects must be of type None, str, dict, or an object that "
+        "value must be of type None, str, dict, or an object that "
         "implements __geo_interface__"
     )
-
-
-# Alias for backward compatibility
-format_intersects = _format_geom
 
 
 @attrs.frozen

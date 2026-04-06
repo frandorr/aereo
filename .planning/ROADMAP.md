@@ -2,13 +2,14 @@
 
 ## Overview
 
-**3 phases** | **11 requirements mapped** | All v1 requirements covered ✓
+**5 phases** | **15 requirements mapped** | All v1 requirements covered ✓
 
 | # | Phase | Goal | Requirements | Success Criteria |
 |---|-------|------|--------------|-----------------|
 | 1 | Extract Plugin System | Define extract plugin interface and registry | EXTR-01, EXTR-02, EXTR-03, EXTR-04, EXTR-05 | 5 |
 | 2 | Pipeline Integration | Integrate extract into aer-core pipeline | PIPE-01, PIPE-02, PIPE-03 | 4 |
 | 3 | Example Plugin | Implement aws-goes-extract as reference | AWSG-01, AWSG-02, AWSG-03 | 4 |
+| 5 | Adapt Search Plugins to Pluggy | Migrate aer-search-aws-goes and aer-search-earthaccess to new pluggy hookimpl system | PLUG-01, PLUG-02, PLUG-03, PLUG-04 | 4 |
 
 ---
 
@@ -106,6 +107,30 @@
 
 ---
 
+## Phase 5: Adapt Search Plugins to Pluggy
+
+**Goal:** Migrate repos/aer-search-aws-goes and repos/aer-search-earthaccess to the new pluggy-based plugin system defined in aer.plugin.core, removing deprecated @plugin decorator and Product types.
+
+**Requirements:**
+- PLUG-01: Search plugins use @hookimpl class pattern instead of @plugin decorator
+- PLUG-02: Search plugins accept (collections, intersects, time_range, search_params) instead of SearchQuery with Product types
+- PLUG-03: Search plugins return GeoDataFrame[SearchResultSchema] matching the new simplified schema (id, collection, geometry, start_time, end_time, href)
+- PLUG-04: Entry points register class instances, not bare functions
+
+**Success Criteria:**
+1. Both plugins use class-based `@hookimpl` pattern conforming to `AerSpec.search()`
+2. No imports of deprecated `Product`, `Channel`, `SearchQuery`, `GridSpatialExtent`, or `@plugin` decorator
+3. Both return GeoDataFrame matching the new `SearchResultSchema` (id, collection, geometry, start_time, end_time, href)
+4. Entry points in pyproject.toml register class instances
+
+**Artifacts:**
+- Updated `aer-search-aws-goes/components/aer/search_aws_goes/core.py`
+- Updated `aer-search-earthaccess/components/aer/search_earthaccess/core.py`
+- Updated tests in both repos
+- Updated pyproject.toml entry points in both repos
+
+---
+
 ## Phase Summary
 
 | Phase | Focus | Key Deliverable |
@@ -114,7 +139,8 @@
 | 2 | Orchestration | Pipeline search → extract |
 | 3 | Example | aws-goes-extract reference impl |
 | 4 | Grid Refactor | Multi-grid SearchResult support |
+| 5 | Plugin Migration | Search plugins → pluggy hookimpl |
 
 ---
 
-*Roadmap updated: 2026-03-27*
+*Roadmap updated: 2026-04-06*

@@ -49,15 +49,11 @@ build.hooks.polylith-bricks = {}
 build.targets.wheel.packages = [ "aer" ]
 
 [tool.polylith]
-bricks."../../components/aer/bootstrap" = "aer/bootstrap"
-bricks."../../components/aer/downloader" = "aer/downloader"
-bricks."../../components/aer/search" = "aer/search"
-bricks."../../components/aer/settings" = "aer/settings"
+bricks."../../components/aer/catalog" = "aer/catalog"
+bricks."../../components/aer/data" = "aer/data"
+bricks."../../components/aer/extractor" = "aer/extractor"
+bricks."../../components/aer/plugin" = "aer/plugin"
+bricks."../../components/aer/repository" = "aer/repository"
 bricks."../../components/aer/spatial" = "aer/spatial"
 bricks."../../components/aer/spectral" = "aer/spectral"
 bricks."../../components/aer/temporal" = "aer/temporal"
-bricks."../../components/aer/downloader_raw" = "aer/downloader_raw"
-bricks."../../components/aer/downloader_aria2" = "aer/downloader_aria2"
-bricks."../../components/aer/plugin" = "aer/plugin"
-bricks."../../components/aer/extract" = "aer/extract"
-bricks."../../bases/aer/download_api" = "aer/download_api"
