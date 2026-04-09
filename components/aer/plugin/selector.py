@@ -12,48 +12,47 @@ from __future__ import annotations
 from typing import Any
 
 import pluggy
-
-from aer.plugin.core import get_plugin_type, get_supported_products
+from aer.plugin.core import get_plugin_type, get_supported_collections
 
 
 class PluginConflictError(Exception):
-    """Raised when multiple plugins match the requested products.
+    """Raised when multiple plugins match the requested collections.
 
     Attributes:
-        products: The products that caused the conflict.
-        plugins: List of plugin names that match the requested products.
+        collections: The collections that caused the conflict.
+        plugins: List of plugin names that match the requested collections.
     """
 
-    def __init__(self, products: list[str], plugins: list[str]) -> None:
-        self.products = products
+    def __init__(self, collections: list[str], plugins: list[str]) -> None:
+        self.collections = collections
         self.plugins = plugins
         plugin_list = ", ".join(plugins)
         super().__init__(
-            f"Multiple plugins support {products}: {plugin_list}. "
+            f"Multiple plugins support {collections}: {plugin_list}. "
             f"Use plugin_name parameter to explicitly select one."
         )
 
 
 class NoMatchingPluginError(Exception):
-    """Raised when no plugin supports the requested products.
+    """Raised when no plugin supports the requested collections.
 
     Attributes:
-        products: The products that were requested.
+        collections: The collections that were requested.
     """
 
-    def __init__(self, products: list[str]) -> None:
-        self.products = products
+    def __init__(self, collections: list[str]) -> None:
+        self.collections = collections
         super().__init__(
-            f"No plugins found supporting any of: {products}. "
-            f"Ensure plugins declare supported_products class attribute."
+            f"No plugins found supporting any of: {collections}. "
+            f"Ensure plugins declare supported_collections class attribute."
         )
 
 
 class PluginSelector:
-    """Selects plugins based on supported products.
+    """Selects plugins based on supported collections.
 
     This class indexes all registered plugins and provides methods
-    to select a single plugin based on product matching.
+    to select a single plugin based on collection matching.
 
     Example::
 
@@ -67,11 +66,11 @@ class PluginSelector:
         selector = PluginSelector(pm)
         selector.index_plugins()
 
-        # Auto-select plugin for "goes-16" product (search type)
-        plugin = selector.select(products=["goes-16"], plugin_type="search")
+        # Auto-select plugin for "ABI-L1b-RadF" collection (search type)
+        plugin = selector.select(collections=["ABI-L1b-RadF"], plugin_type="search")
 
-        # Explicit selection (bypasses product matching)
-        plugin = selector.select(products=["goes-16"], plugin_name="my_plugin")
+        # Explicit selection (bypasses collection matching)
+        plugin = selector.select(collections=["ABI-L1b-RadF"], plugin_name="my_plugin")
     """
 
     def __init__(self, plugin_manager: pluggy.PluginManager) -> None:
@@ -82,20 +81,27 @@ class PluginSelector:
                 registered plugins.
         """
         self._pm = plugin_manager
-        self._product_index: dict[str, list[str]] = {}
+        self._collection_index: dict[str, list[str]] = {}
         self._plugin_names: dict[int, str] = {}
         self._plugin_types: dict[str, str] = {}
+        self._is_indexed = False
 
-    def index_plugins(self) -> None:
-        """Scan all registered plugins and build product index.
+    def index_plugins(self, force: bool = False) -> None:
+        """Scan all registered plugins and build collection index.
 
-        Builds a mapping from product identifiers to the list of
-        plugin names that support each product. Also indexes plugin types.
+        Builds a mapping from collection identifiers to the list of
+        plugin names that support each collection. Also indexes plugin types.
+
+        Args:
+            force: If True, rebuilds the index even if already indexed.
 
         Raises:
-            ValueError: If a plugin lacks the supported_products attribute.
+            ValueError: If a plugin lacks the supported_collections attribute.
         """
-        self._product_index.clear()
+        if self._is_indexed and not force:
+            return
+
+        self._collection_index.clear()
         self._plugin_names.clear()
         self._plugin_types.clear()
 
@@ -115,69 +121,73 @@ class PluginSelector:
             # Store plugin name mapping
             self._plugin_names[id(plugin)] = plugin_name
 
-            # Get plugin type (required for product-based dispatch)
+            # Get plugin type (required for collection-based dispatch)
             try:
                 plugin_type = get_plugin_type(plugin)
                 self._plugin_types[plugin_name] = plugin_type
             except ValueError:
-                # Skip plugins without plugin_type - not using product-based dispatch
+                # Skip plugins without plugin_type - not using collection-based dispatch
                 continue
 
-            # Get supported products
+            # Get supported collections
             try:
-                products = get_supported_products(plugin)
+                collections = get_supported_collections(plugin)
             except ValueError:
-                # Skip plugins that don't declare supported_products
+                # Skip plugins that don't declare supported_collections
                 continue
 
-            # Index each product
-            for product in products:
-                if product not in self._product_index:
-                    self._product_index[product] = []
-                self._product_index[product].append(plugin_name)
+            # Index each collection
+            for collection in collections:
+                if collection not in self._collection_index:
+                    self._collection_index[collection] = []
+                self._collection_index[collection].append(plugin_name)
+
+        self._is_indexed = True
 
     def select(
         self,
-        products: list[str],
+        collections: list[str],
         plugin_type: str | None = None,
         plugin_name: str | None = None,
     ) -> Any:
-        """Select a plugin based on products or explicit name.
+        """Select a plugin based on collections or explicit name.
 
         Args:
-            products: List of product identifiers to match against.
+            collections: List of collection identifiers to match against.
             plugin_type: Optional plugin type filter ("search" or "extract").
                 If provided, only plugins of this type are considered.
             plugin_name: Optional explicit plugin name. If provided,
-                product matching is skipped and this plugin is used directly.
+                collection matching is skipped and this plugin is used directly.
 
         Returns:
             The selected plugin instance.
 
         Raises:
-            PluginConflictError: If multiple plugins match the products
+            PluginConflictError: If multiple plugins match the collections
                 and no explicit plugin_name is provided.
-            NoMatchingPluginError: If no plugins support the requested products.
+            NoMatchingPluginError: If no plugins support the requested collections.
             ValueError: If plugin_type is not "search" or "extract".
         """
-        if not self._product_index:
+        if not self._collection_index:
             raise RuntimeError("No plugins indexed. Call index_plugins() first.")
 
         if plugin_type is not None and plugin_type not in ("search", "extract"):
             raise ValueError("plugin_type must be 'search' or 'extract'")
 
-        # Explicit plugin selection bypasses product matching
+        # Explicit plugin selection bypasses collection matching
         if plugin_name:
             plugin = self._pm.get_plugin(plugin_name)
             if plugin is None:
                 raise ValueError(f"Plugin '{plugin_name}' not found")
             return plugin
 
-        # Find plugins supporting ANY of the requested products
+        # Find plugins supporting ANY of the requested collections
         matching_plugins: set[str] = set()
-        for product in products:
-            if product in self._product_index:
-                matching_plugins.update(self._product_index[product])
+        for requested_collection in collections:
+            req_lower = requested_collection.lower()
+            for indexed_collection, plugins in self._collection_index.items():
+                if indexed_collection.lower() == req_lower:
+                    matching_plugins.update(plugins)
 
         # Filter by plugin type if specified
         if plugin_type:
@@ -189,32 +199,34 @@ class PluginSelector:
 
         # Handle results
         if len(matching_plugins) == 0:
-            raise NoMatchingPluginError(products)
+            raise NoMatchingPluginError(collections)
         elif len(matching_plugins) == 1:
             plugin_name = next(iter(matching_plugins))
             return self._pm.get_plugin(plugin_name)
         else:
-            raise PluginConflictError(products, list(matching_plugins))
+            raise PluginConflictError(collections, list(matching_plugins))
 
     def get_matching_plugins(
-        self, products: list[str], plugin_type: str | None = None
+        self, collections: list[str], plugin_type: str | None = None
     ) -> list[str]:
-        """Get list of plugin names that support any of the given products.
+        """Get list of plugin names that support any of the given collections.
 
         Args:
-            products: List of product identifiers to match.
+            collections: List of collection identifiers to match.
             plugin_type: Optional plugin type filter ("search" or "extract").
 
         Returns:
-            List of plugin names that support at least one of the products.
+            List of plugin names that support at least one of the collections.
         """
-        if not self._product_index:
+        if not self._collection_index:
             return []
 
         matching: set[str] = set()
-        for product in products:
-            if product in self._product_index:
-                matching.update(self._product_index[product])
+        for requested_collection in collections:
+            req_lower = requested_collection.lower()
+            for indexed_collection, plugins in self._collection_index.items():
+                if indexed_collection.lower() == req_lower:
+                    matching.update(plugins)
 
         # Filter by plugin type if specified
         if plugin_type:
@@ -225,9 +237,9 @@ class PluginSelector:
         return list(matching)
 
     def list_index(self) -> dict[str, list[str]]:
-        """Return a copy of the product-to-plugins index.
+        """Return a copy of the collection-to-plugins index.
 
         Returns:
-            Dictionary mapping product identifiers to list of plugin names.
+            Dictionary mapping collection identifiers to list of plugin names.
         """
-        return dict(self._product_index)
+        return dict(self._collection_index)

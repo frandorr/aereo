@@ -29,19 +29,25 @@ Example::
 from __future__ import annotations
 
 import warnings
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pluggy
-
-from aer.plugin.core import AerSpec, PROJECT_NAME
+from aer.plugin.core import PROJECT_NAME, AerSpec
 from aer.plugin.selector import (
     NoMatchingPluginError,
     PluginConflictError,
     PluginSelector,
 )
+from aer.spatial import GeomLike
+from aer.temporal import TimeRange
 
-# Global plugin manager instance
+if TYPE_CHECKING:
+    from aer.plugin.core import ExtractionTask, SearchResultSchema
+    from pandera.typing.geopandas import GeoDataFrame
+
+# Global plugin manager and selector instances
 _plugin_manager: pluggy.PluginManager | None = None
+_plugin_selector: PluginSelector | None = None
 
 
 def _get_plugin_manager() -> pluggy.PluginManager:
@@ -60,27 +66,41 @@ def _get_plugin_manager() -> pluggy.PluginManager:
     return _plugin_manager
 
 
+def _get_selector() -> PluginSelector:
+    """Get or create the global plugin selector.
+
+    Returns:
+        Configured PluginSelector.
+    """
+    global _plugin_selector
+    pm = _get_plugin_manager()
+
+    if _plugin_selector is None:
+        _plugin_selector = PluginSelector(pm)
+
+    _plugin_selector.index_plugins()
+    return _plugin_selector
+
+
 def run_search(
-    products: list[str],
+    collections: list[str],
     plugin_name: str | None = None,
-    collections: list[str] | None = None,
-    intersects: Any = None,
-    time_range: Any = None,
+    intersects: GeomLike | None = None,
+    time_range: TimeRange | None = None,
     search_params: dict[str, Any] | None = None,
     **kwargs: Any,
-) -> Any:
-    """Search for satellite data using product-based plugin dispatch.
+) -> GeoDataFrame[SearchResultSchema]:
+    """Search for satellite data using collection-based plugin dispatch.
 
     This function automatically selects the appropriate plugin based on
-    the requested products. If multiple plugins match, a conflict is
+    the requested collections. If multiple plugins match, a conflict is
     raised unless an explicit plugin_name is provided.
 
     Args:
-        products: List of product identifiers to search for
-            (e.g., ["goes-16", "modis"]).
+        collections: List of collection identifiers to search for
+            (e.g., ["ABI-L1b-RadF", "VJ102IMG"]).
         plugin_name: Optional explicit plugin name. If provided,
-            product matching is skipped and this plugin is used.
-        collections: Optional list of collection identifiers.
+            collection matching is skipped and this plugin is used.
         intersects: Optional spatial geometry to intersect with.
         time_range: Optional temporal range filter.
         search_params: Optional dictionary of search parameters.
@@ -92,49 +112,65 @@ def run_search(
     Raises:
         PluginConflictError: If multiple plugins match and no explicit
             plugin_name is provided.
-        NoMatchingPluginError: If no plugins support the requested products.
+        NoMatchingPluginError: If no plugins support the requested collections.
         RuntimeError: If plugin initialization fails.
     """
     pm = _get_plugin_manager()
-    selector = PluginSelector(pm)
-    selector.index_plugins()
+    selector = _get_selector()
 
-    # Warn if explicit selection bypasses product matching
+    # Warn if explicit selection bypasses collection matching
     if plugin_name:
         warnings.warn(
-            f"Explicit plugin '{plugin_name}' provided, product-based "
-            f"matching skipped for products: {products}",
+            f"Explicit plugin '{plugin_name}' provided, collection-based "
+            f"matching skipped for collections: {collections}",
             UserWarning,
             stacklevel=2,
         )
 
     try:
         plugin = selector.select(
-            products=products, plugin_type="search", plugin_name=plugin_name
+            collections=collections, plugin_type="search", plugin_name=plugin_name
         )
     except (PluginConflictError, NoMatchingPluginError):
         raise
-    except RuntimeError as e:
-        raise RuntimeError(f"Failed to initialize plugins: {e}") from e
+    except Exception as e:
+        raise RuntimeError(f"Failed to select plugin: {e}") from e
 
-    # Call the search hook
-    results = plugin.search(
-        collections=collections or [],
-        intersects=intersects,
-        time_range=time_range,
-        search_params=search_params,
-        **kwargs,
-    )
+    # Find the hook implementation for this specific plugin
+    hook_impls = [
+        impl for impl in pm.hook.search.get_hookimpls() if impl.plugin == plugin
+    ]
+    if not hook_impls:
+        raise RuntimeError(
+            f"Plugin '{pm.get_name(plugin)}' has no search implementation"
+        )
 
-    return results
+    name = hook_impls[0].function.__name__
+    results = []
+    for impl in hook_impls:
+        plugin_ref = impl.plugin
+        if isinstance(plugin_ref, type):
+            plugin_instance = plugin_ref()
+        else:
+            plugin_instance = plugin_ref
+        func = getattr(plugin_instance, name)
+        result = func(
+            collections=collections,
+            intersects=intersects,
+            time_range=time_range,
+            search_params=search_params,
+        )
+        results.append(result)
+
+    return results[0] if results else GeoDataFrame()
 
 
 def create_tasks(
-    search_results: Any,
+    search_results: GeoDataFrame[SearchResultSchema],
     intersects: Any,
     output_path: str,
     plugin_name: str | None = None,
-) -> list[Any]:
+) -> list[ExtractionTask]:
     """Create extraction tasks from search results.
 
     Transforms search results into discrete extraction tasks that can be
@@ -160,55 +196,74 @@ def create_tasks(
         raise ValueError("create_tasks requires non-empty search_results")
 
     pm = _get_plugin_manager()
-    selector = PluginSelector(pm)
-    selector.index_plugins()
 
-    # Get any plugin that has prepare_tasks - typically we'd use the same plugin
-    # that performed the search, but we need to find one with prepare_tasks
-    try:
-        # Find plugins that have prepare_tasks implemented
-        plugins_with_prepare = []
-        for name in selector._plugin_types.keys():
-            plugin = pm.get_plugin(name)
-            if plugin and hasattr(plugin, "prepare_tasks"):
-                plugins_with_prepare.append(name)
+    # Determine which plugin to use for task preparation.
+    # If a plugin_name is provided, use it.
+    # Otherwise, try to find a plugin that supports 'extract' or 'search'
+    # that also implements prepare_tasks.
+    selected_plugin = None
+
+    if plugin_name:
+        selected_plugin = pm.get_plugin(plugin_name)
+        if selected_plugin is None:
+            raise ValueError(f"Plugin '{plugin_name}' not found")
+    else:
+        # Find all plugins that implement prepare_tasks
+        plugins_with_prepare = [
+            p for p in pm.get_plugins() if hasattr(p, "prepare_tasks")
+        ]
 
         if not plugins_with_prepare:
             raise RuntimeError("No plugins have prepare_tasks implemented")
 
-        if plugin_name and plugin_name in plugins_with_prepare:
-            selected_name = plugin_name
-        elif len(plugins_with_prepare) == 1:
-            selected_name = plugins_with_prepare[0]
+        if len(plugins_with_prepare) == 1:
+            selected_plugin = plugins_with_prepare[0]
         else:
-            # Multiple plugins can prepare tasks - need explicit choice
-            # For now, use the first one (could be smarter about this)
-            selected_name = plugins_with_prepare[0]
+            # Multiple plugins can prepare tasks - we need a better heuristic
+            # or explicit choice. For now, we take the first but log a warning.
+            selected_plugin = plugins_with_prepare[0]
+            warnings.warn(
+                f"Multiple plugins implement prepare_tasks. Using "
+                f"'{pm.get_name(selected_plugin)}'. Use plugin_name to be explicit.",
+                UserWarning,
+                stacklevel=2,
+            )
 
-        plugin = pm.get_plugin(selected_name)
-        if plugin is None:
-            raise RuntimeError(f"Plugin '{selected_name}' not found")
-    except Exception as e:
-        raise RuntimeError(f"Failed to prepare tasks: {e}") from e
+    # Call the prepare_tasks hook via the targeted plugin
+    hook_impls = [
+        impl
+        for impl in pm.hook.prepare_tasks.get_hookimpls()
+        if impl.plugin == selected_plugin
+    ]
+    if not hook_impls:
+        raise RuntimeError(
+            f"Plugin '{pm.get_name(selected_plugin)}' has no prepare_tasks implementation"
+        )
 
-    # Call the prepare_tasks hook
-    if not hasattr(plugin, "prepare_tasks"):
-        raise RuntimeError(f"Plugin '{selected_name}' does not implement prepare_tasks")
+    name = hook_impls[0].function.__name__
+    tasks_list = []
+    for impl in hook_impls:
+        plugin_ref = impl.plugin
+        if isinstance(plugin_ref, type):
+            plugin_instance = plugin_ref()
+        else:
+            plugin_instance = plugin_ref
+        func = getattr(plugin_instance, name)
+        result = func(
+            search_results=search_results,
+            intersects=intersects,
+            output_path=output_path,
+        )
+        tasks_list.append(result)
 
-    tasks = plugin.prepare_tasks(
-        search_results=search_results,
-        intersects=intersects,
-        output_path=output_path,
-    )
-
-    return tasks
+    return tasks_list[0] if tasks_list else []
 
 
 def run_extract(
-    task: Any,
+    task: ExtractionTask,
     plugin_name: str | None = None,
     **kwargs: Any,
-) -> Any:
+) -> ExtractionTask:
     """Extract data for an extraction task.
 
     Processes an ExtractionTask to download and process the satellite data.
@@ -235,45 +290,62 @@ def run_extract(
         if plugin is None:
             raise ValueError(f"Plugin '{plugin_name}' not found")
     else:
-        # Try to find an extract plugin - for now we need explicit plugin
-        # In the future, could infer from task metadata
-        raise ValueError(
-            "run_extract requires explicit plugin_name. "
-            "Use list_plugins() to see available plugins."
-        )
+        # Future enhancement: In the future, we could infer the plugin from task metadata
+        # For now, we look for any plugin implementing 'extract'
+        extract_plugins = [p for p in pm.get_plugins() if hasattr(p, "extract")]
+        if not extract_plugins:
+            raise ValueError("No extraction plugins found. Provide plugin_name.")
+
+        plugin = extract_plugins[0]
 
     # Call the extract hook
-    result = plugin.extract(task=task, **kwargs)
+    hook_impls = [
+        impl for impl in pm.hook.extract.get_hookimpls() if impl.plugin == plugin
+    ]
+    if not hook_impls:
+        raise RuntimeError(
+            f"Plugin '{pm.get_name(plugin)}' has no extract implementation"
+        )
 
-    return result
+    name = hook_impls[0].function.__name__
+    results = []
+    for impl in hook_impls:
+        plugin_ref = impl.plugin
+        if isinstance(plugin_ref, type):
+            plugin_instance = plugin_ref()
+        else:
+            plugin_instance = plugin_ref
+        func = getattr(plugin_instance, name)
+        result = func(task=task, **kwargs)
+        results.append(result)
+
+    return results[0] if results else task
 
 
-def list_available_products(plugin_type: str | None = None) -> list[str]:
-    """List all products that have registered plugins.
+def list_available_collections(plugin_type: str | None = None) -> list[str]:
+    """List all collections that have registered plugins.
 
     Args:
         plugin_type: Optional filter for plugin type ("search" or "extract").
 
     Returns:
-        List of product identifiers with available plugins.
+        List of collection identifiers with available plugins.
     """
-    pm = _get_plugin_manager()
-    selector = PluginSelector(pm)
-    selector.index_plugins()
+    selector = _get_selector()
 
-    products = list(selector.list_index().keys())
+    collections = list(selector.list_index().keys())
 
     if plugin_type:
         matching_plugins = selector.get_matching_plugins(
-            products, plugin_type=plugin_type
+            collections, plugin_type=plugin_type
         )
-        products_with_type = set()
-        for product, plugins in selector.list_index().items():
+        collections_with_type = set()
+        for collection, plugins in selector.list_index().items():
             if any(p in matching_plugins for p in plugins):
-                products_with_type.add(product)
-        return list(products_with_type)
+                collections_with_type.add(collection)
+        return list(collections_with_type)
 
-    return products
+    return collections
 
 
 def list_plugins() -> list[str]:
