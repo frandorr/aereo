@@ -46,70 +46,71 @@ if TYPE_CHECKING:
 # Pluggy project identifier - all aer plugins use this namespace
 PROJECT_NAME = "aer"
 
-# Marker for plugin supported_products attribute
-SUPPORTED_PRODUCTS_ATTR = "supported_products"
+# Marker for plugin supported_collections attribute
+SUPPORTED_COLLECTIONS_ATTR = "supported_collections"
 
 # Marker for plugin type (search vs extract)
 PLUGIN_TYPE_ATTR = "plugin_type"
 
-# Product type alias - simple string identifier for satellite products
-# Examples: "goes-16", "modis", "viirs"
-Product = str
+# Collection type alias - simple string identifier for satellite products/collections
+# Examples: "goes-16", "modis", "viirs", "ABI-L1b-RadF"
+Collection = str
 
 
-def get_supported_products(plugin: Any) -> list[str]:
-    """Extract supported_products list from a plugin instance.
+def get_supported_collections(plugin: Any) -> list[str]:
+    """Extract supported_collections list from a plugin.
 
-    Plugins MUST declare ``supported_products`` as a class attribute
-    containing a list of product identifier strings.
+    Plugins SHOULD declare ``supported_collections`` as a class attribute
+    containing a list of collection identifier strings, but it can also
+    be an instance attribute.
 
     Args:
-        plugin: A plugin instance with a supported_products attribute.
+        plugin: A plugin instance.
 
     Returns:
-        List of product identifier strings the plugin supports.
+        List of collection identifier strings the plugin supports.
 
     Raises:
-        ValueError: If the plugin does not have a supported_products attribute.
+        ValueError: If the plugin does not have a valid supported_collections attribute.
     """
-    if not hasattr(plugin, SUPPORTED_PRODUCTS_ATTR):
+    if not hasattr(plugin, SUPPORTED_COLLECTIONS_ATTR):
         raise ValueError(
-            f"Plugin {type(plugin).__name__} must declare supported_products "
-            f"class attribute as a list of product identifiers"
+            f"Plugin {type(plugin).__name__} must declare '{SUPPORTED_COLLECTIONS_ATTR}' "
+            f"attribute as a list of collection identifiers"
         )
-    products = getattr(plugin, SUPPORTED_PRODUCTS_ATTR)
-    if not isinstance(products, list):
+    collections = getattr(plugin, SUPPORTED_COLLECTIONS_ATTR)
+    if not isinstance(collections, list):
         raise ValueError(
-            f"Plugin {type(plugin).__name__}.supported_products must be a list, "
-            f"got {type(products).__name__}"
+            f"Plugin {type(plugin).__name__}.{SUPPORTED_COLLECTIONS_ATTR} must be a list, "
+            f"got {type(collections).__name__}"
         )
-    return products
+    return collections
 
 
 def get_plugin_type(plugin: Any) -> str:
-    """Extract plugin_type from a plugin instance.
+    """Extract plugin_type from a plugin.
 
-    Plugins MUST declare ``plugin_type`` as a class attribute
-    with value "search" or "extract".
+    Plugins SHOULD declare ``plugin_type`` as a class attribute
+    with value "search" or "extract", but it can also be an instance attribute.
 
     Args:
-        plugin: A plugin instance with a plugin_type attribute.
+        plugin: A plugin instance.
 
     Returns:
         The plugin type string ("search" or "extract").
 
     Raises:
-        ValueError: If the plugin does not have a plugin_type attribute.
+        ValueError: If the plugin does not have a valid plugin_type attribute.
     """
     if not hasattr(plugin, PLUGIN_TYPE_ATTR):
         raise ValueError(
-            f"Plugin {type(plugin).__name__} must declare plugin_type "
-            f"class attribute ('search' or 'extract')"
+            f"Plugin {type(plugin).__name__} must declare '{PLUGIN_TYPE_ATTR}' "
+            f"attribute ('search' or 'extract')"
         )
     plugin_type = getattr(plugin, PLUGIN_TYPE_ATTR)
     if plugin_type not in ("search", "extract"):
         raise ValueError(
-            f"Plugin {type(plugin).__name__}.plugin_type must be 'search' or 'extract', "
+            f"Plugin {type(plugin).__name__}.{PLUGIN_TYPE_ATTR} must be 'search' or 'extract', "
             f"got {plugin_type}"
         )
     return plugin_type
@@ -192,7 +193,7 @@ class AerSpec:
         collections: list[str],
         intersects: GeomLike | None,
         time_range: TimeRange | None,
-        search_params: dict[str, Any] | None,
+        search_params: dict[str, Any] | None = None,
     ) -> GeoDataFrame[SearchResultSchema]:
         """Search for satellite data matching the query.
 
