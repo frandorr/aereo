@@ -26,26 +26,25 @@ The codebase is organized into interchangeable bricks:
 
 ## 🔌 The Plugin System
 
-`aer` is designed to be extended without modifying the core library. It uses a registry pattern discovered via `entry_points`.
+`aer` uses **pluggy** for plugin discovery. The plugin system provides a complete pipeline for satellite data processing.
+
+### How It Works
+
+1. **Plugins** are discovered via Python entry points
+2. **Product-based dispatch** automatically selects the right plugin based on product
+3. **Simple API** for users: `run_search` → `create_tasks` → `run_extract`
 
 ### Discovery & Registry
-Plugins register themselves into core registries (like `SearchMethod` or `Instrument`). To initialize all available plugins in your environment, use the bootstrap utility:
+
+Plugins are automatically loaded when you use the API functions:
 
 ```python
-from aer.bootstrap import bootstrap
-bootstrap()  # Automatically discovers and loads all registered aer plugins
+from aer.plugin.api import run_search, list_available_products
+
+# Plugins are loaded automatically via entry points
+products = list_available_products()  # ["goes-16", "modis", ...]
+results = run_search(products=["goes-16"])  # Auto-selects appropriate plugin
 ```
-
-### Extending search
-You can add new search implementations by registering them with `SearchMethod`. Projects define these in their `pyproject.toml`:
-
-```toml
-[project.entry-points."aer.plugins.search"]
-earthaccess = "aer.search_earthaccess.core:SEARCH_EARTHACCESS"
-```
-
-> [!TIP]
-> **Development Note**: When working in a Polylith workspace, plugins are discovered via Python entry points. Registering an entry point in a `project` sub-package makes it available for distribution, but for the plugin to be discoverable **during development** (i.e., when running `uv run`), you must also declare it in the root `pyproject.toml`. False discovery is often caused by missing these root-level entry point declarations.
 
 ### Creating a New Plugin
 
@@ -130,36 +129,47 @@ results = run_search(products=["goes-16"])
 
 ## 🛠 Usage Example
 
-Search for VIIRS and MODIS data using the `earthaccess` plugin:
+The complete pipeline: **search → create tasks → extract**
 
 ```python
-from datetime import datetime
-from aer.bootstrap import bootstrap
-from aer.search import SearchMethod
-from aer.product_viirs_earthaccess import VNP02MOD_EA
-from aer.product_modis_earthaccess import MODIS_021KM_EA
+from aer.plugin.api import run_search, create_tasks, run_extract
 from aer.temporal import TimeRange
+from datetime import datetime
 
-# 1. Initialize the plugin system
-bootstrap()
-
-# 2. Define your search constraints
-time_range = TimeRange(
-    start=datetime(2024, 8, 1, 0, 0, 0),
-    end=datetime(2024, 8, 2, 0, 0, 0),
+# 1. Search for satellite data by product
+results = run_search(
+    products=["goes-16", "modis"],
+    time_range=TimeRange(
+        start=datetime(2024, 8, 1),
+        end=datetime(2024, 8, 2)
+    ),
+    intersects=my_geometry
 )
-
-# 3. Use the registered search method
-search = SearchMethod.get("earthaccess")
-results = search(
-    products=[VNP02MOD_EA, MODIS_021KM_EA],
-    time_range=time_range
-)
-
 print(f"Found {len(results)} granules")
-# Search returns a validated GeoDataFrame
-print(results[["product_name", "start_time", "geometry"]].head())
+
+# 2. Create extraction tasks from search results
+tasks = create_tasks(
+    search_results=results,
+    intersects=my_geometry,
+    output_path="/tmp/extracted"
+)
+
+# 3. Extract data for each task
+for task in tasks:
+    run_extract(task, plugin_name="my_plugin")
+
+print("Extraction complete!")
 ```
+
+**Available API functions:**
+
+| Function | Description |
+|----------|-------------|
+| `run_search(products, ...)` | Search for data by product identifiers |
+| `create_tasks(search_results, ...)` | Transform results into extraction tasks |
+| `run_extract(task, plugin_name)` | Extract data for a task |
+| `list_available_products()` | List products with registered plugins |
+| `list_plugins()` | List all registered plugin names |
 
 ---
 
