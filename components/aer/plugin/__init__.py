@@ -14,27 +14,33 @@ Quick Start for Plugin Developers
     from aer.search import SearchQuery
 
     class MySearchPlugin:
+        # REQUIRED: declare plugin type and products
+        plugin_type = "search"
+        supported_products = ["goes-16", "modis"]
+
         @hookimpl
-        def search(self, query: SearchQuery) -> GeoDataFrame:
+        def search(self, collections, intersects, time_range, search_params):
             # Your search logic here
-            return my_api.search(query)
+            return my_api.search(collections, intersects, time_range, search_params)
 
 2. Register via entry point in ``pyproject.toml``::
 
     [project.entry-points."aer.plugins"]
     my_plugin = "my_package.module:MySearchPlugin"
 
-3. Users can now use your plugin::
+3. Users interact with the simple pipeline API::
 
-    import pluggy
-    from aer.plugin import AerSpec, PROJECT_NAME
+    from aer.plugin.api import run_search, create_tasks, run_extract
 
-    pm = pluggy.PluginManager(PROJECT_NAME)
-    pm.add_hookspecs(AerSpec)
-    pm.load_setuptools_entrypoints("aer.plugins")
+    # Search for data
+    results = run_search(products=["goes-16"])
 
-    # Your plugin is automatically available via the hook system
-    results = pm.hook.search(query=my_query)
+    # Create extraction tasks
+    tasks = create_tasks(results, intersects=my_geom, output_path="/tmp")
+
+    # Extract data
+    for task in tasks:
+        run_extract(task, plugin_name="my_plugin")
 
 Available Hooks
 ---------------
@@ -66,6 +72,7 @@ from aer.plugin.selector import (
 )
 
 from aer.plugin.api import (
+    create_tasks,
     list_available_products,
     list_plugins,
     run_extract,
@@ -86,6 +93,7 @@ __all__ = [
     "NoMatchingPluginError",
     "PluginConflictError",
     "PluginSelector",
+    "create_tasks",
     "list_available_products",
     "list_plugins",
     "run_extract",
