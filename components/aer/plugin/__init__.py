@@ -52,49 +52,47 @@ Available Hooks
 See ``AerSpec`` class for full documentation of each hook.
 """
 
+from aer.plugin.api import (
+    create_tasks,
+    list_available_collections,
+    list_plugins,
+    run_extract,
+    run_search,
+)
 from aer.plugin.core import (
-    AerSpec,
     PLUGIN_TYPE_ATTR,
-    Product,
-    SUPPORTED_PRODUCTS_ATTR,
+    PROJECT_NAME,
+    SUPPORTED_COLLECTIONS_ATTR,
+    AerSpec,
+    Collection,
+    SearchResultSchema,
     get_plugin_type,
-    get_supported_products,
+    get_supported_collections,
     hookimpl,
     hookspec,
-    PROJECT_NAME,
-    SearchResultSchema,
 )
-
 from aer.plugin.selector import (
     NoMatchingPluginError,
     PluginConflictError,
     PluginSelector,
 )
 
-from aer.plugin.api import (
-    create_tasks,
-    list_available_products,
-    list_plugins,
-    run_extract,
-    run_search,
-)
-
 __all__ = [
     "AerSpec",
+    "Collection",
     "PLUGIN_TYPE_ATTR",
-    "Product",
-    "SUPPORTED_PRODUCTS_ATTR",
+    "SearchResultSchema",
+    "SUPPORTED_COLLECTIONS_ATTR",
     "get_plugin_type",
-    "get_supported_products",
+    "get_supported_collections",
     "hookimpl",
     "hookspec",
     "PROJECT_NAME",
-    "SearchResultSchema",
     "NoMatchingPluginError",
     "PluginConflictError",
     "PluginSelector",
     "create_tasks",
-    "list_available_products",
+    "list_available_collections",
     "list_plugins",
     "run_extract",
     "run_search",
