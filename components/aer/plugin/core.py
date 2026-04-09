@@ -49,6 +49,9 @@ PROJECT_NAME = "aer"
 # Marker for plugin supported_products attribute
 SUPPORTED_PRODUCTS_ATTR = "supported_products"
 
+# Marker for plugin type (search vs extract)
+PLUGIN_TYPE_ATTR = "plugin_type"
+
 # Product type alias - simple string identifier for satellite products
 # Examples: "goes-16", "modis", "viirs"
 Product = str
@@ -81,6 +84,35 @@ def get_supported_products(plugin: Any) -> list[str]:
             f"got {type(products).__name__}"
         )
     return products
+
+
+def get_plugin_type(plugin: Any) -> str:
+    """Extract plugin_type from a plugin instance.
+
+    Plugins MUST declare ``plugin_type`` as a class attribute
+    with value "search" or "extract".
+
+    Args:
+        plugin: A plugin instance with a plugin_type attribute.
+
+    Returns:
+        The plugin type string ("search" or "extract").
+
+    Raises:
+        ValueError: If the plugin does not have a plugin_type attribute.
+    """
+    if not hasattr(plugin, PLUGIN_TYPE_ATTR):
+        raise ValueError(
+            f"Plugin {type(plugin).__name__} must declare plugin_type "
+            f"class attribute ('search' or 'extract')"
+        )
+    plugin_type = getattr(plugin, PLUGIN_TYPE_ATTR)
+    if plugin_type not in ("search", "extract"):
+        raise ValueError(
+            f"Plugin {type(plugin).__name__}.plugin_type must be 'search' or 'extract', "
+            f"got {plugin_type}"
+        )
+    return plugin_type
 
 
 # Markers for defining hookspecs and hook implementations
