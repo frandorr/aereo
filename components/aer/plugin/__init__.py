@@ -63,6 +63,13 @@ from aer.plugin.selector import (
     PluginSelector,
 )
 
+from aer.plugin.api import (
+    list_available_products,
+    list_plugins,
+    run_extract,
+    run_search,
+)
+
 __all__ = [
     "AerSpec",
     "Product",
@@ -75,4 +82,8 @@ __all__ = [
     "NoMatchingPluginError",
     "PluginConflictError",
     "PluginSelector",
+    "list_available_products",
+    "list_plugins",
+    "run_extract",
+    "run_search",
 ]
