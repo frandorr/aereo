@@ -48,8 +48,10 @@ See ``AerSpec`` class for full documentation of each hook.
 
 from aer.plugin.core import (
     AerSpec,
+    PLUGIN_TYPE_ATTR,
     Product,
     SUPPORTED_PRODUCTS_ATTR,
+    get_plugin_type,
     get_supported_products,
     hookimpl,
     hookspec,
@@ -72,8 +74,10 @@ from aer.plugin.api import (
 
 __all__ = [
     "AerSpec",
+    "PLUGIN_TYPE_ATTR",
     "Product",
     "SUPPORTED_PRODUCTS_ATTR",
+    "get_plugin_type",
     "get_supported_products",
     "hookimpl",
     "hookspec",

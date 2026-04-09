@@ -13,7 +13,7 @@ from typing import Any
 
 import pluggy
 
-from aer.plugin.core import get_supported_products
+from aer.plugin.core import get_plugin_type, get_supported_products
 
 
 class PluginConflictError(Exception):
@@ -67,8 +67,8 @@ class PluginSelector:
         selector = PluginSelector(pm)
         selector.index_plugins()
 
-        # Auto-select plugin for "goes-16" product
-        plugin = selector.select(products=["goes-16"])
+        # Auto-select plugin for "goes-16" product (search type)
+        plugin = selector.select(products=["goes-16"], plugin_type="search")
 
         # Explicit selection (bypasses product matching)
         plugin = selector.select(products=["goes-16"], plugin_name="my_plugin")
@@ -84,18 +84,20 @@ class PluginSelector:
         self._pm = plugin_manager
         self._product_index: dict[str, list[str]] = {}
         self._plugin_names: dict[int, str] = {}
+        self._plugin_types: dict[str, str] = {}
 
     def index_plugins(self) -> None:
         """Scan all registered plugins and build product index.
 
         Builds a mapping from product identifiers to the list of
-        plugin names that support each product.
+        plugin names that support each product. Also indexes plugin types.
 
         Raises:
             ValueError: If a plugin lacks the supported_products attribute.
         """
         self._product_index.clear()
         self._plugin_names.clear()
+        self._plugin_types.clear()
 
         # Get all registered plugins
         plugins = self._pm.get_plugins()
@@ -113,12 +115,19 @@ class PluginSelector:
             # Store plugin name mapping
             self._plugin_names[id(plugin)] = plugin_name
 
+            # Get plugin type (required for product-based dispatch)
+            try:
+                plugin_type = get_plugin_type(plugin)
+                self._plugin_types[plugin_name] = plugin_type
+            except ValueError:
+                # Skip plugins without plugin_type - not using product-based dispatch
+                continue
+
             # Get supported products
             try:
                 products = get_supported_products(plugin)
             except ValueError:
                 # Skip plugins that don't declare supported_products
-                # (they may not be intended for product-based dispatch)
                 continue
 
             # Index each product
@@ -130,12 +139,15 @@ class PluginSelector:
     def select(
         self,
         products: list[str],
+        plugin_type: str | None = None,
         plugin_name: str | None = None,
     ) -> Any:
         """Select a plugin based on products or explicit name.
 
         Args:
             products: List of product identifiers to match against.
+            plugin_type: Optional plugin type filter ("search" or "extract").
+                If provided, only plugins of this type are considered.
             plugin_name: Optional explicit plugin name. If provided,
                 product matching is skipped and this plugin is used directly.
 
@@ -146,9 +158,13 @@ class PluginSelector:
             PluginConflictError: If multiple plugins match the products
                 and no explicit plugin_name is provided.
             NoMatchingPluginError: If no plugins support the requested products.
+            ValueError: If plugin_type is not "search" or "extract".
         """
         if not self._product_index:
             raise RuntimeError("No plugins indexed. Call index_plugins() first.")
+
+        if plugin_type is not None and plugin_type not in ("search", "extract"):
+            raise ValueError("plugin_type must be 'search' or 'extract'")
 
         # Explicit plugin selection bypasses product matching
         if plugin_name:
@@ -163,6 +179,14 @@ class PluginSelector:
             if product in self._product_index:
                 matching_plugins.update(self._product_index[product])
 
+        # Filter by plugin type if specified
+        if plugin_type:
+            matching_plugins = {
+                name
+                for name in matching_plugins
+                if self._plugin_types.get(name) == plugin_type
+            }
+
         # Handle results
         if len(matching_plugins) == 0:
             raise NoMatchingPluginError(products)
@@ -172,11 +196,14 @@ class PluginSelector:
         else:
             raise PluginConflictError(products, list(matching_plugins))
 
-    def get_matching_plugins(self, products: list[str]) -> list[str]:
+    def get_matching_plugins(
+        self, products: list[str], plugin_type: str | None = None
+    ) -> list[str]:
         """Get list of plugin names that support any of the given products.
 
         Args:
             products: List of product identifiers to match.
+            plugin_type: Optional plugin type filter ("search" or "extract").
 
         Returns:
             List of plugin names that support at least one of the products.
@@ -188,6 +215,12 @@ class PluginSelector:
         for product in products:
             if product in self._product_index:
                 matching.update(self._product_index[product])
+
+        # Filter by plugin type if specified
+        if plugin_type:
+            matching = {
+                name for name in matching if self._plugin_types.get(name) == plugin_type
+            }
 
         return list(matching)
 

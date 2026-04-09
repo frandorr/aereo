@@ -97,7 +97,9 @@ def run_search(
         )
 
     try:
-        plugin = selector.select(products=products, plugin_name=plugin_name)
+        plugin = selector.select(
+            products=products, plugin_type="search", plugin_name=plugin_name
+        )
     except (PluginConflictError, NoMatchingPluginError):
         raise
     except RuntimeError as e:
@@ -146,8 +148,11 @@ def run_extract(
     )
 
 
-def list_available_products() -> list[str]:
+def list_available_products(plugin_type: str | None = None) -> list[str]:
     """List all products that have registered plugins.
+
+    Args:
+        plugin_type: Optional filter for plugin type ("search" or "extract").
 
     Returns:
         List of product identifiers with available plugins.
@@ -156,7 +161,19 @@ def list_available_products() -> list[str]:
     selector = PluginSelector(pm)
     selector.index_plugins()
 
-    return list(selector.list_index().keys())
+    products = list(selector.list_index().keys())
+
+    if plugin_type:
+        matching_plugins = selector.get_matching_plugins(
+            products, plugin_type=plugin_type
+        )
+        products_with_type = set()
+        for product, plugins in selector.list_index().items():
+            if any(p in matching_plugins for p in plugins):
+                products_with_type.add(product)
+        return list(products_with_type)
+
+    return products
 
 
 def list_plugins() -> list[str]:
