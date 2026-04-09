@@ -10,6 +10,9 @@ Example for external plugin developers::
     from aer.search import SearchQuery
 
     class MySearchPlugin:
+        # Plugins MUST declare supported_products class attribute
+        supported_products: list[str] = ["goes-16", "goes-18"]
+
         @hookimpl
         def search(self, query: SearchQuery) -> GeoDataFrame:
             # Your search implementation here
@@ -19,17 +22,21 @@ To register your plugin, create a pyproject.toml entry point::
 
     [project.entry-points."aer.plugins"]
     my_plugin = "my_package.module:MySearchPlugin"
+
+Note: All plugins MUST declare the ``supported_products`` class attribute
+as a list of product identifier strings (e.g., ["goes-16", "modis"]).
+This enables product-based plugin dispatch.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-import pandera as pa
+import attrs
+import pandera.pandas as pa
 import pluggy
 from pandera.typing import Series
 from pandera.typing.geopandas import GeoSeries
-import attrs
 
 if TYPE_CHECKING:
     from aer.spatial import GeomLike, GridCell
@@ -38,6 +45,43 @@ if TYPE_CHECKING:
 
 # Pluggy project identifier - all aer plugins use this namespace
 PROJECT_NAME = "aer"
+
+# Marker for plugin supported_products attribute
+SUPPORTED_PRODUCTS_ATTR = "supported_products"
+
+# Product type alias - simple string identifier for satellite products
+# Examples: "goes-16", "modis", "viirs"
+Product = str
+
+
+def get_supported_products(plugin: Any) -> list[str]:
+    """Extract supported_products list from a plugin instance.
+
+    Plugins MUST declare ``supported_products`` as a class attribute
+    containing a list of product identifier strings.
+
+    Args:
+        plugin: A plugin instance with a supported_products attribute.
+
+    Returns:
+        List of product identifier strings the plugin supports.
+
+    Raises:
+        ValueError: If the plugin does not have a supported_products attribute.
+    """
+    if not hasattr(plugin, SUPPORTED_PRODUCTS_ATTR):
+        raise ValueError(
+            f"Plugin {type(plugin).__name__} must declare supported_products "
+            f"class attribute as a list of product identifiers"
+        )
+    products = getattr(plugin, SUPPORTED_PRODUCTS_ATTR)
+    if not isinstance(products, list):
+        raise ValueError(
+            f"Plugin {type(plugin).__name__}.supported_products must be a list, "
+            f"got {type(products).__name__}"
+        )
+    return products
+
 
 # Markers for defining hookspecs and hook implementations
 hookspec = pluggy.HookspecMarker(PROJECT_NAME)
@@ -63,7 +107,7 @@ class SearchResultSchema(pa.DataFrameModel):
 
     id: Series[pa.String] = pa.Field(nullable=False)
     collection: Series[pa.String] = pa.Field(nullable=False)
-    geometry: GeoSeries = pa.Field(nullable=False)
+    geometry: GeoSeries = pa.Field(nullable=True)
     start_time: Series[pa.DateTime] = pa.Field(nullable=False)
     end_time: Series[pa.DateTime] = pa.Field(nullable=False)
     href: Series[pa.String] = pa.Field(nullable=False)
@@ -116,7 +160,7 @@ class AerSpec:
         collections: list[str],
         intersects: GeomLike | None,
         time_range: TimeRange | None,
-        search_params: dict | None,
+        search_params: dict[str, Any] | None,
     ) -> GeoDataFrame[SearchResultSchema]:
         """Search for satellite data matching the query.
 

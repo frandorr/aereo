@@ -2,7 +2,7 @@
 
 ## Overview
 
-**5 phases** | **15 requirements mapped** | All v1 requirements covered ✓
+**6 phases** | **20 requirements mapped** | All v1 requirements covered ✓
 
 | # | Phase | Goal | Requirements | Success Criteria |
 |---|-------|------|--------------|-----------------|
@@ -10,6 +10,7 @@
 | 2 | Pipeline Integration | Integrate extract into aer-core pipeline | PIPE-01, PIPE-02, PIPE-03 | 4 |
 | 3 | Example Plugin | Implement aws-goes-extract as reference | AWSG-01, AWSG-02, AWSG-03 | 4 |
 | 5 | Adapt Search Plugins to Pluggy | Migrate aer-search-aws-goes and aer-search-earthaccess to new pluggy hookimpl system | PLUG-01, PLUG-02, PLUG-03, PLUG-04 | 4 |
+| 6 | Product-Based Plugin Dispatch | Auto-select plugins based on product support | PROD-01, PROD-02, PROD-03, PROD-04, PROD-05 | 5 |
 
 ---
 
@@ -140,6 +141,33 @@
 | 3 | Example | aws-goes-extract reference impl |
 | 4 | Grid Refactor | Multi-grid SearchResult support |
 | 5 | Plugin Migration | Search plugins → pluggy hookimpl |
+| 6 | Product Dispatch | Auto-select plugins by product |
+
+---
+
+## Phase 6: Product-Based Plugin Dispatch
+
+**Goal:** Implement automatic plugin selection based on product support, with conflict resolution for multiple matching plugins.
+
+**Requirements:**
+- PROD-01: Plugin creators MUST specify supported products via required `supported_products` class attribute
+- PROD-02: User declares products they want to use (not plugin names)
+- PROD-03: System automatically dispatches to corresponding plugin based on product support
+- PROD-04: When two plugins support same products: user can select by plugin name + warning shown
+- PROD-05: Great UX - minimal friction for users
+
+**Success Criteria:**
+1. Plugins declare `supported_products: list[str]` class attribute (required)
+2. `PluginSelector` class indexes plugins by product and selects based on user request
+3. Single matching plugin → auto-selected (seamless UX)
+4. Multiple matching plugins → raise `PluginConflictError` unless user specifies plugin_name
+5. Zero matching plugins → raise `NoMatchingPluginError` with helpful message
+
+**Artifacts:**
+- Updated `components/aer/plugin/core.py` (Product type, helper functions)
+- New `components/aer/plugin/selector.py` (PluginSelector class)
+- Updated `components/aer/plugin/__init__.py` (exports)
+- Updated `components/aer/plugin/api.py` (run_search with dispatch)
 
 ---
 
