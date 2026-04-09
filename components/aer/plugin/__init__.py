@@ -57,6 +57,12 @@ from aer.plugin.core import (
     SearchResultSchema,
 )
 
+from aer.plugin.selector import (
+    NoMatchingPluginError,
+    PluginConflictError,
+    PluginSelector,
+)
+
 __all__ = [
     "AerSpec",
     "Product",
@@ -66,4 +72,7 @@ __all__ = [
     "hookspec",
     "PROJECT_NAME",
     "SearchResultSchema",
+    "NoMatchingPluginError",
+    "PluginConflictError",
+    "PluginSelector",
 ]
