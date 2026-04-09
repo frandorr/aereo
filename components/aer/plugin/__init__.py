@@ -48,6 +48,9 @@ See ``AerSpec`` class for full documentation of each hook.
 
 from aer.plugin.core import (
     AerSpec,
+    Product,
+    SUPPORTED_PRODUCTS_ATTR,
+    get_supported_products,
     hookimpl,
     hookspec,
     PROJECT_NAME,
@@ -56,6 +59,9 @@ from aer.plugin.core import (
 
 __all__ = [
     "AerSpec",
+    "Product",
+    "SUPPORTED_PRODUCTS_ATTR",
+    "get_supported_products",
     "hookimpl",
     "hookspec",
     "PROJECT_NAME",
