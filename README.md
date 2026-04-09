@@ -47,6 +47,85 @@ earthaccess = "aer.search_earthaccess.core:SEARCH_EARTHACCESS"
 > [!TIP]
 > **Development Note**: When working in a Polylith workspace, plugins are discovered via Python entry points. Registering an entry point in a `project` sub-package makes it available for distribution, but for the plugin to be discoverable **during development** (i.e., when running `uv run`), you must also declare it in the root `pyproject.toml`. False discovery is often caused by missing these root-level entry point declarations.
 
+### Creating a New Plugin
+
+Aer uses **pluggy** for plugin discovery. To create a new plugin, you must:
+
+**1. Declare mandatory attributes** on your plugin class:
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `plugin_type` | `"search"` or `"extract"` | ✅ Yes | Determines which hook to dispatch |
+| `supported_products` | `list[str]` | ✅ Yes | Products this plugin handles (e.g., `["goes-16", "modis"]`) |
+
+**2. Implement the appropriate hook(s):**
+
+```python
+from aer.plugin import hookimpl, AerSpec, PROJECT_NAME
+import pluggy
+
+class MySearchPlugin:
+    # MANDATORY: declares this is a search plugin
+    plugin_type = "search"
+
+    # MANDATORY: declares which products this plugin handles
+    supported_products = ["goes-16", "goes-18"]
+
+    @hookimpl
+    def search(self, collections, intersects, time_range, search_params):
+        # Your search implementation
+        return results
+```
+
+Or for an extract plugin:
+
+```python
+class MyExtractPlugin:
+    plugin_type = "extract"
+    supported_products = ["goes-16"]
+
+    @hookimpl
+    def extract(self, task):
+        # Your extraction implementation
+        return task
+```
+
+**3. Register via entry points** in your `pyproject.toml`:
+
+```toml
+[project.entry-points."aer.plugins"]
+my_plugin = "my_package.plugin:MySearchPlugin"
+```
+
+**4. Use product-based dispatch** in your application:
+
+```python
+from aer.plugin import PluginSelector, run_search
+
+# Setup plugin manager
+pm = pluggy.PluginManager("aer")
+pm.add_hookspecs(AerSpec)
+pm.load_setuptools_entrypoints("aer.plugins")
+
+# Use selector with type filtering
+selector = PluginSelector(pm)
+selector.index_plugins()
+
+# Auto-select search plugin for "goes-16"
+plugin = selector.select(products=["goes-16"], plugin_type="search")
+
+# Or use the high-level API (defaults to search type)
+results = run_search(products=["goes-16"])
+```
+
+**Error handling:**
+
+| Error | When raised |
+|-------|-------------|
+| `NoMatchingPluginError` | No plugins support the requested products |
+| `PluginConflictError` | Multiple plugins support the same products (specify `plugin_name` to resolve) |
+| `ValueError` | Invalid `plugin_type` (must be "search" or "extract") |
+
 ---
 
 ## 🛠 Usage Example
