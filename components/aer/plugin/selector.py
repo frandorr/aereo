@@ -1,9 +1,9 @@
 """Plugin selector for product-based plugin dispatch.
 
 This module provides the PluginSelector class that enables automatic
-selection of plugins based on the products they support. It handles:
-- Indexing all registered plugins by their supported products
-- Selecting a single plugin based on requested products
+selection of plugins based on the collections they support. It handles:
+- Indexing all registered plugins by their supported collections
+- Selecting a single plugin based on requested collections
 - Detecting and resolving conflicts when multiple plugins match
 """
 
@@ -83,7 +83,7 @@ class PluginSelector:
         self._pm = plugin_manager
         self._collection_index: dict[str, list[str]] = {}
         self._plugin_names: dict[int, str] = {}
-        self._plugin_types: dict[str, str] = {}
+        self._plugin_types: dict[str, set[str]] = {}
         self._is_indexed = False
 
     def index_plugins(self, force: bool = False) -> None:
@@ -122,12 +122,10 @@ class PluginSelector:
             self._plugin_names[id(plugin)] = plugin_name
 
             # Get plugin type (required for collection-based dispatch)
-            try:
-                plugin_type = get_plugin_type(plugin)
-                self._plugin_types[plugin_name] = plugin_type
-            except ValueError:
-                # Skip plugins without plugin_type - not using collection-based dispatch
+            plugin_type = get_plugin_type(self._pm, plugin)
+            if not plugin_type:
                 continue
+            self._plugin_types[plugin_name] = plugin_type
 
             # Get supported collections
             try:
@@ -194,7 +192,7 @@ class PluginSelector:
             matching_plugins = {
                 name
                 for name in matching_plugins
-                if self._plugin_types.get(name) == plugin_type
+                if plugin_type in self._plugin_types.get(name, set())
             }
 
         # Handle results
@@ -231,7 +229,9 @@ class PluginSelector:
         # Filter by plugin type if specified
         if plugin_type:
             matching = {
-                name for name in matching if self._plugin_types.get(name) == plugin_type
+                name
+                for name in matching
+                if plugin_type in self._plugin_types.get(name, set())
             }
 
         return list(matching)
