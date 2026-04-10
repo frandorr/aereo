@@ -30,7 +30,7 @@ This enables product-based plugin dispatch.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import attrs
 import pandera.pandas as pa
@@ -78,42 +78,25 @@ def get_supported_collections(plugin: Any) -> list[str]:
             f"Plugin {type(plugin).__name__} must declare '{SUPPORTED_COLLECTIONS_ATTR}' "
             f"attribute as a list of collection identifiers"
         )
-    collections = getattr(plugin, SUPPORTED_COLLECTIONS_ATTR)
-    if not isinstance(collections, list):
-        raise ValueError(
-            f"Plugin {type(plugin).__name__}.{SUPPORTED_COLLECTIONS_ATTR} must be a list, "
-            f"got {type(collections).__name__}"
-        )
+    collections = cast(list, getattr(plugin, SUPPORTED_COLLECTIONS_ATTR))
     return collections
 
 
-def get_plugin_type(plugin: Any) -> str:
-    """Extract plugin_type from a plugin.
-
-    Plugins SHOULD declare ``plugin_type`` as a class attribute
-    with value "search" or "extract", but it can also be an instance attribute.
+def get_plugin_type(pm: pluggy.PluginManager, plugin: object) -> set[str]:
+    """Infer plugin type from hook implementations using pluggy's get_hookcallers.
 
     Args:
+        pm: The pluggy PluginManager instance.
         plugin: A plugin instance.
 
     Returns:
-        The plugin type string ("search" or "extract").
-
-    Raises:
-        ValueError: If the plugin does not have a valid plugin_type attribute.
+        Set containing all hook names implemented by the plugin.
     """
-    if not hasattr(plugin, PLUGIN_TYPE_ATTR):
-        raise ValueError(
-            f"Plugin {type(plugin).__name__} must declare '{PLUGIN_TYPE_ATTR}' "
-            f"attribute ('search' or 'extract')"
-        )
-    plugin_type = getattr(plugin, PLUGIN_TYPE_ATTR)
-    if plugin_type not in ("search", "extract"):
-        raise ValueError(
-            f"Plugin {type(plugin).__name__}.{PLUGIN_TYPE_ATTR} must be 'search' or 'extract', "
-            f"got {plugin_type}"
-        )
-    return plugin_type
+    hookcallers = pm.get_hookcallers(plugin)
+    if not hookcallers:
+        return set()
+
+    return {hc.name for hc in hookcallers if hasattr(hc, "name")}
 
 
 # Markers for defining hookspecs and hook implementations
@@ -150,37 +133,51 @@ class SearchResultSchema(pa.DataFrameModel):
         coerce = True
 
 
-@attrs.frozen
-class ExtractionTask:
-    """Data class representing an extraction task.
-    Search results are split into subsets based on spatial and temporal criteria, and each subset is represented as an ExtractionTask.
-    Each subset intersects with grid cells and are extracted to a specific output path.
+class GriddedSearchResultSchema(SearchResultSchema):
+    """Extended schema for search results that includes grid cell information.
+
+    This schema is used when search results are prepared for task extraction
+    and need to include information about which grid cells they intersect with.
     """
 
-    search_results: GeoDataFrame[SearchResultSchema]
-    intersecting_cells: list[GridCell]
-    output_path: str
+    grid_cells: Series[list[GridCell]] = pa.Field(nullable=True)
+
+
+@attrs.frozen
+class ExtractionTask:
+    """Represents a unit of extraction work.
+
+    The relationship between search_results and target_cells is intentionally
+    unconstrained — plugins decide how to interpret it:
+    - one task per (result, cell) pair
+    - one task per result covering all cells
+    - one task per cell covering all results
+    - any other grouping that makes sense for the data source
+    """
+
+    search_results: GeoDataFrame[GriddedSearchResultSchema]
+    extract_params: dict[str, Any] = attrs.Factory(dict)
 
 
 class AerSpec:
     """Hook specifications for the aer plugin system.
 
-        External packages implement these hooks using ``@hookimpl`` to provide
+    External packages implement these hooks using ``@hookimpl`` to provide
     custom search, task preparation, and extraction logic.
 
-        Example::
+    Example::
 
-                from aer.plugin import hookimpl, AerSpec
-                from pandera.typing.geopandas import GeoDataFrame
-                from aer.search import SearchQuery
-                class MySearchPlugin:
-                    @hookimpl
-                    def search(self, collections: list[str],
-                                intersects: GeomLike | None,
-                                time_range: TimeRange | None,
-                                search_params: dict | None = None) -> GeoDataFrame:
-                        # Your search implementation here
-                        return results
+        from aer.plugin import hookimpl, AerSpec
+        from pandera.typing.geopandas import GeoDataFrame
+        from aer.search import SearchQuery
+        class MySearchPlugin:
+            @hookimpl
+            def search(self, collections: list[str],
+                        intersects: GeomLike | None,
+                        time_range: TimeRange | None,
+                        search_params: dict | None = None) -> GeoDataFrame:
+                # Your search implementation here
+                return results
 
 
         The plugin manager will collect all implementations and call them
@@ -193,7 +190,7 @@ class AerSpec:
         collections: list[str],
         intersects: GeomLike | None,
         time_range: TimeRange | None,
-        search_params: dict[str, Any] | None = None,
+        search_params: dict[str, Any] | None,
     ) -> GeoDataFrame[SearchResultSchema]:
         """Search for satellite data matching the query.
 
@@ -201,39 +198,18 @@ class AerSpec:
             collections (list[str]): List of collection identifiers to search within.
             intersects (Intersects | None): Spatial geometry to intersect with.
             time_range (TimeRange | None): Temporal range to filter results.
-            search_params: Additional parameters for search (e.g., cloud cover, specific metadata filters).
+            search_params (dict[str, Any]): Additional parameters for search (e.g., cloud cover, specific metadata filters).
 
         Returns:
             GeoDataFrame: Search results as a GeoDataFrame with SearchResultSchema.
-
-        Example::
-
-            @hookimpl
-            def search(
-                self,
-                collections: list[str],
-                intersects: GeomLike | None,
-                time_range: TimeRange | None,
-                search_params: dict | None = None,
-            ) -> GeoDataFrame:
-                # Example search implementation using a hypothetical API client
-                api_client = MySatelliteAPIClient()
-                results = api_client.search(
-                    collections=collections,
-                    intersects=intersects,
-                    time_range=time_range,
-                    cloud_cover=search_params.get("cloud_cover") if search_params else None,
-                )
-                return results.to_geodataframe(schema=SearchResultSchema)
         """
         ...
 
     @hookspec
     def prepare_tasks(
         self,
-        search_results: GeoDataFrame[SearchResultSchema],
-        intersects: GeomLike,
-        output_path: str,
+        search_results: GeoDataFrame[GriddedSearchResultSchema],
+        extract_params: dict[str, Any] | None = None,
     ) -> list[ExtractionTask]:
         """
         Prepare extraction tasks from search results.
@@ -243,25 +219,39 @@ class AerSpec:
         (or auxiliary files), determining intersecting grid cells, and defining output paths for each task.
 
         Args:
-            search_results (GeoDataFrame[SearchResultSchema]): The search results to prepare tasks from.
-            intersects (GeomLike): The spatial geometry to intersect with for task preparation.
-            output_path (str): Base output path where extracted files should be saved.
+            search_results (GeoDataFrame[GriddedSearchResultSchema]): The search results to prepare tasks from.
+            it containe the grid_cells column which is a list of grid cells that intersect with the search result geometry.
+            extract_params (dict[str, Any] | None): Additional parameters for task preparation
+            (e.g., output directory structure, naming conventions, channels, grouping time windows, etc).
         Returns:
             list[ExtractionTask]: A list of prepared extraction tasks ready for processing.
         Example:
             @hookimpl
-            def prepare_tasks(self, search_results: GeoDataFrame[SearchResultSchema]) -> list[ExtractionTask]:
+            def prepare_tasks(
+                self,
+                search_results: GeoDataFrame[GriddedSearchResultSchema],
+                extract_params: dict[str, Any] | None = None,
+            ) -> list[ExtractionTask]:
+                # Filter to own collections first
+                own_results = search_results[
+                    search_results["collection"].isin(self.supported_collections)
+                ]
+                if own_results.empty:
+                    return []
+
+                # Then apply plugin-specific grouping strategy
+                time_window = (extract_params or {}).get("time_window", "1h")
+                return self._group_by_time_window(own_results, time_window)
+
+            def _group_by_time_window(
+                self,
+                results: GeoDataFrame[SearchResultSchema],
+                window: str,
+            ) -> list[ExtractionTask]:
                 tasks = []
-                for _, result in search_results.iterrows():
-                    # Determine intersecting grid cells for the result geometry
-                    intersecting_cells = find_intersecting_cells(result.geometry, intersects)
-                    # Define output path for this result                    result_output_path = f"{output_path}/{result.id}"
-                    # Create an extraction task                    task = ExtractionTask(
-                        search_results=result,
-                        intersecting_cells=intersecting_cells,
-                        output_path=result_output_path,
-                    )
-                    tasks.append(task)
+                for _key, group in results.groupby(pd.Grouper(key="datetime", freq=window)):
+                    if not group.empty:
+                        tasks.append(ExtractionTask(items=group, window=window))
                 return tasks
 
         """
@@ -277,31 +267,11 @@ class AerSpec:
         Parameters
         ----------
         task : ExtractionTask
-            Task containing source URL, output path, and processing parameters.
-            The task includes the target grid cell in 'overlapping_spatial_extent'.
-
+            The extraction task to process, containing search results and extract_params.
         Returns
         -------
         ExtractionTask
             The same task instance with updated status (SUCCESS or FAILED)
             and output paths populated.
-
-        Example::
-
-            @hookimpl
-            def extract(self, task: ExtractionTask) -> ExtractionTask:
-                try:
-                    # Download from source
-                    data = download(task.source_url)
-                    # Reproject to target grid
-                    reprojected = reproject(data, task.target_grid)
-                    # Save to output
-                    save(reprojected, task.output_path)
-                    task.status = "SUCCESS"
-                    task.output_files = [task.output_path]
-                except Exception as e:
-                    task.status = "FAILED"
-                    task.error = str(e)
-                return task
         """
         ...

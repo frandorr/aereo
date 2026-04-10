@@ -5,8 +5,15 @@ Verifies that the pluggy-based hookspec system is correctly configured.
 
 import pytest
 
+import pluggy
+
 from aer.plugin import core
-from aer.plugin.core import get_plugin_type, get_supported_products
+from aer.plugin.core import (
+    AerSpec,
+    get_plugin_type,
+    get_supported_collections,
+    hookimpl,
+)
 
 
 def test_core_exports():
@@ -36,93 +43,122 @@ def test_all_hooks_are_callable():
         assert callable(attr), f"{attr_name} is not callable"
 
 
-class TestPluginTypeAttribute:
-    """Tests for plugin_type attribute and get_plugin_type function."""
+class TestPluginTypeInference:
+    """Tests for get_plugin_type using pluggy's get_hookcallers."""
 
-    def test_plugin_type_attr_constant(self):
-        """PLUGIN_TYPE_ATTR constant is defined."""
-        assert core.PLUGIN_TYPE_ATTR == "plugin_type"
+    @pytest.fixture
+    def pm(self):
+        """Create a PluginManager with AerSpec registered."""
+        pm = pluggy.PluginManager(core.PROJECT_NAME)
+        pm.add_hookspecs(AerSpec)
+        return pm
 
-    def test_get_plugin_type_search(self):
-        """get_plugin_type returns 'search' for search plugins."""
+    def test_get_plugin_type_search(self, pm):
+        """get_plugin_type returns set with 'search' for search plugins."""
 
         class SearchPlugin:
-            plugin_type = "search"
+            supported_collections = ["goes-16"]
 
-        assert get_plugin_type(SearchPlugin()) == "search"
+            @hookimpl
+            def search(self, collections, intersects, time_range, search_params):
+                pass
 
-    def test_get_plugin_type_extract(self):
-        """get_plugin_type returns 'extract' for extract plugins."""
+        plugin = SearchPlugin()
+        pm.register(plugin, "search-plugin")
+        assert get_plugin_type(pm, plugin) == {"search"}
+
+    def test_get_plugin_type_extract(self, pm):
+        """get_plugin_type returns set with 'extract' for extract plugins."""
 
         class ExtractPlugin:
-            plugin_type = "extract"
+            supported_collections = ["goes-16"]
 
-        assert get_plugin_type(ExtractPlugin()) == "extract"
+            @hookimpl
+            def extract(self, task):
+                pass
 
-    def test_get_plugin_type_missing_raises(self):
-        """get_plugin_type raises ValueError when attribute missing."""
+        plugin = ExtractPlugin()
+        pm.register(plugin, "extract-plugin")
+        assert get_plugin_type(pm, plugin) == {"extract"}
 
-        class NoTypePlugin:
-            pass
+    def test_get_plugin_type_both(self, pm):
+        """get_plugin_type returns set with both for plugins with both hooks."""
 
-        with pytest.raises(ValueError, match="must declare plugin_type"):
-            get_plugin_type(NoTypePlugin())
+        class BothPlugin:
+            supported_collections = ["goes-16"]
 
-    def test_get_plugin_type_invalid_value_raises(self):
-        """get_plugin_type raises ValueError for invalid value."""
+            @hookimpl
+            def search(self, collections, intersects, time_range, search_params):
+                pass
 
-        class InvalidTypePlugin:
-            plugin_type = "invalid"
+            @hookimpl
+            def extract(self, task):
+                pass
 
-        with pytest.raises(ValueError, match="must be 'search' or 'extract'"):
-            get_plugin_type(InvalidTypePlugin())
+        plugin = BothPlugin()
+        pm.register(plugin, "both-plugin")
+        assert get_plugin_type(pm, plugin) == {"search", "extract"}
+
+    def test_get_plugin_type_no_hooks_returns_empty(self, pm):
+        """get_plugin_type returns empty set when plugin has no hooks."""
+
+        class NoHooksPlugin:
+            supported_collections = ["goes-16"]
+
+        plugin = NoHooksPlugin()
+        pm.register(plugin, "no-hooks-plugin")
+        assert get_plugin_type(pm, plugin) == set()
+
+    def test_get_plugin_type_unregistered_returns_empty(self, pm):
+        """get_plugin_type returns empty set for unregistered plugin."""
+
+        class SearchPlugin:
+            supported_collections = ["goes-16"]
+
+            @hookimpl
+            def search(self, collections, intersects, time_range, search_params):
+                pass
+
+        plugin = SearchPlugin()
+        assert get_plugin_type(pm, plugin) == set()
 
 
 class TestSupportedProductsAttribute:
-    """Tests for supported_products attribute and get_supported_products function."""
+    """Tests for supported_collections attribute and get_supported_collections function."""
 
-    def test_supported_products_attr_constant(self):
-        """SUPPORTED_PRODUCTS_ATTR constant is defined."""
-        assert core.SUPPORTED_PRODUCTS_ATTR == "supported_products"
+    def test_supported_collections_attr_constant(self):
+        """SUPPORTED_COLLECTIONS_ATTR constant is defined."""
+        assert core.SUPPORTED_COLLECTIONS_ATTR == "supported_collections"
 
-    def test_product_type_alias(self):
-        """Product type alias is str."""
-        assert core.Product is str
+    def test_collection_type_alias(self):
+        """Collection type alias is str."""
+        assert core.Collection is str
 
-    def test_get_supported_products_single(self):
-        """get_supported_products returns list for single product."""
+    def test_get_supported_collections_single(self):
+        """get_supported_collections returns list for single collection."""
 
-        class SingleProductPlugin:
-            supported_products = ["goes-16"]
+        class SingleCollectionPlugin:
+            supported_collections = ["goes-16"]
 
-        assert get_supported_products(SingleProductPlugin()) == ["goes-16"]
+        assert get_supported_collections(SingleCollectionPlugin()) == ["goes-16"]
 
-    def test_get_supported_products_multiple(self):
-        """get_supported_products returns list for multiple products."""
+    def test_get_supported_collections_multiple(self):
+        """get_supported_collections returns list for multiple collections."""
 
-        class MultiProductPlugin:
-            supported_products = ["goes-16", "goes-18", "modis"]
+        class MultiCollectionPlugin:
+            supported_collections = ["goes-16", "goes-18", "modis"]
 
-        assert get_supported_products(MultiProductPlugin()) == [
+        assert get_supported_collections(MultiCollectionPlugin()) == [
             "goes-16",
             "goes-18",
             "modis",
         ]
 
-    def test_get_supported_products_missing_raises(self):
-        """get_supported_products raises ValueError when attribute missing."""
+    def test_get_supported_collections_missing_raises(self):
+        """get_supported_collections raises ValueError when attribute missing."""
 
-        class NoProductsPlugin:
+        class NoCollectionsPlugin:
             pass
 
-        with pytest.raises(ValueError, match="must declare supported_products"):
-            get_supported_products(NoProductsPlugin())
-
-    def test_get_supported_products_not_list_raises(self):
-        """get_supported_products raises ValueError when not a list."""
-
-        class NotListPlugin:
-            supported_products = "goes-16"
-
-        with pytest.raises(ValueError, match="must be a list"):
-            get_supported_products(NotListPlugin())
+        with pytest.raises(ValueError, match="must declare 'supported_collections'"):
+            get_supported_collections(NoCollectionsPlugin())
