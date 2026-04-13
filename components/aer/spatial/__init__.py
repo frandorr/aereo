@@ -7,6 +7,8 @@ from aer.spatial.core import (
     GridCell,
     GridDefinition,
     OverlapMode,
+    add_overlapping_cells,
+    find_overlapping_cells,
 )
 from aer.spatial.majortom import Grid, GridSchema
 from aer.spatial.utils import (
@@ -22,7 +24,9 @@ __all__ = [
     "Grid",
     "GridSchema",
     "GeomLike",
+    "add_overlapping_cells",
     "get_utm_epsg_from_geometry",
     "get_utm_zone_from_latlng",
     "reproject_geom",
+    "find_overlapping_cells",
 ]
