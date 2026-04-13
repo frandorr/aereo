@@ -12,9 +12,15 @@ from functools import lru_cache
 from typing import Any, Literal, Mapping, Protocol
 
 import attrs
+import geopandas as gpd
+from aer.schemas import SearchResultSchema
+from majortom_eg.MajorTom import MajorTomGrid
+from pandera.typing.geopandas import GeoDataFrame  # type: ignore[no-redef]
 from pyresample.geometry import AreaDefinition
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, shape
 from structlog import get_logger
+
+from .utils import get_utm_epsg_from_geometry
 
 logger = get_logger()
 
@@ -71,6 +77,90 @@ class OverlapMode(Enum):
     INTERSECTS = "intersects"
     WITHIN = "within"
     CONTAINS = "contains"
+
+
+def find_overlapping_cells(
+    grid: MajorTomGrid, geom: Polygon, overlap_mode: OverlapMode
+) -> list[dict[str, Any]]:
+    overlapping = list(grid.generate_grid_cells(geom))
+    if not overlapping:
+        return []
+    cells = []
+    for cell in overlapping:
+        cell_geom = cell.geom
+        relation = overlap_mode.value
+        if relation == "intersects" and not cell_geom.intersects(geom):
+            continue
+        if relation == "within" and not cell_geom.within(geom):
+            continue
+        if relation == "contains" and not cell_geom.contains(geom):
+            continue
+        utm_epsg = get_utm_epsg_from_geometry(cell_geom)
+        cells.append(
+            {
+                "cell_id": cell.id(),
+                "cell_footprint": cell_geom,
+                "utm_crs": f"EPSG:{utm_epsg}",
+            }
+        )
+    return cells
+
+
+def add_overlapping_cells(
+    gdf: GeoDataFrame[SearchResultSchema],
+    aoi: GeomLike,
+    grid: MajorTomGrid,
+    overlap_mode: OverlapMode = OverlapMode.INTERSECTS,
+) -> GeoDataFrame[SearchResultSchema]:
+    """Add overlapping grid cells to a GeoDataFrame based on an AOI and a grid definition.
+
+    Args:
+        gdf (GeoDataFrame): Input GeoDataFrame with search results.
+        aoi (GeomLike): Area of interest as a geometric object.
+        grid (MajorTomGrid): Grid definition to use for finding overlapping cells.
+        overlap_mode (OverlapMode): Mode to determine how to find overlapping cells (default is INTERSECTS).
+
+    Returns:
+        GeoDataFrame: Updated GeoDataFrame with overlapping grid cells added.
+    """
+
+    results: list[dict[str, Any]] = []
+    for idx, row in gdf.iterrows():
+        row_geom = row.geometry
+        # Convert AOI to shapely geometry for intersection
+
+        aoi_geom = shape(dict(aoi))
+        # Calculate intersection between row geometry and AOI
+        intersecting_aoi = row_geom.intersection(aoi_geom)
+        # Use intersection for finding overlapping cells
+        overlapping_cells = find_overlapping_cells(grid, intersecting_aoi, overlap_mode)
+        original_geom = gdf.geometry.iloc[idx]
+        if not overlapping_cells:
+            result_row = dict(row)
+            result_row["geometry"] = original_geom
+            result_row["cell_id"] = None
+            result_row["cell_footprint"] = None
+            result_row["utm_crs"] = None
+            result_row["intersecting_aoi"] = (
+                intersecting_aoi
+                if intersecting_aoi and not intersecting_aoi.is_empty
+                else None
+            )
+            results.append(result_row)
+        for cell in overlapping_cells:
+            result_row = dict(row)
+            result_row["geometry"] = original_geom
+            result_row["cell_id"] = cell["cell_id"]
+            result_row["cell_footprint"] = cell["cell_footprint"]
+            result_row["utm_crs"] = cell["utm_crs"]
+            result_row["intersecting_aoi"] = (
+                intersecting_aoi
+                if intersecting_aoi and not intersecting_aoi.is_empty
+                else None
+            )
+            results.append(result_row)
+
+    return gpd.GeoDataFrame(results)  # type: ignore[return-value]
 
 
 @attrs.frozen

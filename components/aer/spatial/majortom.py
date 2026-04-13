@@ -12,35 +12,13 @@ from typing import cast
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-import pandera.pandas as pa
-from pandera.typing import Series
-from pandera.typing.geopandas import GeoSeries
+from aer.schemas import GridSchema
 from shapely.geometry import Polygon
 from structlog import get_logger
 
 from .utils import get_utm_zone_from_latlng, reproject_geom
 
 logger = get_logger(__name__)
-
-
-class GridSchema(pa.DataFrameModel):  # type: ignore[misc]
-    """Schema for validating a MajorTom-compliant grid GeoDataFrame.
-
-    Defines the standard set of columns for the global grid.
-
-    grid_cell: A unique identifier for each grid cell, typically in the format "row_col" (e.g., "0U_0R").
-    row: The row identifier for the grid cell.
-    col: The column identifier for the grid cell.
-    utm_crs: The EPSG code for the UTM coordinate reference system corresponding to the grid cell's location,
-            which can be used for spatial analysis and transformations.
-    dist: The distance in meters that defines the size of each grid cell, which can be used for spatial analysis and transformations.
-
-    """
-
-    grid_cell: Series[str]
-    utm_footprint: GeoSeries
-    utm_crs: Series[str]
-    dist: Series[int]
 
 
 class Grid:

@@ -35,8 +35,8 @@ from typing import TYPE_CHECKING, Any, cast
 import attrs
 import pandera.pandas as pa
 import pluggy
+from aer.schemas import SearchResultSchema
 from pandera.typing import Series
-from pandera.typing.geopandas import GeoSeries
 
 if TYPE_CHECKING:
     from aer.spatial import GeomLike, GridCell
@@ -104,35 +104,6 @@ hookspec = pluggy.HookspecMarker(PROJECT_NAME)
 hookimpl = pluggy.HookimplMarker(PROJECT_NAME)
 
 
-class SearchResultSchema(pa.DataFrameModel):
-    """Schema for search results returned by the `search` hook.
-
-    This schema defines the expected structure of the GeoDataFrame returned
-    by search implementations. It includes fields for collection identifiers,
-    spatial geometry, temporal information, and any additional metadata needed
-    for task preparation and extraction.
-
-    Fields:
-        id (str): Unique identifier for the search result (e.g., a product ID).
-        collection (str): Identifier for the collection this result belongs to.
-        geometry (geometry): Spatial geometry of the result (e.g., footprint).
-        start_time (datetime): Start time of the data acquisition.
-        end_time (datetime): End time of the data acquisition.
-        href (str): URL or reference to the data source for extraction.
-    """
-
-    id: Series[pa.String] = pa.Field(nullable=False)
-    collection: Series[pa.String] = pa.Field(nullable=False)
-    geometry: GeoSeries = pa.Field(nullable=True)
-    start_time: Series[pa.DateTime] = pa.Field(nullable=False)
-    end_time: Series[pa.DateTime] = pa.Field(nullable=False)
-    href: Series[pa.String] = pa.Field(nullable=False)
-
-    class Config:
-        strict = False
-        coerce = True
-
-
 class GriddedSearchResultSchema(SearchResultSchema):
     """Extended schema for search results that includes grid cell information.
 
@@ -140,7 +111,7 @@ class GriddedSearchResultSchema(SearchResultSchema):
     and need to include information about which grid cells they intersect with.
     """
 
-    grid_cells: Series[list[GridCell]] = pa.Field(nullable=True)
+    grid_cells: Series[list["GridCell"]] = pa.Field(nullable=True)  # type: ignore[valid-type]
 
 
 @attrs.frozen
