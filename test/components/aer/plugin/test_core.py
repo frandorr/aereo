@@ -7,9 +7,9 @@ import pytest
 
 import pluggy
 
+from aer.hookspecs import core as hookspecs_core
 from aer.plugin import core
 from aer.plugin.core import (
-    AerSpec,
     get_plugin_type,
     get_supported_collections,
     hookimpl,
@@ -21,7 +21,6 @@ def test_core_exports():
     assert hasattr(core, "PROJECT_NAME")
     assert hasattr(core, "hookspec")
     assert hasattr(core, "hookimpl")
-    assert hasattr(core, "AerSpec")
 
 
 def test_project_name():
@@ -29,18 +28,12 @@ def test_project_name():
     assert core.PROJECT_NAME == "aer"
 
 
-def test_aerspec_has_all_hooks():
-    """AerSpec defines all required hooks."""
-    required_hooks = ["search", "prepare_tasks", "extract"]
-    for hook_name in required_hooks:
-        assert hasattr(core.AerSpec, hook_name), f"AerSpec missing hook: {hook_name}"
-
-
-def test_all_hooks_are_callable():
-    """All AerSpec hooks are callable methods."""
-    for attr_name in ["search", "prepare_tasks", "extract"]:
-        attr = getattr(core.AerSpec, attr_name)
-        assert callable(attr), f"{attr_name} is not callable"
+def test_hookspecs_are_defined():
+    """Hookspecs module defines required hooks."""
+    assert callable(hookspecs_core.search)
+    assert callable(hookspecs_core.prepare_for_extraction)
+    assert callable(hookspecs_core.extract)
+    assert callable(hookspecs_core.supported_collections)
 
 
 class TestPluginTypeInference:
@@ -48,9 +41,9 @@ class TestPluginTypeInference:
 
     @pytest.fixture
     def pm(self):
-        """Create a PluginManager with AerSpec registered."""
+        """Create a PluginManager with hookspecs registered."""
         pm = pluggy.PluginManager(core.PROJECT_NAME)
-        pm.add_hookspecs(AerSpec)
+        pm.add_hookspecs(hookspecs_core)
         return pm
 
     def test_get_plugin_type_search(self, pm):
@@ -60,7 +53,14 @@ class TestPluginTypeInference:
             supported_collections = ["goes-16"]
 
             @hookimpl
-            def search(self, collections, intersects, time_range, search_params):
+            def search(
+                self,
+                collections,
+                intersects,
+                start_datetime,
+                end_datetime,
+                search_params,
+            ):
                 pass
 
         plugin = SearchPlugin()
@@ -74,7 +74,7 @@ class TestPluginTypeInference:
             supported_collections = ["goes-16"]
 
             @hookimpl
-            def extract(self, task):
+            def extract(self, assets_batch, extract_params):
                 pass
 
         plugin = ExtractPlugin()
@@ -88,11 +88,18 @@ class TestPluginTypeInference:
             supported_collections = ["goes-16"]
 
             @hookimpl
-            def search(self, collections, intersects, time_range, search_params):
+            def search(
+                self,
+                collections,
+                intersects,
+                start_datetime,
+                end_datetime,
+                search_params,
+            ):
                 pass
 
             @hookimpl
-            def extract(self, task):
+            def extract(self, assets_batch, extract_params):
                 pass
 
         plugin = BothPlugin()
@@ -116,7 +123,14 @@ class TestPluginTypeInference:
             supported_collections = ["goes-16"]
 
             @hookimpl
-            def search(self, collections, intersects, time_range, search_params):
+            def search(
+                self,
+                collections,
+                intersects,
+                start_datetime,
+                end_datetime,
+                search_params,
+            ):
                 pass
 
         plugin = SearchPlugin()
@@ -129,10 +143,6 @@ class TestSupportedProductsAttribute:
     def test_supported_collections_attr_constant(self):
         """SUPPORTED_COLLECTIONS_ATTR constant is defined."""
         assert core.SUPPORTED_COLLECTIONS_ATTR == "supported_collections"
-
-    def test_collection_type_alias(self):
-        """Collection type alias is str."""
-        assert core.Collection is str
 
     def test_get_supported_collections_single(self):
         """get_supported_collections returns list for single collection."""

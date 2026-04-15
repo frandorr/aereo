@@ -32,18 +32,24 @@ import warnings
 from typing import TYPE_CHECKING, Any
 
 import pluggy
-from aer.plugin.core import PROJECT_NAME, AerSpec
+from aer.hookspecs import (
+    extract,
+    prepare_for_extraction,
+    search,
+    supported_collections,
+)
+from aer.hookspecs import core as hookspecs_core
+from aer.plugin.core import PROJECT_NAME
 from aer.plugin.selector import (
     NoMatchingPluginError,
     PluginConflictError,
     PluginSelector,
 )
-from aer.spatial import GeomLike
 from aer.temporal import TimeRange
 
 if TYPE_CHECKING:
-    from aer.plugin.core import ExtractionTask, SearchResultSchema
     from pandera.typing.geopandas import GeoDataFrame
+    from shapely.geometry import MultiPolygon, Polygon
 
 # Global plugin manager and selector instances
 _plugin_manager: pluggy.PluginManager | None = None
@@ -60,7 +66,7 @@ def _get_plugin_manager() -> pluggy.PluginManager:
 
     if _plugin_manager is None:
         _plugin_manager = pluggy.PluginManager(PROJECT_NAME)
-        _plugin_manager.add_hookspecs(AerSpec)
+        _plugin_manager.add_hookspecs(hookspecs_core)
         _plugin_manager.load_setuptools_entrypoints("aer.plugins")
 
     return _plugin_manager
@@ -85,11 +91,11 @@ def _get_selector() -> PluginSelector:
 def run_search(
     collections: list[str],
     plugin_name: str | None = None,
-    intersects: GeomLike | None = None,
+    intersects: "Polygon | MultiPolygon | None" = None,
     time_range: TimeRange | None = None,
     search_params: dict[str, Any] | None = None,
     **kwargs: Any,
-) -> GeoDataFrame[SearchResultSchema]:
+) -> GeoDataFrame:
     """Search for satellite data using collection-based plugin dispatch.
 
     This function automatically selects the appropriate plugin based on
@@ -154,10 +160,13 @@ def run_search(
         else:
             plugin_instance = plugin_ref
         func = getattr(plugin_instance, name)
+        start_datetime = time_range.start if time_range else None
+        end_datetime = time_range.end if time_range else None
         result = func(
             collections=collections,
             intersects=intersects,
-            time_range=time_range,
+            start_datetime=start_datetime,
+            end_datetime=end_datetime,
             search_params=search_params,
         )
         results.append(result)
@@ -166,16 +175,16 @@ def run_search(
 
 
 def create_tasks(
-    search_results: GeoDataFrame[SearchResultSchema],
+    search_results: GeoDataFrame,
     intersects: Any,
     output_path: str,
     plugin_name: str | None = None,
-) -> list[ExtractionTask]:
+) -> list:
     """Create extraction tasks from search results.
 
     Transforms search results into discrete extraction tasks that can be
     processed independently. The actual implementation is delegated to
-    the plugin's prepare_tasks hook.
+    the plugin's prepare_for_extraction hook.
 
     Args:
         search_results: GeoDataFrame returned from run_search.
@@ -184,7 +193,7 @@ def create_tasks(
         plugin_name: Optional explicit plugin name for task creation.
 
     Returns:
-        List of ExtractionTask objects ready for processing.
+        List of GeoDataFrames ready for processing.
 
     Raises:
         ValueError: If no search_results provided.
@@ -200,7 +209,7 @@ def create_tasks(
     # Determine which plugin to use for task preparation.
     # If a plugin_name is provided, use it.
     # Otherwise, try to find a plugin that supports 'extract' or 'search'
-    # that also implements prepare_tasks.
+    # that also implements prepare_for_extraction.
     selected_plugin = None
 
     if plugin_name:
@@ -208,13 +217,13 @@ def create_tasks(
         if selected_plugin is None:
             raise ValueError(f"Plugin '{plugin_name}' not found")
     else:
-        # Find all plugins that implement prepare_tasks
+        # Find all plugins that implement prepare_for_extraction
         plugins_with_prepare = [
-            p for p in pm.get_plugins() if hasattr(p, "prepare_tasks")
+            p for p in pm.get_plugins() if hasattr(p, "prepare_for_extraction")
         ]
 
         if not plugins_with_prepare:
-            raise RuntimeError("No plugins have prepare_tasks implemented")
+            raise RuntimeError("No plugins have prepare_for_extraction implemented")
 
         if len(plugins_with_prepare) == 1:
             selected_plugin = plugins_with_prepare[0]
@@ -223,21 +232,21 @@ def create_tasks(
             # or explicit choice. For now, we take the first but log a warning.
             selected_plugin = plugins_with_prepare[0]
             warnings.warn(
-                f"Multiple plugins implement prepare_tasks. Using "
+                f"Multiple plugins implement prepare_for_extraction. Using "
                 f"'{pm.get_name(selected_plugin)}'. Use plugin_name to be explicit.",
                 UserWarning,
                 stacklevel=2,
             )
 
-    # Call the prepare_tasks hook via the targeted plugin
+    # Call the prepare_for_extraction hook via the targeted plugin
     hook_impls = [
         impl
-        for impl in pm.hook.prepare_tasks.get_hookimpls()
+        for impl in pm.hook.prepare_for_extraction.get_hookimpls()
         if impl.plugin == selected_plugin
     ]
     if not hook_impls:
         raise RuntimeError(
-            f"Plugin '{pm.get_name(selected_plugin)}' has no prepare_tasks implementation"
+            f"Plugin '{pm.get_name(selected_plugin)}' has no prepare_for_extraction implementation"
         )
 
     name = hook_impls[0].function.__name__
@@ -251,8 +260,7 @@ def create_tasks(
         func = getattr(plugin_instance, name)
         result = func(
             search_results=search_results,
-            intersects=intersects,
-            output_path=output_path,
+            prepare_params={"intersects": intersects, "output_path": output_path},
         )
         tasks_list.append(result)
 
@@ -260,28 +268,30 @@ def create_tasks(
 
 
 def run_extract(
-    task: ExtractionTask,
+    assets_batch: GeoDataFrame,
     plugin_name: str | None = None,
+    extract_params: dict[str, Any] | None = None,
     **kwargs: Any,
-) -> ExtractionTask:
-    """Extract data for an extraction task.
+) -> GeoDataFrame:
+    """Extract data for a batch of assets.
 
-    Processes an ExtractionTask to download and process the satellite data.
+    Processes a batch of assets to download and process the satellite data.
     The actual implementation is delegated to the plugin's extract hook.
 
     Args:
-        task: ExtractionTask to process (from create_tasks).
+        assets_batch: GeoDataFrame of assets to extract.
         plugin_name: Optional explicit plugin name to use.
+        extract_params: Optional dictionary of extraction parameters.
         **kwargs: Additional keyword arguments passed to the extract hook.
 
     Returns:
-        ExtractionTask: The processed task with extraction results.
+        GeoDataFrame: Extracted artifacts.
 
     Raises:
-        ValueError: If no task is provided.
+        ValueError: If no assets_batch is provided.
     """
-    if task is None:
-        raise ValueError("run_extract requires an ExtractionTask")
+    if assets_batch is None:
+        raise ValueError("run_extract requires an assets_batch")
 
     pm = _get_plugin_manager()
 
@@ -316,10 +326,12 @@ def run_extract(
         else:
             plugin_instance = plugin_ref
         func = getattr(plugin_instance, name)
-        result = func(task=task, **kwargs)
+        result = func(
+            assets_batch=assets_batch, extract_params=extract_params, **kwargs
+        )
         results.append(result)
 
-    return results[0] if results else task
+    return results[0] if results else GeoDataFrame()
 
 
 def list_available_collections(plugin_type: str | None = None) -> list[str]:

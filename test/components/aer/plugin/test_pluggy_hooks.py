@@ -1,6 +1,6 @@
 """Tests for the pluggy-based hook system.
 
-Verifies that the AerSpec hooks can be implemented by external packages
+Verifies that the hookspecs can be implemented by external packages
 and that the plugin manager correctly discovers and calls hook implementations.
 """
 
@@ -10,7 +10,12 @@ import pluggy
 import pytest
 from pandera.typing.geopandas import GeoDataFrame
 
-from aer.plugin import AerSpec, hookimpl, hookspec, PROJECT_NAME
+from aer.hookspecs import (
+    PROJECT_NAME,
+    hookimpl,
+    hookspec,
+)
+from aer.hookspecs import core as hookspecs_core
 
 
 class TestPluggyHookSystem:
@@ -22,12 +27,10 @@ class TestPluggyHookSystem:
 
     def test_hookspec_marker_has_project_name(self) -> None:
         """Hookspec marker has correct project name."""
-        # The marker is a HookspecMarker instance with project name
         assert hookspec.project_name == "aer"
 
     def test_hookimpl_marker_has_project_name(self) -> None:
         """Hookimpl marker has correct project name."""
-        # The marker is a HookimplMarker instance with project name
         assert hookimpl.project_name == "aer"
 
     def test_hookspec_can_decorate_function(self) -> None:
@@ -37,9 +40,8 @@ class TestPluggyHookSystem:
             @hookspec
             def test_hook(self, arg: str) -> str:
                 """A test hook specification."""
-                return ""  # Abstract method for hookspec
+                return ""
 
-        # The function exists and is callable
         assert callable(TestSpec.test_hook)
 
     def test_hookimpl_can_decorate_function(self) -> None:
@@ -50,62 +52,67 @@ class TestPluggyHookSystem:
             def test_hook(self, arg: str) -> str:
                 return f"result: {arg}"
 
-        # The function exists and is callable
         assert callable(TestPlugin.test_hook)
 
 
-class TestAerSpecHooks:
-    """Test that AerSpec hooks can be implemented and called."""
+class TestHookRegistration:
+    """Test that hooks can be implemented and called."""
 
     @pytest.fixture
     def plugin_manager(self) -> pluggy.PluginManager:
-        """Create a plugin manager with AerSpec registered."""
+        """Create a plugin manager with hookspecs registered."""
         pm = pluggy.PluginManager(PROJECT_NAME)
-        pm.add_hookspecs(AerSpec)
+        pm.add_hookspecs(hookspecs_core)
         return pm
 
     def test_search_hook_registration(
         self, plugin_manager: pluggy.PluginManager
     ) -> None:
         """Search hook can be registered and called."""
-        results: list[Any] = []
 
         class DummySearchPlugin:
             """A dummy search plugin for testing."""
 
-            @hookimpl
-            def search(self, query: Any) -> GeoDataFrame:
-                """Dummy search implementation."""
-                results.append(query)
-                # Return minimal valid result
-                return GeoDataFrame()  # type: ignore[return-value]
+            supported_collections = ["test-collection"]
 
-        # Register the plugin
+            @hookimpl
+            def search(
+                self,
+                collections,
+                intersects,
+                start_datetime,
+                end_datetime,
+                search_params,
+            ) -> GeoDataFrame:
+                return GeoDataFrame()
+
         plugin_manager.register(DummySearchPlugin())
 
-        # Verify the hook was registered
         hook = plugin_manager.hook.search
         assert hook is not None
         assert len(hook.get_hookimpls()) == 1
 
-    def test_prepare_tasks_hook_registration(
+    def test_prepare_for_extraction_hook_registration(
         self, plugin_manager: pluggy.PluginManager
     ) -> None:
-        """Prepare_tasks hook can be registered and called."""
+        """prepare_for_extraction hook can be registered and called."""
 
         class DummyPreparePlugin:
-            """A dummy prepare_tasks plugin for testing."""
+            """A dummy prepare_for_extraction plugin for testing."""
+
+            supported_collections = ["test-collection"]
 
             @hookimpl
-            def prepare_tasks(self, query: Any) -> list[dict[str, Any]]:
-                """Dummy prepare_tasks implementation."""
-                return [{"task": "dummy"}]
+            def prepare_for_extraction(
+                self,
+                search_results,
+                prepare_params,
+            ) -> list:
+                return []
 
-        # Register the plugin
         plugin_manager.register(DummyPreparePlugin())
 
-        # Verify the hook was registered
-        hook = plugin_manager.hook.prepare_tasks
+        hook = plugin_manager.hook.prepare_for_extraction
         assert hook is not None
         assert len(hook.get_hookimpls()) == 1
 
@@ -117,16 +124,14 @@ class TestAerSpecHooks:
         class DummyExtractPlugin:
             """A dummy extract plugin for testing."""
 
-            @hookimpl
-            def extract(self, task: Any) -> Any:
-                """Dummy extract implementation."""
-                task.status = "SUCCESS"
-                return task
+            supported_collections = ["test-collection"]
 
-        # Register the plugin
+            @hookimpl
+            def extract(self, assets_batch, extract_params):
+                return GeoDataFrame()
+
         plugin_manager.register(DummyExtractPlugin())
 
-        # Verify the hook was registered
         hook = plugin_manager.hook.extract
         assert hook is not None
         assert len(hook.get_hookimpls()) == 1
@@ -137,20 +142,36 @@ class TestAerSpecHooks:
         """Multiple plugins can implement the same hook."""
 
         class Plugin1:
+            supported_collections = ["test-collection"]
+
             @hookimpl
-            def search(self, query: Any) -> GeoDataFrame:
-                return GeoDataFrame()  # type: ignore[return-value]
+            def search(
+                self,
+                collections,
+                intersects,
+                start_datetime,
+                end_datetime,
+                search_params,
+            ):
+                return GeoDataFrame()
 
         class Plugin2:
-            @hookimpl
-            def search(self, query: Any) -> GeoDataFrame:
-                return GeoDataFrame()  # type: ignore[return-value]
+            supported_collections = ["test-collection"]
 
-        # Register both plugins
+            @hookimpl
+            def search(
+                self,
+                collections,
+                intersects,
+                start_datetime,
+                end_datetime,
+                search_params,
+            ):
+                return GeoDataFrame()
+
         plugin_manager.register(Plugin1())
         plugin_manager.register(Plugin2())
 
-        # Verify both hooks are registered
         hook = plugin_manager.hook.search
         assert len(hook.get_hookimpls()) == 2
 
@@ -160,23 +181,38 @@ class TestAerSpecHooks:
         """Plugin can use tryfirst to prioritize hook execution."""
 
         class PrimaryPlugin:
+            supported_collections = ["test-collection"]
+
             @hookimpl(tryfirst=True)
-            def search(self, query: Any) -> GeoDataFrame:
-                return GeoDataFrame()  # type: ignore[return-value]
+            def search(
+                self,
+                collections,
+                intersects,
+                start_datetime,
+                end_datetime,
+                search_params,
+            ):
+                return GeoDataFrame()
 
         class SecondaryPlugin:
-            @hookimpl
-            def search(self, query: Any) -> GeoDataFrame:
-                return GeoDataFrame()  # type: ignore[return-value]
+            supported_collections = ["test-collection"]
 
-        # Register plugins
+            @hookimpl
+            def search(
+                self,
+                collections,
+                intersects,
+                start_datetime,
+                end_datetime,
+                search_params,
+            ):
+                return GeoDataFrame()
+
         plugin_manager.register(SecondaryPlugin())
         plugin_manager.register(PrimaryPlugin())
 
-        # Verify tryfirst plugin was registered
         hook = plugin_manager.hook.search
         impls = list(hook.get_hookimpls())
-        # The tryfirst plugin should be first in the list
         assert any("PrimaryPlugin" in str(impl.plugin) for impl in impls)
 
 
@@ -185,21 +221,28 @@ class TestHookimplVariations:
 
     @pytest.fixture
     def plugin_manager(self) -> pluggy.PluginManager:
-        """Create a plugin manager with AerSpec registered."""
+        """Create a plugin manager with hookspecs registered."""
         pm = pluggy.PluginManager(PROJECT_NAME)
-        pm.add_hookspecs(AerSpec)
+        pm.add_hookspecs(hookspecs_core)
         return pm
 
     def test_hookimpl_with_specname(self, plugin_manager: pluggy.PluginManager) -> None:
         """Hookimpl can use specname to map different method name."""
 
         class AliasedPlugin:
-            @hookimpl(specname="search")
-            def my_custom_search(self, query: Any) -> GeoDataFrame:
-                """Custom method name mapped to search hook."""
-                return GeoDataFrame()  # type: ignore[return-value]
+            supported_collections = ["test-collection"]
 
-        # Register and verify
+            @hookimpl(specname="search")
+            def my_custom_search(
+                self,
+                collections,
+                intersects,
+                start_datetime,
+                end_datetime,
+                search_params,
+            ) -> GeoDataFrame:
+                return GeoDataFrame()
+
         plugin_manager.register(AliasedPlugin())
         hook = plugin_manager.hook.search
         assert len(hook.get_hookimpls()) == 1
@@ -208,37 +251,55 @@ class TestHookimplVariations:
         """Plugin can use trylast to deprioritize hook execution."""
 
         class LastPlugin:
-            @hookimpl(trylast=True)
-            def search(self, query: Any) -> GeoDataFrame:
-                return GeoDataFrame()  # type: ignore[return-value]
+            supported_collections = ["test-collection"]
 
-        # Register and verify
+            @hookimpl(trylast=True)
+            def search(
+                self,
+                collections,
+                intersects,
+                start_datetime,
+                end_datetime,
+                search_params,
+            ):
+                return GeoDataFrame()
+
         plugin_manager.register(LastPlugin())
         hook = plugin_manager.hook.search
         assert len(hook.get_hookimpls()) == 1
 
 
-class TestAerSpecStructure:
-    """Test the structure and documentation of AerSpec."""
+class TestHookspecsStructure:
+    """Test the structure and documentation of hookspecs."""
 
-    def test_aerspec_has_all_hooks(self) -> None:
-        """AerSpec defines all required hooks."""
-        required_hooks = ["search", "prepare_tasks", "extract"]
+    def test_hookspecs_defined(self) -> None:
+        """Hookspecs module defines all required hooks."""
+        required_hooks = [
+            "supported_collections",
+            "search",
+            "prepare_for_extraction",
+            "extract",
+        ]
         for hook_name in required_hooks:
-            assert hasattr(AerSpec, hook_name), f"AerSpec missing hook: {hook_name}"
+            assert hasattr(hookspecs_core, hook_name), f"Missing hookspec: {hook_name}"
 
     def test_hooks_have_docstrings(self) -> None:
-        """All AerSpec hooks have docstrings."""
-        for attr_name in ["search", "prepare_tasks", "extract"]:
-            attr = getattr(AerSpec, attr_name)
+        """All hookspecs have docstrings."""
+        for attr_name in [
+            "supported_collections",
+            "search",
+            "prepare_for_extraction",
+            "extract",
+        ]:
+            attr = getattr(hookspecs_core, attr_name)
             assert attr.__doc__, f"{attr_name} missing docstring"
 
-    def test_aerspec_can_be_added_to_plugin_manager(self) -> None:
-        """AerSpec can be registered with a PluginManager."""
+    def test_hookspecs_can_be_added_to_plugin_manager(self) -> None:
+        """Hookspecs can be registered with a PluginManager."""
         pm = pluggy.PluginManager(PROJECT_NAME)
-        pm.add_hookspecs(AerSpec)
+        pm.add_hookspecs(hookspecs_core)
 
-        # Verify hooks are available
+        assert hasattr(pm.hook, "supported_collections")
         assert hasattr(pm.hook, "search")
-        assert hasattr(pm.hook, "prepare_tasks")
+        assert hasattr(pm.hook, "prepare_for_extraction")
         assert hasattr(pm.hook, "extract")

@@ -7,14 +7,15 @@ plugins via entry points.
 import pluggy
 import pytest
 
-from aer.plugin import AerSpec, PROJECT_NAME
+from aer.hookspecs import core as hookspecs_core
+from aer.plugin import PROJECT_NAME
 
 
 @pytest.fixture
 def plugin_manager():
     """Create a fresh plugin manager for testing."""
     pm = pluggy.PluginManager(PROJECT_NAME)
-    pm.add_hookspecs(AerSpec)
+    pm.add_hookspecs(hookspecs_core)
     return pm
 
 
@@ -23,7 +24,7 @@ def test_plugin_manager_creation(plugin_manager):
     """Verify plugin manager is created with correct specs."""
     assert plugin_manager.project_name == PROJECT_NAME
     assert hasattr(plugin_manager.hook, "search")
-    assert hasattr(plugin_manager.hook, "prepare_tasks")
+    assert hasattr(plugin_manager.hook, "prepare_for_extraction")
     assert hasattr(plugin_manager.hook, "extract")
 
 
