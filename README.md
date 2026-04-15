@@ -26,150 +26,99 @@ The codebase is organized into interchangeable bricks:
 
 ## 🔌 The Plugin System
 
-`aer` uses **pluggy** for plugin discovery. The plugin system provides a complete pipeline for satellite data processing.
+`aer` uses standard Python `entry_points` for plugin discovery. The plugin system provides a complete pipeline for satellite data processing.
 
 ### How It Works
 
-1. **Plugins** are discovered via Python entry points
-2. **Product-based dispatch** automatically selects the right plugin based on product
-3. **Simple API** for users: `run_search` → `create_tasks` → `run_extract`
+1. **Plugins** are discovered via Python entry points mapped to interfaces (`SearchProvider`, `Extractor`)
+2. **Collection-based dispatch** automatically routes tasks to the correct plugins via `AerRegistry`
+3. **Simple Pipeline API** for users via `AerClient`: `search` → `prepare` → `extract`
 
 ### Discovery & Registry
 
-Plugins are automatically loaded when you use the API functions:
+Plugins are automatically loaded and instantiated by the `AerClient` and `AerRegistry`:
 
 ```python
-from aer.plugin.api import run_search, list_available_products
+from aer.client import AerClient
+from aer.registry import AerRegistry
 
-# Plugins are loaded automatically via entry points
-products = list_available_products()  # ["goes-16", "modis", ...]
-results = run_search(products=["goes-16"])  # Auto-selects appropriate plugin
+# View available plugins
+registry = AerRegistry()
+collections = registry.list_supported_collections()  # ["goes-16", "HLSL30", ...]
+
+# The client orchestrates tasks across plugins automatically
+client = AerClient(registry=registry)
+search_ctx = client.search(collections=["goes-16"])
 ```
 
 ### Creating a New Plugin
 
-Aer uses **pluggy** for plugin discovery. To create a new plugin, you must:
+`aer` relies on object-oriented inheritance for new plugins. To create a new search backend, you must:
 
-**1. Declare mandatory attributes** on your plugin class:
-
-| Attribute | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `plugin_type` | `"search"` or `"extract"` | ✅ Yes | Determines which hook to dispatch |
-| `supported_products` | `list[str]` | ✅ Yes | Products this plugin handles (e.g., `["goes-16", "modis"]`) |
-
-**2. Implement the appropriate hook(s):**
+**1. Inherit from a core interface** and implement methods. E.g. `SearchProvider` or `Extractor`:
 
 ```python
-from aer.plugin import hookimpl, AerSpec, PROJECT_NAME
-import pluggy
+from aer.interfaces import SearchProvider
+from datetime import datetime
+from typing import Sequence, Optional, Mapping, Any
 
-class MySearchPlugin:
-    # MANDATORY: declares this is a search plugin
-    plugin_type = "search"
+class MySearchPlugin(SearchProvider):
+    # MANDATORY: declares which collections this plugin handles
+    supported_collections = ["goes-16", "goes-18"]
 
-    # MANDATORY: declares which products this plugin handles
-    supported_products = ["goes-16", "goes-18"]
-
-    @hookimpl
-    def search(self, collections, intersects, time_range, search_params):
-        # Your search implementation
-        return results
+    def search(
+        self,
+        collections: Sequence[str],
+        intersects: Optional[Any] = None,
+        start_datetime: Optional[datetime] = None,
+        end_datetime: Optional[datetime] = None,
+        search_params: Optional[Mapping[str, Any]] = None,
+    ):
+        # Your search implementation returning standard GeoDataFrame schemas
+        return df
 ```
 
-Or for an extract plugin:
-
-```python
-class MyExtractPlugin:
-    plugin_type = "extract"
-    supported_products = ["goes-16"]
-
-    @hookimpl
-    def extract(self, task):
-        # Your extraction implementation
-        return task
-```
-
-**3. Register via entry points** in your `pyproject.toml`:
+**2. Register via entry points** in your `pyproject.toml`:
 
 ```toml
-[project.entry-points."aer.plugins"]
+[project.entry-points."aer.search_providers"]
 my_plugin = "my_package.plugin:MySearchPlugin"
 ```
 
-**4. Use product-based dispatch** in your application:
-
-```python
-from aer.plugin import PluginSelector, run_search
-
-# Setup plugin manager
-pm = pluggy.PluginManager("aer")
-pm.add_hookspecs(AerSpec)
-pm.load_setuptools_entrypoints("aer.plugins")
-
-# Use selector with type filtering
-selector = PluginSelector(pm)
-selector.index_plugins()
-
-# Auto-select search plugin for "goes-16"
-plugin = selector.select(products=["goes-16"], plugin_type="search")
-
-# Or use the high-level API (defaults to search type)
-results = run_search(products=["goes-16"])
-```
-
-**Error handling:**
-
-| Error | When raised |
-|-------|-------------|
-| `NoMatchingPluginError` | No plugins support the requested products |
-| `PluginConflictError` | Multiple plugins support the same products (specify `plugin_name` to resolve) |
-| `ValueError` | Invalid `plugin_type` (must be "search" or "extract") |
+Find the full walkthrough for writing new plugins in our [Plugin Developer Guide](./docs/build-your-own-plugin.md).
 
 ---
 
 ## 🛠 Usage Example
 
-The complete pipeline: **search → create tasks → extract**
+The complete pipeline is seamlessly managed by `AerClient`: `search` → `prepare` → `extract`
 
 ```python
-from aer.plugin.api import run_search, create_tasks, run_extract
-from aer.temporal import TimeRange
+from aer.client import AerClient, FailureMode
 from datetime import datetime
 
-# 1. Search for satellite data by product
-results = run_search(
-    products=["goes-16", "modis"],
-    time_range=TimeRange(
-        start=datetime(2024, 8, 1),
-        end=datetime(2024, 8, 2)
-    ),
-    intersects=my_geometry
-)
-print(f"Found {len(results)} granules")
+client = AerClient()
 
-# 2. Create extraction tasks from search results
-tasks = create_tasks(
-    search_results=results,
+# Execute the entire workflow in one command!
+results_df = client.run_pipeline(
+    collections=["goes-16", "HLSL30"],
+    start_datetime=datetime(2024, 8, 1),
+    end_datetime=datetime(2024, 8, 2),
     intersects=my_geometry,
-    output_path="/tmp/extracted"
+    failure_mode=FailureMode.BEST_EFFORT # Continue even if one plugin fails
 )
 
-# 3. Extract data for each task
-for task in tasks:
-    run_extract(task, plugin_name="my_plugin")
-
-print("Extraction complete!")
+print(f"Extracted {len(results_df)} assets successfully!")
 ```
 
-**Available API functions:**
+**Available Pipeline methods:**
 
-| Function | Description |
+| Method | Description |
 |----------|-------------|
-| `run_search(products, ...)` | Search for data by product identifiers |
-| `create_tasks(search_results, ...)` | Transform results into extraction tasks |
-| `run_extract(task, plugin_name)` | Extract data for a task |
-| `list_available_products()` | List products with registered plugins |
-| `list_plugins()` | List all registered plugin names |
+| `AerClient.search(...)` | Search for data by collection identifiers, returning `SearchResultContext` |
+| `SearchResultContext.prepare(...)` | Group search results into extraction tasks (`PreparedExtractionContext`) |
+| `PreparedExtractionContext.extract(...)` | Execute download and extraction for grouped tasks |
+| `AerClient.run_pipeline(...)` | Syntactic sugar wrapping all three steps consecutively |
 
 ---
 

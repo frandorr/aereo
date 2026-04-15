@@ -1,10 +1,10 @@
 # aer Core and Plugin Installation
 
-The `aer` project uses a Polylith architecture, allowing for a lightweight core package and optional plugin extensions that use Python's standard pluggy system.
+The `aer` project uses a Polylith architecture, allowing for a lightweight core package and optional plugin extensions that use Python's standard `entry_points` system.
 
 ## Installing aer-core
 
-`aer-core` provides the foundational domain models for spectral data, temporal ranges, spatial grids, and the plugin hookspecs.
+`aer-core` provides the foundational domain models for spectral data, temporal ranges, spatial grids, and the plugin interfaces.
 
 To install the core package:
 
@@ -17,38 +17,34 @@ This will install the `aer` package with the base components:
 - `aer.spectral`: Instruments, Satellites, and Products
 - `aer.temporal`: TimeRange logic
 - `aer.spatial`: Grid and cell management
-- `aer.search`: SearchQuery, SearchResultSchema
-- `aer.plugin`: Pluggy hookspecs (`AerSpec`, `hookimpl`, `hookspec`)
+- `aer.schemas`: Pydantic/Pandera schemas for Assets and Artifacts
+- `aer.interfaces`: Interfaces for plugins (`SearchProvider`, `Extractor`)
+- `aer.registry`: The automatic plugin discovery `AerRegistry`
+- `aer.client`: The primary entrypoint `AerClient`
 - `aer.settings`: Environment configuration
 
 ## Using the Plugin System
 
-The plugin system uses **pluggy**, the same plugin system used by pytest. Plugins are loaded via Python entry points.
+The plugin system dynamically discovers packages that declare specifically named entry points. The highest level API is `AerClient`.
 
 ### Basic Usage
 
 ```python
-import pluggy
-from aer.plugin import AerSpec, PROJECT_NAME
+from datetime import datetime
+from aer.client import AerClient
 
-# Create and configure the plugin manager
-pm = pluggy.PluginManager(PROJECT_NAME)
-pm.add_hookspecs(AerSpec)
+# Create the pipeline orchestrator
+client = AerClient()
 
-# Load all installed plugins from entry points
-pm.load_setuptools_entrypoints("aer.plugins")
-
-# Now you can use the plugins
-from aer.search import SearchQuery
-
-query = SearchQuery(
-    collections=["HLSL30"],
-    datetime="2024-01-01/2024-02-01",
-    intersects=my_geometry,
+# It will automatically find and dispatch searches to registered plugins supporting "my-collection"
+search_ctx = client.search(
+    collections=["my-collection"],
+    start_datetime=datetime(2024, 1, 1),
+    end_datetime=datetime(2024, 2, 1),
+    intersects=my_geometry
 )
 
-# Call the search hook - all registered search plugins will be invoked
-results = pm.hook.search(query=query)
+print(f"Found {len(search_ctx.search_results)} assets!")
 ```
 
 ## Installing a Plugin
@@ -61,24 +57,21 @@ Using `aer-search-earthaccess` as an example:
 pip install projects/aer-search-earthaccess
 ```
 
-Once installed, the plugin automatically registers itself when you call `load_setuptools_entrypoints()`. You can verify this in a Python REPL:
+Once installed, the plugin automatically registers itself. You can verify this in a Python REPL:
 
 ```python
-import pluggy
-from aer.plugin import AerSpec, PROJECT_NAME
+from aer.registry import AerRegistry
 
-pm = pluggy.PluginManager(PROJECT_NAME)
-pm.add_hookspecs(AerSpec)
-pm.load_setuptools_entrypoints("aer.plugins")
+registry = AerRegistry()
 
 # Check registered implementations
-print(pm.hook.search.get_hookimpls())
-# [<HookImpl plugin_name='earthaccess' ...>]
+print(registry.find_searchers_for("HLSL30"))
+# ["earthaccess"]
 ```
 
 ## Developer Guide: Creating a New Plugin Project
 
-To create a new plugin using the Polylith structure:
+To create a new plugin natively inside the `aer` repository using the Polylith structure:
 
 ### 1. Create a New Polylith Project
 Project definitions live in `projects/` and determine which components (bricks) are bundled into the distribution.
@@ -92,39 +85,13 @@ Edit `projects/aer_my_plugin/pyproject.toml` to include the foundational compone
 
 ```toml
 [tool.polylith.bricks]
-"components/aer/search" = "aer/search"          # Search model
-"components/aer/plugin" = "aer/plugin"         # Plugin hookspecs
-"components/aer/my_plugin" = "aer/my_plugin"   # Your implementation
-"components/aer/spectral" = "aer/spectral"       # Data models
-"components/aer/temporal" = "aer/temporal"       # Time models
+"components/aer/interfaces" = "aer/interfaces"   # Plugin interfaces
+"components/aer/schemas" = "aer/schemas"         # Data schemas
+"components/aer/my_plugin" = "aer/my_plugin"     # Your implementation component
 # ... other dependencies
 ```
 
-### 3. Implement Your Plugin
-In your component's `core.py`, implement the hook using `@hookimpl`:
-
-```python
-from aer.plugin import hookimpl
-from aer.search import SearchQuery
-from pandera.typing.geopandas import GeoDataFrame
-
-class MyPlugin:
-    @hookimpl
-    def search(self, query: SearchQuery) -> GeoDataFrame:
-        """Search using my custom data source."""
-        # Your implementation here
-        results = my_api.search(...)
-        return GeoDataFrame(results)
-```
-
-Then declare the entry point in `pyproject.toml`:
-
-```toml
-[project.entry-points."aer.plugins"]
-my_plugin_name = "aer.my_plugin.core:MyPlugin"
-```
-
-### 4. Build and Distribute
+### 3. Build and Distribute
 You can now build a wheel for your plugin:
 
 ```bash
@@ -136,9 +103,8 @@ uv build
 
 The plugin system uses Python's standard `importlib.metadata` entry points mechanism:
 
-1. You declare plugins in `pyproject.toml` under `[project.entry-points."aer.plugins"]`
-2. When `pm.load_setuptools_entrypoints("aer.plugins")` is called, pluggy scans all installed packages
-3. Classes listed in entry points are instantiated and their `@hookimpl` methods are registered
-4. When you call `pm.hook.search()`, all registered search implementations are invoked
+1. You declare plugins in `pyproject.toml` under `[project.entry-points."aer.search_providers"]` and `[project.entry-points."aer.extractors"]`
+2. The `AerRegistry` scans installed packages for these hooks dynamically upon instantiation.
+3. Classes listed in entry points are stored, matching their declared `supported_collections` to facilitate fast lookups and automated execution dynamically.
 
-This is the same mechanism used by pytest, tox, and other major Python tools.
+To learn how to implement the code for a search provider or extractor, read [Build Your Own Plugin](./build-your-own-plugin.md).

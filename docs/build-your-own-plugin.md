@@ -1,6 +1,6 @@
 # Build Your Own `aer` Plugin
 
-The `aer` framework is designed to be fully extensible using Python's standard **pluggy** plugin system. Third-party developers can create standalone Python packages that seamlessly integrate into the `aer` ecosystem.
+The `aer` framework is designed to be fully extensible using Python's standard `entry_points` mechanism. Third-party developers can create standalone Python packages that seamlessly integrate into the `aer` ecosystem.
 
 ## Quick Start
 
@@ -8,15 +8,15 @@ The **best and easiest approach** for building an `aer` plugin is to create a se
 
 ## Step 1: Bootstrap Your Repository
 
-We recommend using the [`enforce-template`](https://github.com/frandorr/enforce-template) as the foundation for your plugin. It comes pre-configured with the standard Python tooling (`uv`, `ruff`, `mypy`, `pytest` etc.) used across the `aer` ecosystem.
+We recommend using the [`aer-plugin-template`](https://github.com/frandorr/aer-plugin-template) as the foundation for your plugin. It comes pre-configured with the standard Python tooling (`uv`, `ruff`, `mypy`, `pytest` etc.) used across the `aer` ecosystem.
 
-1. Go to [https://github.com/frandorr/enforce-template](https://github.com/frandorr/enforce-template).
+1. Go to [https://github.com/frandorr/aer-plugin-template](https://github.com/frandorr/aer-plugin-template).
 2. Click **Use this template** -> **Create a new repository**.
 3. Name your repository (e.g., `aer-plugin-acme`) and clone it locally.
 
 ## Step 2: Add Dependencies
 
-Your plugin only needs to depend on the core `aer` package to access its hookspecs and types.
+Your plugin only needs to depend on the core `aer` package to access its interfaces and schemas.
 
 Update your `pyproject.toml` dependencies to include `aer-core`:
 
@@ -26,8 +26,8 @@ name = "aer-plugin-acme"
 version = "0.1.0"
 dependencies = [
     "aer-core",
-    "geopandas",  # For search results
-    # Add other dependencies your plugin requires (e.g., requests, boto3)
+    "geopandas",  # For returning standard schemas
+    "pandera",    # For schema validation (Optional but recommended)
 ]
 ```
 
@@ -38,127 +38,164 @@ uv sync
 
 ## Step 3: Write Your Plugin Logic
 
-Plugins are classes that implement one or more **hookspecs** using the `@hookimpl` decorator. `aer` uses Python's **pluggy** library to manage plugins.
+Plugins are standard Python classes that inherit from `SearchProvider` or `Extractor` base classes defined in `aer.interfaces`.
 
 ### Search Plugin Example
 
-Create your plugin (e.g., in `acme_plugin/core.py`):
+Create your search provider (e.g., in `acme_plugin/search.py`). Search plugins MUST declare `supported_collections`.
 
 ```python
 """ACME search plugin for aer."""
 
-import geopandas as gpd
+from datetime import datetime
+from typing import Any, Mapping, Sequence
+
+import pandas as pd
 from pandera.typing.geopandas import GeoDataFrame
+from shapely.geometry.base import BaseGeometry
 
-from aer.plugin import hookimpl
-from aer.search import SearchQuery
+from aer.interfaces import SearchProvider
+from aer.schemas import AssetSchema
 
 
-class AcmeSearchPlugin:
+class AcmeSearchProvider(SearchProvider):
     """Search plugin for ACME satellite data."""
 
-    @hookimpl
-    def search(self, query: SearchQuery) -> GeoDataFrame:
-        """Search ACME API for satellite data.
+    # REQUIRED: sequence of collections this plugin supports
+    supported_collections = ["acme-l1", "acme-l2"]
 
-        Parameters
-        ----------
-        query : SearchQuery
-            Search parameters including collections, time range, spatial extent.
-
-        Returns
-        -------
-        GeoDataFrame
-            Search results with columns: collection, id, datetime, geometry.
-        """
+    def search(
+        self,
+        collections: Sequence[str],
+        intersects: BaseGeometry | None,
+        start_datetime: datetime | None,
+        end_datetime: datetime | None,
+        search_params: Mapping[str, Any] | None,
+    ) -> GeoDataFrame[AssetSchema]:
+        """Search ACME API for satellite data."""
         # Your ACME API search logic here
-        results = acme_api.search(
-            collections=query.collections,
-            datetime=query.datetime,
-            intersects=query.intersects,
-        )
-        return gpd.GeoDataFrame(results)
+
+        # Example: Mocking a search request
+        # results = acme_api.search(...)
+
+        # Format the response as a GeoDataFrame that aligns with AssetSchema
+        df = pd.DataFrame([
+            {
+                "id": "acme_item_001",
+                "collection": collections[0],
+                "datetime": datetime.utcnow(),
+                "geometry": intersects if intersects else None,
+                "assets": {"data": {"href": "https://acme.org/data.tif"}}
+            }
+        ])
+
+        # Ensure it matches AssetSchema
+        gdf = GeoDataFrame(df, geometry="geometry")
+        return AssetSchema.validate(gdf)
 ```
 
 ### Extract Plugin Example
 
+Create your extractor (e.g., in `acme_plugin/extract.py`). Extract plugins MUST declare `supported_collections` and implement both `prepare_for_extraction` and `extract`.
+
 ```python
 """ACME extract plugin for aer."""
 
-from aer.plugin import hookimpl
-from aer.extract import ExtractionTask
+from typing import Any
+
+from pandera.typing.geopandas import GeoDataFrame
+from aer.interfaces import Extractor
+from aer.schemas import AssetSchema, ArtifactSchema
 
 
-class AcmeExtractPlugin:
+class AcmeExtractor(Extractor):
     """Extract plugin for ACME data."""
 
-    @hookimpl
-    def extract(self, task: ExtractionTask) -> ExtractionTask:
-        """Download and extract ACME data.
+    # REQUIRED: sequence of collections this plugin supports
+    supported_collections = ["acme-l1"]
 
-        Parameters
-        ----------
-        task : ExtractionTask
-            Task with source_url, output_path, and parameters.
+    def prepare_for_extraction(
+        self,
+        search_results: GeoDataFrame[AssetSchema],
+        prepare_params: dict[str, Any] | None,
+    ) -> list[GeoDataFrame[AssetSchema]]:
+        """Group search results into extraction batches."""
 
-        Returns
-        -------
-        ExtractionTask
-            Task with status updated to SUCCESS or FAILED.
-        """
-        try:
-            # Download from ACME source
-            download(task.source_url, task.output_path)
+        # By default, we might just split into single-row batches for individual download
+        batches = []
+        for i in range(len(search_results)):
+            batches.append(search_results.iloc[[i]].copy())
 
-            # Process/reproject if needed
-            process(task.output_path)
+        return batches
 
-            task.status = "SUCCESS"
-            task.output_files = [task.output_path]
-        except Exception as e:
-            task.status = "FAILED"
-            task.error = str(e)
+    def extract(
+        self,
+        assets_batch: GeoDataFrame[AssetSchema],
+        extract_params: dict[str, Any] | None,
+    ) -> GeoDataFrame[ArtifactSchema]:
+        """Download and extract ACME data for a batch."""
+        extracted_artifacts = []
 
-        return task
+        for _, asset_row in assets_batch.iterrows():
+            item_id = asset_row["id"]
+
+            try:
+                # 1. Download
+                # file_path = download_file(asset_row["assets"]["data"]["href"])
+                file_path = f"/tmp/extracted_{item_id}.tif"
+
+                # 2. Append success artifact
+                payload = asset_row.to_dict()
+                payload["file_path"] = file_path
+                payload["status"] = "SUCCESS"
+                extracted_artifacts.append(payload)
+
+            except Exception as e:
+                # Append failed artifact
+                payload = asset_row.to_dict()
+                payload["status"] = "FAILED"
+                payload["error"] = str(e)
+                extracted_artifacts.append(payload)
+
+        # Ensure return type matches ArtifactSchema rules
+        from geopandas import GeoDataFrame as gpd_GeoDataFrame
+        return ArtifactSchema.validate(gpd_GeoDataFrame(extracted_artifacts, geometry="geometry"))
 ```
 
 ## Step 4: Register the Entry Point
 
 `aer` discovers third-party plugins automatically using **Python Entry Points**.
 
-Add the plugin class path to your `pyproject.toml`:
+Add the plugin class paths to your `pyproject.toml` under the custom `aer.search_providers` and `aer.extractors` groups:
 
 ```toml
-[project.entry-points."aer.plugins"]
-# Name = "module.path:ClassName"
-acme_search = "acme_plugin.core:AcmeSearchPlugin"
-acme_extract = "acme_plugin.extract:AcmeExtractPlugin"
+[project.entry-points."aer.search_providers"]
+# alias = "module.path:ClassName"
+acme_search = "acme_plugin.search:AcmeSearchProvider"
+
+[project.entry-points."aer.extractors"]
+acme_extract = "acme_plugin.extract:AcmeExtractor"
 ```
 
 ## Step 5: Test Your Plugin
 
-Test your plugin using pluggy's PluginManager:
+Test your plugin using the high-level `AerClient` API:
 
 ```python
-import pluggy
-from aer.plugin import AerSpec, PROJECT_NAME
-from acme_plugin.core import AcmeSearchPlugin
+from aer.client import AerClient
+from datetime import datetime
 
-# Create plugin manager
-pm = pluggy.PluginManager(PROJECT_NAME)
-pm.add_hookspecs(AerSpec)
+# The client automatically searches system paths for your entry points!
+client = AerClient()
 
-# Register your plugin
-pm.register(AcmeSearchPlugin())
-
-# Test the hook
-from aer.search import SearchQuery
-query = SearchQuery(
-    collections=["acme_collection"],
-    datetime="2024-01-01/2024-12-31",
-    intersects=some_geometry,
+# Test the end-to-end pipeline
+artifacts_df = client.run_pipeline(
+    collections=["acme-l1"],
+    start_datetime=datetime(2023, 1, 1),
+    end_datetime=datetime(2023, 1, 31)
 )
-results = pm.hook.search(query=query)
+
+print(artifacts_df[["id", "status", "file_path"]])
 ```
 
 ## Step 6: Distribute
@@ -176,26 +213,14 @@ Users install it like any other package:
 pip install aer-plugin-acme
 ```
 
-The plugin is automatically discovered when users create a plugin manager:
+## Available Interfaces
 
-```python
-import pluggy
-from aer.plugin import AerSpec, PROJECT_NAME
+| Interface | Purpose | Key Methods |
+|-----------|---------|-------------|
+| `SearchProvider` | Query satellite data | `search` |
+| `Extractor` | Configure and run extractions | `prepare_for_extraction`, `extract` |
 
-pm = pluggy.PluginManager(PROJECT_NAME)
-pm.add_hookspecs(AerSpec)
-pm.load_setuptools_entrypoints("aer.plugins")  # Loads your plugin!
-```
-
-## Available Hooks
-
-| Hook | Purpose | Input | Output |
-|------|---------|-------|--------|
-| `search` | Query satellite data | `SearchQuery` | `GeoDataFrame` |
-| `prepare_tasks` | Create extraction tasks | `SearchQuery` | `list[ExtractionTask]` |
-| `extract` | Download and process | `ExtractionTask` | `ExtractionTask` |
-
-See `AerSpec` class in `aer.plugin` for detailed documentation.
+See the `aer.interfaces` module for detailed documentation.
 
 ---
 
@@ -219,47 +244,3 @@ rm -rf .venv/lib/python*/site-packages/aer
 uv sync --reinstall-package aer-core --reinstall-package aer-plugin-acme
 ```
 Your local imports will now properly resolve directly to your hot-reloading `components/` directory.
-
----
-
-## Advanced: Hook Options
-
-### Multiple Implementations
-
-Multiple plugins can implement the same hook. Use `tryfirst` or `trylast` to control order:
-
-```python
-class PrimaryPlugin:
-    @hookimpl(tryfirst=True)
-    def search(self, query):
-        # This runs first
-        return results
-
-class FallbackPlugin:
-    @hookimpl(trylast=True)
-    def search(self, query):
-        # This runs last
-        return fallback_results
-```
-
-### Optional Hooks
-
-Mark hooks as optional if they might not exist in the spec:
-
-```python
-class ExperimentalPlugin:
-    @hookimpl(optional=True)
-    def experimental_feature(self, data):
-        return processed_data
-```
-
-### Spec Name Aliasing
-
-Map a method to a different hook name:
-
-```python
-class AliasedPlugin:
-    @hookimpl(specname="search")
-    def my_custom_search_method(self, query):
-        return results
-```
