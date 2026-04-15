@@ -2,7 +2,8 @@
 
 import pluggy
 import pytest
-from aer.plugin import PROJECT_NAME, AerSpec, PluginSelector, hookimpl
+from aer.hookspecs import core as hookspecs_core
+from aer.plugin import PluginSelector, hookimpl
 from aer.plugin.core import get_plugin_type
 from aer.plugin.selector import NoMatchingPluginError, PluginConflictError
 
@@ -13,7 +14,9 @@ class MockSearchPlugin:
     supported_collections = ["goes-16", "goes-18"]
 
     @hookimpl
-    def search(self, collections, intersects, time_range, search_params):
+    def search(
+        self, collections, intersects, start_datetime, end_datetime, search_params
+    ):
         return "search_results"
 
 
@@ -23,8 +26,8 @@ class MockExtractPlugin:
     supported_collections = ["goes-16"]
 
     @hookimpl
-    def extract(self, task):
-        return task
+    def extract(self, assets_batch, extract_params):
+        return "extracted"
 
 
 class MockMultiProductPlugin:
@@ -33,7 +36,9 @@ class MockMultiProductPlugin:
     supported_collections = ["modis", "viirs", "goes-16"]
 
     @hookimpl
-    def search(self, collections, intersects, time_range, search_params):
+    def search(
+        self, collections, intersects, start_datetime, end_datetime, search_params
+    ):
         return "multi_product_results"
 
 
@@ -41,7 +46,9 @@ class MockSearchNoProductsPlugin:
     """Mock search plugin without supported_collections."""
 
     @hookimpl
-    def search(self, collections, intersects, time_range, search_params):
+    def search(
+        self, collections, intersects, start_datetime, end_datetime, search_params
+    ):
         pass
 
 
@@ -63,8 +70,8 @@ class MockInvalidTypePlugin:
 @pytest.fixture
 def plugin_manager():
     """Create a plugin manager with test plugins."""
-    pm = pluggy.PluginManager(PROJECT_NAME)
-    pm.add_hookspecs(AerSpec)
+    pm = pluggy.PluginManager("aer")
+    pm.add_hookspecs(hookspecs_core)
     pm.register(MockSearchPlugin(), name="search_plugin")
     pm.register(MockExtractPlugin(), name="extract_plugin")
     pm.register(MockMultiProductPlugin(), name="multi_product_plugin")
@@ -84,9 +91,9 @@ class TestPluginTypeInference:
 
     @pytest.fixture
     def pm(self):
-        """Create a PluginManager with AerSpec registered."""
-        pm = pluggy.PluginManager(PROJECT_NAME)
-        pm.add_hookspecs(AerSpec)
+        """Create a PluginManager with hookspecs registered."""
+        pm = pluggy.PluginManager("aer")
+        pm.add_hookspecs(hookspecs_core)
         return pm
 
     def test_get_plugin_type_search(self, pm):
@@ -133,8 +140,8 @@ class TestPluginSelectorIndexing:
 
     def test_index_plugins_filters_no_type(self):
         """Plugins without plugin_type are not indexed."""
-        pm = pluggy.PluginManager(PROJECT_NAME)
-        pm.add_hookspecs(AerSpec)
+        pm = pluggy.PluginManager("aer")
+        pm.add_hookspecs(hookspecs_core)
         pm.register(MockSearchNoTypePlugin(), name="no_type_plugin")
 
         selector = PluginSelector(pm)
@@ -143,17 +150,17 @@ class TestPluginSelectorIndexing:
         # Should not crash, but no plugins indexed
         assert selector._plugin_types == {}
 
-    def test_index_plugins_filters_no_products(self):
-        """Plugins without supported_collections are not indexed."""
-        pm = pluggy.PluginManager(PROJECT_NAME)
-        pm.add_hookspecs(AerSpec)
+    def test_index_plugins_raises_on_missing_collections(self):
+        """Plugins without supported_collections raise ValueError."""
+        pm = pluggy.PluginManager("aer")
+        pm.add_hookspecs(hookspecs_core)
         pm.register(MockSearchNoProductsPlugin(), name="no_products_plugin")
 
         selector = PluginSelector(pm)
-        selector.index_plugins()
-
-        # Should not crash, but no collections indexed
-        assert selector._collection_index == {}
+        with pytest.raises(
+            ValueError, match="missing required 'supported_collections'"
+        ):
+            selector.index_plugins()
 
 
 class TestPluginSelectorSelect:
@@ -210,8 +217,8 @@ class TestPluginSelectorSelect:
 
     def test_select_no_indexed_raises(self):
         """select raises RuntimeError when index_plugins not called."""
-        pm = pluggy.PluginManager(PROJECT_NAME)
-        pm.add_hookspecs(AerSpec)
+        pm = pluggy.PluginManager("aer")
+        pm.add_hookspecs(hookspecs_core)
         selector = PluginSelector(pm)
 
         with pytest.raises(RuntimeError, match="No plugins indexed"):
@@ -266,8 +273,8 @@ class TestPluginSelectorGetMatchingPlugins:
 
     def test_get_matching_plugins_not_indexed(self, indexed_selector):
         """get_matching_plugins returns empty when no plugins indexed."""
-        pm = pluggy.PluginManager(PROJECT_NAME)
-        pm.add_hookspecs(AerSpec)
+        pm = pluggy.PluginManager("aer")
+        pm.add_hookspecs(hookspecs_core)
         selector = PluginSelector(pm)
         selector.index_plugins()
 
