@@ -9,6 +9,33 @@ from pandera.typing import Series
 from pandera.typing.geopandas import GeoSeries
 
 
+class GridSchema(pa.DataFrameModel):
+    """Schema for grid dataframes used in the aer plugin system.
+
+    This schema defines the expected structure of the GeoDataFrame representing
+    the spatial grid used for task preparation and artifact organization. It
+    includes fields for grid cell identifiers, spatial geometry, and any
+    additional metadata needed for task preparation and artifact management.
+
+    Fields:
+        grid_cell (str): Unique identifier for the grid cell (e.g., "0U_0R").
+        grid_dist (int): Distance in meters that defines the size of the grid cell.
+        grid_geometry (geometry): Spatial geometry of the grid cell (e.g., footprint).
+        grid_utm_crs (str): EPSG code for the UTM coordinate reference system corresponding to the grid_cell.
+        grid_utm_footprint (geometry): Spatial geometry of the grid_cell footprint in the UTM coordinate reference system.
+    """
+
+    grid_cell: Series[pa.String] = pa.Field(nullable=False)
+    grid_dist: Series[pa.Int] = pa.Field(nullable=False)
+    cell_geometry: GeoSeries = pa.Field(nullable=False)
+    cell_utm_crs: Series[pa.String] = pa.Field(nullable=False)
+    cell_utm_fooprint: GeoSeries = pa.Field(nullable=False)
+
+    class Config:
+        coerce = True
+        strict = False
+
+
 class AssetSchema(pa.DataFrameModel):
     """Schema for search results returned by the `search` hook.
 
@@ -38,7 +65,7 @@ class AssetSchema(pa.DataFrameModel):
         coerce = True
 
 
-class ArtifactSchema(pa.DataFrameModel):
+class ArtifactSchema(GridSchema):
     """
     Schema for artifacts created during extraction.
 
@@ -49,25 +76,24 @@ class ArtifactSchema(pa.DataFrameModel):
     - end_time (datetime): End time of the data acquisition for the artifact.
     - uri (str): URI or reference to the artifact's location (e.g., file path, cloud storage URL).
     - geometry (geometry): Spatial geometry of the artifact (e.g., footprint).
-    - grid_dist (int): Distance in meters that defines the size of the grid cell associated with the artifact.
-    - grid_cell (str): Unique identifier for the grid cell associated with the artifact (e.g., "0U_0R").
-    - utm_crs (str, optional): EPSG code for the UTM coordinate reference system corresponding to the grid_cell.
-    - utm_footprint (geometry, optional): Spatial geometry of the grid_cell footprint in the UTM coordinate reference system,
     - collection (str, optional): Identifier for the collection this artifact belongs to,
         which can be used for organizational and metadata purposes.
+
+    GridSchema fields are inherited, so the artifact will also include:
+    - grid_cell (str): Unique identifier for the grid cell (e.g., "0U_0R").
+    - grid_dist (int): Distance in meters that defines the size of the grid cell.
+    - cell_geometry (geometry): Spatial geometry of the grid cell (e.g., footprint).
+    - cell_utm_crs (str): EPSG code for the UTM coordinate reference system corresponding to the grid_cell.
+    - cell_utm_fooprint (geometry): Spatial geometry of the grid_cell footprint in the UTM coordinate reference system.
 
     """
 
     id: Series[pa.String] = pa.Field(unique=True, nullable=False)
     source_ids: Series[pa.String] = pa.Field(nullable=False)
-    start_time: Series[pa.DateTime] = pa.Field(nullable=False)
-    end_time: Series[pa.DateTime] = pa.Field(nullable=False)
+    start_time: Series[pa.DateTime] = pa.Field(nullable=True)
+    end_time: Series[pa.DateTime] = pa.Field(nullable=True)
     uri: Series[pa.String] = pa.Field(nullable=False)
     geometry: GeoSeries = pa.Field(nullable=False)
-    grid_dist: Series[pa.Int] = pa.Field(nullable=False)
-    grid_cell: Series[pa.String] = pa.Field(nullable=False)
-    utm_crs: Series[pa.String] = pa.Field(nullable=True)
-    utm_fooprint: GeoSeries = pa.Field(nullable=True)
     collection: Series[pa.String] = pa.Field(nullable=True)
 
     class Config:
