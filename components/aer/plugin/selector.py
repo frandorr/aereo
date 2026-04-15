@@ -12,7 +12,11 @@ from __future__ import annotations
 from typing import Any
 
 import pluggy
-from aer.plugin.core import get_plugin_type, get_supported_collections
+from aer.plugin.core import (
+    SUPPORTED_COLLECTIONS_ATTR,
+    get_plugin_type,
+    get_supported_collections,
+)
 
 
 class PluginConflictError(Exception):
@@ -127,12 +131,15 @@ class PluginSelector:
                 continue
             self._plugin_types[plugin_name] = plugin_type
 
-            # Get supported collections
+            # Get supported collections (mandatory for all plugins)
             try:
                 collections = get_supported_collections(plugin)
-            except ValueError:
-                # Skip plugins that don't declare supported_collections
-                continue
+            except ValueError as e:
+                raise ValueError(
+                    f"Plugin '{plugin_name}' is missing required '{SUPPORTED_COLLECTIONS_ATTR}' "
+                    f"attribute. All plugins must declare supported_collections as a list of "
+                    f"collection identifiers."
+                ) from e
 
             # Index each collection
             for collection in collections:

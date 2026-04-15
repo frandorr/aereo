@@ -4,43 +4,43 @@ Verifies the pluggy-based plugin system exports work correctly.
 """
 
 import pluggy
-
+from aer.hookspecs import core as hookspecs_core
 from aer.plugin import (
-    AerSpec,
+    PROJECT_NAME,
     hookimpl,
     hookspec,
-    PROJECT_NAME,
 )
 
 
 def test_public_api_exports():
     """Public API exports all required components."""
-    # Main hook specification class
-    assert AerSpec is not None
-
-    # Decorators for plugin authors
     assert hookimpl is not None
     assert hookspec is not None
-
-    # Project identifier
     assert PROJECT_NAME == "aer"
 
 
 def test_hookimpl_works_with_plugin_manager():
     """Plugin authors can use hookimpl decorator - works with plugin manager."""
     pm = pluggy.PluginManager(PROJECT_NAME)
-    pm.add_hookspecs(AerSpec)
+    pm.add_hookspecs(hookspecs_core)
 
     class TestPlugin:
+        supported_collections = ["test-collection"]
+
         @hookimpl
-        def search(self, query):
+        def search(
+            self,
+            collections,
+            intersects,
+            start_datetime,
+            end_datetime,
+            search_params=None,
+        ):
             return None
 
-    # Should be able to register without errors
     plugin = TestPlugin()
     pm.register(plugin)
 
-    # Verify registration worked
     assert len(list(pm.hook.search.get_hookimpls())) == 1
 
 

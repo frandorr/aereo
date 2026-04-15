@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 06
-status: in_progress
-last_updated: "2026-04-09T14:34:54Z"
+current_phase: 05 (Completed)
+status: unknown
+last_updated: "2026-04-09T14:38:26.990Z"
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 6
   completed_plans: 4
 ---
@@ -61,8 +61,10 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260339-create-oscar-api-consumer-functions-to-f | Create OSCAR API consumer functions to fetch satellites and instruments data into dataframes | 2026-04-01 | 51e8e6b | [260339-create-oscar-api-consumer-functions-to-f](./quick/260339-create-oscar-api-consumer-functions-to-f/) |
 | 260340-create-abstract-searchplugin-class-in-co | Create abstract SearchPlugin class in components/aer/plugin/search.py | 2026-04-04 | 6352fa0 | [260340-create-abstract-searchplugin-class-in-co](./quick/260340-create-abstract-searchplugin-class-in-co/) |
 | 260342-remove-old-plugin-architecture-and-add-p | Remove old plugin architecture and add pluggy hooks tests | 2026-04-06 | 76b3706 | [260342-remove-old-plugin-architecture-and-add-p](./quick/260342-remove-old-plugin-architecture-and-add-p/) |
+| 260343-move-pandera-schemas | Move pandera schemas to new aer.schemas component | 2026-04-13 | b36ad16 | [260343-move-pandera-schemas-to-a-new-polylith-c](./quick/260343-move-pandera-schemas-to-a-new-polylith-c/) |
 | 260343-remove-abcs | Remove SearchPlugin ABCs, standardize on pluggy only | 2026-04-06 | e8067d1 | - |
 | 260409-product-based-dispatch | Add product-based plugin dispatch with PluginSelector | 2026-04-09 | 72d9605 | - |
+| 260344-modify-plugin-component-to-support-new-v | modify plugin component to support new version of simple hookspects and check mandatory impl of supported_collections() | 2026-04-15 | pending | [260344-modify-plugin-component-to-support-new-v](./quick/260344-modify-plugin-component-to-support-new-v/) |
 
 ## Progress
 
@@ -72,4 +74,4 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 
 ---
 
-*Last activity: 2026-04-09 - Implemented product-based plugin dispatch system (72d9605)*
+*Last activity: 2026-04-15 - Completed quick task 260344: modify plugin component to support new version of simple hookspects and check mandatory impl of supported_collections()*
