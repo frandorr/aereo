@@ -19,6 +19,7 @@ dependencies = [
   "attrs>=25.4",
   "cattrs>=26.1",
   "geopandas>=1.1.2",
+  "majortom-eg",
   "openpyxl>=3.1.5",
   "pandas>=3.0.1",
   "pandera[geopandas]>=0.24",
@@ -30,6 +31,7 @@ dependencies = [
   "python-geotiepoints>=1.9",
   "pyyaml>=6.0.3",
   "returns[compatible-mypy]>=0.26",
+  "rtree>=1.4.1",
   "s3fs>=2025.2",
   "scikit-learn>=1.8",
   "shapely>=2.1.2",
@@ -41,10 +43,10 @@ optional-dependencies.earthaccess = [ "aer-search-earthaccess>=1.1.1" ]
 
 [dependency-groups]
 dev = [
-  "aer-extract-aws-goes>=0.1",
   "aer-search-aws-goes>=2",
   "aer-search-earthaccess>=2.0.3,<3",
   "basedpyright>=1.38",
+  "cartopy>=0.25",
   "graphviz>=0.21",
   "marimo[mcp]>=0.21.1",
   "matplotlib>=3.10.8",
@@ -61,9 +63,9 @@ metadata.allow-direct-references = true
 
 [tool.uv]
 sources.aer-core = { path = "projects/aer-core", editable = true }
-sources.aer-extract-aws-goes = { path = "../aer-extract-aws-goes/projects/aer-extract-aws-goes", editable = true }
 sources.aer-search-aws-goes = { path = "../aer-search-aws-goes/projects/aer-search-aws-goes", editable = true }
 sources.aer-search-earthaccess = { path = "../aer-search-earthaccess/projects/aer-search-earthaccess", editable = true }
+sources.majortom_eg = { path = "../majortom", editable = true }
 managed = true
 workspace.members = [ "projects/*" ]
 

@@ -64,7 +64,7 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260343-move-pandera-schemas | Move pandera schemas to new aer.schemas component | 2026-04-13 | b36ad16 | [260343-move-pandera-schemas-to-a-new-polylith-c](./quick/260343-move-pandera-schemas-to-a-new-polylith-c/) |
 | 260343-remove-abcs | Remove SearchPlugin ABCs, standardize on pluggy only | 2026-04-06 | e8067d1 | - |
 | 260409-product-based-dispatch | Add product-based plugin dispatch with PluginSelector | 2026-04-09 | 72d9605 | - |
-| 260344-modify-plugin-component-to-support-new-v | modify plugin component to support new version of simple hookspects and check mandatory impl of supported_collections() | 2026-04-15 | pending | [260344-modify-plugin-component-to-support-new-v](./quick/260344-modify-plugin-component-to-support-new-v/) |
+| 260344-modify-plugin-component-to-support-new-v | modify plugin component to support new version of simple hookspects and check mandatory impl of supported_collections() | 2026-04-15 | 13b0994 | [260344-modify-plugin-component-to-support-new-v](./quick/260344-modify-plugin-component-to-support-new-v/) |
 
 ## Progress
 

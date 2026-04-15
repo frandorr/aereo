@@ -5,9 +5,9 @@ overlap detection, and partitioning, plus ceil_to_next_t_minutes()
 for rounding datetimes to time boundaries.
 """
 
+from typing import Optional
 import attrs
 from datetime import datetime, timedelta
-from returns import maybe
 
 
 @attrs.frozen
@@ -38,7 +38,7 @@ class TimeRange:
         """
         return self.__str__()
 
-    def intersection(self, other: "TimeRange") -> maybe.Maybe["TimeRange"]:
+    def intersection(self, other: "TimeRange") -> Optional["TimeRange"]:
         """
         Returns the intersection of this time range and another time range.
 
@@ -51,8 +51,8 @@ class TimeRange:
         start = max(self.start, other.start)
         end = min(self.end, other.end)
         if start >= end:
-            return maybe.Nothing
-        return maybe.Some(TimeRange(start=start, end=end))
+            return None
+        return TimeRange(start=start, end=end)
 
     def overlaps(self, other: "TimeRange") -> bool:
         """Check if this time range overlaps with another time range.
@@ -63,7 +63,7 @@ class TimeRange:
         Returns:
             bool: True if there is an overlapping period, False otherwise.
         """
-        return self.intersection(other) != maybe.Nothing
+        return self.intersection(other) is not None
 
     def partition(self, step: timedelta) -> list["TimeRange"]:
         """
