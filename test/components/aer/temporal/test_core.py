@@ -6,7 +6,6 @@ and datetime rounding utilities.
 
 from datetime import datetime, timedelta
 import pytest
-from returns.maybe import Nothing
 
 from aer.temporal.core import TimeRange, round_to_next_t_minutes
 
@@ -45,19 +44,19 @@ def test_time_range_intersection():
 
     # Overlapping
     intersection1 = tr1.intersection(tr2)
-    assert intersection1.value_or(None) == TimeRange(
+    assert intersection1 == TimeRange(
         start=datetime(2023, 1, 1, 11, 0), end=datetime(2023, 1, 1, 12, 0)
     )
 
     # Non-overlapping
     tr3 = TimeRange(start=datetime(2023, 1, 1, 13, 0), end=datetime(2023, 1, 1, 14, 0))
     intersection2 = tr1.intersection(tr3)
-    assert intersection2 == Nothing
+    assert intersection2 is None
 
     # Touching but not overlapping (start == end)
     tr4 = TimeRange(start=datetime(2023, 1, 1, 12, 0), end=datetime(2023, 1, 1, 13, 0))
     intersection3 = tr1.intersection(tr4)
-    assert intersection3 == Nothing
+    assert intersection3 is None
 
 
 def test_time_range_overlaps():

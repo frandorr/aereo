@@ -3,14 +3,14 @@ Spatial component for storing geometry features, AOI types, and other spatial ab
 """
 
 from aer.spatial.core import (
-    GeomLike,
     GridCell,
+    GridCellOri,
     GridDefinition,
     OverlapMode,
     add_overlapping_cells,
     find_overlapping_cells,
 )
-from aer.spatial.majortom import Grid, GridSchema
+from aer.spatial.majortom import Grid
 from aer.spatial.utils import (
     get_utm_epsg_from_geometry,
     get_utm_zone_from_latlng,
@@ -19,11 +19,10 @@ from aer.spatial.utils import (
 
 __all__ = [
     "GridDefinition",
+    "GridCellOri",
     "GridCell",
     "OverlapMode",
     "Grid",
-    "GridSchema",
-    "GeomLike",
     "add_overlapping_cells",
     "get_utm_epsg_from_geometry",
     "get_utm_zone_from_latlng",
