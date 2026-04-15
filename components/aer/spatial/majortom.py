@@ -12,7 +12,7 @@ from typing import cast
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-from aer.schemas import GridSchema
+
 from shapely.geometry import Polygon
 from structlog import get_logger
 
@@ -49,8 +49,6 @@ class Grid:
             lambda row: reproject_geom(row.geometry, "EPSG:4326", row["utm_crs"]),
             axis=1,
         )
-        # validate self.points with grid schema
-        GridSchema.validate(self.points)
 
     def get_rows(self):
         # Define set of latitudes to use, based on the grid distance

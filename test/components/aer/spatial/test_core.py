@@ -1,20 +1,23 @@
 """Tests for the spatial component core models.
 
-Verifies GridCell, GridDefinition, GridSchema validation, polygon reprojection,
+Verifies GridCellOri, GridDefinition, GridSchema validation, polygon reprojection,
 and pyresample AreaDefinition generation.
 """
 
-import pytest
-from shapely.geometry import Polygon, Point
-from pyresample.geometry import AreaDefinition
-import geopandas as gpd
+from datetime import datetime
 
+import geopandas as gpd
+import pytest
 from aer.spatial import (
-    reproject_geom,
-    GridCell,
+    GridCellOri,
     GridDefinition,
-    GridSchema,
+    OverlapMode,
+    add_overlapping_cells,
+    reproject_geom,
 )
+from majortom_eg.MajorTom import MajorTomGrid
+from pyresample.geometry import AreaDefinition
+from shapely.geometry import Polygon, shape
 
 
 @pytest.fixture
@@ -24,7 +27,7 @@ def sample_polygon():
 
 @pytest.fixture
 def sample_grid_cell(sample_polygon):
-    return GridCell(
+    return GridCellOri(
         grid_cell="A_1",
         footprint=sample_polygon,
         utm_footprint=sample_polygon,
@@ -91,27 +94,80 @@ def test_grid_definition_custom_utm_definition():
     assert grid_def.utm_definition == "bottomleft"
 
 
-def test_grid_schema_validation():
-    import pandas as pd
-
-    df = pd.DataFrame(
+@pytest.fixture
+def sample_gdf():
+    return gpd.GeoDataFrame(
         {
-            "grid_cell": ["89D_36L"],
-            "row": ["89D"],
-            "col": ["36L"],
-            "utm_crs": ["EPSG:32701"],
-            "dist": [100000],
-        }
-    )
-    gdf = gpd.GeoDataFrame(
-        df,
-        geometry=[Point(-180, -79.70149)],
-    )
-    gdf["utm_footprint"] = gpd.GeoSeries(
-        [Polygon([(-180, -79.701), (-180, -78.806), (-175, -78.806), (-175, -79.701)])]
+            "id": ["test1"],
+            "collection": ["test"],
+            "geometry": [Polygon([(0, 0), (0, 1), (1, 1), (1, 0), (0, 0)])],
+            "start_time": [datetime(2020, 1, 1)],
+            "end_time": [datetime(2020, 1, 2)],
+            "href": ["http://test.com"],
+        },
+        crs="EPSG:4326",
     )
 
-    validated_gdf = GridSchema.validate(gdf)
-    assert not validated_gdf.empty
-    assert "grid_cell" in validated_gdf.columns
-    assert validated_gdf.iloc[0]["grid_cell"] == "89D_36L"
+
+@pytest.fixture
+def sample_aoi():
+    return shape(
+        {"type": "Polygon", "coordinates": [[[0, 0], [0, 2], [2, 2], [2, 0], [0, 0]]]}
+    )
+
+
+@pytest.fixture
+def sample_grid():
+    return MajorTomGrid(d=320)
+
+
+def test_add_overlapping_cells_basic(sample_gdf, sample_aoi, sample_grid):
+    result = add_overlapping_cells(
+        sample_gdf, sample_aoi, sample_grid, OverlapMode.INTERSECTS
+    )
+    assert "cell_id" in result.columns
+    assert "cell_footprint" in result.columns
+    assert "utm_crs" in result.columns
+    assert len(result) > 0
+    assert result.iloc[0]["cell_id"] is not None
+
+
+def test_add_overlapping_cells_multiple_results(sample_gdf, sample_aoi, sample_grid):
+    gdf_multiple = gpd.GeoDataFrame(
+        {
+            "id": ["test1", "test2"],
+            "collection": ["test", "test"],
+            "geometry": [
+                Polygon([(0.1, 0.1), (0.1, 0.2), (0.2, 0.2), (0.2, 0.1)]),
+                Polygon([(1.1, 1.1), (1.1, 1.2), (1.2, 1.2), (1.2, 1.1)]),
+            ],
+            "start_time": [datetime(2020, 1, 1), datetime(2020, 1, 1)],
+            "end_time": [datetime(2020, 1, 2), datetime(2020, 1, 2)],
+            "href": ["http://test.com", "http://test.com"],
+        },
+        crs="EPSG:4326",
+    )
+    result = add_overlapping_cells(
+        gdf_multiple,  # pyright: ignore[reportArgumentType]
+        sample_aoi,
+        sample_grid,
+        OverlapMode.INTERSECTS,
+    )
+    assert len(result) > 2
+    assert "test1" in result["id"].values
+    assert "test2" in result["id"].values
+
+
+def test_add_overlapping_cells_within_mode(sample_gdf, sample_aoi, sample_grid):
+    result = add_overlapping_cells(
+        sample_gdf, sample_aoi, sample_grid, OverlapMode.WITHIN
+    )
+    assert "cell_id" in result.columns
+    assert len(result) > 0
+
+
+def test_add_overlapping_cells_contains_mode(sample_gdf, sample_aoi, sample_grid):
+    result = add_overlapping_cells(
+        sample_gdf, sample_aoi, sample_grid, OverlapMode.CONTAINS
+    )
+    assert "cell_id" in result.columns

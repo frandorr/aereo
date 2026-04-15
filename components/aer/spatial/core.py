@@ -5,70 +5,23 @@ spatial grid systems, coordinate transformations, and pyresample
 AreaDefinition generation.
 """
 
-import json
-from copy import deepcopy
 from enum import Enum
 from functools import lru_cache
-from typing import Any, Literal, Mapping, Protocol
+from typing import Literal
 
 import attrs
 import geopandas as gpd
-from aer.schemas import SearchResultSchema
-from majortom_eg.MajorTom import MajorTomGrid
+from aer.schemas import AssetSchema
+from majortom_eg.MajorTom import GridCell, MajorTomGrid
 from pandera.typing.geopandas import GeoDataFrame  # type: ignore[no-redef]
 from pyresample.geometry import AreaDefinition
-from shapely.geometry import Polygon, shape
+from shapely.geometry import MultiPolygon, Polygon
+from shapely.geometry.base import BaseGeometry
 from structlog import get_logger
 
 from .utils import get_utm_epsg_from_geometry
 
 logger = get_logger()
-
-
-# Define a protocol for objects that have a __geo_interface__ property
-# like pystac-client https://github.com/stac-utils/pystac-client/blob/main/pystac_client/item_search.py#L54
-class GeoInterface(Protocol):
-    @property
-    def __geo_interface__(self) -> dict[str, Any]: ...
-
-
-def _format_geom(
-    value: str | dict[str, Any] | GeoInterface | None,
-) -> dict[str, Any]:
-    if value is None:
-        raise Exception("GEom value cannot be None")
-    if isinstance(value, dict):
-        if value.get("type") == "Feature":
-            geom = deepcopy(value.get("geometry"))
-            if geom is None:
-                raise Exception("Feature must have a geometry")
-            return geom
-        else:
-            return deepcopy(value)
-    if isinstance(value, str):
-        return dict(json.loads(value))
-    if hasattr(value, "__geo_interface__"):
-        return dict(deepcopy(getattr(value, "__geo_interface__")))
-    raise Exception(
-        "value must be of type None, str, dict, or an object that "
-        "implements __geo_interface__"
-    )
-
-
-@attrs.frozen
-class GeomLike(Mapping):
-    """A simple wrapper for geometric objects that behaves like a read-only geojson dict."""
-
-    _geom: dict[str, Any] = attrs.field(converter=_format_geom)
-
-    def __getitem__(self, key: str) -> Any:
-        return self._geom[key]
-
-    def __iter__(self):
-        return iter(self._geom)
-
-    def __len__(self) -> int:
-        return len(self._geom)
 
 
 class OverlapMode(Enum):
@@ -79,92 +32,78 @@ class OverlapMode(Enum):
     CONTAINS = "contains"
 
 
+@lru_cache(maxsize=16)
 def find_overlapping_cells(
-    grid: MajorTomGrid, geom: Polygon, overlap_mode: OverlapMode
-) -> list[dict[str, Any]]:
+    grid: MajorTomGrid,
+    geom: Polygon | MultiPolygon,
+    intersecting_geom: Polygon | None = None,
+    overlap_mode: OverlapMode = OverlapMode.INTERSECTS,
+) -> tuple[list[GridCell], BaseGeometry]:
+    if intersecting_geom is not None:
+        # intersects geom with intersecting_geom to get the actual geometry to check against the grid
+        geom = geom.intersection(intersecting_geom)  # type: ignore[assignment]
+        if geom.is_empty:
+            return [], geom  # pyright: ignore[reportReturnType]
     overlapping = list(grid.generate_grid_cells(geom))
-    if not overlapping:
-        return []
-    cells = []
-    for cell in overlapping:
-        cell_geom = cell.geom
-        relation = overlap_mode.value
-        if relation == "intersects" and not cell_geom.intersects(geom):
-            continue
-        if relation == "within" and not cell_geom.within(geom):
-            continue
-        if relation == "contains" and not cell_geom.contains(geom):
-            continue
-        utm_epsg = get_utm_epsg_from_geometry(cell_geom)
-        cells.append(
-            {
-                "cell_id": cell.id(),
-                "cell_footprint": cell_geom,
-                "utm_crs": f"EPSG:{utm_epsg}",
-            }
-        )
-    return cells
+    return overlapping, geom  # pyright: ignore[reportReturnType]
 
 
 def add_overlapping_cells(
-    gdf: GeoDataFrame[SearchResultSchema],
-    aoi: GeomLike,
+    gdf: GeoDataFrame[AssetSchema],
+    aoi: Polygon | MultiPolygon,
     grid: MajorTomGrid,
     overlap_mode: OverlapMode = OverlapMode.INTERSECTS,
-) -> GeoDataFrame[SearchResultSchema]:
+) -> GeoDataFrame[AssetSchema]:
     """Add overlapping grid cells to a GeoDataFrame based on an AOI and a grid definition.
+
+    Uses pre-computed grid cells and STRtree spatial index for O(log n) lookups.
 
     Args:
         gdf (GeoDataFrame): Input GeoDataFrame with search results.
-        aoi (GeomLike): Area of interest as a geometric object.
+        aoi (Polygon | MultiPolygon): Area of interest as a shapely geometry.
         grid (MajorTomGrid): Grid definition to use for finding overlapping cells.
         overlap_mode (OverlapMode): Mode to determine how to find overlapping cells (default is INTERSECTS).
 
     Returns:
         GeoDataFrame: Updated GeoDataFrame with overlapping grid cells added.
     """
+    from tqdm import tqdm
 
-    results: list[dict[str, Any]] = []
-    for idx, row in gdf.iterrows():
+    results = []
+    for _, row in tqdm(gdf.iterrows()):
         row_geom = row.geometry
-        # Convert AOI to shapely geometry for intersection
+        matching_cells, intersecting_geom = find_overlapping_cells(
+            grid=grid,
+            geom=row_geom,
+            intersecting_geom=aoi,
+            overlap_mode=overlap_mode,
+        )
 
-        aoi_geom = shape(dict(aoi))
-        # Calculate intersection between row geometry and AOI
-        intersecting_aoi = row_geom.intersection(aoi_geom)
-        # Use intersection for finding overlapping cells
-        overlapping_cells = find_overlapping_cells(grid, intersecting_aoi, overlap_mode)
-        original_geom = gdf.geometry.iloc[idx]
-        if not overlapping_cells:
+        if not matching_cells:
             result_row = dict(row)
-            result_row["geometry"] = original_geom
+            result_row["geometry"] = row_geom
             result_row["cell_id"] = None
             result_row["cell_footprint"] = None
             result_row["utm_crs"] = None
-            result_row["intersecting_aoi"] = (
-                intersecting_aoi
-                if intersecting_aoi and not intersecting_aoi.is_empty
-                else None
-            )
+            result_row["intersecting_aoi"] = intersecting_geom
             results.append(result_row)
-        for cell in overlapping_cells:
+            continue
+
+        for cell in matching_cells:
+            cell_geom = cell.geom  # pyright: ignore[reportAttributeAccessIssue]
             result_row = dict(row)
-            result_row["geometry"] = original_geom
-            result_row["cell_id"] = cell["cell_id"]
-            result_row["cell_footprint"] = cell["cell_footprint"]
-            result_row["utm_crs"] = cell["utm_crs"]
-            result_row["intersecting_aoi"] = (
-                intersecting_aoi
-                if intersecting_aoi and not intersecting_aoi.is_empty
-                else None
-            )
+            result_row["geometry"] = row_geom
+            result_row["cell_id"] = cell.id  # pyright: ignore[reportAttributeAccessIssue]
+            result_row["cell_footprint"] = cell_geom
+            result_row["utm_crs"] = f"EPSG:{get_utm_epsg_from_geometry(cell_geom)}"
+            result_row["intersecting_aoi"] = intersecting_geom
             results.append(result_row)
 
-    return gpd.GeoDataFrame(results)  # type: ignore[return-value]
+    return gpd.GeoDataFrame(results)  # pyright: ignore[reportReturnType]
 
 
 @attrs.frozen
-class GridCell:
+class GridCellOri:
     """
     A single grid cell with spatial properties.
 

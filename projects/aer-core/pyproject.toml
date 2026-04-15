@@ -34,7 +34,6 @@ dependencies = [
   "pyproj>=3.7.1",
   "pyresample>=1.35",
   "pyyaml>=6.0.1",
-  "returns[compatible-mypy]>=0.26",
   "shapely>=2.1.2",
   "structlog>=25.5",
   "utm>=0.8.1",
@@ -49,10 +48,7 @@ build.hooks.polylith-bricks = {}
 build.targets.wheel.packages = [ "aer" ]
 
 [tool.polylith]
-bricks."../../components/aer/catalog" = "aer/catalog"
 bricks."../../components/aer/data" = "aer/data"
-bricks."../../components/aer/extractor" = "aer/extractor"
-bricks."../../components/aer/plugin" = "aer/plugin"
 bricks."../../components/aer/repository" = "aer/repository"
 bricks."../../components/aer/spatial" = "aer/spatial"
 bricks."../../components/aer/spectral" = "aer/spectral"

@@ -10,7 +10,7 @@
 | 2 | Pipeline Integration | Integrate extract into aer-core pipeline | PIPE-01, PIPE-02, PIPE-03 | 4 |
 | 3 | Example Plugin | Implement aws-goes-extract as reference | AWSG-01, AWSG-02, AWSG-03 | 4 |
 | 5 | Adapt Search Plugins to Pluggy | Migrate aer-search-aws-goes and aer-search-earthaccess to new pluggy hookimpl system | PLUG-01, PLUG-02, PLUG-03, PLUG-04 | 4 |
-| 6 | Product-Based Plugin Dispatch | Auto-select plugins based on product support | PROD-01, PROD-02, PROD-03, PROD-04, PROD-05 | 5 |
+| 6 | Product-Based Plugin Dispatch | Complete    | 2026-04-09 | 5 |
 
 ---
 
