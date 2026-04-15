@@ -3,6 +3,6 @@
 Public API for pandera schemas used for validating dataframes.
 """
 
-from .core import ArtifactSchema, AssetSchema
+from .core import ArtifactSchema, AssetSchema, GridSchema
 
-__all__ = ["AssetSchema", "ArtifactSchema"]
+__all__ = ["AssetSchema", "ArtifactSchema", "GridSchema"]

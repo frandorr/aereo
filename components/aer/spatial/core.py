@@ -7,11 +7,11 @@ AreaDefinition generation.
 
 from enum import Enum
 from functools import lru_cache
-from typing import Literal
+from typing import Literal, Sequence
 
 import attrs
 import geopandas as gpd
-from aer.schemas import AssetSchema
+from aer.schemas import AssetSchema, GridSchema
 from majortom_eg.MajorTom import GridCell, MajorTomGrid
 from pandera.typing.geopandas import GeoDataFrame  # type: ignore[no-redef]
 from pyresample.geometry import AreaDefinition
@@ -32,20 +32,39 @@ class OverlapMode(Enum):
     CONTAINS = "contains"
 
 
+def grid_cells_to_geodataframe(
+    cells: Sequence[GridCell],
+) -> GeoDataFrame[GridSchema]:
+    """Convert a sequence of GridCell objects to a GeoDataFrame.
+
+    Args:
+        cells (Sequence[GridCell]): A sequence of GridCell objects.
+
+    Returns:
+        GeoDataFrame[AssetSchema]: A GeoDataFrame containing the grid cells with their geometries and attributes.
+    """
+    data = []
+    for cell in cells:
+        cell_geom = cell.geom  # pyright: ignore[reportAttributeAccessIssue]
+        data.append(
+            {
+                "cell_id": cell.id,  # pyright: ignore[reportAttributeAccessIssue]
+                "geometry": cell_geom,
+                "utm_crs": f"EPSG:{get_utm_epsg_from_geometry(cell_geom)}",
+            }
+        )
+    return gpd.GeoDataFrame(data)  # pyright: ignore[reportReturnType]
+
+
 @lru_cache(maxsize=16)
 def find_overlapping_cells(
-    grid: MajorTomGrid,
-    geom: Polygon | MultiPolygon,
-    intersecting_geom: Polygon | None = None,
+    geom: BaseGeometry,
+    grid_d_spacing: int,
     overlap_mode: OverlapMode = OverlapMode.INTERSECTS,
-) -> tuple[list[GridCell], BaseGeometry]:
-    if intersecting_geom is not None:
-        # intersects geom with intersecting_geom to get the actual geometry to check against the grid
-        geom = geom.intersection(intersecting_geom)  # type: ignore[assignment]
-        if geom.is_empty:
-            return [], geom  # pyright: ignore[reportReturnType]
+) -> Sequence[GridCell]:
+    grid = MajorTomGrid(d=grid_d_spacing)
     overlapping = list(grid.generate_grid_cells(geom))
-    return overlapping, geom  # pyright: ignore[reportReturnType]
+    return overlapping
 
 
 def add_overlapping_cells(
@@ -72,12 +91,15 @@ def add_overlapping_cells(
     results = []
     for _, row in tqdm(gdf.iterrows()):
         row_geom = row.geometry
-        matching_cells, intersecting_geom = find_overlapping_cells(
-            grid=grid,
-            geom=row_geom,
-            intersecting_geom=aoi,
-            overlap_mode=overlap_mode,
-        )
+        intersecting_geom = row_geom.intersection(aoi) if aoi is not None else row_geom
+        if intersecting_geom.is_empty:
+            matching_cells = []
+        else:
+            matching_cells = find_overlapping_cells(
+                geom=intersecting_geom,
+                grid_d_spacing=grid.D,
+                overlap_mode=overlap_mode,
+            )
 
         if not matching_cells:
             result_row = dict(row)
