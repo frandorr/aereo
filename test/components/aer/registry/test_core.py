@@ -3,10 +3,11 @@ from typing import Any, Mapping, Sequence, cast
 from unittest.mock import MagicMock
 
 import pytest
-from aer.interfaces import Extractor, SearchProvider
+from aer.interfaces import ExtractionTask, Extractor, SearchProvider
 from aer.registry import AerRegistry
 from aer.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
+from shapely.geometry.base import BaseGeometry
 
 
 # Dummy plugins
@@ -16,7 +17,7 @@ class DummySearchProvider(SearchProvider):
     def search(
         self,
         collections: Sequence[str],
-        intersects: dict[str, Any] | None,
+        intersects: BaseGeometry | None,
         start_datetime: datetime | None,
         end_datetime: datetime | None,
         search_params: Mapping[str, Any] | None,
@@ -27,16 +28,13 @@ class DummySearchProvider(SearchProvider):
 class DummyExtractor(Extractor):
     supported_collections = ["SharedCollection", "DummyCollection2"]
 
-    def prepare_for_extraction(
-        self,
-        search_results: GeoDataFrame[AssetSchema],
-        prepare_params: dict[str, Any] | None,
-    ) -> list[GeoDataFrame[AssetSchema]]:
-        return [cast(GeoDataFrame[AssetSchema], AssetSchema.empty())]
+    @property
+    def target_grid_d(self) -> int:
+        return 10000
 
     def extract(
         self,
-        assets_batch: GeoDataFrame[AssetSchema],
+        extraction_task: ExtractionTask,
         extract_params: dict[str, Any] | None,
     ) -> GeoDataFrame[ArtifactSchema]:
         return cast(GeoDataFrame[ArtifactSchema], ArtifactSchema.empty())
