@@ -1,0 +1,118 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MADRAS",
+  "instrument_fullname": "Microwave Analysis & Detection of Rain & Atmospheric Structures",
+  "url": "https://space.oscar.wmo.int/instruments/view/madras",
+  "schema_type": "microwave",
+  "original_columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisations",
+    "NEΔT",
+    "IFOV",
+    "Pixel"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "No.": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": 18.7,
+      "bandwidth": 200.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.43,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        40000.0,
+        16000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_02",
+      "No.": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": 23.8,
+      "bandwidth": 400.0,
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.44,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        40000.0,
+        16000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_03",
+      "No.": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": 36.5,
+      "bandwidth": 1000.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.36,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        40000.0,
+        16000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_04",
+      "No.": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": 89.0,
+      "bandwidth": 1700.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 0.42,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        10000.0,
+        16000.0
+      ],
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_05",
+      "No.": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": 157.0,
+      "bandwidth": 1700.0,
+      "polarisations": "V, H",
+      "NEΔT": {
+        "value": 1.13,
+        "unit": "K"
+      },
+      "spatial_resolution": [
+        6000.0,
+        16000.0
+      ],
+      "unit": null,
+      "nedt": null
+    }
+  ]
+}

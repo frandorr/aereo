@@ -1,0 +1,66 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "CAPI",
+  "instrument_fullname": "Cloud and Aerosol Polarization Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/capi",
+  "schema_type": "microwave",
+  "original_columns": [
+    "Central frequency",
+    "Bandwidth",
+    "SNR @ typical radiance",
+    "Polarization angles",
+    "Resolution at s.s.p."
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_frequency": 380.0,
+      "bandwidth": 43.0,
+      "SNR @ typical radiance": "260 @ 28.0 W·m -2 ·μm -1 ·sr -1",
+      "Polarization angles": "-",
+      "spatial_resolution": 250.0,
+      "unit": "nm",
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_frequency": 670.0,
+      "bandwidth": 50.0,
+      "SNR @ typical radiance": "160 @ 22.0 W·m -2 ·μm -1 ·sr -1",
+      "Polarization angles": "0°, 60°, 120°",
+      "spatial_resolution": 250.0,
+      "unit": "nm",
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_frequency": 870.0,
+      "bandwidth": 30.0,
+      "SNR @ typical radiance": "400 @ 25.0 W·m -2 ·μm -1 ·sr -1",
+      "Polarization angles": "-",
+      "spatial_resolution": 250.0,
+      "unit": "nm",
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_frequency": 1375.0,
+      "bandwidth": 30.0,
+      "SNR @ typical radiance": "180 @ 6.0 W·m -2 ·μm -1 ·sr -1",
+      "Polarization angles": "-",
+      "spatial_resolution": 1000.0,
+      "unit": "nm",
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_05",
+      "central_frequency": 1640.0,
+      "bandwidth": 20.0,
+      "SNR @ typical radiance": "110 @ 7.3 W·m -2 ·μm -1 ·sr -1",
+      "Polarization angles": "0°, 60°, 120°",
+      "spatial_resolution": 1000.0,
+      "unit": "nm",
+      "nedt": null
+    }
+  ]
+}

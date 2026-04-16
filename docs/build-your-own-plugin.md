@@ -1,20 +1,22 @@
 # Build Your Own `aer` Plugin
 
-The `aer` framework is designed to be fully extensible. Third-party developers can create standalone Python packages that seamlessly integrate into the `aer` ecosystem. This guide explains how to build and distribute your own plugins.
+The `aer` framework is designed to be fully extensible using Python's standard `entry_points` mechanism. Third-party developers can create standalone Python packages that seamlessly integrate into the `aer` ecosystem.
+
+## Quick Start
 
 The **best and easiest approach** for building an `aer` plugin is to create a separate repository. This allows you to develop, test, and release your integration independently, without dealing with the core repository's Polylith architecture constraints.
 
 ## Step 1: Bootstrap Your Repository
 
-We recommend using the [`enforce-template`](https://github.com/frandorr/enforce-template) as the foundation for your plugin. It comes pre-configured with the standard Python tooling (`uv`, `ruff`, `mypy`, `pytest` etc.) used across the `aer` ecosystem.
+We recommend using the [`aer-plugin-template`](https://github.com/frandorr/aer-plugin-template) as the foundation for your plugin. It comes pre-configured with the standard Python tooling (`uv`, `ruff`, `mypy`, `pytest` etc.) used across the `aer` ecosystem.
 
-1. Go to [https://github.com/frandorr/enforce-template](https://github.com/frandorr/enforce-template).
+1. Go to [https://github.com/frandorr/aer-plugin-template](https://github.com/frandorr/aer-plugin-template).
 2. Click **Use this template** -> **Create a new repository**.
 3. Name your repository (e.g., `aer-plugin-acme`) and clone it locally.
 
 ## Step 2: Add Dependencies
 
-Your plugin only needs to depend on the core `aer` package to access its taxonomies, models, and decorators.
+Your plugin only needs to depend on the core `aer` package to access its interfaces and schemas.
 
 Update your `pyproject.toml` dependencies to include `aer-core`:
 
@@ -24,7 +26,8 @@ name = "aer-plugin-acme"
 version = "0.1.0"
 dependencies = [
     "aer-core",
-    # Add other dependencies your plugin requires (e.g., requests, boto3)
+    "geopandas",  # For returning standard schemas
+    "pandera",    # For schema validation (Optional but recommended)
 ]
 ```
 
@@ -35,68 +38,195 @@ uv sync
 
 ## Step 3: Write Your Plugin Logic
 
-Plugins are simply typed functions decorated with the `@plugin` marker. `aer` uses these type hints to build a Capability Graph that resolves how data flows between components.
+Plugins are standard Python classes that inherit from `SearchProvider` or `Extractor` base classes defined in `aer.interfaces`.
 
-Create your plugin logic (e.g., in `acme_plugin/core.py`):
+### Search Plugin Example
+
+Create your search provider (e.g., in `acme_plugin/search.py`). Search plugins MUST declare `supported_collections`.
 
 ```python
-import geopandas as gpd
-from aer.plugin import plugin
-from aer.search import SearchQuery
+"""ACME search plugin for aer."""
 
-@plugin(name="acme_search", category="search")
-def run_acme_search(query: SearchQuery) -> gpd.GeoDataFrame:
-    """Search for data using the ACME system."""
-    # ...
-    return gpd.GeoDataFrame(...)
+from datetime import datetime
+from typing import Any, Mapping, Sequence
 
-@plugin(name="acme_extract", category="extract")
-def run_acme_extract(gdf: gpd.GeoDataFrame, output_dir: str) -> gpd.GeoDataFrame:
-    """Extract and reproject ACME data to the grid cell in 'overlapping_spatial_extent'."""
-    # ...
-    return gpd.GeoDataFrame(...)
+import pandas as pd
+from pandera.typing.geopandas import GeoDataFrame
+from shapely.geometry.base import BaseGeometry
+
+from aer.interfaces import SearchProvider
+from aer.schemas import AssetSchema
+
+
+class AcmeSearchProvider(SearchProvider):
+    """Search plugin for ACME satellite data."""
+
+    # REQUIRED: sequence of collections this plugin supports
+    supported_collections = ["acme-l1", "acme-l2"]
+
+    def search(
+        self,
+        collections: Sequence[str],
+        intersects: BaseGeometry | None,
+        start_datetime: datetime | None,
+        end_datetime: datetime | None,
+        search_params: Mapping[str, Any] | None,
+    ) -> GeoDataFrame[AssetSchema]:
+        """Search ACME API for satellite data."""
+        # Your ACME API search logic here
+
+        # Example: Mocking a search request
+        # results = acme_api.search(...)
+
+        # Format the response as a GeoDataFrame that aligns with AssetSchema
+        df = pd.DataFrame([
+            {
+                "id": "acme_item_001",
+                "collection": collections[0],
+                "datetime": datetime.utcnow(),
+                "geometry": intersects if intersects else None,
+                "assets": {"data": {"href": "https://acme.org/data.tif"}}
+            }
+        ])
+
+        # Ensure it matches AssetSchema
+        gdf = GeoDataFrame(df, geometry="geometry")
+        return AssetSchema.validate(gdf)
+```
+
+### Extract Plugin Example
+
+Create your extractor (e.g., in `acme_plugin/extract.py`). Extract plugins MUST declare `supported_collections` and implement both `prepare_for_extraction` and `extract`.
+
+```python
+"""ACME extract plugin for aer."""
+
+from typing import Any
+
+from pandera.typing.geopandas import GeoDataFrame
+from aer.interfaces import Extractor
+from aer.schemas import AssetSchema, ArtifactSchema
+
+
+class AcmeExtractor(Extractor):
+    """Extract plugin for ACME data."""
+
+    # REQUIRED: sequence of collections this plugin supports
+    supported_collections = ["acme-l1"]
+
+    def prepare_for_extraction(
+        self,
+        search_results: GeoDataFrame[AssetSchema],
+        prepare_params: dict[str, Any] | None,
+    ) -> list[GeoDataFrame[AssetSchema]]:
+        """Group search results into extraction batches."""
+
+        # By default, we might just split into single-row batches for individual download
+        batches = []
+        for i in range(len(search_results)):
+            batches.append(search_results.iloc[[i]].copy())
+
+        return batches
+
+    def extract(
+        self,
+        assets_batch: GeoDataFrame[AssetSchema],
+        extract_params: dict[str, Any] | None,
+    ) -> GeoDataFrame[ArtifactSchema]:
+        """Download and extract ACME data for a batch."""
+        extracted_artifacts = []
+
+        for _, asset_row in assets_batch.iterrows():
+            item_id = asset_row["id"]
+
+            try:
+                # 1. Download
+                # file_path = download_file(asset_row["assets"]["data"]["href"])
+                file_path = f"/tmp/extracted_{item_id}.tif"
+
+                # 2. Append success artifact
+                payload = asset_row.to_dict()
+                payload["file_path"] = file_path
+                payload["status"] = "SUCCESS"
+                extracted_artifacts.append(payload)
+
+            except Exception as e:
+                # Append failed artifact
+                payload = asset_row.to_dict()
+                payload["status"] = "FAILED"
+                payload["error"] = str(e)
+                extracted_artifacts.append(payload)
+
+        # Ensure return type matches ArtifactSchema rules
+        from geopandas import GeoDataFrame as gpd_GeoDataFrame
+        return ArtifactSchema.validate(gpd_GeoDataFrame(extracted_artifacts, geometry="geometry"))
 ```
 
 ## Step 4: Register the Entry Point
 
-`aer` discovers third-party plugins automatically using standard Python Entry Points.
+`aer` discovers third-party plugins automatically using **Python Entry Points**.
 
-Add the exact path to your decorated function into your `pyproject.toml` under the `[project.entry-points."aer.plugins"]` section:
+Add the plugin class paths to your `pyproject.toml` under the custom `aer.search_providers` and `aer.extractors` groups:
 
 ```toml
-[project.entry-points."aer.plugins"]
-# Name = "module.path:function_name"
-acme_search = "acme_plugin.core:run_acme_search"
+[project.entry-points."aer.search_providers"]
+# alias = "module.path:ClassName"
+acme_search = "acme_plugin.search:AcmeSearchProvider"
+
+[project.entry-points."aer.extractors"]
+acme_extract = "acme_plugin.extract:AcmeExtractor"
 ```
 
-## Step 5: Test and Distribute
+## Step 5: Test Your Plugin
 
-You can now test your plugin locally. When users install both `aer-core` and your plugin package, the plugin will be detected automatically!
+Test your plugin using the high-level `AerClient` API:
 
 ```python
-from aer.bootstrap import bootstrap
-from aer.plugin import plugin_registry
+from aer.client import AerClient
+from datetime import datetime
 
-# Bootstraps the plugin system, scanning installed packages
-bootstrap()
+# The client automatically searches system paths for your entry points!
+client = AerClient()
 
-# Your plugin is now part of the ecosystem!
-from aer.plugin import run_search, run_extract
+# Test the end-to-end pipeline
+artifacts_df = client.run_pipeline(
+    collections=["acme-l1"],
+    start_datetime=datetime(2023, 1, 1),
+    end_datetime=datetime(2023, 1, 31)
+)
 
-# 1. Search
-results = run_search("acme_search", query)
-
-# 2. Extract
-extracted = run_extract("acme_extract", results, "/tmp/acme")
+print(artifacts_df[["id", "status", "file_path"]])
 ```
 
-Because your plugin is just a standard Python package, you can publish it to PyPI (`uv build` and `uv publish`) or share it internally. Users just `pip install aer-plugin-acme` and they are ready to go!
+## Step 6: Distribute
+
+Your plugin is just a standard Python package. Publish it to PyPI:
+
+```bash
+uv build
+uv publish
+```
+
+Users install it like any other package:
+
+```bash
+pip install aer-plugin-acme
+```
+
+## Available Interfaces
+
+| Interface | Purpose | Key Methods |
+|-----------|---------|-------------|
+| `SearchProvider` | Query satellite data | `search` |
+| `Extractor` | Configure and run extractions | `prepare_for_extraction`, `extract` |
+
+See the `aer.interfaces` module for detailed documentation.
 
 ---
 
 ## Troubleshooting: Local Development alongside `aer`
 
-If you are developing your plugin *simultaneously* with the `aer` core framework on the same machine (e.g., using `uv` workspace paths), you might notice that `uv sync` installs the dependencies into your `.venv` and masks your local source edits by copying physical files into `site-packages`.
+If you are developing your plugin *simultaneously* with the `aer` core framework on the same machine (e.g., using `uv` workspace paths), you might notice that `uv sync` installs the dependencies into your `.venv` and masks your local source edits.
 
 This happens because `aer` uses `hatch-polylith-bricks`, which by default bundles files during an editable install.
 

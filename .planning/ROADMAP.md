@@ -2,13 +2,15 @@
 
 ## Overview
 
-**3 phases** | **11 requirements mapped** | All v1 requirements covered ✓
+**6 phases** | **20 requirements mapped** | All v1 requirements covered ✓
 
 | # | Phase | Goal | Requirements | Success Criteria |
 |---|-------|------|--------------|-----------------|
 | 1 | Extract Plugin System | Define extract plugin interface and registry | EXTR-01, EXTR-02, EXTR-03, EXTR-04, EXTR-05 | 5 |
 | 2 | Pipeline Integration | Integrate extract into aer-core pipeline | PIPE-01, PIPE-02, PIPE-03 | 4 |
 | 3 | Example Plugin | Implement aws-goes-extract as reference | AWSG-01, AWSG-02, AWSG-03 | 4 |
+| 5 | Adapt Search Plugins to Pluggy | Migrate aer-search-aws-goes and aer-search-earthaccess to new pluggy hookimpl system | PLUG-01, PLUG-02, PLUG-03, PLUG-04 | 4 |
+| 6 | Product-Based Plugin Dispatch | Complete    | 2026-04-09 | 5 |
 
 ---
 
@@ -106,15 +108,73 @@
 
 ---
 
-## Phase Summary
+## Phase 5: Adapt Search Plugins to Pluggy
 
-| Phase | Focus | Key Deliverable |
-|-------|-------|-----------------|
-| 1 | Interface | ExtractPlugin protocol + registry |
-| 2 | Orchestration | Pipeline search → extract |
-| 3 | Example | aws-goes-extract reference impl |
-| 4 | Grid Refactor | Multi-grid SearchResult support |
+**Goal:** Migrate repos/aer-search-aws-goes and repos/aer-search-earthaccess to the new pluggy-based plugin system defined in aer.plugin.core, removing deprecated @plugin decorator and Product types.
+
+**Requirements:**
+- PLUG-01: Search plugins use @hookimpl class pattern instead of @plugin decorator
+- PLUG-02: Search plugins accept (collections, intersects, time_range, search_params) instead of SearchQuery with Product types
+- PLUG-03: Search plugins return GeoDataFrame[SearchResultSchema] matching the new simplified schema (id, collection, geometry, start_time, end_time, href)
+- PLUG-04: Entry points register class instances, not bare functions
+
+**Success Criteria:**
+1. Both plugins use class-based `@hookimpl` pattern conforming to `AerSpec.search()`
+2. No imports of deprecated `Product`, `Channel`, `SearchQuery`, `GridSpatialExtent`, or `@plugin` decorator
+3. Both return GeoDataFrame matching the new `SearchResultSchema` (id, collection, geometry, start_time, end_time, href)
+4. Entry points in pyproject.toml register class instances
+
+**Artifacts:**
+- Updated `aer-search-aws-goes/components/aer/search_aws_goes/core.py`
+- Updated `aer-search-earthaccess/components/aer/search_earthaccess/core.py`
+- Updated tests in both repos
+- Updated pyproject.toml entry points in both repos
 
 ---
 
-*Roadmap updated: 2026-03-27*
+## Phase Summary
+
+| Phase | Focus | Key Deliverable | Status |
+|-------|-------|-----------------|--------|
+| 1 | Interface | ExtractPlugin protocol + registry | ● Complete |
+| 2 | Orchestration | Pipeline search → extract | ○ Pending |
+| 3 | Example | aws-goes-extract reference impl | ○ Pending |
+| 4 | Grid Refactor | Multi-grid SearchResult support | ● Complete |
+| 5 | Plugin Migration | Search plugins → pluggy hookimpl | ● Complete |
+| 6 | Product Dispatch | Auto-select plugins by product | ● Complete |
+
+---
+
+## Phase 6: Product-Based Plugin Dispatch
+
+**Goal:** Implement automatic plugin selection based on product support, with conflict resolution for multiple matching plugins.
+
+**Status:** ● Complete (2026-04-09)
+
+**Requirements:**
+- PROD-01: Plugin creators MUST specify supported products via required `supported_products` class attribute ✓
+- PROD-02: User declares products they want to use (not plugin names) ✓
+- PROD-03: System automatically dispatches to corresponding plugin based on product support ✓
+- PROD-04: When two plugins support same products: user can select by plugin name + warning shown ✓
+- PROD-05: Great UX - minimal friction for users ✓
+
+**Success Criteria:** 5/5
+
+**Commit:** 72d9605
+
+**Success Criteria:**
+1. Plugins declare `supported_products: list[str]` class attribute (required)
+2. `PluginSelector` class indexes plugins by product and selects based on user request
+3. Single matching plugin → auto-selected (seamless UX)
+4. Multiple matching plugins → raise `PluginConflictError` unless user specifies plugin_name
+5. Zero matching plugins → raise `NoMatchingPluginError` with helpful message
+
+**Artifacts:**
+- Updated `components/aer/plugin/core.py` (Product type, helper functions)
+- New `components/aer/plugin/selector.py` (PluginSelector class)
+- Updated `components/aer/plugin/__init__.py` (exports)
+- Updated `components/aer/plugin/api.py` (run_search with dispatch)
+
+---
+
+*Roadmap updated: 2026-04-09*

@@ -1,217 +1,144 @@
 # aer Plugin System
 
-`aer` uses a **unified plugin registry** with a type-aware **Capability Graph**. This allows third-party developers to register new search backends, download backends, or data transformations using a single `@plugin` decorator — no base classes, no config files.
+`aer` uses a modular, object-oriented plugin architecture built around standard Python `entry_points`. This allows developers to seamlessly register new search providers and extractors for satellite data collections without needing complex third-party hook libraries like `pluggy`.
 
 ## How it Works
 
-The plugin system has two layers:
+The plugin system relies on clear, strongly-typed interfaces defined in `aer.interfaces`. Plugins subclass these base classes, and an internal `AerRegistry` discovers them at runtime.
 
-1. **Spectral Registry** — `Instrument`, `Satellite`, `BandType`, and `Product` are immutable frozen dataclasses backed by class-level registries. When you call `.register()`, it instantiates your new element and adds it to the global namespace.
+### The Pipeline (`AerClient`)
 
-2. **Plugin Registry** — The `PluginRegistry` provides a unified registry for all functional plugins (search, extract, download, transform, etc.). It automatically infers input/output types from function annotations, building a **Capability Graph** of all available data pipelines.
+The data orchestration lifecycle consists of three core stages, managed cohesively by the `AerClient`:
 
-## Writing a Plugin
-
-### The `@plugin` Decorator
-
-Creating a plugin is just decorating a typed function:
-
-```python
-from aer.plugin import plugin
-import geopandas as gpd
-
-@plugin(name="my_filter", category="transform")
-def filter_large_granules(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    """Keep only granules above 50 MB."""
-    return gdf[gdf["size_mb"] > 50]
-```
-
-That's it. The registry automatically:
-1. Extracts the input type (`GeoDataFrame`) and return type (`GeoDataFrame`) from annotations.
-2. Registers the function in the global plugin registry.
-3. Adds an edge to the Capability Graph so the plugin can be discovered and chained.
-
-### Extract Plugins
-
-Extract plugins are responsible for downloading and reprojecting data to the **majortom grid**. They follow the same `@plugin` pattern but use the `category="extract"`:
-
-```python
-from aer.plugin import plugin
-from aer.extract import ExtractedResultSchema
-import geopandas as gpd
-
-@plugin(name="my_extractor", category="extract")
-def extract_data(gdf: gpd.GeoDataFrame, output_dir: str) -> gpd.GeoDataFrame:
-    """Extract and reproject granules to the majortom grid."""
-    # 1. Download data from S3/HTTPS
-    # 2. Reproject to the grid cell specified in 'overlapping_spatial_extent'
-    # 3. Save to output_dir
-    # 4. Return GeoDataFrame[ExtractedResultSchema]
-    return gpd.GeoDataFrame(...)
-```
-
-### Using Plugins
-
-```python
-from aer.plugin import plugin_registry
-
-# Discover all plugins
-for p in plugin_registry.all():
-    print(p)  # <Plugin 'earthaccess' (search): SearchQuery -> GeoDataFrame>
-
-# Use the simplified public API
-from aer.plugin import run_search, run_extract
-
-# 1. Search
-results = run_search("earthaccess", query)
-
-# 2. Extract (calls the 'extract' category plugin by name)
-extracted = run_extract("my_extractor", results, "/tmp/output")
-
-# Visualise possible type transitions
-from aer.search import SearchQuery
-plugin_registry.show_capabilities(SearchQuery)
-# [*] SearchQuery
-#  └── (earthaccess) -> GeoDataFrame
-#       └── (my_extractor) -> GeoDataFrame
-```
-
-### Chaining Plugins with Pipeline
-
-```python
-from aer.plugin import Pipeline
-
-# Type transitions are validated at construction time
-pipe = Pipeline("earthaccess", "my_filter")
-result = pipe.run(query)
-```
-
-## Spectral Definitions (Instruments, Satellites, Products)
-
-The spectral registry allows third-party packages to define entirely custom satellite, sensor, and product taxonomies. Because these taxonomies are pure metadata, `aer` supports an extensible **YAML Configuration System**.
-
-### 1. YAML Configuration (Recommended)
-
-You can define custom instruments, satellites, bands, and products in a `.yaml` file. The framework will parse and register these objects automatically at runtime.
-
-Create a file `custom_sensor.yaml`:
-```yaml
-instruments:
-  - name: "OLI"
-    url: "https://landsat.gsfc.nasa.gov/"
-
-satellites:
-  - name: "LANDSAT_8"
-
-products:
-  - name: "LC08_L1TP"
-    instrument: "OLI"
-    supported_satellites: ["LANDSAT_8"]
-    channels:
-      - c_id: "B1"
-        resolution: 30
-        band:
-          name: "Coastal/Aerosol"
-          type: "Visible"
-          central_wavelength: 0.443
-          bandwidth: 0.016
-```
-
-Then point the environment variable to your file or directory of files:
-```bash
-export AER_SPECTRAL_CONFIG_PATH=/path/to/custom_sensor.yaml
-```
-
-The config loader will instantly pre-register all objects globally in `Product.all()`, so components like search plugins can use it immediately without requiring code changes.
-
-### 2. Python API (Programmatic)
-
-If you must define elements programmatically, use `.register()` on the core typestate markers. Always capture the return value of `.register()` for type safety:
-
-Because plugins extend the namespace dynamically, always capture the return value of `.register()` for type safety:
-
-```python
-from aer.spectral import Instrument, Satellite, BandType, Band, Channel, Product
-
-# Register new instruments and satellites
-OLI = Instrument.register("OLI", "https://landsat.gsfc.nasa.gov/...")
-LANDSAT_8 = Satellite.register("LANDSAT_8")
-
-# Define channels using standard aer interfaces
-L8_BAND_1 = Channel(
-    c_id="B1",
-    instrument=OLI,
-    band=Band(
-        name="Coastal/Aerosol",
-        band_type=BandType.VISIBLE,
-        central_wavelength=0.443,
-        bandwidth=0.016,
-    ),
-    resolution=30,
-)
-
-# Products auto-register on creation
-LC08_PRODUCT = Product(
-    name="LC08_L1TP",
-    instrument=OLI,
-    supported_satellites=frozenset([LANDSAT_8]),
-    channels=(L8_BAND_1,),
-)
-
-# Now discoverable globally
-assert Product.get("LC08_L1TP") is LC08_PRODUCT
-```
+1.  **Search**: `SearchProvider` plugins query satellite data collections and return standardized `AssetSchema` GeoDataFrames. The `AerClient` concurrently dispatches searches across multiple plugins.
+2.  **Prepare**: `Extractor` plugins break down the search results into discrete execution batches (e.g., grouping by time, location, or file).
+3.  **Extract**: `Extractor` plugins download, reproject, and format the data into unified `ArtifactSchema` GeoDataFrames.
 
 ## The API Surface
 
-### Plugin Registry
+`aer.interfaces` provides the core interfaces that plugins must implement:
 
-| Operation | API |
-|---|---|
-| Register | `@plugin(name="...", category="...")` |
-| Get by name | `plugin_registry.get("name")` |
-| List all | `plugin_registry.all()` |
-| Show graph | `plugin_registry.show_capabilities(StartType)` |
-| Chain | `Pipeline("step1", "step2").run(input)` |
-| Search API | `run_search("name", query)` |
-| Extract API | `run_extract("name", gdf, out_dir)` |
+### `SearchProvider`
 
-### Spectral Registry
+Responsible for querying remote APIs and building the initial asset footprint.
+Plugins must declare `supported_collections` as a sequence of strings.
 
-| Class | Registration | Query | Iterator |
-|---|---|---|---|
-| `Instrument` | `Instrument.register("NAME", url="...")` | `Instrument.get("NAME")` | `Instrument.all()` |
-| `Satellite` | `Satellite.register("NAME", url="...")` | `Satellite.get("NAME")` | `Satellite.all()` |
-| `BandType` | `BandType.register("Name")` | `BandType.get("Name")` | `BandType.all()` |
-| `Product` | `Product(name="P", ...)` | `Product.get("P")` | `Product.all()` |
+```python
+from typing import Mapping, Sequence, Any
+from datetime import datetime
+from shapely.geometry.base import BaseGeometry
+from pandera.typing.geopandas import GeoDataFrame
 
-*Note: Registrations are **idempotent**. Calling `.register()` with the same name returns the existing instance.*
+from aer.interfaces import SearchProvider
+from aer.schemas import AssetSchema
+
+class MySearchProvider(SearchProvider):
+    supported_collections = ["my-satellite-data"]
+
+    def search(
+        self,
+        collections: Sequence[str],
+        intersects: BaseGeometry | None,
+        start_datetime: datetime | None,
+        end_datetime: datetime | None,
+        search_params: Mapping[str, Any] | None,
+    ) -> GeoDataFrame[AssetSchema]:
+        ...
+```
+
+### `Extractor`
+
+Responsible for generating task batches and running data extraction.
+Plugins must declare `supported_collections` as a sequence of strings.
+
+```python
+from typing import Any
+from pandera.typing.geopandas import GeoDataFrame
+
+from aer.interfaces import Extractor
+from aer.schemas import AssetSchema, ArtifactSchema
+
+class MyExtractor(Extractor):
+    supported_collections = ["my-satellite-data"]
+
+    def prepare_for_extraction(
+        self,
+        search_results: GeoDataFrame[AssetSchema],
+        prepare_params: dict[str, Any] | None,
+    ) -> list[GeoDataFrame[AssetSchema]]:
+        ...
+
+    def extract(
+        self,
+        assets_batch: GeoDataFrame[AssetSchema],
+        extract_params: dict[str, Any] | None,
+    ) -> GeoDataFrame[ArtifactSchema]:
+        ...
+```
+
+## Using the High-Level API (Recommended)
+
+The `AerClient` module provides a simple, robust interface that handles object discovery, mapping collections to plugins, parallel search execution, and unified error handling (`FailureMode`).
+
+```python
+from datetime import datetime
+from aer.client import AerClient, FailureMode
+
+client = AerClient()
+
+# 1. Run the entire pipeline in one go
+artifacts_df = client.run_pipeline(
+    collections=["my-satellite-data"],
+    start_datetime=datetime(2023, 1, 1),
+    end_datetime=datetime(2023, 1, 31),
+    failure_mode=FailureMode.BEST_EFFORT, # Continue if some plugins fail
+)
+
+# 2. Or, run step-by-step for more control
+search_ctx = client.search(
+    collections=["my-satellite-data"],
+    start_datetime=datetime(2023, 1, 1),
+    end_datetime=datetime(2023, 1, 31)
+)
+
+print(f"Found {len(search_ctx.search_results)} assets.")
+
+prep_ctx = search_ctx.prepare(prepare_params={"chunk_size": 10})
+final_df = prep_ctx.extract(extract_params={"bands": ["B04"]})
+```
+
+## Advanced: Manual Plugin Management
+
+If you need fine-grained control, use the `AerRegistry` directly. It parses `entry_points` and provides instantiated plugin objects.
+
+```python
+from aer.registry import AerRegistry
+
+registry = AerRegistry()
+
+# See what collections are supported overall
+print(registry.list_supported_collections())
+
+# Find which plugins can handle a specific collection
+extractor_names = registry.find_extractors_for("my-satellite-data")
+
+# Instantiate a specialized extractor
+extractor = registry.get_extractor(extractor_names[0], global_config="...")
+```
 
 ## Entry Points & Discovery
 
-Functional plugins (search, download, etc.) are discovered automatically via **Python Entry Points**. The `PluginRegistry` scans for entry points in the `aer.plugins` group.
-
-### The Bootstrap Mechanism
-
-To eagerly load all installed plugins, call `bootstrap()`:
-
-```python
-from aer.bootstrap import bootstrap
-bootstrap()
-```
-
-Alternatively, `plugin_registry.get()` and `plugin_registry.all()` trigger lazy loading on first access.
-
-### Plugin Discovery (Entry Points)
-
-Plugins are declared in the `[project.entry-points]` section of your `pyproject.toml`:
+Plugins are discovered automatically via Python `entry_points`. Declare them in `pyproject.toml` under explicitly defined groups:
 
 ```toml
-[project.entry-points."aer.plugins"]
-earthaccess = "aer.search_earthaccess.core:search_earthaccess"
+[project.entry-points."aer.search_providers"]
+my_searcher = "my_package.module:MySearchProvider"
+
+[project.entry-points."aer.extractors"]
+my_extractor = "my_package.extraction:MyExtractor"
 ```
 
 > [!IMPORTANT]
-> **Workspace Discovery Root**: In a Polylith development environment, `importlib.metadata` reads discovery metadata from the package currently installed in the environment (the root `pyproject.toml` when using `uv sync` at the workspace root).
->
-> If you add a new plugin to a `projects/` sub-package but **do not** add it to the root `pyproject.toml`, it will be missing from the registry during development, leading to `KeyError: "Plugin '...' is not registered."`. Always mirror your plugin entry points in the root configuration during active development.
+> **Workspace Discovery Root**: In a Polylith development environment, `importlib.metadata` reads discovery metadata from the package currently installed in the environment. If you add a new plugin to a `projects/` sub-package but **do not** add it to the root `pyproject.toml`, it will be missing during development. Always mirror your plugin entry points in the root configuration during active development.
+
+To learn how to build and expose your own custom search providers and extractors natively, see [Build Your Own Plugin](./build-your-own-plugin.md).

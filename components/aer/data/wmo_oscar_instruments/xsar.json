@@ -1,0 +1,40 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "XSAR",
+  "instrument_fullname": "X-band Synthetic Aperture Radar",
+  "url": "https://space.oscar.wmo.int/instruments/view/xsar",
+  "schema_type": "sar_active",
+  "original_columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Polarisations",
+    "Incidence angle"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "operation_mode": "Spotlight",
+      "spatial_resolution": 1.0,
+      "swath_width": 10000.0,
+      "polarisation": "HH or VV",
+      "field_of_regard": 15.0
+    },
+    {
+      "channel_name": "Band_02",
+      "operation_mode": "Stripmap",
+      "spatial_resolution": 2.0,
+      "swath_width": 12000.0,
+      "polarisation": "HH or VV",
+      "field_of_regard": 15.0
+    },
+    {
+      "channel_name": "Band_03",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": 16.0,
+      "swath_width": 50000.0,
+      "polarisation": "HH or VV",
+      "field_of_regard": 15.0
+    }
+  ]
+}

@@ -1,0 +1,412 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MWS",
+  "instrument_fullname": "Micro-Wave Sounder",
+  "url": "https://space.oscar.wmo.int/instruments/view/mws",
+  "schema_type": "microwave",
+  "original_columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT",
+    "IFOV at s.s.p."
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "No.": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": 23.8,
+      "bandwidth": 270.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.25,
+        "unit": "K"
+      },
+      "spatial_resolution": 40000.0,
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_02",
+      "No.": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": 31.4,
+      "bandwidth": 180.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.35,
+        "unit": "K"
+      },
+      "spatial_resolution": 40000.0,
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_03",
+      "No.": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": 50.3,
+      "bandwidth": 180.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_04",
+      "No.": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": 52.8,
+      "bandwidth": 400.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.35,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_05",
+      "No.": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": "53.246±0.08",
+      "bandwidth": 2.0,
+      "polarisations": "H or V",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_06",
+      "No.": {
+        "value": 6,
+        "unit": null
+      },
+      "central_frequency": "53.596±0.115",
+      "bandwidth": 2.0,
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_07",
+      "No.": {
+        "value": 7,
+        "unit": null
+      },
+      "central_frequency": "53.948±0.081",
+      "bandwidth": 2.0,
+      "polarisations": "H or V",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_08",
+      "No.": {
+        "value": 8,
+        "unit": null
+      },
+      "central_frequency": 54.4,
+      "bandwidth": 400.0,
+      "polarisations": "H or V",
+      "NEΔT": {
+        "value": 0.35,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_09",
+      "No.": {
+        "value": 9,
+        "unit": null
+      },
+      "central_frequency": 54.94,
+      "bandwidth": 400.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.35,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_10",
+      "No.": {
+        "value": 10,
+        "unit": null
+      },
+      "central_frequency": 55.5,
+      "bandwidth": 330.0,
+      "polarisations": "H or V",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_11",
+      "No.": {
+        "value": 11,
+        "unit": null
+      },
+      "central_frequency": 57.290344,
+      "bandwidth": 330.0,
+      "polarisations": "H or V",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_12",
+      "No.": {
+        "value": 12,
+        "unit": null
+      },
+      "central_frequency": "57.290344±0.217",
+      "bandwidth": 2.0,
+      "polarisations": "H or V",
+      "NEΔT": {
+        "value": 0.55,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_13",
+      "No.": {
+        "value": 13,
+        "unit": null
+      },
+      "central_frequency": "57.290344±0.3222±0.048",
+      "bandwidth": 4.0,
+      "polarisations": "H or V",
+      "NEΔT": {
+        "value": 0.6,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_14",
+      "No.": {
+        "value": 14,
+        "unit": null
+      },
+      "central_frequency": "57.290344±0.3222±0.022",
+      "bandwidth": 4.0,
+      "polarisations": "H or V",
+      "NEΔT": {
+        "value": 0.9,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_15",
+      "No.": {
+        "value": 15,
+        "unit": null
+      },
+      "central_frequency": "57.290344±0.3222±0.010",
+      "bandwidth": 4.0,
+      "polarisations": "H or V",
+      "NEΔT": {
+        "value": 1.2,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_16",
+      "No.": {
+        "value": 16,
+        "unit": null
+      },
+      "central_frequency": "57.290344±0.3222±0.0045",
+      "bandwidth": 4.0,
+      "polarisations": "H or V",
+      "NEΔT": {
+        "value": 2.0,
+        "unit": "K"
+      },
+      "spatial_resolution": 20000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_17",
+      "No.": {
+        "value": 17,
+        "unit": null
+      },
+      "central_frequency": 89.0,
+      "bandwidth": 4000.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.25,
+        "unit": "K"
+      },
+      "spatial_resolution": 17000.0,
+      "unit": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_18",
+      "No.": {
+        "value": 18,
+        "unit": null
+      },
+      "central_frequency": 164.0,
+      "bandwidth": 2.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "spatial_resolution": 17000.0,
+      "unit": "-167",
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_19",
+      "No.": {
+        "value": 19,
+        "unit": null
+      },
+      "central_frequency": "183.311±7.0",
+      "bandwidth": 2.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      },
+      "spatial_resolution": 17000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_20",
+      "No.": {
+        "value": 20,
+        "unit": null
+      },
+      "central_frequency": "183.311±4.5",
+      "bandwidth": 2.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.4,
+        "unit": "K"
+      },
+      "spatial_resolution": 17000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_21",
+      "No.": {
+        "value": 21,
+        "unit": null
+      },
+      "central_frequency": "183.311±3.0",
+      "bandwidth": 2.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.6,
+        "unit": "K"
+      },
+      "spatial_resolution": 17000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_22",
+      "No.": {
+        "value": 22,
+        "unit": null
+      },
+      "central_frequency": "183.311±1.8",
+      "bandwidth": 2.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.6,
+        "unit": "K"
+      },
+      "spatial_resolution": 17000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_23",
+      "No.": {
+        "value": 23,
+        "unit": null
+      },
+      "central_frequency": "183.311±1.0",
+      "bandwidth": 2.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.75,
+        "unit": "K"
+      },
+      "spatial_resolution": 17000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_24",
+      "No.": {
+        "value": 24,
+        "unit": null
+      },
+      "central_frequency": 229.0,
+      "bandwidth": 2000.0,
+      "polarisations": "V or H",
+      "NEΔT": {
+        "value": 0.7,
+        "unit": "K"
+      },
+      "spatial_resolution": 17000.0,
+      "unit": null,
+      "nedt": null
+    }
+  ]
+}

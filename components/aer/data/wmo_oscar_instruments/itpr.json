@@ -1,0 +1,190 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "ITPR",
+  "instrument_fullname": "Infrared Temperature Profile Radiometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/itpr",
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
+    "Wavelength",
+    "Wave number",
+    "Bandwidth",
+    "NEN"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "Wavelength": {
+        "value": 19.71,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 507.3,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 84.0,
+        "unit": "cm -1"
+      },
+      "NEN": {
+        "value": 0.195,
+        "unit": "mW m -2 sr -1 cm"
+      },
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_02",
+      "Wavelength": {
+        "value": 14.96,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 668.3,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 5.3,
+        "unit": "cm -1"
+      },
+      "NEN": {
+        "value": 0.5,
+        "unit": "mW m -2 sr -1 cm"
+      },
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_03",
+      "Wavelength": {
+        "value": 14.5,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 689.5,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 15.2,
+        "unit": "cm -1"
+      },
+      "NEN": {
+        "value": 0.187,
+        "unit": "mW m -2 sr -1 cm"
+      },
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_04",
+      "Wavelength": {
+        "value": 14.01,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 713.8,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 17.0,
+        "unit": "cm -1"
+      },
+      "NEN": {
+        "value": 0.192,
+        "unit": "mW m -2 sr -1 cm"
+      },
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_05",
+      "Wavelength": {
+        "value": 13.39,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 747.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 17.2,
+        "unit": "cm -1"
+      },
+      "NEN": {
+        "value": 0.192,
+        "unit": "mW m -2 sr -1 cm"
+      },
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_06",
+      "Wavelength": {
+        "value": 11.12,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 899.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 39.5,
+        "unit": "cm -1"
+      },
+      "NEN": {
+        "value": 0.192,
+        "unit": "mW m -2 sr -1 cm"
+      },
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    },
+    {
+      "channel_name": "Band_07",
+      "Wavelength": {
+        "value": 3.73,
+        "unit": "µm"
+      },
+      "wave_number_range": {
+        "value": 2683.0,
+        "unit": "cm -1"
+      },
+      "Bandwidth": {
+        "value": 430.0,
+        "unit": "cm -1"
+      },
+      "NEN": {
+        "value": 0.004,
+        "unit": "mW m -2 sr -1 cm"
+      },
+      "unit": "cm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "spectral_resolution": null,
+      "number_of_channels": null,
+      "snr_or_nedt": null
+    }
+  ]
+}

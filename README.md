@@ -26,61 +26,99 @@ The codebase is organized into interchangeable bricks:
 
 ## 🔌 The Plugin System
 
-`aer` is designed to be extended without modifying the core library. It uses a registry pattern discovered via `entry_points`.
+`aer` uses standard Python `entry_points` for plugin discovery. The plugin system provides a complete pipeline for satellite data processing.
+
+### How It Works
+
+1. **Plugins** are discovered via Python entry points mapped to interfaces (`SearchProvider`, `Extractor`)
+2. **Collection-based dispatch** automatically routes tasks to the correct plugins via `AerRegistry`
+3. **Simple Pipeline API** for users via `AerClient`: `search` → `prepare` → `extract`
 
 ### Discovery & Registry
-Plugins register themselves into core registries (like `SearchMethod` or `Instrument`). To initialize all available plugins in your environment, use the bootstrap utility:
+
+Plugins are automatically loaded and instantiated by the `AerClient` and `AerRegistry`:
 
 ```python
-from aer.bootstrap import bootstrap
-bootstrap()  # Automatically discovers and loads all registered aer plugins
+from aer.client import AerClient
+from aer.registry import AerRegistry
+
+# View available plugins
+registry = AerRegistry()
+collections = registry.list_supported_collections()  # ["goes-16", "HLSL30", ...]
+
+# The client orchestrates tasks across plugins automatically
+client = AerClient(registry=registry)
+search_ctx = client.search(collections=["goes-16"])
 ```
 
-### Extending search
-You can add new search implementations by registering them with `SearchMethod`. Projects define these in their `pyproject.toml`:
+### Creating a New Plugin
+
+`aer` relies on object-oriented inheritance for new plugins. To create a new search backend, you must:
+
+**1. Inherit from a core interface** and implement methods. E.g. `SearchProvider` or `Extractor`:
+
+```python
+from aer.interfaces import SearchProvider
+from datetime import datetime
+from typing import Sequence, Optional, Mapping, Any
+
+class MySearchPlugin(SearchProvider):
+    # MANDATORY: declares which collections this plugin handles
+    supported_collections = ["goes-16", "goes-18"]
+
+    def search(
+        self,
+        collections: Sequence[str],
+        intersects: Optional[Any] = None,
+        start_datetime: Optional[datetime] = None,
+        end_datetime: Optional[datetime] = None,
+        search_params: Optional[Mapping[str, Any]] = None,
+    ):
+        # Your search implementation returning standard GeoDataFrame schemas
+        return df
+```
+
+**2. Register via entry points** in your `pyproject.toml`:
 
 ```toml
-[project.entry-points."aer.plugins.search"]
-earthaccess = "aer.search_earthaccess.core:SEARCH_EARTHACCESS"
+[project.entry-points."aer.search_providers"]
+my_plugin = "my_package.plugin:MySearchPlugin"
 ```
 
-> [!TIP]
-> **Development Note**: When working in a Polylith workspace, plugins are discovered via Python entry points. Registering an entry point in a `project` sub-package makes it available for distribution, but for the plugin to be discoverable **during development** (i.e., when running `uv run`), you must also declare it in the root `pyproject.toml`. False discovery is often caused by missing these root-level entry point declarations.
+Find the full walkthrough for writing new plugins in our [Plugin Developer Guide](./docs/build-your-own-plugin.md).
 
 ---
 
 ## 🛠 Usage Example
 
-Search for VIIRS and MODIS data using the `earthaccess` plugin:
+The complete pipeline is seamlessly managed by `AerClient`: `search` → `prepare` → `extract`
 
 ```python
+from aer.client import AerClient, FailureMode
 from datetime import datetime
-from aer.bootstrap import bootstrap
-from aer.search import SearchMethod
-from aer.product_viirs_earthaccess import VNP02MOD_EA
-from aer.product_modis_earthaccess import MODIS_021KM_EA
-from aer.temporal import TimeRange
 
-# 1. Initialize the plugin system
-bootstrap()
+client = AerClient()
 
-# 2. Define your search constraints
-time_range = TimeRange(
-    start=datetime(2024, 8, 1, 0, 0, 0),
-    end=datetime(2024, 8, 2, 0, 0, 0),
+# Execute the entire workflow in one command!
+results_df = client.run_pipeline(
+    collections=["goes-16", "HLSL30"],
+    start_datetime=datetime(2024, 8, 1),
+    end_datetime=datetime(2024, 8, 2),
+    intersects=my_geometry,
+    failure_mode=FailureMode.BEST_EFFORT # Continue even if one plugin fails
 )
 
-# 3. Use the registered search method
-search = SearchMethod.get("earthaccess")
-results = search(
-    products=[VNP02MOD_EA, MODIS_021KM_EA],
-    time_range=time_range
-)
-
-print(f"Found {len(results)} granules")
-# Search returns a validated GeoDataFrame
-print(results[["product_name", "start_time", "geometry"]].head())
+print(f"Extracted {len(results_df)} assets successfully!")
 ```
+
+**Available Pipeline methods:**
+
+| Method | Description |
+|----------|-------------|
+| `AerClient.search(...)` | Search for data by collection identifiers, returning `SearchResultContext` |
+| `SearchResultContext.prepare(...)` | Group search results into extraction tasks (`PreparedExtractionContext`) |
+| `PreparedExtractionContext.extract(...)` | Execute download and extraction for grouped tasks |
+| `AerClient.run_pipeline(...)` | Syntactic sugar wrapping all three steps consecutively |
 
 ---
 

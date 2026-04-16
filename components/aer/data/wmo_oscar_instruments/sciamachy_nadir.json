@@ -1,0 +1,168 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "SCIAMACHY-nadir",
+  "instrument_fullname": "Scanning Imaging Absorption Spectrometer for Atmospheric Cartography (nadir-scanning component)",
+  "url": "https://space.oscar.wmo.int/instruments/view/sciamachy_nadir",
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
+    "Spectral range",
+    "No. of channels",
+    "Spectral resolution",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "Spectral range": {
+        "min": 214.0,
+        "max": 334.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1024,
+        "unit": null
+      },
+      "spectral_resolution": 0.24,
+      "snr_or_nedt": "200 @ 0.5 W m -2 sr -1 μm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_02",
+      "Spectral range": {
+        "min": 300.0,
+        "max": 412.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1024,
+        "unit": null
+      },
+      "spectral_resolution": 0.26,
+      "snr_or_nedt": "2300 @ 58 W m -2 sr -1 μm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_03",
+      "Spectral range": {
+        "min": 383.0,
+        "max": 628.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1024,
+        "unit": null
+      },
+      "spectral_resolution": 0.44,
+      "snr_or_nedt": "2600 @ 90 W m -2 sr -1 μm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_04",
+      "Spectral range": {
+        "min": 595.0,
+        "max": 812.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1024,
+        "unit": null
+      },
+      "spectral_resolution": 0.48,
+      "snr_or_nedt": "2800 @ 61 W m -2 sr -1 μm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_05",
+      "Spectral range": {
+        "min": 773.0,
+        "max": 1063.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1024,
+        "unit": null
+      },
+      "spectral_resolution": 0.54,
+      "snr_or_nedt": "1900 @ 40 W m -2 sr -1 μm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_06",
+      "Spectral range": {
+        "min": 971.0,
+        "max": 1773.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1024,
+        "unit": null
+      },
+      "spectral_resolution": 1.48,
+      "snr_or_nedt": "1500 @ 25 W m -2 sr -1 μm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_07",
+      "Spectral range": {
+        "min": 1934.0,
+        "max": 2044.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1024,
+        "unit": null
+      },
+      "spectral_resolution": 0.22,
+      "snr_or_nedt": "100 @ 3.4 W m -2 sr -1 μm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_08",
+      "Spectral range": {
+        "min": 2259.0,
+        "max": 2386.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 1024,
+        "unit": null
+      },
+      "spectral_resolution": 0.26,
+      "snr_or_nedt": "320 @ 2.2 W m -2 sr -1 μm -1",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_09",
+      "Spectral range": {
+        "min": 310.0,
+        "max": 2380.0,
+        "unit": "nm"
+      },
+      "No. of channels": {
+        "value": 7,
+        "unit": null
+      },
+      "spectral_resolution": 67.0,
+      "snr_or_nedt": "Not relevant",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MSI",
+  "instrument_fullname": "Multi-Spectral Imager for Earth-CARE",
+  "url": "https://space.oscar.wmo.int/instruments/view/msi",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "channel_name": "B01",
+      "central_wavelength": 670.0,
+      "bandwidth": 20.0,
+      "snr_or_nedt": "500 @ 1 % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "B02",
+      "central_wavelength": 865.0,
+      "bandwidth": 20.0,
+      "snr_or_nedt": "500 @ 1 % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "B03",
+      "central_wavelength": 1670.0,
+      "bandwidth": 60.0,
+      "snr_or_nedt": "250 @ 1 % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "B04",
+      "central_wavelength": 2210.0,
+      "bandwidth": 100.0,
+      "snr_or_nedt": "250 @ 1 % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "B05",
+      "central_wavelength": 8.8,
+      "bandwidth": 0.9,
+      "snr_or_nedt": 0.25,
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "B06",
+      "central_wavelength": 10.8,
+      "bandwidth": 0.9,
+      "snr_or_nedt": 0.25,
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "B07",
+      "central_wavelength": 12.0,
+      "bandwidth": 0.9,
+      "snr_or_nedt": 0.25,
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "KEIS",
+  "instrument_fullname": "Kazakh Earth Imaging System",
+  "url": "https://space.oscar.wmo.int/instruments/view/keis",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": 0.475,
+      "bandwidth": 0.44,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": 0.555,
+      "bandwidth": 0.52,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": "0.657.5 μm",
+      "bandwidth": 0.63,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": 0.71,
+      "bandwidth": 0.69,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": 0.805,
+      "bandwidth": 0.76,
+      "snr_or_nedt": "….. @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

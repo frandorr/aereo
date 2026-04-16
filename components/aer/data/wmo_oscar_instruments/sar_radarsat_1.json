@@ -1,0 +1,80 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "SAR (RadarSat-1)",
+  "instrument_fullname": "Synthetic Aperture Radar (C-band)",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar_radarsat_1",
+  "schema_type": "sar_active",
+  "original_columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Field of regard",
+    "Polarisat ion"
+  ],
+  "channels": [
+    {
+      "channel_name": "Standard",
+      "operation_mode": "Standard",
+      "spatial_resolution": 25.0,
+      "swath_width": 100000.0,
+      "field_of_regard": 500.0,
+      "polarisation": "HH/HV or VV/VH"
+    },
+    {
+      "channel_name": "Wide",
+      "operation_mode": "Fine",
+      "spatial_resolution": 10.0,
+      "swath_width": 50000.0,
+      "field_of_regard": 225.0,
+      "polarisation": "HH/HV or VV/VH"
+    },
+    {
+      "channel_name": "Fine",
+      "operation_mode": "ScanSAR wide",
+      "spatial_resolution": 100.0,
+      "swath_width": 500000.0,
+      "field_of_regard": 500.0,
+      "polarisation": "HH/HV or VV/VH"
+    },
+    {
+      "channel_name": "ScanSAR Narrow",
+      "operation_mode": "ScanSAR narrow",
+      "spatial_resolution": 50.0,
+      "swath_width": 300000.0,
+      "field_of_regard": 420.0,
+      "polarisation": "HH/HV or VV/VH"
+    },
+    {
+      "channel_name": "ScanSAR Wide",
+      "operation_mode": "Polarimetric standard",
+      "spatial_resolution": 25.0,
+      "swath_width": 25000.0,
+      "field_of_regard": 350.0,
+      "polarisation": "VV/HH, HH/HV, VV/VH"
+    },
+    {
+      "channel_name": "Extended High",
+      "operation_mode": "Polarimetric fine",
+      "spatial_resolution": 10.0,
+      "swath_width": 25000.0,
+      "field_of_regard": 200.0,
+      "polarisation": "VV/HH, HH/HV, VV/VH"
+    },
+    {
+      "channel_name": "Extended Low",
+      "operation_mode": "Multi-look fine",
+      "spatial_resolution": 10.0,
+      "swath_width": 50000.0,
+      "field_of_regard": 350.0,
+      "polarisation": "HH or VV"
+    },
+    {
+      "channel_name": "Band_08",
+      "operation_mode": "Ultra-fine",
+      "spatial_resolution": 3.0,
+      "swath_width": 20000.0,
+      "field_of_regard": 150.0,
+      "polarisation": "HH or VV"
+    }
+  ]
+}

@@ -1,0 +1,224 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "OLCI",
+  "instrument_fullname": "Ocean and Land Colour Imager ",
+  "url": "https://space.oscar.wmo.int/instruments/view/olci",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "channel_name": "Oa01",
+      "central_wavelength": 400.0,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "2188 @ 62.95 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa02",
+      "central_wavelength": 412.5,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "2061 @ 74.14 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa03",
+      "central_wavelength": 442.5,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "1811 @ 65.61 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa04",
+      "central_wavelength": 490.0,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "1541 @ 51.21 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa05",
+      "central_wavelength": 510.0,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "1488 @ 44.39 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa06",
+      "central_wavelength": 560.0,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "1280 @ 31.49 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa07",
+      "central_wavelength": 620.0,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "997 @ 21.14 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa08",
+      "central_wavelength": 665.0,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "883 @ 16.38 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa09",
+      "central_wavelength": 673.75,
+      "bandwidth": 7.5,
+      "snr_or_nedt": "707 @ 15.70 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa10",
+      "central_wavelength": 681.25,
+      "bandwidth": 7.5,
+      "snr_or_nedt": "745 @ 15.11 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa11",
+      "central_wavelength": 708.25,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "785 @ 12.73 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa12",
+      "central_wavelength": 753.75,
+      "bandwidth": 7.5,
+      "snr_or_nedt": "605 @ 10.33 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa13",
+      "central_wavelength": 761.25,
+      "bandwidth": 2.5,
+      "snr_or_nedt": "232 @ 6.09 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa14",
+      "central_wavelength": 764.375,
+      "bandwidth": 3.75,
+      "snr_or_nedt": "305 @ 7.13 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa15",
+      "central_wavelength": 767.5,
+      "bandwidth": 2.5,
+      "snr_or_nedt": "330 @ 7.58 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa16",
+      "central_wavelength": 778.75,
+      "bandwidth": 15.0,
+      "snr_or_nedt": "812 @ 9.18 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa17",
+      "central_wavelength": 865.0,
+      "bandwidth": 20.0,
+      "snr_or_nedt": "666 @ 6.17 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa18",
+      "central_wavelength": 885.0,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "395 @ 6.00 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa19",
+      "central_wavelength": 900.0,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "308 @ 4.73 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa20",
+      "central_wavelength": 940.0,
+      "bandwidth": 20.0,
+      "snr_or_nedt": "203 @ 2.39 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Oa21",
+      "central_wavelength": 1020.0,
+      "bandwidth": 40.0,
+      "snr_or_nedt": "151 @ 3.86 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

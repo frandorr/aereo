@@ -1,0 +1,70 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "CERES",
+  "instrument_fullname": "Clouds and the Earth’s Radiant Energy System ",
+  "url": "https://space.oscar.wmo.int/instruments/view/ceres",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Channel",
+    "Spectral interval",
+    "Noise Equivalent Radiance",
+    "Absolute accuracy",
+    "SNR"
+  ],
+  "channels": [
+    {
+      "channel_name": "SW",
+      "Channel": "Short-wave",
+      "bandwidth": 0.3,
+      "Noise Equivalent Radiance": {
+        "value": 0.3,
+        "unit": "W m -2 sr -1"
+      },
+      "Absolute accuracy": {
+        "value": 0.8,
+        "unit": "W m -2 sr -1"
+      },
+      "snr_or_nedt": 225.0,
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Total",
+      "Channel": "Total radiance",
+      "bandwidth": 0.3,
+      "Noise Equivalent Radiance": {
+        "value": 0.3,
+        "unit": "W m -2 sr -1"
+      },
+      "Absolute accuracy": {
+        "value": 0.6,
+        "unit": "W m -2 sr -1"
+      },
+      "snr_or_nedt": 750.0,
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Window",
+      "Channel": "TIR",
+      "bandwidth": 8.0,
+      "Noise Equivalent Radiance": {
+        "value": 0.3,
+        "unit": "W m -2 sr -1"
+      },
+      "Absolute accuracy": {
+        "value": 0.3,
+        "unit": "W m -2 sr -1"
+      },
+      "snr_or_nedt": 750.0,
+      "central_wavelength": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

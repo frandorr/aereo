@@ -1,0 +1,200 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "TMS (Tomorrow)",
+  "instrument_fullname": "Tomorrow Microwave Sounder",
+  "url": "https://space.oscar.wmo.int/instruments/view/tms_tomorrow",
+  "schema_type": "microwave",
+  "original_columns": [
+    "No.",
+    "Central frequency",
+    "Bandwidth",
+    "NE∆T",
+    "Nadir IFOV"
+  ],
+  "channels": [
+    {
+      "channel_name": "CH01",
+      "No.": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": "91.655 ± 1.4 GHz",
+      "bandwidth": 2000.0,
+      "NE∆T": {
+        "value": 0.55,
+        "unit": "K"
+      },
+      "spatial_resolution": 30000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH02",
+      "No.": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": "118.75 ± 3.5 GHz",
+      "bandwidth": 1000.0,
+      "NE∆T": {
+        "value": 0.93,
+        "unit": "K"
+      },
+      "spatial_resolution": 25000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH03",
+      "No.": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": "118.75 ± 2.625 GHz",
+      "bandwidth": 750.0,
+      "NE∆T": {
+        "value": 0.95,
+        "unit": "K"
+      },
+      "spatial_resolution": 25000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH04",
+      "No.": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": "118.75 ± 1.875 GHz",
+      "bandwidth": 750.0,
+      "NE∆T": {
+        "value": 0.88,
+        "unit": "K"
+      },
+      "spatial_resolution": 25000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH05",
+      "No.": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": "118.75 ± 1.25 GHz",
+      "bandwidth": 500.0,
+      "NE∆T": {
+        "value": 0.95,
+        "unit": "K"
+      },
+      "spatial_resolution": 25000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH06",
+      "No.": {
+        "value": 6,
+        "unit": null
+      },
+      "central_frequency": "118.75 ± 0.75 GHz",
+      "bandwidth": 500.0,
+      "NE∆T": {
+        "value": 0.95,
+        "unit": "K"
+      },
+      "spatial_resolution": 25000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH07",
+      "No.": {
+        "value": 7,
+        "unit": null
+      },
+      "central_frequency": "118.75 ± 0.375 GHz",
+      "bandwidth": 250.0,
+      "NE∆T": {
+        "value": 1.21,
+        "unit": "K"
+      },
+      "spatial_resolution": 25000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH08",
+      "No.": {
+        "value": 8,
+        "unit": null
+      },
+      "central_frequency": "118.75 ± 0.125 GHz",
+      "bandwidth": 250.0,
+      "NE∆T": {
+        "value": 1.16,
+        "unit": "K"
+      },
+      "spatial_resolution": 25000.0,
+      "nedt": null
+    },
+    {
+      "channel_name": "CH09",
+      "No.": {
+        "value": 9,
+        "unit": null
+      },
+      "central_frequency": 184.41,
+      "bandwidth": 2000.0,
+      "NE∆T": {
+        "value": 0.79,
+        "unit": "K"
+      },
+      "spatial_resolution": 15000.0,
+      "unit": "GHz",
+      "nedt": null
+    },
+    {
+      "channel_name": "CH10",
+      "No.": {
+        "value": 10,
+        "unit": null
+      },
+      "central_frequency": 186.51,
+      "bandwidth": 2000.0,
+      "NE∆T": {
+        "value": 0.73,
+        "unit": "K"
+      },
+      "spatial_resolution": 15000.0,
+      "unit": "GHz",
+      "nedt": null
+    },
+    {
+      "channel_name": "CH11",
+      "No.": {
+        "value": 11,
+        "unit": null
+      },
+      "central_frequency": 190.31,
+      "bandwidth": 2000.0,
+      "NE∆T": {
+        "value": 0.69,
+        "unit": "K"
+      },
+      "spatial_resolution": 15000.0,
+      "unit": "GHz",
+      "nedt": null
+    },
+    {
+      "channel_name": "CH12",
+      "No.": {
+        "value": 12,
+        "unit": null
+      },
+      "central_frequency": 204.8,
+      "bandwidth": 2000.0,
+      "NE∆T": {
+        "value": 0.75,
+        "unit": "K"
+      },
+      "spatial_resolution": 15000.0,
+      "unit": "GHz",
+      "nedt": null
+    }
+  ]
+}

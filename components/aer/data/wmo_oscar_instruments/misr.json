@@ -1,0 +1,63 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MISR",
+  "instrument_fullname": "Multi-angle Imaging Spectro-Radiometer ",
+  "url": "https://space.oscar.wmo.int/instruments/view/misr",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "channel_name": "Blue",
+      "central_wavelength": 446.4,
+      "bandwidth": 41.9,
+      "snr_or_nedt": "300 @ 179 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Green",
+      "central_wavelength": 557.5,
+      "bandwidth": 28.6,
+      "snr_or_nedt": "620 @ 177 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Red",
+      "central_wavelength": 671.7,
+      "bandwidth": 21.9,
+      "snr_or_nedt": "650 @ 146 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "NIR",
+      "central_wavelength": 866.4,
+      "bandwidth": 39.7,
+      "snr_or_nedt": "740 @   93 W m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": "",
+      "bandwidth": "",
+      "snr_or_nedt": "Radiometric accuracy: 3% at maximum signal",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

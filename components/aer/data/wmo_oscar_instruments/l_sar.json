@@ -1,0 +1,31 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "L-SAR",
+  "instrument_fullname": "L-band Synthetic Aperture Radar",
+  "url": "https://space.oscar.wmo.int/instruments/view/l_sar",
+  "schema_type": "sar_active",
+  "original_columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Polarisations"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "operation_mode": "Large swath",
+      "spatial_resolution": 7.0,
+      "swath_width": 350000.0,
+      "polarisation": "HH or VV",
+      "field_of_regard": null
+    },
+    {
+      "channel_name": "Band_02",
+      "operation_mode": "Narrow swath",
+      "spatial_resolution": 7.0,
+      "swath_width": 175000.0,
+      "polarisation": "VV/HH, HH/HV, VV/VH",
+      "field_of_regard": null
+    }
+  ]
+}

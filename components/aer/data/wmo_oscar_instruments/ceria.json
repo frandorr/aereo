@@ -1,0 +1,44 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "CERIA",
+  "instrument_fullname": "CERIA Camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/ceria",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": 455.0,
+      "bandwidth": 400.0,
+      "snr_or_nedt": "…….. @ ……. % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": 535.0,
+      "bandwidth": 490.0,
+      "snr_or_nedt": "…….. @ ……. % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": 605.0,
+      "bandwidth": 580.0,
+      "snr_or_nedt": "…….. @ ……. % albedo",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

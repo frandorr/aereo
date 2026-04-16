@@ -1,0 +1,101 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "SCAMS",
+  "instrument_fullname": "Scanning Microwave Spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/scams",
+  "schema_type": "microwave",
+  "original_columns": [
+    "No.",
+    "Central frequency (GHz)",
+    "Bandwidth (MHz)",
+    "Polarisation",
+    "NEΔT"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "No.": {
+        "value": 1,
+        "unit": null
+      },
+      "central_frequency": 22.231,
+      "bandwidth": 220.0,
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.2,
+        "unit": "K"
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_02",
+      "No.": {
+        "value": 2,
+        "unit": null
+      },
+      "central_frequency": 31.65,
+      "bandwidth": 220.0,
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.2,
+        "unit": "K"
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_03",
+      "No.": {
+        "value": 3,
+        "unit": null
+      },
+      "central_frequency": 52.863,
+      "bandwidth": 220.0,
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.6,
+        "unit": "K"
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_04",
+      "No.": {
+        "value": 4,
+        "unit": null
+      },
+      "central_frequency": 53.845,
+      "bandwidth": 220.0,
+      "polarisations": "V",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
+    },
+    {
+      "channel_name": "Band_05",
+      "No.": {
+        "value": 5,
+        "unit": null
+      },
+      "central_frequency": 55.445,
+      "bandwidth": 220.0,
+      "polarisations": "H",
+      "NEΔT": {
+        "value": 0.5,
+        "unit": "K"
+      },
+      "unit": null,
+      "spatial_resolution": null,
+      "nedt": null
+    }
+  ]
+}

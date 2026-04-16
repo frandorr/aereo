@@ -1,0 +1,1021 @@
+id,slug,acronym,fullname,space_agency,status,orbit,launch_date,eol,altitude,longitude,ect,wigos_id,data_access_link,link,payload
+1,acrimsat,ACRIMSat,Active Cavity Radiometer Irradiance Monitor Satellite,NASA,Inactive,Sunsynchronous orbit,20 Dec 1999,14 Dec 2013,696,,10:50 desc,,https://eosweb.larc.nasa.gov/radiation-budget,,['acrim_iii']
+2,adeos,ADEOS,Advanced Earth Observing Satellite (original name: “Midori”),JAXA,Inactive,Sunsynchronous orbit,17 Aug 1996,30 Jun 1997,797,,10:30 desc,0-20009-0-120,,,"['nscat', 'ris', 'ilas_i', 'toms', 'octs', 'img', 'avnir', 'polder']"
+3,adeos_2,ADEOS-2,Advanced Earth Observing Satellite - 2 (original name: “Midori-2”) ,JAXA,Inactive,Sunsynchronous orbit,14 Dec 2002,25 Oct 2003,812,,10:30:00 desc,0-20009-0-121,,,"['seawinds', 'gli', 'dcs_adeos', 'ilas_ii', 'amsr', 'polder']"
+4,aeolus,Aeolus,Aeolus,ESA,Inactive,Sunsynchronous orbit,22 Aug 2018,05 Jul 2023,320,,06:00 desc,0-20009-0-048,http://aeolus-ds.eo.esa.int/oads/access,,['aladin']
+5,alos,ALOS,Advanced Land Observing Satellite,JAXA,Inactive,Sunsynchronous orbit,24 Jan 2006,22 Apr 2011,692,,10:30 desc,,,,"['palsar', 'avnir_2', 'prism']"
+6,alos_2,ALOS-2,Advanced Land Observing Satellite  - 2,JAXA,Operational,Sunsynchronous orbit,24 May 2014,≥2026,640,,12:00 desc,,http://www.eorc.jaxa.jp/ALOS/en/index.htm,,"['circ', 'palsar_2']"
+7,alos_3,ALOS-3,Advanced Land Observing Satellite - 3,JAXA,Lost at launch,Sunsynchronous orbit,06 Mar 2023,06 Mar 2023,669,,10:30 desc,,,,['wish']
+8,alsat_1,AlSat-1,Algeria Satellite - 1,ASAL,Inactive,Sunsynchronous orbit,28 Nov 2002,15 Aug 2010,700,,10:30 asc,,,,['slim6']
+9,alsat_2,AlSat-2,Algeria Satellite - 2,ASAL,Presumably inactive,Sunsynchronous orbit,12 Jul 2010,≥2019,686,,10:30 asc,,,,['naomi_alsat']
+10,alsat_2b,AlSat-2B,Algeria Satellite - 2B,ASAL,Operational,Sunsynchronous orbit,26 Sep 2016,≥2030,680,,09:30 asc,,,,['naomi_alsat']
+11,amazonia_1,Amazônia-1,Amazônia-1,"INPE,AEB",Operational,Sunsynchronous orbit,28 Feb 2021,≥2026,752,,10:30 desc,,,,['awfi']
+12,ascends,ASCENDS,"Active Sensing of CO2 Emissions over Nights, Days, and Seasons",NASA,Mission concept,Sunsynchronous orbit,TBD,TBD,450,,10:30 asc,,,,"['co2_lidar', 'co_sensor']"
+13,ats_1,ATS-1,Application Technology Satellite - 1,NASA,Inactive,Geostationary orbit,06 Dec 1966,01 Dec 1978,35786,-150,,,,,['sscc']
+14,ats_3,ATS-3,Application Technology Satellite - 3,NASA,Inactive,Geostationary orbit,06 Nov 1967,01 Dec 1978,35786,-45,,,,,['msscc']
+15,ats_6,ATS-6,Application Technology Satellite - 6,NASA,Inactive,Geostationary orbit,30 Apr 1974,03 Aug 1979,35786,-94,,,,,['vhrr_ats']
+16,bilsat,BILSat,BILTEN Satellte,TÜBITAK-UZAY,Inactive,Sunsynchronous orbit,27 Sep 2003,15 Aug 2006,686,,10:30 asc,,,,"['coban', 'pancam', 'msis']"
+17,bird,BIRD,Bi-spectral Infra-Red Detection,DLR,Inactive,Sunsynchronous orbit,22 Oct 2001,01 Jul 2007,572,,10:30 desc,,,,"['hsrs', 'horus', 'waoss_b']"
+18,beijing_1,Beijing-1,Beijing-1,NRSCC,Presumably inactive,Sunsynchronous orbit,27 Oct 2005,≥2010,699,,08:15 asc,,,,"['cmt', 'slim6']"
+19,calipso,CALIPSO,Cloud-Aerosol Lidar and Infrared Pathfinder Satellite Observations,"NASA,CNES",Inactive,Sunsynchronous orbit,28 Apr 2006,01 Aug 2023,689,,13:45 asc,0-20009-0-787,https://eosweb.larc.nasa.gov/project/calipso/calipso_table,,"['wfc', 'iir', 'caliop']"
+20,cartosat_1_irs_p5,CartoSat-1 (IRS-P5),CartoSat-1,ISRO,Inactive,Sunsynchronous orbit,05 May 2005,05 May 2019,618,,10:15 desc,,http://www.nrsc.gov.in/IRS_Data_Products?q=IRS_Data_Products,,['pan_cartosat_1']
+21,cartosat_2,CartoSat-2,CartoSat-2,ISRO,Inactive,Sunsynchronous orbit,10 Jan 2007,13 Aug 2019,635,,09:30 desc,,http://www.nrsc.gov.in/IRS_Data_Products?q=IRS_Data_Products,,['pan_cartosat_2a_b']
+22,cartosat_2a,CartoSat-2A,CartoSat-2A,ISRO,Operational,Sunsynchronous orbit,28 Apr 2008,≥2026,635,,09:32 desc,,http://www.nrsc.gov.in/IRS_Data_Products?q=IRS_Data_Products,,['pan_cartosat_2a_b']
+23,cartosat_2b,CartoSat-2B,CartoSat-2B,ISRO,Operational,Sunsynchronous orbit,12 Jul 2010,≥2026,640,,09:30 desc,,http://www.nrsc.gov.in/IRS_Data_Products?q=IRS_Data_Products,,['pan_cartosat_2a_b']
+24,cartosat_3,CartoSat-3,CartoSat-3,ISRO,Operational,Sunsynchronous orbit,27 Nov 2019,≥2026,450,,09:30 desc,,,,"['mx', 'pan_cartosat_3']"
+25,cbers_1,CBERS-1,China-Brazil Earth Resources Satellite - 1 (ZY-1 FM1),"CAST,AEB,CRESDA,INPE",Inactive,Sunsynchronous orbit,14 Oct 1999,12 Oct 2003,778,,10:30:00 desc,,,,"['wfi', 'dcs_cbers', 'hrcc', 'irmss']"
+26,cbers_2,CBERS-2,China-Brazil Earth Resources Satellite - 2 (ZY-1 FM2),"CAST,AEB,CRESDA,INPE",Inactive,Sunsynchronous orbit,21 Oct 2003,15 Nov 2007,778,,10:30:00 desc,,,,"['wfi', 'dcs_cbers', 'hrcc', 'irmss']"
+27,cbers_2b,CBERS-2B,China-Brazil Earth Resources Satellite - 2B (ZY-1 FM2B) ,"CAST,AEB,CRESDA,INPE",Inactive,Sunsynchronous orbit,19 Sep 2007,16 May 2010,778,,10:30:00 desc,,,,"['wfi', 'dcs_cbers', 'hrcc', 'hrpc']"
+28,cbers_3,CBERS-3,China-Brazil Earth Resources Satellite - 3 (ZY-1 FM3) ,"CAST,AEB,CRESDA,INPE",Lost at launch,Sunsynchronous orbit,09 Dec 2013,09 Dec 2013,778,,10:30 desc,,,,"['wfi_2', 'muxcam', 'dcs_cbers', 'irmss_2', 'panmux']"
+29,cbers_4,CBERS-4,China-Brazil Earth Resources Satellite - 4 (ZY-1 FM4) ,"CAST,AEB,CRESDA,INPE",Operational,Sunsynchronous orbit,07 Dec 2014,≥2026,778,,10:30 asc,,http://www.dgi.inpe.br/CDSR/,,"['wfi_2', 'muxcam', 'dcs_cbers', 'irmss_2', 'panmux']"
+30,champ,CHAMP,Challenging Mini-Satellite Payload,DLR,Inactive,Drifting orbit,15 Jul 2000,19 Sep 2010,470,,,0-20009-0-041,,,"['asc', 'lrr_dlr', 'didm', 'mias', 'star', 'blackjack_champ']"
+31,clarreo_1a,CLARREO-1A,Climate Absolute Radiance and Refractivity Observatory - 1A,NASA,Mission concept,Drifting orbit,TBD,TBD,609,,,,,,"['ir_spectrometer', 'gnss_ro']"
+32,cloudsat,CloudSat,CloudSat,NASA,Inactive,Sunsynchronous orbit,28 Apr 2006,01 Aug 2023,689,,13:30 asc,0-20009-0-788,http://www.cloudsat.cira.colostate.edu/,,['cpr_cloudsat']
+33,coms,COMS,"Communication, Oceanography and Meteorology Satellite","KMA,KARI,ME (NIER),MLTM",Inactive,Geostationary orbit,26 Jun 2010,01 Apr 2021,35786,128.2,,0-20009-0-810,http://nmsc.kma.go.kr/html/homepage/en/dataservice/system_info.do,,"['mi', 'goci']"
+34,geo_kompsat_2a,GEO-KOMPSAT-2A,Geostationary Korea Multi-Purpose Satellite - 2A,"KMA,KARI,ME (NIER),MLTM",Operational,Geostationary orbit,04 Dec 2018,≥2029,35786,128.2,,0-20009-0-811,https://nmsc.kma.go.kr/enhome/html/main/main.do,,"['ami', 'ksem_cm', 'ksem_pd', 'ksem_mg_sosmag']"
+35,geo_kompsat_2b,GEO-KOMPSAT-2B,Geostationary Korea Multi-Purpose Satellite - 2B,"KMA,KARI,ME (NIER),MLTM",Operational,Geostationary orbit,18 Feb 2020,≥2030,35786,128.2,,0-20009-0-814,http://nmsc.kma.go.kr,,"['goci_ii', 'gems']"
+36,coriolis,Coriolis,Coriolis,"DoD,NASA",Inactive,Sunsynchronous orbit,06 Jan 2003,Dec 2020,838,,06:10 desc,0-20009-0-283,http://manati.star.nesdis.noaa.gov/products/WindSAT.php,,"['windsat', 'smei']"
+37,cosmic_1,COSMIC-1,"Constellation Observing System for Meteorology, Ionosphere & Climate - 1","NSPO,NOAA,UCAR",Inactive,Drifting orbit,14 Apr 2006,06 May 2020,800,,,0-20009-0-740,http://cdaac-www.cosmic.ucar.edu/cdaac/index.html,,"['tip', 'igor_cosmic', 'certo_tbb']"
+38,cryosat,CryoSat,CryoSat,ESA,Inactive,Sunsynchronous orbit,08 Oct 2005,08 Oct 2005,717,,,-20009--,,,"['lrr_esa', 'siral', 'doris']"
+39,cryosat_2,CryoSat-2,CryoSat-2,ESA,Operational,Drifting orbit,08 Apr 2010,≥2028,717,,,0-20009-0-047,https://earth.esa.int/web/guest/-/how-to-access-cryosat-data-6842,,"['lrr_esa', 'siral', 'doris']"
+40,csg_1,CSG-1,COSMO-SkyMed Second Generation - 1,ASI,Operational,Sunsynchronous orbit,18 Dec 2019,≥2026,619,,05:46 asc,,,,['csg_sar']
+41,csg_2,CSG-2,COSMO-SkyMed Second Generation - 2,ASI,Operational,Sunsynchronous orbit,31 Jan 2022,≥2029,619,,05:46 asc,,,,['csg_sar']
+42,csk_1,CSK-1,COSMO-SkyMed - 1,ASI,Operational,Sunsynchronous orbit,08 Jun 2007,≥2026,629.5,,05:46 asc,,,,['sar_2000']
+43,csk_2,CSK-2,COSMO-SkyMed - 2,ASI,Operational,Sunsynchronous orbit,09 Dec 2007,≥2026,629.5,,05:46 asc,,,,['sar_2000']
+44,csk_3,CSK-3,COSMO-SkyMed - 3,ASI,Operational,Sunsynchronous orbit,25 Oct 2008,≥2026,629.5,,05:46 asc,,,,['sar_2000']
+45,csk_4,CSK-4,COSMO-SkyMed - 4,ASI,Operational,Sunsynchronous orbit,06 Nov 2010,≥2026,629.5,,05:46 asc,,,,['sar_2000']
+46,deimos_1,Deimos-1,Deimos-1,Elecnor-Deimos,Presumably inactive,Sunsynchronous orbit,29 Jul 2009,≥2019,660,,10:30 asc,,,,['slim6']
+47,desdyni,DESDynI,"Deformation, Ecosystem Structure, and Dynamics of Ice",NASA,Mission concept,Sunsynchronous orbit,TBD,TBD,400,,06:00 desc,,,,"['vcl', 'insar']"
+48,dmsp_f01,DMSP-F01,Defense Meteorological Satellite Program - F01,"DoD,NOAA",Inactive,Sunsynchronous orbit,11 Sep 1976,17 Sep 1979,820,,06:20:00 desc,0-20009-0-746,,,"['ols', 'sem_ssb_x_2', 'ssh', 'sem_ssj4']"
+49,dmsp_f02,DMSP-F02,Defense Meteorological Satellite Program - F02,"DoD,NOAA",Inactive,Sunsynchronous orbit,04 Jun 1977,19 Mar 1978,832,,10:00:00 desc,0-20009-0-747,,,"['ols', 'sem_ssb_x_2', 'ssh', 'sem_ssj4', 'sem_ssi_es_2']"
+50,dmsp_f03,DMSP-F03,Defense Meteorological Satellite Program - F03,"DoD,NOAA",Inactive,Sunsynchronous orbit,30 Apr 1978,01 Dec 1979,810,,06:20:00 desc,0-20009-0-748,,,"['ols', 'sem_ssb_x_2', 'ssh', 'sem_ssj4']"
+51,dmsp_f04,DMSP-F04,Defense Meteorological Satellite Program - F04,"DoD,NOAA",Inactive,Sunsynchronous orbit,06 Jun 1979,09 Aug 1980,840,,10:00:00 desc,0-20009-0-749,,,"['ols', 'ssm_t', 'ssh', 'sem_ssj4', 'sem_ssi_es_2']"
+52,dmsp_f05,DMSP-F05,Defense Meteorological Satellite Program - F05,"DoD,NOAA",Inactive,Sunsynchronous orbit,14 Jul 1980,14 Jul 1980,820,,06:20 desc,,,,"['ols', 'sem_ssb_x_2', 'sem_ssj4', 'sem_ssi_es_2']"
+53,dmsp_f06,DMSP-F06,Defense Meteorological Satellite Program - F06,"DoD,NOAA",Inactive,Sunsynchronous orbit,21 Dec 1982,10 Nov 1997,824,,06:20:00 desc,,,,"['ols', 'sem_ssb_x_2', 'sem_ssj4', 'sem_ssi_es_2']"
+54,dmsp_f07,DMSP-F07,Defense Meteorological Satellite Program - F07,"DoD,NOAA",Inactive,Sunsynchronous orbit,18 Nov 1983,16 May 1988,835,,10:10:00 desc,0-20009-0-240,,,"['ols', 'sem_ssm', 'ssm_t', 'sem_ssb_x_2', 'sem_ssj4', 'sem_ssi_es_2']"
+55,dmsp_f08,DMSP-F08,Defense Meteorological Satellite Program - F08,"DoD,NOAA",Inactive,Sunsynchronous orbit,18 Jun 1987,01 Oct 2006,856,,06:10:00 desc,0-20009-0-241,,,"['ols', 'ssm_i', 'ssm_t', 'sem_ssb_x_2', 'sem_ssj4', 'sem_ssi_es_2']"
+56,dmsp_f09,DMSP-F09,Defense Meteorological Satellite Program - F09,"DoD,NOAA",Inactive,Sunsynchronous orbit,03 Feb 1988,01 Aug 1994,832,,09:30:00 desc,0-20009-0-242,,,"['ols', 'ssm_t', 'sem_ssj4', 'sem_ssi_es_2']"
+57,dmsp_f10,DMSP-F10,Defense Meteorological Satellite Program - F10,"DoD,NOAA",Inactive,Sunsynchronous orbit,01 Dec 1990,24 Oct 1997,790,,07:30:00 desc,0-20009-0-243,,,"['ols', 'ssm_i', 'ssm_t', 'sem_ssb_x_2', 'sem_ssj4', 'sem_ssi_es_2']"
+58,dmsp_f11,DMSP-F11,Defense Meteorological Satellite Program - F11,"DoD,NOAA",Inactive,Sunsynchronous orbit,28 Nov 1991,07 Aug 2000,853,,05:00:00 desc,0-20009-0-244,,,"['ols', 'ssm_i', 'ssm_t', 'ssm_t_2', 'sem_ssb_x_2', 'sem_ssj4', 'sem_ssi_es_2']"
+59,dmsp_f12,DMSP-F12,Defense Meteorological Satellite Program - F12,"DoD,NOAA",Inactive,Sunsynchronous orbit,29 Aug 1994,13 Oct 2008,850,,03:35 desc,0-20009-0-245,,,"['ols', 'sem_ssm', 'ssm_i', 'ssm_t', 'ssm_t_2', 'sem_ssb_x_2', 'sem_ssj4', 'sem_ssi_es_2']"
+60,dmsp_f13,DMSP-F13,Defense Meteorological Satellite Program - F13,"DoD,NOAA",Inactive,Sunsynchronous orbit,24 Mar 1995,03 Feb 2015,850,,05:51 desc,0-20009-0-246,http://www.class.ncdc.noaa.gov/saa/products/welcome,,"['ols', 'sem_ssm', 'ssm_i', 'ssm_t', 'sem_ssb_x_2', 'sem_ssj4', 'sem_ssi_es_2']"
+61,dmsp_f14,DMSP-F14,Defense Meteorological Satellite Program - F14,"DoD,NOAA",Inactive,Sunsynchronous orbit,04 Apr 1997,11 Feb 2020,852,,05:00 desc,0-20009-0-247,https://www.bou.class.noaa.gov/saa/products/search?sub_id=0&datatype_family=DMSP&submit.x=27&submit.y=9,,"['ols', 'sem_ssm', 'ssm_i', 'ssm_t', 'ssm_t_2', 'sem_ssj4', 'sem_ssi_es_2']"
+62,dmsp_f15,DMSP-F15,Defense Meteorological Satellite Program - F15,"DoD,NOAA",Inactive,Sunsynchronous orbit,12 Dec 1999,Dec 2020,850,,14:50 asc,0-20009-0-248,https://www.bou.class.noaa.gov/saa/products/search?sub_id=0&datatype_family=DMSP&submit.x=27&submit.y=9,,"['ols', 'ssm_i', 'ssm_t', 'ssm_t_2', 'sess_ssm_boom', 'sem_ssj4', 'sem_ssi_es_2']"
+63,dmsp_f16,DMSP-F16,Defense Meteorological Satellite Program - F16,"DoD,NOAA",Inactive,Sunsynchronous orbit,18 Oct 2003,≥2023,848,,06:20 desc,0-20009-0-249,https://www.bou.class.noaa.gov/saa/products/search?sub_id=0&datatype_family=DMSP&submit.x=27&submit.y=9,,"['ols', 'ssmis', 'sess_ssm_boom', 'sess_ssuli', 'sess_ssusi', 'sess_ssj5', 'sess_ssi_es_3']"
+64,dmsp_f17,DMSP-F17,Defense Meteorological Satellite Program - F17,"DoD,NOAA",Operational,Sunsynchronous orbit,04 Nov 2006,Sep 2026,848,,06:35 desc,0-20009-0-285,https://www.bou.class.noaa.gov/saa/products/search?sub_id=0&datatype_family=DMSP&submit.x=27&submit.y=9,,"['ols', 'ssmis', 'sess_ssm_boom', 'sess_ssuli', 'sess_ssusi', 'sess_ssj5', 'sess_ssi_es_3']"
+65,dmsp_f18,DMSP-F18,Defense Meteorological Satellite Program - F18,"DoD,NOAA",Operational,Sunsynchronous orbit,18 Oct 2009,Sep 2026,850,,04:30 desc,0-20009-0-286,https://www.bou.class.noaa.gov/saa/products/search?sub_id=0&datatype_family=DMSP&submit.x=27&submit.y=9,,"['ols', 'ssmis', 'sess_ssm_boom', 'sess_ssuli', 'sess_ssusi', 'sess_ssj5', 'sess_ssi_es_3']"
+66,dmsp_f19,DMSP-F19,Defense Meteorological Satellite Program - S19,"DoD,NOAA",Inactive,Sunsynchronous orbit,03 Apr 2014,11 Feb 2016,850,,06:36 desc,0-20009-0-287,https://www.bou.class.noaa.gov/saa/products/search?sub_id=0&datatype_family=DMSP&submit.x=27&submit.y=9,,"['ols', 'ssmis', 'sess_ssm_boom', 'sess_ssuli', 'sess_ssusi', 'sess_ssj5', 'sess_ssi_es_3']"
+68,dubaisat_1,DubaiSat-1,DubaiSat-1,EIAST,Inactive,Sunsynchronous orbit,29 Jul 2009,09 May 2016,686,,10:30 desc,,,,['dmac']
+71,earthcare,EarthCARE,"Earth Clouds, Aerosol and Radiation Explorer","ESA,JAXA",Operational,Sunsynchronous orbit,28 May 2024,≥2034,394,,14:00 desc,0-20009-0-049,https://earth.esa.int/eogateway/catalog,,"['atlid', 'bbr', 'msi', 'cpr_earth_care']"
+72,electro_goms,Electro-GOMS,Electro - Geostationary Operational Meteorological Satellite,"RosHydroMet,Roscosmos",Inactive,Geostationary orbit,31 Oct 1994,15 Nov 2000,35786,76.5,,,,,"['dcs_electro', 'rms_solar', 'str_electro', 'rms_mag', 'rms_platform']"
+73,electro_l_n1,Electro-L N1,Electro-L Number 1,"RosHydroMet,Roscosmos",Inactive,Geostationary orbit,20 Jan 2011,≥2016,35786,-29.6,,,http://planet.iitp.ru/english/spacecraft/elektro-l-n1_eng.htm,,"['msu_gs', 'dcs_electro', 'ggak_e_dir_e', 'ggak_e_vuss_e', 'geos_r_electro', 'ggak_e_skl_e', 'ggak_e_gals_e', 'ggak_e_skif_6']"
+74,electro_l_n2,Electro-L N2,Electro-L Number 2,"RosHydroMet,Roscosmos",Operational,Geostationary orbit,11 Dec 2015,≥2026,35786,-14.5,,-20009--,https://navigator.eumetsat.int/search?query=electro-L,,"['msu_gs', 'dcs_electro', 'ggak_e_dir_e', 'ggak_e_vuss_e', 'geos_r_electro', 'ggak_e_skl_e', 'ggak_e_gals_e', 'ggak_e_skif_6']"
+75,electro_m_n1_1,Electro-M N1-1,Electro-M Number 1,"RosHydroMet,Roscosmos",Planned,Geostationary orbit,≥2036,≥2046,35786,,,-20009--,,,"['lm', 'erbr', 'dcs_electro', 'ggak_e_fm_e', 'ggak_e_dir_e', 'ggak_e_isp_2m', 'msu_gsm', 'ggak_e_vuss_e', 'geos_r_electro', 'irfs_gs', 'ggak_e_gals_e', 'ggak_e_skif_6']"
+76,electro_m_n1_2,Electro-M N1-2,Electro-M Number 2,"RosHydroMet,Roscosmos",Planned,Geostationary orbit,≥2036,≥2046,35786,,,-20009--,,,"['lm', 'erbr', 'dcs_electro', 'ggak_e_fm_e', 'ggak_e_dir_e', 'ggak_e_isp_2m', 'msu_gsm', 'ggak_e_vuss_e', 'geos_r_electro', 'irfs_gs', 'ggak_e_gals_e', 'ggak_e_skif_6']"
+77,enmap,EnMAP,Environmental Mapping and Analysis Programme,DLR,Operational,Sunsynchronous orbit,01 Apr 2022,≥2026,653,,11:00 desc,,https://www.enmap.org/data_tools/,,['hsi_enmap']
+78,envisat,Envisat,Environmental Satellite,ESA,Inactive,Sunsynchronous orbit,01 Mar 2002,08 Apr 2012,774,,10:00 desc,0-20009-0-060,,,"['sciamachy_nadir', 'ra_2', 'lrr_esa', 'asar', 'gomos', 'mipas', 'meris', 'aatsr', 'mwr_envisat', 'doris', 'sciamachy_limb']"
+79,aqua,Aqua,Earth Observation System - Aqua,NASA,Operational,Sunsynchronous orbit,04 May 2002,≥2026,705,,14:18 asc,0-20009-0-784,https://directreadout.sci.gsfc.nasa.gov/?id=dspContent&cid=14,,"['airs', 'hsb', 'ceres', 'amsu_a', 'modis', 'amsr_e']"
+80,aura,Aura,Earth Observation System - Aura,NASA,Operational,Sunsynchronous orbit,15 Jul 2004,≥2026,705,,13:56 asc,0-20009-0-785,https://disc.gsfc.nasa.gov/Aura,,"['mls_eos_aura', 'hirdls', 'tes_limb', 'omi', 'tes_nadir']"
+81,terra,Terra,Earth Observation System - Terra,NASA,Operational,Sunsynchronous orbit,18 Dec 1999,≥2026,705,,09:40 asc,0-20009-0-783,https://directreadout.sci.gsfc.nasa.gov/?id=dspContent&cid=15,,"['ceres', 'misr', 'mopitt', 'modis', 'aster']"
+83,metop_sg_a2,Metop-SG-A2,Meteorological operational satellite Second Generation A2 ,"EUMETSAT,ESA",Planned,Sunsynchronous orbit,≥2033,≥2042,835,,09:30 desc,0-20009-0-026,,,"['ro', 'mws', 'rmu', '3mi', 'iasi_ng', 'sentinel_5', 'metimage']"
+84,metop_sg_a3,Metop-SG-A3,Meteorological operational satellite Second Generation A3,"EUMETSAT,ESA",Planned,Sunsynchronous orbit,≥2039,≥2047,835,,09:30 desc,0-20009-0-028,,,"['ro', 'mws', 'rmu', '3mi', 'iasi_ng', 'sentinel_5', 'metimage']"
+85,metop_sg_b1,Metop-SG-B1,Meteorological operational satellite Second Generation B1,"EUMETSAT,ESA",Planned,Sunsynchronous orbit,≥2026,≥2035,835,,09:30 desc,0-20009-0-025,,,"['ro', 'ici', 'sca_scatterometer', 'mwi_metop_sg', 'rmu', 'a_dcs']"
+86,metop_sg_b2,Metop-SG-B2,Meteorological operational satellite Second Generation B2,"EUMETSAT,ESA",Planned,Sunsynchronous orbit,≥2033,≥2041,835,,09:30 desc,0-20009-0-027,,,"['ro', 'ici', 'sca_scatterometer', 'mwi_metop_sg', 'rmu', 'a_dcs']"
+87,metop_sg_b3,Metop-SG-B3,Meteorological operational satellite Second Generation B3,"EUMETSAT,ESA",Planned,Sunsynchronous orbit,≥2040,≥2048,835,,09:30 desc,0-20009-0-029,,,"['ro', 'ici', 'sca_scatterometer', 'mwi_metop_sg', 'rmu', 'a_dcs']"
+88,erbs,ERBS,Earth Radiation Budget Satellite,NASA,Inactive,Drifting orbit,05 Oct 1984,14 Oct 2005,610,,,0-20009-0-780,,,"['erbe', 'sage_ii']"
+89,ers_1,ERS-1,European Remote-sensing Satellite - 1,ESA,Inactive,Sunsynchronous orbit,17 Jul 1991,10 Mar 2000,785,,10:30 desc,0-20009-0-001,,,"['ra', 'lrr_esa', 'prare', 'atsr', 'ami_scat', 'ami_sar']"
+90,ers_2,ERS-2,European Remote-sensing Satellite - 2,ESA,Inactive,Sunsynchronous orbit,21 Apr 1995,06 Jul 2011,785,,10:30 desc,0-20009-0-002,,,"['ra', 'lrr_esa', 'prare', 'gome', 'ami_scat', 'atsr_2', 'mwr_envisat', 'ami_sar']"
+91,essa_1,ESSA-1,Environmental Science and Services Administration - 1,"NOAA,NASA",Inactive,Sunsynchronous orbit,03 Feb 1966,08 Mar 1967,770,,09:30:00 desc,,,,"['fpr', 'vcs_wa']"
+92,essa_2,ESSA-2,Environmental Science and Services Administration - 2,"NOAA,NASA",Inactive,Sunsynchronous orbit,28 Feb 1966,16 Oct 1970,1390,,09:30 desc,,,,['apt']
+93,essa_3,ESSA-3,Environmental Science and Services Administration - 3,"NOAA,NASA",Inactive,Sunsynchronous orbit,02 Oct 1966,02 Dec 1968,1440,,09:30:00 desc,,,,"['fpr', 'avcs']"
+94,essa_4,ESSA-4,Environmental Science and Services Administration - 4,"NOAA,NASA",Inactive,Sunsynchronous orbit,26 Jan 1967,05 May 1968,1380,,09:30:00 desc,,,,['apt']
+95,essa_5,ESSA-5,Environmental Science and Services Administration - 5,"NOAA,NASA",Inactive,Sunsynchronous orbit,20 Apr 1967,20 Feb 1970,1390,,09:30:00 desc,,,,"['fpr', 'avcs']"
+96,essa_6,ESSA-6,Environmental Science and Services Administration - 6,"NOAA,NASA",Inactive,Sunsynchronous orbit,10 Nov 1967,03 Dec 1969,1450,,09:30:00 desc,,,,['apt']
+97,essa_7,ESSA-7,Environmental Science and Services Administration - 7,"NOAA,NASA",Inactive,Sunsynchronous orbit,16 Aug 1968,10 Mar 1970,1450,,09:30:00 desc,,,,"['fpr', 'avcs']"
+98,essa_8,ESSA-8,Environmental Science and Services Administration - 8,"NOAA,NASA",Inactive,Sunsynchronous orbit,15 Dec 1968,12 Mar 1976,1440,,09:30:00 desc,,,,['apt']
+99,essa_9,ESSA-9,Environmental Science and Services Administration - 9,"NOAA,NASA",Inactive,Sunsynchronous orbit,26 Feb 1969,12 Nov 1972,1470,,09:30:00 desc,,,,"['fpr', 'avcs']"
+100,formosat_2,FORMOSAT-2,FORMOSAT-2,"NSPO,UCAR",Inactive,Sunsynchronous orbit,21 May 2004,19 Aug 2016,891,,09:30 desc,,,,"['rsi', 'isual']"
+101,fy_1a,FY-1A,Feng-Yun - 1A,"CMA,NRSCC",Inactive,Sunsynchronous orbit,07 Sep 1988,16 Oct 1988,900,,15:30 asc,,,,"['mvisr', 'sem_ims', 'sem_hepd']"
+102,fy_1b,FY-1B,Feng-Yun - 1B,"CMA,NRSCC",Inactive,Sunsynchronous orbit,03 Sep 1990,05 Aug 1991,900,,07:50 desc,,,,"['mvisr', 'sem_ims', 'sem_hepd']"
+103,fy_1c,FY-1C,Feng-Yun - 1C,"CMA,NRSCC",Inactive,Sunsynchronous orbit,10 May 1999,26 Apr 2004,862,,07:00 desc,0-20009-0-500,,,"['mvisr', 'sem_ims', 'sem_hepd']"
+104,fy_1d,FY-1D,Feng-Yun - 1D,"CMA,NRSCC",Inactive,Sunsynchronous orbit,15 May 2002,01 Apr 2012,866,,09:00 desc,0-20009-0-501,,,"['mvisr', 'sem_ims', 'sem_hepd']"
+105,fy_2a,FY-2A,Feng-Yun - 2A,"CMA,NRSCC",Inactive,Geostationary orbit,10 Jun 1997,08 Apr 1998,35786,105,,,http://nsmc.cma.gov.cn/NewSite/NSMC_EN/Channels/100028.html?reg=LAN&pas=CLC&col=COL&t=24,,"['dcs_fy', 'sem_fy_2', 's_vissr_fy_2a_b']"
+106,fy_2b,FY-2B,Feng-Yun - 2B,"CMA,NRSCC",Inactive,Geostationary orbit,25 Jun 2000,Sep 2004,35786,105,,0-20009-0-512,http://nsmc.cma.gov.cn/NewSite/NSMC_EN/Channels/100028.html?reg=LAN&pas=CLC&col=COL&t=24,,"['dcs_fy', 'sem_fy_2', 's_vissr_fy_2a_b']"
+107,fy_2c,FY-2C,Feng-Yun - 2C,"CMA,NRSCC",Inactive,Geostationary orbit,19 Oct 2004,23 Nov 2009,35786,105,,0-20009-0-513,http://nsmc.cma.gov.cn/NewSite/NSMC_EN/Channels/100028.html?reg=LAN&pas=CLC&col=COL&t=24,,"['dcs_fy', 'sem_fy_2', 's_vissr_fy_2c_d_e']"
+108,fy_2d,FY-2D,Feng-Yun - 2D,"CMA,NRSCC",Inactive,Geostationary orbit,08 Dec 2006,Jul 2015,35786,86.5,,0-20009-0-514,http://satellite.nsmc.org.cn/PortalSite/Default.aspx,,"['dcs_fy', 'sem_fy_2', 's_vissr_fy_2c_d_e']"
+109,fy_2e,FY-2E,Feng-Yun - 2E,"CMA,NRSCC",Inactive,Geostationary orbit,23 Dec 2008,31 Dec 2018,35786,86.5,,0-20009-0-515,http://satellite.nsmc.org.cn/portalsite/Data/DataView.aspx?SatelliteType=1&SatelliteCode=FY2E,,"['dcs_fy', 'sem_fy_2', 's_vissr_fy_2c_d_e']"
+110,fy_2f,FY-2F,Feng-Yun - 2F,"CMA,NRSCC",Inactive,Geostationary orbit,13 Jan 2012,01 Apr 2022,35786,112,,0-20009-0-516,http://satellite.nsmc.org.cn/portalsite/Data/DataView.aspx?SatelliteType=1&SatelliteCode=FY2F,,"['sxm', 'dcs_fy', 'sem_fy_2', 's_vissr_fy_2f_g_h']"
+111,fy_2g,FY-2G,Feng-Yun - 2G,"CMA,NRSCC",Operational,Geostationary orbit,31 Dec 2014,≥2026,35786,99.2,,0-20009-0-517,http://satellite.nsmc.org.cn/portalsite/Data/DataView.aspx?SatelliteType=1&SatelliteCode=FY2G,,"['sxm', 'dcs_fy', 'sem_fy_2', 's_vissr_fy_2f_g_h']"
+112,fy_2h,FY-2H,Feng-Yun - 2H,"CMA,NRSCC",Operational,Geostationary orbit,05 Jun 2018,≥2026,35786,79,,0-20009-0-518,http://satellite.nsmc.org.cn/PortalSite/Default.aspx,,"['sxm', 'dcs_fy', 'sem_fy_2', 's_vissr_fy_2f_g_h']"
+113,fy_3a,FY-3A,Feng-Yun - 3A,"CMA,NRSCC",Inactive,Sunsynchronous orbit,27 May 2008,05 Jan 2015,834,,09:05 desc,0-20009-0-520,http://satellite.nsmc.org.cn/PortalSite/Default.aspx,,"['tou', 'erm_1', 'sim_1', 'iras', 'sbus', 'mwri_1', 'mwhs_1', 'mersi_1', 'virr_fy_3', 'mwts_1', 'sem_ims', 'sem_hepd']"
+114,fy_3b,FY-3B,Feng-Yun - 3B,"CMA,NRSCC",Inactive,Sunsynchronous orbit,04 Nov 2010,09 Dec 2021,836,,14:45 asc,0-20009-0-521,http://satellite.nsmc.org.cn/portalsite/Data/DataView.aspx?SatelliteType=0&SatelliteCode=FY3B,,"['tou', 'sim_1', 'erm_1', 'iras', 'sbus', 'mwri_1', 'mwts_1', 'mwhs_1', 'mersi_1', 'virr_fy_3', 'sem_ims', 'sem_hepd']"
+115,fy_3c,FY-3C,Feng-Yun 3C,"CMA,NRSCC",Inactive,Sunsynchronous orbit,23 Sep 2013,28 Nov 2024,836,,08:20 desc,0-20009-0-522,http://satellite.nsmc.org.cn/portalsite/Data/DataView.aspx?SatelliteType=0&SatelliteCode=FY3C,,"['tou', 'erm_1', 'sim_1', 'iras', 'gnos', 'sbus', 'mwri_1', 'mwhs_2', 'mersi_1', 'virr_fy_3', 'mwts_2', 'sem_ims', 'sem_hepd']"
+116,fy_3d,FY-3D,Feng-Yun 3D,"CMA,NRSCC",Operational,Sunsynchronous orbit,14 Nov 2017,≥2026,836,,14:00 asc,0-20009-0-523,http://satellite.nsmc.org.cn/PortalSite/Default.aspx,,"['gnos', 'mwri_1', 'gas', 'hiras', 'mwhs_2', 'mersi_2', 'mwts_2', 'sws_ipm', 'sws_wai', 'sem_hepd']"
+117,fy_3e,FY-3E,Feng-Yun 3E,"CMA,NRSCC",Operational,Sunsynchronous orbit,04 Jul 2021,≥2029,836,,05:40 desc,0-20009-0-524,http://data.nsmc.org.cn/portalsite/default.aspx,,"['windrad', 'sim_2', 'ssim', 'xeuvi', 'gnos_2', 'mwhs_2', 'mwts_3', 'hiras_2', 'mersi_ll', 'sws_tri_ipm', 'sws_sem_hepd']"
+118,fy_3h,FY-3H,Feng-Yun 3H,"CMA,NRSCC",Commissioning,Sunsynchronous orbit,27 Sep 2025,≥2033,836,,14:00 asc,-20009--,https://satellite.nsmc.org.cn/portalsite/,,"['gnos_2', 'mwri_2', 'mwhs_2', 'mersi_3', 'gas_2', 'mwts_3', 'hiras_2', 'sws_ipm', 'sws_wai']"
+119,fy_3f,FY-3F,Feng-Yun 3F,"CMA,NRSCC",Operational,Sunsynchronous orbit,03 Aug 2023,≥2031,836,,10:00 desc,0-20009-0-525,https://satellite.nsmc.org.cn/portalsite/,,"['erm_2', 'sim_2', 'oms_limb', 'gnos_2', 'mwri_2', 'mwhs_2', 'mersi_3', 'mwts_3', 'hiras_2', 'oms_nadir']"
+120,fy_4a,FY-4A,Feng-Yun - 4A,"CMA,NRSCC",Operational,Geostationary orbit,10 Dec 2016,≥2026,35786,123.5,,0-20009-0-530,http://satellite.nsmc.org.cn/portalsite/Data/DataView.aspx?SatelliteType=1&SatelliteCode=FY4A,,"['lmi', 'dcs_fy', 'sep', 'agri', 'giirs']"
+121,fy_4b,FY-4B,Feng-Yun - 4B,"CMA,NRSCC",Operational,Geostationary orbit,02 Jun 2021,≥2029,35786,105,,0-20009-0-531,http://data.nsmc.org.cn/portalsite/default.aspx,,"['dcs_fy', 'sep', 'ghi', 'agri', 'giirs_2']"
+122,fy_4c,FY-4C,Feng-Yun - 4C,"CMA,NRSCC",Commissioning,Geostationary orbit,26 Dec 2025,≥2033,35786,133,,-20009--,,,"['lmi', 'dcs_fy', 'sxus', 'sxeuv', 'sep', 'seuvi_fy_4', 'agri', 'giirs_2', 'musi']"
+123,fy_4d,FY-4D,Feng-Yun - 4D,"CMA,NRSCC",Planned,Geostationary orbit,≥2026,≥2034,35786,,,-20009--,,,"['lmi', 'dcs_fy', 'sep', 'seuvi_fy_4', 'agri', 'giirs_2']"
+124,fy_4e,FY-4E,Feng-Yun - 4E,"CMA,NRSCC",Planned,Geostationary orbit,≥2027,≥2035,35786,,,-20009--,,,"['dcs_fy', 'fgm_fy4', 'ghi', 'agri', 'giirs_2', 'musi']"
+127,gcom_c,GCOM-C,Global Change Observation Mission for Climate,JAXA,Operational,Sunsynchronous orbit,23 Dec 2017,≥2026,798,,10:30 desc,0-20009-0-123,http://suzaku.eorc.jaxa.jp/GCOM_C/data/data.html,,['sgli']
+130,gcom_w,GCOM-W,Global Change Observation Mission for Water,JAXA,Operational,Sunsynchronous orbit,17 May 2012,≥2026,700,,13:30 asc,0-20009-0-122,https://gportal.jaxa.jp/gpr/?lang=en,,['amsr2']
+133,geosat,GEOSat,Geodetic Satellite,"DoD,NASA",Inactive,Drifting orbit,12 Mar 1985,31 Jan 1990,785,,,,,,['gra']
+134,gfo,GFO,GEOSat Follow-on,"DoD,NASA",Inactive,Drifting orbit,10 Feb 1998,22 Oct 2008,784,,,,,,"['trsr', 'gfo_ra', 'lra_nasa', 'wvr']"
+135,glory,Glory,Glory,NASA,Lost at launch,Sunsynchronous orbit,04 Mar 2011,04 Mar 2011,705,,13:30 asc,,,,"['cc', 'tim', 'aps']"
+136,goce,GOCE,Gravity Field and Steady-State Ocean Circulation Explorer,ESA,Inactive,Sunsynchronous orbit,17 Mar 2009,21 Oct 2013,230,,06:00 asc,,,,"['lrr_esa', 'ssti', 'egg']"
+137,goes_1,GOES-1,Geostationary Operational Environmental Satellite - 1,"NOAA,NASA",Inactive,Geostationary orbit,16 Oct 1975,07 Mar 1985,35786,-135,,0-20009-0-731,,,"['sem_mag', 'dcis', 'sem_eps', 'vissr', 'sem_xrs_euv', 'sem_hepad']"
+138,goes_2,GOES-2,Geostationary Operational Environmental Satellite - 2,"NOAA,NASA",Inactive,Geostationary orbit,16 Jun 1977,01 Jul 1993,35786,-75,,0-20009-0-732,,,"['sem_mag', 'dcis', 'sem_eps', 'vissr', 'sem_xrs_euv', 'sem_hepad']"
+139,goes_3,GOES-3,Geostationary Operational Environmental Satellite - 3,"NOAA,NASA",Inactive,Geostationary orbit,16 Jun 1978,01 Jul 1993,35786,-135,,0-20009-0-733,,,"['sem_mag', 'dcis', 'sem_eps', 'vissr', 'sem_xrs_euv', 'sem_hepad']"
+140,goes_4,GOES-4,Geostationary Operational Environmental Satellite - 4,"NOAA,NASA",Inactive,Geostationary orbit,09 Sep 1980,22 Nov 1988,35786,-135,,0-20009-0-734,,,"['sem_mag', 'vas', 'dcis', 'sem_eps', 'sem_xrs_euv', 'sem_hepad']"
+141,goes_5,GOES-5,Geostationary Operational Environmental Satellite - 5,"NOAA,NASA",Inactive,Geostationary orbit,22 May 1981,18 Jul 1990,35786,-75,,0-20009-0-735,,,"['sem_mag', 'vas', 'dcis', 'sem_eps', 'sem_xrs_euv', 'sem_hepad']"
+142,goes_6,GOES-6,Geostationary Operational Environmental Satellite - 6,"NOAA,NASA",Inactive,Geostationary orbit,28 Apr 1983,01 Jul 1989,35786,-135,,0-20009-0-250,,,"['sem_mag', 'vas', 'dcis', 'sem_eps', 'sem_xrs_euv', 'sem_hepad']"
+143,goes_7,GOES-7,Geostationary Operational Environmental Satellite - 7,"NOAA,NASA",Inactive,Geostationary orbit,26 Feb 1987,11 Jan 1996,35786,-75,,0-20009-0-251,,,"['sem_mag', 'vas', 'dcis', 'sem_eps', 'sem_xrs_euv', 'sem_hepad']"
+144,goes_8,GOES-8,Geostationary Operational Environmental Satellite - 8,"NOAA,NASA",Inactive,Geostationary orbit,13 Apr 1994,05 May 2004,35786,-75,,0-20009-0-252,http://www.nesdis.noaa.gov/satellite_information.html,,"['sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_8_11', 'sem_xrs_euv', 'sem_hepad']"
+145,goes_9,GOES-9,Geostationary Operational Environmental Satellite - 9,"NOAA,NASA",Inactive,Geostationary orbit,23 May 1995,22 May 2003,35786,-135,,0-20009-0-253,http://www.nesdis.noaa.gov/satellite_information.html,,"['sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_8_11', 'sem_xrs_euv', 'sem_hepad']"
+146,goes_10,GOES-10,Geostationary Operational Environmental Satellite - 10 ,"NOAA,NASA",Inactive,Geostationary orbit,25 Apr 1997,01 Dec 2006,35786,-135,,0-20009-0-254,http://www.nesdis.noaa.gov/satellite_information.html,,"['sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_8_11', 'sem_xrs_euv', 'sem_hepad']"
+147,goes_11,GOES-11,Geostationary Operational Environmental Satellite - 11,"NOAA,NASA",Inactive,Geostationary orbit,03 May 2000,05 Dec 2011,35786,-135,,0-20009-0-255,http://www.nesdis.noaa.gov/satellite_information.html,,"['sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_8_11', 'sem_xrs_euv', 'sem_hepad']"
+148,goes_12,GOES-12,Geostationary Operational Environmental Satellite - 12,"NOAA,NASA",Inactive,Geostationary orbit,23 Jul 2001,10 May 2010,35786,-75,,0-20009-0-256,http://www.nesdis.noaa.gov/satellite_information.html,,"['sxi', 'sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_12_15', 'sem_xrs_euv', 'sem_hepad']"
+149,goes_13,GOES-13,Geostationary Operational Environmental Satellite - 13,"NOAA,NASA",Inactive,Geostationary orbit,24 May 2006,Oct 2019,35786,61.5,,0-20009-0-257,http://www.goes.noaa.gov/,,"['sxi', 'sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_12_15', 'sem_xrs_euv', 'sem_hepad']"
+150,goes_14,GOES-14,Geostationary Operational Environmental Satellite - 14,"NOAA,NASA",Stand-by,Geostationary orbit,27 Jun 2009,≥2027,35786,-108,,0-20009-0-258,http://www.goes.noaa.gov/,,"['sxi', 'sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_12_15', 'sem_xrs_euv', 'sem_hepad']"
+151,goes_15,GOES-15,Geostationary Operational Environmental Satellite - 15,"NOAA,NASA",Inactive,Geostationary orbit,04 Mar 2010,Jun 2023,35786,61.5,,0-20009-0-259,http://www.goes.noaa.gov/,,"['sxi', 'sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_12_15', 'sem_xrs_euv', 'sem_hepad']"
+152,goes_16,GOES-16,Geostationary Operational Environmental Satellite - 16,"NOAA,NASA",Back-up,Geostationary orbit,19 Nov 2016,≥2032,35786,-75.2,,0-20009-0-270,http://cimss.ssec.wisc.edu/goes/goesdata.html,,"['glm', 'suvi', 'sem_mag', 'abi', 'geos_r', 'dcis', 'seiss_ehis', 'seiss_mps', 'exis', 'seiss_sgps']"
+154,gosat,GOSAT,Green-house gas Observing Satellite,"JAXA,MOE",Operational,Sunsynchronous orbit,23 Jan 2009,≥2026,666,,13:00 desc,0-20009-0-140,https://data2.gosat.nies.go.jp,,"['tanso_cai', 'tanso_fts']"
+156,gpm_core_observatory,GPM Core Observatory,Global Precipitation Measurement - Core Observatory,"NASA,JAXA",Operational,Drifting orbit,27 Feb 2014,≥2030,442,,,0-20009-0-288,http://pmm.nasa.gov/data-access,,"['dpr', 'gmi_core']"
+158,grace_a,GRACE A,Gravity Recovery and Climate Experiment A,"NASA,DLR",Inactive,Drifting orbit,17 Mar 2002,27 Oct 2017,337,,,0-20009-0-722,http://www.csr.utexas.edu/grace/,,"['lrr_dlr', 'sca_grace', 'hairs', 'blackjack_grace', 'superstar']"
+159,grace_c_grace_fo,GRACE C (GRACE-FO),Gravity Recovery and Climate Experiment C - Follow-on,"NASA,DLR",Operational,Drifting orbit,22 May 2018,≥2028,490,,,0-20009-0-803,,,"['lrr_dlr', 'sca_grace', 'hairs', 'superstar', 'tri_g_grace_fo']"
+160,himawari_1_gms_1,Himawari-1 (GMS-1),Himawari-1 (Geostationary Meteorological Satellite - 1),"JMA,JAXA",Inactive,Geostationary orbit,14 Jul 1977,30 Jun 1989,35786,140,,0-20009-0-153,http://www.jma.go.jp/jma/jma-eng/satellite/dissemination.htm,,"['dcs_himawari', 'rms_himawari', 'vissr_himawari_1_4']"
+161,himawari_2_gms_2,Himawari-2 (GMS-2),Himawari-2 (Geostationary Meteorological Satellite - 2) ,"JMA,JAXA",Inactive,Geostationary orbit,11 Aug 1981,20 Nov 1987,35786,140,,0-20009-0-154,http://www.jma.go.jp/jma/jma-eng/satellite/dissemination.html,,"['dcs_himawari', 'rms_himawari', 'vissr_himawari_1_4']"
+162,himawari_3_gms_3,Himawari-3 (GMS-3),Himawari-3 (Geostationary Meteorological Satellite - 3) ,"JMA,JAXA",Inactive,Geostationary orbit,03 Aug 1984,22 Jun 1995,35786,140,,0-20009-0-150,http://www.jma.go.jp/jma/jma-eng/satellite/dissemination.html,,"['dcs_himawari', 'rms_himawari', 'vissr_himawari_1_4']"
+163,himawari_4_gms_4,Himawari-4 (GMS-4),Himawari-4 (Geostationary Meteorological Satellite - 4) ,"JMA,JAXA",Inactive,Geostationary orbit,06 Sep 1989,24 Feb 2000,35786,140,,0-20009-0-151,http://www.jma.go.jp/jma/jma-eng/satellite/dissemination.html,,"['dcs_himawari', 'rms_himawari', 'vissr_himawari_1_4']"
+164,himawari_5_gms_5,Himawari-5 (GMS-5),Himawari-5 (Geostationary Meteorological Satellite - 5) ,"JMA,JAXA",Inactive,Geostationary orbit,18 Mar 1995,22 May 2003,35786,140,,0-20009-0-152,http://www.jma.go.jp/jma/jma-eng/satellite/dissemination.html,,"['dcs_himawari', 'vissr_himawari_5']"
+165,himawari_6_mtsat_1r,Himawari-6 (MTSAT-1R),Himawari-6 (Multifunction Transport Satellite -1R),"JMA,JCAB",Inactive,Geostationary orbit,26 Feb 2005,04 Dec 2015,35786,140,,0-20009-0-171,http://www.jma.go.jp/jma/jma-eng/satellite/dissemination.html,,"['dcs_himawari', 'jami']"
+166,himawari_7_mtsat_2,Himawari-7 (MTSAT-2),Himawari-7 (Multifunction Transport Satellite - 2),"JMA,JCAB",Inactive,Geostationary orbit,18 Feb 2006,10 May 2016,35786,145,,0-20009-0-172,http://www.jma.go.jp/jma/jma-eng/satellite/dissemination.html,,"['dcs_himawari', 'imager_mtsat_2']"
+167,himawari_8,Himawari-8,Himawari-8,JMA,Stand-by,Geostationary orbit,07 Oct 2014,≥2030,35786,140.7,,0-20009-0-173,http://www.jma.go.jp/jma/jma-eng/satellite/dissemination.html,,"['ahi', 'dcs_himawari']"
+169,hj_1a,HJ-1A,Huan Jing 1A,"CRESDA,CAST",Inactive,Sunsynchronous orbit,06 Sep 2008,≥2018,650,,10:30 desc,,http://218.247.138.119:7777/DSSPlatform/index.html,,"['wvc', 'hsi']"
+170,hj_1b,HJ-1B,Huan Jing 1B,"CRESDA,CAST",Presumably inactive,Sunsynchronous orbit,06 Sep 2008,≥2018,650,,10:30 desc,,http://218.247.138.119:7777/DSSPlatform/index.html,,"['wvc', 'irmss_hj']"
+171,hj_1c,HJ-1C,Huan Jing 1C,"CRESDA,CAST",Inactive,Sunsynchronous orbit,18 Nov 2012,≥2023,502,,06:00 desc,0-20009-0-,http://218.247.138.119:7777/DSSPlatform/index.html,,['sar_s']
+172,hy_1a,HY-1A,Hai Yang 1A,"NSOAS,CAST",Inactive,Sunsynchronous orbit,15 May 2002,30 Mar 2004,795,,10:30 desc,,,,"['czi', 'cocts']"
+173,hy_1b,HY-1B,Hai Yang 1B,"NSOAS,CAST",Inactive,Sunsynchronous orbit,11 Apr 2007,13 Feb 2016,798,,10:30 desc,,http://www.nsoas.gov.cn/NSOAS_En/Products/3.html,,"['czi', 'cocts']"
+174,hy_1c,HY-1C,Hai Yang 1C,"NSOAS,CAST",Operational,Sunsynchronous orbit,07 Sep 2018,≥2026,785,,10:30 desc,-20009--,,,"['czi', 'ais', 'scs', 'cocts', 'uvi_hy']"
+175,hy_1d,HY-1D,Hai Yang 1D,"NSOAS,CAST",Operational,Sunsynchronous orbit,10 Jun 2020,≥2026,798,,13:30 asc,-20009--,,,"['czi', 'ais', 'scs', 'cocts', 'uvi_hy']"
+176,hy_2a,HY-2A,Hai Yang 2A,"NSOAS,CAST",Presumably inactive,Sunsynchronous orbit,16 Aug 2011,≥2022,975,,06:00 desc,0-20009-0-502,https://navigator.eumetsat.int/search?query=hy-2,,"['hscat', 'alt_sso', 'lra_nasa', 'cmr', 'mwri_hy_2', 'doris']"
+177,icesat,ICESat,"Ice, Cloud and land Elevation Satellite",NASA,Inactive,Drifting orbit,12 Jan 2003,14 Aug 2010,600,,,,http://nsidc.org/data/icesat/,,"['trsr', 'glas', 'lra_nasa']"
+178,icesat_2,ICESat-2,"Ice, Cloud and land Elevation Satellite",NASA,Operational,Drifting orbit,15 Sep 2018,≥2034,481,,,0-20009-0-,http://nsidc.org/data/icesat/,,"['trsr', 'lra_nasa', 'atlas']"
+179,ims_1,IMS-1,Indian Mini-Satellite - 1,ISRO,Inactive,Sunsynchronous orbit,28 Apr 2008,20 Sep 2012,632,,09:30 desc,,,,"['mx_t', 'hysi_t']"
+180,seosat_ingenio,SEOSat/Ingenio,Spanish Earth Observation Satellite (also Ingenio),"CDTI,ESA",Lost at launch,Sunsynchronous orbit,17 Nov 2020,17 Nov 2020,668,,10:30 desc,,,,"['ms_ingenio', 'uvas', 'pan_ingenio']"
+181,insat_1a,INSAT-1A,Indian National Satellite - 1A,ISRO,Inactive,Geostationary orbit,10 Apr 1982,06 Sep 1982,35786,74,,,,,"['dcs_insat', 'vhrr_insat']"
+182,insat_1b,INSAT-1B,Indian National Satellite - 1B,ISRO,Inactive,Geostationary orbit,30 Aug 1983,15 Jul 1993,35786,74,,0-20009-0-430,,,"['dcs_insat', 'vhrr_insat']"
+183,insat_1c,INSAT-1C,Indian National Satellite - 1C,ISRO,Inactive,Geostationary orbit,22 Jul 1988,22 Nov 1989,35786,93.5,,0-20009-0-431,,,"['dcs_insat', 'vhrr_insat']"
+184,insat_1d,INSAT-1D,Indian National Satellite - 1D,ISRO,Inactive,Geostationary orbit,12 Jun 1990,14 May 2002,35786,74,,0-20009-0-432,,,"['dcs_insat', 'vhrr_insat']"
+185,insat_2a,INSAT-2A,Indian National Satellite - 2A,ISRO,Inactive,Geostationary orbit,10 Jul 1992,30 May 2002,35786,74,,0-20009-0-450,,,"['sas_r', 'dcs_insat', 'vhrr_insat']"
+186,insat_2b,INSAT-2B,Indian National Satellite - 2B,ISRO,Inactive,Geostationary orbit,23 Jul 1993,01 Jul 2004,35786,93.5,,0-20009-0-451,,,"['sas_r', 'dcs_insat', 'vhrr_insat']"
+187,insat_2c,INSAT-2C,Indian National Satellite - 2C,ISRO,Inactive,Geostationary orbit,07 Dec 1995,15 Apr 2002,35786,93.5,,,,,
+188,insat_2d,INSAT-2D,Indian National Satellite - 2D,ISRO,Inactive,Geostationary orbit,04 Jun 1997,04 Oct 1997,35786,93.5,,,,,"['sas_r', 'dcs_insat', 'vhrr_insat']"
+189,insat_2e,INSAT-2E,Indian National Satellite - 2E,ISRO,Inactive,Geostationary orbit,03 Apr 1999,15 Apr 2012,35786,83,,0-20009-0-452,,,"['sas_r', 'dcs_insat', 'ccd', 'vhrr_insat']"
+190,insat_3a,INSAT-3A,Indian National Satellite - 3A,"IMD,ISRO",Inactive,Geostationary orbit,10 Apr 2003,Sep 2016,35786,93.5,,0-20009-0-470,,,"['sas_r', 'dcs_insat', 'ccd', 'vhrr_insat']"
+191,insat_3b,INSAT-3B,Indian National Satellite - 3B,"IMD,ISRO",Inactive,Geostationary orbit,22 Mar 2000,02 Nov 2010,35786,83,,,,,
+192,insat_3c,INSAT-3C,Indian National Satellite - 3C,"IMD,ISRO",Inactive,Geostationary orbit,24 Jan 2002,≥2014,35786,74,,,,,
+193,insat_3d,INSAT-3D,Indian National Satellite - 3D,"IMD,ISRO",Back-up,Geostationary orbit,25 Jul 2013,01 Oct 2024,35786,129.5,,0-20009-0-471,http://satellite.imd.gov.in,,"['sas_r', 'dcs_insat', 'sounder_insat', 'imager_insat']"
+194,insat_3dr,INSAT-3DR,Indian National Satellite - 3D repeat,"IMD,ISRO",Operational,Geostationary orbit,08 Sep 2016,≥2026,35786,74,,0-20009-0-473,http://satellite.imd.gov.in,,"['sas_r', 'dcs_insat', 'sounder_insat', 'imager_insat']"
+196,irs_1a,IRS-1A,Indian Remote Sensing satellite - 1A,ISRO,Inactive,Sunsynchronous orbit,17 Mar 1988,01 Jul 1992,904,,10:30 desc,,,,"['liss_1', 'liss_2']"
+197,irs_1b,IRS-1B,Indian Remote Sensing satellite - 1B,ISRO,Inactive,Sunsynchronous orbit,29 Aug 1991,01 Jul 2001,904,,10:30:00 desc,,,,"['liss_1', 'liss_2']"
+198,irs_1c,IRS-1C,Indian Remote Sensing satellite - 1C,ISRO,Inactive,Sunsynchronous orbit,28 Dec 1995,21 Sep 2005,817,,10:30:00 desc,,,,"['wifs', 'pan_irs', 'liss_3_irs_1']"
+199,irs_1d,IRS-1D,Indian Remote Sensing satellite - 1D,ISRO,Inactive,Sunsynchronous orbit,29 Sep 1997,15 Jan 2010,778,,10:30 desc,,,,"['wifs', 'pan_irs', 'liss_3_irs_1']"
+200,irs_1e_irs_p1,IRS-1E (IRS-P1),Indian Remote Sensing satellite - 1E / P1,ISRO,Lost at launch,Sunsynchronous orbit,20 Sep 1993,20 Sep 1993,904,,10:30 desc,,,,"['meoss', 'liss_1']"
+201,irs_p2,IRS-P2,Indian Remote Sensing satellite - P2,ISRO,Inactive,Sunsynchronous orbit,15 Oct 1994,15 Sep 1997,817,,10:30 desc,,,,['liss_2m']
+202,irs_p3,IRS-P3,Indian Remote Sensing satellite - P3,ISRO,Inactive,Sunsynchronous orbit,21 Mar 1996,15 Oct 2004,817,,10:30 desc,,,,"['wifs_irs_p3', 'ixae', 'mos']"
+203,itos_1_tiros_m,ITOS-1 (TIROS-M),Improved TIROS Operational System,"NOAA,NASA",Inactive,Sunsynchronous orbit,23 Jan 1970,18 Jun 1971,1470,,14:30 asc,,,,"['fpr', 'spm', 'sr', 'apt', 'avcs']"
+204,jason_1,JASON-1,Joint Altimetry Satellite Oceanography Network - 1,"NOAA,CNES,EUMETSAT",Inactive,Drifting orbit,07 Dec 2001,01 Jul 2013,1324,,,0-20009-0-260,,,"['poseidon_2', 'trsr', 'lra_nasa', 'jmr', 'doris']"
+205,jason_2,JASON-2,Joint Altimetry Satellite Oceanography Network - 2,"NOAA,CNES,EUMETSAT",Inactive,Drifting orbit,20 Jun 2008,01 Oct 2019,1309.5,,,0-20009-0-261,http://aviso.altimetry.fr/index.php?id=1458,,"['poseidon_3', 'trsr', 'lpt', 'lra_nasa', 'amr', 'carmen', 'doris']"
+206,jason_3,JASON-3,Joint Altimetry Satellite Oceanography Network - 3,"NOAA,CNES,EUMETSAT",Operational,Drifting orbit,17 Jan 2016,≥2027,1336,,,0-20009-0-262,http://aviso.altimetry.fr/index.php?id=1458,,"['poseidon_3b', 'trsr', 'lpt', 'lra_nasa', 'amr', 'carmen', 'doris']"
+207,jers,JERS,Japan Earth Resources Satellite,JAXA,Inactive,Sunsynchronous orbit,11 Feb 1992,11 Oct 1998,568,,10:45 desc,,,,"['sar_jers', 'ops_jers']"
+208,noaa_20,NOAA-20,National Oceanic and Atmospheric Administration - 20,"NOAA,NASA",Operational,Sunsynchronous orbit,18 Nov 2017,≥2032,824,,13:25 asc,0-20009-0-225,https://data.noaa.gov/onestop/collections?q=Noaa-20,,"['cris', 'ceres', 'omps_nadir', 'viirs', 'atms']"
+209,noaa_21,NOAA-21,National Oceanic and Atmospheric Administration - 21,"NOAA,NASA",Operational,Sunsynchronous orbit,10 Nov 2022,≥2030,824,,13:25 asc,0-20009-0-226,https://data.noaa.gov/onestop/collections?q=Noaa-21,,"['omps_limb', 'cris', 'omps_nadir', 'viirs', 'atms']"
+210,kalpana_1,Kalpana-1,Kalpana-1,"ISRO,IMD",Inactive,Geostationary orbit,12 Sep 2002,Sep 2017,35786,74,,0-20009-0-410,http://satellite.imd.gov.in/dynamic/insat2nd.htm,,"['dcs_insat', 'vhrr_insat']"
+211,kanopus_v1,KANOPUS-V1,KANOPUS-V1,"Roscosmos,RosHydroMet",Inactive,Sunsynchronous orbit,22 Jul 2012,01 Jul 2020,510,,10:30 asc,,http://eng.ntsomz.ru/zakaz/data,,"['pss', 'mss_kanopus', 'msu_200']"
+212,kanopus_v_ik_1,KANOPUS-V-IK-1,Kanopus-Vulkan-Infra-Krasny-1,"Roscosmos,RosHydroMet",Operational,Sunsynchronous orbit,14 Jul 2017,≥2026,510,,10:30 asc,,,,"['pss', 'mss_kanopus', 'msu_ik_sr']"
+213,kompsat_1,KOMPSAT-1,Korea Multi-Purpose Satellite - 1,KARI,Inactive,Sunsynchronous orbit,20 Dec 1999,31 Jan 2008,685,,10:50:00 asc,,,,"['eoc', 'osmi', 'sps_ims', 'sps_hepd']"
+214,kompsat_2,KOMPSAT-2,Korea Multi-Purpose Satellite - 2,KARI,Operational,Sunsynchronous orbit,28 Jul 2006,≥2026,685,,10:50 asc,,http://www.si-imaging.com/products/,,['msc']
+215,kompsat_3,KOMPSAT-3,Korea Multi-Purpose Satellite - 3,KARI,Operational,Sunsynchronous orbit,17 May 2012,≥2026,675,,13:30 asc,,http://www.si-imaging.com/products/,,['aeiss']
+216,kompsat_5,KOMPSAT-5,Korea Multi-Purpose Satellite - 5,KARI,Operational,Sunsynchronous orbit,22 Aug 2013,≥2026,550,,06:00 asc,0-20009-0-825,https://cdaac-www.cosmic.ucar.edu/cdaac/products.html#kompsat5rt,,"['cosi', 'lrr_dlr', 'aopod']"
+217,lageos_1,LAGEOS-1,Laser Geodynamics Satellite - 1,"ASI,NASA",Operational,Drifting orbit,04 May 1976,≥2026,5900,,,,,,['lra_asi']
+218,lageos_2,LAGEOS-2,Laser Geodynamics Satellite - 2,"ASI,NASA",Operational,Drifting orbit,22 Oct 1992,≥2042,5780,,,,,,['lra_asi']
+219,landsat_1_erts,Landsat-1 (ERTS),Landsat-1,"USGS,NASA",Inactive,Sunsynchronous orbit,23 Jul 1972,02 Jan 1978,907,,10:00 desc,,,,"['mss', 'rbv', 'dcs_landsat']"
+220,landsat_2,Landsat-2,Landsat-2,"USGS,NASA",Inactive,Sunsynchronous orbit,22 Jan 1975,25 Feb 1982,908,,10:00:00 desc,,,,"['mss', 'rbv', 'dcs_landsat']"
+221,landsat_3,Landsat-3,Landsat-3,"USGS,NASA",Inactive,Sunsynchronous orbit,05 Mar 1978,31 Mar 1983,915,,10:00:00 desc,,,,"['mss', 'rbv', 'dcs_landsat']"
+222,landsat_4,Landsat-4,Landsat-4.,"USGS,NASA",Inactive,Sunsynchronous orbit,16 Jul 1982,≥1993,705,,10:00 desc,0-20009-0-221,,,"['gps_nasa', 'tm', 'mss']"
+223,landsat_5,Landsat-5,Landsat-5,"USGS,NASA",Inactive,Sunsynchronous orbit,01 Mar 1984,18 Nov 2011,705,,09:45 desc,0-20009-0-220,,,"['gps_nasa', 'tm', 'mss']"
+224,landsat_6,Landsat-6,Landsat-6,"USGS,NASA",Lost at launch,Sunsynchronous orbit,05 Oct 1993,05 Oct 1993,705,,09:45 desc,,,,['etm']
+225,landsat_7,Landsat-7,Landsat-7,"USGS,NASA",Inactive,Sunsynchronous orbit,15 Apr 1999,≥2024,705,,08:30 desc,0-20009-0-222,https://lta.cr.usgs.gov/,,['etm_plus']
+226,lares_1,LARES-1,Laser RElativity Satellite - 1,"ASI,NASA",Operational,Drifting orbit,13 Feb 2012,≥2050,1450,,,-20009--,,,['lra_asi']
+227,landsat_8,Landsat-8,Landsat-8,"USGS,NASA",Operational,Sunsynchronous orbit,11 Feb 2013,≥2026,705,,10:11 desc,,https://lta.cr.usgs.gov/,,"['oli', 'tirs']"
+228,megha_tropiques,Megha-Tropiques,Megha-Tropiques,"ISRO,CNES",Inactive,Drifting orbit,12 Oct 2011,Jan 2022,867,,,0-20009-0-440,http://www.icare.univ-lille1.fr/browse/mtview.php,,"['scarab', 'rosa', 'madras', 'saphir']"
+229,meteor_1_1,Meteor-1-1,Meteor-1-1,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,26 Mar 1969,26 Jan 1970,560,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+230,meteor_1_2,Meteor-1-2,Meteor-1-2,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,06 Oct 1969,06 Jul 1970,530,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+231,meteor_1_3,Meteor-1-3,Meteor-1-3,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,17 Mar 1970,17 Dec 1970,680,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+232,meteor_1_4,Meteor-1-4,Meteor-1-4,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,28 Apr 1970,28 Jan 1971,560,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+233,meteor_1_5,Meteor-1-5,Meteor-1-5,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,23 Jun 1970,23 Mar 1971,840,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+234,meteor_1_6,Meteor-1-6,Meteor-1-6,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,15 Oct 1970,15 Jul 1971,440,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+235,meteor_1_7,Meteor-1-7,Meteor-1-7,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,20 Jan 1971,20 Oct 1971,540,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+236,meteor_1_8,Meteor-1-8,Meteor-1-8,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,17 Apr 1971,17 Jan 1972,250,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+237,meteor_1_9,Meteor-1-9,Meteor-1-9,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,16 Jul 1971,16 Apr 1972,350,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+238,meteor_1_10,Meteor-1-10,Meteor-1-10,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,29 Dec 1971,29 Sep 1972,870,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+239,meteor_1_11,Meteor-1-11,Meteor-1-11,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,30 Mar 1972,30 Dec 1972,870,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+240,meteor_1_12,Meteor-1-12,Meteor-1-12,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,30 Jun 1972,30 Mar 1973,880,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+241,meteor_1_13,Meteor-1-13,Meteor-1-13,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,26 Oct 1972,26 Jul 1973,860,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+242,meteor_1_14,Meteor-1-14,Meteor-1-14,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,20 Mar 1973,20 Dec 1973,850,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+243,meteor_1_15,Meteor-1-15,Meteor-1-15,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,29 May 1973,28 Feb 1974,860,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+244,meteor_1_16,Meteor-1-16,Meteor-1-16,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,05 Mar 1974,05 Dec 1974,850,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+245,meteor_1_17,Meteor-1-17,Meteor-1-17,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,24 Apr 1974,24 Jan 1975,870,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+246,meteor_1_19,Meteor-1-19,Meteor-1-19,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,28 Oct 1974,01 Dec 1975,860,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+247,meteor_1_20,Meteor-1-20,Meteor-1-20,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,17 Dec 1974,17 Sep 1975,860,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+248,meteor_1_21,Meteor-1-21,Meteor-1-21,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,01 Apr 1975,01 Jul 1976,870,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+249,meteor_1_22,Meteor-1-22,Meteor-1-22,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,18 Sep 1975,01 Dec 1976,850,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+250,meteor_1_23,Meteor-1-23,Meteor-1-23,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,25 Dec 1975,25 Sep 1976,860,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+251,meteor_1_24,Meteor-1-24,Meteor-1-24,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,07 Apr 1976,07 Jan 1977,860,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+252,meteor_1_26,Meteor-1-26,Meteor-1-26,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,15 Oct 1976,15 Jul 1977,860,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+253,meteor_1_27,Meteor-1-27,Meteor-1-27,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,05 Apr 1977,05 Jan 1978,860,,,,,,"['ac', 'tv_meteor_1', 'ir_meteor_1']"
+254,meteor_2_1,Meteor-2-1,Meteor-2-1,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,11 Jul 1975,11 Jan 1977,860,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+255,meteor_2_2,Meteor-2-2,Meteor-2-2,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,06 Jan 1977,06 Jul 1978,880,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+256,meteor_2_3,Meteor-2-3,Meteor-2-3,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,14 Dec 1977,14 Jun 1979,860,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+257,meteor_2_4,Meteor-2-4,Meteor-2-4,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,01 Mar 1979,01 Sep 1980,850,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+258,meteor_2_5,Meteor-2-5,Meteor-2-5,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,31 Oct 1979,30 Apr 1981,870,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+259,meteor_2_6,Meteor-2-6,Meteor-2-6,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,09 Sep 1980,09 Mar 1982,860,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+260,meteor_2_7,Meteor-2-7,Meteor-2-7,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,14 May 1981,14 Nov 1982,860,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+261,meteor_2_8,Meteor-2-8,Meteor-2-8,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,25 Mar 1982,25 Sep 1983,940,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+262,meteor_2_9,Meteor-2-9,Meteor-2-9,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,14 Dec 1982,14 Jun 1984,840,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+263,meteor_2_10,Meteor-2-10,Meteor-2-10,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,28 Oct 1983,28 Apr 1985,810,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+264,meteor_2_11,Meteor-2-11,Meteor-2-11,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,05 Jul 1984,05 Jan 1986,950,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+265,meteor_2_12,Meteor-2-12,Meteor-2-12,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,06 Feb 1985,06 Jul 1986,940,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+266,meteor_2_13,Meteor-2-13,Meteor-2-13,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,26 Dec 1985,26 Jun 1987,950,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+267,meteor_2_14,Meteor-2-14,Meteor-2-14,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,27 May 1986,27 Nov 1987,950,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+268,meteor_2_15,Meteor-2-15,Meteor-2-15,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,05 Jan 1987,05 Jul 1988,950,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+269,meteor_2_16,Meteor-2-16,Meteor-2-16,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,18 Aug 1987,18 Feb 1989,950,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+270,meteor_2_17,Meteor-2-17,Meteor-2-17,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,30 Jan 1988,30 Jul 1990,950,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+271,meteor_2_18,Meteor-2-18,Meteor-2-18,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,28 Feb 1989,28 Aug 1990,940,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+272,meteor_2_19,Meteor-2-19,Meteor-2-19,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,27 Jun 1990,27 Dec 1991,950,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+273,meteor_2_20,Meteor-2-20,Meteor-2-20,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,28 Sep 1990,28 Mar 1992,950,,,,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+274,meteor_2_21,Meteor-2-21,Meteor-2-21,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,31 Aug 1993,28 Feb 1995,950,,,0-20009-0-320,,,"['rmk_2', 'tv_meteor_2', 'ir_meteor_2', 'sm_meteor_2']"
+276,meteor_3_1,Meteor-3-1,Meteor-3-1,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,24 Oct 1985,24 Oct 1987,1200,,,,,,"['mr_900b', 'mr_2000m', 'rmk_2', 'klimat', 'sm_meteor_3']"
+277,meteor_3_2,Meteor-3-2,Meteor-3-2,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,26 Jul 1988,26 Jul 1990,1200,,,,,,"['mr_900b', 'mr_2000m', 'rmk_2', 'klimat', 'sm_meteor_3']"
+278,meteor_3_3,Meteor-3-3,Meteor-3-3,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,24 Oct 1989,24 Oct 1991,1240,,,,,,"['mr_900b', 'mr_2000m', 'rmk_2', 'klimat', 'sm_meteor_3']"
+279,meteor_3_4,Meteor-3-4,Meteor-3-4,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,24 Apr 1991,24 Apr 1993,1200,,,,,,"['mr_900b', 'mr_2000m', 'rmk_2', 'klimat', 'sm_meteor_3']"
+280,meteor_3_5,Meteor-3-5,Meteor-3-5,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,15 Aug 1991,15 Aug 1993,1200,,,0-20009-0-321,,,"['mr_900b', 'toms', 'mr_2000m', 'rmk_2', 'klimat', 'sm_meteor_3']"
+281,meteor_3_6,Meteor-3-6,Meteor-3-6,"RosHydroMet,Roscosmos",Inactive,Drifting orbit,25 Jan 1994,25 Jan 1996,1210,,,,,,"['scarab', 'prare', 'mr_900b', 'mr_2000m', 'rmk_2', 'klimat', 'sm_meteor_3']"
+282,meteor_3m,Meteor-3M,Meteor-3M,"RosHydroMet,Roscosmos",Inactive,Sunsynchronous orbit,10 Dec 2001,05 Apr 2006,1020,,09:15 asc,,,,"['sfm_2', 'ocs', 'mr_2000m1', 'sage_iii', 'mivza', 'klimat', 'mtvza', 'msu_e', 'ggak_m_kgi_4c', 'ggak_m_msgi_mka']"
+283,meteor_m_n1,Meteor-M N1,Meteor-M Number 1,"RosHydroMet,Roscosmos",Inactive,Sunsynchronous orbit,17 Sep 2009,23 Sep 2014,826,,09:30 desc,,http://planet.iitp.ru/english/meteor/meteor_1_data_eng.htm,,"['ikor_m', 'sspd', 'msu_mr', 'kmss', 'severjanin_m', 'ggak_m_rims_m', 'mtvza_gy', 'ggak_e_gals_e_meteor', 'ggak_e_skif_6_meteor']"
+284,meteor_m_n2,Meteor-M N2,Meteor-M Number 2,"RosHydroMet,Roscosmos",Inactive,Sunsynchronous orbit,08 Jul 2014,01 Jun 2024,820,,09:30 asc,0-20009-0-324,http://planet.iitp.ru/english/meteor/meteor_2_data_eng.htm,,"['ikor_m', 'sspd', 'msu_mr', 'kmss', 'ikfs_2', 'severjanin_m', 'ggak_m_rims_m', 'mtvza_gy', 'ggak_e_gals_e_meteor', 'ggak_e_skif_6_meteor']"
+286,meteor_mp_n1,Meteor-MP N1,Meteor-MP Number 1,"RosHydroMet,Roscosmos",Planned,Sunsynchronous orbit,≥2036,≥2043,830,,15:30 asc,-20009--,,,"['tgsp', 'scat_mp', 'sspd', 'ikfs_3', 'arma_mp', 'msu_mr_mp', 'sas_r_meteor', 'ggak_m_rims_m', 'mtvza_gy_mp', 'ggak_e_gals_e_meteor', 'ggak_e_skif_6_meteor']"
+287,meteor_mp_n2,Meteor-MP N2,Meteor-MP Number 2,"RosHydroMet,Roscosmos",Planned,Sunsynchronous orbit,≥2037,≥2044,830,,09:30 desc,-20009--,,,"['ikor_m', 'tgsp', 'scat_mp', 'sspd', 'ikfs_3', 'arma_mp', 'msu_mr_mp', 'sas_r_meteor', 'ggak_m_rims_m', 'mtvza_gy_mp', 'ggak_e_gals_e_meteor', 'ggak_e_skif_6_meteor']"
+289,meteosat_12,Meteosat-12,Meteosat-12 (formerly MTG-1),"EUMETSAT,EC,ESA",Operational,Geostationary orbit,13 Dec 2022,≥2033,35786,-0.3,,0-20009-0-071,https://user.eumetsat.int/resources/user-guides/mtg-in-operations,,"['li', 'fci', 'geos_r', 'dcs_meteosat', 'rmu']"
+290,mtg_i2,MTG-I2,Meteosat Third Generation - Imaging 2,"EUMETSAT,EC,ESA",Planned,Geostationary orbit,≥2026,≥2037,35786,,,0-20009-0-073,,,"['li', 'fci', 'geos_r', 'dcs_meteosat', 'rmu']"
+291,mtg_i3,MTG-I3,Meteosat Third Generation - Imaging 3,"EUMETSAT,EC,ESA",Planned,Geostationary orbit,≥2033,≥2044,35786,,,0-20009-0-074,,,"['li', 'fci', 'geos_r', 'dcs_meteosat', 'rmu']"
+292,mtg_i4,MTG-I4,Meteosat Third Generation - Imaging 4,"EUMETSAT,EC,ESA",Planned,Geostationary orbit,≥2036,≥2047,35786,,,0-20009-0-076,,,"['li', 'fci', 'geos_r', 'dcs_meteosat', 'rmu']"
+293,mtg_s1,MTG-S1,Meteosat Third Generation - Sounding 1,"EUMETSAT,EC,ESA",Commissioning,Geostationary orbit,01 Jul 2025,≥2036,35786,3.4,,0-20009-0-072,,,"['irs', 'rmu', 'sentinel_4']"
+294,mtg_s2,MTG-S2,Meteosat Third Generation - Sounding 2,"EUMETSAT,EC,ESA",Planned,Geostationary orbit,≥2035,≥2046,35786,,,0-20009-0-075,,,"['irs', 'rmu', 'sentinel_4']"
+295,meteosat_1,Meteosat-1,Meteosat-1,"EUMETSAT,ESA",Inactive,Geostationary orbit,23 Nov 1977,24 Nov 1979,35786,,,0-20009-0-058,,,"['dcs_meteosat', 'mviri']"
+296,meteosat_2,Meteosat-2,Meteosat-2,"EUMETSAT,ESA",Inactive,Geostationary orbit,19 Jun 1981,02 Dec 1991,35786,,,0-20009-0-059,,,"['dcs_meteosat', 'mviri']"
+297,meteosat_3,Meteosat-3,Meteosat-3,"EUMETSAT,ESA",Inactive,Geostationary orbit,15 Jun 1988,01 Aug 1991,35786,,,0-20009-0-050,,,"['dcs_meteosat', 'mviri']"
+298,meteosat_4,Meteosat-4,Meteosat-4,"EUMETSAT,ESA",Inactive,Geostationary orbit,06 Mar 1989,08 Nov 1995,35786,,,0-20009-0-051,,,"['dcs_meteosat', 'mviri']"
+299,meteosat_5,Meteosat-5,Meteosat-5,"EUMETSAT,ESA",Inactive,Geostationary orbit,02 Mar 1991,01 Jun 1998,35786,,,0-20009-0-052,,,"['dcs_meteosat', 'mviri']"
+300,meteosat_6,Meteosat-6,Meteosat-6,"EUMETSAT,ESA",Inactive,Geostationary orbit,20 Nov 1993,27 Apr 2007,35786,,,0-20009-0-053,,,"['dcs_meteosat', 'mviri']"
+301,meteosat_7_iodc,Meteosat-7 (IODC),Meteosat-7 (Indian Ocean Data Coverage),"EUMETSAT,ESA",Inactive,Geostationary orbit,05 Dec 2006,01 Feb 2017,35786,58,,-20009--,http://www.eumetsat.int/website/home/Satellites/CurrentSatellites/Meteosat/IndianOceanDataCoverage/index.html,,"['dcs_meteosat', 'mviri']"
+302,meteosat_8,Meteosat-8,Meteosat-8,"EUMETSAT,ESA",Inactive,Geostationary orbit,28 Aug 2002,04 Jul 2016,35786,3.7,,0-20009-0-055,https://navigator.eumetsat.int/search?query=meteosat-8%20level-1&s=s,,"['gerb', 'geos_r', 'dcs_meteosat', 'seviri']"
+303,meteosat_9,Meteosat-9,Meteosat-9,"EUMETSAT,ESA",Inactive,Geostationary orbit,21 Dec 2005,01 Apr 2022,35786,3.5,,0-20009-0-056,https://navigator.eumetsat.int/search?query=meteosat-9%20level-1&s=s,,"['gerb', 'geos_r', 'dcs_meteosat', 'seviri']"
+304,meteosat_10,Meteosat-10,Meteosat-10,"EUMETSAT,ESA",Operational,Geostationary orbit,05 Jul 2012,≥2030,35786,0.0,,0-20009-0-057,https://navigator.eumetsat.int/search?query=meteosat-10%20level-1&s=s,,"['gerb', 'geos_r', 'dcs_meteosat', 'seviri']"
+305,meteosat_11,Meteosat-11,Meteosat-11,"EUMETSAT,ESA",Operational,Geostationary orbit,15 Jul 2015,≥2033,35786,9.5,,0-20009-0-070,https://navigator.eumetsat.int/search?query=meteosat-11%20level-1&s=s,,"['gerb', 'geos_r', 'dcs_meteosat', 'seviri']"
+306,metop_a,Metop-A,Meteorological operational satellite - A,"EUMETSAT,ESA",Inactive,Sunsynchronous orbit,19 Oct 2006,15 Nov 2021,827,,07:50 desc,0-20009-0-004,https://navigator.eumetsat.int/search?query=metop-a%20level-1&s=s,,"['ascat', 'sem_ted', 'gras', 'hirs_4', 'mhs', 'gome_2', 'iasi', 's_rsat', 'sem_meped', 'a_dcs', 'amsu_a', 'avhrr_3']"
+307,metop_b,Metop-B,Meteorological operational satellite - B,"EUMETSAT,ESA",Operational,Sunsynchronous orbit,17 Sep 2012,≥2027,830,,09:00 desc,0-20009-0-003,https://navigator.eumetsat.int/search?query=metop-b%20level-1&s=s,,"['ascat', 'sem_ted', 'gras', 'mhs', 'hirs_4', 'gome_2', 'iasi', 's_rsat', 'sem_meped', 'a_dcs', 'amsu_a', 'avhrr_3']"
+308,metop_c,Metop-C,Meteorological operational satellite - C,"EUMETSAT,ESA",Operational,Sunsynchronous orbit,07 Nov 2018,≥2027,827,,09:31 desc,0-20009-0-005,https://navigator.eumetsat.int/search?query=metop-c%20level-1&s=s,,"['ascat', 'sem_ted', 'gras', 'mhs', 'gome_2', 'iasi', 'sem_meped', 'a_dcs', 'amsu_a', 'avhrr_3']"
+309,orbview_1_microlab,OrbView-1/MicroLab,OrbView-1/MicroLab,"NASA,UCAR",Inactive,Drifting orbit,01 Apr 1995,03 Apr 2000,785,,,,,,"['otd', 'gps_met']"
+310,monitor_e,Monitor-E,Monitor - Experimental,Roscosmos,Inactive,Sunsynchronous orbit,26 Aug 2005,15 Aug 2008,540,,10:30 asc,,,,"['ms_monitor', 'pan_monitor_e']"
+311,mos_1,MOS-1,Marine Observatory Satellite -1,JAXA,Inactive,Sunsynchronous orbit,19 Feb 1987,29 Nov 1995,908,,10:15 desc,,,,"['msr', 'vtir', 'messr']"
+312,mos_1b,MOS-1B,Marine Observatory Satellite - 1B,JAXA,Inactive,Sunsynchronous orbit,07 Feb 1990,25 Apr 1996,908,,10:35 desc,,,,"['msr', 'vtir', 'messr']"
+313,nigeriasat_1,NigeriaSat-1,NigeriaSat-1,NASRDA,Inactive,Sunsynchronous orbit,27 Sep 2003,15 Nov 2011,686,,10:30 asc,,,,['slim6']
+314,nigeriasat_2,NigeriaSat-2,NigeriaSat-2,NASRDA,Unclear,Sunsynchronous orbit,17 Aug 2011,≥2023,718,,10:30 asc,,,,"['mri', 'vhri']"
+315,nimbus_1,Nimbus-1,Nimbus-1,NASA,Inactive,Sunsynchronous orbit,28 Aug 1964,23 Sep 1964,634,,12:00 desc,0-20009-0-761,,,"['apt', 'avcs', 'hrir']"
+316,nimbus_2,Nimbus-2,Nimbus-2,NASA,Inactive,Sunsynchronous orbit,15 May 1966,17 Jan 1969,1140,,11:30 desc,0-20009-0-762,,,"['mrir', 'apt', 'avcs', 'hrir']"
+317,nimbus_3,Nimbus-3,Nimbus-3,NASA,Inactive,Sunsynchronous orbit,13 Apr 1969,22 Jan 1972,1100,,12:00 desc,0-20009-0-763,,,"['muse', 'mrir', 'idcs', 'sirs_a', 'irls', 'hrir', 'iris_b']"
+318,nimbus_4,Nimbus-4,Nimbus-4,NASA,Inactive,Sunsynchronous orbit,08 Apr 1970,30 Sep 1980,1100,,12:00 desc,0-20009-0-764,,,"['fws', 'muse', 'idcs', 'buv', 'irls', 'sirs_b', 'iris_d', 'thir', 'scr_nimbus_4']"
+319,nimbus_5,Nimbus-5,Nimbus-5,NASA,Inactive,Sunsynchronous orbit,10 Dec 1972,29 Mar 1983,1100,,12:00 desc,0-20009-0-765,,,"['nems', 'itpr', 'scmr', 'thir', 'scr_nimbus_5', 'esmr_nimbus_5']"
+320,nimbus_6,Nimbus-6,Nimbus-6,NASA,Inactive,Sunsynchronous orbit,12 Jun 1975,29 Mar 1983,1100,,12:00 desc,0-20009-0-766,,,"['erb', 'lrir', 'pmr', 'hirs', 'thir', 'scams', 'twerle', 'esmr_nimbus_6']"
+321,nimbus_7,Nimbus-7,Nimbus-7,NASA,Inactive,Sunsynchronous orbit,24 Oct 1978,01 Aug 1994,947,,12:00 desc,0-20009-0-767,,,"['erb', 'sams', 'lims', 'sam_ii', 'czcs', 'toms', 'sbuv', 'thir', 'smmr']"
+322,nmp_eo_1,NMP-EO-1,New Millennium Program Earth Observing - 1,"NASA,USGS",Inactive,Sunsynchronous orbit,21 Nov 2000,30 Mar 2017,691,,09:45 desc,,http://eo1.usgs.gov/,,"['hyperion', 'ali', 'lac']"
+323,noaa_1,NOAA-1,National Oceanic and Atmospheric Administration - 1,"NOAA,NASA",Inactive,Sunsynchronous orbit,11 Dec 1970,19 Aug 1971,1450,,13:30 asc,0-20009-0-701,,,"['fpr', 'spm', 'sr', 'apt', 'avcs']"
+324,noaa_2,NOAA-2,National Oceanic and Atmospheric Administration - 2,"NOAA,NASA",Inactive,Sunsynchronous orbit,13 Oct 1972,30 Jan 1975,1450,,14:30:00 asc,0-20009-0-702,,,"['spm', 'sr', 'vtpr', 'vhrr_noaa']"
+325,noaa_3,NOAA-3,National Oceanic and Atmospheric Administration - 3,"NOAA,NASA",Inactive,Sunsynchronous orbit,06 Nov 1973,31 Aug 1976,1500,,14:30:00 asc,0-20009-0-703,,,"['spm', 'sr', 'vtpr', 'vhrr_noaa']"
+326,noaa_4,NOAA-4,National Oceanic and Atmospheric Administration - 4,"NOAA,NASA",Inactive,Sunsynchronous orbit,15 Nov 1974,18 Nov 1978,1450,,14:30:00 asc,0-20009-0-704,,,"['spm', 'sr', 'vtpr', 'vhrr_noaa']"
+327,noaa_5,NOAA-5,National Oceanic and Atmospheric Administration - 5,"NOAA,NASA",Inactive,Sunsynchronous orbit,29 Jul 1976,16 Jul 1979,1510,,14:30:00 asc,0-20009-0-705,,,"['spm', 'sr', 'vtpr', 'vhrr_noaa']"
+328,noaa_6,NOAA-6,National Oceanic and Atmospheric Administration - 6,"NOAA,NASA",Inactive,Sunsynchronous orbit,27 Jun 1979,31 Mar 1987,840,,07:30 desc,0-20009-0-706,,,"['argos', 'ssu', 'msu', 'sem_ted', 'hirs_2', 'avhrr', 'sem_meped']"
+329,noaa_7,NOAA-7,National Oceanic and Atmospheric Administration - 7,"NOAA,NASA",Inactive,Sunsynchronous orbit,23 Jun 1981,07 Jun 1986,860,,14:30:00 asc,0-20009-0-707,,,"['argos', 'ssu', 'msu', 'sem_ted', 'hirs_2', 'sem_meped', 'avhrr_2']"
+330,noaa_8,NOAA-8,National Oceanic and Atmospheric Administration - 8,"NOAA,NASA",Inactive,Sunsynchronous orbit,28 Mar 1983,29 Dec 1985,820,,07:30:00 desc,0-20009-0-200,,,"['argos', 'ssu', 'msu', 'sem_ted', 'hirs_2', 's_rsat', 'avhrr', 'sem_meped']"
+331,noaa_9,NOAA-9,National Oceanic and Atmospheric Administration - 9,"NOAA,NASA",Inactive,Sunsynchronous orbit,12 Dec 1984,13 Feb 1998,850,,14:30:00 asc,0-20009-0-201,,,"['argos', 'ssu', 'msu', 'sem_ted', 'erbe_noaa', 'sbuv_2', 'hirs_2', 's_rsat', 'sem_meped', 'avhrr_2']"
+332,noaa_10,NOAA-10,National Oceanic and Atmospheric Administration - 10,"NOAA,NASA",Inactive,Sunsynchronous orbit,17 Sep 1986,30 Aug 2001,810,,07:30:00 desc,0-20009-0-202,,,"['argos', 'msu', 'sem_ted', 'erbe_noaa', 'sbuv_2', 'hirs_2', 's_rsat', 'avhrr', 'sem_meped']"
+333,noaa_11,NOAA-11,National Oceanic and Atmospheric Administration - 11,"NOAA,NASA",Inactive,Sunsynchronous orbit,24 Sep 1988,16 Jun 2004,843,,14:10:00 asc,0-20009-0-203,,,"['argos', 'ssu', 'msu', 'sbuv_2', 'hirs_2', 's_rsat', 'avhrr_2']"
+334,noaa_12,NOAA-12,National Oceanic and Atmospheric Administration - 12,"NOAA,NASA",Inactive,Sunsynchronous orbit,14 May 1991,10 Aug 2007,804,,05:10:00 desc,0-20009-0-204,,,"['argos', 'msu', 'sem_ted', 'hirs_2', 'sem_meped', 'avhrr_2']"
+335,noaa_13,NOAA-13,National Oceanic and Atmospheric Administration - 13,"NOAA,NASA",Inactive,Sunsynchronous orbit,09 Aug 1993,21 Aug 1993,820,,14:00:00 asc,,,,"['argos', 'msu', 'sem_ted', 'sbuv_2', 'hirs_2', 's_rsat', 'sem_meped', 'avhrr_2']"
+336,noaa_14,NOAA-14,National Oceanic and Atmospheric Administration - 14,"NOAA,NASA",Inactive,Sunsynchronous orbit,30 Dec 1994,23 May 2007,844,,09:30:00 desc,0-20009-0-205,,,"['argos', 'ssu', 'msu', 'sem_ted', 'sbuv_2', 'hirs_2', 'hirs_3', 's_rsat', 'sem_meped', 'avhrr_2']"
+337,noaa_15,NOAA-15,National Oceanic and Atmospheric Administration - 15,"NOAA,NASA",Inactive,Sunsynchronous orbit,13 May 1998,19 Aug 2025,813,,07:29 desc,0-20009-0-206,https://www.bou.class.noaa.gov/saa/products/welcome,,"['sem_ted', 'hirs_3', 'dcs_2', 's_rsat', 'sem_meped', 'amsu_a', 'amsu_b', 'avhrr_3']"
+338,noaa_16,NOAA-16,National Oceanic and Atmospheric Administration - 16,"NOAA,NASA",Inactive,Sunsynchronous orbit,21 Sep 2000,09 Jun 2014,849,,09:01 desc,0-20009-0-207,http://www.ncdc.noaa.gov/oa/pod-guide/ncdc/docs/klm/index.htm,,"['sem_ted', 'sbuv_2', 'hirs_3', 's_rsat', 'dcs_2', 'sem_meped', 'amsu_a', 'amsu_b', 'avhrr_3']"
+339,noaa_17,NOAA-17,National Oceanic and Atmospheric Administration - 17,"NOAA,NASA",Inactive,Sunsynchronous orbit,24 Jun 2002,10 Apr 2013,810,,07:03 desc,0-20009-0-208,http://www.ncdc.noaa.gov/oa/pod-guide/ncdc/docs/klm/index.htm,,"['sem_ted', 'sbuv_2', 'hirs_3', 's_rsat', 'dcs_2', 'sem_meped', 'amsu_a', 'amsu_b', 'avhrr_3']"
+340,noaa_18,NOAA-18,National Oceanic and Atmospheric Administration - 18,"NOAA,NASA",Inactive,Sunsynchronous orbit,20 May 2005,06 Jun 2025,854,,10:34 desc,0-20009-0-209,https://www.bou.class.noaa.gov/saa/products/welcome,,"['sem_ted', 'sbuv_2', 'hirs_4', 'mhs', 's_rsat', 'dcs_2', 'sem_meped', 'amsu_a', 'avhrr_3']"
+341,noaa_19,NOAA-19,National Oceanic and Atmospheric Administration - 19,"NOAA,NASA",Inactive,Sunsynchronous orbit,06 Feb 2009,13 Aug 2025,870,,08:22 desc,0-20009-0-223,https://www.bou.class.noaa.gov/saa/products/welcome,,"['sem_ted', 'sbuv_2', 'hirs_4', 'mhs', 's_rsat', 'sem_meped', 'a_dcs', 'amsu_a', 'avhrr_3']"
+342,snpp,SNPP,Suomi National Polar-orbiting Partnership,"NOAA,NASA",Operational,Sunsynchronous orbit,28 Oct 2011,≥2029,824,,13:25 asc,0-20009-0-224,https://data.noaa.gov/onestop/collections?q=snpp,,"['omps_limb', 'cris', 'ceres', 'omps_nadir', 'viirs', 'atms']"
+343,oceansat_1_irs_p4,OceanSat-1 (IRS-P4),Satellite for the Ocean - 1,ISRO,Inactive,Sunsynchronous orbit,26 May 1999,08 Aug 2010,723,,12:00 desc,,,,"['ocm_oceansat_1', 'msmr']"
+344,oceansat_2,OceanSat-2,Satellite for the Ocean - 2,ISRO,Inactive,Sunsynchronous orbit,23 Sep 2009,Jul 2023,730,,11:53 desc,0-20009-0-421,,,"['oscat', 'ocm_oceansat_2', 'rosa_oceansat']"
+345,oceansat_3_eos_06,OceanSat-3 (EOS-06),OceanSat-3 (EOS-06),ISRO,Operational,Sunsynchronous orbit,26 Nov 2022,≥2027,723,,12:00 desc,0-20009-0-423,,,"['oscat_3', 'ocm_oceansat_3', 'argos_4']"
+346,oco,OCO,Orbiting Carbon Observatory,NASA,Lost at launch,Sunsynchronous orbit,24 Feb 2009,24 Feb 2009,705,,13:15 asc,,,,['oco_spectrometer']
+347,oco_2,OCO-2,Orbiting Carbon Observatory - 2,NASA,Operational,Sunsynchronous orbit,02 Jul 2014,≥2026,705,,13:36 asc,0-20009-0-289,https://co2.jpl.nasa.gov/,,['oco_spectrometer']
+348,odin,Odin,Odin,"SNSA,CNES,CSA",Operational,Sunsynchronous orbit,20 Feb 2001,≥2026,552,,06:42 desc,0-20009-0-813,,,"['smr', 'osiris']"
+349,okean_o_1,Okean-O-1,Okean-O-1,"NSAU,Roscosmos,RosHydroMet",Inactive,Drifting orbit,17 Jul 1999,15 Sep 2000,648,,,,,,"['kondor_2', 'rlsbo', 'msu_v', 'msu_m', 'r225', 'r600', 'trasser', 'delta_2d', 'msu_sk_okean']"
+350,okean_o1_1,Okean-O1-1,Okean-O1-1,"NSAU,Roscosmos,RosHydroMet",Inactive,Drifting orbit,29 Jul 1986,29 Jul 1988,660,,,,,,"['kondor', 'rlsbo', 'mwr_okean', 'rm_08_okean', 'msu_sk_okean']"
+351,okean_o1_2,Okean-O1-2,Okean-O1-2,"NSAU,Roscosmos,RosHydroMet",Inactive,Drifting orbit,16 Jul 1987,16 Jul 1989,660,,,,,,"['kondor', 'rlsbo', 'mwr_okean', 'rm_08_okean', 'msu_sk_okean']"
+352,okean_o1_3,Okean-O1-3,Okean-O1-3,"NSAU,Roscosmos,RosHydroMet",Inactive,Drifting orbit,05 Jul 1988,05 Jul 1990,660,,,,,,"['kondor', 'rlsbo', 'trasser', 'mwr_okean', 'rm_08_okean', 'msu_sk_okean']"
+353,okean_o1_4,Okean-O1-4,Okean-O1-4,"NSAU,Roscosmos,RosHydroMet",Inactive,Drifting orbit,09 Jun 1989,09 Jun 1989,660,,,,,,"['kondor', 'rlsbo', 'mwr_okean', 'rm_08_okean', 'msu_sk_okean']"
+354,okean_o1_5,Okean-O1-5,Okean-O1-5,"NSAU,Roscosmos,RosHydroMet",Inactive,Drifting orbit,28 Feb 1990,28 Feb 1992,660,,,,,,"['kondor', 'rlsbo', 'mwr_okean', 'rm_08_okean', 'msu_sk_okean']"
+355,okean_o1_6,Okean-O1-6,Okean-O1-6,"NSAU,Roscosmos,RosHydroMet",Inactive,Drifting orbit,04 Jun 1991,04 Jun 1993,660,,,,,,"['kondor', 'rlsbo', 'mwr_okean', 'rm_08_okean', 'msu_sk_okean']"
+356,okean_o1_7,Okean-O1-7,Okean-O1-7,"NSAU,Roscosmos,RosHydroMet",Inactive,Drifting orbit,11 Oct 1994,11 Oct 1996,660,,,,,,"['kondor', 'rlsbo', 'mwr_okean', 'rm_08_okean', 'msu_sk_okean']"
+357,Orsted,Ørsted,Ørsted,"DNSC,CNES,NASA",Inactive,Drifting orbit,23 Feb 1999,Jan 2014,750,,,,,,"['asc', 'ovm', 'fvm', 'cpd', 'trsr_Orsted']"
+358,pace,PACE,"Plankton, Aerosol, Cloud, ocean Ecosystem","NASA,CNES",Operational,Sunsynchronous orbit,08 Feb 2024,≥2027,676,,13:00 desc,-20009--,https://pace.oceansciences.org/access_pace_data.htm,,"['oci', 'spexone', 'harp2']"
+359,parasol,PARASOL,"Polarisation et Anisotropie des Réflectances au sommet de l'Atmosphère, couplées avec un Satellite d'Observation emportant un Lidar",CNES,Inactive,Sunsynchronous orbit,18 Dec 2004,18 Dec 2013,700,,15:20 asc,,,,['polder']
+360,seosar_paz,SEOSAR/Paz,Satélite Español de Observación SAR (also Paz),"MDE,CDTI",Operational,Sunsynchronous orbit,22 Feb 2018,≥2026,514,,06:00 asc,0-20009-0-044,,,"['lrr_dlr', 'sar_x_paz_seosar', 'rohpp']"
+361,pleiades_1a,Pléiades-1A,Pleiades-1A,CNES,Operational,Sunsynchronous orbit,17 Dec 2011,≥2028,705,,10:30 desc,0-20009-0-,,,['hiri']
+362,pleiades_1b,Pléiades-1B,Pleiades-1B,CNES,Operational,Sunsynchronous orbit,02 Dec 2012,≥2028,694,,10:30 desc,0-20009-0-,,,['hiri']
+363,prisma,PRISMA,PRecursore IperSpettrale della Missione Applicativa,ASI,Operational,Sunsynchronous orbit,22 Mar 2019,≥2026,615,,10:30 desc,0-20009-0-,,,"['pan', 'hyc']"
+364,proba_1,PROBA-1,Project for On-Board Autonomy - 1,ESA,Operational,Sunsynchronous orbit,22 Oct 2001,≥2026,615,,07:30 desc,0-20009-0-,https://earth.esa.int/web/guest/-/more-on-proba-data-images-5559,,"['hrc', 'chris', 'srem_dose', 'srem_particles']"
+365,quikscat,QuikSCAT,Quick Scatterometer Mission,NASA,Inactive,Sunsynchronous orbit,19 Jun 1999,23 Nov 2009,803,,06:00 asc,0-20009-0-281,,,['seawinds']
+366,radarsat_1,RadarSat-1,RadarSat-1,CSA,Inactive,Sunsynchronous orbit,04 Nov 1995,29 Mar 2013,798,,06:00 desc,,,,['sar_radarsat_1']
+367,radarsat_2,RadarSat-2,RadarSat-2,CSA,Operational,Sunsynchronous orbit,14 Dec 2007,≥2027,798,,05:59 desc,-20009--,,,['sar_radarsat_1']
+368,rapideye_5_sats,RapidEye (5 sats),RapidEye (5 sats),"Planet,DLR,RapidEye",Presumably inactive,Sunsynchronous orbit,29 Aug 2008,Mar 2020,630,,11:00 desc,,,,['reis']
+369,rasat,RASAT,Remote Sensing Satellite,TÜBITAK-UZAY,Operational,Sunsynchronous orbit,17 Aug 2011,≥2026,690,,10:15 asc,0-20009-0-,,,['ois']
+370,rcm_1,RCM-1,RadarSat Constellation Mission - 1,CSA,Operational,Sunsynchronous orbit,12 Jun 2019,≥2031,592,,06:01 desc,-20009--,,,"['ais', 'sar_rcm']"
+373,resourcesat_1_irs_p6,ResourceSat-1 (IRS-P6),Satellite for Earth Resources - 1,ISRO,Inactive,Sunsynchronous orbit,17 Oct 2003,07 Dec 2013,817,,10:42 desc,,http://www.nrsc.gov.in/IRS_Data_Products?q=IRS_Data_Products,,"['awifs', 'liss_4', 'liss_3_resourcesat']"
+374,resourcesat_2,ResourceSat-2,Satellite for Earth Resources - 2,ISRO,Operational,Sunsynchronous orbit,20 Apr 2011,≥2026,817,,10:33 desc,-20009--,http://www.nrsc.gov.in/IRS_Data_Products?q=IRS_Data_Products,,"['awifs', 'liss_4', 'liss_3_resourcesat']"
+375,resurs_dk,Resurs-DK,Resurs-DK,Roscosmos,Inactive,Drifting orbit,15 Jun 2006,≥2016,570,,,,http://eng.ntsomz.ru/zakaz/data,,"['arina', 'geoton_1', 'pamela']"
+376,resurs_o1_1,Resurs-O1-1,Resurs-O1-1,"Roscosmos,RosHydroMet",Inactive,Sunsynchronous orbit,03 Oct 1985,11 Nov 1986,620,,10:15 asc,,,,"['sar_travers', 'msu_e_resurs_o1', 'msu_sk_resurs']"
+377,resurs_o1_2,Resurs-O1-2,Resurs-O1-2,"Roscosmos,RosHydroMet",Inactive,Sunsynchronous orbit,20 Apr 1988,01 Jun 1999,650,,10:15:00 asc,,,,"['msu_e_resurs_o1', 'msu_sk_resurs']"
+378,resurs_o1_3,Resurs-O1-3,Resurs-O1-3,"Roscosmos,RosHydroMet",Inactive,Sunsynchronous orbit,04 Nov 1994,15 May 2001,675,,10:15:00 asc,,,,"['msu_e_resurs_o1', 'msu_sk_resurs']"
+379,resurs_o1_4,Resurs-O1-4,Resurs-O1-4,"Roscosmos,RosHydroMet",Inactive,Sunsynchronous orbit,10 Jul 1998,15 Jan 2002,835,,10:15 asc,,,,"['scarab', 'mp_900b', 'msu_e_resurs_o1', 'msu_sk1']"
+380,risat_1,RISAT-1,Radar Imaging Satellite -1,ISRO,Inactive,Sunsynchronous orbit,26 Apr 2012,31 Mar 2017,546,,06:00 desc,,,,['sar_c_risat']
+381,risat_2,RISAT-2,Radar Imaging Satellite - 2,ISRO,Inactive,Drifting orbit,20 Apr 2009,30 Oct 2022,440,,,,,,['sar_x_risat_2']
+382,sac_a,SAC-A,Satélite de Aplicaciones Cientificas - A,"CONAE,AEB,INPE,NASA",Inactive,Drifting orbit,04 Dec 1998,15 Aug 1999,395,,,,,,
+383,sac_b,SAC-B,Satélite de Aplicaciones Cientificas - B,"CONAE,AEB,INPE,NASA",Lost at launch,Drifting orbit,04 Nov 1996,04 Nov 1996,550,,,,,,"['hxrs', 'gxre_soxs', 'isena', 'cubic', 'gxre_grabs']"
+384,sac_c,SAC-C,Satélite de Aplicaciones Cientificas - B,"CONAE,AEB,INPE,NASA",Inactive,Sunsynchronous orbit,21 Nov 2000,15 Aug 2013,705,,10:20 desc,0-20009-0-820,,,"['ist', 'ovm', 'fvm', 'dcs_sac', 'hrtc', 'hstc', 'mmrs', 'golpe', 'icare']"
+385,sac_d,SAC-D,Satélite de Aplicaciones Cientificas - D,"CONAE,AEB,INPE,NASA",Inactive,Sunsynchronous orbit,10 Jun 2011,07 Jun 2015,661,,06:00 desc,0-20009-0-821,http://podaac.jpl.nasa.gov/aquarius,,"['hsc', 'dcs_sac', 'aquarius', 'nirst', 'rosa', 'mwr_sac_d', 'icare']"
+386,saocom_1a,SAOCOM-1A,SAtélite Argentino de Observación COn Microondas - 1A,CONAE,Operational,Sunsynchronous orbit,08 Oct 2018,≥2026,620,,06:00 asc,0-20009-0-,,,['sar_l']
+387,saocom_1b,SAOCOM-1B,SAtélite Argentino de Observación COn Microondas - 1B,CONAE,Operational,Sunsynchronous orbit,30 Aug 2020,≥2026,620,,06:00 asc,0-20009-0-,,,['sar_l']
+388,saocom_2a,SAOCOM-2A,SAtélite Argentino de Observación COn Microondas - 2A,CONAE,Planned,Sunsynchronous orbit,≥2026,≥2030,620,,06:00 asc,0-20009-0-,,,['sar_l']
+389,saocom_2b,SAOCOM-2B,SAtélite Argentino de Observación COn Microondas - 2B,CONAE,Planned,Sunsynchronous orbit,≥2026,≥2031,620,,06:00 asc,,,,['sar_l']
+390,saral,SARAL,Satellite with ARGOS and AltiKa,"CNES,ISRO",Operational,Sunsynchronous orbit,25 Feb 2013,≥2026,800,,05:56 asc,0-20009-0-441,http://www.aviso.altimetry.fr/en/data/products/sea-surface-height-products/global/gdr-igdr-and-ogdr.html,,"['altika', 'lra_cnes', 'a_dcs', 'doris']"
+391,scd_1,SCD-1,Satélite de Coleta de Dados - 1,"INPE,AEB",Operational,Drifting orbit,09 Feb 1993,≥2026,750,,,0-20009-0-,,,['dcs_cbers']
+392,scd_2,SCD-2,Satélite de Coleta de Dados - 2,"INPE,AEB",Operational,Drifting orbit,22 Oct 1998,≥2026,750,,,0-20009-0-,,,['dcs_cbers']
+393,scisat_1,SCISAT-1,Scientific Satellite -1,"CSA,NASA",Operational,Drifting orbit,13 Aug 2003,≥2027,650,,,0-20009-0-812,,,"['ace_fts', 'maestro']"
+394,seasat,SeaSat,SeaSat,NASA,Inactive,Drifting orbit,27 Jun 1978,10 Oct 1978,785,,,,,,"['sar', 'alt_seasat', 'sass', 'lrr_nasa', 'smmr', 'virr_seasat']"
+395,orbview_2_seastar,OrbView-2/SeaStar,OrbView-2 (former: SeaStar),GeoEye,Inactive,Sunsynchronous orbit,01 Aug 1997,11 Dec 2010,705,,12:00 desc,,,,['seawifs']
+396,sentinel_1a,Sentinel-1A,Sentinel-1A,"ESA,EC",Operational,Sunsynchronous orbit,03 Apr 2014,≥2026,693,,06:00 desc,0-20009-0-062,https://sentinel.esa.int/web/sentinel/missions/sentinel-1/data-products,,['sar_c_sentinel_1']
+397,sentinel_1b,Sentinel-1B,Sentinel-1B,"ESA,EC",Inactive,Sunsynchronous orbit,25 Apr 2016,03 Aug 2022,693,,06:00 desc,0-20009-0-063,https://sentinel.esa.int/web/sentinel/sentinel-data-access,,['sar_c_sentinel_1']
+398,sentinel_2a,Sentinel-2A,Sentinel-2A,"ESA,EC",Operational,Sunsynchronous orbit,23 Jun 2015,May 2026,786,,10:30 desc,-20009--,https://sentiwiki.copernicus.eu/web/sentinel-2,,['msi_sentinel_2a']
+399,sentinel_2b,Sentinel-2B,Sentinel-2B,"ESA,EC",Operational,Sunsynchronous orbit,07 Mar 2017,≥2027,786,,10:30 desc,-20009--,https://sentiwiki.copernicus.eu/web/sentinel-2,,['msi_sentinel_2a']
+400,sentinel_3a,Sentinel-3A,Sentinel-3A,"ESA,EC,EUMETSAT",Operational,Sunsynchronous orbit,16 Feb 2016,≥2027,814.5,,10:00 desc,0-20009-0-061,https://navigator.eumetsat.int/search?query=sentinel-3A,,"['gps_esa', 'lrr_esa', 'sral', 'olci', 'slstr', 'mwr_sentinel_3', 'doris']"
+402,sentinel_5p,Sentinel-5P,Sentinel-5 precursor,"ESA,NSO",Operational,Sunsynchronous orbit,13 Oct 2017,≥2027,824,,13:30 asc,0-20009-0-064,https://browser.dataspace.copernicus.eu/,,['tropomi']
+403,sich_1,SICH-1,SICH-1 (Okean-O1-8),"NSAU,Roscosmos,RosHydroMet",Inactive,Drifting orbit,31 Aug 1995,14 Dec 2001,650,,,,,,"['kondor', 'rlsbo', 'mwr_okean', 'rm_08_okean', 'msu_sk_okean']"
+404,sich_1m,SICH-1M,SICH-1 (Okean-O1-9) ,"NSAU,Roscosmos,RosHydroMet",Inactive,Drifting orbit,24 Dec 2004,15 Apr 2006,650,,,,,,"['mtvza_ok_optical', 'rlsbo', 'msu_eu', 'rm_08_okean', 'mtvza_ok_mw']"
+405,sich_2,SICH-2,SICH-2,NSAU,Inactive,Sunsynchronous orbit,17 Aug 2011,12 Dec 2012,700,,10:50 desc,,,,"['potential', 'irei', 'mbei']"
+406,smap,SMAP,Soil Moisture Active-Passive,NASA,Operational,Sunsynchronous orbit,31 Jan 2015,≥2026,685,,06:00 desc,0-20009-0-789,http://smap.jpl.nasa.gov/data/,,['smap']
+407,smm,SMM,Solar Maximum Mission,NASA,Inactive,Drifting orbit,14 Feb 1980,24 Nov 1989,510,,,,,,"['cp', 'grs', 'xrp', 'hxrbs', 'hxis', 'uvsp', 'acrim_i']"
+408,smos,SMOS,Soil Moisture and Ocean Salinity,"ESA,CDTI,CNES",Operational,Sunsynchronous orbit,02 Nov 2009,≥2028,755,,06:00 asc,0-20009-0-046,https://smos-ds-02.eo.esa.int/oads/access/,,"['sta', 'gps_esa', 'miras']"
+409,sms_1,SMS-1,Synchronous Meteorological Satellite - 1,"NASA,NOAA",Inactive,Geostationary orbit,17 May 1974,21 Jan 1981,35786,-75,,,,,"['sem_mag', 'dcis', 'sem_eps', 'vissr', 'sem_xrs_euv', 'sem_hepad']"
+410,sms_2,SMS-2,Synchronous Meteorological Satellite - 2,"NASA,NOAA",Inactive,Geostationary orbit,06 Feb 1975,05 Aug 1982,35786,-135,,,,,"['sem_mag', 'dcis', 'sem_eps', 'vissr', 'sem_xrs_euv', 'sem_hepad']"
+411,sorce,SORCE,Solar Radiation and Climate Experiment,NASA,Inactive,Drifting orbit,25 Jan 2003,25 Feb 2020,640,,,,http://disc.sci.gsfc.nasa.gov/SORCE,,"['xps', 'sim', 'tim', 'solstice']"
+412,spot_1,SPOT-1,Satellite Pour l’Observation de la Terre - 1,"CNES,Spot Image",Inactive,Sunsynchronous orbit,22 Feb 1986,02 Aug 2003,822,,10:30 desc,0-20009-0-020,,,['hrv']
+413,spot_2,SPOT-2,Satellite Pour l’Observation de la Terre - 2,"CNES,Spot Image",Inactive,Sunsynchronous orbit,22 Jan 1990,01 Jul 2009,822,,10:30 desc,0-20009-0-021,,,"['hrv', 'doris']"
+414,spot_3,SPOT-3,Satellite Pour l’Observation de la Terre - 3,"CNES,Spot Image",Inactive,Sunsynchronous orbit,26 Sep 1993,14 Nov 1996,822,,10:30:00 desc,0-20009-0-022,,,"['poam', 'hrv', 'doris']"
+415,spot_4,SPOT-4,Satellite Pour l’Observation de la Terre - 4,"CNES,Spot Image",Inactive,Sunsynchronous orbit,24 Mar 1998,11 Jan 2013,832,,10:30:00 desc,0-20009-0-023,http://www.astrium-geo.com,,"['poam', 'vegetation', 'pastec', 'hrvir', 'doris']"
+416,spot_5,SPOT-5,Satellite Pour l’Observation de la Terre - 5,"CNES,Spot Image",Inactive,Sunsynchronous orbit,04 May 2002,27 Mar 2015,832,,10:30:00 desc,,http://www.astrium-geo.com,,"['hrg', 'vegetation', 'hrs', 'doris']"
+417,spot_6,SPOT-6,Satellite Pour l’Observation de la Terre - 6,"Spot Image,CNES",Operational,Sunsynchronous orbit,09 Sep 2012,≥2026,695,,10:30 desc,0-20009-0-,,,['naomi_spot']
+418,spot_7,SPOT-7,Satellite Pour l’Observation de la Terre - 7,"Spot Image,CNES",Operational,Sunsynchronous orbit,30 Jun 2014,≥2026,695,,10:30 desc,0-20009-0-,http://www.astrium-geo.com,,['naomi_spot']
+419,starlette,STARLETTE,Satellite de Taille Adaptée avec Réflecteurs Laser pour les Etudes de la Terre,CNES,Operational,Drifting orbit,06 Feb 1975,≥2050,812,,,,,,['lr']
+420,stella,STELLA,STELLA,CNES,Operational,Drifting orbit,30 Sep 1993,≥2050,800,,,,,,['lr']
+421,sumbandilasat,SumbandilaSat,SumbandilaSat,SANSA,Inactive,Sunsynchronous orbit,17 Sep 2009,15 Jul 2011,504,,09:00 desc,,,,['msi_sansa']
+422,swarm_c,SWARM-C,The Earth’s Magnetic Field and Environment Explorers - C,"ESA,CNES,CSA",Operational,Drifting orbit,22 Nov 2013,≥2026,460,,,0-20009-0-,https://earth.esa.int/web/guest/swarm/data-access,,"['acc', 'gps_esa', 'str_swarm', 'lrr_dlr', 'vfm', 'asm', 'efi_swarm']"
+423,swarm_b,SWARM-B,The Earth’s Magnetic Field and Environment Explorers - B,"ESA,CNES,CSA",Operational,Drifting orbit,22 Nov 2013,≥2026,530,,,0-20009-0-,https://earth.esa.int/web/guest/swarm/data-access,,"['acc', 'gps_esa', 'str_swarm', 'lrr_dlr', 'vfm', 'asm', 'efi_swarm']"
+424,swot,SWOT,Surface Water and Ocean Topography,"NASA,CNES",Operational,Drifting orbit,16 Dec 2022,≥2026,891,,,0-20009-0-280,https://podaac.jpl.nasa.gov/SWOT,,"['gps_nasa', 'karin', 'poseidon_3c', 'lra_nasa', 'mw_radiometer', 'doris']"
+425,tacsat_2,TacSat-2,Tactical Satellite - 2,DoD,Inactive,Drifting orbit,12 Dec 2006,21 Dec 2007,418,,,,,,['igor_tacsat_2']
+426,tandem_x,TanDEM-X,TerraSAR-X Add-oN for Digital Elevation Measurement,DLR,Operational,Sunsynchronous orbit,21 Jun 2010,≥2026,515,,06:00 desc,0-20009-0-043,,,"['sar_x', 'tor']"
+427,terrasar_x,TerraSAR-X,TerraSAR-X,DLR,Operational,Sunsynchronous orbit,15 Jun 2007,≥2026,515,,06:00 desc,0-20009-0-042,https://cdaac-www.cosmic.ucar.edu/cdaac/products.html,,"['sar_x', 'tor']"
+428,tandem_l,Tandem-L,Tandem-L Interferometric Radar Mission,DLR,Considered,Sunsynchronous orbit,≥2028,≥2040,745,,06:00 desc,,,,['l_sar']
+429,theos_1,THEOS-1,Thailand Earth Observation System - 1,GISTDA,Operational,Sunsynchronous orbit,01 Oct 2008,≥2026,822,,21:35 asc,0-20009-0-,,,"['ms_theos', 'pan_theos']"
+430,timed,TIMED,"Thermosphere, Ionosphere, Mesosphere Energetics and Dynamics mission",NASA,Operational,Drifting orbit,07 Dec 2001,≥2026,625,,,0-20009-0-,,,"['tidi', 'see', 'guvi', 'saber']"
+431,tiros_1,TIROS-1,Television and Infra-Red Observation Satellite - 1,NASA,Inactive,Drifting orbit,01 Apr 1960,17 Jun 1960,720,,,,,,"['vcs_wa', 'vcs_na']"
+432,tiros_2,TIROS-2,Television and Infra-Red Observation Satellite - 2,NASA,Inactive,Drifting orbit,23 Nov 1960,24 Dec 1961,670,,,,,,"['fpr', 'mrir', 'vcs_wa', 'vcs_na']"
+433,tiros_3,TIROS-3,Television and Infra-Red Observation Satellite - 3,NASA,Inactive,Drifting orbit,12 Jul 1961,27 Feb 1962,780,,,,,,"['fpr', 'mrir', 'vcs_wa']"
+434,tiros_4,TIROS-4,Television and Infra-Red Observation Satellite - 4,NASA,Inactive,Drifting orbit,02 Feb 1962,19 Jul 1962,770,,,,,,"['fpr', 'mrir', 'vcs_wa', 'vcs_ma']"
+435,tiros_5,TIROS-5,Television and Infra-Red Observation Satellite - 5,NASA,Inactive,Drifting orbit,19 Jun 1962,27 Nov 1963,750,,,,,,"['vcs_wa', 'vcs_ma']"
+436,tiros_6,TIROS-6,Television and Infra-Red Observation Satellite - 6,NASA,Inactive,Drifting orbit,18 Sep 1962,12 Oct 1963,700,,,,,,"['vcs_wa', 'vcs_ma']"
+437,tiros_7,TIROS-7,Television and Infra-Red Observation Satellite - 7,NASA,Inactive,Drifting orbit,19 Jun 1963,03 Jun 1968,680,,,,,,"['lp', 'fpr', 'mrir', 'vcs_wa']"
+438,tiros_8,TIROS-8,Television and Infra-Red Observation Satellite - 8,NASA,Inactive,Drifting orbit,21 Dec 1963,01 Jul 1967,730,,,,,,"['apt', 'vcs_wa']"
+439,tiros_9,TIROS-9,Television and Infra-Red Observation Satellite - 9,NASA,Inactive,Sunsynchronous orbit,22 Jan 1965,12 Jun 1968,1350,,09:30 desc,,,,['vcs_wa']
+440,tiros_10,TIROS-10,Television and Infra-Red Observation Satellite - 10,NASA,Inactive,Sunsynchronous orbit,02 Jul 1965,01 Jul 1967,790,,09:30 desc,,,,['vcs_wa']
+441,tiros_n,TIROS-N,Television and Infra-Red Observation Satellite - N,"NOAA,NASA",Inactive,Sunsynchronous orbit,13 Oct 1978,27 Feb 1981,850,,14:30 asc,0-20009-0-708,,,"['argos', 'ssu', 'msu', 'sem_ted', 'hirs_2', 'avhrr', 'sem_meped']"
+442,toms_earth_probe,TOMS Earth Probe,Total Ozone Mapping Spectrometer - Earth Probe,NASA,Inactive,Sunsynchronous orbit,02 Jul 1996,02 Dec 2006,750,,12:00 desc,,,,['toms']
+443,topex_poseidon,TOPEX-Poseidon,"Topography Experiment - Positioning,Ocean,Solid Earth, Ice Dynamics, Orbital Navigator","NASA,CNES",Inactive,Drifting orbit,10 Aug 1992,09 Oct 2005,1336,,,,,,"['nra', 'gpsdr', 'lra_nasa', 'ssalt', 'tmr', 'doris']"
+444,topsat,TopSat,TopSat,UKSA,Inactive,Sunsynchronous orbit,27 Oct 2005,17 Aug 2008,686,,10:30 asc,,,,['ralcam_1']
+445,trmm,TRMM,Tropical Rainfall Measuring Mission,"NASA,JAXA",Inactive,Drifting orbit,27 Nov 1997,08 Apr 2015,402,,,0-20009-0-282,http://pps.gsfc.nasa.gov/,,"['lis', 'pr', 'tmi', 'virs', 'ceres']"
+446,uars,UARS,Upper Atmosphere Research Satellite,NASA,Inactive,Drifting orbit,12 Sep 1991,14 Dec 2005,570,,,0-20009-0-781,,,"['mls', 'hrdi', 'haloe', 'windii', 'claes', 'isams', 'susim', 'solstice', 'acrim_ii', 'pem_vmag', 'pem_eps', 'pem_axis']"
+447,uk_dmc_1,UK-DMC-1,UK contribution to the Disaster Monitoring Constellation - 1,"SSTL,UKSA",Inactive,Sunsynchronous orbit,27 Sep 2003,15 Nov 2011,686,,10:30 asc,,,,['slim6']
+448,uk_dmc_2,UK-DMC-2,UK contribution to the Disaster Monitoring Constellation - 2,"SSTL,UKSA",Presumably inactive,Sunsynchronous orbit,29 Jul 2009,≥2019,686,,10:30 asc,,,,['slim6']
+449,vens,VENµS,Vegetation and Environment monitoring on a New Micro-Satellite,"CNES,ISA",Operational,Sunsynchronous orbit,02 Aug 2017,≥2026,720,,10:30 desc,0-20009-0-,,,['vssc']
+450,cosmic_2,COSMIC-2,"Constellation Observing System for Meteorology, Ionosphere & Climate - 2a","NSPO,NOAA,UCAR",Operational,Drifting orbit,25 Jun 2019,≥2026,520,,,0-20009-0-741,https://cdaac-www.cosmic.ucar.edu/cdaac/index.html,,"['rfb', 'vidi', 'tgrs_cosmic_2']"
+451,triton,TRITON ,TRITON also (FORMOSAT-7R),"NSPO,NOAA,UCAR",Operational,Sunsynchronous orbit,09 Oct 2023,≥2029,628,,10:00 desc,-20009--,,,['gpsr']
+452,resurs_p1,Resurs-P1,Resurs-P1,Roscosmos,Inactive,Sunsynchronous orbit,25 Jun 2013,Oct 2021,473,,10:30 desc,,http://eng.ntsomz.ru/zakaz/data,,"['gsa', 'geoton_l1', 'shmsa_vr', 'shmsa_sr']"
+453,x_sat,X-Sat,X-Sat,NTU,Presumably inactive,Sunsynchronous orbit,20 Apr 2011,≥2019,820,,10:20 desc,,,,['iris_x_sat']
+454,ace,ACE,Advanced Composition Explorer,NASA,Operational,Lagrange libration point 1,25 Aug 1997,≥2027,1.5e+06,,,-20009--,http://www.srl.caltech.edu/ACE/ASC/,,"['mag_ace', 'sis', 'swims', 'uleis', 'swics', 'cris_ace', 'epam', 'swepam', 'sepica']"
+455,solar_b_hinode,Solar-B (Hinode),Solar-B (Hinode),JAXA,Operational,Sunsynchronous orbit,23 Sep 2006,≥2026,680,,06:00 asc,0-20009-0-,,,"['xrt', 'eis', 'sot']"
+456,mms_a,MMS-A,Magnetospheric MultiScale mission - A,NASA,Operational,Cross-magnetosphere orbit,13 Mar 2015,≥2026,,,,0-20009-0-,,,"['dp', 'afg', 'fpi', 'dfg', 'scm_mms', 'edi_mms', 'hpca', 'eis_mss', 'feeps', 'aspoc_mms']"
+457,sdo,SDO,Solar Dynamics Observatory,NASA,Operational,Geosynchronous orbit,11 Feb 2010,≥2026,35756,-105,,0-20009-0-,,,"['eve', 'aia', 'hmi']"
+458,soho,SOHO,Solar and Heliospheric Observatory,"ESA,NASA",Operational,Lagrange libration point 1,02 Dec 1995,≥2027,1.5e+06,,,0-20009-0-,http://sohodata.nascom.nasa.gov/cgi-bin/data_query,,"['mdi', 'sem_soho', 'eit', 'cds', 'uvcs', 'swan', 'virgo', 'golf', 'lasco', 'sumer', 'celias', 'costep', 'erne']"
+459,stereo_b,STEREO-B,Solar-TErrestrial RElations Observatory - B,NASA,Inactive,Ecliptic orbit,26 Oct 2006,01 Oct 2014,,,,,https://stereo-ssc.nascom.nasa.gov/,,"['s_waves', 'secchi_euvi', 'impact_mag', 'secchi_hi_2', 'secchi_cor_1', 'secchi_cor_2', 'secchi_hi_1', 'impact_sep', 'plastic', 'impact_swea', 'impact_ste']"
+460,themis_d,THEMIS-D,Time History of Events and Macroscale Interactions during Substorms - D,NASA,Operational,Cross-magnetosphere orbit,17 Feb 2007,≥2026,,,,-20009--,,,"['scm', 'sst', 'esa', 'fgm_themis', 'efi_themis']"
+461,trace,TRACE,Transition Region and Coronal Explorer,NASA,Inactive,Sunsynchronous orbit,02 Apr 1998,21 Jun 2010,627,,06:00 asc,,,,['trace']
+464,amazonia_1b,Amazônia-1B,Amazônia-1B,"INPE,AEB",Planned,Sunsynchronous orbit,≥2026,≥2029,752,,10:30 desc,0-20009-0-,,,['awfi']
+465,arctica_m_n1,Arctica-M N1,Arctica-M N1,"RosHydroMet,Roscosmos",Operational,Molniya orbit,28 Feb 2021,≥2026,,,,-20009--,,,"['dcs_a', 'msu_gs_a', 'ggak_e_fm_e', 'ggak_e_gals_e_arctica', 'ggak_e_skif_6_arctica']"
+466,arctica_m_n2,Arctica-M N2,Arctica-M N2,"RosHydroMet,Roscosmos",Operational,Molniya orbit,16 Dec 2023,≥2028,,,,-20009--,,,"['dcs_a', 'msu_gs_a', 'ggak_e_fm_e', 'ggak_e_gals_e_arctica', 'ggak_e_skif_6_arctica']"
+467,asnaro_1,ASNARO-1,Advanced Satellite with new system ARchitecure for Observation - 1,"USEF,METI,NEC",Operational,Sunsynchronous orbit,06 Nov 2014,≥2026,504,,11:00 desc,0-20009-0-,,,['ops_asnaro']
+468,asnaro_2,ASNARO-2,Advanced Satellite with new system ARchitecure for Observation - 2,"USEF,METI,NEC",Operational,Sunsynchronous orbit,17 Jan 2018,≥2026,500,,06:00 desc,0-20009-0-,,,['xsar']
+469,aditya_1,Aditya-1,Aditya-1,ISRO,Operational,Lagrange libration point 1,02 Sep 2023,≥2028,1500000,,,-20009--,,,"['velc', 'suit', 'solexs', 'papa', 'hel1os', 'magnetometer_aditya', 'aspex']"
+470,cassiope,CASSIOPE,Cascade SmallSat and Ionospheric Polar Explorer,CSA,Inactive,Cross-magnetosphere orbit,29 Sep 2013,17 Dec 2021,670,,,,,,"['rri', 'fai', 'gap', 'sei', 'cer', 'nms', 'mgf_cassiope', 'irm']"
+471,cluster_1,CLUSTER-1,CLUSTER-1,"ESA,NASA",Inactive,Cross-magnetosphere orbit,09 Aug 2000,22 Oct 2025,,,,0-20009-0-,http://caa.estec.esa.int/caa/,,"['wbd', 'fgm', 'edi', 'aspoc', 'cis', 'efw_cluster', 'peace', 'staff', 'rapid', 'whisper']"
+472,cluster_3,CLUSTER-3,CLUSTER-3,"ESA,NASA",Inactive,Cross-magnetosphere orbit,16 Jul 2000,08 Sep 2024,,,,0-20009-0-,http://caa.estec.esa.int/caa/,,"['wbd', 'fgm', 'edi', 'aspoc', 'cis', 'efw_cluster', 'peace', 'staff', 'rapid', 'whisper']"
+473,coronas_photon,Coronas-Photon,Complex Orbital Observations Near-Earth of Activity of the Sun - Photon,Roscosmos,Inactive,Drifting orbit,30 Jan 2009,01 Dec 2009,550,,,,,,"['rt_2', 'brm', 'sm_8m', 'phoka', 'konus_rf', 'penguin_m', 'step_f', 'electron_m_pesca', 'tesis', 'natalya_2m_rad', 'natalya_2m_particles']"
+474,electro_l_n3,Electro-L N3,Electro-L Number 3,"RosHydroMet,Roscosmos",Operational,Geostationary orbit,24 Dec 2019,≥2029,35786,76,,-20009--,,,"['msu_gs', 'dcs_electro', 'ggak_e_dir_e', 'ggak_e_vuss_e', 'geos_r_electro', 'ggak_e_gals_e', 'ggak_e_skif_6', 'ggak_e_skl_e']"
+475,geotail,GEOTAIL,GEOTAIL,"JAXA,NASA",Inactive,Cross-magnetosphere orbit,02 Jul 1992,28 Jun 2022,,,,0-20009-0-,,,"['efd', 'mgf', 'pwi', 'lep', 'hep', 'cpi', 'epic']"
+478,iss_sage_iii,ISS SAGE-III,Stratospheric Aerosol and Gas Experiment III on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Operational,Drifting orbit,19 Feb 2017,≥2026,407,,,-20009--,https://eosweb.larc.nasa.gov/project/sageiii-iss/sageiii-iss_table,,['sage_iii']
+479,sentinel_6a,Sentinel-6A,Sentinel-6A,"EUMETSAT,CNES,EC,ESA,NASA,NOAA",Operational,Drifting orbit,21 Nov 2020,≥2027,1336,,,0-20009-0-066,https://user.eumetsat.int/search-view?term=sentinel%206&sort=score%20desc,,"['poseidon_4', 'gps_esa', 'lra_nasa', 'hrmr', 'rmu', 'doris', 'amr_c', 'gnss_ro_sentinel_6']"
+480,sentinel_6b,Sentinel-6B,Sentinel-6B,"EUMETSAT,CNES,EC,ESA,NASA,NOAA",Commissioning,Drifting orbit,17 Nov 2025,≥2032,1336,,,0-20009-0-067,,,"['poseidon_4', 'gps_esa', 'lra_nasa', 'hrmr', 'rmu', 'doris', 'amr_c', 'gnss_ro_sentinel_6']"
+481,kompsat_3a,KOMPSAT-3A,Korea Multi-Purpose Satellite - 3A,KARI,Operational,Sunsynchronous orbit,26 Mar 2015,≥2026,528,,13:30 asc,0-20009-0-,http://www.si-imaging.com/products/,,"['iip', 'aeiss']"
+482,meteor_m_n2_1,Meteor-M N2-1,Meteor-M Number 2-1 ,"RosHydroMet,Roscosmos",Inactive,Sunsynchronous orbit,28 Nov 2017,28 Nov 2017,816.4,,15:09 asc,,,,"['ikor_m', 'sspd', 'msu_mr', 'kmss', 'ikfs_2', 's_rsat', 'severjanin_m', 'ggak_m_rims_m', 'mtvza_gy', 'ggak_e_gals_e_meteor', 'ggak_e_skif_6_meteor']"
+483,meteor_m_n2_2,Meteor-M N2-2,Meteor-M Number 2-2,"RosHydroMet,Roscosmos",Inactive,Sunsynchronous orbit,05 Jul 2019,Jan 2025,821,,15:15 asc,0-20009-0-325,,,"['ikor_m', 'sspd', 'msu_mr', 'kmss', 'ikfs_2', 'severjanin_m', 'ggak_m_rims_m', 'mtvza_gy', 'ggak_e_gals_e_meteor', 'ggak_e_skif_6_meteor']"
+486,picard,Picard,Picard,CNES,Inactive,Sunsynchronous orbit,15 Jun 2010,04 Apr 2014,725,,06:00 asc,,,,"['sovap', 'sodism', 'premos']"
+487,polar,Polar,Polar,NASA,Inactive,Cross-magnetosphere orbit,24 Feb 1996,15 Apr 2008,,,,,,,"['mfe', 'uvi', 'vis', 'pwi_polar', 'efi_polar', 'hydra', 'timas', 'pixie', 'ceppad', 'cammice', 'tide_psi']"
+488,wind,WIND,WIND,NASA,Operational,Lagrange libration point 1,01 Nov 1994,≥2026,1.5e+06,,,0-20009-0-,http://pwg.gsfc.nasa.gov/windnrt/,,"['swe', 'mfi', 'waves', 'konus', 'tgrs', 'plasma', 'epact', 'sms']"
+489,zy_3_01,ZY-3-01,Zi Yuan - 3-01,"CAST,CRESDA",Inactive,Sunsynchronous orbit,09 Jan 2012,≥2022,506,,10:30 desc,0-20009-0-,,,"['tac', 'msc_zy']"
+490,proba_2,PROBA-2,Project for On-Board Autonomy - 2,ESA,Operational,Sunsynchronous orbit,02 Nov 2009,≥2026,730,,06:00 asc,0-20009-0-,http://proba2.oma.be/,,"['lyra', 'dslp', 'tpmu', 'swap']"
+491,vap_2_sat,VAP (2 sat),Van Allen Probes (2 sats),NASA,Inactive,Cross-magnetosphere orbit,30 Aug 2012,18 Oct 2019,,,,,,,"['rps', 'efw_vap', 'ect_hope', 'ect_rept', 'ect_mageis', 'rbspice', 'emfisis']"
+492,zy_1_2c,ZY-1-2C,Zi Yuan 1-2,"CAST,CRESDA",Presumably inactive,Sunsynchronous orbit,22 Dec 2011,≥2019,781,,10:30 desc,,,,"['hrcc_2', 'hrpc_2']"
+493,ssot,SSOT,Sistema Satellital para Observation de la Tierra,ACE,Unclear,Sunsynchronous orbit,17 Dec 2011,≥2022,630,,10:30 desc,,,,['naomi_ssot']
+494,geoeye_1,GeoEye-1,GeoEye-1,"Maxar,GeoEye",Unclear,Sunsynchronous orbit,06 Sep 2008,≥2026,681,,10:30 desc,0-20009-0-,,,['gis']
+497,quickbird,QuickBird,QuickBird,"Maxar,DigitalGlobe",Inactive,Sunsynchronous orbit,18 Oct 2001,27 Jan 2015,482,,10:30 desc,,,,['bgis_2000']
+498,worldview_1,WorldView-1,WorldView-1,"Maxar,DigitalGlobe",Operational,Sunsynchronous orbit,18 Sep 2007,≥2026,499,,13:30 desc,0-20009-0-,,,['wv60']
+499,worldview_2,WorldView-2,WorldView-2,"Maxar,DigitalGlobe",Operational,Sunsynchronous orbit,01 Oct 2009,≥2026,770,,10:30:00 desc,0-20009-0-,,,['wv110']
+500,worldview_3,WorldView-3,WorldView-3,"Maxar,DigitalGlobe",Operational,Sunsynchronous orbit,13 Aug 2014,≥2026,770,,10:30:00 desc,0-20009-0-,,,['wv110']
+501,orbview_3,OrbView-3,OrbView-3,"Maxar,GeoEye",Inactive,Sunsynchronous orbit,26 Jun 2003,23 Apr 2007,470,,10:30:00 desc,,,,['ohris']
+502,ikonos,Ikonos,Ikonos,"Maxar,GeoEye",Inactive,Sunsynchronous orbit,24 Sep 1999,31 Mar 2015,686,,10:30 desc,,,,['osa']
+506,ace_aer_clo_eco,ACE (Aer.Clo.Eco.),Aerosol-Cloud-Ecosystems,NASA,Mission concept,Sunsynchronous orbit,TBD,TBD,,,,,,,"['ace_lidar', 'oci', 'harp2', 'cpr_cloudsat']"
+508,biomass,BIOMASS,BIOMASS,ESA,Operational,Sunsynchronous orbit,29 Apr 2025,≥2030,660,,06:00 desc,0-20009-0-,,,['sar_p']
+509,carbonsat,CarbonSat,Satellite for the Carbon Cycle,,Mission concept,Sunsynchronous orbit,TBD,TBD,,,,,,,
+511,flex,FLEX,FLuorescence EXplorer,ESA,Planned,Sunsynchronous orbit,Apr 2026,≥2029,800,,10:00 desc,,,,
+512,gacm,GACM,Global Atmospheric Composition Mission,NASA,Mission concept,Sunsynchronous orbit,TBD,TBD,,,,,,,['o3_lidar']
+513,geo_cape,GEO-CAPE,Geostationary Coastal and Air Pollution Events,NASA,Mission concept,Geostationary orbit,TBD,TBD,35786,-100,,,,,
+514,hyspiri,HyspIRI,Hyperspectral Infra-Red Imager,NASA,Mission concept,Sunsynchronous orbit,TBD,TBD,TBD,,,,,,
+515,list,LIST,Lidar Surface Topography,NASA,Mission concept,Sunsynchronous orbit,TBD,TBD,,,,,,,
+516,path,PATH,Precipitation and All-weather Temperature and Humidity,NASA,Mission concept,Geostationary orbit,TBD,TBD,35786,,,,,,['geostar']
+518,sclp,SCLP,Snow and Cold Land Processes,NASA,Mission concept,Sunsynchronous orbit,TBD,TBD,TBD,,TBD ,,,,['sar_x_ku']
+519,xovwm,XOVWM,Extended Ocean Vector Winds Mission,NOAA,Mission concept,Sunsynchronous orbit,TBD,TBD,TBD,,TBD ,,,,
+520,fy_3g,FY-3G,Feng Yun 3G,"CMA,NRSCC",Operational,Drifting orbit,16 Apr 2023,≥2029,407,,,0-20009-0-526,https://satellite.nsmc.org.cn/portalsite/,,"['haoc', 'gnos_2', 'mersi_rm', 'pmr_fy_3', 'pmai', 'mwri_rm']"
+521,fy_3i,FY-3I,Feng Yun 3I,"CMA,NRSCC",Planned,Drifting orbit,≥2027,≥2033,407,,,0-20009-0-,,,"['sws_sem_nadd', 'haoc', 'gnos_2', 'mersi_rm', 'pmr_fy_3', 'mwri_rm']"
+522,ionosfera_m_n1_n2,Ionosfera-M N1 & N2,Ionosfera-M N1 and N2,Roscosmos,Operational,Sunsynchronous orbit,04 Nov 2024,≥2032,820,,09:30 asc,-20009--,,,"['pes', 'laertes', 'nbk_2', 'st_1', 'mayak', 'ozonometer_tm', 'esep', 'gals_1', 'sper_1']"
+523,ionosfera_m_n3_n4,Ionosfera-M N3 & N4,Ionosfera-M N3 and N4,Roscosmos,Commissioning,Sunsynchronous orbit,25 Jul 2025,≥2033,820,,16:00 asc,0-20009-0-,,,"['pes', 'laertes', 'nbk_2', 'st_1', 'mayak', 'ozonometer_tm', 'esep', 'gals_1', 'sper_1']"
+524,zond_m,Zond-M, Zond-M,Roscosmos,Considered,Sunsynchronous orbit,≥2027,≥2030,600,,TBD ,0-20009-0-,,,"['fm_g', 'stek', 'solist', 'st_2', 'nbk_2', 'ozonometer_3', 'rims_a', 'suf', 'srf', 'respekt', 'letitsiya_camera']"
+525,dscovr,DSCOVR,Deep Space Climate Observatory,"NOAA,NASA",Operational,Lagrange libration point 1,11 Feb 2015,≥2029,1.5e+06,N/A,N/A ,0-20009-0-,https://www.ngdc.noaa.gov/dscovr/portal,,"['fc', 'es', 'mag_dscovr', 'epic_dscovr', 'nistar']"
+526,eos_03,EOS 03,Earth Observation Satellite - 03,ISRO,Lost at launch,Geostationary orbit,11 Aug 2021,11 Aug 2021,35786,85.5,,,,,"['mx_lwir', 'mx_vnir', 'hys_swir', 'hys_vnir']"
+527,th_1a,TH-1A,Tian Hui - 1A,"PLA,CAST",Presumably inactive,Sunsynchronous orbit,24 Aug 2010,≥2018,503,,13:30 desc,,,,"['ms_th', 'pan_th']"
+528,th_1b,TH-1B,Tian Hui - 1B,"PLA,CAST",Unclear,Sunsynchronous orbit,06 May 2012,≥2023,498,,13:30 desc,,,,"['ms_th', 'pan_th']"
+529,iss_tsis_1,ISS TSIS-1,Total and Spectral Solar Irradiance Sensor - 1,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Operational,Drifting orbit,15 Dec 2017,≥2026,407,,,-20009--,,,['tsis']
+531,meteosat_3_adc,Meteosat-3 (ADC),Meteosat-3 (Atlantic Data Coverage),"EUMETSAT,ESA",Inactive,Geostationary orbit,01 Aug 1991,01 Feb 1993,35786,-50,,-20009--,,,"['dcs_meteosat', 'mviri']"
+532,meteosat_3_x_adc,Meteosat-3 (X-ADC),Meteosat-3 (Extended Atlantic Data Coverage),"EUMETSAT,ESA",Inactive,Geostationary orbit,01 Feb 1993,22 Nov 1995,35786,-75,,-20009--,,,"['dcs_meteosat', 'mviri']"
+533,meteosat_5_iodc,Meteosat-5 (IODC),Meteosat-5 (Indian Ocean Data Coverage),"EUMETSAT,ESA",Inactive,Geostationary orbit,01 Jun 1998,26 Apr 2007,35786,63,,-20009--,,,"['dcs_meteosat', 'mviri']"
+534,meteosat_6_iodc,Meteosat-6 (IODC),Meteosat-6 (Indian Ocean Data Coverage),"EUMETSAT,ESA",Inactive,Geostationary orbit,27 Apr 2007,15 Apr 2011,35786,67.5,,-20009--,,,"['dcs_meteosat', 'mviri']"
+535,meteosat_7,Meteosat-7,Meteosat-7,"EUMETSAT,ESA",Inactive,Geostationary orbit,02 Sep 1997,05 Dec 2006,35786,,,0-20009-0-054,,,"['dcs_meteosat', 'mviri']"
+536,goes_9_gms_backup,GOES-9 (GMS backup),Geostationary Operational Environmental Satellite - 9 (GMS backup),"NOAA,NASA",Inactive,Geostationary orbit,22 May 2003,24 Jul 2006,35786,155,,,http://www.nesdis.noaa.gov/satellite_information.html,,"['sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_8_11', 'sem_xrs_euv', 'sem_hepad']"
+537,goes_10_s_america,GOES-10 (S-America),Geostationary Operational Environmental Satellite - 10 (South America) ,"NOAA,NASA",Inactive,Geostationary orbit,01 Dec 2006,02 Dec 2009,35786,-60,,,http://www.nesdis.noaa.gov/satellite_information.html,,"['sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_8_11', 'sem_xrs_euv', 'sem_hepad']"
+538,goes_12_s_america,GOES-12 (S-America),Geostationary Operational Environmental Satellite - 12 (South America),"NOAA,NASA",Inactive,Geostationary orbit,10 May 2010,16 Aug 2013,35786,-60,,,http://www.nesdis.noaa.gov/satellite_information.html,,"['sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_12_15', 'sem_hepad']"
+539,c_nofs,C/NOFS,Communication/Navigation Outage Forecasting System,"DoD,NASA,UCAR,USAF",Inactive,Drifting orbit,16 Apr 2008,28 Nov 2015,588,,,0-20009-0-786,http://cdaweb.gsfc.nasa.gov/cnofs/,,"['plp', 'didm', 'vefi', 'certo', 'cindi', 'coriss']"
+540,vrss_1,VRSS-1,Venezuelan Remote Sensing Satellite - 1 (Francisco de Miranda),"ABAE,CAST",Unclear,Sunsynchronous orbit,29 Sep 2012,≥2022,645,,10:30 desc,,,,"['pmc', 'wmc']"
+541,stpsat_3,STPSat-3,Space Test Program Satellite - 3,DoD,Unclear,Drifting orbit,20 Nov 2013,≥2022,500,,,,,,"['tim', 'swats', 'imesa_r']"
+542,stpsat_1,STPSat-1,Space Test Program Satellite - 1,DoD,Inactive,Drifting orbit,09 Mar 2007,07 Oct 2009,550,,,,,,"['shimmer', 'citris']"
+543,stpsat_2,STPSat-2,Space Test Program Satellite - 2,DoD,Presumably inactive,Drifting orbit,20 Nov 2010,≥2019,647,,,,,,['odtml']
+545,cfosat,CFOSAT,Chinese-French Oceanography Satellite,"NSOAS,CNES",Operational,Sunsynchronous orbit,29 Oct 2018,≥2026,500,,06:00 desc,0-20009-0-802,,,"['cscat', 'swim']"
+547,cygnss_8_sats,CYGNSS (8 sats),Cyclone Global Navigation Satellite System (8 sats),NASA,Operational,Drifting orbit,15 Dec 2016,≥2026,500,,,,https://podaac.jpl.nasa.gov/datasetlist?ids=Platform&values=CYGNSS,,['ddmi']
+548,solar_orbiter,Solar Orbiter,Solar Orbiter,"ESA,NASA",Operational,Solar orbit,10 Feb 2020,≥2030,N/A,,,0-20009-0-,https://soar.esac.esa.int/soar/,,"['rpw', 'eui', 'stix', 'phi', 'epd', 'swa', 'solohi', 'spice', 'metis', 'mag_solar_orbiter']"
+550,gokturk_2,Göktürk-2,Göktürk-2,TÜBITAK-UZAY,Unclear,Sunsynchronous orbit,18 Dec 2012,≥2023,679,,10:30 asc,0-20009-0-,,,['eos_c']
+555,hy_2b,HY-2B,Hai Yang 2B,"NSOAS,CAST",Operational,Sunsynchronous orbit,25 Oct 2018,≥2026,973,,06:00 desc,0-20009-0-503,,,"['hscat', 'alt_sso', 'lra_nasa', 'cmr', 'mwri_hy_2']"
+556,hy_2c,HY-2C,Hai Yang 2C,"NSOAS,CAST",Operational,Drifting orbit,21 Sep 2020,≥2026,1336,,,0-20009-0-504,,,"['hscat', 'alt_high', 'lra_nasa', 'cmr', 'doris']"
+557,hy_2d,HY-2D,Hai Yang 2D,"NSOAS,CAST",Operational,Drifting orbit,19 May 2021,≥2026,973,,,0-20009-0-505,,,"['hscat', 'alt_high', 'lra_nasa', 'cmr', 'doris']"
+558,resurs_p2,Resurs-P2,Resurs-P2,Roscosmos,Inactive,Sunsynchronous orbit,26 Dec 2014,10 Oct 2018,475,,10:30 desc,,http://eng.ntsomz.ru/zakaz/data,,"['nucleon', 'gsa', 'geoton_l1', 'shmsa_vr', 'shmsa_sr']"
+559,clarreo_2a,CLARREO-2A,Climate Absolute Radiance and Refractivity Observatory - 2A,NASA,Mission concept,Drifting orbit,TBD,TBD,609,,,,,,"['ir_spectrometer', 'gnss_ro']"
+560,clarreo_1b,CLARREO-1B,Climate Absolute Radiance and Refractivity Observatory - 1B,NASA,Mission concept,Drifting orbit,TBD,TBD,609,,,,,,['sw_spectrometer']
+561,clarreo_2b,CLARREO-2B,Climate Absolute Radiance and Refractivity Observatory - 2B,NASA,Mission concept,Drifting orbit,TBD,TBD,609,,,,,,['sw_spectrometer']
+562,proba_v,PROBA-V,Project for On-Board Autonomy - Végétation,ESA,Unclear,Sunsynchronous orbit,07 May 2013,31 Oct 2021,820,,11:00 asc,-20009--,http://www.vito-eodata.be/,,"['epd_proba_v', 'vegetation_p']"
+563,orbview_4,OrbView-4,OrbView-4,"Maxar,GeoEye",Lost at launch,Sunsynchronous orbit,21 Sep 2001,21 Sep 2001,470,,10:30 desc,,,,"['ohis', 'ohris']"
+564,nigeriasat_x,NigeriaSat-X,NigeriaSat-X,NASRDA,Unclear,Sunsynchronous orbit,17 Aug 2011,≥2023,681,,10:15 asc,,,,['slim6']
+565,dubaisat_2,DubaiSat-2,DubaiSat-2,EIAST,Inactive,Sunsynchronous orbit,21 Nov 2013,≥2022,600,,10:30 desc,0-20009-0-,,,['hirais']
+566,solar_a_yohkoh,Solar-A (Yohkoh),Solar-A (Yohkoh),JAXA,Inactive,Drifting orbit,30 Aug 1991,15 Dec 2001,645,,,,,,"['hxt', 'sxt', 'wbs', 'bcs']"
+567,coronas_i,Coronas-I,Complex Orbital Observations Near-Earth of Activity of the Sun - I,Roscosmos,Inactive,Drifting orbit,02 Mar 1994,15 Jul 1994,550,,,,,,"['sors', 'vuss', 'sufr_sp_c', 'avs', 'difos', 'res_c', 'terek_c', 'iris_coronas', 'skl_rad', 'diogeness', 'helicon', 'skl_particles']"
+568,coronas_f,Coronas-F,Complex Orbital Observations Near-Earth of Activity of the Sun - F,Roscosmos,Inactive,Drifting orbit,31 Jul 2001,06 Dec 2005,550,,,,,,"['resik', 'sors', 'vuss', 'spr_n', 'sufr_sp_c', 'avs', 'imap_5', 'difos', 'res_c', 'rps_1', 'terek_c', 'iris_coronas', 'skl_rad', 'diogeness', 'helicon', 'skl_particles']"
+569,stsat_1,STSat-1,Science and Technology Satellite - 1,KARI,Inactive,Sunsynchronous orbit,27 Sep 2003,15 Oct 2005,690,,10:30 asc,,,,"['spp_fields', 'fims', 'spp_particles']"
+570,stsat_2,STSat-2,Science and Technology Satellite - 2,KARI,Lost at launch,Cross-magnetosphere orbit,25 Aug 2009,25 Aug 2009,670,,,,,,"['lra_kari', 'dream']"
+571,stsat_3,STSat-3,Science and Technology Satellite - 3,KARI,Unclear,Sunsynchronous orbit,21 Nov 2013,≥2023,700,,17:30 asc,,,,"['comis', 'miris_meoc', 'miris_msoc']"
+572,iris,IRIS,Interface Region Imaging Spectrograph,NASA,Operational,Sunsynchronous orbit,28 Jun 2013,≥2026,649,,06:00 asc,0-20009-0-,,,['iris_iris']
+573,rhessi,RHESSI,Reuven Ramaty High Energy Solar Spectroscopic Imager,NASA,Inactive,Drifting orbit,05 Feb 2002,16 Aug 2018,600,,,,,,['rhessi']
+574,twins_2_sats,TWINS (2 sats),Two Wide-angle Imaging Neutral-atom Spectrometers (2 sats),"NASA,USAF",Inactive,Molniya orbit,28 Jun 2006,≥2020,,,,,,,"['lad', 'twins']"
+575,ibex,IBEX,Interstellar Boundary Explorer,NASA,Unclear,Cross-magnetosphere orbit,19 Oct 2008,≥2023,,,,0-20009-0-,,,['ibex']
+576,artemis_p1,ARTEMIS-P1,"Acceleration, Reconnection, Turbulence, and Electrodynamics of the Moon's Interaction with the Sun - P1",NASA,Operational,Lunar orbit,15 Jul 2011,≥2026,,,,0-20009-0-,,,"['scm', 'sst', 'esa', 'fgm_themis', 'efi_themis']"
+577,parker_solar_probe,Parker Solar Probe,Parker Solar Probe,NASA,Operational,Solar orbit,12 Aug 2018,≥2026,,,,0-20009-0-,,,"['wispr', 'fields', 'sweapi', 'isis_epi']"
+578,stsat_2c,STSat-2C,Science and Technology Satellite - 2C,KARI,Inactive,Cross-magnetosphere orbit,30 Jan 2013,15 Sep 2014,670,,,,,,"['lp', 'lra_kari', 'srem_dose', 'srem_particles']"
+580,meteor_p1,Meteor-P1,Meteor-Priroda - 1,"Roscosmos,RosHydroMet",Inactive,Drifting orbit,09 Jul 1974,09 Jul 1976,890,,,,,,"['msu_s', 'shf', 'msu_m', 'tv_meteor_1', 'ir_meteor_1']"
+581,meteor_p2,Meteor-P2,Meteor-Priroda - 2,"Roscosmos,RosHydroMet",Inactive,Drifting orbit,15 May 1976,15 May 1978,890,,,,,,"['msu_s', 'shf', 'r10_m', 'msu_m', 'ir_meteor_1', 'si_1']"
+582,meteor_p3,Meteor-P3,Meteor-Priroda - 3,"Roscosmos,RosHydroMet",Inactive,Sunsynchronous orbit,29 Jul 1977,29 Jul 1979,640,,10:15 asc,,,,"['msu_s', 'shf', 'r10_m', 'msu_m', 'si_1']"
+583,meteor_p4,Meteor-P4,Meteor-Priroda - 4,"Roscosmos,RosHydroMet",Inactive,Sunsynchronous orbit,25 Jan 1979,25 Jan 1981,640,,10:15 asc,,,,"['msu_s', 'r10_m', 'msu_m', 'si_1']"
+584,meteor_p5,Meteor-P5,Meteor-Priroda - 5,"Roscosmos,RosHydroMet",Inactive,Sunsynchronous orbit,18 Jun 1980,18 Jun 1982,630,,10:15 asc,,,,"['msu_s', 'r10_m', 'msu_m', 'msu_e_resurs_o1', 'mss_fragment', 'msu_sk_resurs']"
+585,meteor_p6,Meteor-P6,Meteor-Priroda - 6,"Roscosmos,RosHydroMet",Inactive,Sunsynchronous orbit,10 Jul 1981,10 Jul 1983,650,,10:15 asc,,,,"['msu_s', 'shf', 'r10_m', 'msu_m']"
+586,hcmm,HCMM,Heat Capacity Mapping Mission,NASA,Inactive,Sunsynchronous orbit,26 Apr 1978,30 Sep 1980,620,,14:00 asc,,,,['hcmr']
+587,vnredsat_1,VNREDSat-1,"Vietnam Natural Resources, Environment and Disaster-monitoring Satellite - 1",STI-VAST,Unclear,Sunsynchronous orbit,07 May 2013,≥2022,704,,10:30 desc,,,,['naomi_alsat']
+588,gf_1,GF-1,Gao Fen - 1,CNSA,Unclear,Sunsynchronous orbit,26 Apr 2013,≥2023,640,,10:30 desc,,,,"['wfv', 'pms']"
+589,gf_2,GF-2,Gao Fen - 2,CNSA,Operational,Sunsynchronous orbit,19 Aug 2014,≥2026,631,,10:30 desc,0-20009-0-,,,['pms_2']
+590,tempo,TEMPO,Tropospheric Emissions: Monitoring of Pollution,NASA,Operational,Geostationary orbit,07 Apr 2023,≥2026,35786,-91,,0-20009-0-790,,,['tempo']
+591,gfz_1,GFZ-1,GeoForschungsZentrum-1 Geodesy Satellite,DLR,Inactive,Drifting orbit,19 Apr 1995,23 Jun 1999,398,,,,,,['rra']
+592,merlin,MERLIN,Methane Remote Sensing Mission,"CNES,DLR",Planned,Sunsynchronous orbit,≥2028,≥2031,506,,06:00 asc,,,,['ipda_lidar']
+593,cartosat_2c,CartoSat-2C,CartoSat-2C,ISRO,Operational,Sunsynchronous orbit,22 Jun 2016,≥2026,505,,09:28 desc,0-20009-0-,http://www.nrsc.gov.in/IRS_Data_Products?q=IRS_Data_Products,,"['evm', 'hrmx', 'pan_cartosat_2c_d']"
+594,cartosat_2d,CartoSat-2D,CartoSat-2D,ISRO,Operational,Sunsynchronous orbit,15 Feb 2017,≥2026,515,,09:30 desc,0-20009-0-,http://www.nrsc.gov.in/IRS_Data_Products?q=IRS_Data_Products,,"['evm', 'hrmx', 'pan_cartosat_2c_d']"
+595,compira,COMPIRA,Coastal and Ocean measurement Mission with Precise and Innovative Radar Altimeter,JAXA,Planned,Drifting orbit,≥2026,≥2029,TBD,,,0-20009-0-,,,"['altimeter_compira', 'shiosai']"
+596,egyptsat_1,EgyptSat-1,EgyptSat-1,NARSS,Inactive,Sunsynchronous orbit,17 Apr 2007,19 Jul 2010,668,,10:30 desc,,http://www.narss.sci.eg,,"['irei', 'mbei']"
+597,egyptsat_2,EgyptSat-2,EgyptSat-2,NARSS,Inactive,Drifting orbit,16 Apr 2014,09 Jun 2015,634,,10:30 desc,,http://www.narss.sci.eg,,['msi_egyptsat']
+598,sampex,SAMPEX,Solar Anomalous and Magnetospheric Particle Explorer,NASA,Inactive,Drifting orbit,03 Jul 1992,13 Nov 2012,590,,,,,,"['pet', 'hilt', 'mast', 'leica']"
+599,image,IMAGE,Imager for Magnetopause-to-Aurora Global Exploration,NASA,Inactive,Cross-magnetosphere orbit,25 Mar 2000,15 Dec 2005,6782,,,,,,"['rpi', 'euv', 'lena', 'hena', 'mena', 'fuv_si', 'fuv_geo', 'fuv_wic']"
+600,kazeosat_1,KazEOSat-1,"High Resolution Earth Observation Satellite, Kazakhstan",Kazcosmos,Unclear,Sunsynchronous orbit,30 Apr 2014,≥2022,759,,10:15 desc,,,,['naomi_kazeosat']
+601,kazeosat_2,KazEOSat-2,"Medium Resolution Earth Observation Satellite, Kazakhstan",Kazcosmos,Unclear,Sunsynchronous orbit,19 Jun 2014,≥2022,630,,10:30 asc,,,,['keis']
+602,resourcesat_2a,ResourceSat-2A,Satellite for Earth Resources - 2A,ISRO,Operational,Sunsynchronous orbit,07 Dec 2016,≥2026,817,,10:20 desc,0-20009-0-,http://www.nrsc.gov.in/IRS_Data_Products?q=IRS_Data_Products,,"['awifs', 'liss_4', 'liss_3_resourcesat']"
+603,insat_3ds,INSAT-3DS,Indian National Satellite - 3D second repeat,"IMD,ISRO",Operational,Geostationary orbit,17 Feb 2024,≥2034,35786,82,,0-20009-0-474,https://mosdac.gov.in/,,"['sas_r', 'dcs_insat', 'sounder_insat', 'imager_insat']"
+604,eos_04,EOS-04,Earth Observation Satellite - 04 (also known as RISAT-1A),ISRO,Operational,Sunsynchronous orbit,14 Feb 2022,≥2027,529,,06:00 desc,,,,['sar_c_risat']
+605,scatsat_1,ScatSat-1,ScatSat-1,ISRO,Inactive,Sunsynchronous orbit,26 Sep 2016,28 Feb 2021,732,,08:45 desc,0-20009-0-422,https://mosdac.gov.in/,,['oscat']
+606,gosat_2,GOSAT-2,Green-house gas Observing Satellite - 2,"JAXA,MOE",Operational,Sunsynchronous orbit,29 Oct 2018,≥2026,613,,13:00 desc,0-20009-0-141,,,"['tanso_fts_2', 'tanso_cai_2']"
+607,gf_3,GF-3,Gao Fen - 3,CNSA,Operational,Sunsynchronous orbit,09 Aug 2016,≥2026,758,,06:00 desc,,,,['sar_c_gf_3']
+608,gf_4,GF-4,Gao Fen - 4,CNSA,Operational,Geostationary orbit,28 Dec 2015,≥2026,35786,106,,,,,['gf_4_13_imager']
+609,gf_5,GF-5,Gao Fen - 5,CNSA,Inactive,Sunsynchronous orbit,08 May 2018,≥2020,705,,13:30 asc,,,,"['ahsi', 'aius', 'emi', 'dpc', 'vims', 'gmi_gf_5']"
+613,electro_l_n4,Electro-L N4,Electro-L Number 4,"RosHydroMet,Roscosmos",Operational,Geostationary orbit,05 Feb 2023,≥2033,35786,165.8,,-20009--,,,"['msu_gs', 'dcs_electro', 'ggak_e_fm_e', 'ggak_e_dir_e', 'ggak_e_isp_2m', 'ggak_e_vuss_e', 'geos_r_electro', 'ggak_e_skl_e', 'ggak_e_gals_e', 'ggak_e_skif_6']"
+615,meteor_m_n2_3,Meteor-M N2-3,Meteor-M Number 2-3,"RosHydroMet,Roscosmos",Operational,Sunsynchronous orbit,27 Jun 2023,≥2028,820,,15:00 asc,-20009--,,,"['msu_mr', 'kmss', 'ikfs_2', 'meteosar', 'sas_r_meteor', 'ggak_m_rims_m', 'mtvza_gy', 'ggak_e_gals_e_meteor', 'ggak_e_skif_6_meteor']"
+616,meteor_m_n2_4,Meteor-M N2-4,Meteor-M Number 2-4,"RosHydroMet,Roscosmos",Operational,Sunsynchronous orbit,29 Feb 2024,≥2029,820.7,,09:00 desc,-20009--,,,"['ikor_m', 'sspd', 'msu_mr', 'kmss', 'ikfs_2', 'meteosar', 'sas_r_meteor', 'ggak_m_rims_m', 'mtvza_gy', 'ggak_e_gals_e_meteor', 'ggak_e_skif_6_meteor']"
+617,meteor_m_n2_5,Meteor-M N2-5,Meteor-M Number 2-5,"RosHydroMet,Roscosmos",Planned,Sunsynchronous orbit,≥2027,≥2032,820.7,,15:00 desc,-20009--,,,"['ikor_m', 'sspd', 'msu_mr', 'kmss', 'ikfs_2', 'meteosar', 'sas_r_meteor', 'ggak_m_rims_m', 'mtvza_gy', 'ggak_e_gals_e_meteor', 'ggak_e_skif_6_meteor']"
+621,iss_rapidscat,ISS RapidScat,Rapid Scatterometer on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Inactive,Drifting orbit,21 Sep 2014,19 Aug 2016,407,,,0-20009-0-801,http://podaac.jpl.nasa.gov/dataset/RSCAT_LEVEL_2B_OWV_COMP_12_V1?ids=Platform&values=ISS,,['rapidscat']
+622,iss_cats,ISS CATS,Cloud-Aerosol Transport System on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Inactive,Drifting orbit,10 Jan 2015,≥2017,407,,,,http://cats.gsfc.nasa.gov/data/browse/,,['cats']
+623,iss_lis,ISS LIS,Lightning Imaging Sensor on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Inactive,Drifting orbit,19 Feb 2017,16 Nov 2023,407,,,-20009--,https://lightning.nsstc.nasa.gov/data/data_iss_lis.html,,['lis_iss']
+624,iss_oco_3,ISS OCO-3,Orbiting Carbon Observatory 3 on the ISS,NASA,Operational,Drifting orbit,04 May 2019,≥2026,407,,,-20009--,,,['oco_iss_spectrometer']
+625,iss_hico,ISS HICO,Hyperspectral Imager for the Coastal Ocean on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Inactive,Drifting orbit,25 Sep 2009,24 Sep 2014,407,,,,,,['hico']
+626,sac_e_sabia_mar_a,SAC-E/SABIA-MAR A,"Satélite de Aplicaciones Cientificas - E / Satélite Argentino-Brasileño de Información en Alimento, Agua y Ambiente - A","CONAE,AEB,INPE,NASA",Planned,Sunsynchronous orbit,≥2026,≥2029,645,,10:30 desc,0-20009-0-,,,"['hsc', 'dcs_sac', 'mus_nir_swir']"
+627,sac_e_sabia_mar_b,SAC-E/SABIA-MAR B,"Satélite de Aplicaciones Cientificas - E / Satélite Argentino-Brasileño de Información en Alimento, Agua y Ambiente - B","CONAE,AEB,INPE,NASA",Planned,Sunsynchronous orbit,≥2026,≥2029,645,,10:30 desc,0-20009-0-,,,"['hsc', 'dcs_sac', 'mus_uv_vis_nir']"
+628,iss_desis,ISS DESIS,DLR Earth Sensing Imaging Spectrometer on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Operational,Drifting orbit,29 Jun 2018,≥2026,,,,0-20009-0-,,,['desis']
+629,deimos_2,Deimos-2,Deimos-2,Elecnor-Deimos,Operational,Sunsynchronous orbit,19 Jun 2014,≥2026,620,,10:30 asc,0-20009-0-,,,['hirais']
+630,skysat_1,SkySat-1,Sky Satellite - 1,Planet,Unclear,Sunsynchronous orbit,21 Nov 2013,≥2023,587,,10:30 desc,,,,['skysat']
+631,skysat_2,SkySat-2,Sky Satellite - 2,Planet,Operational,Sunsynchronous orbit,08 Jul 2014,≥2026,600,,10:30 desc,,,,['skysat']
+632,icon,ICON,Ionospheric Connection Explorer ,NASA,Operational,Drifting orbit,11 Oct 2019,≥2026,575,,,0-20009-0-,https://icon.ssl.berkeley.edu/Data,,"['ivm', 'fuv_icon', 'euv_icon', 'mighti']"
+633,iss_gedi,ISS GEDI,Global Ecosystem Dynamics Investigation on ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Operational,Drifting orbit,05 Dec 2018,≥2030,407,,,-20009--,,,['gedi_lidar']
+634,iss_ecostress,ISS ECOSTRESS,ECOsystem Spaceborne Thermal Radiometer Experiment on Space Station,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Operational,Drifting orbit,29 Jun 2018,≥2026,407,,,-20009--,,,['ecostress']
+635,kondor_e1,Kondor-E1,Kondor-Experimental SAR Spacecraft No. 1,NPOMash,Presumably inactive,Drifting orbit,19 Dec 2014,≥2019,500,,,,,,['sar_10']
+636,diademe_1,Diadéme-1,Diadéme-1,CNES,Operational,Drifting orbit,08 Feb 1967,≥2050,698,,,,,,['rra_cnes']
+637,diademe_2,Diadéme-2,Diadéme-2,CNES,Operational,Drifting orbit,15 Feb 1967,≥2050,990,,,,,,['rra_cnes']
+638,hrws_sar,HRWS-SAR,High Resolution Wide Swath SAR,DLR,Planned,Sunsynchronous orbit,≥2029,≥2036,515,,06:00 desc,,,,['hrws_sar']
+639,nisar,NISAR,NASA-ISRO Synthetic Aperture Radar,"NASA,ISRO",Operational,Sunsynchronous orbit,30 Jul 2025,≥2029,747,,06:00 desc,-20009--,,,"['sar_l_nisar', 'sar_s_nisar']"
+640,resurs_p3,Resurs-P3,Resurs-P3,Roscosmos,Inactive,Sunsynchronous orbit,13 Mar 2016,16 May 2017,477,,10:30 desc,,http://eng.ntsomz.ru/zakaz/data,,"['gsa', 'geoton_l1', 'shmsa_vr', 'shmsa_sr']"
+643,hy_3c,HY-3C,Hai Yang 3C,"NSOAS,CAST",Planned,Geostationary orbit,≥2028,≥2038,35786,TBD,,0-20009-0-,,,
+644,obzor_r_n1,Obzor-R N1,Operative Monitoring Satellite - Radar - number 1,Roscosmos,Commissioning,Sunsynchronous orbit,25 Dec 2025,≥2029,650,,06:00 desc,-20009--,,,['asar_mp']
+645,obzor_r_n2,Obzor-R N2,Operative Monitoring Satellite - Radar - number 2,Roscosmos,Planned,Sunsynchronous orbit,≥2026,≥2029,650,,TBD ,0-20009-0-,,,['asar_mp']
+646,obzor_r_n3,Obzor-R N3,Operative Monitoring Satellite - Radar - number 3,Roscosmos,Planned,Sunsynchronous orbit,≥2026,≥2030,650,,TBD ,0-20009-0-,,,['asar_mp']
+647,obzor_r_n4,Obzor-R N4,Operative Monitoring Satellite - Radar - number 4,Roscosmos,Planned,Sunsynchronous orbit,≥2027,≥2034,650,,TBD ,,,,['asar_mp']
+648,obzor_o_n1,Obzor-O N1,Operative Monitoring Satellite - Optical - number 1,Roscosmos,Planned,Sunsynchronous orbit,≥2026,≥2031,700,,10:30 desc,0-20009-0-,,,
+649,obzor_o_n2,Obzor-O N2,Operative Monitoring Satellite - Optical - number 2,Roscosmos,Planned,Sunsynchronous orbit,≥2026,≥2032,700,,10:30 desc,0-20009-0-,,,
+650,obzor_o_n3,Obzor-O N3,Operative Monitoring Satellite - Optical - number 3,Roscosmos,Planned,Sunsynchronous orbit,≥2026,≥2033,700,,10:30 desc,,,,
+651,obzor_o_n4,Obzor-O N4,Operative Monitoring Satellite - Optical - number 4,Roscosmos,Planned,Sunsynchronous orbit,≥2027,≥2034,700,,10:30 desc,,,,
+652,sj_9a,SJ-9A,Shijian 9A,"CRESDA,CAST",Unclear,Sunsynchronous orbit,14 Oct 2012,≥2022,645,,10:30 desc,,,,"['pan_sj_9', 'mux_sj_9']"
+653,sj_9b,SJ-9B,Shijian 9B,"CRESDA,CAST",Unclear,Sunsynchronous orbit,14 Oct 2012,≥2022,645,,10:30 desc,,,,['irs_sj_9']
+658,swarm_a,SWARM-A,The Earth’s Magnetic Field and Environment Explorers - A,"ESA,CNES,CSA",Operational,Drifting orbit,22 Nov 2013,≥2026,460,,,0-20009-0-,https://earth.esa.int/web/guest/swarm/data-access,,"['acc', 'gps_esa', 'str_swarm', 'lrr_dlr', 'vfm', 'asm', 'efi_swarm']"
+660,cartosat_2e,CartoSat-2E,CartoSat-2E,ISRO,Operational,Sunsynchronous orbit,23 Jun 2017,≥2026,505,,09:29 desc,0-20009-0-,http://www.nrsc.gov.in/IRS_Data_Products?q=IRS_Data_Products,,"['evm', 'hrmx', 'pan_cartosat_2c_d']"
+662,jpss_3,JPSS-3,Joint Polar Satellite System - 3,"NOAA,NASA",Planned,Sunsynchronous orbit,31 Dec 2032,≥2041,824,,13:30 asc,-20009--,,,"['omps_limb', 'cris', 'omps_nadir', 'viirs', 'atms']"
+663,jpss_4,JPSS-4,Joint Polar Satellite System - 4,"NOAA,NASA",Planned,Sunsynchronous orbit,31 Dec 2027,≥2036,824,,13:30 asc,-20009--,,,"['libera', 'omps_limb', 'cris', 'omps_nadir', 'viirs', 'atms']"
+664,goes_17,GOES-17,Geostationary Operational Environmental Satellite - 17,"NOAA,NASA",Stand-by,Geostationary orbit,01 Mar 2018,≥2029,35786,-104.7,,0-20009-0-271,	http://cimss.ssec.wisc.edu/goes/goesdata.html,,"['glm', 'suvi', 'sem_mag', 'abi', 'geos_r', 'dcis', 'seiss_ehis', 'seiss_mps', 'exis', 'seiss_sgps']"
+665,goes_18,GOES-18,Geostationary Operational Environmental Satellite - 18,"NOAA,NASA",Operational,Geostationary orbit,01 Mar 2022,≥2041,35786,-137,,0-20009-0-272,	http://cimss.ssec.wisc.edu/goes/goesdata.html,,"['glm', 'suvi', 'sem_mag', 'abi', 'geos_r', 'dcis', 'seiss_ehis', 'seiss_mps', 'exis', 'seiss_sgps']"
+666,goes_19,GOES-19,Geostationary Operational Environmental Satellite - 19,"NOAA,NASA",Operational,Geostationary orbit,25 Jun 2024,≥2043,35786,-75.2,,0-20009-0-273,https://cimss.ssec.wisc.edu/goes/goesdata.html,,"['glm', 'suvi', 'ccor_1', 'sem_mag', 'abi', 'geos_r', 'dcis', 'seiss_ehis', 'seiss_mps', 'exis', 'seiss_sgps']"
+667,gf_8,GF-8,Gao Fen - 8,CNSA,Operational,Sunsynchronous orbit,26 Jun 2015,≥2026,475,,10:30 desc,,,,['pms_2']
+668,sstl_s1_1,SSTL-S1 1,Surrey Satellite Technology Ltd - S1 1,"SSTL,21AT,UKSA",Operational,Sunsynchronous orbit,10 Jul 2015,≥2026,630,,10:30 asc,0-20009-0-,,,['vhri_100']
+669,sstl_s1_2,SSTL-S1 2,Surrey Satellite Technology Ltd - S1 2,"SSTL,21AT,UKSA",Operational,Sunsynchronous orbit,10 Jul 2015,≥2026,630,,10:30 asc,0-20009-0-,,,['vhri_100']
+670,sstl_s1_3,SSTL-S1 3,Surrey Satellite Technology Ltd - S1 3,"SSTL,21AT,UKSA",Operational,Sunsynchronous orbit,10 Jul 2015,≥2026,630,,10:30 asc,0-20009-0-,,,['vhri_100']
+671,himawari_9,Himawari-9,Himawari-9,JMA,Operational,Geostationary orbit,02 Nov 2016,≥2034,35786,140.7,,0-20009-0-174,http://www.jma.go.jp/jma/jma-eng/satellite/dissemination.html,,"['ahi', 'dcs_himawari']"
+672,kondor_e,Kondor-E,Kondor-Experimental SAR Spacecraft,NPOMash,Inactive,Drifting orbit,27 Jun 2013,≥2014,500,,,,,,['sar_10']
+673,th_1c,TH-1C,Tian Hui - 1C,"PLA,CAST",Operational,Sunsynchronous orbit,26 Oct 2015,≥2026,498,,13:30 desc,0-20009-0-,,,"['ms_th', 'pan_th']"
+674,jilin_1,Jilin-1,Jilin-1,CRESDA,Operational,Sunsynchronous orbit,05 Jun 2019,≥2030,528,,10:30 asc,-20009--,,,['jilin_imager']
+675,worldview_4,WorldView-4,WorldView-4,"Maxar,DigitalGlobe",Inactive,Sunsynchronous orbit,11 Nov 2016,07 Jan 2019,617,,10:30 desc,,,,['spaceview_110']
+676,tansat,TANSAT,Exploratory Satellite for Atmospheric CO2,"MOST,CAS,CMA",Inactive,Sunsynchronous orbit,21 Dec 2016,01 Feb 2022,712,,13:30 asc,-20009--,http://satellite.nsmc.org.cn/portalsite/Data/DataView.aspx?SatelliteType=2&SatelliteCode=TANSAT,,"['capi', 'acgs']"
+677,zy_3_02,ZY-3-02,Zi Yuan - 3-02,"CAST,CRESDA",Operational,Sunsynchronous orbit,30 May 2016,≥2026,506,,10:30 desc,0-20009-0-,,,"['tac', 'msc_zy']"
+678,fy_3j,FY-3J,Feng-Yun 3J,"CMA,NRSCC",Planned,Sunsynchronous orbit,≥2026,≥2034,836,,05:20 desc,-20009--,,,"['windrad', 'sim_2', 'ssim', 'enai', 'xeuvi', 'gnos_2', 'mwhs_2', 'mwts_3', 'hiras_2', 'mersi_ll', 'sws_tri_ipm', 'sws_sem_fgm', 'sws_sem_ims', 'sws_sem_hepd']"
+679,skysat_3,SkySat-3,Sky Satellite - 3,Planet,Operational,Sunsynchronous orbit,22 Jun 2016,≥2026,500,,10:30 desc,,,,['skysat']
+680,hy_3a_hy_1e,HY-3A (HY-1E),Hai Yang 3A,"NSOAS,CAST",Operational,Sunsynchronous orbit,16 Nov 2023,≥2031,781,,10:30 desc,-20009--,,,"['ais', 'czi2', 'cocts2', 'pmris']"
+681,hy_1f,HY-1F,Hai Yang 1F,"NSOAS,CAST",Planned,Sunsynchronous orbit,≥2028,≥2036,798,,13:30 asc,0-20009-0-,,,"['ais', 'czi2', 'cocts2', 'pmris']"
+682,hy_2e,HY-2E,Hai Yang 2E,"NSOAS,CAST",Planned,Sunsynchronous orbit,≥2026,≥2031,973,,06:00 desc,0-20009-0-,,,"['hscat', 'alt_sso', 'lra_nasa', 'cmr', 'mwri_hy_2']"
+683,hy_2f,HY-2F,Hai Yang 2F,"NSOAS,CAST",Planned,Drifting orbit,≥2026,≥2031,1336,,,0-20009-0-,,,"['hscat', 'alt_high', 'lra_nasa', 'cmr', 'doris']"
+684,meteosat_8_iodc,Meteosat-8 (IODC),Meteosat-8 (Indian Ocean Data Coverage),"EUMETSAT,ESA",Inactive,Geostationary orbit,15 Sep 2016,Jun 2022,35786,41.5,,-20009--,https://navigator.eumetsat.int/product/EO:EUM:DAT:MSG:HRSEVIRI-IODC?filter=satellite__MSG&query=level%201&s=extended,,"['gerb', 'geos_r', 'dcs_meteosat', 'seviri']"
+685,hy_2n,HY-2N,Hai Yang 2N,"NSOAS,CAST",Planned,Drifting orbit,≥2028,≥2033,1336,,,0-20009-0-,,,
+686,hy_4a_or_hy_2s,HY-4A (or HY-2S),Hai Yang 4A,NSOAS,Operational,Sunsynchronous orbit,13 Nov 2024,≥2033,654,,06:00 desc,0-20009-0-,,,"['imr', 'micap']"
+687,hy_3d,HY-3D,Hai Yang 3D,"NSOAS,CAST",Planned,Geostationary orbit,≥2028,≥2036,35786,TBD,,0-20009-0-,,,
+688,hy_2l_cfosat_fo,HY-2L (CFOSAT-FO),HY-2L Chinese-French Oceanography Satellite - follow-on,"NSOAS,CNES",Planned,Sunsynchronous orbit,≥2030,≥2038,500,,07:00 desc,0-20009-0-,,,"['cscat', 'swim']"
+689,iss_clarreo_pf,ISS CLARREO-PF,Climate Absolute Radiance and Refractivity Observatory Pathfinder on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Planned,Drifting orbit,≥2027,≥2028,407,,,-20009--,,,['hysics']
+690,maia,MAIA,Multi-Angle Imager for Aerosols,NASA,Planned,Sunsynchronous orbit,≥2026,≥2029,740,,TBD ,-20009--,,,['maia']
+692,mistic_winds,MISTiC Winds,Midwave Infrared Sounding of Temperature and humidity in a Constellation for Winds,NASA,Mission concept,Sunsynchronous orbit,TBD,TBD,705,,13:30 asc,,,,
+696,gf_9,GF-9,Gao Fen - 9,CNSA,Operational,Sunsynchronous orbit,14 Sep 2015,≥2026,650,,10:30 desc,,,,['pms_2']
+697,skysat_4,SkySat-4,Sky Satellite - 4,Planet,Operational,Sunsynchronous orbit,16 Sep 2016,≥2026,507,,10:30 desc,,,,['skysat']
+698,skysat_5,SkySat-5,Sky Satellite - 5,Planet,Operational,Sunsynchronous orbit,16 Sep 2016,≥2026,507,,10:30 desc,,,,['skysat']
+699,skysat_6,SkySat-6,Sky Satellite - 6,Planet,Operational,Sunsynchronous orbit,16 Sep 2016,≥2026,507,,10:30 desc,,,,['skysat']
+700,skysat_7,SkySat-7,Sky Satellite - 7,Planet,Operational,Sunsynchronous orbit,16 Sep 2016,≥2026,509,,10:30 desc,,,,['skysat']
+701,skysat_8,SkySat-8,Sky Satellite - 8,Planet,Operational,Sunsynchronous orbit,31 Oct 2017,≥2026,500,,13:30 asc,,,,['skysat']
+702,skysat_9,SkySat-9,Sky Satellite - 9,Planet,Operational,Sunsynchronous orbit,31 Oct 2017,≥2026,500,,13:30 asc,,,,['skysat']
+703,skysat_10,SkySat-10,Sky Satellite - 10,Planet,Operational,Sunsynchronous orbit,31 Oct 2017,≥2026,500,,13:30 asc,,,,['skysat']
+704,skysat_11,SkySat-11,Sky Satellite - 11,Planet,Operational,Sunsynchronous orbit,31 Oct 2017,≥2026,500,,13:30 asc,,,,['skysat']
+705,skysat_12,SkySat-12,Sky Satellite - 12,Planet,Operational,Sunsynchronous orbit,31 Oct 2017,≥2026,500,,13:30 asc,,,,['skysat']
+706,skysat_13,SkySat-13,Sky Satellite - 13,Planet,Operational,Sunsynchronous orbit,31 Oct 2017,≥2026,500,,13:30 asc,,,,['skysat']
+707,perusat_1,PeruSat-1,PeruSat-1,CONIDA,Operational,Sunsynchronous orbit,16 Sep 2016,≥2026,705,,10:30 desc,,,,['naomi_kazeosat']
+708,alsat_1b,AlSat-1B,Algeria Satellite - 1B,ASAL,Operational,Sunsynchronous orbit,26 Sep 2016,≥2026,690,,10:30 asc,0-20009-0-,,,['slim6']
+709,xmm_newton,XMM-Newton,X-ray Multi-Mirror Mission Observatory - Newton,ESA,Operational,Drifting orbit,10 Dec 1999,≥2026,40000,,,,,,"['om', 'rgs', 'epic_xmm']"
+710,crres,CRRES,Combined Release and Radiation Effects Satellite,"NASA,DoD",Inactive,Drifting orbit,25 Jul 1990,12 Oct 1991,3400,,,,,,['mea']
+711,galileo,Galileo,Galileo,"ESA,EC",Operational,Drifting orbit,21 Oct 2011,≥2031,23222,,,,,,['emu']
+712,ses_14,SES-14,SES-14,SES,Presumably inactive,Geostationary orbit,25 Jan 2018,≥2022,35786,-47.5,,,,,['gold']
+713,explorer_vii,Explorer-VII,Explorer-VII,NASA,Inactive,Drifting orbit,13 Oct 1959,24 Aug 1961,722,,,,,,['fpr']
+714,gokturk_1a,Göktürk-1A,Göktürk-1A,TÜBITAK-UZAY,Operational,Sunsynchronous orbit,05 Dec 2016,≥2026,700,,10:30 asc,0-20009-0-,,,['hiri']
+715,arase_erg,Arase (ERG),Exploration of energization and Radiation in Geospace,JAXA,Operational,Cross-magnetosphere orbit,20 Dec 2016,≥2033,3000,,,,,,"['pwe', 'mgf_erg', 'hep_e', 'xep_e', 'lep_e', 'lep_i', 'mep_i', 'mep_e']"
+716,superview_1,SuperView-1,SuperView-1,"CAST,SpacEyes",Operational,Sunsynchronous orbit,28 Dec 2016,≥2026,534,,10:30 desc,0-20009-0-,,,['pms_3']
+717,superview_2,SuperView-2,SuperView-2,"CAST,SpacEyes",Operational,Sunsynchronous orbit,28 Dec 2016,≥2026,534,,10:30 desc,0-20009-0-,,,['pms_3']
+718,superview_3,SuperView-3,SuperView-3,"CAST,SpacEyes",Operational,Sunsynchronous orbit,09 Jan 2018,≥2026,500,,10:30 desc,0-20009-0-,,,['pms_3']
+719,superview_4,SuperView-4,SuperView-4,"CAST,SpacEyes",Operational,Sunsynchronous orbit,09 Jan 2018,≥2026,500,,10:30 desc,0-20009-0-,,,['pms_3']
+720,resourcesat_3,ResourceSat-3,Satellite for Earth Resources - 3,ISRO,Planned,Sunsynchronous orbit,≥2026,≥2030,795,,10:30 desc,0-20009-0-,http://www.nrsc.gov.in,,"['atcor', 'aliss_3']"
+721,resourcesat_3a,ResourceSat-3A,Satellite for Earth Resources - 3A,ISRO,Planned,Sunsynchronous orbit,≥2026,≥2030,795,,10:30 desc,,http://www.nrsc.gov.in,,"['atcor', 'aliss_3']"
+722,oceansat_3a,OceanSat-3A,OceanSat-3A,ISRO,Planned,Sunsynchronous orbit,Jun 2026,≥2030,723,,12:00 desc,-20009--,https://bhoonidhi.nrsc.gov.in/bhoonidhi/home.html,,"['oscat_3', 'sstm', 'ocm_oceansat_3', 'maths']"
+724,landsat_9,Landsat-9,Landsat-9,"USGS,NASA",Operational,Sunsynchronous orbit,27 Sep 2021,≥2031,705,,10:00 desc,-20009--,https://lta.cr.usgs.gov/,,"['oli', 'tirs']"
+725,tsis_2,TSIS-2,Total and Spectral Solar Irradiance Sensor - 2 ,NASA,Planned,Drifting orbit,≥2026,≥2028,407,,,-20009--,,,['tsis']
+726,csim,CSIM,Compact Spectral Irradiance Monitor,NASA,Inactive,Drifting orbit,03 Dec 2018,Feb 2022,587,,,,,,['sim']
+728,amazonia_2,Amazônia-2,Amazônia-2,"INPE,AEB",Planned,Sunsynchronous orbit,≥2026,≥2029,778,,10:30 desc,0-20009-0-,,,['awfi_2']
+730,kanopus_v3,KANOPUS-V3,KANOPUS-V3,"Roscosmos,RosHydroMet",Operational,Sunsynchronous orbit,01 Feb 2018,≥2026,510,,10:30 asc,0-20009-0-,http://eng.ntsomz.ru/zakaz/data,,"['pss', 'mss_kanopus', 'msu_200']"
+732,kanopus_v4,KANOPUS-V4,KANOPUS-V4,"Roscosmos,RosHydroMet",Operational,Sunsynchronous orbit,01 Feb 2018,≥2026,510,,10:30 asc,0-20009-0-,http://eng.ntsomz.ru/zakaz/data,,"['pss', 'mss_kanopus', 'msu_200']"
+733,formosat_1,FORMOSAT-1,FORMOSAT-1,"NSPO,UCAR",Inactive,Drifting orbit,26 Jan 1999,17 Jun 2004,600,,,,,,"['oci_formosat', 'ipei']"
+734,formosat_5,FORMOSAT-5,FORMOSAT-5,"NSPO,UCAR",Operational,Sunsynchronous orbit,24 Aug 2017,≥2026,720,,10:00 desc,0-20009-0-,,,"['aip', 'rsi_formosat_5']"
+735,vrss_2,VRSS-2,Venezuelan Remote Sensing Satellite - 2 (Antonio José de Sucre),"ABAE,CAST",Unclear,Sunsynchronous orbit,09 Oct 2017,≥2023,636,,10:30 desc,,,,
+736,mohammed_vi_a,Mohammed VI-A,Mohammed VI-A,CRTS,Operational,Sunsynchronous orbit,08 Nov 2017,≥2026,620,,10:30 desc,0-20009-0-,,,['hiri']
+737,mohammed_vi_b,Mohammed VI-B,Mohammed VI-B,CRTS,Operational,Sunsynchronous orbit,21 Nov 2018,≥2026,620,,10:30 desc,0-20009-0-,,,['hiri']
+738,cartosat_2f,CartoSat-2F,CartoSat-2F,ISRO,Operational,Sunsynchronous orbit,12 Jan 2018,≥2026,505,,09:37 desc,0-20009-0-,http://www.nrsc.gov.in/IRS_Data_Products?q=IRS_Data_Products,,"['evm', 'hrmx', 'pan_cartosat_2c_d']"
+739,skysat_14,SkySat-14,Sky Satellite - 14,Planet,Operational,Sunsynchronous orbit,03 Dec 2018,≥2026,500,,13:30 asc,,,,['skysat']
+740,skysat_15,SkySat-15,Sky Satellite - 15,Planet,Operational,Sunsynchronous orbit,03 Dec 2018,≥2026,500,,13:30 asc,,,,['skysat']
+741,gf_1_02,GF-1-02,Gao Fen - 1 - 02,CNSA,Operational,Sunsynchronous orbit,31 Mar 2018,≥2026,640,,10:30 desc,,,,['pms']
+742,gf_1_03,GF-1-03,Gao Fen - 1 - 03,CNSA,Operational,Sunsynchronous orbit,31 Mar 2018,≥2026,640,,10:30 desc,,,,['pms']
+743,gf_1_04,GF-1-04,Gao Fen - 1 - 04,CNSA,Operational,Sunsynchronous orbit,31 Mar 2018,≥2026,640,,10:30 desc,,,,['pms']
+745,iss_asim,ISS ASIM,Atmosphere-Space Interactions Monitor on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Operational,Drifting orbit,02 Apr 2018,≥2026,407,,,0-20009-0-,,,"['mmia', 'mxgs']"
+746,gf_6,GF-6,Gao Fen - 6,CNSA,Operational,Sunsynchronous orbit,02 Jun 2018,≥2026,640,,10:30 desc,,,,"['wfv', 'pms']"
+747,resourcesat_3s,ResourceSat-3S,Satellite for Earth Resources - 3 Sampler,ISRO,Planned,Sunsynchronous orbit,≥2026,≥2029,633,,10:30 desc,0-20009-0-,http://www.nrsc.gov.in,,"['liss_v', 'apan_resourcesat_3s']"
+748,resourcesat_3sa,ResourceSat-3SA,Satellite for Earth Resources - 3 Sampler A,ISRO,Planned,Sunsynchronous orbit,≥2026,≥2031,633,,10:30 desc,,http://www.nrsc.gov.in,,"['liss_v', 'apan_resourcesat_3s']"
+749,hrsat_1a,HRSAT-1A,High Resolution Satellite -1A,ISRO,Planned,Sunsynchronous orbit,≥2027,≥2029,660,,09:30 desc,0-20009-0-,,,['hrsat_1']
+750,trishna,TRISHNA,TRISHNA,"ISRO,CNES",Planned,Sunsynchronous orbit,≥2026,≥2031,761,,13:00 asc,,,,['trishna']
+751,alos_4_daichi_4,ALOS-4 (DAICHI-4),Advanced Land Observing Satellite  - 4,JAXA,Operational,Sunsynchronous orbit,01 Jul 2024,≥2031,613,,12:00 desc,-20009--,,,"['ais', 'palsar_3']"
+752,gosat_gw,GOSAT-GW,Global Observation SATellite for Greenhouse gases and Water cycle,"JAXA,MOE",Commissioning,Sunsynchronous orbit,28 Jun 2025,≥2032,666,,13:30 asc,0-20009-0-142,,,"['amsr3', 'tanso_3']"
+754,sentinel_1c,Sentinel-1C,Sentinel-1C,"ESA,EC",Operational,Sunsynchronous orbit,05 Dec 2024,≥2034,693,,06:00 desc,0-20009-0-068,https://sentinel.esa.int/web/sentinel/missions/sentinel-1/data-products,,"['ais', 'sar_c_sentinel_1']"
+755,sentinel_1d,Sentinel-1D,Sentinel-1D,"ESA,EC",Commissioning,Sunsynchronous orbit,04 Nov 2025,≥2035,693,,06:00 desc,0-20009-0-069,https://sentinel.esa.int/web/sentinel/missions/sentinel-1/data-products,,['sar_c_sentinel_1']
+756,sentinel_2c,Sentinel-2C,Sentinel-2C,"ESA,EC",Operational,Sunsynchronous orbit,04 Sep 2024,≥2034,786,,10:30 desc,-20009--,https://sentiwiki.copernicus.eu/web/sentinel-2,,['msi_sentinel_2a']
+757,sentinel_2d,Sentinel-2D,Sentinel-2D,"ESA,EC",Planned,Sunsynchronous orbit,≥2028,≥2038,786,,10:30 desc,-20009--,https://sentiwiki.copernicus.eu/web/sentinel-2,,['msi_sentinel_2a']
+764,mats,MATS,Mesospheric Airglow/Aerosol Tomography and Spectroscopy,SNSA,Operational,Sunsynchronous orbit,04 Nov 2022,≥2026,585,,06:00 desc,0-20009-0-,,,['mats']
+765,gf_11,GF-11,Gao Fen - 9,CNSA,Operational,Sunsynchronous orbit,31 Jul 2018,≥2026,412,,10:30 desc,,,,['pms_2']
+766,sstl_s1_4,SSTL-S1 4,Surrey Satellite Technology Ltd - S1 4,"SSTL,21AT,UKSA",Operational,Sunsynchronous orbit,16 Sep 2018,≥2026,630,,10:30 asc,0-20009-0-,,,['vhri_100']
+767,novasar_s,NovaSAR-S,NovaSAR-S,"SSTL,UKSA",Operational,Sunsynchronous orbit,16 Sep 2018,≥2026,580,,10:30 asc,0-20009-0-,,,['s_sar']
+768,egyptsat_a,EgyptSat-A,EgyptSat-A,NARSS,Operational,Sunsynchronous orbit,21 Feb 2019,≥2026,668,,10:30 desc,0-20009-0-,http://www.narss.sci.eg,,['msi_egyptsat']
+769,hysis,HySIS,Hyper Spectral Imaging Spectrometer,ISRO,Operational,Sunsynchronous orbit,29 Nov 2018,≥2026,630,,10:34 desc,0-20009-0-,,,['hysis']
+770,kanopus_v5,KANOPUS-V5,KANOPUS-V5,"Roscosmos,RosHydroMet",Operational,Sunsynchronous orbit,27 Dec 2018,≥2026,510,,10:30 asc,0-20009-0-,http://eng.ntsomz.ru/zakaz/data,,"['pss', 'mss_kanopus', 'msu_200']"
+771,kanopus_v6,KANOPUS-V6,KANOPUS-V6,"Roscosmos,RosHydroMet",Operational,Sunsynchronous orbit,27 Dec 2018,≥2026,510,,10:30 asc,0-20009-0-,http://eng.ntsomz.ru/zakaz/data,,"['pss', 'mss_kanopus', 'msu_200']"
+772,iss_moli,ISS MOLI,Multi-footprint Observation Lidar and Imager on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Planned,Drifting orbit,≥2027,≥2028,407,,,0-20009-0-,,,"['moli_lidar', 'moli_imager']"
+773,dubaisat_3,DubaiSat-3,DubaiSat-3,EIAST,Operational,Sunsynchronous orbit,29 Oct 2018,≥2026,613,,10:30 desc,0-20009-0-,,,['khcs']
+774,cbers_4b,CBERS-4B,China-Brazil Earth Resources Satellite - 4B (ZY-1 FM4B) ,"CAST,AEB,CRESDA,INPE",Operational,Sunsynchronous orbit,20 Dec 2019,≥2026,778,,10:30 asc,0-20009-0-,http://www.dgi.inpe.br/CDSR/,,"['wfi_2', 'muxcam', 'dcs_cbers', 'irmss_2', 'panmux']"
+775,gf_7,GF-7,Gao Fen - 7,CNSA,Operational,Sunsynchronous orbit,03 Nov 2019,≥2027,500,,10:30 desc,,,,['pms_2']
+776,blacksky_1,BlackSky-1,BlackSky 1,BSG,Operational,Sunsynchronous orbit,29 Nov 2018,≥2026,500,,10:30 desc,,,,['spaceview_24']
+777,blacksky_2,BlackSky-2,BlackSky 2,BSG,Operational,Sunsynchronous orbit,03 Dec 2018,≥2026,500,,10:30 desc,,,,['spaceview_24']
+778,risat_2b,RISAT-2B,Radar Imaging Satellite - 2B,ISRO,Operational,Drifting orbit,22 May 2019,≥2026,555,,,0-20009-0-,,,['sar_x_risat_2']
+780,falcon_eye_1,Falcon-Eye 1,Falcon-Eye 1,EIAST,Inactive,Sunsynchronous orbit,11 Jul 2019,11 Jul 2019,610,,10:30 desc,,,,['hiri']
+781,falcon_eye_2,Falcon-Eye 2,Falcon-Eye 2,EIAST,Operational,Sunsynchronous orbit,02 Dec 2020,≥2026,610,,10:30 desc,0-20009-0-,,,['hiri']
+783,risat_2br1,RISAT-2BR1,Radar Imaging Satellite - 2BR-1,ISRO,Operational,Drifting orbit,11 Dec 2019,≥2026,555,,,0-20009-0-,,,['sar_x_risat_2']
+784,swfo_l1,SWFO-L1,Space Weather Follow-On at L1,"NOAA,ESA,NASA",Commissioning,Lagrange libration point 1,24 Sep 2025,≥2030,1.5e+06,,,-20009--,,,"['ccor_2', 'swis_mag', 'swis_stis', 'swis_swips']"
+785,blacksky_3,BlackSky-3,BlackSky-3,BSG,Operational,Sunsynchronous orbit,28 Jun 2019,≥2026,500,,10:30 desc,,,,['spaceview_24']
+786,resurs_p4,Resurs-P4,Resurs-P4,Roscosmos,Operational,Sunsynchronous orbit,31 Mar 2024,≥2029,477,,10:30 desc,-20009--,http://eng.ntsomz.ru/zakaz/data,,"['gsa', 'geoton_l1', 'shmsa_vr', 'shmsa_sr']"
+787,resurs_p5,Resurs-P5,Resurs-P5,Roscosmos,Operational,Sunsynchronous orbit,25 Dec 2024,≥2029,477,,10:30 desc,-20009--,http://eng.ntsomz.ru/zakaz/data,,"['gsa', 'geoton_l1', 'shmsa_vr']"
+788,blacksky_4,BlackSky-4,BlackSky-4,BSG,Operational,Sunsynchronous orbit,19 Aug 2019,≥2026,500,,10:30 desc,,,,['spaceview_24']
+789,iss_raincube,ISS RainCube,Radar in a CubeSat,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Inactive,Drifting orbit,21 May 2018,22 Dec 2020,407,,,,,,['raincube']
+790,zy_1_2d,ZY-1-2D,Zi Yuan 1-2D,"CAST,CRESDA",Operational,Sunsynchronous orbit,12 Sep 2019,≥2026,781,,10:30 desc,0-20009-0-,,,
+792,hrsat_1b,HRSAT-1B,High Resolution Satellite -1B,ISRO,Planned,Sunsynchronous orbit,≥2027,≥2029,660,,09:30 desc,0-20009-0-,,,['hrsat_1']
+794,blacksky_9,BlackSky-9,BlackSky-9,BSG,Lost at launch,Sunsynchronous orbit,15 May 2021,15 May 2021,500,,10:30 desc,,,,['spaceview_24']
+795,blacksky_8,BlackSky-8,BlackSky-8,BSG,Lost at launch,Sunsynchronous orbit,15 May 2021,15 May 2021,500,,10:30 desc,,,,['spaceview_24']
+796,blacksky_7,BlackSky-7,BlackSky-7,BSG,Operational,Sunsynchronous orbit,22 Mar 2021,≥2026,500,,10:30 desc,,,,['spaceview_24']
+797,blacksky_5,BlackSky-5,BlackSky-5,BSG,Operational,Sunsynchronous orbit,07 Aug 2020,≥2026,500,,10:30 desc,,,,['spaceview_24']
+798,gf_10,GF-10,Gao Fen - 10,CNSA,Operational,Sunsynchronous orbit,04 Oct 2019,≥2027,613,,10:30 desc,,,,['pms_2']
+800,electro_l_n5,Electro-L N5,Electro-L Number 5,"RosHydroMet,Roscosmos",Commissioning,Geostationary orbit,12 Feb 2026,≥2035,35786,120,,-20009--,,,"['msu_gs', 'dcs_electro', 'ggak_e_fm_e', 'ggak_e_dir_e', 'ggak_e_isp_2m', 'ggak_e_vuss_e', 'geos_r_electro', 'ggak_e_skl_e', 'ggak_e_gals_e', 'ggak_e_skif_6']"
+801,meteor_m_n2_6,Meteor-M N2-6,Meteor-M Number 2-6,"RosHydroMet,Roscosmos",Planned,Sunsynchronous orbit,≥2028,≥2033,820.7,,09:00 asc,0-20009-0-,,,"['ikor_m', 'sspd', 'msu_mr', 'kmss', 'ikfs_2', 'meteosar', 'sas_r_meteor', 'ggak_m_rims_m', 'mtvza_gy', 'ggak_e_gals_e_meteor', 'ggak_e_skif_6_meteor']"
+802,sentinel_3b,Sentinel-3B,Sentinel-3B,"ESA,EC,EUMETSAT",Operational,Sunsynchronous orbit,25 Apr 2018,≥2028,814.5,,10:00 desc,0-20009-0-065,https://navigator.eumetsat.int/search?query=sentinel-3A,,"['gps_esa', 'lrr_esa', 'sral', 'olci', 'slstr', 'mwr_sentinel_3', 'doris']"
+803,sentinel_3c,Sentinel-3C,Sentinel-3C,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2026,≥2035,810,,10:00 desc,-20009--,https://navigator.eumetsat.int/search?query=sentinel-3A,,"['gps_esa', 'lrr_esa', 'sral', 'olci', 'slstr', 'mwr_sentinel_3', 'doris']"
+804,sentinel_3d,Sentinel-3D,Sentinel-3D,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2028,≥2037,810,,10:00 desc,-20009--,https://navigator.eumetsat.int/search?query=sentinel-3A,,"['gps_esa', 'lrr_esa', 'sral', 'olci', 'slstr', 'mwr_sentinel_3', 'doris']"
+805,eos_01,EOS-01,Earth Observation Satellite - 01,ISRO,Operational,Drifting orbit,07 Nov 2020,≥2026,555,,,0-20009-0-,,,['sar_x_risat_2']
+806,iss_cowvr,ISS COWVR,Compact Ocean Wind Vector Radiometer on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Operational,Drifting orbit,21 Dec 2021,≥2026,407,,,0-20009-0-801,,,['cowvr']
+807,iss_hisui,ISS HISUI,Hyperspectral Imager Suite,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Operational,Drifting orbit,05 Dec 2019,≥2026,407,,,0-20009-0-,,,['hisui']
+808,gf_12,GF-12,Gao Fen - 12,CNSA,Operational,Sunsynchronous orbit,27 Nov 2019,≥2027,635,,06:00 desc,,,,['sar_c_gf_3']
+809,lares_2,LARES-2,Laser RElativity Satellite - 2,"ASI,NASA",Operational,Drifting orbit,13 Jul 2022,≥2050,5899,,,-20009--,,,['lra_asi']
+810,kompsat_6,KOMPSAT-6,Korea Multi-Purpose Satellite - 6,KARI,Planned,Sunsynchronous orbit,Mar 2026,≥2029,505,,06:00 asc,-20009--,,,['cosi']
+811,kompsat_7,KOMPSAT-7,Korea Multi-Purpose Satellite - 7,KARI,Commissioning,Sunsynchronous orbit,01 Dec 2025,≥2029,685,,10:50 asc,0-20009-0-,http://www.si-imaging.com/products/,,['aeiss_hr']
+812,cas_500_1,CAS 500-1,Compact Advanced Satellite 500-1,KARI,Operational,Sunsynchronous orbit,22 Mar 2021,≥2026,528,,10:50 asc,,,,['aeiss_hr']
+813,cas_500_2,CAS 500-2,Compact Advanced Satellite 500-2,KARI,Planned,Sunsynchronous orbit,≥2026,≥2029,528,,10:50 asc,0-20009-0-,,,['aeiss_hr']
+814,artemis_p2,ARTEMIS-P2,"Acceleration, Reconnection, Turbulence, and Electrodynamics of the Moon's Interaction with the Sun - P2",NASA,Operational,Lunar orbit,15 Jul 2011,≥2026,,,,0-20009-0-,,,"['scm', 'sst', 'esa', 'fgm_themis', 'efi_themis']"
+815,mms_b,MMS-B,Magnetospheric MultiScale mission - B,NASA,Operational,Cross-magnetosphere orbit,13 Mar 2015,≥2026,,,,0-20009-0-,,,"['dp', 'afg', 'fpi', 'dfg', 'scm_mms', 'edi_mms', 'hpca', 'eis_mss', 'feeps', 'aspoc_mms']"
+816,mms_c,MMS-C,Magnetospheric MultiScale mission - C,NASA,Operational,Cross-magnetosphere orbit,13 Mar 2015,≥2026,,,,0-20009-0-,,,"['dp', 'afg', 'dfg', 'fpi', 'scm_mms', 'edi_mms', 'hpca', 'eis_mss', 'feeps', 'aspoc_mms']"
+817,mms_d,MMS-D,Magnetospheric MultiScale mission - D,NASA,Operational,Cross-magnetosphere orbit,13 Mar 2015,≥2026,,,,0-20009-0-,,,"['dp', 'afg', 'dfg', 'fpi', 'scm_mms', 'edi_mms', 'hpca', 'eis_mss', 'feeps', 'aspoc_mms']"
+818,stereo_a,STEREO-A,Solar-TErrestrial RElations Observatory - B,NASA,Operational,Ecliptic orbit,26 Oct 2006,≥2026,,,,0-20009-0-,https://stereo-ssc.nascom.nasa.gov/,,"['s_waves', 'secchi_euvi', 'impact_mag', 'secchi_hi_2', 'secchi_cor_1', 'secchi_cor_2', 'secchi_hi_1', 'impact_sep', 'plastic', 'impact_swea', 'impact_ste']"
+819,themis_a,THEMIS-A,Time History of Events and Macroscale Interactions during Substorms - A,NASA,Operational,Cross-magnetosphere orbit,17 Feb 2007,≥2026,,,,-20009--,,,"['scm', 'sst', 'esa', 'fgm_themis', 'efi_themis']"
+820,themis_e,THEMIS-E,Time History of Events and Macroscale Interactions during Substorms - E,NASA,Operational,Cross-magnetosphere orbit,17 Feb 2007,≥2026,,,,-20009--,,,"['scm', 'sst', 'esa', 'fgm_themis', 'efi_themis']"
+821,pleiades_neo_3,Pléiades-Neo 3,Pléiades-Neo 3,Airbus,Operational,Sunsynchronous orbit,29 Apr 2021,≥2031,620,,10:30 desc,,,,['pleiades_neo']
+822,pleiades_neo_4,Pléiades-Neo 4,Pléiades-Neo 4,Airbus,Operational,Sunsynchronous orbit,17 Aug 2021,≥2031,620,,10:30 desc,,,,['pleiades_neo']
+823,pleiades_neo_5,Pléiades-Neo 5,Pléiades-Neo 5,Airbus,Lost at launch,Sunsynchronous orbit,21 Dec 2022,21 Dec 2022,620,,10:30 desc,,,,['pleiades_neo']
+824,pleiades_neo_6,Pléiades-Neo 6,Pléiades-Neo 6,Airbus,Lost at launch,Sunsynchronous orbit,21 Dec 2022,21 Dec 2022,620,,10:30 desc,,,,['pleiades_neo']
+825,microcarb,MicroCarb,MicroCarb,"CNES,EUMETSAT,UKSA",Commissioning,Sunsynchronous orbit,26 Jul 2025,≥2030,650,,10:30 desc,0-20009-0-009,,,['microcarb']
+827,lemur_2,Lemur-2,Low Earth Multi-Use Receiver - 2,SPIRE,Operational,Sunsynchronous orbit,28 Sep 2015,≥2040,550,,,0-20009-0-269,,,['stratos']
+828,cicero,CICERO,Community Initiative for Continuing Earth Radio Occultation,GeoOptics,Operational,Sunsynchronous orbit,23 Jun 2017,≥2026,550,,,0-20009-0-265,,,['cion']
+829,iceye,ICEYE,ICEYE,"ICEYE,ESA",Operational,Sunsynchronous orbit,03 Dec 2018,≥2040,600,,TBD ,-20009--,https://www.iceye.com/downloads/datasets,,['iceye_sar']
+832,3d_winds,3D-Winds,Three-Dimensional Tropospheric Winds from Space-Based Lidar,NASA,Mission concept,Sunsynchronous orbit,TBD,TBD,TBD,,,-20009--,,,['3d_winds_lidar']
+833,gf_9_02,GF-9-02,Gao Fen - 9-02,CNSA,Operational,Sunsynchronous orbit,31 May 2020,≥2028,650,,10:30 desc,,,,['pms_2']
+834,gf_9_03,GF-9-03,Gao Fen - 9-03,CNSA,Operational,Sunsynchronous orbit,17 Jun 2020,≥2028,650,,10:30 desc,,,,['pms_2']
+835,skysat_16,SkySat-16,Sky Satellite - 16,Planet,Operational,Sunsynchronous orbit,13 Jun 2020,≥2026,500,,13:30 asc,,,,['skysat']
+837,skysat_17,SkySat-17,Sky Satellite - 17,Planet,Operational,Sunsynchronous orbit,13 Jun 2020,≥2026,500,,13:30 asc,,,,['skysat']
+838,skysat_18,SkySat-18,Sky Satellite - 18,Planet,Operational,Sunsynchronous orbit,13 Jun 2020,≥2026,500,,13:30 asc,0-20009-0-,,,['skysat']
+840,metop_sg_a1,Metop-SG-A1,Meteorological operational satellite Second Generation A1,"EUMETSAT,ESA",Commissioning,Sunsynchronous orbit,13 Aug 2025,≥2034,835,,09:30 desc,0-20009-0-024,,,"['ro', 'mws', 'rmu', '3mi', 'iasi_ng', 'sentinel_5', 'metimage']"
+863,zy_3_03,ZY-3-03,Zi Yuan - 3-03,"CAST,CRESDA",Operational,Sunsynchronous orbit,25 Jul 2020,≥2026,506,,10:30 desc,0-20009-0-,,,"['tac', 'msc_zy']"
+865,skysat_19,SkySat-19,Sky Satellite - 19,Planet,Operational,Sunsynchronous orbit,18 Aug 2020,≥2026,500,,13:30 asc,0-20009-0-,,,['skysat']
+866,skysat_20,SkySat-20,Sky Satellite - 20,Planet,Operational,Sunsynchronous orbit,18 Aug 2020,≥2026,500,,13:30 asc,0-20009-0-,,,['skysat']
+867,skysat_21,SkySat-21,Sky Satellite - 21,Planet,Operational,Sunsynchronous orbit,18 Aug 2020,≥2026,500,,13:30 asc,0-20009-0-,,,['skysat']
+869,gf_9_04,GF-9-04,Gao Fen - 9-04,CNSA,Operational,Sunsynchronous orbit,06 Aug 2020,≥2028,640,,10:30 desc,,,,['pms_2']
+874,iss_emit,ISS EMIT,Earth Surface Mineral Dust Source Investigation on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Operational,Drifting orbit,15 Jul 2022,≥2026,407,,,-20009--,https://lpdaac.usgs.gov/data/get-started-data/collection-overview/missions/emit-overview/,,['emit']
+875,prefire_1,PREFIRE-1,Polar Radiant Energy in the Far Infrared Experiment-1,NASA,Operational,Sunsynchronous orbit,05 Jun 2024,≥2026,544,,15:45 desc,-20009--,,,['tirs_prefire']
+876,forum,FORUM,Far-infrared Outgoing Radiation Understanding and Monitoring,ESA,Planned,Sunsynchronous orbit,≥2028,≥2033,835,,09:30 desc,0-20009-0-,,,['fsi']
+877,gf_9_05,GF-9-05,Gao Fen - 9-05,CNSA,Operational,Sunsynchronous orbit,23 Aug 2020,≥2028,640,,10:30 desc,,,,['pms_2']
+879,gf_11_02,GF-11-02,Gao Fen - 11-02,CNSA,Operational,Sunsynchronous orbit,07 Sep 2020,≥2028,415,,10:30 desc,,,,['pms_2']
+880,hj_2a,HJ-2A,Huan Jing 2A,"CRESDA,CAST",Operational,Sunsynchronous orbit,27 Sep 2020,≥2026,650,,10:30 desc,0-20009-0-,http://218.247.138.119:7777/DSSPlatform/index.html,,"['hsi_2', 'wvc_2', 'irmss_2_hj']"
+882,hj_2b,HJ-2B,Huan Jing 2B,"CRESDA,CAST",Operational,Sunsynchronous orbit,27 Sep 2020,≥2026,650,,10:30 desc,0-20009-0-,http://218.247.138.119:7777/DSSPlatform/index.html,,"['hsi_2', 'wvc_2', 'irmss_2_hj']"
+884,gf_13,GF-13,Gao Fen - 13,CNSA,Operational,Geostationary orbit,11 Oct 2020,≥2028,35786,118,,,,,['gf_4_13_imager']
+885,gf_14,GF-14,Gao Fen - 14,CNSA,Operational,Sunsynchronous orbit,06 Dec 2020,≥2028,488,,10:30 desc,,,,['pms_2']
+886,cimr_a,CIMR-A,Copernicus Imaging Microwave Radiometer-A,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2029,≥2036,832,,06:00 desc,0-20009-0-,,,['cimr']
+887,cluster_2,CLUSTER-2,CLUSTER-2,"ESA,NASA",Inactive,Cross-magnetosphere orbit,16 Jul 2000,08 Sep 2024,,,,0-20009-0-,http://caa.estec.esa.int/caa/,,"['wbd', 'fgm', 'edi', 'aspoc', 'cis', 'efw_cluster', 'peace', 'staff', 'rapid', 'whisper']"
+888,cluster_4,CLUSTER-4,CLUSTER-4,"ESA,NASA",Inactive,Cross-magnetosphere orbit,09 Aug 2000,08 Sep 2024,,,,0-20009-0-,http://caa.estec.esa.int/caa/,,"['wbd', 'fgm', 'edi', 'aspoc', 'cis', 'efw_cluster', 'peace', 'staff', 'rapid', 'whisper']"
+889,theos_2_main,THEOS-2 Main,Thailand Earth Observation System - 2 Main VHR Satellite,GISTDA,Operational,Sunsynchronous orbit,09 Oct 2023,≥2033,621,,22:15 asc,-20009--,,,"['ms_theos_2', 'pan_theos_2']"
+890,theos_2a_small,THEOS-2A Small,Thailand Earth Observation System - 2 Small Satellite,GISTDA,Lost at launch,Sunsynchronous orbit,12 Jan 2026,≥2026,590,,10:30 asc,-20009--,,,['ceria']
+891,blacksky_6,BlackSky-6,BlackSky-6,BSG,Operational,Sunsynchronous orbit,07 Aug 2020,≥2026,490,,10:30 desc,,,,['spaceview_24']
+892,gf_12_02,GF-12-02,Gao Fen - 12-02,CNSA,Operational,Sunsynchronous orbit,30 Mar 2021,≥2029,635,,06:00 desc,,,,['sar_c_gf_3']
+893,capella,Capella,Capella,Capella,Operational,Sunsynchronous orbit,03 Dec 2018,≥2040,500,,10:30 desc,-20009--,,,['capella_sar']
+894,fy_4m1,FY-4M1,FY-4 Microwave1,"CMA,NRSCC",Planned,Geostationary orbit,≥2026,≥2033,35786,TBD,,0-20009-0-,,,"['enai', 'mws_geo']"
+895,tropics_02,TROPICS-02,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats - 02,NASA,Lost at launch,Drifting orbit,12 Jun 2022,12 Jun 2022,550,,,0-20009-0-227,https://disc.gsfc.nasa.gov,,['tms']
+896,tropics_03,TROPICS-03,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats - 03,NASA,Inactive,Drifting orbit,08 May 2023,12 Nov 2025,550,,,0-20009-0-228,https://disc.gsfc.nasa.gov,,['tms']
+901,gnomes_1,GNOMES-1,GNSS Navigation and Occultation Measurement Satellites,PlanetiQ,Inactive,Sunsynchronous orbit,30 Aug 2020,≥2021,600,,TBD ,,,,['pyxis_ro']
+902,gf_11_03,GF-11-03,Gao Fen - 11-03,CNSA,Operational,Sunsynchronous orbit,20 Nov 2021,≥2028,450,,10:30 desc,,,,['pms_2']
+903,blacksky_10,BlackSky-10,BlackSky-10,BSG,Operational,Sunsynchronous orbit,18 Nov 2021,≥2026,500,,10:30 desc,,,,['spaceview_24']
+904,blacksky_11,BlackSky-11,BlackSky-11,BSG,Operational,Sunsynchronous orbit,18 Nov 2021,≥2026,500,,10:30 desc,,,,['spaceview_24']
+905,blacksky_12,BlackSky-12,BlackSky-12,BSG,Operational,Sunsynchronous orbit,02 Dec 2021,≥2026,500,,10:30 desc,,,,['spaceview_24']
+906,blacksky_13,BlackSky-13,BlackSky-13,BSG,Operational,Sunsynchronous orbit,02 Dec 2021,≥2026,500,,10:30 desc,,,,['spaceview_24']
+907,blacksky_14,BlackSky-14,BlackSky-14,BSG,Operational,Drifting orbit,09 Dec 2021,≥2026,430,,,,,,['spaceview_24']
+908,blacksky_15,BlackSky-15,BlackSky-15,BSG,Operational,Drifting orbit,09 Dec 2021,≥2026,430,,,,,,['spaceview_24']
+910,gf_5_02,GF-5-02,Gao Fen - 5-02,CNSA,Operational,Sunsynchronous orbit,07 Sep 2021,≥2028,705,,13:30 asc,,,,"['ahsi', 'aius', 'emi', 'dpc', 'vims', 'gmi_gf_5']"
+911,flock,FLOCK,FLOCK (Dove),Planet,Operational,Sunsynchronous orbit,09 Jan 2014,≥2040,475,,10:30 desc,-20009--,,,['flock']
+912,chime_a,CHIME-A,Copernicus Hyperspectral Imaging Mission for the Environment-A,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2029,≥2034,786,,10:30 desc,,,,['chime']
+913,co2m_a,CO2M-A,Carbon Dioxide Monitoring mission-A,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2027,≥2034,735,,11:30 desc,0-20009-0-006,,,"['clim', 'map', 'co2i_and_no2i']"
+914,cristal_a,CRISTAL-A,Copernicus polaR Ice and Snow Topography ALtimeter-A,"ESA,EC,EUMETSAT",Planned,Drifting orbit,≥2028,≥2034,717,,,,,,"['gps_esa', 'lrr_esa', 'hrmr', 'amr_cr', 'iris_cristal']"
+915,lstm_a,LSTM-A,Land Surface Temperature Monitoring-A,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2029,≥2034,640,,13:30 asc,0-20009-0-,,,['lstm']
+916,rose_l_a,ROSE-L A,Copernicus Observation System for Europe in L-band A,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2030,≥2035,693,,06:00 desc,,,,['rose_l']
+917,altius,ALTIUS,Atmospheric Limb Tracker for Investigation of the Upcoming Stratosphere,"ESA,BIRA",Planned,Sunsynchronous orbit,≥2026,≥2029,668,,10:00 desc,0-20009-0-045,,,['altius']
+918,meteosat_9_iodc,Meteosat-9 (IODC),Meteosat-9 (IODC),"EUMETSAT,ESA",Operational,Geostationary orbit,01 Jul 2022,≥2027,35786,45.5,,0-20009-0-056,http://www.eumetsat.int/website/home/Data/DataDelivery/EUMETCast/index.html?l=e,,"['gerb', 'geos_r', 'dcs_meteosat', 'seviri']"
+920,gf_3_02_or_csar_01,GF-3(02) or CSAR-01,GF-3(02),CNSA,Operational,Sunsynchronous orbit,22 Nov 2021,≥2029,740,,06:00 desc,0-20009-0-,,,"['ais', 'sar_c_gf_3']"
+921,truths,TRUTHS,Traceable Radiometry Underpinning Terrestrial- and Helio- Studies,"ESA,UKSA",Mission concept,Drifting orbit,TBD,TBD,610,,,0-20009-0-,,,"['csar', 'his']"
+922,iss_tempest_d,ISS TEMPEST-D,Temporal Experiment for Storms and Tropical Systems Technology - Demonstration on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Inactive,Drifting orbit,21 May 2018,22 Jun 2021,400,,,,,,['mm_radiometer']
+923,iss_tempest_1,ISS TEMPEST-1,Temporal Experiment for Storms and Tropical Systems Technology - 1 on the ISS,"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Inactive,Drifting orbit,21 Dec 2021,Jun 2024,400,,,-20009--,,,['mm_radiometer']
+924,iss_gari,ISS GARI,The GAGG Radiation Instruments (GARI),"NASA,CSA,DLR,ESA,JAXA,Roscosmos",Inactive,Drifting orbit,21 Dec 2021,10 Jan 2023,407,,,0-20009-0-,,,['gari']
+925,blacksky_16,BlackSky-16,BlackSky-16,BSG,Operational,Drifting orbit,02 Apr 2022,≥2026,430,,,,,,['spaceview_24']
+926,blacksky_17,BlackSky-17,BlackSky-17,BSG,Operational,Drifting orbit,02 Apr 2022,≥2026,430,,,,,,['spaceview_24']
+927,sich_2_30,SICH-2-30,SICH-2-30 (originally SICH-2-1),NSAU,Operational,Sunsynchronous orbit,13 Jan 2022,≥2027,700,,10:50 desc,,,,"['potential', 'irei', 'mbei']"
+928,punch,PUNCH,Polarimeter to UNify the Corona and Heliosphere,"NASA,NRL",Operational,Sunsynchronous orbit,12 Mar 2025,≥2028,570,,06:00 asc,0-20009-0-,,,"['nfi', 'wfi_punch', 'steam']"
+929,strix_a,StriX-α,StriX-α,Synspective,Inactive,Sunsynchronous orbit,15 Dec 2020,≥2024,500,,10:00 asc,-20009--,,,['x_sar']
+930,strix_b,StriX-β,StriX-β,Synspective,Operational,Sunsynchronous orbit,28 Feb 2022,≥2032,500,,10:00 desc,,,,['x_sar']
+931,edrs_c,EDRS-C,European Data Relay Satellite - C,"ESA,Airbus",Operational,Geostationary orbit,06 Aug 2019,≥2034,35786,31,,,,,['rmu']
+932,vigil_l5,Vigil-L5,Vigil-L5 (previously known as Lagrange-L5),ESA,Planned,L4-L5,≥2031,≥2038,,,,-20009--,,,"['pla', 'ccor_2', 'jedi', 'pmi', 'hi1_vigil', 'hi2_vigil', 'magnetometer_vigil']"
+933,tropics_01_pathfinder,TROPICS-01 (Pathfinder),Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats - 01,NASA,Inactive,Sunsynchronous orbit,30 Jun 2021,≥2023,550,,13:30 asc,0-20009-0-709,https://disc.gsfc.nasa.gov,,['tms']
+934,aws_pfm,AWS PFM,Arctic Weather Satellite Proto-Flight Model,ESA,Operational,Sunsynchronous orbit,16 Aug 2024,≥2029,600,,10:00 desc,0-20009-0-080,,,['mwr_aws']
+935,Nusat,ÑuSat     ,ÑuSat Earth Observation (also referred to as Aleph),Satellogic ,Operational,Drifting orbit,30 May 2016,≥2040,500,,,-20009--,https://satellogic.com/products/,,['Nusat_imager']
+936,gf_3_03_or_csar_02,GF-3(03) or CSAR-02,GF-3(03),CNSA,Operational,Sunsynchronous orbit,06 Apr 2022,≥2030,740,,06:00 desc,0-20009-0-,,,"['ais', 'sar_c_gf_3']"
+937,dq_1,DQ-1,DQ-1 also AEMS (Atmospheric Environment Monitoring Satellite) or Daqi-1,CNSA,Operational,Sunsynchronous orbit,15 Apr 2022,≥2030,705,,13:00 asc,,,,"['acdl', 'wsi', 'emi_2', 'dpc_2', 'posp']"
+938,superview_neo_1_01,SuperView Neo-1 01,SuperView Neo-1 01,"CAST,SpacEyes",Operational,Sunsynchronous orbit,29 Apr 2022,≥2028,495,,,,,,['pms_3']
+939,superview_neo_1_02,SuperView Neo-1 02,SuperView Neo-1 02,"CAST,SpacEyes",Operational,Sunsynchronous orbit,29 Apr 2022,≥2028,495,,,,,,['pms_3']
+940,csg_3,CSG-3,COSMO-SkyMed Second Generation - 3,ASI,Commissioning,Sunsynchronous orbit,03 Jan 2026,≥2032,619,,,-20009--,,,['csg_sar']
+941,csg_4,CSG-4,COSMO-SkyMed Second Generation - 4,ASI,Planned,Sunsynchronous orbit,≥2026,≥2033,,,,,,,['csg_sar']
+946,dq_2,DQ-2,DQ-2 also AEMS (Atmospheric Environment Monitoring Satellite) or Daqi-1,CNSA,Planned,Sunsynchronous orbit,≥2026,≥2033,705,,13:00 asc,0-20009-0-,,,"['acdl', 'gas_2']"
+947,gnomes_2,GNOMES-2,GNSS Navigation and Occultation Measurement Satellites,PlanetiQ,Presumably inactive,Sunsynchronous orbit,30 Jun 2021,≥2026,525,,TBD ,0-20009-0-,,,['pyxis_ro']
+948,gnomes_3,GNOMES-3,GNSS Navigation and Occultation Measurement Satellites,PlanetiQ,Presumably inactive,Sunsynchronous orbit,01 Apr 2022,≥2027,645,,TBD ,0-20009-0-,,,['pyxis_ro']
+949,quicksounder,QuickSounder,QuickSounder,"NOAA,NASA",Planned,Sunsynchronous orbit,Apr 2026,≥2029,824,,17:30 asc,-20009--,,,['atms']
+950,cicero_2,CICERO-2,Community Initiative for Continuing Earth Radio Occultation,GeoOptics,Operational,Sunsynchronous orbit,25 May 2022,≥2035,,,,0-20009-0-266,,,['cion_2']
+951,umbra,UMBRA,UMBRA,UMBRA,Operational,Sunsynchronous orbit,≥2021,≥2035,500,,,-20009--,https://umbra.space/products/sar,,['umbra_sar']
+952,ghgsat,GHGSat,Greenhouse Gas Satellite,GHGSat,Operational,Sunsynchronous orbit,22 Jun 2016,≥2030,500,,,0-20009-0-,https://www.ghgsat.com/en/products-services/data-sat,,"['c_a', 'ghgsat_spectrometer']"
+953,wsf_m1,WSF-M1,Weather System Follow-on Microwave,DoD,Operational,Sunsynchronous orbit,11 Apr 2024,≥2030,854,,06:00 desc,0-20009-0-760,,,"['ecp', 'mwi_wsf_m']"
+954,miman,MIMAN,Monochrome Imaging for Monitoring Aerosol by Nanosatellite,KARI,Operational,Sunsynchronous orbit,21 Jun 2022,≥2026,710,,04:00 asc,0-20009-0-,,,['miman']
+956,gf_12_03,GF-12-03,Gao Fen - 12-03,CNSA,Operational,Sunsynchronous orbit,27 Jun 2022,30 Nov 2028,635,,06:00 desc,,,,['sar_c_gf_3']
+957,nachos_1,NACHOS-1,Nano-satellite Atmospheric Chemistry Hyperspectral Observation System-1,"LANL,NASA",Inactive,Drifting orbit,19 Feb 2022,Jul 2024,400,,,-20009--,,,['nachos_imager']
+958,nachos_2,NACHOS-2,Nano-satellite Atmospheric Chemistry Hyperspectral Observation System-1,"LANL,NASA",Operational,Drifting orbit,02 Jul 2022,≥2026,500,,,,,,['nachos_imager']
+959,ludi_tance_1_01a,Ludi-Tance 1 01A,L-band differential interferometric synthetic aperture radar satellite A,"CNSA,CASC",Operational,Sunsynchronous orbit,26 Jan 2022,≥2032,600,,,,,,['l_band_sar_ludi_tance']
+960,ludi_tance_1_01b,Ludi-Tance 1 01B,L-band differential interferometric synthetic aperture radar satellite A,"CNSA,CASC",Operational,Sunsynchronous orbit,26 Feb 2022,≥2032,600,,,,,,['l_band_sar_ludi_tance']
+961,ctim_fd,CTIM-FD,Compact Total Irradiance Monitor-Flight Demonstration,NASA,Inactive,Drifting orbit,02 Jul 2022,Jul 2024,500,,,-20009--,https://lasp.colorado.edu/ctim/data/,,['ctim_fd']
+962,superview_neo_2_01,SuperView Neo-2 01,SuperView Neo-2 01,"CAST,SpacEyes",Operational,Sunsynchronous orbit,15 Jul 2022,≥2027,495,,07:00 desc,,,,['sar_superview']
+963,superview_neo_2_02,SuperView Neo-2 02,SuperView Neo-2 02,"CAST,SpacEyes",Operational,Sunsynchronous orbit,15 Jul 2022,≥2027,495,,07:00 desc,,,,['sar_superview']
+964,strix_1,StriX-1,StriX-1,Synspective,Operational,Sunsynchronous orbit,15 Sep 2022,30 Nov 2031,574,,10:00 desc,-20009--,,,['x_sar']
+965,argos_4_gazelle,Argos-4 (GAzelle),Argos-4 also referred to as GAzelle,"NOAA,CNES",Operational,Sunsynchronous orbit,07 Oct 2022,≥2027,750,,06:00 desc,0-20009-0-,https://www.argos-system.org/using-argos/how-to-access-to-your-satellite-data/,,['argos_4']
+966,tropics_04,TROPICS-04,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats - 04,NASA,Lost at launch,Drifting orbit,12 Jun 2022,12 Jun 2022,550,,,0-20009-0-229,https://disc.gsfc.nasa.gov,,['tms']
+967,tropics_05,TROPICS-05,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats - 05,NASA,Inactive,Drifting orbit,08 May 2023,12 Nov 2025,550,,,0-20009-0-263,https://disc.gsfc.nasa.gov,,['tms']
+968,tropics_06,TROPICS-06,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats - 06,NASA,Inactive,Drifting orbit,26 May 2023,Jul 2025,550,,,0-20009-0-264,https://disc.gsfc.nasa.gov,,['tms']
+969,tropics_07,TROPICS-07,Time-Resolved Observations of Precipitation structure and storm Intensity with a Constellation of Smallsats - 07,NASA,Inactive,Drifting orbit,26 May 2023,≥2023,550,,,0-20009-0-284,https://disc.gsfc.nasa.gov,,['tms']
+972,aso_s_kuafu_1,ASO-S (Kuafu-1),Advanced Space-based Solar Observatory,CAS,Operational,Sunsynchronous orbit,08 Oct 2022,≥2026,744,,06:00 desc,,,,"['hxi', 'lst', 'fmg']"
+973,hj_2e,HJ-2E,Huan Jing 2E (also known as S-SAR01),"CRESDA,CAST",Operational,Sunsynchronous orbit,13 Oct 2022,≥2030,500,,07:00 desc,,,,['sar_s']
+974,hj_2f,HJ-2F,Huan Jing 2F (also known as S-SAR02),"CRESDA,CAST",Operational,Sunsynchronous orbit,08 Aug 2023,≥2031,506,,06:00 desc,-20009--,,,['sar_s']
+975,co2image,CO2Image,CO2Image,DLR,Considered,Sunsynchronous orbit,≥2030,≥2033,500,,11:00 asc,0-20009-0-,,,['cosis']
+976,worldview_legion_1,WorldView Legion-1,WorldView Legion-1,"Maxar,DigitalGlobe",Operational,Sunsynchronous orbit,02 May 2024,≥2030,524,,10:30 desc,-20009--,https://www.maxar.com/,,['spaceview_ng']
+977,worldview_legion_2,WorldView Legion-2,WorldView Legion-2,"Maxar,DigitalGlobe",Operational,Sunsynchronous orbit,02 May 2024,≥2030,540,,10:30 desc,-20009--,https://www.maxar.com/,,['spaceview_ng']
+978,circe,CIRCE,Coordinated Ionospheric Reconstruction CubeSat Experiment,"UKSA,NRL",Lost at launch,Drifting orbit,09 Jan 2023,09 Jan 2023,555,,,0-20009-0-,,,"['radmon', 'inms', 'tri_tip', 'topcat_ii']"
+979,co2m_b,CO2M-B,Carbon Dioxide Monitoring mission-B,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2028,≥2035,735,,11:30 desc,0-20009-0-007,,,"['clim', 'map', 'co2i_and_no2i']"
+980,gf_5_01a,GF-5-01A,Gao Fen - 5-01A,CNSA,Operational,Sunsynchronous orbit,08 Dec 2022,≥2030,705,,13:30 asc,,,,"['ahsi', 'aius', 'emi', 'dpc', 'vims', 'gmi_gf_5']"
+981,gf_11_04,GF-11-04,Gao Fen - 11-04,CNSA,Operational,Sunsynchronous orbit,27 Dec 2022,30 Nov 2027,450,,10:30 desc,,,,['pms_2']
+983,wsf_m2,WSF-M2,Weather System Follow-on Microwave 2,DoD,Planned,Sunsynchronous orbit,≥2028,≥2035,833,,,,,,"['ecp', 'mwi_wsf_m']"
+984,imap,IMAP,Interstellar Mapping and Acceleration Probe,NASA,Commissioning,Lagrange libration point 1,24 Sep 2025,≥2029,1.5e+06,,N/A ,0-20009-0-,,,"['mag', 'hit', 'swapi', 'idex', 'swe_imap', 'glows', 'imap_ultra', 'imap_lo', 'imap_hi', 'codice']"
+985,eps_aeolus_2,EPS-Aeolus 2,EPS-Aeolus 2,"EUMETSAT,ESA",Considered,Sunsynchronous orbit,≥2034,≥2039,,,06:00 desc,-20009--,,,
+986,gf_13_02,GF-13-02,Gao Fen - 13,CNSA,Operational,Geostationary orbit,17 Mar 2023,≥2030,35786,117.9,,,,,['gf_4_13_imager']
+987,geoxo_2,GeoXO 2,GeoXO 2,"NOAA,NASA",Planned,Geostationary orbit,≥2033,≥2041,35786,-105,,0-20009-0-,,,"['gxs', 'gxi', 'dcis']"
+988,geoxo_1,GeoXO 1,GeoXO 1,"NOAA,NASA",Planned,Geostationary orbit,≥2032,≥2045,35786,-105,,0-20009-0-,,,"['glm', 'abi', 'dcis']"
+989,geoxo_3,GeoXO 3,GeoXO 3,"NOAA,NASA",Planned,Geostationary orbit,≥2039,≥2050,35786,-105,,0-20009-0-,,,"['lmx', 'ghi', 'dcis']"
+990,blacksky_18,BlackSky-18,BlackSky-18,BSG,Operational,Drifting orbit,24 Mar 2023,≥2026,450,,,,,,['spaceview_24']
+991,blacksky_19,BlackSky-19,BlackSky-19,BSG,Operational,Drifting orbit,24 Mar 2023,≥2026,450,,,,,,['spaceview_24']
+992,himawari_10,Himawari-10,Himawari-10,JMA,Planned,Geostationary orbit,≥2030,≥2046,35786,140.7,,-20009--,,,"['ghms', 'ghmi', 'dcs_himawari', 'rms_himawari']"
+993,hyms_iod,HYMS IOD,Hyperspectral Microwave Sounder In Orbit Demonstrator,SPIRE,Commissioning,Sunsynchronous orbit,11 Jan 2026,≥2028,550,,,0-20009-0-,,,['hyms']
+994,ghost_1,GHOSt-1,Global Hyperspectral Observation Satellite 1,OSK,Operational,Sunsynchronous orbit,15 Apr 2023,≥2028,525,,,,https://www.orbitalsidekick.com/,,['ghost_imager']
+995,ghost_2,GHOSt-2,Global Hyperspectral Observation Satellite 2,OSK,Operational,Sunsynchronous orbit,15 Apr 2023,≥2028,525,,,,https://www.orbitalsidekick.com/,,['ghost_imager']
+996,eos_07,EOS-07,EOS-07 also known as Microsat-2B,ISRO,Operational,Drifting orbit,10 Feb 2023,≥2026,450,,,-20009--,,,['mhs_eos_07']
+997,sme,SME,Solar Mesosphere Explorer,NASA,Inactive,Sunsynchronous orbit,06 Oct 1981,04 Apr 1989,540,,03:00 ,,https://nssdc.gsfc.nasa.gov/nmc/spacecraft/displayDataset.action?spacecraftId=1981-100A,,"['sme_spa', 'sme_ir', 'sme_sum', 'sme_vnd', 'sme_uvoe']"
+998,tomorrow_r1,Tomorrow-R1,Tomorrow-R1,Tomorrow.io,Operational,Sunsynchronous orbit,15 Apr 2023,≥2028,550,,08:00 asc,-20009--,https://www.tomorrow.io/software/,,['tomorrow_io_radar']
+999,hydrognss_1,HydroGNSS-1,Hydro Global Navigation Satellite System-1,"ESA,SSTL,UKSA",Commissioning,Sunsynchronous orbit,28 Nov 2025,≥2029,550,,10:30 ,-20009--,,,['gnss_r']
+1000,hydrognss_2,HydroGNSS-2,Hydro Global Navigation Satellite System-2,"ESA,SSTL,UKSA",Commissioning,Sunsynchronous orbit,28 Nov 2025,≥2029,550,,10:30 ,-20009--,,,['gnss_r']
+1001,pretty,PRETTY,Passive Reflectometry and Dosimetry,ESA,Operational,Sunsynchronous orbit,06 Oct 2023,≥2026,579,,11:00 desc,-20009--,,,"['dosimeter', 'gnss_r_pretty']"
+1002,harmony_1,Harmony-1,Harmony-1,ESA,Planned,Sunsynchronous orbit,≥2029,≥2034,693,,06:00 desc,,,,
+1003,harmony_2,Harmony-2,Harmony-2,ESA,Planned,Sunsynchronous orbit,≥2029,≥2034,693,,06:00 desc,,,,
+1004,ghost_3,GHOSt-3,Global Hyperspectral Observation Satellite 3,OSK,Operational,Sunsynchronous orbit,12 Jun 2023,≥2028,525,,,,https://www.orbitalsidekick.com/,,['ghost_imager']
+1005,tomorrow_r2,Tomorrow-R2,Tomorrow-R2,Tomorrow.io,Operational,Sunsynchronous orbit,12 Jun 2023,≥2028,550,,12:00 desc,-20009--,https://www.tomorrow.io/software/,,['tomorrow_io_radar']
+1006,kondor_fka_1,Kondor-FKA 1,Kondor-Experimental SAR Spacecraft FKA 1,NPOMash,Operational,Sunsynchronous orbit,26 May 2023,≥2028,510,,,,,,['sar_10']
+1007,kondor_fka_2,Kondor-FKA 2,Kondor-Experimental SAR Spacecraft FKA 2,NPOMash,Operational,Sunsynchronous orbit,29 Nov 2024,≥2029,510,,,-20009--,,,['sar_10']
+1008,eps_sterna_1,EPS-Sterna-1,EPS-Sterna-1,"EUMETSAT,ESA",Planned,Sunsynchronous orbit,≥2029,≥2042,595,,03:30 desc,-20009--,,,['mwr_sterna']
+1009,eps_sterna_2,EPS-Sterna-2,EPS-Sterna-2,"EUMETSAT,ESA",Planned,Sunsynchronous orbit,≥2029,≥2042,595,,07:30 desc,-20009--,,,['mwr_sterna']
+1010,eps_sterna_3,EPS-Sterna-3,EPS-Sterna-3,"EUMETSAT,ESA",Planned,Sunsynchronous orbit,≥2029,≥2042,595,,11:30 desc,-20009--,,,['mwr_sterna']
+1011,sdgsat_1,SDGSAT-1,Sustainable Development Science Satellite 1,CAS,Operational,Sunsynchronous orbit,05 Nov 2021,≥2026,505,,10:00 desc,0-20009-0-,www.sdgsat.ac.cn,,"['glimmer', 'tir', 'msi_sdgsat']"
+1012,risat_1b_eos_09,RISAT-1B (EOS-09),RISAT-1B (EOS-09),ISRO,Lost at launch,Sunsynchronous orbit,18 May 2025,≥2029,529,,06:00 desc,-20009--,,,['sar_c_risat']
+1013,co2m_c,CO2M-C,Carbon Dioxide Monitoring mission-C,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2029,≥2036,735,,11:30 desc,0-20009-0-008,,,"['clim', 'map', 'co2i_and_no2i']"
+1014,tianmu_1,Tianmu-1,Tianmu-1,CASIC,Operational,Sunsynchronous orbit,09 Jan 2023,≥2040,520,,,0-20009-0-540,,,['tgnos_m']
+1015,piesat_1,PIESAT-1,PIESAT-1 (also known as Hongtu-1),CASC,Operational,Sunsynchronous orbit,30 Mar 2023,≥2033,530,,06:00 asc,0-20009-0-,https://www.piesat.cn/website/en-us/index.html,,['x_sar_piesat']
+1016,ludi_tance_4_01a,Ludi-Tance 4 01A,L-band differential interferometric synthetic aperture radar satellite 4 01A,"CNSA,CASC",Operational,Geosynchronous orbit,12 Aug 2023,≥2040,36000,89.5,,0-20009-0-,,,['l_band_sar_ludi_tance']
+1017,gf_12_04,GF-12-04,Gao Fen - 12-04,CNSA,Operational,Sunsynchronous orbit,20 Aug 2023,≥2029,635,,06:00 desc,,,,['sar_c_gf_3']
+1018,tanager_1,Tanager-1,Tanager-1,Planet,Operational,Sunsynchronous orbit,16 Aug 2024,≥2029,520,,12:00 desc,-20009--,https://carbonmapper.org/data/,,['carbon_mapper']
+1019,tanager_2,Tanager-2,Tanager-2,Planet,Planned,Sunsynchronous orbit,≥2026,≥2029,405,,,0-20009-0-,https://carbonmapper.org/data/,,['carbon_mapper']
+1020,hotsat_1,HOTSAT-1,HOTSAT-1,"SSTL,UKSA",Operational,Sunsynchronous orbit,12 Jun 2023,Dec 2023,536,,12:00 desc,,https://www.satellitevu.com/,,['hotsat_imager']
+1021,proba_v_cc,PROBA-V-CC,Project for On-Board Autonomy - Végétation Companion Cubesat,ESA,Operational,Sunsynchronous orbit,09 Oct 2023,≥2026,574,,11:00 desc,-20009--,http://www.vito-eodata.be/,,['vegetation_p']
+1022,alouette_1,Alouette-1,Alouette-1,CSA,Inactive,Drifting orbit,29 Sep 1962,30 Sep 1972,1000,,,,https://nssdc.gsfc.nasa.gov/nmc/experiment/display.action?id=1962-049A-02,,"['sfs', 'vlf_receiver', 'cosmic_radio_noise', 'epd_alouette']"
+1023,alouette_2,Alouette-2,Alouette-2 (also known as ISIS-X),CSA,Inactive,Drifting orbit,29 Nov 1965,01 Aug 1975,1000,,,,https://nssdc.gsfc.nasa.gov/nmc/experiment/display.action?id=1962-049A-02,,"['sfs', 'vlf_receiver', 'cosmic_radio_noise', 'epd_alouette']"
+1024,swnext_sol_a,SWNext SOL-A,Space Weather Next at L1 A,"NOAA,ESA,NASA",Planned,Lagrange libration point 1,≥2029,≥2033,1.5e+06,,,-20009--,,,"['ccor_2', 'xfm', 'swis_mag', 'swis_stis', 'swis_swips']"
+1025,swnext_sol_b,SWNext SOL-B,Space Weather Next at L1 B,"NOAA,ESA,NASA",Planned,Lagrange libration point 1,≥2033,≥2038,1.5e+06,,,-20009--,,,"['ccor_2', 'xfm', 'swis_mag', 'swis_stis', 'swis_swips']"
+1026,prisma2gen,PRISMA2GEN,PRecursore IperSpettrale della Missione Applicativa 2nd Generation,ASI,Planned,Sunsynchronous orbit,≥2028,≥2035,515,,10:30 desc,,,,"['pan', 'hyc']"
+1027,magic_1,MAGIC-1,MAGIC-1,NASA,Planned,Drifting orbit,≥2028,≥2040,397,,,,,,"['lti', 'microstar']"
+1028,magic_2,MAGIC-2,MAGIC-2,NASA,Planned,Drifting orbit,≥2028,≥2040,397,,,,,,"['lti', 'microstar']"
+1029,aos_storm,AOS-Storm,Atmosphere Observing System - Storm,"NASA,ASI,CNES,CSA,JAXA",Considered,Drifting orbit,Mar 2029,≥2031,430,,,-20009--,,,['comodo_r']
+1030,aos_pmm,AOS-PMM,Atmosphere Observing System - Precipitation Measuring Mission,"JAXA,CNES,NASA",Planned,Drifting orbit,Mar 2029,≥2034,430,,,-20009--,,,"['comodo_r', 'kudpr']"
+1031,aos_sky,AOS-Sky,Atmosphere Observing System - Sky ,"NASA,ASI,CNES,CSA,JAXA",Considered,Sunsynchronous orbit,Dec 2031,≥2036,450,,13:30 ,-20009--,,,"['aos_lidar', 'ticfire', 'aos_sky_mwr', 'aos_sky_radar', 'aos_sky_polarimeter']"
+1032,aos_hawcsat,AOS-HAWCSat,"Atmosphere Observing System - High-altitude Aerosols, Water vapour and Clouds Sat","JAXA,CSA,NASA",Planned,Sunsynchronous orbit,≥2031,≥2036,430,,13:30 ,,,,"['ali_hawcsat', 'show']"
+1033,polsir_1,PolSIR-1,Polarized Submillimeter Ice-cloud Radiometer-1,NASA,Planned,Drifting orbit,≥2027,≥2030,475,,,-20009--,,,['polsir_radiometer']
+1034,polsir_2,PolSIR-2,Polarized Submillimeter Ice-cloud Radiometer-1,NASA,Planned,Drifting orbit,≥2027,≥2030,475,,,-20009--,,,['polsir_radiometer']
+1035,pelican,Pelican,Pelican,Planet,Operational,Sunsynchronous orbit,11 Nov 2023,≥2039,475,,,-20009--,,,['pelican_imager']
+1036,sentinel_6c,Sentinel-6C,Sentinel-6C,"EUMETSAT,CNES,EC,ESA,NASA,NOAA",Planned,Drifting orbit,≥2030,≥2036,1336,,,-20009--,,,"['poseidon_4', 'gps_esa', 'lra_nasa', 'hrmr', 'rmu', 'doris', 'amr_c', 'gnss_ro_sentinel_6']"
+1037,chime_b,CHIME-B,Copernicus Hyperspectral Imaging Mission for the Environment-B,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2031,≥2037,786,,10:30 desc,,,,['chime']
+1038,cristal_b,CRISTAL-B,Copernicus polaR Ice and Snow Topography ALtimeter-B,"ESA,EC,EUMETSAT",Planned,Drifting orbit,≥2031,≥2036,717,,,,,,"['gps_esa', 'lrr_esa', 'hrmr', 'amr_cr', 'iris_cristal']"
+1039,lstm_b,LSTM-B,Land Surface Temperature Monitoring-B,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2031,≥2038,640,,13:30 asc,0-20009-0-,,,['lstm']
+1040,rose_l_b,ROSE-L B,Copernicus Observation System for Europe in L-band B,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2032,≥2037,693,,06:00 desc,,,,['rose_l']
+1041,cimr_b,CIMR-B,Copernicus Imaging Microwave Radiometer-B,"ESA,EC,EUMETSAT",Planned,Sunsynchronous orbit,≥2035,≥2042,820,,06:00 desc,0-20009-0-,,,['cimr']
+1042,gnomes_4,GNOMES-4,GNSS Navigation and Occultation Measurement Satellites,PlanetiQ,Operational,Sunsynchronous orbit,01 Dec 2023,≥2028,645,,TBD ,0-20009-0-,,,['pyxis_ro']
+1043,hrmis,HRMIS,High Resolution Multi-mode Imaging Satellite,CAST,Operational,Sunsynchronous orbit,03 Jul 2020,≥2030,,,10:30 desc,,,,"['hrc_hrmis', 'smac']"
+1044,arctica_m_n3,Arctica-M N3,Arctica-M N3,"RosHydroMet,Roscosmos",Planned,Molniya orbit,≥2029,≥2034,,,,-20009--,,,"['dcs_a', 'msu_gs_a', 'ggak_e_fm_e', 'ggak_e_gals_e_arctica', 'ggak_e_skif_6_arctica']"
+1045,arctica_m_n4,Arctica-M N4,Arctica-M N4,"RosHydroMet,Roscosmos",Planned,Molniya orbit,≥2029,≥2034,,,,-20009--,,,"['dcs_a', 'msu_gs_a', 'ggak_e_fm_e', 'ggak_e_gals_e_arctica', 'ggak_e_skif_6_arctica']"
+1046,proba_3c,PROBA-3C,PROBA-3 Coronograph,ESA,Operational,Molniya orbit,05 Dec 2024,≥2030,,,,-20009--,,https://www.esa.int/Enabling_Support/Space_Engineering_Technology/Proba_Missions/About_Proba-3,['aspiics']
+1047,proba_3o,PROBA-3O,PROBA-3 Occulter,ESA,Operational,Molniya orbit,05 Dec 2024,≥2030,,,,-20009--,,https://www.esa.int/Enabling_Support/Space_Engineering_Technology/Proba_Missions/About_Proba-3,['occulter']
+1048,incus_1,INCUS-1,INCUS-1,NASA,Planned,Drifting orbit,≥2027,≥2029,,,,-20009--,,,['incus_radar']
+1049,incus_2,INCUS-2,INCUS-2,NASA,Planned,Drifting orbit,≥2027,≥2029,,,,-20009--,,,"['incus_radar', 'mm_radiometer']"
+1050,incus_3,INCUS-3,INCUS-3,NASA,Planned,Drifting orbit,≥2027,≥2029,,,,-20009--,,,['incus_radar']
+1051,yunyao_1,YunYao-1,YunYao-1 constellation,CASC,Operational,Sunsynchronous orbit,11 Jan 2024,≥2030,535,,,-20009--,,,['yunyao_receiver']
+1052,ghost_4,GHOSt-4,Global Hyperspectral Observation Satellite 3,OSK,Operational,Sunsynchronous orbit,04 Mar 2024,≥2029,525,,,-20009--,https://www.orbitalsidekick.com/,,['ghost_imager']
+1054,ghost_5,GHOSt-5,Global Hyperspectral Observation Satellite 3,OSK,Operational,Sunsynchronous orbit,04 Mar 2024,≥2029,525,,,-20009--,https://www.orbitalsidekick.com/,,['ghost_imager']
+1055,methanesat,MethaneSAT,MethaneSAT,NZSA,Inactive,Sunsynchronous orbit,04 Mar 2024,20 Jun 2025,600,,13:00 desc,-20009--,https://www.methanesat.org/data/,,"['methanesat_spectrometer_1', 'methanesat_spectrometer_2']"
+1056,strix_3,StriX-3,StriX-3,Synspective,Operational,Sunsynchronous orbit,12 Mar 2024,≥2029,580,,16:00 asc,-20009--,,,['x_sar']
+1057,musat_1,MuSat-1,MuSat-1,MUON SPACE,Inactive,Sunsynchronous orbit,12 Jun 2023,Dec 2024,,,,-20009--,,,
+1058,musat_2,MuSat-2,MuSat-2,MUON SPACE,Operational,Sunsynchronous orbit,04 Mar 2024,≥2031,622,,12:00 desc,-20009--,,,['gnss_r_musat']
+1059,superview_neo_3_01,SuperView Neo-3-01,SuperView Neo-3-01,"CAST,SpacEyes",Operational,Sunsynchronous orbit,15 Apr 2024,≥2029,500,,10:30 desc,-20009--,,,['pms_3']
+1060,yunhai_2,Yunhai-2,Yunhai-2,"CNSA,CASC",Operational,Drifting orbit,29 Dec 2018,≥2028,800,,,-20009--,,,
+1061,yunhai_3,Yunhai-3,Yunhai-3,"CNSA,CASC",Operational,Sunsynchronous orbit,11 Nov 2022,≥2028,870,,,-20009--,,,
+1062,yunhai_1,Yunhai-1,Yunhai-1,"CNSA,CASC",Operational,Sunsynchronous orbit,11 Nov 2016,≥2028,780,,,-20009--,,,
+1063,prefire_2,PREFIRE-2,Polar Radiant Energy in the Far Infrared Experiment-2,NASA,Operational,Sunsynchronous orbit,25 May 2024,≥2026,530,,08:03 asc,-20009--,,,['tirs_prefire']
+1065,electro_l_n6,Electro-L N6,Electro-L Number 6,"RosHydroMet,Roscosmos",Planned,Geostationary orbit,≥2030,≥2039,35786,,,-20009--,,,"['msu_gs', 'dcs_electro', 'ggak_e_fm_e', 'ggak_e_dir_e', 'ggak_e_isp_2m', 'ggak_e_vuss_e', 'geos_r_electro', 'ggak_e_skl_e', 'ggak_e_gals_e', 'ggak_e_skif_6']"
+1066,electro_l_n7,Electro-L N7,Electro-L Number 7,"RosHydroMet,Roscosmos",Planned,Geostationary orbit,≥2033,≥2041,35786,,,-20009--,,,"['msu_gs', 'dcs_electro', 'ggak_e_fm_e', 'ggak_e_dir_e', 'ggak_e_isp_2m', 'ggak_e_vuss_e', 'geos_r_electro', 'ggak_e_skl_e', 'ggak_e_gals_e', 'ggak_e_skif_6']"
+1067,glimr,GLIMR,Geosynchronous Littoral Imaging and Monitoring Radiometer,NASA,Planned,Geostationary orbit,≥2027,≥2029,,,,-20009--,,,['hsi_glimr']
+1068,gf_11_05,GF-11-05,Gao Fen - 11-05,CNSA,Operational,Sunsynchronous orbit,19 Jul 2024,≥2029,,,10:30 desc,-20009--,,,['pms_2']
+1069,strix_4,StriX-4,StriX-4,Synspective,Operational,Drifting orbit,02 Aug 2024,≥2028,545,,,-20009--,,,['x_sar']
+1070,eos_08,EOS-08,EOS-08  (also Microsat-2C),ISRO,Operational,Drifting orbit,16 Aug 2024,≥2026,475,,,-20009--,,,"['eoir', 'sic_uv_dosimeter', 'gnss_r_microsat_2c']"
+1071,worldview_legion_3,WorldView Legion-3,WorldView Legion-3,"Maxar,DigitalGlobe",Operational,Drifting orbit,15 Aug 2024,≥2030,540,,,-20009--,https://www.maxar.com/,,['spaceview_ng']
+1072,worldview_legion_4,WorldView Legion-4,WorldView Legion-4,"Maxar,DigitalGlobe",Operational,Drifting orbit,15 Aug 2024,≥2030,528,,,-20009--,https://www.maxar.com/,,['spaceview_ng']
+1073,gnomes_5,GNOMES-5,GNSS Navigation and Occultation Measurement Satellites,PlanetiQ,Operational,Sunsynchronous orbit,16 Aug 2024,≥2028,645,,TBD ,-20009--,,,['pyxis_ro']
+1074,tomorrow_s1,Tomorrow-S1,Tomorrow Microwave Sounder 1,Tomorrow.io,Operational,Sunsynchronous orbit,16 Aug 2024,≥2027,487,,22:47 asc,0-20009-0-769,https://www.tomorrow.io/weather-intelligence-platform/,,['tms_tomorrow']
+1076,Phsat_2,Φsat-2,Φsat-2,ESA,Operational,Sunsynchronous orbit,16 Aug 2024,≥2028,510,,,-20009--,,,['hyperscout_2']
+1077,tomorrow_s2,Tomorrow-S2,Tomorrow Microwave Sounder 2,Tomorrow.io,Operational,Sunsynchronous orbit,16 Aug 2024,≥2027,487,,22:47 asc,0-20009-0-769,https://www.tomorrow.io/weather-intelligence-platform/,,['tms_tomorrow']
+1078,aurora,Aurora,Aurora,OSK,Operational,Sunsynchronous orbit,30 Jun 2021,30 Nov 2026,454,,15:30 desc,-20009--,https://www.orbitalsidekick.com/,,['hi']
+1079,landsat_next_a,Landsat Next-A,Landsat Next-A,NASA,Planned,Sunsynchronous orbit,≥2031,≥2036,653,,10:10 desc,-20009--,https://lta.cr.usgs.gov/,,['landis']
+1080,landsat_next_b,Landsat Next-B,Landsat Next-B,NASA,Planned,Sunsynchronous orbit,≥2031,≥2036,653,,18:10 desc,-20009--,https://lta.cr.usgs.gov/,,['landis']
+1081,landsat_next_c,Landsat Next-C,Landsat Next-C,NASA,Planned,Sunsynchronous orbit,≥2031,≥2036,653,,02:10 desc,-20009--,https://lta.cr.usgs.gov/,,['landis']
+1083,c3iel_a,C3IEL-A,"Cluster for Cloud Evolution, ClimatE and Lightning",CNES,Planned,Sunsynchronous orbit,≥2028,≥2031,650,,13:30 ,-20009--,,,"['cloud', 'loip', 'wvimager']"
+1084,c3iel_b,C3IEL-B,"Cluster for Cloud Evolution, ClimatE and Lightning",CNES,Planned,Sunsynchronous orbit,≥2028,≥2031,650,,13:30 ,-20009--,,,"['cloud', 'loip', 'wvimager']"
+1085,rcm_2,RCM-2,RadarSat Constellation Mission - 1,CSA,Operational,Sunsynchronous orbit,12 Jun 2019,≥2031,592,,06:01 desc,-20009--,,,"['ais', 'sar_rcm']"
+1086,rcm_3,RCM-3,RadarSat Constellation Mission - 1,CSA,Operational,Sunsynchronous orbit,12 Jun 2019,≥2031,592,,06:01 desc,-20009--,,,"['ais', 'sar_rcm']"
+1087,gf_12_05,GF-12-05,Gao Fen - 12-05,CNSA,Operational,Sunsynchronous orbit,15 Oct 2024,30 Nov 2029,635,,06:00 desc,-20009--,,,['sar_c_gf_3']
+1088,lotusat_1,LOTUSat-1,LOTUSat-1,STI-VAST,Planned,Sunsynchronous orbit,≥2026,≥2030,505,,06:00 desc,-20009--,,,['sar_x_lotusat']
+1089,piesat_2,PIESAT-2,PIESAT-2,CASC,Operational,Sunsynchronous orbit,09 Nov 2024,≥2034,530,,10:00 desc,0-20009-0-,https://www.piesat.cn/website/en-us/index.html,,['x_sar_piesat']
+1091,superview_neo_2_03,SuperView Neo-2 03,SuperView Neo-2 03,"CAST,SpacEyes",Operational,Sunsynchronous orbit,24 Nov 2024,≥2029,495,,07:00 desc,0-20009-0-,,,['sar_superview']
+1092,superview_neo_2_04,SuperView Neo-2 04,SuperView Neo-2 04,"CAST,SpacEyes",Operational,Sunsynchronous orbit,24 Nov 2024,≥2029,495,,07:00 desc,0-20009-0-,,,['sar_superview']
+1093,strix_6,StriX-6,StriX-6,Synspective,Commissioning,Drifting orbit,20 Mar 2026,≥2029,545,,,-20009--,,,['x_sar']
+1094,strix_2,StriX-2,StriX-2,Synspective,Operational,Sunsynchronous orbit,21 Dec 2024,30 Nov 2031,570,,,-20009--,,,['x_sar']
+1095,tomorrow_s3,Tomorrow-S3,Tomorrow Microwave Sounder 3,Tomorrow.io,Operational,Drifting orbit,21 Dec 2024,≥2028,495,,,0-20009-0-769,https://www.tomorrow.io/weather-intelligence-platform/,,['tms_tomorrow']
+1096,tomorrow_s4,Tomorrow-S4,Tomorrow Microwave Sounder 4,Tomorrow.io,Operational,Drifting orbit,21 Dec 2024,≥2028,495,,,0-20009-0-769,https://www.tomorrow.io/weather-intelligence-platform/,,['tms_tomorrow']
+1098,hotbird_13f,HOTBIRD 13F,HOTBIRD 13F,"ESA,Airbus",Operational,Geostationary orbit,15 Oct 2022,≥2037,35786,13,,0-20009-0-,,,['icare_ng']
+1099,hotbird_13g,HOTBIRD 13G,HOTBIRD 13G,"ESA,Airbus",Operational,Geostationary orbit,03 Nov 2022,≥2037,35786,13,,0-20009-0-,,,['icare_ng']
+1100,firesat_pathfinder,FireSat-Pathfinder,FireSat- Pathfinder,MUON SPACE,Operational,Sunsynchronous orbit,15 Mar 2025,≥2028,,,,0-20009-0-0,,,['radiometer_firesat']
+1101,uvsq_ng,UVSQ-NG,UVSQ Next Generation,"LASP,LATMOS",Operational,Sunsynchronous orbit,15 Mar 2025,≥2030,550,,10:30 ,0-20009-0-0,,,"['ers_uvsq', 'unis']"
+1102,fy_4f,FY-4F,Feng-Yun - 4F,"CMA,NRSCC",Planned,Geostationary orbit,≥2029,≥2037,35786,,,-20009--,,,"['lmi', 'dcs_fy', 'sep', 'agri', 'giirs_2']"
+1103,worldview_legion_5,WorldView Legion-5,WorldView Legion-5,"Maxar,DigitalGlobe",Operational,Drifting orbit,04 Feb 2025,≥2030,710,,,-20009--,https://www.maxar.com/,,['spaceview_ng']
+1104,worldview_legion_6,WorldView Legion-6,WorldView Legion-6,"Maxar,DigitalGlobe",Operational,Drifting orbit,04 Feb 2025,≥2030,455,,,-20009--,https://www.maxar.com/,,['spaceview_ng']
+1105,tomorrow_s5,Tomorrow-S5,Tomorrow Microwave Sounder 5,Tomorrow.io,Operational,Sunsynchronous orbit,15 Mar 2025,≥2028,514,,10:23 asc,0-20009-0-769,https://www.tomorrow.io/weather-intelligence-platform/,,['tms_tomorrow']
+1106,tomorrow_s6,Tomorrow-S6,Tomorrow Microwave Sounder 6,Tomorrow.io,Operational,Sunsynchronous orbit,15 Mar 2025,≥2028,514,,10:23 asc,0-20009-0-769,https://www.tomorrow.io/weather-intelligence-platform/,,['tms_tomorrow']
+1107,tomorrow_s7,Tomorrow-S7,Tomorrow Microwave Sounder 7,Tomorrow.io,Operational,Drifting orbit,22 Apr 2025,≥2028,577,,,0-20009-0-769,https://www.tomorrow.io/weather-intelligence-platform/,,['tms_tomorrow']
+1108,tomorrow_s8,Tomorrow-S8,Tomorrow Microwave Sounder 8,Tomorrow.io,Commissioning,Drifting orbit,02 Nov 2025,≥2028,517,,,0-20009-0-769,https://www.tomorrow.io/weather-intelligence-platform/,,['tms_tomorrow']
+1109,tomorrow_s9,Tomorrow-S9,Tomorrow Microwave Sounder 9,Tomorrow.io,Commissioning,Drifting orbit,02 Nov 2025,≥2028,517,,,0-20009-0-769,https://www.tomorrow.io/weather-intelligence-platform/,,['tms_tomorrow']
+1110,tomorrow_s10,Tomorrow-S10,Tomorrow Microwave Sounder 10,Tomorrow.io,Commissioning,Sunsynchronous orbit,11 Jan 2026,≥2029,510,,17:27 asc,0-20009-0-769,https://www.tomorrow.io/weather-intelligence-platform/,,['tms_tomorrow']
+1111,nemo_am,NEMO-AM,Nano satellite for Earth Monitoring and Observation-Aerosol Monitoring,ISRO,Planned,Sunsynchronous orbit,≥2026,≥2030,650,,09:30 desc,0-20009-0-0,,,['imager_nemo']
+1112,blacksky_20_gen3_1,BlackSky-20 (Gen3-1),BlackSky 3rd Generation 1,BSG,Operational,Drifting orbit,18 Feb 2025,≥2030,470,,,0-20009-0-,,,['blacksky_imager']
+1113,ews_g2,EWS-G2,Electro-optical Infrared Weather System-Geostationary mission-2,"DoD,NOAA,USAF",Operational,Geostationary orbit,Dec 2023,≥2027,35786,61.5,,0-20009-0-,,,"['sxi', 'sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_12_15', 'sem_xrs_euv', 'sem_hepad']"
+1114,ews_g1,EWS-G1,Electro-optical Infrared Weather System-Geostationary-1,"DoD,NOAA,USAF",Inactive,Geostationary orbit,Oct 2019,≥2024,35786,61.5,,-20009--,,,"['sxi', 'sounder', 'sem_mag', 'geos_r', 'dcis', 'sem_eps', 'imager_goes_12_15', 'sem_xrs_euv', 'sem_hepad']"
+1116,tansat_2,TANSAT-2,Exploratory Satellite for Atmospheric CO2-2,"MOST,CAS,CMA",Planned,Molniya orbit,≥2026,≥2032,702,,13:05 ,-20009--,http://satellite.nsmc.org.cn/portalsite/Data/DataView.aspx?SatelliteType=2&SatelliteCode=TANSAT,,"['dusifis', 'caphi', 'h3imager', 'uwhigo']"
+1117,grace_continuity,GRACE-Continuity,Gravity Recovery and Climate Experiment - Continuity,"NASA,DLR",Planned,Drifting orbit,≥2028,≥2035,490,,,-20009--,,,"['lrr_dlr', 'sca_grace', 'hairs', 'superstar', 'tri_g_grace_fo']"
+1118,s3ng_topo_a,S3NG-TOPO A,Sentinel-3 Next Generation Topographhy Mission,"ESA,EC,EUMETSAT",Considered,Sunsynchronous orbit,≥2032,≥2040,810,,18:00 asc,-20009--,,,['poseidon_5']
+1119,s3ng_topo_b,S3NG-TOPO B,Sentinel-3 Next Generation Topographhy Mission,"ESA,EC,EUMETSAT",Considered,Sunsynchronous orbit,≥2032,≥2040,810,,18:00 asc,-20009--,,,['poseidon_5']
+1120,gems2_amethyst,GEMS2- Amethyst,Global Environmental Monitoring System - Amethyst,Weatherstream,Planned,Sunsynchronous orbit,≥2026,≥2029,,,,0-20009-0-0,https://weatherstream.com,,['gems2']
+1121,gems2_beryl,GEMS2- Beryl,Global Environmental Monitoring System - Amethyst,Weatherstream,Planned,Sunsynchronous orbit,≥2026,≥2029,,,,0-20009-0-0,https://weatherstream.com,,['gems2']
+1122,hy_3b,HY-3B,Hai Yang 3B,"NSOAS,CAST",Planned,Sunsynchronous orbit,≥2027,≥2035,,,,-20009--,,,"['ais', 'czi2', 'cocts2', 'pmris']"
+1124,blacksky_21_gen3_2,BlackSky-21 (Gen3-2),BlackSky-21,BSG,Operational,Drifting orbit,02 Jun 2025,≥2028,450,,,0-20009-0-,,,['spaceview_24']
+1125,meteor_m_n2_7,Meteor-M N2-7,Meteor-M Number 2-7,"RosHydroMet,Roscosmos",Planned,Sunsynchronous orbit,≥2034,≥2039,820.7,,,0-20009-0-,,,"['ikor_m', 'sspd', 'msu_mr', 'kmss', 'ikfs_2', 'meteosar', 'sas_r_meteor', 'ggak_m_rims_m', 'mtvza_gy', 'ggak_e_gals_e_meteor', 'ggak_e_skif_6_meteor']"
+1126,meteor_m_n2_8,Meteor-M N2-8,Meteor-M Number 2-8,"RosHydroMet,Roscosmos",Planned,Sunsynchronous orbit,≥2035,≥2040,820.7,,,0-20009-0-,,,"['ikor_m', 'sspd', 'msu_mr', 'kmss', 'ikfs_2', 'meteosar', 'sas_r_meteor', 'ggak_m_rims_m', 'mtvza_gy', 'ggak_e_gals_e_meteor', 'ggak_e_skif_6_meteor']"
+1127,arctica_m_n5,Arctica-M N5,Arctica-M N5,"RosHydroMet,Roscosmos",Planned,Molniya orbit,≥2030,≥2035,,,,-20009--,,,"['dcs_a', 'msu_gs_a', 'ggak_e_fm_e', 'ggak_e_gals_e_arctica', 'ggak_e_skif_6_arctica']"
+1128,arctica_m_n6,Arctica-M N6,Arctica-M N6,"RosHydroMet,Roscosmos",Planned,Molniya orbit,≥2030,≥2035,,,,-20009--,,,"['dcs_a', 'msu_gs_a', 'ggak_e_fm_e', 'ggak_e_gals_e_arctica', 'ggak_e_skif_6_arctica']"
+1129,arctica_m_n7,Arctica-M N7,Arctica-M N7,"RosHydroMet,Roscosmos",Planned,Molniya orbit,≥2035,≥2040,,,,-20009--,,,"['dcs_a', 'msu_gs_a', 'ggak_e_fm_e', 'ggak_e_gals_e_arctica', 'ggak_e_skif_6_arctica']"
+1130,arctica_m_n8,Arctica-M N8,Arctica-M N8,"RosHydroMet,Roscosmos",Planned,Molniya orbit,≥2035,≥2040,,,,-20009--,,,"['dcs_a', 'msu_gs_a', 'ggak_e_fm_e', 'ggak_e_gals_e_arctica', 'ggak_e_skif_6_arctica']"
+1131,geo_kompsat_5,GEO-KOMPSAT-5,Geostationary Korea Multi-Purpose Satellite - 5,"KMA,KARI,ME (NIER),MLTM",Planned,Geostationary orbit,≥2031,≥2041,35786,128.2,,-20009--,https://nmsc.kma.go.kr/enhome/html/main/main.do,,"['ami_gk5', 'ksem_ii_sxrd', 'ksem_ii_cm', 'ksem_ii_hept', 'ksem_ii_sosmag_ii', 'ksem_ii_heel']"
+1132,qps_sar_5,QPS-SAR 5,QPS-SAR 5 (Tsukuyomi 1),iQPS,Operational,Drifting orbit,15 Dec 2023,≥2028,580,,,0-20009-0-0,https://i-qps.net/en/product/,,['qps_sar']
+1133,qps_sar_6,QPS-SAR 6,QPS-SAR 6 (Amateru 3),iQPS,Operational,Sunsynchronous orbit,12 Jun 2023,≥2028,500,,,0-20009-0-0,https://i-qps.net/en/product/,,['qps_sar']
+1134,qps_sar_7,QPS-SAR 7,QPS-SAR 7 (Tsukuyomi 2),iQPS,Operational,Drifting orbit,08 Apr 2024,≥2029,590,,,0-20009-0-0,https://i-qps.net/en/product/,,['qps_sar']
+1135,qps_sar_8,QPS-SAR 8,QPS-SAR 8 (Amateru 4),iQPS,Operational,Sunsynchronous orbit,16 Aug 2024,≥2029,550,,,0-20009-0-0,https://i-qps.net/en/product/,,['qps_sar']
+1136,qps_sar_9,QPS-SAR 9,QPS-SAR 9 (Susanoo-1),iQPS,Operational,Drifting orbit,15 Mar 2025,≥2029,573,,,0-20009-0-0,https://i-qps.net/en/product/,,['qps_sar']
+1137,qps_sar_10,QPS-SAR 10,QPS-SAR 10 (Wadatsumi 1),iQPS,Operational,Drifting orbit,17 May 2025,≥2029,580,,,0-20009-0-0,https://i-qps.net/en/product/,,['qps_sar']
+1138,qps_sar_11,QPS-SAR 11,QPS-SAR 11 (Yamatsumi 1),iQPS,Operational,Drifting orbit,11 Jun 2025,≥2029,580,,,0-20009-0-0,https://i-qps.net/en/product/,,['qps_sar']
+1139,tracers,TRACERS,Tandem Reconnection and Cusp Electrodynamics Reconnaissance Satellites,NASA,Operational,Sunsynchronous orbit,23 Jul 2025,≥2026,500,,10:00 desc,0-20009-0-0,https://tracers.physics.uiowa.edu/tracers-portal,,"['aci', 'efi', 'msc_tracers', 'mag_tracers', 'magic', 'ace_tracers']"
+1140,qps_sar_12,QPS-SAR 12,QPS-SAR 12 (Kushinada 1),iQPS,Operational,Drifting orbit,05 Aug 2025,≥2029,580,,,0-20009-0-0,https://i-qps.net/en/product/,,['qps_sar']
+1141,xcube_1,XCUBE-1,XCUBE-1,XPLORE,Operational,Drifting orbit,21 Dec 2024,≥2029,508,,,0-20009-0-0,https://www.xplore.com/inquire.html ,,['hyperscape100']
+1142,platino_2,PLATiNO-2,PLATiNO-2 ,ASI,Planned,Sunsynchronous orbit,≥2026,≥2029,740,,,0-20009-0-0,,,"['maia', 'platino_tir']"
+1143,platino_1,PLATiNO-1,PLATiNO-1,ASI,Planned,Sunsynchronous orbit,≥2026,≥2029,740,,05:45 asc,0-20009-0-0,,,['sar_x_platino']
+1144,carruthers,Carruthers,Carruthers Geocorona Observatory,NASA,Commissioning,Lagrange libration point 1,24 Sep 2025,≥2028,,,,0-20009-0-0,,,['fuv_carruthers']
+1145,wivern,WIVERN,Wind Velocity Radar Nephoscope,ESA,Planned,Sunsynchronous orbit,≥2033,≥2038,500,,,0-20009-0-0,,,"['wivern_radiometer', 'wivern_doppler_radar']"
+1146,grace_b,GRACE B,Gravity Recovery and Climate Experiment B,"NASA,DLR",Inactive,Drifting orbit,17 Mar 2002,27 Oct 2017,337,,,0-20009-0-723,http://www.csr.utexas.edu/grace/,,"['lrr_dlr', 'sca_grace', 'hairs', 'blackjack_grace', 'superstar']"
+1147,grace_d_grace_fo,GRACE D (GRACE-FO),Gravity Recovery and Climate Experiment D - Follow-on,"NASA,DLR",Operational,Drifting orbit,22 May 2018,≥2028,490,,,0-20009-0-804,,,"['lrr_dlr', 'sca_grace', 'hairs', 'superstar', 'tri_g_grace_fo']"
+1148,strix_5,StriX-5,StriX-5,Synspective,Commissioning,Drifting orbit,14 Oct 2025,≥2028,583,,,-20009--,,,['x_sar']
+1149,geoxo_4,GeoXO 4,GeoXO 4,"NOAA,NASA",Planned,Geostationary orbit,≥2043,≥2051,35786,-105,,0-20009-0-,,,"['gxs', 'gxi', 'dcis']"
+1150,gf_14_02,GF-14-02,Gao Fen - 14-02,CNSA,Commissioning,Sunsynchronous orbit,26 Oct 2025,≥2030,488,,10:30 desc,0-20009-0-,,,['pms_2']
+1151,qps_sar_14,QPS-SAR 14,QPS-SAR 14 (Yachihoko),iQPS,Commissioning,Drifting orbit,05 Nov 2025,30 Nov 2028,580,,,0-20009-0-0,https://i-qps.net/en/product/,,['qps_sar']
+1152,g20,G20,G20,ISRO,Planned,Sunsynchronous orbit,≥2027,≥2032,720,,11:35 desc,0-20009-0-0,,,"['sacff', 'polsac', 'ensac', 'hymaths']"
+1153,wfs_1,WFS-1,WildFireSat-1,CSA,Planned,Sunsynchronous orbit,≥2029,≥2034,480,,18:00 asc,0-20009-0-0,,,['wfs_radiometer']
+1154,blacksky_22_gen3_3,BlackSky-22 (Gen3-3),BlackSky-22,BSG,Operational,Drifting orbit,20 Nov 2025,30 Nov 2028,450,,,0-20009-0-,,,['spaceview_24']
+1155,smile,SMILE,Solar wind Magnetosphere Ionosphere Link Explorer,"ESA,CAS",Planned,Cross-magnetosphere orbit,≥2026,≥2029,121000,,,0-20009-0-0,,,"['lia', 'mag_smile', 'sxi_smile', 'uvi_smile']"
+1156,cas_500_3,CAS 500-3,Compact Advanced Satellite 500-3,KARI,Commissioning,Sunsynchronous orbit,26 Nov 2025,≥2028,498,,,0-20009-0-,,,['aeiss_hr']
+1157,qps_sar_15,QPS-SAR 15,QPS-SAR 15 (Sukunami 1),iQPS,Commissioning,Drifting orbit,21 Dec 2025,30 Nov 2028,580,,,0-20009-0-0,https://i-qps.net/en/product/,,['qps_sar']
+1158,tomorrow_s11,Tomorrow-S11,Tomorrow Microwave Sounder 11,Tomorrow.io,Commissioning,Sunsynchronous orbit,11 Jan 2026,≥2029,510,,17:27 asc,0-20009-0-769,https://www.tomorrow.io/weather-intelligence-platform/,,['tms_tomorrow']

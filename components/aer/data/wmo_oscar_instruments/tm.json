@@ -1,0 +1,93 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "TM",
+  "instrument_fullname": "Thematic Mapper",
+  "url": "https://space.oscar.wmo.int/instruments/view/tm",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": "",
+      "bandwidth": "",
+      "snr_or_nedt": "Low signal",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": 0.48,
+      "bandwidth": 0.45,
+      "snr_or_nedt": "56 @ 40 W m -2 sr -1 μm -1",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": 0.56,
+      "bandwidth": 0.52,
+      "snr_or_nedt": "60 @ 30 W m -2 sr -1 μm -1",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": 0.66,
+      "bandwidth": 0.63,
+      "snr_or_nedt": "47 @ 21.7 W m -2 sr -1 μm -1",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": 0.83,
+      "bandwidth": 0.76,
+      "snr_or_nedt": "41 @ 13.6 W m -2 sr -1 μm -1",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_06",
+      "central_wavelength": 1.65,
+      "bandwidth": 1.55,
+      "snr_or_nedt": "38 @ 4.0 W m -2 sr -1 μm -1",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_07",
+      "central_wavelength": 2.2,
+      "bandwidth": 2.08,
+      "snr_or_nedt": "25 @ 1.7 W m -2 sr -1 μm -1",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_08",
+      "central_wavelength": 11.45,
+      "bandwidth": 10.4,
+      "snr_or_nedt": 0.13,
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}
