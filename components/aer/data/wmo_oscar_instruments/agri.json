@@ -1,0 +1,181 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "AGRI",
+  "instrument_fullname": "Advanced Geostationary Radiation Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/agri",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR or NEΔT @ specified input",
+    "IFOV at s.s.p.",
+    "Comment"
+  ],
+  "channels": [
+    {
+      "channel_name": "CH01",
+      "central_wavelength": 0.47,
+      "bandwidth": 0.45,
+      "snr_or_nedt": "≥90 @ 100% albedo",
+      "spatial_resolution": 1000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH02",
+      "central_wavelength": 0.65,
+      "bandwidth": 0.55,
+      "snr_or_nedt": "≥150 @ 100% albedo",
+      "spatial_resolution": 500.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH03",
+      "central_wavelength": 0.825,
+      "bandwidth": 0.75,
+      "snr_or_nedt": "≥200 @ 100% albedo or ≥3 @ 1% albedo",
+      "spatial_resolution": 1000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH04",
+      "central_wavelength": 1.378,
+      "bandwidth": "1.371~1.386 µm",
+      "snr_or_nedt": "≥120 @ 100% albedo or ≥2 @ 1% albedo",
+      "spatial_resolution": 2000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH05",
+      "central_wavelength": 1.61,
+      "bandwidth": 1.58,
+      "snr_or_nedt": "≥200 @ 100% albedo or ≥3 @ 1% albedo",
+      "spatial_resolution": 2000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH06",
+      "central_wavelength": 2.25,
+      "bandwidth": 2.1,
+      "snr_or_nedt": "≥200 @ 100% albedo or ≥2 @ 1% albedo",
+      "spatial_resolution": 2000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH07",
+      "central_wavelength": 3.75,
+      "bandwidth": 3.5,
+      "snr_or_nedt": "≤ 0.7 K @ 315 K",
+      "spatial_resolution": 2000.0,
+      "Comment": "",
+      "unit": "µm (high)",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH08",
+      "central_wavelength": 3.75,
+      "bandwidth": 3.5,
+      "snr_or_nedt": 0.2,
+      "spatial_resolution": 4000.0,
+      "Comment": "",
+      "unit": "µm (low)",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH09",
+      "central_wavelength": 6.25,
+      "bandwidth": 5.8,
+      "snr_or_nedt": 0.2,
+      "spatial_resolution": 4000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH10",
+      "central_wavelength": 6.95,
+      "bandwidth": "6.75~7.15",
+      "snr_or_nedt": 0.25,
+      "spatial_resolution": 4000.0,
+      "Comment": "Not on FY-4A",
+      "unit": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH11",
+      "central_wavelength": 7.1,
+      "bandwidth": 6.9,
+      "snr_or_nedt": 0.25,
+      "spatial_resolution": 4000.0,
+      "Comment": "FY-4A/FY-4B",
+      "unit": "µm/7.42 µm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH12",
+      "central_wavelength": 8.55,
+      "bandwidth": 8.3,
+      "snr_or_nedt": 0.2,
+      "spatial_resolution": 4000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH13",
+      "central_wavelength": 10.8,
+      "bandwidth": 10.3,
+      "snr_or_nedt": 0.2,
+      "spatial_resolution": 4000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH14",
+      "central_wavelength": 12.0,
+      "bandwidth": 11.5,
+      "snr_or_nedt": 0.2,
+      "spatial_resolution": 4000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "CH15",
+      "central_wavelength": 13.5,
+      "bandwidth": 13.2,
+      "snr_or_nedt": 0.5,
+      "spatial_resolution": 4000.0,
+      "Comment": "",
+      "unit": "µm",
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "HRVIR",
+  "instrument_fullname": "Haute Résolution dans le Visible et l’Infra-Rouge",
+  "url": "https://space.oscar.wmo.int/instruments/view/hrvir",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": 0.545,
+      "bandwidth": 0.5,
+      "snr_or_nedt": "188 @ 50 % albedo, SZA=60°",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": 0.645,
+      "bandwidth": 0.61,
+      "snr_or_nedt": "198 @ 50 % albedo, SZA=60°",
+      "unit": "µm (MS)",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": 0.645,
+      "bandwidth": 0.61,
+      "snr_or_nedt": "152 @ 50 % albedo, SZA=60°",
+      "unit": "µm (PAN)",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": 0.84,
+      "bandwidth": 0.79,
+      "snr_or_nedt": "218 @ 70 % albedo, SZA=60°",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": 1.64,
+      "bandwidth": 1.58,
+      "snr_or_nedt": "60 @ 50 % albedo, SZA=60°",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

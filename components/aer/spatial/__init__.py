@@ -2,26 +2,14 @@
 Spatial component for storing geometry features, AOI types, and other spatial abstractions.
 """
 
-from aer.spatial.core import (
-    Grid,
-    GridCell,
-    GridDefinition,
-    GridSpatialExtent,
-    GridSchema,
-    reproject_polygon,
+from aer.spatial.utils import (
     get_utm_epsg_from_geometry,
     get_utm_zone_from_latlng,
-    GridRow,
+    reproject_geom,
 )
 
 __all__ = [
-    "Grid",
-    "GridCell",
-    "GridDefinition",
-    "GridSpatialExtent",
-    "GridSchema",
-    "reproject_polygon",
     "get_utm_epsg_from_geometry",
     "get_utm_zone_from_latlng",
-    "GridRow",
+    "reproject_geom",
 ]

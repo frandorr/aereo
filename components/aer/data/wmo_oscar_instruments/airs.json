@@ -1,0 +1,125 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "AIRS",
+  "instrument_fullname": "Atmospheric Infra-Red Sounder ",
+  "url": "https://space.oscar.wmo.int/instruments/view/airs",
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
+    "Spectral range (µm)",
+    "Spectral range (cm -1 )",
+    "Spectral resolution",
+    "SNR or NEΔT @ specified input"
+  ],
+  "channels": [
+    {
+      "channel_name": "LWIR",
+      "Spectral range (µm)": {
+        "min": 3.74,
+        "max": 4.61,
+        "unit": "µm"
+      },
+      "Spectral range (cm -1 )": {
+        "min": 2170.0,
+        "max": 2674.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": "~ 2.0 cm -1",
+      "snr_or_nedt": 0.14,
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "MWIR",
+      "Spectral range (µm)": {
+        "min": 6.2,
+        "max": 8.22,
+        "unit": "µm"
+      },
+      "Spectral range (cm -1 )": {
+        "min": 1216.0,
+        "max": 1613.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": "~ 1.0 cm -1",
+      "snr_or_nedt": 0.2,
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "SWIR",
+      "Spectral range (µm)": {
+        "min": 8.8,
+        "max": 15.4,
+        "unit": "µm"
+      },
+      "Spectral range (cm -1 )": {
+        "min": 650.0,
+        "max": 1136.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": "~ 0.5 cm -1",
+      "snr_or_nedt": 0.35,
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_04",
+      "Spectral range (µm)": {
+        "min": 0.41,
+        "max": 0.44,
+        "unit": "µm"
+      },
+      "Spectral range (cm -1 )": "not relevant",
+      "spectral_resolution": 30.0,
+      "snr_or_nedt": "> 100 @ 40 % albedo",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_05",
+      "Spectral range (µm)": {
+        "min": 0.58,
+        "max": 0.68,
+        "unit": "µm"
+      },
+      "Spectral range (cm -1 )": "not relevant",
+      "spectral_resolution": 100.0,
+      "snr_or_nedt": "> 100 @ 40 % albedo",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_06",
+      "Spectral range (µm)": {
+        "min": 0.71,
+        "max": 0.92,
+        "unit": "µm"
+      },
+      "Spectral range (cm -1 )": "not relevant",
+      "spectral_resolution": 210.0,
+      "snr_or_nedt": "> 100 @ 40 % albedo",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_07",
+      "Spectral range (µm)": {
+        "min": 0.49,
+        "max": 0.94,
+        "unit": "µm"
+      },
+      "Spectral range (cm -1 )": "not relevant",
+      "spectral_resolution": "N/A (broadband)",
+      "snr_or_nedt": "> 100 @ 40 % albedo",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    }
+  ]
+}

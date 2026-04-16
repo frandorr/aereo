@@ -1,0 +1,87 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "GAS",
+  "instrument_fullname": "Greenhouse-gases Absorption Spectrometer",
+  "url": "https://space.oscar.wmo.int/instruments/view/gas",
+  "schema_type": "spectrometer_sounder",
+  "original_columns": [
+    "Spectral range (μm )",
+    "Spectral range (cm -1 )",
+    "Spectral resolution",
+    "SNR @ expected input radiance"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "Spectral range (μm )": {
+        "min": 0.75,
+        "max": 0.77,
+        "unit": "μm"
+      },
+      "Spectral range (cm -1 )": {
+        "min": 13000.0,
+        "max": 13300.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": 0.6,
+      "snr_or_nedt": "> 300",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_02",
+      "Spectral range (μm )": {
+        "min": 1.56,
+        "max": 1.72,
+        "unit": "μm"
+      },
+      "Spectral range (cm -1 )": {
+        "min": 5800.0,
+        "max": 6400.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": 0.27,
+      "snr_or_nedt": "> 300",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_03",
+      "Spectral range (μm )": {
+        "min": 1.92,
+        "max": 2.08,
+        "unit": "μm"
+      },
+      "Spectral range (cm -1 )": {
+        "min": 4800.0,
+        "max": 5200.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": 0.27,
+      "snr_or_nedt": "> 300",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    },
+    {
+      "channel_name": "Band_04",
+      "Spectral range (μm )": {
+        "min": 2.2,
+        "max": 2.38,
+        "unit": "μm"
+      },
+      "Spectral range (cm -1 )": {
+        "min": 4200.0,
+        "max": 4550.0,
+        "unit": "cm -1"
+      },
+      "spectral_resolution": 0.27,
+      "snr_or_nedt": "> 300",
+      "wave_number_min": null,
+      "wave_number_max": null,
+      "number_of_channels": null
+    }
+  ]
+}

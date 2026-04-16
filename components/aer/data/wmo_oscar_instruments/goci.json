@@ -1,0 +1,94 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "GOCI",
+  "instrument_fullname": "Geostationary Ocean Color Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/goci",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Bandwidth",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": 412.0,
+      "bandwidth": 20.0,
+      "snr_or_nedt": "1000 @ 100 mW m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": 443.0,
+      "bandwidth": 20.0,
+      "snr_or_nedt": "1090 @ 86 mW m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": 490.0,
+      "bandwidth": 20.0,
+      "snr_or_nedt": "1170 @ 67 mW m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": 555.0,
+      "bandwidth": 20.0,
+      "snr_or_nedt": "1070 @ 56 mW m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": 660.0,
+      "bandwidth": 20.0,
+      "snr_or_nedt": "1010 @ 32 mW m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_06",
+      "central_wavelength": 680.0,
+      "bandwidth": 10.0,
+      "snr_or_nedt": "870 @ 31 mW m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_07",
+      "central_wavelength": 745.0,
+      "bandwidth": 20.0,
+      "snr_or_nedt": "860 @ 20 mW m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_08",
+      "central_wavelength": 865.0,
+      "bandwidth": 40.0,
+      "snr_or_nedt": "750 @ 16 mW m -2 sr -1 μm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

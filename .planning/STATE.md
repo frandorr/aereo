@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 02
+current_phase: 05 (Completed)
 status: unknown
-last_updated: "2026-03-19T20:35:02.158Z"
+last_updated: "2026-04-09T14:38:26.990Z"
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 3
-  completed_plans: 3
+  total_phases: 6
+  completed_phases: 4
+  total_plans: 6
+  completed_plans: 4
 ---
 
 # State: aer Plugin Extraction System
@@ -20,7 +20,7 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 
 **Core value:** Users can search data from any satellite provider and extract it to a standardized grid in a consistent way, regardless of source.
 
-**Current phase:** 02
+**Current phase:** 05 (Completed)
 
 ## Workflow Config
 
@@ -36,6 +36,8 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 1: Extract Plugin System | ◆ In Progress | Context captured |
 | 2: Pipeline Integration | ○ Pending | Orchestration |
 | 3: Example Plugin | ○ Pending | Reference impl |
+| 4: Finalize new GridCell model | ● Completed | Grid schema updated |
+| 5: Migrating Search Plugins To Pluggy | ● Completed | Migrated EarthAccess and GOES plugins to hookimpl |
 
 ### Quick Tasks Completed
 
@@ -48,12 +50,28 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260327-remov | Remove row_idx and col_idx from GridRow/G | 2026-03-25 | befb6e9 | [260327-remove-row-idx-and-col-idx-from-gridrow-](./quick/260327-remove-row-idx-and-col-idx-from-gridrow-/) |
 | 260328-deter | Determine whether ExtractPlugin.extract s | 2026-03-25 | 00ce438 | [260328-determine-whether-extractplugin-extract-](./quick/260328-determine-whether-extractplugin-extract-/) |
 | 260329-creat | Fix extraction component tests to match a | 2026-03-25 | 63d9738 | [260329-create-tests-for-extraction-component-an](./quick/260329-create-tests-for-extraction-component-an/) |
+| 260330-adap | adapt repository and models to remove UU | 2026-03-28 | 3bfe069 | [260330-adapt-repository-and-models-to-remove-uu](./quick/260330-adapt-repository-and-models-to-remove-uu/) |
+| 260331-refa | refactor Instrument/Satellite to many-to- | 2026-03-28 | c357c95 | [260331-refactor-satellite-instrument-channel-re](./quick/260331-refactor-satellite-instrument-channel-re/) |
+| 260332-creat | Create InMemoryRepository and tests | 2026-03-29 | 6fd997d | [260332-create-tests-subclassing-aerrepository-w](./quick/260332-create-tests-subclassing-aerrepository-w/) |
+| 260334-pars | Parse WMO OSCAR instrument channels to JSON | 2026-03-29 | aaa84cf | [260334-parse-wmo-oscar-instrument-channels-from](./quick/260334-parse-wmo-oscar-instrument-channels-from/) |
+| 260335-fix | Fix GridCell tests to use both footprint and utm_footprint, add catalog component tests | 2026-03-31 | fcff7f5 | [260335-fix-gridcell-tests-to-use-both-footprint](./quick/260335-fix-gridcell-tests-to-use-both-footprint/) |
+| 260336-refa | Refactor Plugin System to Support Class-Based Plugins | 2026-03-31 | pending | [260336-refactor-plugin-system-to-support-class-](./quick/260336-refactor-plugin-system-to-support-class-) |
+| 260337-update-agents-md-to-mention-codemap-usag | Update AGENTS.md to mention codemap usage for code exploration | 2026-03-31 | f2d241f | [260337-update-agents-md-to-mention-codemap-usag](./quick/260337-update-agents-md-to-mention-codemap-usag/) |
+| 260338-extract-url-data-from-payload-and-acrony | Extract URL data from Payload and Acronym column hyperlinks in Excel file | 2026-04-01 | 7afe9d8 | [260338-extract-url-data-from-payload-and-acrony](./quick/260338-extract-url-data-from-payload-and-acrony/) |
+| 260339-create-oscar-api-consumer-functions-to-f | Create OSCAR API consumer functions to fetch satellites and instruments data into dataframes | 2026-04-01 | 51e8e6b | [260339-create-oscar-api-consumer-functions-to-f](./quick/260339-create-oscar-api-consumer-functions-to-f/) |
+| 260340-create-abstract-searchplugin-class-in-co | Create abstract SearchPlugin class in components/aer/plugin/search.py | 2026-04-04 | 6352fa0 | [260340-create-abstract-searchplugin-class-in-co](./quick/260340-create-abstract-searchplugin-class-in-co/) |
+| 260342-remove-old-plugin-architecture-and-add-p | Remove old plugin architecture and add pluggy hooks tests | 2026-04-06 | 76b3706 | [260342-remove-old-plugin-architecture-and-add-p](./quick/260342-remove-old-plugin-architecture-and-add-p/) |
+| 260343-move-pandera-schemas | Move pandera schemas to new aer.schemas component | 2026-04-13 | b36ad16 | [260343-move-pandera-schemas-to-a-new-polylith-c](./quick/260343-move-pandera-schemas-to-a-new-polylith-c/) |
+| 260343-remove-abcs | Remove SearchPlugin ABCs, standardize on pluggy only | 2026-04-06 | e8067d1 | - |
+| 260409-product-based-dispatch | Add product-based plugin dispatch with PluginSelector | 2026-04-09 | 72d9605 | - |
+| 260344-modify-plugin-component-to-support-new-v | modify plugin component to support new version of simple hookspects and check mandatory impl of supported_collections() | 2026-04-15 | 13b0994 | [260344-modify-plugin-component-to-support-new-v](./quick/260344-modify-plugin-component-to-support-new-v/) |
 
 ## Progress
 
 - Requirements: 11 defined
-- Phases: 3 created
-- Current: Phase 1 context captured, ready to plan
+- Phases: 4 created (6 total)
+- Current: Phase 06 in progress - product-based dispatch implemented
 
 ---
-*Last activity: 2026-03-25 - Completed quick task 260329-creat: Fix extraction component tests to match actual class definitions*
+
+*Last activity: 2026-04-15 - Completed quick task 260344: modify plugin component to support new version of simple hookspects and check mandatory impl of supported_collections()*

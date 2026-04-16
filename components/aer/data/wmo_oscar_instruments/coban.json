@@ -1,0 +1,94 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "COBAN",
+  "instrument_fullname": "Multiband Camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/coban",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified albedo"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": 0.4,
+      "bandwidth": 0.38,
+      "snr_or_nedt": "…… @ ….. % albedo",
+      "unit": "μm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": 0.45,
+      "bandwidth": 0.41,
+      "snr_or_nedt": "…… @ ….. % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": 0.5,
+      "bandwidth": 0.46,
+      "snr_or_nedt": "…… @ ….. % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": 0.55,
+      "bandwidth": 0.51,
+      "snr_or_nedt": "…… @ ….. % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": 0.6,
+      "bandwidth": 0.56,
+      "snr_or_nedt": "…… @ ….. % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_06",
+      "central_wavelength": 0.65,
+      "bandwidth": 0.61,
+      "snr_or_nedt": "…… @ ….. % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_07",
+      "central_wavelength": 0.7,
+      "bandwidth": 0.66,
+      "snr_or_nedt": "…… @ ….. % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_08",
+      "central_wavelength": 0.925,
+      "bandwidth": 0.85,
+      "snr_or_nedt": "…… @ ….. % albedo",
+      "unit": "µm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

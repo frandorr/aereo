@@ -1,0 +1,48 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "PALSAR",
+  "instrument_fullname": "Phased-Array L-band Synthetic Aperture Radar",
+  "url": "https://space.oscar.wmo.int/instruments/view/palsar",
+  "schema_type": "sar_active",
+  "original_columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Polarisation",
+    "Incidence angle"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "operation_mode": "Highest resolution",
+      "spatial_resolution": 7.0,
+      "swath_width": 40000.0,
+      "polarisation": "HH or VV",
+      "field_of_regard": 8.0
+    },
+    {
+      "channel_name": "Band_02",
+      "operation_mode": "High resolution",
+      "spatial_resolution": 14.0,
+      "swath_width": 40000.0,
+      "polarisation": "HH/HV or VV/VH",
+      "field_of_regard": 8.0
+    },
+    {
+      "channel_name": "Band_03",
+      "operation_mode": "ScanSAR",
+      "spatial_resolution": 100.0,
+      "swath_width": 250000.0,
+      "polarisation": "HH or VV",
+      "field_of_regard": 18.0
+    },
+    {
+      "channel_name": "Band_04",
+      "operation_mode": "Polarimetry",
+      "spatial_resolution": 24.0,
+      "swath_width": 30000.0,
+      "polarisation": "HH/HV + VV/VH",
+      "field_of_regard": 8.0
+    }
+  ]
+}

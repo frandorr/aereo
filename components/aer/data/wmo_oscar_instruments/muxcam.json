@@ -1,0 +1,80 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "MUXCAM",
+  "instrument_fullname": "Multispectral Camera",
+  "url": "https://space.oscar.wmo.int/instruments/view/muxcam",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central",
+    "Spectral",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "Central": "wavelength",
+      "central_wavelength": "interval",
+      "snr_or_nedt": "Low signal",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_02",
+      "Central": {
+        "value": 0.485,
+        "unit": "µm"
+      },
+      "central_wavelength": 0.45,
+      "snr_or_nedt": "31 @ 35.3 W m -2 sr -1 μm -1",
+      "unit": "µm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_03",
+      "Central": {
+        "value": 0.555,
+        "unit": "µm"
+      },
+      "central_wavelength": 0.52,
+      "snr_or_nedt": "29 @ 25.7 W m -2 sr -1 μm -1",
+      "unit": "µm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_04",
+      "Central": {
+        "value": 0.66,
+        "unit": "µm"
+      },
+      "central_wavelength": 0.63,
+      "snr_or_nedt": "23 @ 12.9 W m -2 sr -1 μm -1",
+      "unit": "µm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_05",
+      "Central": {
+        "value": 0.83,
+        "unit": "µm"
+      },
+      "central_wavelength": 0.77,
+      "snr_or_nedt": "24 @ 8.9 W m -2 sr -1 μm -1",
+      "unit": "µm",
+      "bandwidth": null,
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

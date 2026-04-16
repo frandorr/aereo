@@ -1,0 +1,113 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "ALI",
+  "instrument_fullname": "Advanced Land Imager",
+  "url": "https://space.oscar.wmo.int/instruments/view/ali",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Central wavelength",
+    "Spectral interval",
+    "SNR @ specified input spectral radiance"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": 443.0,
+      "bandwidth": 433.0,
+      "snr_or_nedt": "339 @ 14.8 mW cm -2 sr -1 µm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": 482.0,
+      "bandwidth": 450.0,
+      "snr_or_nedt": "572 @ 17.1 mW cm -2 sr -1 µm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": 565.0,
+      "bandwidth": 525.0,
+      "snr_or_nedt": "1001 @ 16.1 mW cm -2 sr -1 µm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": 660.0,
+      "bandwidth": 630.0,
+      "snr_or_nedt": "1039 @ 13.4 mW cm -2 sr -1 µm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": 790.0,
+      "bandwidth": 775.0,
+      "snr_or_nedt": "722 @ 10.4 mW cm -2 sr -1 µm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_06",
+      "central_wavelength": 867.0,
+      "bandwidth": 845.0,
+      "snr_or_nedt": "710 @ 8.73 mW cm -2 sr -1 µm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_07",
+      "central_wavelength": 1250.0,
+      "bandwidth": 1200.0,
+      "snr_or_nedt": "662 @ 4.42 mW cm -2 sr -1 µm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_08",
+      "central_wavelength": 1650.0,
+      "bandwidth": 1550.0,
+      "snr_or_nedt": "1040 @ 2.15 mW cm -2 sr -1 µm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_09",
+      "central_wavelength": 2215.0,
+      "bandwidth": 2080.0,
+      "snr_or_nedt": "912 @ 0.68 mW cm -2 sr -1 µm -1",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_10",
+      "central_wavelength": "Panchromatic",
+      "bandwidth": 480.0,
+      "snr_or_nedt": "348 @ 15.0 mW cm -2 sr -1 µm -1",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}

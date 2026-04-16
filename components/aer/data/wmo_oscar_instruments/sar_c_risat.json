@@ -1,0 +1,56 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "SAR-C (RISAT)",
+  "instrument_fullname": "Synthetic Aperture Radar (C-band)",
+  "url": "https://space.oscar.wmo.int/instruments/view/sar_c_risat",
+  "schema_type": "sar_active",
+  "original_columns": [
+    "Operation mode",
+    "Resolution",
+    "Swath",
+    "Field of regard",
+    "Polarisation"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "operation_mode": "HRS (High Resolution Spotlight)",
+      "spatial_resolution": 1.0,
+      "swath_width": 10000.0,
+      "field_of_regard": 659.0,
+      "polarisation": "HH or VV or HH/HV or VV/VH"
+    },
+    {
+      "channel_name": "Band_02",
+      "operation_mode": "FRS-1 (Fine Resolution Stripmap-1)",
+      "spatial_resolution": 3.0,
+      "swath_width": 30000.0,
+      "field_of_regard": 659.0,
+      "polarisation": "HH or VV or HH/HV or VV/VH"
+    },
+    {
+      "channel_name": "Band_03",
+      "operation_mode": "FRS-2 (Fine Resolution Stripmap-2)",
+      "spatial_resolution": 9.0,
+      "swath_width": 30000.0,
+      "field_of_regard": 659.0,
+      "polarisation": "VV/HH, HH/HV, VV/VH"
+    },
+    {
+      "channel_name": "Band_04",
+      "operation_mode": "MRS (Medium Resolution ScanSAR)",
+      "spatial_resolution": 25.0,
+      "swath_width": 120000.0,
+      "field_of_regard": 659.0,
+      "polarisation": "HH or VV or HH/HV or VV/VH"
+    },
+    {
+      "channel_name": "Band_05",
+      "operation_mode": "CRS (Coarse Resolution ScanSAR)",
+      "spatial_resolution": 50.0,
+      "swath_width": 240000.0,
+      "field_of_regard": 659.0,
+      "polarisation": "HH or VV or HH/HV or VV/VH"
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "instrument_id": null,
+  "instrument_acronym": "Sentinel-5",
+  "instrument_fullname": "UVNS: Ultra-violet, Visible and Near-infrared Sounder",
+  "url": "https://space.oscar.wmo.int/instruments/view/sentinel_5",
+  "schema_type": "optical_infrared",
+  "original_columns": [
+    "Band ID",
+    "Spectral range",
+    "Spectral resolution",
+    "SNR"
+  ],
+  "channels": [
+    {
+      "channel_name": "Band_01",
+      "central_wavelength": 1.0,
+      "bandwidth": 270.0,
+      "snr_or_nedt": "100 @ 270 nm",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_02",
+      "central_wavelength": 0.5,
+      "bandwidth": 300.0,
+      "snr_or_nedt": "1000 @ 320 nm",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_03",
+      "central_wavelength": 0.5,
+      "bandwidth": 370.0,
+      "snr_or_nedt": "1500 @ 420 nm, for λ < 430 nm 1800 @ 460 nm for 430-460 nm 1500 @ 460 nm for λ > 460 nm",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_04",
+      "central_wavelength": 0.4,
+      "bandwidth": 685.0,
+      "snr_or_nedt": "500 @ 710 nm",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_05",
+      "central_wavelength": 0.4,
+      "bandwidth": 755.0,
+      "snr_or_nedt": "500 @ 755 nm",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_06",
+      "central_wavelength": 0.25,
+      "bandwidth": 1595.0,
+      "snr_or_nedt": "250 @ 1675 nm",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    },
+    {
+      "channel_name": "Band_07",
+      "central_wavelength": 0.25,
+      "bandwidth": 2305.0,
+      "snr_or_nedt": "120 @ 2385 nm",
+      "unit": "nm",
+      "spatial_resolution": null,
+      "snr_low": null,
+      "snr_high": null
+    }
+  ]
+}
