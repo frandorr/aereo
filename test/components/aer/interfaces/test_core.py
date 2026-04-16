@@ -1,10 +1,11 @@
-from typing import Any
+from typing import Any, cast
 
-import pandas as pd
+import geopandas as gpd
 import pytest
-from aer.interfaces import AerPlugin, Extractor, SearchProvider
-from aer.schemas import ArtifactSchema, AssetSchema
+from aer.interfaces import AerPlugin, ExtractionTask, Extractor, SearchProvider
+from aer.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
+from shapely.geometry import Polygon
 
 
 def test_plugin_missing_supported_collections():
@@ -70,27 +71,87 @@ def test_extractor_extract_batches(monkeypatch):
     class ValidExtractor(Extractor):
         supported_collections = ["GOES"]
 
-        def prepare_for_extraction(
-            self,
-            search_results: GeoDataFrame[AssetSchema],
-            prepare_params: dict[str, Any] | None,
-        ) -> list[GeoDataFrame[AssetSchema]]:
-            return [search_results]
+        @property
+        def target_grid_d(self) -> int:
+            return 10000
 
         def extract(
             self,
-            assets_batch: GeoDataFrame[AssetSchema],
+            extraction_task: ExtractionTask,
             extract_params: dict[str, Any] | None,
         ) -> GeoDataFrame[ArtifactSchema]:
-            return assets_batch  # pyright: ignore[reportReturnType]
+            return extraction_task.assets  # pyright: ignore[reportReturnType]
 
     extractor = ValidExtractor()
     monkeypatch.setattr("aer.schemas.ArtifactSchema.validate", lambda x: x)
 
-    df1 = pd.DataFrame({"id": [1]})
-    df2 = pd.DataFrame({"id": [2]})
+    df1 = gpd.GeoDataFrame(
+        {"id": [1]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
+    )
+    df2 = gpd.GeoDataFrame(
+        {"id": [2]}, geometry=[Polygon([[1, 1], [2, 1], [2, 2], [1, 2]])]
+    )
 
-    result = extractor.extract_batches([df1, df2])  # pyright: ignore[reportArgumentType]
+    task1 = ExtractionTask(
+        assets=cast(Any, df1),
+        target_grid_d=10000,
+        target_grid_overlap=False,
+        resolution=10.0,
+        uri="test1",
+    )
+    task2 = ExtractionTask(
+        assets=cast(Any, df2),
+        target_grid_d=10000,
+        target_grid_overlap=False,
+        resolution=10.0,
+        uri="test2",
+    )
+
+    result = extractor.extract_batches([task1, task2])
 
     assert len(result) == 2
     assert list(result["id"]) == [1, 2]
+
+
+def test_extractor_prepare_for_extraction():
+    class ValidExtractor(Extractor):
+        supported_collections = ["GOES"]
+
+        @property
+        def target_grid_d(self) -> int:
+            return 10000
+
+        def extract(
+            self,
+            extraction_task: ExtractionTask,
+            extract_params: dict[str, Any] | None,
+        ) -> GeoDataFrame[ArtifactSchema]:
+            return extraction_task.assets  # pyright: ignore[reportReturnType]
+
+    extractor = ValidExtractor()
+
+    # Needs a GeoDataFrame
+    df = gpd.GeoDataFrame(
+        {"id": [1, 2]},
+        geometry=[
+            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
+            Polygon([[1, 1], [2, 1], [2, 2], [1, 2]]),
+        ],
+    )
+
+    # Should raise error if resolution or uri not provided
+    with pytest.raises(
+        ValueError, match="Default prepare_for_extraction requires resolution and uri"
+    ):
+        extractor.prepare_for_extraction(cast(Any, df))
+
+    tasks = extractor.prepare_for_extraction(
+        cast(Any, df), resolution=10.0, uri="test_uri", prepare_params={"x": 1}
+    )
+
+    assert len(tasks) == 2
+    assert tasks[0].resolution == 10.0
+    assert tasks[0].uri == "test_uri"
+    assert tasks[0].task_context == {"prepare_params": {"x": 1}}
+    assert len(tasks[0].assets) == 1
+    assert list(tasks[0].assets["id"]) == [1]

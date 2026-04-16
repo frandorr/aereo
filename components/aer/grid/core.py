@@ -1,6 +1,7 @@
-from functools import cached_property
+from functools import cached_property, lru_cache
 from typing import Sequence, cast
 
+import geopandas as gpd
 import numpy as np
 import shapely
 from aer.schemas import GridSchema
@@ -8,7 +9,8 @@ from aer.spatial import get_utm_epsg_from_geometry, reproject_geom
 from majortom_eg.MajorTom import GridCell as BaseGridCell
 from majortom_eg.MajorTom import MajorTomGrid
 from pandera.typing.geopandas import GeoDataFrame
-from shapely.geometry import Polygon
+from pyresample.geometry import AreaDefinition
+from shapely.geometry import Point, Polygon
 from shapely.geometry.base import BaseGeometry
 
 
@@ -38,7 +40,6 @@ class GridCell(BaseGridCell):
         """
         Converts the GridCell to a GeoDataFrame for easier spatial analysis and visualization.
         """
-        import geopandas as gpd
 
         return cast(
             GeoDataFrame,
@@ -62,6 +63,40 @@ class GridCell(BaseGridCell):
     def utm_footprint(self):
         return reproject_geom(self.geom, src_epsg="epsg:4326", dst_epsg=self.utm_crs)
 
+    def area_name(self, resolution: int) -> str:
+        """
+        Get the area name based on grid cell and a resolution in meters.
+        Args:
+            resolution (int): Resolution in meters
+        Returns:
+            str: Area name
+
+        """
+        return f"{self.id()}_dist-{self.D}m_res-{resolution}m"
+
+    @lru_cache(maxsize=8)
+    def area_def(self, resolution: int):
+        """Creates a Pyresample AreaDefinition for this grid cell's UTM footprint.
+        Args:
+            resolution (int): Resolution in meters
+        Returns:
+            AreaDefinition: Pyresample AreaDefinition
+        """
+        bounds = self.utm_footprint.bounds  # minx, miny, maxx, maxy
+        area_extent = (bounds[0], bounds[1], bounds[2], bounds[3])
+        width, height = (self.D // resolution, self.D // resolution)
+        area_name = self.area_name(resolution)
+        area_def = AreaDefinition(
+            area_id=area_name,
+            description=f"Area defined for {area_name} in {self.utm_crs}",
+            proj_id=self.utm_crs,
+            projection=self.utm_crs,
+            area_extent=area_extent,
+            width=width,
+            height=height,
+        )
+        return area_def
+
 
 class GridDefinition(MajorTomGrid):
     """
@@ -70,9 +105,23 @@ class GridDefinition(MajorTomGrid):
     """
 
     def __init__(self, d: int = 10000, overlap=False):
+        """
+        Initializes the GridDefinition with the specified grid distance and overlap option.
+        Args:
+            d (int): The grid distance in meters (default is 10,000).
+            overlap (bool): Whether to generate overlapping grid cells (default is False).
+        """
         super().__init__(d=d, overlap=overlap)
 
     def cell_from_id(self, cell_id: str) -> GridCell:
+        """
+        Overrides the base class method to support both old geohash IDs and new ESA Major TOM naming convention.
+
+        Args:
+            cell_id (str): The cell ID, which can be either an old geohash or a new ESA Major TOM name (e.g., "922U_249R" or "922U_249R_OV").
+        Returns:
+            GridCell: A GridCell object corresponding to the given cell ID.
+        """
         # Fallback: If no underscore, route to old geohash lookup logic
         if "_" not in cell_id:
             # Revert to base class method if it's an old geohash
@@ -132,8 +181,19 @@ class GridDefinition(MajorTomGrid):
             )
             return GridCell(self.D, overlap_poly, is_primary=False, cell_id=cell_id)
 
-    def get_cell_name(self, row_idx, col_idx, lon_spacing, is_primary=True) -> str:
-        """Generates the ESA Major TOM naming convention (e.g., 922D_249L)."""
+    def get_cell_name(
+        self, row_idx: int, col_idx: int, lon_spacing: float, is_primary=True
+    ) -> str:
+        """Generates the ESA Major TOM naming convention (e.g., 922D_249L).
+
+        Args:
+            row_idx (int): The row index of the cell.
+            col_idx (int): The column index of the cell.
+            lon_spacing (float): The longitude spacing for the current latitude.
+            is_primary (bool): Whether this is a primary cell or an overlapping cell.
+        Returns:
+            str: The generated cell name following the ESA Major TOM convention.
+        """
         # 1. Calculate row relative to the Equator
         rel_y = row_idx - int(self.row_count) // 2
         y_dir = "U" if rel_y >= 0 else "D"
@@ -152,6 +212,17 @@ class GridDefinition(MajorTomGrid):
         return name
 
     def generate_grid_cells(self, polygon: BaseGeometry) -> Sequence[GridCell]:
+        """
+        Generates grid cells that intersect with the given polygon. It processes the grid row by row,
+        calculating the appropriate longitude spacing and offsets for each latitude, and uses shapely's vectorized
+        geometry operations to efficiently determine which cells intersect the polygon.
+
+        Args:
+            polygon (BaseGeometry): The input polygon to intersect with the grid cells.
+        Returns:
+            Sequence[GridCell]: A list of GridCell objects that intersect with the input polygon.
+
+        """
         shapely.prepare(polygon)
         min_lon, min_lat, max_lon, max_lat = polygon.bounds
         if min_lon > max_lon:
@@ -221,3 +292,68 @@ class GridDefinition(MajorTomGrid):
                     cells.append(GridCell(self.D, poly, is_primary=False, cell_id=c_id))
 
         return cells
+
+    def to_esa_compatible_dataframe(self, cells: Sequence[GridCell]) -> GeoDataFrame:
+        """
+        Converts a sequence of GridCells into a GeoDataFrame that perfectly
+        matches the schema and formatting of the original ESA `Grid.points` dataframe.
+
+        Args:
+            cells (Sequence[GridCell]): A list of GridCell objects to convert.
+        Returns:
+            GeoDataFrame: A GeoDataFrame with columns and formatting identical to the ESA grid points.
+        """
+
+        data = {
+            "name": [],
+            "row": [],
+            "col": [],
+            "row_idx": [],
+            "col_idx": [],
+            "utm_zone": [],
+            "epsg": [],
+        }
+        geometries = []
+
+        for cell in cells:
+            # ESA's base grid dataframe only stored primary grid points, not overlaps
+            if not cell.is_primary:
+                continue
+
+            parts = cell.id().split("_")
+            r_str, c_str = parts[0], parts[1]
+
+            # ESA grid points are defined as the bottom-left corner of the cell
+            bottom_left = cell.geom.exterior.coords[0]
+            lon, lat = bottom_left[0], bottom_left[1]
+
+            # Reconstruct original ESA row_idx and col_idx
+            y_val = int(r_str[:-1])
+            rel_y = y_val if r_str[-1].upper() == "U" else -y_val
+            row_idx = rel_y + int(self.row_count) // 2
+
+            lon_spacing = self.get_lon_spacing(lat)
+            n_cols = round(360 / lon_spacing) if lon_spacing > 0 else 0
+            x_val = int(c_str[:-1])
+            rel_x = x_val if c_str[-1].upper() == "R" else -x_val
+            col_idx = rel_x + n_cols // 2
+
+            # Format the CRS to match ESA exactly (e.g., 'EPSG:32701' and '32701')
+            raw_crs = str(cell.utm_crs).upper()
+            epsg_str = raw_crs if "EPSG:" in raw_crs else f"EPSG:{raw_crs}"
+            utm_zone = epsg_str.split(":")[-1]
+
+            data["name"].append(cell.id())
+            data["row"].append(r_str)
+            data["col"].append(c_str)
+            data["row_idx"].append(row_idx)
+            data["col_idx"].append(col_idx)
+            data["utm_zone"].append(utm_zone)
+            data["epsg"].append(epsg_str)
+
+            geometries.append(Point(lon, lat))
+
+        # Return a GeoDataFrame with the exact same structure as the ESA one
+        return cast(
+            GeoDataFrame, gpd.GeoDataFrame(data, geometry=geometries, crs="EPSG:4326")
+        )
