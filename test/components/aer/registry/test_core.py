@@ -47,27 +47,24 @@ class InvalidPlugin:
 @pytest.fixture
 def mock_entry_points(monkeypatch):
     def mock_ep(group):
-        if group == "aer.search_providers":
+        if group == "aer.plugins":
             ep1 = MagicMock()
             ep1.name = "dummy_searcher"
             ep1.load.return_value = DummySearchProvider
 
             ep2 = MagicMock()
-            ep2.name = "invalid_searcher"
+            ep2.name = "invalid_plugin"
             ep2.load.return_value = InvalidPlugin
 
-            return [ep1, ep2]
-
-        elif group == "aer.extractors":
             ep3 = MagicMock()
             ep3.name = "dummy_extractor"
             ep3.load.return_value = DummyExtractor
 
             ep4 = MagicMock()
-            ep4.name = "failing_extractor"
+            ep4.name = "failing_plugin"
             ep4.load.side_effect = Exception("Failed to load")
 
-            return [ep3, ep4]
+            return [ep1, ep2, ep3, ep4]
         return []
 
     monkeypatch.setattr("importlib.metadata.entry_points", mock_ep)
@@ -79,8 +76,8 @@ def test_registry_discovery(mock_entry_points):
     assert "dummy_extractor" in registry._extractors
 
     # invalid and failing ones shouldn't be added
-    assert "invalid_searcher" not in registry._searchers
-    assert "failing_extractor" not in registry._extractors
+    assert "invalid_plugin" not in registry._searchers
+    assert "failing_plugin" not in registry._extractors
 
 
 def test_list_supported_collections(mock_entry_points):
