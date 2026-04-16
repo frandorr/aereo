@@ -65,6 +65,7 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260343-remove-abcs | Remove SearchPlugin ABCs, standardize on pluggy only | 2026-04-06 | e8067d1 | - |
 | 260409-product-based-dispatch | Add product-based plugin dispatch with PluginSelector | 2026-04-09 | 72d9605 | - |
 | 260344-modify-plugin-component-to-support-new-v | modify plugin component to support new version of simple hookspects and check mandatory impl of supported_collections() | 2026-04-15 | 13b0994 | [260344-modify-plugin-component-to-support-new-v](./quick/260344-modify-plugin-component-to-support-new-v/) |
+| 260416-mtk | give me an example script that uses plugin aer-search-aws-goes | 2026-04-16 | pending | [260416-mtk-give-me-an-example-script-that-uses-plug](./quick/260416-mtk-give-me-an-example-script-that-uses-plug/) |
 
 ## Progress
 
@@ -74,4 +75,4 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 
 ---
 
-*Last activity: 2026-04-15 - Completed quick task 260344: modify plugin component to support new version of simple hookspects and check mandatory impl of supported_collections()*
+*Last activity: 2026-04-16 - Completed quick task 260416-mtk: give me an example script that uses plugin aer-search-aws-goes with real data, store it in development/local/*
