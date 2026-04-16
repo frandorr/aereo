@@ -29,43 +29,30 @@ class AerRegistry:
         """Finds all installed packages declaring aer entry_points."""
         logger.info("Discovering aer plugins...")
 
-        # 1. Load Search Providers
-        searcher_eps = importlib.metadata.entry_points(group="aer.search_providers")
-        for ep in searcher_eps:
+        # Load all plugins from the unified aer.plugins group
+        eps = importlib.metadata.entry_points(group="aer.plugins")
+        for ep in eps:
             try:
                 plugin_class = ep.load()
-                if not issubclass(plugin_class, SearchProvider):
-                    logger.warning(
-                        f"Plugin '{ep.name}' does not inherit from SearchProvider. Skipping."
+
+                if issubclass(plugin_class, SearchProvider):
+                    self._searchers[ep.name] = plugin_class
+                    self._map_products(
+                        ep.name, plugin_class, self._collection_to_searchers
                     )
-                    continue
-
-                self._searchers[ep.name] = plugin_class
-                self._map_products(ep.name, plugin_class, self._collection_to_searchers)
-                logger.debug(f"Loaded searcher: {ep.name}")
-
-            except Exception as e:
-                logger.error(f"Failed to load searcher plugin '{ep.name}': {e}")
-
-        # 2. Load Extractors
-        extractor_eps = importlib.metadata.entry_points(group="aer.extractors")
-        for ep in extractor_eps:
-            try:
-                plugin_class = ep.load()
-                if not issubclass(plugin_class, Extractor):
-                    logger.warning(
-                        f"Plugin '{ep.name}' does not inherit from Extractor. Skipping."
+                    logger.debug(f"Loaded searcher: {ep.name}")
+                elif issubclass(plugin_class, Extractor):
+                    self._extractors[ep.name] = plugin_class
+                    self._map_products(
+                        ep.name, plugin_class, self._collection_to_extractors
                     )
-                    continue
-
-                self._extractors[ep.name] = plugin_class
-                self._map_products(
-                    ep.name, plugin_class, self._collection_to_extractors
-                )
-                logger.debug(f"Loaded extractor: {ep.name}")
-
+                    logger.debug(f"Loaded extractor: {ep.name}")
+                else:
+                    logger.warning(
+                        f"Plugin '{ep.name}' does not inherit from SearchProvider or Extractor. Skipping."
+                    )
             except Exception as e:
-                logger.error(f"Failed to load extractor plugin '{ep.name}': {e}")
+                logger.error(f"Failed to load plugin '{ep.name}': {e}")
 
     def _map_products(
         self, plugin_name: str, plugin_class: Type, target_map: Dict[str, List[str]]
