@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
+from functools import cached_property
 from typing import Any, Mapping, Sequence, cast
 
 import pandas as pd
+from aer.grid import GridCell, GridDefinition
 from aer.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
@@ -77,42 +79,114 @@ class SearchProvider(AerPlugin, plugin_abstract=True):
         ...
 
 
+class ExtractionTask:
+    def __init__(
+        self,
+        assets: GeoDataFrame[AssetSchema],
+        target_grid_d: int,
+        target_grid_overlap: bool,
+        resolution: float,
+        uri: str,
+        aoi: BaseGeometry | None = None,
+        task_context: dict[str, Any] | None = None,
+    ):
+        self.assets = assets
+        self.resolution = resolution
+        self.aoi = aoi
+        self._grid_d = target_grid_d
+        self._overlap = target_grid_overlap
+        self.uri = uri
+        self.task_context = task_context or {}
+
+    @cached_property
+    def overlapping_grid_cells(self) -> Sequence[GridCell]:
+        """
+        Calculates the intersecting grid cells for this specific task's AOI.
+        """
+        grid_def = GridDefinition(d=self._grid_d, overlap=self._overlap)
+        geometry = self.assets.union_all()
+        intersection = geometry.intersection(self.aoi) if self.aoi else geometry
+        grid_cells = grid_def.generate_grid_cells(intersection)
+        return grid_cells
+
+
 class Extractor(AerPlugin, plugin_abstract=True):
+    @property
     @abstractmethod
+    def target_grid_d(self) -> int:
+        """The size of the square grid cell in meters (e.g., 100000)."""
+        pass
+
+    @property
+    def target_grid_overlap(self) -> bool:
+        """Default overlap setting. Subclasses can override this."""
+        return False
+
     def prepare_for_extraction(
         self,
         search_results: GeoDataFrame[AssetSchema],
-        prepare_params: dict[str, Any] | None,
-    ) -> list[GeoDataFrame[AssetSchema]]:
+        target_aoi: BaseGeometry | None = None,
+        resolution: float | None = None,
+        uri: str | None = None,
+        prepare_params: dict[str, Any] | None = None,
+    ) -> Sequence[ExtractionTask]:
         """Prepare search results for extraction by grouping/filtering/transforming/etc
         them into one or more GeoDataFrames of extraction tasks.
         Each GeoDataFrame represents a batch of results that can be processed together for extraction.
 
         Args:
             search_results: The GeoDataFrame of search results to prepare for extraction.
+            target_aoi: The area of interest as a shapely geometry. This can be used to spatially filter or group the search results.
+            resolution: The desired resolution for extraction, which can be used to determine how to group or filter the search results.
+                It can be None if user prefers to infer resolution from the search results.
+            uri: An optional URI that can be used to define an output path or identifier for the extraction results.
+                This can be used to group search results that should be extracted together.
+                For example it can be a bucket.
+                It can be None if user prefers to infer uri from the search results or other parameters.
             prepare_params: Additional parameters for preparation,
                 user defined and specific to the collection, provider, outputs, etc.
 
         Returns:
-            A list of GeoDataFrames, each containing a batch of search results to be extracted together.
-            If you wish to extract each result individually, return a list where each element
+            A Sequence of ExtractionTask, each containing a batch of search results to be extracted together.
+            If you wish to extract each result individually, return a sequence where each extraction_task.assets
             is a single-row GeoDataFrame (e.g., `[results.iloc[[i]] for i in range(len(results))]`).
 
         """
-        ...
+
+        # Default implementation: one task per asset (no grouping), need resolution and uri to be defined for the task
+        if resolution is None or uri is None:
+            raise ValueError(
+                "Default prepare_for_extraction requires resolution and uri to be defined"
+                "If you want to prepare without resolution or uri, you need to override this method with a custom implementation."
+            )
+        tasks = []
+        for i in range(len(search_results)):
+            asset_batch = search_results.iloc[[i]]  # single-row GeoDataFrame
+            task = ExtractionTask(
+                assets=asset_batch,
+                target_grid_d=self.target_grid_d,
+                target_grid_overlap=self.target_grid_overlap,
+                resolution=resolution,
+                uri=uri,
+                aoi=target_aoi,
+                task_context={"prepare_params": prepare_params},
+            )
+            tasks.append(task)
+        return tasks
 
     @abstractmethod
     def extract(
         self,
-        assets_batch: GeoDataFrame[AssetSchema],
+        extraction_task: ExtractionTask,
         extract_params: dict[str, Any] | None,
     ) -> GeoDataFrame[ArtifactSchema]:
-        """Extract data for a batch of assets.
+        """Extract data for a batch of assets (equivalent to one item of the prepare_for_extraction output).
         Args:
-            assets_batch: A GeoDataFrame containing a batch of assets to extract.
-                This is one of the GeoDataFrames returned by the `prepare_for_extraction` hook.
+            extraction_task: An ExtractionTask containing a batch of assets to extract.
+                This is one of the items returned by the `prepare_for_extraction` method.
+                    extraction_task.task_context holds batch-specific data generated during preparation
             extract_params: Additional parameters for extraction,
-                user defined and specific to the collection, provider, outputs, etc.
+                user defined and specific to the collection, provider, outputs, etc. Holds global configuration (e.g. max_retries, credentials).
 
         Returns:
             A GeoDataFrame of extracted artifacts, where each row corresponds to an extracted asset
@@ -123,7 +197,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
 
     def extract_batches(
         self,
-        assets_batches: list[GeoDataFrame[AssetSchema]],
+        extraction_task_batch: Sequence[ExtractionTask],
         extract_params: dict[str, Any] | None = None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """
@@ -134,16 +208,17 @@ class Extractor(AerPlugin, plugin_abstract=True):
         multiprocessing, or distributed cloud compute) suited to their specific I/O profile.
 
         Args:
-            assets_batches: A list of GeoDataFrames, where each GeoDataFrame contains a batch
-                of assets to extract. This is the output of the `prepare_for_extraction` hook.
+            extraction_task_batch: A sequence of ExtractionTask, where each one contains a batch
+                of assets to extract. This is the output of the `prepare_for_extraction` method.
             extract_params: Additional parameters for extraction,
                 user defined and specific to the collection, provider, outputs, etc.
         Returns:
             A GeoDataFrame of extracted artifacts, where each row corresponds to an extracted asset
             and its corresponding grid_cell, and includes metadata such as collection, geometry,
         """
+        # default implementation: sequential execution of extract for each batch
         results = []
-        for batch in assets_batches:
+        for batch in extraction_task_batch:
             # We call the abstract method internally
             results.append(self.extract(batch, extract_params))
 
