@@ -71,3 +71,31 @@ def test_get_cell_name():
         row_idx=grid.row_count // 2 + 1, col_idx=60, lon_spacing=3.0, is_primary=False
     )
     assert "OV" in name_ov
+
+
+def test_grid_cell_area_name_and_def():
+    polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+    cell = core.GridCell(d=10000, geom=polygon, is_primary=True, cell_id="0U_0R")
+
+    assert cell.area_name(50) == "0U_0R_dist-10000m_res-50m"
+    area = cell.area_def(50)
+    assert area.area_id == "0U_0R_dist-10000m_res-50m"
+    assert area.width == 10000 // 50
+    assert area.height == 10000 // 50
+
+
+def test_to_esa_compatible_dataframe():
+    grid = core.GridDefinition(d=10000)
+    polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
+    cells = grid.generate_grid_cells(polygon)
+
+    gdf = grid.to_esa_compatible_dataframe(cells)
+    assert len(gdf) > 0
+    assert "name" in gdf.columns
+    assert "row" in gdf.columns
+    assert "col" in gdf.columns
+    assert "row_idx" in gdf.columns
+    assert "col_idx" in gdf.columns
+    assert "utm_zone" in gdf.columns
+    assert "epsg" in gdf.columns
+    assert gdf.crs == "EPSG:4326"
