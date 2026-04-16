@@ -4,7 +4,7 @@ requires = [ "hatch-polylith-bricks", "hatchling" ]
 
 [project]
 name = "aer-core"
-version = "3.4.0"
+version = "3.5.0"
 description = "A modular, high-performance capability-graph framework for processing Earth Observation sensor data."
 readme = "README.md"
 keywords = [
