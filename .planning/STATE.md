@@ -67,6 +67,8 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 | 260344-modify-plugin-component-to-support-new-v | modify plugin component to support new version of simple hookspects and check mandatory impl of supported_collections() | 2026-04-15 | 13b0994 | [260344-modify-plugin-component-to-support-new-v](./quick/260344-modify-plugin-component-to-support-new-v/) |
 | 260416-mtk | give me an example script that uses plugin aer-search-aws-goes | 2026-04-16 | pending | [260416-mtk-give-me-an-example-script-that-uses-plug](./quick/260416-mtk-give-me-an-example-script-that-uses-plug/) |
 
+| 260417 | Normalize collection names in AerClient search to match plugin supported_collections format | 2026-04-17 | 509769b | [260417-normalize-collection-names-in-aerclient-](./quick/260417-normalize-collection-names-in-aerclient-/) |
+
 ## Progress
 
 - Requirements: 11 defined
@@ -75,4 +77,4 @@ See: `.planning/PROJECT.md` (updated 2026-03-19)
 
 ---
 
-*Last activity: 2026-04-16 - Completed quick task 260416-mtk: give me an example script that uses plugin aer-search-aws-goes with real data, store it in development/local/*
+*Last activity: 2026-04-17 - Completed quick task 260417: Normalize collection names in AerClient search to match plugin supported_collections format*
