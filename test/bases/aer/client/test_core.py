@@ -54,6 +54,41 @@ def test_client_search_success(monkeypatch):
     assert isinstance(search_context.search_results, pd.DataFrame)
 
 
+def test_client_search_normalizes_collections(monkeypatch):
+    """Verify that collection names are normalized to lowercase before being passed to plugins."""
+    mock_registry = MagicMock(spec=AerRegistry)
+
+    # Setup mock registry to return valid dummy data for lowercase collection name
+    mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
+
+    mock_searcher = MagicMock()
+    monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "GOES-Abi1"
+    mock_searcher.search.return_value = valid_df
+
+    mock_registry.get_searcher.return_value = mock_searcher
+
+    client = AerClient(registry=mock_registry)
+
+    # Search with uppercase collection name - should be normalized to lowercase
+    client.search(
+        collections=["GOES-Abi1"],
+        start_datetime=None,
+        end_datetime=None,
+    )
+
+    # The plugin should receive lowercase collection name
+    call_args = mock_searcher.search.call_args
+    assert call_args is not None
+    passed_collections = list(call_args.kwargs.get("collections", []))
+    assert "goes-abi1" in passed_collections, (
+        f"Expected lowercase collection, got: {passed_collections}"
+    )
+
+
 def test_client_search_all_fail_strict():
     mock_registry = MagicMock(spec=AerRegistry)
     mock_registry.find_searchers_for.return_value = ["dummy_searcher"]

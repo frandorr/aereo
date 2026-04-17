@@ -100,6 +100,32 @@ def test_find_extractors_for(mock_entry_points):
     assert registry.find_extractors_for("Unknown") == []
 
 
+def test_case_insensitive_searcher_lookup(mock_entry_points):
+    """Test that find_searchers_for matches collections case-insensitively."""
+    registry = AerRegistry()
+    # Exact match
+    assert registry.find_searchers_for("DummyCollection1") == ["dummy_searcher"]
+    # Lowercase
+    assert registry.find_searchers_for("dummycollection1") == ["dummy_searcher"]
+    # Uppercase
+    assert registry.find_searchers_for("DUMMYCOLLECTION1") == ["dummy_searcher"]
+    # Mixed case (like the reported bug: "abi-L1b-RadC" vs "ABI-L1b-RadC")
+    assert registry.find_searchers_for("dummyCollection1") == ["dummy_searcher"]
+
+
+def test_case_insensitive_extractor_lookup(mock_entry_points):
+    """Test that find_extractors_for matches collections case-insensitively."""
+    registry = AerRegistry()
+    # Exact match
+    assert registry.find_extractors_for("DummyCollection2") == ["dummy_extractor"]
+    # Lowercase
+    assert registry.find_extractors_for("dummycollection2") == ["dummy_extractor"]
+    # Uppercase
+    assert registry.find_extractors_for("DUMMYCOLLECTION2") == ["dummy_extractor"]
+    # Mixed case
+    assert registry.find_extractors_for("DummyCollection2") == ["dummy_extractor"]
+
+
 def test_get_searcher(mock_entry_points):
     registry = AerRegistry()
 

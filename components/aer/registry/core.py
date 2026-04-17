@@ -22,6 +22,9 @@ class AerRegistry:
         self._collection_to_searchers: Dict[str, List[str]] = {}
         self._collection_to_extractors: Dict[str, List[str]] = {}
 
+        # Track original case for display in list_supported_collections
+        self._original_collections: Dict[str, str] = {}
+
         # Automatically load on instantiation
         self.discover_plugins()
 
@@ -57,28 +60,48 @@ class AerRegistry:
     def _map_products(
         self, plugin_name: str, plugin_class: Type, target_map: Dict[str, List[str]]
     ) -> None:
-        """Maps a plugin's supported_collections to the plugin name for fast lookups."""
+        """Maps a plugin's supported_collections to the plugin name for fast lookups.
+
+        Stores collection names in lowercase for case-insensitive matching,
+        while also tracking original case in _original_collections for display purposes.
+        """
         # supported_collections is guaranteed to exist by the ABC __init_subclass__ hook
         for product in plugin_class.supported_collections:
-            target_map.setdefault(product, []).append(plugin_name)
+            # Store in lowercase for case-insensitive lookups
+            lower_product = product.lower()
+            target_map.setdefault(lower_product, []).append(plugin_name)
+            # Track first seen original case for display
+            if lower_product not in self._original_collections:
+                self._original_collections[lower_product] = product
 
     # --- Public API for the CLI / Orchestrator ---
 
     def list_supported_collections(self) -> List[str]:
-        """Returns a list of all products supported by currently installed plugins."""
-        # Combine keys from both maps and return unique values
+        """Returns a list of all products supported by currently installed plugins.
+
+        Returns collection names in their original case as defined by plugins.
+        """
+        # Combine keys from both maps and return unique values in original case
         all_products = set(self._collection_to_searchers.keys()).union(
             set(self._collection_to_extractors.keys())
         )
-        return sorted(list(all_products))
+        # Map back to original case for display
+        display_names = [self._original_collections.get(p, p) for p in all_products]
+        return sorted(display_names)
 
     def find_searchers_for(self, collection_name: str) -> List[str]:
-        """Returns names of search plugins that support the requested collection."""
-        return self._collection_to_searchers.get(collection_name, [])
+        """Returns names of search plugins that support the requested collection.
+
+        Case-insensitive lookup.
+        """
+        return self._collection_to_searchers.get(collection_name.lower(), [])
 
     def find_extractors_for(self, collection_name: str) -> List[str]:
-        """Returns names of extraction plugins that support the requested collection."""
-        return self._collection_to_extractors.get(collection_name, [])
+        """Returns names of extraction plugins that support the requested collection.
+
+        Case-insensitive lookup.
+        """
+        return self._collection_to_extractors.get(collection_name.lower(), [])
 
     def get_searcher(self, plugin_name: str, **kwargs) -> SearchProvider:
         """Instantiates and returns a SearchProvider by name."""
