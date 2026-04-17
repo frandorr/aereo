@@ -288,13 +288,24 @@ class AerClient:
         # 1. Map plugins to collections safely
         searcher_to_collections = defaultdict(list)
         for collection in collections:
-            plugin_names = self.registry.find_searchers_for(collection)
-            if not plugin_names:
-                logger.warning("search_plugin_not_found", collection=collection)
-                continue
+            # check if there is a plugin_hint for this collection and if it's valid before falling back to registry discovery
+            # This prevents us from dispatching to unintended plugins if a user provides an incorrect hint
 
-            target_plugin = plugin_hints.get(collection, plugin_names[0])
-            searcher_to_collections[target_plugin].append(collection)
+            hint = plugin_hints.get(collection)
+            if hint:
+                target_plugin = hint
+            else:
+                plugin_names = self.registry.find_searchers_for(collection)
+                if not plugin_names:
+                    logger.warning(
+                        "Search skipped for collection with no registered plugin. \n"
+                        "You may want to check your registry configuration or plugin hints (e.g. plugin_hints={'a_collection': 'search_plugin'}",
+                        collection=collection,
+                    )
+                    continue
+
+                target_plugin = plugin_names[0]
+            searcher_to_collections[target_plugin].append(collection.lower())
 
         all_results = []
         errors = []
