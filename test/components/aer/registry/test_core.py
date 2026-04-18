@@ -144,3 +144,53 @@ def test_get_extractor(mock_entry_points):
 
     with pytest.raises(ValueError, match="not found or failed to load"):
         registry.get_extractor("missing_extractor")
+
+
+def test_get_collection_mapping_for_searcher(mock_entry_points):
+    """Test that collection names are mapped to plugin's declared format."""
+    registry = AerRegistry()
+
+    # Plugin declares supported_collections = ["DummyCollection1", "SharedCollection"]
+    # Should map user input (any case) to plugin's original case
+
+    # Exact match - returns original
+    result = registry.get_collection_mapping_for_searcher(
+        "dummy_searcher", ["DummyCollection1"]
+    )
+    assert result == ["DummyCollection1"]
+
+    # Uppercase - maps to original lower/uppercase combo
+    result = registry.get_collection_mapping_for_searcher(
+        "dummy_searcher", ["DUMMYCOLLECTION1"]
+    )
+    assert result == ["DummyCollection1"]
+
+    # Lowercase - maps to original
+    result = registry.get_collection_mapping_for_searcher(
+        "dummy_searcher", ["dummycollection1"]
+    )
+    assert result == ["DummyCollection1"]
+
+
+def test_get_collection_mapping_for_searcher_unknown_plugin(mock_entry_points):
+    """Test fallback when plugin is not found in mapping."""
+    registry = AerRegistry()
+
+    # Unknown plugin falls back to lowercase
+    result = registry.get_collection_mapping_for_searcher(
+        "unknown_plugin", ["SomeCollection"]
+    )
+    assert result == ["somecollection"]
+
+
+def test_get_collection_mapping_for_extractor(mock_entry_points):
+    """Test collection mapping for extractors."""
+    registry = AerRegistry()
+
+    # Plugin declares supported_collections = ["SharedCollection", "DummyCollection2"]
+    # Should map user input to plugin's original case
+
+    result = registry.get_collection_mapping_for_extractor(
+        "dummy_extractor", ["DUMMYCOLLECTION2"]
+    )
+    assert result == ["DummyCollection2"]

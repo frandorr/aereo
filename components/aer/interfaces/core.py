@@ -3,6 +3,7 @@ from datetime import datetime
 from functools import cached_property
 from typing import Any, Mapping, Sequence, cast
 
+import attrs
 import pandas as pd
 from aer.grid import GridCell, GridDefinition
 from aer.schemas import ArtifactSchema, AssetSchema
@@ -79,35 +80,45 @@ class SearchProvider(AerPlugin, plugin_abstract=True):
         ...
 
 
+@attrs.frozen
 class ExtractionTask:
-    def __init__(
-        self,
-        assets: GeoDataFrame[AssetSchema],
-        target_grid_d: int,
-        target_grid_overlap: bool,
-        resolution: float,
-        uri: str,
-        aoi: BaseGeometry | None = None,
-        task_context: dict[str, Any] | None = None,
-    ):
-        self.assets = assets
-        self.resolution = resolution
-        self.aoi = aoi
-        self._grid_d = target_grid_d
-        self._overlap = target_grid_overlap
-        self.uri = uri
-        self.task_context = task_context or {}
+    assets: GeoDataFrame[AssetSchema]
+    target_grid_d: int
+    target_grid_overlap: bool
+    resolution: float
+    uri: str
+    aoi: BaseGeometry | None = None
+    task_context: dict[str, Any] = attrs.field(factory=dict)
 
     @cached_property
     def overlapping_grid_cells(self) -> Sequence[GridCell]:
         """
         Calculates the intersecting grid cells for this specific task's AOI.
         """
-        grid_def = GridDefinition(d=self._grid_d, overlap=self._overlap)
+        grid_def = GridDefinition(
+            d=self.target_grid_d,
+            overlap=self.target_grid_overlap,
+        )
+
         geometry = self.assets.union_all()
         intersection = geometry.intersection(self.aoi) if self.aoi else geometry
-        grid_cells = grid_def.generate_grid_cells(intersection)
-        return grid_cells
+
+        return grid_def.generate_grid_cells(intersection)
+
+    def __repr__(self) -> str:
+        n_assets = len(self.assets) if self.assets is not None else 0
+        geom_type = getattr(self.aoi, "geom_type", None)
+
+        return (
+            f"{self.__class__.__name__}("
+            f"n_assets={n_assets}, "
+            f"resolution={self.resolution}, "
+            f"grid_d={self.target_grid_d}, "
+            f"overlap={self.target_grid_overlap}, "
+            f"aoi={geom_type}, "
+            f"uri='{self.uri}'"
+            f")"
+        )
 
 
 class Extractor(AerPlugin, plugin_abstract=True):
