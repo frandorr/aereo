@@ -1,15 +1,15 @@
 # aer 🪐
 
-**aer** (from the Greek word for *air*) is a modular, high-performance Python framework designed for satellite data discovery, extraction, and processing. Built with the [Polylith architecture](https://davidvujic.github.io/python-polylith-docs/setup/) and powered by `uv`, it provides an extensible foundation for handling multi-sensor Earth observation data (GOES, VIIRS, MODIS, Sentinel-3) with a focus on type-safety and cloud-native workflows.
+**aer** (from the Greek word for *air*) is a modular, high-performance Python framework for satellite data discovery, extraction, and processing. Built with the [Polylith architecture](https://davidvujic.github.io/python-polylith-docs/setup/) and powered by `uv`, it provides an extensible foundation for handling multi-sensor Earth observation data with a focus on type-safety and cloud-native workflows.
 
 ---
 
 ## 🚀 Key Features
 
 *   **Modular Architecture**: Built using Python Polylith. Logic is decoupled into reusable `components`, while `projects` assemble them into deployable artifacts.
-*   **Instrument-Agnostic Domain Models**: Strongly typed definitions for `spectral` bands, `spatial` grids, and `temporal` ranges.
-*   **Extensible Plugin System**: A registry-based system that allows seamless addition of new search methods, instruments, and products via Python entry points.
-*   **Cloud-Native Search**: Native integration with NASA Earthdata via the `search-earthaccess` plugin, returning type-validated `GeoDataFrame` objects with granule footprints.
+*   **Instrument-Agnostic Domain Models**: Strongly typed definitions for `spectral` bands, `spatial` grids, and `temporal` ranges — independent of any specific satellite mission.
+*   **Extensible Plugin System**: A registry-based system that allows seamless addition of new search and extraction capabilities via standard Python entry points.
+*   **MajorTOM-Compatible Grid Engine**: First-class support for the ESA MajorTOM grid naming convention, with vectorized grid cell generation and UTM-projected area definitions.
 *   **Performance First**: Leverages `uv` for lightning-fast dependency management and `attrs` for efficient data modeling.
 
 ---
@@ -18,8 +18,9 @@
 
 The codebase is organized into interchangeable bricks:
 
-*   **`components/aer/`**: Reusable functional blocks (e.g., `spectral`, `spatial`, `temporal`, `search`).
-*   **`projects/`**: Deployable artifacts (e.g., `aer-search-earthaccess`). These assemble components and define plugin entry points.
+*   **`components/aer/`**: Reusable functional blocks (e.g., `spectral`, `spatial`, `temporal`, `grid`, `schemas`, `interfaces`, `registry`).
+*   **`bases/aer/client/`**: The orchestration client (`AerClient`) that wires registry, search, preparation, and extraction into a unified pipeline.
+*   **`projects/`**: Deployable packages (e.g., `aer-core`). These assemble components and bases into installable distributions.
 *   **`test/`**: Mirrors the component structure for unit testing, plus `test/integration` for cross-component validation.
 
 ---
@@ -30,9 +31,10 @@ The codebase is organized into interchangeable bricks:
 
 ### How It Works
 
-1. **Plugins** are discovered via Python entry points mapped to interfaces (`SearchProvider`, `Extractor`)
-2. **Collection-based dispatch** automatically routes tasks to the correct plugins via `AerRegistry`
-3. **Simple Pipeline API** for users via `AerClient`: `search` → `prepare` → `extract`
+1. **Plugins** are discovered via Python entry points under the `aer.plugins` group.
+2. **Collection-based dispatch** automatically routes tasks to the correct plugin via `AerRegistry`: each plugin declares which data collections it supports.
+3. **Typed interfaces** define the contract: plugins inherit from `SearchProvider` (data discovery) or `Extractor` (data retrieval and processing).
+4. **Pipeline API** for users via `AerClient`: `search` → `prepare` → `extract`.
 
 ### Discovery & Registry
 
@@ -42,83 +44,130 @@ Plugins are automatically loaded and instantiated by the `AerClient` and `AerReg
 from aer.client import AerClient
 from aer.registry import AerRegistry
 
-# View available plugins
+# View available plugins and collections
 registry = AerRegistry()
-collections = registry.list_supported_collections()  # ["goes-16", "HLSL30", ...]
+collections = registry.list_supported_collections()  # e.g. ["abi-l1b-radc", "VJ203IMG", ...]
 
 # The client orchestrates tasks across plugins automatically
 client = AerClient(registry=registry)
-search_ctx = client.search(collections=["goes-16"])
 ```
 
 ### Creating a New Plugin
 
-`aer` relies on object-oriented inheritance for new plugins. To create a new search backend, you must:
+`aer` relies on class-based inheritance for new plugins. To create a new search or extraction backend:
 
-**1. Inherit from a core interface** and implement methods. E.g. `SearchProvider` or `Extractor`:
+**1. Inherit from a core interface** and implement the required methods:
 
 ```python
 from aer.interfaces import SearchProvider
 from datetime import datetime
-from typing import Sequence, Optional, Mapping, Any
+from typing import Sequence, Mapping, Any
 
 class MySearchPlugin(SearchProvider):
     # MANDATORY: declares which collections this plugin handles
-    supported_collections = ["goes-16", "goes-18"]
+    supported_collections = ["my-collection-l1", "my-collection-l2"]
 
     def search(
         self,
         collections: Sequence[str],
-        intersects: Optional[Any] = None,
-        start_datetime: Optional[datetime] = None,
-        end_datetime: Optional[datetime] = None,
-        search_params: Optional[Mapping[str, Any]] = None,
+        intersects: Any | None = None,
+        start_datetime: datetime | None = None,
+        end_datetime: datetime | None = None,
+        search_params: Mapping[str, Any] | None = None,
     ):
-        # Your search implementation returning standard GeoDataFrame schemas
-        return df
+        # Your search implementation returning a GeoDataFrame[AssetSchema]
+        ...
 ```
 
 **2. Register via entry points** in your `pyproject.toml`:
 
 ```toml
-[project.entry-points."aer.search_providers"]
-my_plugin = "my_package.plugin:MySearchPlugin"
+[project.entry-points."aer.plugins"]
+my_search = "my_package.plugin:MySearchPlugin"
 ```
 
 Find the full walkthrough for writing new plugins in our [Plugin Developer Guide](./docs/build-your-own-plugin.md).
 
 ---
 
-## 🛠 Usage Example
+## 🛠 Usage Examples
 
-The complete pipeline is seamlessly managed by `AerClient`: `search` → `prepare` → `extract`
+### 1. Search Only
+
+Use `AerClient.search()` to discover data across any installed search plugin. Results are returned as a schema-validated `GeoDataFrame`:
 
 ```python
-from aer.client import AerClient, FailureMode
-from datetime import datetime
+from datetime import datetime, timezone
+from aer.client import AerClient
 
 client = AerClient()
 
-# Execute the entire workflow in one command!
-results_df = client.run_pipeline(
-    collections=["goes-16", "HLSL30"],
-    start_datetime=datetime(2024, 8, 1),
-    end_datetime=datetime(2024, 8, 2),
-    intersects=my_geometry,
-    failure_mode=FailureMode.BEST_EFFORT # Continue even if one plugin fails
+# Search for data in a collection supported by an installed plugin
+search_ctx = client.search(
+    collections=["my-collection-l1"],
+    start_datetime=datetime(2026, 1, 1, 10, 0, tzinfo=timezone.utc),
+    end_datetime=datetime(2026, 1, 1, 18, 0, tzinfo=timezone.utc),
+    search_params={"channels": ["1", "13"]},
 )
 
-print(f"Extracted {len(results_df)} assets successfully!")
+results = search_ctx.search_results
+print(f"Found {len(results)} assets")
+print(results[["collection", "start_time", "href"]].head())
 ```
 
-**Available Pipeline methods:**
+### 2. Search + Prepare + Extract
+
+After searching, prepare batches and run extraction through the installed extractor plugin:
+
+```python
+from aer.client import AerClient, FailureMode
+from datetime import datetime, timezone
+
+client = AerClient()
+
+# Step 1: Search
+search_ctx = client.search(
+    collections=["my-collection-l1"],
+    start_datetime=datetime(2026, 1, 1, tzinfo=timezone.utc),
+    end_datetime=datetime(2026, 1, 2, tzinfo=timezone.utc),
+)
+
+# Step 2: Prepare — groups search results into extraction tasks
+prep_ctx = search_ctx.prepare()
+
+# Step 3: Extract — runs each extractor plugin on its assigned tasks
+artifacts = prep_ctx.extract(failure_mode=FailureMode.BEST_EFFORT)
+print(f"Extracted {len(artifacts)} artifacts")
+```
+
+### 3. Full Pipeline (one-liner)
+
+Use `run_pipeline()` for the entire `search → prepare → extract` lifecycle:
+
+```python
+from aer.client import AerClient, FailureMode
+from datetime import datetime, timezone
+
+client = AerClient()
+
+artifacts_df = client.run_pipeline(
+    collections=["my-collection-l1"],
+    start_datetime=datetime(2026, 1, 1, tzinfo=timezone.utc),
+    end_datetime=datetime(2026, 1, 2, tzinfo=timezone.utc),
+    failure_mode=FailureMode.BEST_EFFORT,
+)
+
+print(f"Pipeline complete: {len(artifacts_df)} artifacts extracted")
+```
+
+### Available Pipeline API
 
 | Method | Description |
 |----------|-------------|
 | `AerClient.search(...)` | Search for data by collection identifiers, returning `SearchResultContext` |
 | `SearchResultContext.prepare(...)` | Group search results into extraction tasks (`PreparedExtractionContext`) |
-| `PreparedExtractionContext.extract(...)` | Execute download and extraction for grouped tasks |
-| `AerClient.run_pipeline(...)` | Syntactic sugar wrapping all three steps consecutively |
+| `PreparedExtractionContext.extract(...)` | Execute extraction for grouped tasks |
+| `AerClient.run_pipeline(...)` | Convenience wrapper running all three steps sequentially |
 
 ---
 
@@ -127,8 +176,17 @@ print(f"Extracted {len(results_df)} assets successfully!")
 ### Prerequisites
 *   [uv](https://github.com/astral-sh/uv) (required for dependency management)
 
-### Setup
-Clone the repository and sync the workspace:
+### Install `aer-core`
+
+```bash
+pip install aer-core
+```
+
+Then install the plugins you need. Search and extraction plugins are distributed as separate packages — install them to unlock specific data collection support.
+
+### Development Setup
+
+Clone the repository and sync the workspace for local development:
 
 ```bash
 git clone https://github.com/frandorr/aer.git
@@ -160,8 +218,8 @@ uv run pytest test/components/aer/spectral/
 
 ### Core Conventions
 *   **Public API**: Only symbols exported in `__init__.py` via `__all__` should be imported by other components.
-*   **Type Hinting**: `aer` uses strict type checking (Pydantic, attrs, returns).
-*   **Plugin registration**: Follow the patterns in `aer.plugins` and `aer.bootstrap`.
+*   **Type Hinting**: `aer` uses strict type checking with `attrs`-based models and `pandera` schema validation.
+*   **Plugin registration**: Plugins register under the `aer.plugins` entry point group and inherit from `SearchProvider` or `Extractor`.
 
 ---
 
