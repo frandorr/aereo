@@ -8,7 +8,7 @@ The **best and easiest approach** for building an `aer` plugin is to create a se
 
 ## Step 1: Bootstrap Your Repository
 
-We recommend using the [`aer-plugin-template`](https://github.com/frandorr/aer-plugin-template) as the foundation for your plugin. It comes pre-configured with the standard Python tooling (`uv`, `ruff`, `mypy`, `pytest` etc.) used across the `aer` ecosystem.
+We recommend using the [`aer-plugin-template`](https://github.com/frandorr/aer-plugin-template) as the foundation for your plugin. It comes pre-configured with the standard Python tooling (`uv`, `ruff`, `pyright`, `pytest` etc.) used across the `aer` ecosystem.
 
 1. Go to [https://github.com/frandorr/aer-plugin-template](https://github.com/frandorr/aer-plugin-template).
 2. Click **Use this template** -> **Create a new repository**.
@@ -166,14 +166,12 @@ class AcmeExtractor(Extractor):
 
 `aer` discovers third-party plugins automatically using **Python Entry Points**.
 
-Add the plugin class paths to your `pyproject.toml` under the custom `aer.search_providers` and `aer.extractors` groups:
+Add the plugin class paths to your `pyproject.toml` under the unified `aer.plugins` group:
 
 ```toml
-[project.entry-points."aer.search_providers"]
+[project.entry-points."aer.plugins"]
 # alias = "module.path:ClassName"
 acme_search = "acme_plugin.search:AcmeSearchProvider"
-
-[project.entry-points."aer.extractors"]
 acme_extract = "acme_plugin.extract:AcmeExtractor"
 ```
 
