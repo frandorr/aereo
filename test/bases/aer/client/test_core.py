@@ -6,6 +6,7 @@ from shapely.geometry import Point
 from aer.registry.core import AerRegistry
 from aer.client.core import AerClient, FailureMode, normalize_geometry
 from aer.schemas.core import AssetSchema, ArtifactSchema
+from aer.interfaces.core import ExtractionTask
 
 
 def test_normalize_geometry_dict_to_shapely():
@@ -42,16 +43,16 @@ def test_client_search_success(monkeypatch):
     client = AerClient(registry=mock_registry)
 
     # 1. Search
-    search_context = client.search(
+    search_results = client.search(
         collections=["MODIS"], intersects={"type": "Point", "coordinates": [0, 0]}
     )
 
     # Validations
-    assert len(search_context.search_results) == 2
+    assert len(search_results) == 2
     mock_registry.find_searchers_for.assert_called_with("MODIS")
     mock_registry.get_searcher.assert_called_with("dummy_searcher")
     mock_searcher.search.assert_called_once()
-    assert isinstance(search_context.search_results, pd.DataFrame)
+    assert isinstance(search_results, pd.DataFrame)
 
 
 def test_client_search_normalizes_collections(monkeypatch):
@@ -122,10 +123,10 @@ def test_client_search_all_fail_best_effort():
     client = AerClient(registry=mock_registry)
 
     # Will not raise, returns an empty geometry
-    search_ctx = client.search(
+    search_results = client.search(
         collections=["MODIS"], failure_mode=FailureMode.BEST_EFFORT
     )
-    assert len(search_ctx.search_results) == 0
+    assert len(search_results) == 0
 
 
 def test_client_run_pipeline_e2e(monkeypatch):
@@ -150,8 +151,17 @@ def test_client_run_pipeline_e2e(monkeypatch):
     # -- Extractor Setup --
     mock_registry.find_extractors_for.return_value = ["dummy_extractor"]
     mock_extractor = MagicMock()
-    # It must prepare and return a list of dfs
-    mock_extractor.prepare_for_extraction.return_value = [valid_search_df]
+    from typing import cast
+    from pandera.typing.geopandas import GeoDataFrame
+
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_search_df),
+        target_grid_d=10000,
+        target_grid_overlap=False,
+        resolution=10,
+        uri="test-uri",
+    )
+    mock_extractor.prepare_for_extraction.return_value = [task]
     # It must extract and return an ArtifactSchema
     valid_artifact_df = pd.DataFrame(
         columns=list(ArtifactSchema.to_schema().columns.keys())

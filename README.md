@@ -103,14 +103,13 @@ from aer.client import AerClient
 client = AerClient()
 
 # Search for data in a collection supported by an installed plugin
-search_ctx = client.search(
+results = client.search(
     collections=["my-collection-l1"],
     start_datetime=datetime(2026, 1, 1, 10, 0, tzinfo=timezone.utc),
     end_datetime=datetime(2026, 1, 1, 18, 0, tzinfo=timezone.utc),
     search_params={"channels": ["1", "13"]},
 )
 
-results = search_ctx.search_results
 print(f"Found {len(results)} assets")
 print(results[["collection", "start_time", "href"]].head())
 ```
@@ -126,17 +125,21 @@ from datetime import datetime, timezone
 client = AerClient()
 
 # Step 1: Search
-search_ctx = client.search(
+search_results = client.search(
     collections=["my-collection-l1"],
     start_datetime=datetime(2026, 1, 1, tzinfo=timezone.utc),
     end_datetime=datetime(2026, 1, 2, tzinfo=timezone.utc),
 )
 
 # Step 2: Prepare — groups search results into extraction tasks
-prep_ctx = search_ctx.prepare()
+tasks = client.prepare_for_extraction(
+    search_results,
+    resolution=1000.0,
+    uri="s3://my-output-bucket/",
+)
 
 # Step 3: Extract — runs each extractor plugin on its assigned tasks
-artifacts = prep_ctx.extract(failure_mode=FailureMode.BEST_EFFORT)
+artifacts = client.extract_batches(tasks, failure_mode=FailureMode.BEST_EFFORT)
 print(f"Extracted {len(artifacts)} artifacts")
 ```
 
@@ -164,9 +167,9 @@ print(f"Pipeline complete: {len(artifacts_df)} artifacts extracted")
 
 | Method | Description |
 |----------|-------------|
-| `AerClient.search(...)` | Search for data by collection identifiers, returning `SearchResultContext` |
-| `SearchResultContext.prepare(...)` | Group search results into extraction tasks (`PreparedExtractionContext`) |
-| `PreparedExtractionContext.extract(...)` | Execute extraction for grouped tasks |
+| `AerClient.search(...)` | Search for data by collection identifiers, returning `GeoDataFrame` |
+| `AerClient.prepare_for_extraction(...)` | Group search results into extraction tasks (`Sequence[ExtractionTask]`) |
+| `AerClient.extract_batches(...)` | Execute extraction for grouped tasks returning `GeoDataFrame` |
 | `AerClient.run_pipeline(...)` | Convenience wrapper running all three steps sequentially |
 
 ---
