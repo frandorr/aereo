@@ -99,3 +99,96 @@ def test_to_esa_compatible_dataframe():
     assert "utm_zone" in gdf.columns
     assert "epsg" in gdf.columns
     assert gdf.crs == "EPSG:4326"
+
+
+# --- AreaDef tests ---
+
+
+def test_area_def_is_frozen():
+    """AreaDef must be immutable (attrs.frozen)."""
+    ad = core.AreaDef(
+        area_id="test",
+        description="test area",
+        projection="EPSG:32720",
+        width=50,
+        height=50,
+        area_extent=(0.0, 0.0, 100000.0, 100000.0),
+    )
+    import attrs
+    import pytest
+
+    with pytest.raises(attrs.exceptions.FrozenInstanceError):
+        ad.area_id = "changed"  # type: ignore[misc]
+
+
+def test_area_def_to_yaml_structure():
+    """to_yaml() must produce valid YAML with all required pyresample keys."""
+    ad = core.AreaDef(
+        area_id="cell_1",
+        description="Area defined for cell_1 in EPSG:32720",
+        projection="EPSG:32720",
+        width=50,
+        height=50,
+        area_extent=(500000.0, 6000000.0, 600000.0, 6100000.0),
+    )
+    yaml_str = ad.to_yaml()
+    assert "cell_1:" in yaml_str
+    assert "EPSG: 32720" in yaml_str
+    assert "height: 50" in yaml_str
+    assert "width: 50" in yaml_str
+    assert "lower_left_xy: [500000.0, 6000000.0]" in yaml_str
+    assert "upper_right_xy: [600000.0, 6100000.0]" in yaml_str
+    assert "units: m" in yaml_str
+
+
+def test_area_def_returns_area_def_type():
+    """GridCell.area_def() must return an AreaDef instance."""
+    polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+    cell = core.GridCell(d=100000, geom=polygon, is_primary=True, cell_id="0U_0R")
+    ad = cell.area_def(2000)
+    assert isinstance(ad, core.AreaDef)
+    assert ad.width == 100000 // 2000
+    assert ad.height == 100000 // 2000
+    # projection can be "EPSG:32631" or just "32631"
+    epsg_code = ad.projection.split(":")[-1] if ":" in ad.projection else ad.projection
+    assert epsg_code.isdigit()
+
+
+def test_area_def_from_generated_cell():
+    """AreaDef from a real grid-generated cell should have valid extent and CRS."""
+    from shapely.geometry import Point
+
+    grid = core.GridDefinition(d=100000)
+    cells = grid.generate_grid_cells(Point(-64.0, -31.4).buffer(0.1))
+    assert len(cells) > 0
+    ad = cells[0].area_def(2000)
+    assert isinstance(ad, core.AreaDef)
+    assert ad.width == 50
+    assert ad.height == 50
+    # Extent should have min < max for both x and y
+    assert ad.area_extent[0] < ad.area_extent[2]
+    assert ad.area_extent[1] < ad.area_extent[3]
+
+
+def test_area_def_yaml_round_trip_with_pyresample():
+    """to_yaml() output must be loadable by pyresample.area_config.load_area_from_string."""
+    try:
+        from pyresample.area_config import load_area_from_string
+    except ImportError:
+        import pytest
+
+        pytest.skip("pyresample not installed")
+
+    ad = core.AreaDef(
+        area_id="test_roundtrip",
+        description="Round-trip test area in EPSG:32720",
+        projection="EPSG:32720",
+        width=50,
+        height=50,
+        area_extent=(500000.0, 6000000.0, 600000.0, 6100000.0),
+    )
+    area = load_area_from_string(ad.to_yaml(), ad.area_id)
+    assert area is not None and not isinstance(area, list)
+    assert area.width == ad.width
+    assert area.height == ad.height
+    assert area.area_extent == ad.area_extent

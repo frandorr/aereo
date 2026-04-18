@@ -1,6 +1,7 @@
 from functools import cached_property, lru_cache
 from typing import Sequence, cast
 
+import attrs
 import geopandas as gpd
 import numpy as np
 import shapely
@@ -9,9 +10,55 @@ from aer.spatial import get_utm_epsg_from_geometry, reproject_geom
 from majortom_eg.MajorTom import GridCell as BaseGridCell
 from majortom_eg.MajorTom import MajorTomGrid
 from pandera.typing.geopandas import GeoDataFrame
-from pyresample.geometry import AreaDefinition
 from shapely.geometry import Point, Polygon
 from shapely.geometry.base import BaseGeometry
+
+
+@attrs.frozen
+class AreaDef:
+    """Lightweight, pyresample-free area definition.
+
+    Holds the geometric parameters that fully describe a pyresample
+    AreaDefinition without importing it.  Use :meth:`to_yaml` to produce
+    a YAML string loadable by
+    ``pyresample.area_config.load_area_from_string``.
+    """
+
+    area_id: str
+    description: str
+    projection: str  # EPSG string, e.g. "EPSG:32720"
+    width: int
+    height: int
+    area_extent: tuple[float, float, float, float]  # (min_x, min_y, max_x, max_y)
+
+    def to_yaml(self) -> str:
+        """Serialise to a YAML string that pyresample can load.
+
+        Usage in downstream plugins::
+
+            from pyresample.area_config import load_area_from_string
+            area = load_area_from_string(my_area.to_yaml(), my_area.area_id)
+        """
+        # Extract numeric EPSG code regardless of whether projection
+        # is stored as "EPSG:32720" or plain "32720"
+        epsg_code = (
+            self.projection.split(":")[-1]
+            if ":" in self.projection
+            else self.projection
+        )
+        return (
+            f"{self.area_id}:\n"
+            f"  description: {self.description}\n"
+            f"  projection:\n"
+            f"    EPSG: {epsg_code}\n"
+            f"  shape:\n"
+            f"    height: {self.height}\n"
+            f"    width: {self.width}\n"
+            f"  area_extent:\n"
+            f"    lower_left_xy: [{self.area_extent[0]}, {self.area_extent[1]}]\n"
+            f"    upper_right_xy: [{self.area_extent[2]}, {self.area_extent[3]}]\n"
+            f"    units: m\n"
+        )
 
 
 class GridCell(BaseGridCell):
@@ -75,27 +122,28 @@ class GridCell(BaseGridCell):
         return f"{self.id()}_dist-{self.D}m_res-{resolution}m"
 
     @lru_cache(maxsize=8)
-    def area_def(self, resolution: int):
-        """Creates a Pyresample AreaDefinition for this grid cell's UTM footprint.
+    def area_def(self, resolution: int) -> AreaDef:
+        """Creates an AreaDef for this grid cell's UTM footprint.
+
         Args:
             resolution (int): Resolution in meters
         Returns:
-            AreaDefinition: Pyresample AreaDefinition
+            AreaDef: Lightweight area definition. Use ``to_yaml()`` to
+                convert to a YAML string loadable by pyresample.
         """
         bounds = self.utm_footprint.bounds  # minx, miny, maxx, maxy
         area_extent = (bounds[0], bounds[1], bounds[2], bounds[3])
-        width, height = (self.D // resolution, self.D // resolution)
+        width = self.D // resolution
+        height = self.D // resolution
         area_name = self.area_name(resolution)
-        area_def = AreaDefinition(
+        return AreaDef(
             area_id=area_name,
             description=f"Area defined for {area_name} in {self.utm_crs}",
-            proj_id=self.utm_crs,
-            projection=self.utm_crs,
-            area_extent=area_extent,
+            projection=str(self.utm_crs),
             width=width,
             height=height,
+            area_extent=area_extent,
         )
-        return area_def
 
 
 class GridDefinition(MajorTomGrid):
