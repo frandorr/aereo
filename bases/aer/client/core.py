@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Any, Mapping, Optional, Sequence, cast
 
 import pandas as pd
-from aer.interfaces.core import Extractor
+from aer.interfaces.core import ExtractionTask, Extractor
 from aer.registry.core import AerRegistry
 from aer.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -38,7 +38,7 @@ class ExtractorBatch:
     """Explicit mapping linking an Extractor instance to its specific task workloads."""
 
     extractor: Extractor
-    batches: list[GeoDataFrame[AssetSchema]]
+    batches: Sequence[ExtractionTask]
 
 
 class PreparedExtractionContext:
@@ -188,7 +188,9 @@ class SearchResultContext:
             )
 
             batches = extractor.prepare_for_extraction(
-                cast(GeoDataFrame, df_group), prepare_params
+                cast(GeoDataFrame, df_group),
+                target_aoi=None,
+                prepare_params=prepare_params,
             )
             extractor_map.append(ExtractorBatch(extractor=extractor, batches=batches))
 
@@ -305,7 +307,12 @@ class AerClient:
                     continue
 
                 target_plugin = plugin_names[0]
-            searcher_to_collections[target_plugin].append(collection.lower())
+
+            # Map user's collection name to the plugin's declared format
+            mapped_collections = self.registry.get_collection_mapping_for_searcher(
+                target_plugin, [collection]
+            )
+            searcher_to_collections[target_plugin].extend(mapped_collections)
 
         all_results = []
         errors = []
