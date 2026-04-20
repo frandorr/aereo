@@ -44,8 +44,10 @@ optional-dependencies.earthaccess = [ "aer-search-earthaccess>=1.1.1" ]
 [dependency-groups]
 dev = [
   "aer-extract-aws-goes",
+  "aer-extract-pc-sentinel2",
   "aer-search-aws-goes>=2",
   "aer-search-earthaccess>=2.0.3,<3",
+  "aer-search-pc-sentinel2",
   "basedpyright>=1.38",
   "cartopy>=0.25",
   "graphviz>=0.21",
@@ -65,8 +67,10 @@ metadata.allow-direct-references = true
 [tool.uv]
 sources.aer-core = { path = "projects/aer-core", editable = true }
 sources.aer-extract-aws-goes = { path = "../aer-extract-aws-goes/projects/aer-extract-aws-goes", editable = true }
+sources.aer-extract-pc-sentinel2 = { path = "../aer-extract-pc-sentinel2/projects/aer-extract-pc-sentinel2", editable = true }
 sources.aer-search-aws-goes = { path = "../aer-search-aws-goes/projects/aer-search-aws-goes", editable = true }
 sources.aer-search-earthaccess = { path = "../aer-search-earthaccess/projects/aer-search-earthaccess", editable = true }
+sources.aer-search-pc-sentinel2 = { path = "../aer-search-pc-sentinel2/projects/aer-search-pc-sentinel2", editable = true }
 managed = true
 workspace.members = [ "projects/*" ]
 

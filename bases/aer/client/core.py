@@ -5,9 +5,10 @@ from enum import Enum
 from typing import Any, Mapping, Optional, Sequence, cast
 
 import pandas as pd
-from aer.interfaces.core import ExtractionTask
-from aer.registry.core import AerRegistry
-from aer.schemas.core import ArtifactSchema, AssetSchema
+import json
+from aer.interfaces import ExtractionTask
+from aer.registry import AerRegistry
+from aer.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
@@ -59,6 +60,66 @@ class AerClient:
         """
         self.registry = registry or AerRegistry()
 
+    @staticmethod
+    def _normalize_hints(hints: dict[str, str]) -> dict[str, str]:
+        """Return a copy of *hints* with all keys lowercased.
+
+        This makes plugin_hints lookups case-insensitive: the user can write
+        ``{"Sentinel-2-L2A": "my_plugin"}`` and the lookup against
+        ``"sentinel-2-l2a"`` (the value stored by the registry) will still
+        resolve correctly.
+        """
+        return {k.lower(): v for k, v in hints.items()}
+
+    def _resolve_params(
+        self, params: Optional[Mapping[str, Any]], collection: str
+    ) -> Mapping[str, Any]:
+        """Resolves parameters for a specific collection by merging global and per-collection overrides.
+
+        All collection-name key lookups are case-insensitive: the user can write
+        ``"Sentinel-2-L2A"``, ``"sentinel-2-l2a"``, or ``"SENTINEL-2-L2A"`` in
+        ``params`` and the right override will always be applied.
+
+        Algorithm:
+          1. Build a lowercase-key index of ``params`` for case-insensitive matching.
+          2. Start with non-collection-name params (global params).
+          3. Merge the per-collection override block (if present) on top.
+        """
+        if params is None:
+            return {}
+
+        # canonical set of all known collection names (lowercase)
+        all_known_collections_lower = {
+            c.lower() for c in self.registry.list_supported_collections()
+        }
+
+        # 1. Build a lowercase-key lookup for the incoming params dict so we can
+        #    do case-insensitive matching without mutating the caller's data.
+        params_lower: dict[
+            str, tuple[str, Any]
+        ] = {}  # lower_key -> (original_key, value)
+        for k, v in params.items():
+            params_lower[k.lower()] = (k, v)
+
+        collection_lower = collection.lower()
+
+        # 2. Start with all global (non-collection) params.
+        #    A key is considered a "collection key" if its lowercase form appears
+        #    in the known collections set.
+        resolved: dict[str, Any] = {
+            orig_key: value
+            for lower_key, (orig_key, value) in params_lower.items()
+            if lower_key not in all_known_collections_lower
+        }
+
+        # 3. Merge the per-collection override block on top (if present).
+        if collection_lower in params_lower:
+            override = params_lower[collection_lower][1]
+            if isinstance(override, Mapping):
+                resolved.update(override)
+
+        return resolved
+
     def search(
         self,
         collections: Sequence[str],
@@ -86,36 +147,64 @@ class AerClient:
             GeoDataFrame[AssetSchema]: A verified GeoDataFrame of combined search results.
         """
 
-        plugin_hints = plugin_hints or {}
+        plugin_hints = self._normalize_hints(plugin_hints or {})
         norm_intersects = normalize_geometry(intersects)
 
-        # 1. Map plugins to collections safely
-        searcher_to_collections = defaultdict(list)
+        logger.info(
+            "search_called",
+            collections=collections,
+            plugin_hints=plugin_hints,
+        )
+
+        # 1. Resolution & Grouping Phase
+        # We group by (target_plugin, resolved_search_params) to minimize redundant plugin calls
+        # while ensuring each collection gets its targeted parameters.
+
+        def get_params_key(p: Mapping[str, Any]) -> str:
+            # Simple stable key for grouping; default=str handles non-JSON-serializable objects
+            return json.dumps(p, sort_keys=True, default=str)
+
+        # Map (plugin_name, params_key) -> (list_of_collections, resolved_params_dict)
+        execution_groups: dict[
+            tuple[str, str], tuple[list[str], Mapping[str, Any]]
+        ] = {}
+
         for collection in collections:
-            hint = plugin_hints.get(collection)
+            hint = plugin_hints.get(collection.lower())
             if hint:
                 target_plugin = hint
             else:
                 plugin_names = self.registry.find_searchers_for(collection)
                 if not plugin_names:
                     logger.warning(
-                        "Search skipped for collection with no registered plugin. \n"
-                        "You may want to check your registry configuration or plugin hints (e.g. plugin_hints={'a_collection': 'search_plugin'})",
+                        "search_skipped_no_plugin",
                         collection=collection,
                     )
                     continue
-
                 target_plugin = plugin_names[0]
 
-            mapped_collections = self.registry.get_collection_mapping_for_searcher(
-                target_plugin, [collection]
-            )
-            searcher_to_collections[target_plugin].extend(mapped_collections)
+            # Resolve targeted parameters for this specific collection
+            c_params = self._resolve_params(search_params, collection)
+            p_key = get_params_key(c_params)
+
+            group_key = (target_plugin, p_key)
+            if group_key not in execution_groups:
+                # First time we see this plugin+params combo, fetch canonical names
+                mapped_cols = self.registry.get_collection_mapping_for_searcher(
+                    target_plugin, [collection]
+                )
+                execution_groups[group_key] = (mapped_cols, c_params)
+            else:
+                # Add to existing group
+                mapped_cols = self.registry.get_collection_mapping_for_searcher(
+                    target_plugin, [collection]
+                )
+                execution_groups[group_key][0].extend(mapped_cols)
 
         all_results = []
         errors = []
 
-        if not searcher_to_collections:
+        if not execution_groups:
             if failure_mode == FailureMode.STRICT:
                 raise RuntimeError(
                     "No eligible search plugins found for the requested collections."
@@ -123,9 +212,7 @@ class AerClient:
             return cast(GeoDataFrame, AssetSchema.empty())
 
         # 2. Parallel fan-out dispatch to remote plugin APIs
-        with ThreadPoolExecutor(
-            max_workers=max(1, len(searcher_to_collections))
-        ) as executor:
+        with ThreadPoolExecutor(max_workers=max(1, len(execution_groups))) as executor:
             futures = {
                 executor.submit(
                     self.registry.get_searcher(p_name).search,
@@ -133,15 +220,21 @@ class AerClient:
                     intersects=norm_intersects,
                     start_datetime=start_datetime,
                     end_datetime=end_datetime,
-                    search_params=search_params,
+                    search_params=s_params,
                 ): (p_name, s_cols)
-                for p_name, s_cols in searcher_to_collections.items()
+                for (p_name, _), (s_cols, s_params) in execution_groups.items()
             }
 
             for future in as_completed(futures):
                 plugin_name, cols = futures[future]
                 try:
                     df = future.result()
+                    logger.debug(
+                        "search_completed",
+                        plugin=plugin_name,
+                        collections=cols,
+                        count=len(df),
+                    )
                     all_results.append(df)
                 except Exception as e:
                     logger.error(
@@ -178,7 +271,7 @@ class AerClient:
         target_aoi: Optional[BaseGeometry | dict] = None,
         resolution: Optional[float] = None,
         uri: Optional[str] = None,
-        prepare_params: Optional[dict[str, Any]] = None,
+        prepare_params: Optional[Mapping[str, Any]] = None,
         plugin_hints: Optional[dict[str, str]] = None,
     ) -> Sequence[ExtractionTask]:
         """Groups search results by collection and distributes batches to appropriate Extractors.
@@ -197,7 +290,7 @@ class AerClient:
         if search_results.empty:
             return []
 
-        plugin_hints = plugin_hints or {}
+        plugin_hints = self._normalize_hints(plugin_hints or {})
         norm_intersects = normalize_geometry(target_aoi)
         all_tasks = []
 
@@ -211,13 +304,17 @@ class AerClient:
                     f"No Extractor plugin found for collection: {collection_str}"
                 )
 
-            target_plugin = plugin_hints.get(collection_str, extractor_names[0])
+            target_plugin = plugin_hints.get(collection_str.lower(), extractor_names[0])
             if target_plugin not in extractor_names:
                 raise ValueError(
                     f"Hinted plugin '{target_plugin}' is not registered for {collection_str}."
                 )
 
             extractor = self.registry.get_extractor(target_plugin)
+
+            # Resolve targeted parameters for this collection
+            c_params = self._resolve_params(prepare_params, collection_str)
+
             logger.debug(
                 "prepare_batches_start", plugin=target_plugin, collection=collection_str
             )
@@ -227,8 +324,9 @@ class AerClient:
                 target_aoi=norm_intersects,
                 resolution=resolution,
                 uri=uri,
-                prepare_params=prepare_params,
+                prepare_params=c_params,
             )
+
             all_tasks.extend(batches)
 
         return all_tasks
@@ -236,7 +334,7 @@ class AerClient:
     def extract_batches(
         self,
         extraction_task_batch: Sequence[ExtractionTask],
-        extract_params: Optional[dict[str, Any]] = None,
+        extract_params: Optional[Mapping[str, Any]] = None,
         plugin_hints: Optional[dict[str, str]] = None,
         failure_mode: FailureMode = FailureMode.STRICT,
     ) -> GeoDataFrame[ArtifactSchema]:
@@ -255,7 +353,7 @@ class AerClient:
         """
         all_artifacts = []
         errors = []
-        plugin_hints = plugin_hints or {}
+        plugin_hints = self._normalize_hints(plugin_hints or {})
 
         # Group tasks by collection
         collection_tasks: dict[str, list[ExtractionTask]] = defaultdict(list)
@@ -273,7 +371,7 @@ class AerClient:
                     raise e
                 continue
 
-            target_plugin = plugin_hints.get(collection, extractor_names[0])
+            target_plugin = plugin_hints.get(collection.lower(), extractor_names[0])
             if target_plugin not in extractor_names:
                 e = ValueError(
                     f"Hinted plugin '{target_plugin}' not registered for {collection}."
@@ -287,15 +385,26 @@ class AerClient:
             plugin_name = type(extractor).__name__
             batch_count = len(tasks)
 
+            # Resolve targeted parameters for this collection
+            c_params = self._resolve_params(extract_params, collection)
+
             logger.info(
-                "extract_batches_start", plugin=plugin_name, batch_count=batch_count
+                "extract_batches_start",
+                plugin=plugin_name,
+                batch_count=batch_count,
+                collection=collection,
             )
 
             try:
-                df = extractor.extract_batches(tasks, extract_params)
+                df = extractor.extract_batches(tasks, c_params)
                 all_artifacts.append(df)
             except Exception as e:
-                logger.error("extract_failed", plugin=plugin_name, exc_info=True)
+                logger.error(
+                    "extract_failed",
+                    plugin=plugin_name,
+                    collection=collection,
+                    exc_info=True,
+                )
                 errors.append(e)
 
         if not all_artifacts:
@@ -319,8 +428,8 @@ class AerClient:
         search_params: Optional[Mapping[str, Any]] = None,
         resolution: Optional[float] = None,
         uri: Optional[str] = None,
-        prepare_params: Optional[dict[str, Any]] = None,
-        extract_params: Optional[dict[str, Any]] = None,
+        prepare_params: Optional[Mapping[str, Any]] = None,
+        extract_params: Optional[Mapping[str, Any]] = None,
         plugin_hints: Optional[dict[str, str]] = None,
         failure_mode: FailureMode = FailureMode.STRICT,
     ) -> GeoDataFrame[ArtifactSchema]:
