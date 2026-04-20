@@ -139,7 +139,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
         target_aoi: BaseGeometry | None = None,
         resolution: float | None = None,
         uri: str | None = None,
-        prepare_params: dict[str, Any] | None = None,
+        prepare_params: Mapping[str, Any] | None = None,
     ) -> Sequence[ExtractionTask]:
         """Prepare search results for extraction by grouping/filtering/transforming/etc
         them into one or more GeoDataFrames of extraction tasks.
@@ -189,7 +189,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
     def extract(
         self,
         extraction_task: ExtractionTask,
-        extract_params: dict[str, Any] | None,
+        extract_params: Mapping[str, Any] | None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """Extract data for a batch of assets (equivalent to one item of the prepare_for_extraction output).
         Args:
@@ -209,7 +209,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
     def extract_batches(
         self,
         extraction_task_batch: Sequence[ExtractionTask],
-        extract_params: dict[str, Any] | None = None,
+        extract_params: Mapping[str, Any] | None = None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """
         Execute extraction over multiple batches.
