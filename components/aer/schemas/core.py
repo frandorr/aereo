@@ -29,7 +29,7 @@ class GridSchema(pa.DataFrameModel):
     grid_dist: Series[pa.Int] = pa.Field(nullable=False)
     cell_geometry: GeoSeries = pa.Field(nullable=False)
     cell_utm_crs: Series[pa.String] = pa.Field(nullable=False)
-    cell_utm_fooprint: GeoSeries = pa.Field(nullable=False)
+    cell_utm_footprint: GeoSeries = pa.Field(nullable=False)
 
     class Config:
         coerce = True
@@ -84,7 +84,7 @@ class ArtifactSchema(GridSchema):
     - grid_dist (int): Distance in meters that defines the size of the grid cell.
     - cell_geometry (geometry): Spatial geometry of the grid cell (e.g., footprint).
     - cell_utm_crs (str): EPSG code for the UTM coordinate reference system corresponding to the grid_cell.
-    - cell_utm_fooprint (geometry): Spatial geometry of the grid_cell footprint in the UTM coordinate reference system.
+    - cell_utm_footprint (geometry): Spatial geometry of the grid_cell footprint in the UTM coordinate reference system.
 
     """
 
