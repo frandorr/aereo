@@ -5,6 +5,7 @@ extracted from the WMO OSCAR database, providing cached retrieval
 by acronym with disambiguation support.
 """
 
+import ast
 import csv
 import json
 from functools import lru_cache
@@ -74,7 +75,16 @@ class AerLocalSpectralRepository(AerSpectralRepository):
             raise KeyError(f"Satellite with acronym '{acronym}' not found")
 
         payload = []
-        for instrument_slug in sat_data["payload"]:
+        payload_raw = sat_data.get("payload", "").strip()
+        if payload_raw:
+            try:
+                instrument_slugs = ast.literal_eval(payload_raw)
+            except (ValueError, SyntaxError):
+                instrument_slugs = []
+        else:
+            instrument_slugs = []
+
+        for instrument_slug in instrument_slugs:
             try:
                 instrument = self.get_instrument(instrument_slug)
                 payload.append(instrument)
