@@ -51,13 +51,19 @@ dev = [
   "basedpyright>=1.38",
   "cartopy>=0.25",
   "graphviz>=0.21",
+  "icechunk>=2.0.3",
   "marimo[mcp]>=0.21.1",
   "matplotlib>=3.10.8",
+  "obstore>=0.9.3",
   "polylith-cli>=1.42.5,<2",
   "pytest>=9.0.2,<10",
   "python-semantic-release>=10.5.3,<11",
+  "rasterio>=1.5",
+  "rioxarray>=0.22",
   "satpy>=0.59",
   "types-requests>=2.32.4.20260107,<3",
+  "virtualizarr>=2.4",
+  "xarray>=2026.4",
 ]
 
 [tool.hatch]
@@ -94,6 +100,7 @@ extraPaths = [ "components", "bases", "development" ]
 
 [tool.polylith]
 bricks."components/aer/data" = "aer/data"
+bricks."components/aer/eoids" = "aer/eoids"
 bricks."components/aer/grid" = "aer/grid"
 bricks."components/aer/interfaces" = "aer/interfaces"
 bricks."components/aer/registry" = "aer/registry"
