@@ -127,6 +127,7 @@ class AerClient:
         start_datetime: Optional[datetime] = None,
         end_datetime: Optional[datetime] = None,
         search_params: Optional[Mapping[str, Any]] = None,
+        init_params: Optional[Mapping[str, Any]] = None,
         plugin_hints: Optional[dict[str, str]] = None,
         failure_mode: FailureMode = FailureMode.BEST_EFFORT,
     ) -> GeoDataFrame[AssetSchema]:
@@ -138,6 +139,16 @@ class AerClient:
             start_datetime (Optional[datetime]): Optional start datetime for temporal filtering.
             end_datetime (Optional[datetime]): Optional end datetime for temporal filtering.
             search_params (Optional[Mapping[str, Any]]): Additional parameters to pass to search plugins.
+            init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for plugin instantiation.
+                Can be a flat dict (applied to every searcher) or use collection names as top-level keys
+                for per-collection overrides, following the same pattern as ``search_params``::
+
+                    # Global kwargs — applied to every searcher
+                    init_params={"timeout": 30}
+
+                    # Per-collection kwargs
+                    init_params={"GOES-16": {"timeout": 60}, "Sentinel-2-L2A": {"timeout": 10}}
+
             plugin_hints (Optional[dict[str, str]]): Optional mapping of collection to preferred plugin name for search.
                     If not provided, the first registered plugin will be used.
             failure_mode (FailureMode): Determines pipeline behavior when partial or total plugin failures occur. Defaults to BEST_EFFORT.
@@ -215,7 +226,12 @@ class AerClient:
         with ThreadPoolExecutor(max_workers=max(1, len(execution_groups))) as executor:
             futures = {
                 executor.submit(
-                    self.registry.get_searcher(p_name).search,
+                    self.registry.get_searcher(
+                        p_name,
+                        **self._resolve_params(
+                            init_params, s_cols[0] if s_cols else ""
+                        ),
+                    ).search,
                     collections=s_cols,
                     intersects=norm_intersects,
                     start_datetime=start_datetime,
@@ -272,6 +288,7 @@ class AerClient:
         resolution: Optional[float] = None,
         uri: Optional[str] = None,
         prepare_params: Optional[Mapping[str, Any]] = None,
+        init_params: Optional[Mapping[str, Any]] = None,
         plugin_hints: Optional[dict[str, str]] = None,
     ) -> Sequence[ExtractionTask]:
         """Groups search results by collection and distributes batches to appropriate Extractors.
@@ -282,6 +299,15 @@ class AerClient:
             resolution: The desired resolution for extraction.
             uri: An optional URI defining output path or identifier.
             prepare_params: Additional parameters to pass to prepare_for_extraction method.
+            init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for extractor instantiation.
+                Supports global and per-collection overrides, matching the ``prepare_params`` pattern::
+
+                    # Override target_grid_d for a specific collection
+                    init_params={"ABI-L1b-RadC": {"target_grid_d": 50_000}}
+
+                    # Or globally for all extractors
+                    init_params={"target_grid_d": 50_000}
+
             plugin_hints: Optional mapping of collection to preferred plugin name.
 
         Returns:
@@ -310,7 +336,9 @@ class AerClient:
                     f"Hinted plugin '{target_plugin}' is not registered for {collection_str}."
                 )
 
-            extractor = self.registry.get_extractor(target_plugin)
+            # Resolve targeted init kwargs and instantiate the extractor
+            c_init = self._resolve_params(init_params, collection_str)
+            extractor = self.registry.get_extractor(target_plugin, **c_init)
 
             # Resolve targeted parameters for this collection
             c_params = self._resolve_params(prepare_params, collection_str)
@@ -335,6 +363,7 @@ class AerClient:
         self,
         extraction_task_batch: Sequence[ExtractionTask],
         extract_params: Optional[Mapping[str, Any]] = None,
+        init_params: Optional[Mapping[str, Any]] = None,
         plugin_hints: Optional[dict[str, str]] = None,
         failure_mode: FailureMode = FailureMode.STRICT,
     ) -> GeoDataFrame[ArtifactSchema]:
@@ -345,6 +374,15 @@ class AerClient:
         Args:
             extraction_task_batch: A sequence of ExtractionTasks, usually from prepare_for_extraction.
             extract_params: Additional parameters to pass to each Extractor.
+            init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for extractor instantiation.
+                Supports global and per-collection overrides, matching the ``extract_params`` pattern::
+
+                    # Override target_grid_d globally
+                    init_params={"target_grid_d": 50_000}
+
+                    # Or per-collection
+                    init_params={"ABI-L1b-RadC": {"target_grid_d": 50_000, "target_grid_overlap": True}}
+
             plugin_hints: Optional mapping of collection to preferred plugin name.
             failure_mode: STRICT raises errors; BEST_EFFORT continues with successful plugins.
 
@@ -381,7 +419,9 @@ class AerClient:
                     raise e
                 continue
 
-            extractor = self.registry.get_extractor(target_plugin)
+            # Resolve targeted init kwargs and instantiate the extractor
+            c_init = self._resolve_params(init_params, collection)
+            extractor = self.registry.get_extractor(target_plugin, **c_init)
             plugin_name = type(extractor).__name__
             batch_count = len(tasks)
 
@@ -430,11 +470,17 @@ class AerClient:
         uri: Optional[str] = None,
         prepare_params: Optional[Mapping[str, Any]] = None,
         extract_params: Optional[Mapping[str, Any]] = None,
+        init_params: Optional[Mapping[str, Any]] = None,
         plugin_hints: Optional[dict[str, str]] = None,
         failure_mode: FailureMode = FailureMode.STRICT,
     ) -> GeoDataFrame[ArtifactSchema]:
-        """
-        Convenience 'God Method' running the entire data lifecycle sequentially.
+        """Convenience 'God Method' running the entire data lifecycle sequentially.
+
+        Args:
+            init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs forwarded to all
+                plugin instantiations (searchers and extractors). Supports global and per-collection
+                overrides — see :meth:`search`, :meth:`prepare_for_extraction`, and
+                :meth:`extract_batches` for details.
         """
         search_df = self.search(
             collections=collections,
@@ -442,6 +488,7 @@ class AerClient:
             start_datetime=start_datetime,
             end_datetime=end_datetime,
             search_params=search_params,
+            init_params=init_params,
             plugin_hints=plugin_hints,
             failure_mode=failure_mode,
         )
@@ -452,12 +499,14 @@ class AerClient:
             resolution=resolution,
             uri=uri,
             prepare_params=prepare_params,
+            init_params=init_params,
             plugin_hints=plugin_hints,
         )
 
         return self.extract_batches(
             extraction_task_batch=tasks,
             extract_params=extract_params,
+            init_params=init_params,
             plugin_hints=plugin_hints,
             failure_mode=failure_mode,
         )

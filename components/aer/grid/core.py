@@ -121,20 +121,55 @@ class GridCell(BaseGridCell):
         """
         return f"{self.id()}_dist-{self.D}m_res-{resolution}m"
 
-    @lru_cache(maxsize=8)
-    def area_def(self, resolution: int) -> AreaDef:
+    @lru_cache(maxsize=16)
+    def area_def(self, resolution: int, padding: int = 0) -> AreaDef:
         """Creates an AreaDef for this grid cell's UTM footprint.
 
+        The output extent is a centred D x D metre box in UTM space, with its
+        centre snapped to the resolution grid.  This guarantees that:
+
+        * ``width == height == D // resolution + 2 * padding`` (fixed tensor shape for ML).
+        * Pixel size is **exactly** ``resolution`` metres (no stretching).
+        * Extractions of the same cell from different constellations
+          (GOES, VIIRS, MODIS ...) at the same resolution share an identical
+          spatial footprint, making pixel-wise stacking valid.
+
+        The optional ``padding`` argument extends the box by ``padding`` pixels
+        on **every side**.  This creates a border that overlaps neighbouring
+        cells, guaranteeing full spatial coverage with no gaps at cell edges.
+        A padding of 1-2 pixels is sufficient for most use cases.
+
         Args:
-            resolution (int): Resolution in meters
+            resolution (int): Resolution in meters.
+            padding (int): Number of extra pixels to add on each side (default 0).
+                           The resulting shape is ``(D // resolution + 2*padding) ** 2``.
         Returns:
             AreaDef: Lightweight area definition. Use ``to_yaml()`` to
                 convert to a YAML string loadable by pyresample.
         """
         bounds = self.utm_footprint.bounds  # minx, miny, maxx, maxy
-        area_extent = (bounds[0], bounds[1], bounds[2], bounds[3])
-        width = self.D // resolution
-        height = self.D // resolution
+
+        # Compute UTM centroid and snap it to the resolution grid so that the
+        # pixel edges are deterministic regardless of which instrument is used.
+        cx = (bounds[0] + bounds[2]) / 2
+        cy = (bounds[1] + bounds[3]) / 2
+        cx = round(cx / resolution) * resolution
+        cy = round(cy / resolution) * resolution
+
+        # Core D x D box, expanded symmetrically by padding pixels on each side.
+        pad_m = padding * resolution
+        half = self.D / 2
+        snapped_extent = (
+            cx - half - pad_m,
+            cy - half - pad_m,
+            cx + half + pad_m,
+            cy + half + pad_m,
+        )
+
+        core_pixels = self.D // resolution
+        width = core_pixels + 2 * padding
+        height = core_pixels + 2 * padding
+
         area_name = self.area_name(resolution)
         return AreaDef(
             area_id=area_name,
@@ -142,7 +177,7 @@ class GridCell(BaseGridCell):
             projection=str(self.utm_crs),
             width=width,
             height=height,
-            area_extent=area_extent,
+            area_extent=snapped_extent,
         )
 
 

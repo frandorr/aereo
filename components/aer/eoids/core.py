@@ -1,5 +1,24 @@
 import datetime
+import re
 from pathlib import Path
+from typing import Any
+
+import numpy as np
+import rasterio
+from numpy.typing import NDArray
+from rasterio.crs import CRS
+from rasterio.merge import merge
+from rasterio.transform import Affine
+from rasterio.vrt import WarpedVRT
+from rasterio.warp import Resampling
+
+# Known EOIDS key tokens — order matters for greedy matching
+_EOIDS_KEYS = ("loc", "start", "end", "sat", "prod", "band", "res", "desc")
+_EOIDS_PATTERN = re.compile(
+    r"(" + "|".join(_EOIDS_KEYS) + r")-"
+    r"([^_]+(?:_[^-]+)*?)"
+    r"(?=_(?:" + "|".join(_EOIDS_KEYS) + r")-|$)"
+)
 
 
 def build_eoids_path(
@@ -83,3 +102,247 @@ def build_eoids_path(
 
     base_dir.mkdir(parents=True, exist_ok=True)
     return base_dir / filename
+
+
+# ---------------------------------------------------------------------------
+# Parsing
+# ---------------------------------------------------------------------------
+
+
+def parse_eoids_filename(path: str | Path) -> dict[str, str]:
+    """Extract metadata key-value pairs from an EOIDS-compliant filename.
+
+    Values whose keys contain underscores (e.g. ``sat-goes_east``) are handled
+    correctly thanks to a greedy regex that stops only at the next recognised
+    EOIDS key token.
+
+    Args:
+        path: Full path or bare filename following the EOIDS naming convention.
+
+    Returns:
+        Dictionary mapping EOIDS keys (``loc``, ``start``, ``end``, ``sat``,
+        ``prod``, ``band``, ``res``, ``desc``) to their string values.
+        Only keys present in the filename are included.
+
+    Example::
+
+        >>> parse_eoids_filename(
+        ...     "loc-0U38L_start-20260101T100022_end-20260101T100953_"
+        ...     "sat-goes_east_prod-RadF_band-C01_res-1000m.tif"
+        ... )
+        {'loc': '0U38L', 'start': '20260101T100022', 'end': '20260101T100953',
+         'sat': 'goes_east', 'prod': 'RadF', 'band': 'C01', 'res': '1000m'}
+    """
+    stem = Path(path).stem
+    return dict(_EOIDS_PATTERN.findall(stem))
+
+
+# ---------------------------------------------------------------------------
+# Scanning
+# ---------------------------------------------------------------------------
+
+
+def scan_eoids_dir(
+    root_dir: str | Path,
+    *,
+    date: str | None = None,
+    satellite: str | None = None,
+    band: str | None = None,
+    cell_id: str | None = None,
+    product: str | None = None,
+    suffix: str = "tif",
+) -> list[dict[str, Any]]:
+    """Recursively discover EOIDS files under *root_dir* with optional filtering.
+
+    The function walks the directory tree, finds files matching ``*.<suffix>``,
+    parses each filename, and returns only those entries whose metadata matches
+    **all** of the supplied filter arguments.
+
+    Args:
+        root_dir: Top-level EOIDS dataset directory.
+        date: Filter by date string as it appears in the directory hierarchy
+            (e.g. ``"20260101"``).
+        satellite: Filter by satellite value (e.g. ``"goes_east"``).
+        band: Filter by band value (e.g. ``"C01"``).
+        cell_id: Filter by cell identifier (e.g. ``"0U38L"``).
+        product: Filter by product identifier (e.g. ``"RadF"``).
+        suffix: File extension to search for (default ``"tif"``).
+
+    Returns:
+        A list of dicts, each containing all parsed EOIDS key-value pairs
+        **plus** ``"path"`` (a :class:`~pathlib.Path` to the file) and
+        ``"date"`` (extracted from the directory hierarchy).
+    """
+    root = Path(root_dir)
+    safe_suffix = suffix.lstrip(".")
+    results: list[dict[str, Any]] = []
+
+    for filepath in root.rglob(f"*.{safe_suffix}"):
+        meta = parse_eoids_filename(filepath.name)
+        if not meta:
+            continue
+
+        # Extract the date from the directory hierarchy (date-YYYYMMDD)
+        file_date: str | None = None
+        for parent in filepath.parents:
+            if parent.name.startswith("date-"):
+                file_date = parent.name[5:]
+                break
+
+        entry: dict[str, Any] = {**meta, "path": filepath, "date": file_date}
+
+        # Apply filters — skip if any filter doesn't match
+        if date is not None and file_date != date:
+            continue
+        if satellite is not None and meta.get("sat") != satellite:
+            continue
+        if band is not None and meta.get("band") != band:
+            continue
+        if cell_id is not None and meta.get("loc") != cell_id.replace("_", ""):
+            continue
+        if product is not None and meta.get("prod") != product:
+            continue
+
+        results.append(entry)
+
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Loading
+# ---------------------------------------------------------------------------
+
+
+def load_eoids_tiles(
+    root_dir: str | Path,
+    *,
+    date: str | None = None,
+    satellite: str | None = None,
+    band: str | None = None,
+    cell_id: str | None = None,
+    product: str | None = None,
+    suffix: str = "tif",
+) -> list[rasterio.DatasetReader]:
+    """Open matching EOIDS tiles as rasterio dataset readers.
+
+    Wraps :func:`scan_eoids_dir` and opens every matched file with
+    :func:`rasterio.open`.  The caller is responsible for closing the
+    returned datasets (or use them as context managers individually).
+
+    Args:
+        root_dir: Top-level EOIDS dataset directory.
+        date: Filter by date string (e.g. ``"20260101"``).
+        satellite: Filter by satellite (e.g. ``"goes_east"``).
+        band: Filter by band (e.g. ``"C01"``).
+        cell_id: Filter by cell identifier (e.g. ``"0U38L"``).
+        product: Filter by product (e.g. ``"RadF"``).
+        suffix: File extension to search for (default ``"tif"``).
+
+    Returns:
+        List of open :class:`rasterio.DatasetReader` objects.
+    """
+    entries = scan_eoids_dir(
+        root_dir,
+        date=date,
+        satellite=satellite,
+        band=band,
+        cell_id=cell_id,
+        product=product,
+        suffix=suffix,
+    )
+    return [rasterio.open(e["path"]) for e in entries]
+
+
+# ---------------------------------------------------------------------------
+# Mosaicking
+# ---------------------------------------------------------------------------
+
+
+def mosaic_eoids_tiles(
+    root_dir: str | Path,
+    *,
+    date: str | None = None,
+    satellite: str | None = None,
+    band: str | None = None,
+    cell_id: str | None = None,
+    product: str | None = None,
+    suffix: str = "tif",
+    target_crs: str | CRS = "EPSG:4326",
+    resampling: Resampling = Resampling.nearest,
+    nodata: float | None = None,
+) -> tuple[NDArray[np.floating[Any]], Affine, CRS]:
+    """Load and mosaic EOIDS tiles into a single array in a common CRS.
+
+    Grid cells produced by the extraction pipeline may live in different UTM
+    zones.  This function reprojects every tile to *target_crs* on-the-fly
+    using rasterio VRT warping, then merges them with
+    :func:`rasterio.merge.merge`.
+
+    Args:
+        root_dir: Top-level EOIDS dataset directory.
+        date: Filter by date string (e.g. ``"20260101"``).
+        satellite: Filter by satellite (e.g. ``"goes_east"``).
+        band: Filter by band (e.g. ``"C01"``).
+        cell_id: Filter by cell identifier (e.g. ``"0U38L"``).
+        product: Filter by product (e.g. ``"RadF"``).
+        suffix: File extension to search for (default ``"tif"``).
+        target_crs: The CRS to reproject all tiles into before merging.
+            Defaults to ``"EPSG:4326"``.
+        resampling: Resampling method for warping (default: nearest).
+        nodata: Value to treat as nodata.  When *None*, the value embedded in
+            each GeoTIFF is used (if available).
+
+    Returns:
+        A 3-tuple of ``(mosaic, transform, crs)`` where *mosaic* is a
+        ``(bands, height, width)`` numpy array, *transform* is the
+        :class:`~rasterio.transform.Affine` geotransform for the mosaic, and
+        *crs* is the output :class:`~rasterio.crs.CRS`.
+
+    Raises:
+        FileNotFoundError: If no tiles match the given filters.
+    """
+    entries = scan_eoids_dir(
+        root_dir,
+        date=date,
+        satellite=satellite,
+        band=band,
+        cell_id=cell_id,
+        product=product,
+        suffix=suffix,
+    )
+    if not entries:
+        raise FileNotFoundError(
+            f"No EOIDS tiles found in '{root_dir}' matching the given filters."
+        )
+
+    dst_crs = CRS.from_user_input(target_crs)
+
+    datasets: list[WarpedVRT | rasterio.DatasetReader] = []
+    opened: list[rasterio.DatasetReader] = []
+    try:
+        for entry in entries:
+            src = rasterio.open(entry["path"])
+            opened.append(src)
+
+            nd = nodata if nodata is not None else src.nodata
+
+            if src.crs == dst_crs:
+                datasets.append(src)
+            else:
+                vrt = WarpedVRT(
+                    src,
+                    crs=dst_crs,
+                    resampling=resampling,
+                    nodata=nd,
+                )
+                datasets.append(vrt)
+
+        mosaic, out_transform = merge(datasets, nodata=nodata)
+    finally:
+        for ds in datasets:
+            if isinstance(ds, WarpedVRT):
+                ds.close()
+        for ds in opened:
+            ds.close()
+
+    return mosaic, out_transform, dst_crs
