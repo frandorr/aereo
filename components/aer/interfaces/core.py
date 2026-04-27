@@ -100,8 +100,19 @@ class ExtractionTask:
             overlap=self.target_grid_overlap,
         )
 
-        geometry = self.assets.union_all()
-        intersection = geometry.intersection(self.aoi) if self.aoi else geometry
+        if hasattr(self.assets, "union_all"):
+            geometry = self.assets.union_all()
+        else:
+            geometry = None
+
+        intersection = (
+            geometry.intersection(self.aoi)
+            if (geometry is not None and self.aoi)
+            else (geometry or self.aoi)
+        )
+
+        if intersection is None:
+            return []
 
         return grid_def.generate_grid_cells(intersection)
 

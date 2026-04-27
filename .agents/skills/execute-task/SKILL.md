@@ -38,8 +38,8 @@ You implement coding tasks by leveraging the codebase index (`docs/codemap.csv`)
 
 6. **Verify**
    - Check imports use the public API.
-   - Run linting: `ruff check components/<project>/<component>/`.
-   - Run tests: `python -m pytest test/components/<project>/<component>/ -v`.
+   - Run linting: `uv run ruff check components/<project>/<component>/`.
+   - Run tests: `uv run pytest test/components/<project>/<component>/ -v`.
 
 7. **Finalize**
    Regenerate the codemap to reflect your changes.
