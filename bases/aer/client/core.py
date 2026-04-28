@@ -120,6 +120,60 @@ class AerClient:
 
         return resolved
 
+    def _resolve_plugin_for_collection(
+        self, plugin_type: str, collection: str, plugin_hints: dict[str, str]
+    ) -> Optional[str]:
+        """Resolves the appropriate plugin name for a collection, factoring in user hints.
+
+        Args:
+            plugin_type: "searcher" or "extractor".
+            collection: The collection name.
+            plugin_hints: Normalized mapping of collection to preferred plugin name.
+
+        Returns:
+            The resolved target plugin name, or None if no plugin is found.
+
+        Raises:
+            ValueError: If a hinted plugin is not registered.
+        """
+        hint = plugin_hints.get(collection.lower())
+
+        if plugin_type == "searcher":
+            has_plugin = self.registry.has_searcher
+            get_collections = self.registry.get_searcher_collections
+            find_plugins = self.registry.find_searchers_for
+        elif plugin_type == "extractor":
+            has_plugin = self.registry.has_extractor
+            get_collections = self.registry.get_extractor_collections
+            find_plugins = self.registry.find_extractors_for
+        else:
+            raise ValueError(f"Unknown plugin type: {plugin_type}")
+
+        if hint:
+            target_plugin = hint
+            if not has_plugin(target_plugin):
+                raise ValueError(
+                    f"Hinted plugin '{target_plugin}' is not a registered {plugin_type.capitalize()}."
+                )
+
+            supported = get_collections(target_plugin)
+            if len(supported) > 0 and collection.lower() not in [
+                s.lower() for s in supported
+            ]:
+                logger.warning(
+                    f"Hinted {plugin_type} plugin '{target_plugin}' supports collections {supported}, but '{collection}' is not among them."
+                )
+            elif len(supported) == 0:
+                logger.warning(
+                    f"Hinted {plugin_type} plugin '{target_plugin}' declares no supported collections. Proceeding anyway for '{collection}'."
+                )
+            return target_plugin
+        else:
+            plugin_names = find_plugins(collection)
+            if not plugin_names:
+                return None
+            return plugin_names[0]
+
     def search(
         self,
         collections: Sequence[str],
@@ -181,18 +235,15 @@ class AerClient:
         ] = {}
 
         for collection in collections:
-            hint = plugin_hints.get(collection.lower())
-            if hint:
-                target_plugin = hint
-            else:
-                plugin_names = self.registry.find_searchers_for(collection)
-                if not plugin_names:
-                    logger.warning(
-                        "search_skipped_no_plugin",
-                        collection=collection,
-                    )
-                    continue
-                target_plugin = plugin_names[0]
+            target_plugin = self._resolve_plugin_for_collection(
+                "searcher", collection, plugin_hints
+            )
+            if not target_plugin:
+                logger.warning(
+                    "search_skipped_no_plugin",
+                    collection=collection,
+                )
+                continue
 
             # Resolve targeted parameters for this specific collection
             c_params = self._resolve_params(search_params, collection)
@@ -324,16 +375,12 @@ class AerClient:
 
         for collection, df_group in grouped_results:
             collection_str = str(collection)
-            extractor_names = self.registry.find_extractors_for(collection_str)
-            if not extractor_names:
+            target_plugin = self._resolve_plugin_for_collection(
+                "extractor", collection_str, plugin_hints
+            )
+            if not target_plugin:
                 raise ValueError(
                     f"No Extractor plugin found for collection: {collection_str}"
-                )
-
-            target_plugin = plugin_hints.get(collection_str.lower(), extractor_names[0])
-            if target_plugin not in extractor_names:
-                raise ValueError(
-                    f"Hinted plugin '{target_plugin}' is not registered for {collection_str}."
                 )
 
             # Resolve targeted init kwargs and instantiate the extractor
@@ -401,19 +448,13 @@ class AerClient:
                 collection_tasks[collection].append(task)
 
         for collection, tasks in collection_tasks.items():
-            extractor_names = self.registry.find_extractors_for(collection)
-            if not extractor_names:
-                e = RuntimeError(f"No plugin found for collection: {collection}")
-                errors.append(e)
-                if failure_mode == FailureMode.STRICT:
-                    raise e
-                continue
-
-            target_plugin = plugin_hints.get(collection.lower(), extractor_names[0])
-            if target_plugin not in extractor_names:
-                e = ValueError(
-                    f"Hinted plugin '{target_plugin}' not registered for {collection}."
+            try:
+                target_plugin = self._resolve_plugin_for_collection(
+                    "extractor", collection, plugin_hints
                 )
+                if not target_plugin:
+                    raise RuntimeError(f"No plugin found for collection: {collection}")
+            except Exception as e:
                 errors.append(e)
                 if failure_mode == FailureMode.STRICT:
                     raise e
@@ -422,7 +463,6 @@ class AerClient:
             # Resolve targeted init kwargs and instantiate the extractor
             c_init = self._resolve_params(init_params, collection)
             extractor = self.registry.get_extractor(target_plugin, **c_init)
-            plugin_name = type(extractor).__name__
             batch_count = len(tasks)
 
             # Resolve targeted parameters for this collection
@@ -430,7 +470,7 @@ class AerClient:
 
             logger.info(
                 "extract_batches_start",
-                plugin=plugin_name,
+                plugin=target_plugin,
                 batch_count=batch_count,
                 collection=collection,
             )
@@ -441,7 +481,7 @@ class AerClient:
             except Exception as e:
                 logger.error(
                     "extract_failed",
-                    plugin=plugin_name,
+                    plugin=target_plugin,
                     collection=collection,
                     exc_info=True,
                 )
