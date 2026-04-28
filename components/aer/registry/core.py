@@ -124,6 +124,22 @@ class AerRegistry:
         """
         return self._collection_to_extractors.get(collection_name.lower(), [])
 
+    def get_searcher_collections(self, plugin_name: str) -> List[str]:
+        if plugin_name in self._searchers:
+            return list(self._searchers[plugin_name].supported_collections)
+        return []
+
+    def get_extractor_collections(self, plugin_name: str) -> List[str]:
+        if plugin_name in self._extractors:
+            return list(self._extractors[plugin_name].supported_collections)
+        return []
+
+    def has_searcher(self, plugin_name: str) -> bool:
+        return plugin_name in self._searchers
+
+    def has_extractor(self, plugin_name: str) -> bool:
+        return plugin_name in self._extractors
+
     def get_collection_mapping_for_searcher(
         self, plugin_name: str, collection_names: Sequence[str]
     ) -> List[str]:

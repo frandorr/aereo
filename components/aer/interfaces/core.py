@@ -44,12 +44,7 @@ class AerPlugin(ABC):
                 f"(list, tuple, or set), got {type(cls.supported_collections).__name__}."
             )
 
-        # 5. Prevent empty sequences (optional, but recommended for strictness)
-        if len(cls.supported_collections) == 0:
-            raise ValueError(
-                f"'{cls.__name__}.supported_collections' cannot be empty. "
-                f"A plugin must support at least one collection."
-            )
+        # 5. Empty sequences are allowed (used by plugins that only support plugin_hints)
 
 
 class SearchProvider(AerPlugin, plugin_abstract=True):
