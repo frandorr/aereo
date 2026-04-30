@@ -394,11 +394,20 @@ class AerClient:
                 "prepare_batches_start", plugin=target_plugin, collection=collection_str
             )
 
+            # Create a default profile if resolution is provided but no profiles are defined
+            from aer.interfaces.core import ExtractionProfile
+
+            resolved_profiles = []
+            if resolution is not None:
+                resolved_profiles.append(
+                    ExtractionProfile(name="default", resolution=resolution)
+                )
+
             batches = extractor.prepare_for_extraction(
                 cast(GeoDataFrame, df_group),
                 target_aoi=norm_intersects,
-                resolution=resolution,
                 uri=uri,
+                profiles=resolved_profiles,
                 prepare_params=c_params,
             )
 
@@ -413,6 +422,7 @@ class AerClient:
         init_params: Optional[Mapping[str, Any]] = None,
         plugin_hints: Optional[dict[str, str]] = None,
         failure_mode: FailureMode = FailureMode.STRICT,
+        max_batch_workers: Optional[int] = None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """
         Executes the extraction phase by iterating over the provided ExtractionTasks,
@@ -476,7 +486,9 @@ class AerClient:
             )
 
             try:
-                df = extractor.extract_batches(tasks, c_params)
+                df = extractor.extract_batches(
+                    tasks, extract_params=c_params, max_batch_workers=max_batch_workers
+                )
                 all_artifacts.append(df)
             except Exception as e:
                 logger.error(
@@ -513,6 +525,7 @@ class AerClient:
         init_params: Optional[Mapping[str, Any]] = None,
         plugin_hints: Optional[dict[str, str]] = None,
         failure_mode: FailureMode = FailureMode.STRICT,
+        max_batch_workers: Optional[int] = None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """Convenience 'God Method' running the entire data lifecycle sequentially.
 
@@ -549,4 +562,5 @@ class AerClient:
             init_params=init_params,
             plugin_hints=plugin_hints,
             failure_mode=failure_mode,
+            max_batch_workers=max_batch_workers,
         )

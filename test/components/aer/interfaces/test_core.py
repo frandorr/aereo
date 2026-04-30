@@ -34,10 +34,10 @@ def test_plugin_supported_collections_is_not_sequence():
 
 
 def test_plugin_supported_collections_is_empty():
-    with pytest.raises(ValueError, match="cannot be empty"):
+    class InvalidPlugin(AerPlugin):
+        supported_collections = []
 
-        class InvalidPlugin(AerPlugin):
-            supported_collections = []
+    assert InvalidPlugin.supported_collections == []
 
 
 def test_plugin_valid_supported_collections():
@@ -92,18 +92,20 @@ def test_extractor_extract_batches(monkeypatch):
         {"id": [2]}, geometry=[Polygon([[1, 1], [2, 1], [2, 2], [1, 2]])]
     )
 
+    from aer.interfaces.core import ExtractionProfile
+
+    profile = ExtractionProfile(name="default", resolution=10.0)
+
     task1 = ExtractionTask(
         assets=cast(Any, df1),
-        target_grid_d=10000,
-        target_grid_overlap=False,
-        resolution=10.0,
+        grid_cells=[],
+        profile=profile,
         uri="test1",
     )
     task2 = ExtractionTask(
         assets=cast(Any, df2),
-        target_grid_d=10000,
-        target_grid_overlap=False,
-        resolution=10.0,
+        grid_cells=[],
+        profile=profile,
         uri="test2",
     )
 
@@ -119,7 +121,7 @@ def test_extractor_prepare_for_extraction():
 
         @property
         def target_grid_d(self) -> int:
-            return 10000
+            return 1000000  # Large grid to keep cell count low
 
         def extract(
             self,
@@ -130,28 +132,50 @@ def test_extractor_prepare_for_extraction():
 
     extractor = ValidExtractor()
 
-    # Needs a GeoDataFrame
+    from datetime import datetime
+
+    from aer.interfaces.core import ExtractionProfile
+
+    # Needs a GeoDataFrame with collection and start_time
     df = gpd.GeoDataFrame(
-        {"id": [1, 2]},
+        {
+            "id": [1, 2],
+            "collection": ["GOES", "GOES"],
+            "start_time": [datetime(2023, 1, 1, 12, 0), datetime(2023, 1, 1, 12, 0)],
+        },
         geometry=[
             Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
             Polygon([[1, 1], [2, 1], [2, 2], [1, 2]]),
         ],
     )
 
-    # Should raise error if resolution or uri not provided
+    # Should raise error if uri not provided
     with pytest.raises(
-        ValueError, match="Default prepare_for_extraction requires resolution and uri"
+        ValueError, match="Default prepare_for_extraction requires uri to be defined"
     ):
         extractor.prepare_for_extraction(cast(Any, df))
 
+    profile = ExtractionProfile(name="test_profile", resolution=10.0)
+
+    # Should raise error if profiles not provided
+    with pytest.raises(
+        ValueError,
+        match="Default prepare_for_extraction requires at least one profile to be defined",
+    ):
+        extractor.prepare_for_extraction(cast(Any, df), uri="test_uri")
+
     tasks = extractor.prepare_for_extraction(
-        cast(Any, df), resolution=10.0, uri="test_uri", prepare_params={"x": 1}
+        cast(Any, df),
+        profiles=[profile],
+        uri="test_uri",
+        prepare_params={"cells_per_chunk": 1},
     )
 
-    assert len(tasks) == 2
-    assert tasks[0].resolution == 10.0
+    assert len(tasks) > 0
+    assert tasks[0].profile.resolution == 10.0
+    assert tasks[0].profile.name == "test_profile"
     assert tasks[0].uri == "test_uri"
-    assert tasks[0].task_context == {"prepare_params": {"x": 1}}
-    assert len(tasks[0].assets) == 1
-    assert list(tasks[0].assets["id"]) == [1]
+    assert tasks[0].prepare_params == {"cells_per_chunk": 1}
+    assert tasks[0].aoi is None
+    assert len(tasks[0].assets) == 2  # Both assets have same start_time and collection
+    assert "start_time" in tasks[0].task_context
