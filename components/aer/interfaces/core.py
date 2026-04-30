@@ -1,14 +1,17 @@
+import logging
 from abc import ABC, abstractmethod
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
-from functools import cached_property
 from typing import Any, Mapping, Sequence, cast
 
 import attrs
 import pandas as pd
-from aer.grid import GridCell, GridDefinition
+from aer.grid import GridCell
 from aer.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
+
+logger = logging.getLogger(__name__)
 
 
 class AerPlugin(ABC):
@@ -76,55 +79,95 @@ class SearchProvider(AerPlugin, plugin_abstract=True):
 
 
 @attrs.frozen
-class ExtractionTask:
-    assets: GeoDataFrame[AssetSchema]
-    target_grid_d: int
-    target_grid_overlap: bool
+class ExtractionProfile:
+    """
+    Defines a blueprint for extraction, specifying which collections and variables
+    to extract and at what resolution.
+
+    Attributes:
+        name: A unique identifier for this profile (e.g., 'viirs_cloud_mask').
+        resolution: Resolution for extraction in meters for this specific profile.
+        collection_variables_map: Mapping of collection to variables.
+        extra_params: A container for user-specific or plugin-specific attributes
+            (e.g., a mapping for Satpy readers).
+    """
+
+    name: str
     resolution: float
+    collection_variables_map: Mapping[str, Sequence[str]] = attrs.field(factory=dict)
+    extra_params: Mapping[str, Any] = attrs.field(factory=dict)
+
+
+@attrs.frozen
+class ExtractionTask:
+    """
+    A class representing a task for extracting data.
+
+    Attributes:
+        assets: GeoDataFrame of assets to extract. It can group multiple collections
+            (for example Imagery + Geolocation). Schema is defined in `aer.schemas.AssetSchema`.
+        profile: The ExtractionProfile containing target variables and resolution.
+        uri: Destination URI for extracted artifacts.
+        grid_cells: Spatial grid cells this task covers.
+        aoi: Optional area-of-interest geometry used to clip the extraction region.
+        prepare_params: Parameters forwarded from ``prepare_for_extraction`` that drove
+            task construction (e.g. ``dataset_names``, ``cells_per_chunk``). Plugins can
+            read these in ``extract()`` without needing them re-passed via ``extract_params``.
+        task_context: Observability metadata generated during task preparation
+            (e.g. ``chunk_id``, ``total_chunks``, ``start_time``).
+    """
+
+    assets: GeoDataFrame[AssetSchema]
+    profile: ExtractionProfile
     uri: str
+    grid_cells: Sequence[GridCell]
     aoi: BaseGeometry | None = None
-    task_context: dict[str, Any] = attrs.field(factory=dict)
+    prepare_params: Mapping[str, Any] = attrs.field(factory=dict)
+    task_context: Mapping[str, Any] = attrs.field(factory=dict)
 
-    @cached_property
-    def overlapping_grid_cells(self) -> Sequence[GridCell]:
-        """
-        Calculates the intersecting grid cells for this specific task's AOI.
-        """
-        grid_def = GridDefinition(
-            d=self.target_grid_d,
-            overlap=self.target_grid_overlap,
-        )
+    def __attrs_post_init__(self) -> None:
+        if self.assets is None or len(self.assets) == 0:
+            raise ValueError("assets cannot be empty")
 
-        if hasattr(self.assets, "union_all"):
-            geometry = self.assets.union_all()
-        else:
-            geometry = None
-
-        intersection = (
-            geometry.intersection(self.aoi)
-            if (geometry is not None and self.aoi)
-            else (geometry or self.aoi)
-        )
-
-        if intersection is None:
-            return []
-
-        return grid_def.generate_grid_cells(intersection)
+        if self.profile.collection_variables_map:
+            if "collection" in self.assets.columns:
+                asset_collections = set(self.assets["collection"])
+                for col in self.profile.collection_variables_map:
+                    if col not in asset_collections:
+                        raise ValueError(
+                            f"Collection '{col}' in collection_variables_map not found in assets collection column."
+                        )
 
     def __repr__(self) -> str:
         n_assets = len(self.assets) if self.assets is not None else 0
-        geom_type = getattr(self.aoi, "geom_type", None)
+
+        if self.grid_cells:
+            all_cells_str = (
+                f"{self.grid_cells[0].__class__.__name__}('"
+                + ", ".join([str(c) for c in self.grid_cells])
+                + "')"
+            )
+        else:
+            all_cells_str = "[]"
 
         return (
             f"{self.__class__.__name__}("
             f"n_assets={n_assets}, "
-            f"resolution={self.resolution}, "
-            f"grid_d={self.target_grid_d}, "
-            f"overlap={self.target_grid_overlap}, "
-            f"aoi={geom_type}, "
+            f"profile='{self.profile.name}', "
+            f"resolution={self.profile.resolution}, "
+            f"grid_cells={all_cells_str}, "
             f"uri='{self.uri}'"
             f")"
         )
+
+
+def _extract_wrapper(
+    extractor: "Extractor",
+    task: "ExtractionTask",
+    extract_params: Mapping[str, Any] | None,
+) -> "GeoDataFrame[ArtifactSchema]":
+    """Module-level wrapper so ProcessPoolExecutor can pickle the call."""
+    return extractor.extract(task, extract_params)
 
 
 class Extractor(AerPlugin, plugin_abstract=True):
@@ -143,52 +186,103 @@ class Extractor(AerPlugin, plugin_abstract=True):
         self,
         search_results: GeoDataFrame[AssetSchema],
         target_aoi: BaseGeometry | None = None,
-        resolution: float | None = None,
+        target_grid_dist: int | None = None,
+        target_grid_overlap: bool | None = None,
         uri: str | None = None,
+        profiles: Sequence[ExtractionProfile] | None = None,
         prepare_params: Mapping[str, Any] | None = None,
     ) -> Sequence[ExtractionTask]:
-        """Prepare search results for extraction by grouping/filtering/transforming/etc
-        them into one or more GeoDataFrames of extraction tasks.
-        Each GeoDataFrame represents a batch of results that can be processed together for extraction.
-
-        Args:
-            search_results: The GeoDataFrame of search results to prepare for extraction.
-            target_aoi: The area of interest as a shapely geometry. This can be used to spatially filter or group the search results.
-            resolution: The desired resolution for extraction, which can be used to determine how to group or filter the search results.
-                It can be None if user prefers to infer resolution from the search results.
-            uri: An optional URI that can be used to define an output path or identifier for the extraction results.
-                This can be used to group search results that should be extracted together.
-                For example it can be a bucket.
-                It can be None if user prefers to infer uri from the search results or other parameters.
-            prepare_params: Additional parameters for preparation,
-                user defined and specific to the collection, provider, outputs, etc.
-
-        Returns:
-            A Sequence of ExtractionTask, each containing a batch of search results to be extracted together.
-            If you wish to extract each result individually, return a sequence where each extraction_task.assets
-            is a single-row GeoDataFrame (e.g., `[results.iloc[[i]] for i in range(len(results))]`).
-
-        """
-
-        # Default implementation: one task per asset (no grouping), need resolution and uri to be defined for the task
-        if resolution is None or uri is None:
+        """Prepare extraction tasks by grouping assets by profile and start time, then chunking grid cells."""
+        if uri is None:
             raise ValueError(
-                "Default prepare_for_extraction requires resolution and uri to be defined"
-                "If you want to prepare without resolution or uri, you need to override this method with a custom implementation."
+                "Default prepare_for_extraction requires uri to be defined."
             )
+
+        if not profiles:
+            raise ValueError(
+                "Default prepare_for_extraction requires at least one profile to be defined."
+            )
+
+        prepare_params = prepare_params or {}
+        cells_per_chunk = int(prepare_params.get("cells_per_chunk", 50))
+
+        grid_dist = (
+            target_grid_dist if target_grid_dist is not None else self.target_grid_d
+        )
+        grid_overlap = (
+            target_grid_overlap
+            if target_grid_overlap is not None
+            else self.target_grid_overlap
+        )
+
+        from aer.grid import GridDefinition
+
+        grid_def = GridDefinition(d=grid_dist, overlap=grid_overlap)
+
         tasks = []
-        for i in range(len(search_results)):
-            asset_batch = search_results.iloc[[i]]  # single-row GeoDataFrame
-            task = ExtractionTask(
-                assets=asset_batch,
-                target_grid_d=self.target_grid_d,
-                target_grid_overlap=self.target_grid_overlap,
-                resolution=resolution,
-                uri=uri,
-                aoi=target_aoi,
-                task_context={"prepare_params": prepare_params},
-            )
-            tasks.append(task)
+
+        # 1. Iterate over each profile
+        for profile in profiles:
+            # Filter assets by profile collections if specified
+            if profile.collection_variables_map:
+                profile_assets = search_results[
+                    search_results["collection"].isin(
+                        list(profile.collection_variables_map.keys())
+                    )
+                ].copy()
+            else:
+                profile_assets = search_results.copy()
+
+            if profile_assets.empty:
+                continue
+
+            # 2. Group by exact start_time
+            for start_time, time_group in profile_assets.groupby("start_time"):
+                # 3. Determine base geometry union of the group
+                if hasattr(time_group, "union_all"):
+                    group_geom = time_group.union_all()
+                else:
+                    group_geom = time_group.geometry.unary_union
+
+                if group_geom is None or group_geom.is_empty:
+                    continue
+
+                # 4. Intersect with target_aoi if provided
+                if target_aoi is not None:
+                    aoi_geom = target_aoi.intersection(group_geom)
+                else:
+                    aoi_geom = group_geom
+
+                if aoi_geom is None or aoi_geom.is_empty:
+                    continue
+
+                # 5. Generate grid cells specifically for the intersected geometry
+                all_cells = list(grid_def.generate_grid_cells(aoi_geom))
+                if not all_cells:
+                    continue
+
+                # 6. Chunk cells and create tasks
+                cell_chunks = [
+                    all_cells[i : i + cells_per_chunk]
+                    for i in range(0, len(all_cells), cells_per_chunk)
+                ]
+
+                for chunk_idx, cells in enumerate(cell_chunks):
+                    task = ExtractionTask(
+                        assets=cast(GeoDataFrame, time_group),
+                        profile=profile,
+                        uri=uri,
+                        grid_cells=cells,
+                        aoi=target_aoi,
+                        prepare_params=prepare_params,
+                        task_context={
+                            "chunk_id": chunk_idx,
+                            "total_chunks": len(cell_chunks),
+                            "start_time": str(start_time),
+                        },
+                    )
+                    tasks.append(task)
+
         return tasks
 
     @abstractmethod
@@ -203,7 +297,9 @@ class Extractor(AerPlugin, plugin_abstract=True):
                 This is one of the items returned by the `prepare_for_extraction` method.
                     extraction_task.task_context holds batch-specific data generated during preparation
             extract_params: Additional parameters for extraction,
-                user defined and specific to the collection, provider, outputs, etc. Holds global configuration (e.g. max_retries, credentials).
+                user defined and specific to the collection, provider, outputs, etc.
+                Holds global configuration (e.g. max_retries, credentials).
+                Per-task preparation parameters are available on ``extraction_task.prepare_params``.
 
         Returns:
             A GeoDataFrame of extracted artifacts, where each row corresponds to an extracted asset
@@ -216,30 +312,66 @@ class Extractor(AerPlugin, plugin_abstract=True):
         self,
         extraction_task_batch: Sequence[ExtractionTask],
         extract_params: Mapping[str, Any] | None = None,
+        max_batch_workers: int | None = None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """
-        Execute extraction over multiple batches.
+        Execute extraction over multiple batches, optionally in parallel.
 
-        The default implementation is sequential. Subclasses can override
-        this method to implement parallel execution (e.g., ThreadPoolExecutor,
-        multiprocessing, or distributed cloud compute) suited to their specific I/O profile.
+        When ``max_batch_workers`` is set, batches are processed in parallel
+        using ``ProcessPoolExecutor``.  Failed batches are logged and collected;
+        if *all* batches fail a ``RuntimeError`` is raised.
+
+        When ``max_batch_workers`` is ``None`` (default), falls back to
+        sequential execution.
 
         Args:
             extraction_task_batch: A sequence of ExtractionTask, where each one contains a batch
                 of assets to extract. This is the output of the `prepare_for_extraction` method.
             extract_params: Additional parameters for extraction,
                 user defined and specific to the collection, provider, outputs, etc.
+            max_batch_workers: Maximum number of worker processes for parallel execution.
+                ``None`` (default) disables parallelism and runs sequentially.
         Returns:
             A GeoDataFrame of extracted artifacts, where each row corresponds to an extracted asset
             and its corresponding grid_cell, and includes metadata such as collection, geometry,
+            time range, and any other relevant attributes.
         """
-        # default implementation: sequential execution of extract for each batch
-        results = []
-        for batch in extraction_task_batch:
-            # We call the abstract method internally
-            results.append(self.extract(batch, extract_params))
+        if max_batch_workers is None:
+            # Sequential path (original behaviour)
+            results = []
+            for batch in extraction_task_batch:
+                results.append(self.extract(batch, extract_params))
+            concatenated = pd.concat(results, ignore_index=True)
+            validated = ArtifactSchema.validate(concatenated)
+            return cast(GeoDataFrame[ArtifactSchema], validated)
 
-        # concat
+        # Parallel path
+        results: list[GeoDataFrame[ArtifactSchema]] = []
+        errors: list[str] = []
+
+        tasks = [(self, batch, extract_params) for batch in extraction_task_batch]
+
+        with ProcessPoolExecutor(max_workers=max_batch_workers) as executor:
+            futures = {
+                executor.submit(_extract_wrapper, *t): i for i, t in enumerate(tasks)
+            }
+
+            for future in as_completed(futures):
+                batch_idx = futures[future]
+                try:
+                    results.append(future.result())
+                except Exception as exc:  # noqa: BLE001
+                    logger.error(
+                        "batch_extract_failed",
+                        extra={"batch": batch_idx, "error": str(exc)},
+                    )
+                    errors.append(str(exc))
+
+        if not results:
+            raise RuntimeError(
+                f"All {len(extraction_task_batch)} batches failed. Errors: {errors}"
+            )
+
         concatenated = pd.concat(results, ignore_index=True)
         validated = ArtifactSchema.validate(concatenated)
         return cast(GeoDataFrame[ArtifactSchema], validated)
