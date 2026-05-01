@@ -8,6 +8,23 @@ from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
 
 
+class _PicklableExtractor(Extractor):
+    """Module-level extractor so ProcessPoolExecutor can pickle it."""
+
+    supported_collections = ["GOES"]
+
+    @property
+    def target_grid_d(self) -> int:
+        return 10000
+
+    def extract(
+        self,
+        extraction_task: ExtractionTask,
+        extract_params: dict[str, Any] | None,
+    ) -> GeoDataFrame[ArtifactSchema]:
+        return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
+
+
 def test_plugin_missing_supported_collections():
     with pytest.raises(
         TypeError, match="must define the 'supported_collections' attribute"
@@ -68,21 +85,7 @@ def test_extractor_abstract():
 
 
 def test_extractor_extract_batches(monkeypatch):
-    class ValidExtractor(Extractor):
-        supported_collections = ["GOES"]
-
-        @property
-        def target_grid_d(self) -> int:
-            return 10000
-
-        def extract(
-            self,
-            extraction_task: ExtractionTask,
-            extract_params: dict[str, Any] | None,
-        ) -> GeoDataFrame[ArtifactSchema]:
-            return extraction_task.assets  # pyright: ignore[reportReturnType]
-
-    extractor = ValidExtractor()
+    extractor = _PicklableExtractor()
     monkeypatch.setattr("aer.schemas.ArtifactSchema.validate", lambda x: x)
 
     df1 = gpd.GeoDataFrame(
@@ -115,8 +118,43 @@ def test_extractor_extract_batches(monkeypatch):
     assert list(result["id"]) == [1, 2]
 
 
+def test_extractor_extract_batches_parallel(monkeypatch):
+    """Parallel path uses forkserver/spawn and succeeds with picklable objects."""
+    extractor = _PicklableExtractor()
+    monkeypatch.setattr("aer.schemas.ArtifactSchema.validate", lambda x: x)
+
+    df1 = gpd.GeoDataFrame(
+        {"id": [1]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
+    )
+    df2 = gpd.GeoDataFrame(
+        {"id": [2]}, geometry=[Polygon([[1, 1], [2, 1], [2, 2], [1, 2]])]
+    )
+
+    from aer.interfaces.core import ExtractionProfile
+
+    profile = ExtractionProfile(name="default", resolution=10.0)
+
+    task1 = ExtractionTask(
+        assets=cast(Any, df1),
+        grid_cells=[],
+        profile=profile,
+        uri="test1",
+    )
+    task2 = ExtractionTask(
+        assets=cast(Any, df2),
+        grid_cells=[],
+        profile=profile,
+        uri="test2",
+    )
+
+    result = extractor.extract_batches([task1, task2], max_batch_workers=2)
+
+    assert len(result) == 2
+    assert sorted(result["id"].tolist()) == [1, 2]
+
+
 def test_extractor_prepare_for_extraction():
-    class ValidExtractor(Extractor):
+    class LargeGridExtractor(Extractor):
         supported_collections = ["GOES"]
 
         @property
@@ -128,9 +166,9 @@ def test_extractor_prepare_for_extraction():
             extraction_task: ExtractionTask,
             extract_params: dict[str, Any] | None,
         ) -> GeoDataFrame[ArtifactSchema]:
-            return extraction_task.assets  # pyright: ignore[reportReturnType]
+            return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
 
-    extractor = ValidExtractor()
+    extractor = LargeGridExtractor()
 
     from datetime import datetime
 
