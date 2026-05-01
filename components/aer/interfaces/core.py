@@ -1,8 +1,11 @@
 import logging
+import sys
 from abc import ABC, abstractmethod
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
-from typing import Any, Mapping, Sequence, cast
+from multiprocessing import get_context
+from pathlib import Path
+from typing import Any, Mapping, Protocol, Sequence, cast
 
 import attrs
 import pandas as pd
@@ -12,6 +15,14 @@ from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
 
 logger = logging.getLogger(__name__)
+
+
+class Downloader(Protocol):
+    """Callable that downloads a URL to a local path."""
+
+    def __call__(self, url: str, local_path: Path) -> None:
+        """Download *url* to *local_path*."""
+        ...
 
 
 class AerPlugin(ABC):
@@ -318,8 +329,12 @@ class Extractor(AerPlugin, plugin_abstract=True):
         Execute extraction over multiple batches, optionally in parallel.
 
         When ``max_batch_workers`` is set, batches are processed in parallel
-        using ``ProcessPoolExecutor``.  Failed batches are logged and collected;
-        if *all* batches fail a ``RuntimeError`` is raised.
+        using ``ProcessPoolExecutor`` with a ``forkserver`` context (Unix) or
+        ``spawn`` context (Windows).  This avoids thread-safety issues that can
+        occur with the default ``fork`` start method when threaded libraries
+        such as dask or rasterio have already been imported in the parent
+        process.  Failed batches are logged and collected; if *all* batches fail
+        a ``RuntimeError`` is raised.
 
         When ``max_batch_workers`` is ``None`` (default), falls back to
         sequential execution.
@@ -351,7 +366,10 @@ class Extractor(AerPlugin, plugin_abstract=True):
 
         tasks = [(self, batch, extract_params) for batch in extraction_task_batch]
 
-        with ProcessPoolExecutor(max_workers=max_batch_workers) as executor:
+        mp_context = get_context("spawn" if sys.platform == "win32" else "forkserver")
+        with ProcessPoolExecutor(
+            max_workers=max_batch_workers, mp_context=mp_context
+        ) as executor:
             futures = {
                 executor.submit(_extract_wrapper, *t): i for i, t in enumerate(tasks)
             }

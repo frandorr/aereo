@@ -6,6 +6,20 @@ They serve as a blueprint for the actual implementations of extractors and searc
 By defining these interfaces, we ensure that all implementations adhere to a consistent structure and can be easily integrated into the system.
 """
 
-from aer.interfaces.core import AerPlugin, ExtractionTask, Extractor, SearchProvider
+from aer.interfaces.core import (
+    AerPlugin,
+    Downloader,
+    ExtractionProfile,
+    ExtractionTask,
+    Extractor,
+    SearchProvider,
+)
 
-__all__ = ["AerPlugin", "ExtractionTask", "Extractor", "SearchProvider"]
+__all__ = [
+    "AerPlugin",
+    "Downloader",
+    "ExtractionProfile",
+    "ExtractionTask",
+    "Extractor",
+    "SearchProvider",
+]
