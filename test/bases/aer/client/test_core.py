@@ -367,3 +367,141 @@ def test_search_plugin_hint_case_insensitive(monkeypatch):
     )
 
     mock_registry.get_searcher.assert_called_with("preferred_searcher")
+
+
+# ---------------------------------------------------------------------------
+# prepare_for_extraction – target_grid_dist / target_grid_overlap forwarding
+# ---------------------------------------------------------------------------
+
+
+def _make_prepare_client(monkeypatch, valid_search_df):
+    """Return a client whose extractor mock captures prepare_for_extraction calls."""
+    from aer.interfaces.core import ExtractionProfile, ExtractionTask
+    from typing import cast
+    from pandera.typing.geopandas import GeoDataFrame
+
+    mock_registry = MagicMock(spec=AerRegistry)
+    monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
+
+    mock_registry.find_extractors_for.return_value = ["dummy_extractor"]
+    mock_extractor = MagicMock()
+
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_search_df),
+        profile=ExtractionProfile(name="test", resolution=10),
+        uri="test-uri",
+        grid_cells=[],
+    )
+    mock_extractor.prepare_for_extraction.return_value = [task]
+    mock_registry.get_extractor.return_value = mock_extractor
+
+    client = AerClient(registry=mock_registry)
+    return client, mock_extractor
+
+
+def _make_valid_search_df():
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "MODIS"
+    return valid_df
+
+
+def test_prepare_for_extraction_passes_target_grid_dist(monkeypatch):
+    """target_grid_dist kwarg must be forwarded to extractor.prepare_for_extraction."""
+    valid_search_df = _make_valid_search_df()
+    client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
+
+    client.prepare_for_extraction(
+        search_results=valid_search_df,
+        resolution=100.0,
+        uri="s3://bucket/out/",
+        target_grid_dist=50_000,
+    )
+
+    call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
+    assert call_kwargs.get("target_grid_dist") == 50_000
+
+
+def test_prepare_for_extraction_passes_target_grid_overlap(monkeypatch):
+    """target_grid_overlap kwarg must be forwarded to extractor.prepare_for_extraction."""
+    valid_search_df = _make_valid_search_df()
+    client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
+
+    client.prepare_for_extraction(
+        search_results=valid_search_df,
+        resolution=100.0,
+        uri="s3://bucket/out/",
+        target_grid_overlap=True,
+    )
+
+    call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
+    assert call_kwargs.get("target_grid_overlap") is True
+
+
+def test_prepare_for_extraction_passes_none_grid_params_by_default(monkeypatch):
+    """When not supplied, both grid params should be forwarded as None (defer to extractor)."""
+    valid_search_df = _make_valid_search_df()
+    client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
+
+    client.prepare_for_extraction(
+        search_results=valid_search_df,
+        resolution=100.0,
+        uri="s3://bucket/out/",
+    )
+
+    call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
+    assert call_kwargs.get("target_grid_dist") is None
+    assert call_kwargs.get("target_grid_overlap") is None
+
+
+def test_run_pipeline_forwards_grid_params(monkeypatch):
+    """run_pipeline must thread target_grid_dist and target_grid_overlap to prepare_for_extraction."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
+    monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
+
+    # Search side
+    mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
+    mock_searcher = MagicMock()
+    valid_search_df = _make_valid_search_df()
+    mock_searcher.search.return_value = valid_search_df
+    mock_registry.get_searcher.return_value = mock_searcher
+
+    # Extractor side
+    from aer.interfaces.core import ExtractionProfile, ExtractionTask
+    from typing import cast
+    from pandera.typing.geopandas import GeoDataFrame
+
+
+    mock_registry.find_extractors_for.return_value = ["dummy_extractor"]
+    mock_extractor = MagicMock()
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_search_df),
+        profile=ExtractionProfile(name="test", resolution=10),
+        uri="s3://out",
+        grid_cells=[],
+    )
+    mock_extractor.prepare_for_extraction.return_value = [task]
+    valid_artifact_df = pd.DataFrame(
+        columns=list(ArtifactSchema.to_schema().columns.keys())
+    )
+    valid_artifact_df.loc[0] = {
+        col: "test" for col in ArtifactSchema.to_schema().columns.keys()
+    }
+    valid_artifact_df["geometry"] = Point(0, 0)
+    mock_extractor.extract_batches.return_value = valid_artifact_df
+    mock_registry.get_extractor.return_value = mock_extractor
+
+    client = AerClient(registry=mock_registry)
+    client.run_pipeline(
+        collections=["MODIS"],
+        resolution=10,
+        target_grid_dist=100_000,
+        target_grid_overlap=True,
+    )
+
+    call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
+    assert call_kwargs.get("target_grid_dist") == 100_000
+    assert call_kwargs.get("target_grid_overlap") is True
+
