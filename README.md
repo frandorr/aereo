@@ -109,7 +109,7 @@ print("Supported collections:", registry.list_supported_collections())
 *   **Vectorized Grid Engine**: A MajorTOM-compatible grid engine that uses vectorized grid cell generation and standard UTM projections.
 *   **Extensible Extraction Profiles**: `ExtractionProfile` defines blueprints for extraction (resolution, variables) and includes an `extra_params` container for plugin-specific configuration (e.g., Satpy reader mappings).
 *   **Decoupled Extraction Tasks**: `ExtractionTask` objects are now first-class citizens with explicit `aoi` and `prepare_params` attributes, making it easier to build plugins that respond to user constraints.
-*   **Type-Safety First**: Uses `attrs` and `pandera` to ensure strict runtime enforcement of data models and geospatial dataframe schemas.
+
 
 ### Creating Your First Plugin
 
