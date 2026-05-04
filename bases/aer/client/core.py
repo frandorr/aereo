@@ -358,6 +358,8 @@ class AerClient:
         prepare_params: Optional[Mapping[str, Any]] = None,
         init_params: Optional[Mapping[str, Any]] = None,
         plugin_hints: Optional[Mapping[str, str | Sequence[str]]] = None,
+        target_grid_dist: Optional[int] = None,
+        target_grid_overlap: Optional[bool] = None,
     ) -> Sequence[ExtractionTask]:
         """Groups search results by collection and distributes batches to appropriate Extractors.
 
@@ -381,6 +383,11 @@ class AerClient:
                 Supports two formats:
                 * Collection → plugin: ``{"MODIS": "my_extractor"}``
                 * Plugin → collections (inverted): ``{"my_extractor": ["MODIS", "VIIRS"]}``
+            target_grid_dist (Optional[int]): Override the extractor's default grid cell size in meters
+                (e.g. ``100_000`` for 100 km cells).  When ``None``, the extractor's ``target_grid_d``
+                property is used.
+            target_grid_overlap (Optional[bool]): Override the extractor's default grid overlap setting.
+                When ``None``, the extractor's ``target_grid_overlap`` property is used.
 
         Returns:
             A Sequence of prepared ExtractionTasks.
@@ -444,6 +451,8 @@ class AerClient:
         batches = extractor.prepare_for_extraction(
             cast(GeoDataFrame, search_results),
             target_aoi=norm_intersects,
+            target_grid_dist=target_grid_dist,
+            target_grid_overlap=target_grid_overlap,
             uri=uri,
             profiles=resolved_profiles,
             prepare_params=c_params,
@@ -582,6 +591,8 @@ class AerClient:
         failure_mode: FailureMode = FailureMode.STRICT,
         max_batch_workers: Optional[int] = None,
         profiles: Optional[Sequence[ExtractionProfile]] = None,
+        target_grid_dist: Optional[int] = None,
+        target_grid_overlap: Optional[bool] = None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """Convenience "God Method" running the entire data lifecycle sequentially.
 
@@ -606,6 +617,10 @@ class AerClient:
             failure_mode (FailureMode): Error handling strategy.
             max_batch_workers (Optional[int]): Number of parallel workers for extraction.
             profiles (Optional[Sequence[ExtractionProfile]]): Detailed extraction profiles.
+            target_grid_dist (Optional[int]): Override the extractor's default grid cell size in meters.
+                Forwarded to :meth:`prepare_for_extraction`.
+            target_grid_overlap (Optional[bool]): Override the extractor's default grid overlap setting.
+                Forwarded to :meth:`prepare_for_extraction`.
         """
         search_df = self.search(
             collections=collections,
@@ -627,6 +642,8 @@ class AerClient:
             prepare_params=prepare_params,
             init_params=init_params,
             plugin_hints=plugin_hints,
+            target_grid_dist=target_grid_dist,
+            target_grid_overlap=target_grid_overlap,
         )
 
         return self.extract_batches(

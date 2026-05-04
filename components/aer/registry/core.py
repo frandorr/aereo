@@ -164,6 +164,10 @@ class AerRegistry:
             return [c.lower() for c in collection_names]
 
         canonical_to_original = self._searcher_collection_mapping[plugin_name]
+        # Wildcard plugins (e.g. ["*"]) should preserve user's original case
+        if "*" in canonical_to_original:
+            return list(collection_names)
+
         result = []
         for col in collection_names:
             canonical = col.lower()
@@ -196,6 +200,10 @@ class AerRegistry:
             return [c.lower() for c in collection_names]
 
         canonical_to_original = self._extractor_collection_mapping[plugin_name]
+        # Wildcard plugins (e.g. ["*"]) should preserve user's original case
+        if "*" in canonical_to_original:
+            return list(collection_names)
+
         result = []
         for col in collection_names:
             canonical = col.lower()
