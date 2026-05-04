@@ -154,12 +154,13 @@ def test_client_run_pipeline_e2e(monkeypatch):
     from typing import cast
     from pandera.typing.geopandas import GeoDataFrame
 
+    from aer.interfaces.core import ExtractionProfile
+
     task = ExtractionTask(
         assets=cast(GeoDataFrame, valid_search_df),
-        target_grid_d=10000,
-        target_grid_overlap=False,
-        resolution=10,
+        profile=ExtractionProfile(name="test", resolution=10),
         uri="test-uri",
+        grid_cells=[],
     )
     mock_extractor.prepare_for_extraction.return_value = [task]
     # It must extract and return an ArtifactSchema
@@ -177,7 +178,7 @@ def test_client_run_pipeline_e2e(monkeypatch):
     client = AerClient(registry=mock_registry)
 
     # Run the big convenient wrapper
-    final_df = client.run_pipeline(collections=["MODIS"])
+    final_df = client.run_pipeline(collections=["MODIS"], resolution=10)
 
     assert len(final_df) == 1
     mock_searcher.search.assert_called_once()
@@ -282,6 +283,64 @@ def test_normalize_hints_lowercases_keys():
 
 def test_normalize_hints_empty():
     assert AerClient._normalize_hints({}) == {}
+
+
+def test_normalize_hints_inverted_format():
+    """Inverted format: plugin -> [collections] should expand to collection -> plugin."""
+    result = AerClient._normalize_hints({"extract_satpy": ["VJ202IMG", "VJ203IMG"]})
+    assert result == {
+        "vj202img": "extract_satpy",
+        "vj203img": "extract_satpy",
+    }
+
+
+def test_normalize_hints_inverted_format_lowercases_collections():
+    """Collection names in inverted format should be lower-cased."""
+    result = AerClient._normalize_hints(
+        {"MyPlugin": ["Sentinel-2-L2A", "ABI-L1b-RadF"]}
+    )
+    assert result == {
+        "sentinel-2-l2a": "MyPlugin",
+        "abi-l1b-radf": "MyPlugin",
+    }
+
+
+def test_normalize_hints_mixed_formats():
+    """Legacy and inverted formats can coexist (though not recommended)."""
+    result = AerClient._normalize_hints(
+        {
+            "MODIS": "legacy_plugin",  # legacy
+            "extract_satpy": ["VJ202IMG", "VJ203IMG"],  # inverted
+        }
+    )
+    assert result == {
+        "modis": "legacy_plugin",
+        "vj202img": "extract_satpy",
+        "vj203img": "extract_satpy",
+    }
+
+
+def test_search_plugin_hint_inverted_format(monkeypatch):
+    """Inverted plugin_hints should resolve correctly for search."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry.find_searchers_for.return_value = []  # No auto-discovery
+    mock_registry.get_collection_mapping_for_searcher.return_value = ["modis"]
+    mock_registry.list_supported_collections.return_value = ["modis"]
+
+    mock_searcher = MagicMock()
+    monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "modis"
+    mock_searcher.search.return_value = valid_df
+    mock_registry.get_searcher.return_value = mock_searcher
+
+    client = AerClient(registry=mock_registry)
+    client.search(
+        collections=["modis"],
+        plugin_hints={"preferred_searcher": ["modis"]},  # inverted
+    )
+    mock_registry.get_searcher.assert_called_with("preferred_searcher")
 
 
 def test_search_plugin_hint_case_insensitive(monkeypatch):

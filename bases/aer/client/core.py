@@ -1,4 +1,3 @@
-from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from enum import Enum
@@ -6,7 +5,7 @@ from typing import Any, Mapping, Optional, Sequence, cast
 
 import pandas as pd
 import json
-from aer.interfaces import ExtractionTask
+from aer.interfaces import ExtractionProfile, ExtractionTask
 from aer.registry import AerRegistry
 from aer.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -61,15 +60,29 @@ class AerClient:
         self.registry = registry or AerRegistry()
 
     @staticmethod
-    def _normalize_hints(hints: dict[str, str]) -> dict[str, str]:
-        """Return a copy of *hints* with all keys lowercased.
+    def _normalize_hints(hints: Mapping[str, str | Sequence[str]]) -> Mapping[str, str]:
+        """Normalize plugin hints to a collection→plugin mapping with lower-cased keys.
 
-        This makes plugin_hints lookups case-insensitive: the user can write
-        ``{"Sentinel-2-L2A": "my_plugin"}`` and the lookup against
-        ``"sentinel-2-l2a"`` (the value stored by the registry) will still
-        resolve correctly.
+        Supports two input shapes:
+
+        * **Collection → plugin** (legacy)::
+            ``{"Sentinel-2-L2A": "my_plugin", "ABI-L1b-RadF": "goes_plugin"}``
+        * **Plugin → collections** (inverted)::
+            ``{"extract_satpy": ["VJ202IMG", "VJ203IMG"]}``
+
+        Both are normalized to ``{collection.lower(): plugin}`` so that downstream
+        lookups are case-insensitive.
         """
-        return {k.lower(): v for k, v in hints.items()}
+        normalized: dict[str, str] = {}
+        for key, value in hints.items():
+            if isinstance(value, str):
+                # Legacy format: collection -> plugin
+                normalized[key.lower()] = value
+            else:
+                # Inverted format: plugin -> [collections, ...]
+                for collection in value:
+                    normalized[str(collection).lower()] = key
+        return normalized
 
     def _resolve_params(
         self, params: Optional[Mapping[str, Any]], collection: str
@@ -121,7 +134,7 @@ class AerClient:
         return resolved
 
     def _resolve_plugin_for_collection(
-        self, plugin_type: str, collection: str, plugin_hints: dict[str, str]
+        self, plugin_type: str, collection: str, plugin_hints: Mapping[str, str]
     ) -> Optional[str]:
         """Resolves the appropriate plugin name for a collection, factoring in user hints.
 
@@ -182,7 +195,7 @@ class AerClient:
         end_datetime: Optional[datetime] = None,
         search_params: Optional[Mapping[str, Any]] = None,
         init_params: Optional[Mapping[str, Any]] = None,
-        plugin_hints: Optional[dict[str, str]] = None,
+        plugin_hints: Optional[Mapping[str, str | Sequence[str]]] = None,
         failure_mode: FailureMode = FailureMode.BEST_EFFORT,
     ) -> GeoDataFrame[AssetSchema]:
         """Find data across massive sensor networks utilizing parallel Fan-Out search dispatch.
@@ -203,7 +216,10 @@ class AerClient:
                     # Per-collection kwargs
                     init_params={"GOES-16": {"timeout": 60}, "Sentinel-2-L2A": {"timeout": 10}}
 
-            plugin_hints (Optional[dict[str, str]]): Optional mapping of collection to preferred plugin name for search.
+            plugin_hints (Optional[dict[str, str | Sequence[str]]]): Optional mapping specifying preferred plugins.
+                    Supports two formats:
+                    * Collection → plugin: ``{"MODIS": "my_searcher"}``
+                    * Plugin → collections (inverted): ``{"my_searcher": ["MODIS", "VIIRS"]}``
                     If not provided, the first registered plugin will be used.
             failure_mode (FailureMode): Determines pipeline behavior when partial or total plugin failures occur. Defaults to BEST_EFFORT.
                 - STRICT: Any plugin failure raises an exception and halts the pipeline.
@@ -338,17 +354,19 @@ class AerClient:
         target_aoi: Optional[BaseGeometry | dict] = None,
         resolution: Optional[float] = None,
         uri: Optional[str] = None,
+        profiles: Optional[Sequence[ExtractionProfile]] = None,
         prepare_params: Optional[Mapping[str, Any]] = None,
         init_params: Optional[Mapping[str, Any]] = None,
-        plugin_hints: Optional[dict[str, str]] = None,
+        plugin_hints: Optional[Mapping[str, str | Sequence[str]]] = None,
     ) -> Sequence[ExtractionTask]:
         """Groups search results by collection and distributes batches to appropriate Extractors.
 
         Args:
             search_results: The merged GeoDataFrame of search results to prepare.
             target_aoi: Optional area of interest as a shapely geometry.
-            resolution: The desired resolution for extraction.
+            resolution: The desired resolution for extraction. If provided, a default profile is created.
             uri: An optional URI defining output path or identifier.
+            profiles: A sequence of ExtractionProfile objects. If provided, they take precedence over resolution.
             prepare_params: Additional parameters to pass to prepare_for_extraction method.
             init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for extractor instantiation.
                 Supports global and per-collection overrides, matching the ``prepare_params`` pattern::
@@ -359,7 +377,10 @@ class AerClient:
                     # Or globally for all extractors
                     init_params={"target_grid_d": 50_000}
 
-            plugin_hints: Optional mapping of collection to preferred plugin name.
+            plugin_hints (Optional[dict[str, str | Sequence[str]]]): Optional mapping specifying preferred plugins.
+                Supports two formats:
+                * Collection → plugin: ``{"MODIS": "my_extractor"}``
+                * Plugin → collections (inverted): ``{"my_extractor": ["MODIS", "VIIRS"]}``
 
         Returns:
             A Sequence of prepared ExtractionTasks.
@@ -371,9 +392,10 @@ class AerClient:
         norm_intersects = normalize_geometry(target_aoi)
         all_tasks = []
 
-        grouped_results = search_results.groupby("collection")
-
-        for collection, df_group in grouped_results:
+        # Resolve extractor for all collections (assumes single extractor for all collections in profiles)
+        unique_collections = search_results["collection"].unique()
+        plugin_set = set()
+        for collection in unique_collections:
             collection_str = str(collection)
             target_plugin = self._resolve_plugin_for_collection(
                 "extractor", collection_str, plugin_hints
@@ -382,36 +404,52 @@ class AerClient:
                 raise ValueError(
                     f"No Extractor plugin found for collection: {collection_str}"
                 )
+            plugin_set.add(target_plugin)
 
-            # Resolve targeted init kwargs and instantiate the extractor
-            c_init = self._resolve_params(init_params, collection_str)
-            extractor = self.registry.get_extractor(target_plugin, **c_init)
-
-            # Resolve targeted parameters for this collection
-            c_params = self._resolve_params(prepare_params, collection_str)
-
-            logger.debug(
-                "prepare_batches_start", plugin=target_plugin, collection=collection_str
+        if len(plugin_set) > 1:
+            raise ValueError(
+                f"Multiple extractor plugins found for collections: {list(unique_collections)}. "
+                "Ensure all collections use the same extractor or use per-collection profiles."
             )
 
-            # Create a default profile if resolution is provided but no profiles are defined
-            from aer.interfaces.core import ExtractionProfile
+        target_plugin = plugin_set.pop()
+        first_collection = (
+            str(unique_collections[0]) if len(unique_collections) > 0 else ""
+        )
 
-            resolved_profiles = []
-            if resolution is not None:
-                resolved_profiles.append(
-                    ExtractionProfile(name="default", resolution=resolution)
-                )
+        # Resolve init and prepare params
+        c_init = self._resolve_params(init_params, first_collection)
+        extractor = self.registry.get_extractor(target_plugin, **c_init)
+        c_params = self._resolve_params(prepare_params, first_collection)
 
-            batches = extractor.prepare_for_extraction(
-                cast(GeoDataFrame, df_group),
-                target_aoi=norm_intersects,
-                uri=uri,
-                profiles=resolved_profiles,
-                prepare_params=c_params,
+        logger.debug(
+            "prepare_batches_start",
+            plugin=target_plugin,
+            collections=list(unique_collections),
+        )
+
+        # Determine profiles for extraction
+        if profiles:
+            resolved_profiles = list(profiles)
+        elif resolution is not None:
+            resolved_profiles = [
+                ExtractionProfile(name="default", resolution=resolution)
+            ]
+        else:
+            raise ValueError(
+                "Either 'profiles' or 'resolution' must be provided for extraction."
             )
 
-            all_tasks.extend(batches)
+        # Pass full search results to extractor (profile filtering happens there)
+        batches = extractor.prepare_for_extraction(
+            cast(GeoDataFrame, search_results),
+            target_aoi=norm_intersects,
+            uri=uri,
+            profiles=resolved_profiles,
+            prepare_params=c_params,
+        )
+
+        all_tasks.extend(batches)
 
         return all_tasks
 
@@ -420,17 +458,16 @@ class AerClient:
         extraction_task_batch: Sequence[ExtractionTask],
         extract_params: Optional[Mapping[str, Any]] = None,
         init_params: Optional[Mapping[str, Any]] = None,
-        plugin_hints: Optional[dict[str, str]] = None,
+        plugin_hints: Optional[Mapping[str, str | Sequence[str]]] = None,
         failure_mode: FailureMode = FailureMode.STRICT,
         max_batch_workers: Optional[int] = None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """
-        Executes the extraction phase by iterating over the provided ExtractionTasks,
-        grouping them by collection, and dynamically invoking each Extractor plugin.
+        Executes the extraction phase by delegating all ExtractionTasks to the appropriate Extractor plugin.
 
         Args:
             extraction_task_batch: A sequence of ExtractionTasks, usually from prepare_for_extraction.
-            extract_params: Additional parameters to pass to each Extractor.
+            extract_params: Additional parameters to pass to the Extractor.
             init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for extractor instantiation.
                 Supports global and per-collection overrides, matching the ``extract_params`` pattern::
 
@@ -440,7 +477,10 @@ class AerClient:
                     # Or per-collection
                     init_params={"ABI-L1b-RadC": {"target_grid_d": 50_000, "target_grid_overlap": True}}
 
-            plugin_hints: Optional mapping of collection to preferred plugin name.
+            plugin_hints (Optional[dict[str, str | Sequence[str]]]): Optional mapping specifying preferred plugins.
+                Supports two formats:
+                * Collection → plugin: ``{"MODIS": "my_extractor"}``
+                * Plugin → collections (inverted): ``{"my_extractor": ["MODIS", "VIIRS"]}``
             failure_mode: STRICT raises errors; BEST_EFFORT continues with successful plugins.
 
         Returns:
@@ -450,61 +490,76 @@ class AerClient:
         errors = []
         plugin_hints = self._normalize_hints(plugin_hints or {})
 
-        # Group tasks by collection
-        collection_tasks: dict[str, list[ExtractionTask]] = defaultdict(list)
+        if not extraction_task_batch:
+            logger.warning("extract_empty_result", reason="No tasks provided")
+            return cast(GeoDataFrame, ArtifactSchema.empty())
+
+        # Collect all unique collections from tasks
+        unique_collections: set[str] = set()
         for task in extraction_task_batch:
             if not task.assets.empty:
-                collection = str(task.assets["collection"].iloc[0])
-                collection_tasks[collection].append(task)
+                unique_collections.add(str(task.assets["collection"].iloc[0]))
 
-        for collection, tasks in collection_tasks.items():
-            try:
-                target_plugin = self._resolve_plugin_for_collection(
-                    "extractor", collection, plugin_hints
-                )
-                if not target_plugin:
-                    raise RuntimeError(f"No plugin found for collection: {collection}")
-            except Exception as e:
-                errors.append(e)
-                if failure_mode == FailureMode.STRICT:
-                    raise e
-                continue
+        if not unique_collections:
+            logger.warning(
+                "extract_empty_result", reason="No collections found in tasks"
+            )
+            return cast(GeoDataFrame, ArtifactSchema.empty())
 
-            # Resolve targeted init kwargs and instantiate the extractor
-            c_init = self._resolve_params(init_params, collection)
-            extractor = self.registry.get_extractor(target_plugin, **c_init)
-            batch_count = len(tasks)
+        # Resolve extractor plugin for all collections, ensure consistency
+        plugin_set: set[str] = set()
+        for collection in unique_collections:
+            target_plugin = self._resolve_plugin_for_collection(
+                "extractor", collection, plugin_hints
+            )
+            if not target_plugin:
+                raise RuntimeError(f"No plugin found for collection: {collection}")
+            plugin_set.add(target_plugin)
 
-            # Resolve targeted parameters for this collection
-            c_params = self._resolve_params(extract_params, collection)
-
-            logger.info(
-                "extract_batches_start",
-                plugin=target_plugin,
-                batch_count=batch_count,
-                collection=collection,
+        if len(plugin_set) > 1:
+            raise ValueError(
+                f"Multiple extractor plugins found for collections: {list(unique_collections)}. "
+                "Ensure all collections use the same extractor."
             )
 
-            try:
-                df = extractor.extract_batches(
-                    tasks, extract_params=c_params, max_batch_workers=max_batch_workers
-                )
-                all_artifacts.append(df)
-            except Exception as e:
-                logger.error(
-                    "extract_failed",
-                    plugin=target_plugin,
-                    collection=collection,
-                    exc_info=True,
-                )
-                errors.append(e)
+        target_plugin = plugin_set.pop()
+        first_collection = next(iter(unique_collections))
+
+        # Resolve init params and instantiate extractor
+        c_init = self._resolve_params(init_params, first_collection)
+        extractor = self.registry.get_extractor(target_plugin, **c_init)
+
+        # Resolve extract params
+        c_params = self._resolve_params(extract_params, first_collection)
+
+        logger.info(
+            "extract_batches_start",
+            plugin=target_plugin,
+            batch_count=len(extraction_task_batch),
+            collections=list(unique_collections),
+        )
+
+        try:
+            df = extractor.extract_batches(
+                extraction_task_batch,
+                extract_params=c_params,
+                max_batch_workers=max_batch_workers,
+            )
+            all_artifacts.append(df)
+        except Exception as e:
+            logger.error(
+                "extract_failed",
+                plugin=target_plugin,
+                collections=list(unique_collections),
+                exc_info=True,
+            )
+            errors.append(e)
 
         if not all_artifacts:
             if failure_mode == FailureMode.STRICT and errors:
                 raise RuntimeError(
-                    f"Extraction failed strictly for all plugins. {len(errors)} errors captured."
+                    f"Extraction failed strictly. {len(errors)} errors captured."
                 )
-
             logger.warning("extract_empty_result", reason="No artifacts retrieved")
             return cast(GeoDataFrame, ArtifactSchema.empty())
 
@@ -523,17 +578,34 @@ class AerClient:
         prepare_params: Optional[Mapping[str, Any]] = None,
         extract_params: Optional[Mapping[str, Any]] = None,
         init_params: Optional[Mapping[str, Any]] = None,
-        plugin_hints: Optional[dict[str, str]] = None,
+        plugin_hints: Optional[Mapping[str, str | Sequence[str]]] = None,
         failure_mode: FailureMode = FailureMode.STRICT,
         max_batch_workers: Optional[int] = None,
+        profiles: Optional[Sequence[ExtractionProfile]] = None,
     ) -> GeoDataFrame[ArtifactSchema]:
-        """Convenience 'God Method' running the entire data lifecycle sequentially.
+        """Convenience "God Method" running the entire data lifecycle sequentially.
 
         Args:
+            collections (Sequence[str]): List of collection identifiers to search across.
+            intersects (Optional[BaseGeometry | dict]): Optional geometry for spatial filtering.
+            start_datetime (Optional[datetime]): Optional start datetime for temporal filtering.
+            end_datetime (Optional[datetime]): Optional end datetime for temporal filtering.
+            search_params (Optional[Mapping[str, Any]]): Additional parameters for search plugins.
+            resolution (Optional[float]): Desired resolution. Used if profiles is None.
+            uri (Optional[str]): Output destination URI.
+            prepare_params (Optional[Mapping[str, Any]]): Parameters for task preparation.
+            extract_params (Optional[Mapping[str, Any]]): Parameters for data extraction.
             init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs forwarded to all
                 plugin instantiations (searchers and extractors). Supports global and per-collection
                 overrides — see :meth:`search`, :meth:`prepare_for_extraction`, and
                 :meth:`extract_batches` for details.
+            plugin_hints (Optional[dict[str, str | Sequence[str]]]): Preferred plugins for specific collections.
+                Supports two formats:
+                * Collection → plugin: ``{"MODIS": "my_searcher"}``
+                * Plugin → collections (inverted): ``{"my_searcher": ["MODIS", "VIIRS"]}``
+            failure_mode (FailureMode): Error handling strategy.
+            max_batch_workers (Optional[int]): Number of parallel workers for extraction.
+            profiles (Optional[Sequence[ExtractionProfile]]): Detailed extraction profiles.
         """
         search_df = self.search(
             collections=collections,
@@ -551,6 +623,7 @@ class AerClient:
             target_aoi=intersects,
             resolution=resolution,
             uri=uri,
+            profiles=profiles,
             prepare_params=prepare_params,
             init_params=init_params,
             plugin_hints=plugin_hints,

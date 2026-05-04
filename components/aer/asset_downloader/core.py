@@ -1,17 +1,31 @@
 import shutil
 from pathlib import Path
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
+
+if TYPE_CHECKING:
+    from aer.interfaces import Downloader
 
 
 def download_asset_safely(
-    href: str, local_path: Path, s3_client: Optional[Any] = None
+    href: str,
+    local_path: Path,
+    s3_client: Optional[Any] = None,
+    http_session: Optional[Any] = None,
+    downloader: Optional["Downloader"] = None,
 ) -> None:
     """Download asset with a filelock to avoid corruption in multi-processing.
 
     Args:
         href: URL or local path to the asset.
         local_path: Destination path for the downloaded file.
-        s3_client: Optional authenticated S3FileSystem to use instead of anonymous.
+        s3_client: Optional authenticated S3FileSystem for S3 access.
+            Note: Only works when running in AWS us-west-2 region.
+        http_session: Optional authenticated requests.Session for HTTPS downloads.
+            Use earthaccess.get_requests_https_session() to create.
+            Works from anywhere (no AWS region requirement).
+        downloader: Optional callable that handles the download itself.
+            If provided, it is called unconditionally inside the file lock
+            and all built-in logic is skipped.
     """
     import filelock
     import s3fs
@@ -22,13 +36,16 @@ def download_asset_safely(
 
     with filelock.FileLock(str(lock_path)):
         if not local_path.exists():
-            if href.startswith("s3://"):
+            if downloader is not None:
+                downloader(href, local_path)
+            elif href.startswith("s3://"):
                 fs = (
                     s3_client if s3_client is not None else s3fs.S3FileSystem(anon=True)
                 )
                 fs.get(href.replace("s3://", ""), str(local_path))
             elif href.startswith("http://") or href.startswith("https://"):
-                response = requests.get(href, stream=True)
+                http = http_session if http_session is not None else requests
+                response = http.get(href, stream=True)
                 response.raise_for_status()
                 with open(local_path, "wb") as f:
                     for chunk in response.iter_content(chunk_size=8192):

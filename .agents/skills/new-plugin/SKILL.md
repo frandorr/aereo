@@ -14,24 +14,25 @@ When the user asks to implement a new plugin (e.g., for Sentinel-2, Landsat, or 
 ### 1. Understand Goal & Examples
 - Read the user's goal carefully.
 - Inspect the provided example website, notebook, or tutorial (using the `read_url_content` tool) to understand the necessary API calls and data fetching logic.
-- Review existing reference implementations such as `/root/repos/aer-search-aws-goes` and `/root/repos/aer-extract-aws-goes` (using the `view_file` tool) to understand the plugin architecture, interfaces, and expected schemas.
+- Review existing reference implementations such as [aer-search-aws-goes](https://github.com/frandorr/aer-search-aws-goes) and [aer-extract-aws-goes](https://github.com/frandorr/aer-extract-aws-goes) to understand the plugin architecture, interfaces, and expected schemas.
 - NOTE: Search plugins must output `GeoDataFrame[AssetSchema]`. Extract plugins must output `GeoDataFrame[ArtifactSchema]`.
 
 ### 2. Scaffold Repositories
 For both the search plugin and the extract plugin, perform the following scaffolding steps:
 ```bash
-# 1. Copy the plugin template (excluding heavy caches)
-rsync -a --exclude='.venv' --exclude='.ruff_cache' --exclude='.mypy_cache' /root/repos/aer-plugin-template/ /root/repos/<plugin-name>/
+# 1. Clone the plugin template
+git clone https://github.com/frandorr/aer-plugin-template <plugin-name>
 
-# 2. Run the template setup script automatically
-cd /root/repos/<plugin-name>
-echo -e "<plugin-name>\nAntigravity\naer-project\n" | bash setup.sh
+# 2. Run the template setup script
+cd <plugin-name>
+# The setup script typically asks for: plugin-name, author-name, and project-name
+echo -e "<plugin-name>\n<author-name>\n<project-name>\n" | bash setup.sh
 ```
 
 ### 3. Install Specific Dependencies
 Based on your knowledge of the example implementation, add required packages to each plugin:
 ```bash
-cd /root/repos/<plugin-name>
+cd <plugin-name>
 uv add <dependencies...> # (e.g., pystac-client, planetary-computer, odc-stac, rioxarray)
 ```
 
@@ -50,7 +51,7 @@ Modify `components/aer/<plugin_module_name>/core.py` in the extract repository.
 - Align/resample the data to the bounding box and `utm_crs` belonging to each `GridCell` overlapping the asset.
 - Define a grid (by default `target_grid_d=10_000` or 10km grid limits).
 - Save the processed tiles local disk as NetCDF/TIFF (`.nc`/`.tif`) files and record their absolute paths as `uri`.
-- Build and return a `GeoDataFrame` correctly cast & validated as `ArtifactSchema`. Required columns: `id`, `source_ids`, `start_time`, `end_time`, `uri`, `geometry`, `collection`, `grid_cell`, `grid_dist`, `cell_geometry`, `cell_utm_crs`, `cell_utm_fooprint`.
+- Build and return a `GeoDataFrame` correctly cast & validated as `ArtifactSchema`. Required columns: `id`, `source_ids`, `start_time`, `end_time`, `uri`, `geometry`, `collection`, `grid_cell`, `grid_dist`, `cell_geometry`, `cell_utm_crs`, `cell_utm_footprint`.
 
 ### 6. Verification
 Ensure all linting errors are mitigated and the code correctly imports interfaces from `aer.interfaces`. If needed, test the entry point discoverability using `uv run poly info`.
