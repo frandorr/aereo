@@ -409,11 +409,14 @@ def _make_valid_search_df():
 
 def test_prepare_for_extraction_passes_target_grid_dist(monkeypatch):
     """target_grid_dist kwarg must be forwarded to extractor.prepare_for_extraction."""
+    from typing import cast
+    from pandera.typing.geopandas import GeoDataFrame
+
     valid_search_df = _make_valid_search_df()
     client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
 
     client.prepare_for_extraction(
-        search_results=valid_search_df,
+        search_results=cast(GeoDataFrame, valid_search_df),
         resolution=100.0,
         uri="s3://bucket/out/",
         target_grid_dist=50_000,
@@ -425,11 +428,14 @@ def test_prepare_for_extraction_passes_target_grid_dist(monkeypatch):
 
 def test_prepare_for_extraction_passes_target_grid_overlap(monkeypatch):
     """target_grid_overlap kwarg must be forwarded to extractor.prepare_for_extraction."""
+    from typing import cast
+    from pandera.typing.geopandas import GeoDataFrame
+
     valid_search_df = _make_valid_search_df()
     client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
 
     client.prepare_for_extraction(
-        search_results=valid_search_df,
+        search_results=cast(GeoDataFrame, valid_search_df),
         resolution=100.0,
         uri="s3://bucket/out/",
         target_grid_overlap=True,
@@ -441,11 +447,14 @@ def test_prepare_for_extraction_passes_target_grid_overlap(monkeypatch):
 
 def test_prepare_for_extraction_passes_none_grid_params_by_default(monkeypatch):
     """When not supplied, both grid params should be forwarded as None (defer to extractor)."""
+    from typing import cast
+    from pandera.typing.geopandas import GeoDataFrame
+
     valid_search_df = _make_valid_search_df()
     client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
 
     client.prepare_for_extraction(
-        search_results=valid_search_df,
+        search_results=cast(GeoDataFrame, valid_search_df),
         resolution=100.0,
         uri="s3://bucket/out/",
     )
@@ -472,7 +481,6 @@ def test_run_pipeline_forwards_grid_params(monkeypatch):
     from aer.interfaces.core import ExtractionProfile, ExtractionTask
     from typing import cast
     from pandera.typing.geopandas import GeoDataFrame
-
 
     mock_registry.find_extractors_for.return_value = ["dummy_extractor"]
     mock_extractor = MagicMock()
@@ -504,4 +512,3 @@ def test_run_pipeline_forwards_grid_params(monkeypatch):
     call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
     assert call_kwargs.get("target_grid_dist") == 100_000
     assert call_kwargs.get("target_grid_overlap") is True
-
