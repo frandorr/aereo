@@ -317,6 +317,17 @@ def mosaic_eoids_tiles(
 
     dst_crs = CRS.from_user_input(target_crs)
 
+    # Sort by descending valid-pixel count so that tiles with the most
+    # coverage are processed first by merge(method='first').  This prevents
+    # sparse tiles (which may contain NaN outside the actual swath) from
+    # blocking valid data in overlapping areas.
+    def _valid_count(entry: dict[str, Any]) -> int:
+        with rasterio.open(entry["path"]) as src:
+            data = src.read(1)
+            return int(np.sum(~np.isnan(data) & (data != 0)))
+
+    entries.sort(key=_valid_count, reverse=True)
+
     datasets: list[WarpedVRT | rasterio.DatasetReader] = []
     opened: list[rasterio.DatasetReader] = []
     try:
