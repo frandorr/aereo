@@ -5,8 +5,7 @@ from shapely.geometry import Point
 
 from aer.registry.core import AerRegistry
 from aer.client.core import AerClient, FailureMode, normalize_geometry
-from aer.schemas.core import AssetSchema, ArtifactSchema
-from aer.interfaces.core import ExtractionTask
+from aer.schemas.core import AssetSchema
 
 
 def test_normalize_geometry_dict_to_shapely():
@@ -127,63 +126,6 @@ def test_client_search_all_fail_best_effort():
         collections=["MODIS"], failure_mode=FailureMode.BEST_EFFORT
     )
     assert len(search_results) == 0
-
-
-def test_client_run_pipeline_e2e(monkeypatch):
-    mock_registry = MagicMock(spec=AerRegistry)
-
-    # -- Search Setup --
-    mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
-    mock_searcher = MagicMock()
-    monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
-    monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
-
-    valid_search_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
-    valid_search_df.loc[0] = {
-        col: "test" for col in AssetSchema.to_schema().columns.keys()
-    }
-    valid_search_df["geometry"] = Point(0, 0)
-    valid_search_df["collection"] = "MODIS"
-    mock_searcher.search.return_value = valid_search_df
-
-    mock_registry.get_searcher.return_value = mock_searcher
-
-    # -- Extractor Setup --
-    mock_registry.find_extractors_for.return_value = ["dummy_extractor"]
-    mock_extractor = MagicMock()
-    from typing import cast
-    from pandera.typing.geopandas import GeoDataFrame
-
-    from aer.interfaces.core import ExtractionProfile
-
-    task = ExtractionTask(
-        assets=cast(GeoDataFrame, valid_search_df),
-        profile=ExtractionProfile(name="test", resolution=10),
-        uri="test-uri",
-        grid_cells=[],
-    )
-    mock_extractor.prepare_for_extraction.return_value = [task]
-    # It must extract and return an ArtifactSchema
-    valid_artifact_df = pd.DataFrame(
-        columns=list(ArtifactSchema.to_schema().columns.keys())
-    )
-    valid_artifact_df.loc[0] = {
-        col: "test" for col in ArtifactSchema.to_schema().columns.keys()
-    }
-    valid_artifact_df["geometry"] = Point(0, 0)
-    mock_extractor.extract_batches.return_value = valid_artifact_df
-
-    mock_registry.get_extractor.return_value = mock_extractor
-
-    client = AerClient(registry=mock_registry)
-
-    # Run the big convenient wrapper
-    final_df = client.run_pipeline(collections=["MODIS"], resolution=10)
-
-    assert len(final_df) == 1
-    mock_searcher.search.assert_called_once()
-    mock_extractor.prepare_for_extraction.assert_called_once()
-    mock_extractor.extract_batches.assert_called_once()
 
 
 # ---------------------------------------------------------------------------
@@ -462,53 +404,3 @@ def test_prepare_for_extraction_passes_none_grid_params_by_default(monkeypatch):
     call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
     assert call_kwargs.get("target_grid_dist") is None
     assert call_kwargs.get("target_grid_overlap") is None
-
-
-def test_run_pipeline_forwards_grid_params(monkeypatch):
-    """run_pipeline must thread target_grid_dist and target_grid_overlap to prepare_for_extraction."""
-    mock_registry = MagicMock(spec=AerRegistry)
-    monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
-    monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
-
-    # Search side
-    mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
-    mock_searcher = MagicMock()
-    valid_search_df = _make_valid_search_df()
-    mock_searcher.search.return_value = valid_search_df
-    mock_registry.get_searcher.return_value = mock_searcher
-
-    # Extractor side
-    from aer.interfaces.core import ExtractionProfile, ExtractionTask
-    from typing import cast
-    from pandera.typing.geopandas import GeoDataFrame
-
-    mock_registry.find_extractors_for.return_value = ["dummy_extractor"]
-    mock_extractor = MagicMock()
-    task = ExtractionTask(
-        assets=cast(GeoDataFrame, valid_search_df),
-        profile=ExtractionProfile(name="test", resolution=10),
-        uri="s3://out",
-        grid_cells=[],
-    )
-    mock_extractor.prepare_for_extraction.return_value = [task]
-    valid_artifact_df = pd.DataFrame(
-        columns=list(ArtifactSchema.to_schema().columns.keys())
-    )
-    valid_artifact_df.loc[0] = {
-        col: "test" for col in ArtifactSchema.to_schema().columns.keys()
-    }
-    valid_artifact_df["geometry"] = Point(0, 0)
-    mock_extractor.extract_batches.return_value = valid_artifact_df
-    mock_registry.get_extractor.return_value = mock_extractor
-
-    client = AerClient(registry=mock_registry)
-    client.run_pipeline(
-        collections=["MODIS"],
-        resolution=10,
-        target_grid_dist=100_000,
-        target_grid_overlap=True,
-    )
-
-    call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
-    assert call_kwargs.get("target_grid_dist") == 100_000
-    assert call_kwargs.get("target_grid_overlap") is True

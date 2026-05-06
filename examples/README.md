@@ -1,6 +1,59 @@
 # AER Examples
 
-This directory contains example notebooks, datasets, and visualizations demonstrating the AER (Asset Extraction and Retrieval) framework for satellite data processing.
+Jupyter notebooks demonstrating the AER (Asset Extraction and Retrieval) framework for satellite data processing.
+
+---
+
+## Before You Start
+
+1. **Python ≥ 3.13** — `python --version`
+2. **aer installed** — run `uv sync` from the repo root
+3. **Earthdata login** (only for NASA sensors: MODIS, VIIRS, Sentinel-3):
+   ```bash
+   # Option 1: Create a .netrc file
+   echo "machine urs.earthdata.nasa.gov login YOUR_USER password YOUR_PASS" >> ~/.netrc
+   chmod 600 ~/.netrc
+
+   # Option 2: Environment variables
+   export EARTHDATA_USERNAME=YOUR_USER
+   export EARTHDATA_PASSWORD=YOUR_PASS
+   ```
+4. **Disk space**: ~500 MB–2 GB per sensor
+
+---
+
+## Quick Start: Pick a Notebook
+
+| Notebook | Sensor | Auth | ⏱ Est. Time | 💾 Disk | Recommended |
+|----------|--------|:----:|:-----------:|:-------:|:-----------:|
+| [goes_abi_extraction.ipynb](extraction/goes_abi_extraction.ipynb) | GOES-19 ABI | None ✅ | ~3 min | ~200 MB | ⭐ **Start here** |
+| [sentinel2_msi_extraction.ipynb](extraction/sentinel2_msi_extraction.ipynb) | Sentinel-2 MSI | None ✅ | ~5 min | ~500 MB | |
+| [modis_terra_extraction.ipynb](extraction/modis_terra_extraction.ipynb) | MODIS Terra | Earthdata 🔐 | ~5 min | ~800 MB | |
+| [viirs_extraction.ipynb](extraction/viirs_extraction.ipynb) | VIIRS (NOAA-21) | Earthdata 🔐 | ~8 min | ~1 GB | |
+| [sentinel3_olci_extraction.ipynb](extraction/sentinel3_olci_extraction.ipynb) | Sentinel-3 OLCI | Earthdata 🔐 | ~10 min | ~2 GB | |
+
+### Running a Notebook
+
+```bash
+cd aer
+uv run jupyter notebook examples/
+```
+
+Or convert to a script and run directly:
+
+```bash
+cd aer/examples/extraction
+uv run jupyter nbconvert --to script goes_abi_extraction.ipynb
+uv run python goes_abi_extraction.py
+```
+
+Every notebook follows the same 4-step pattern:
+1. **Search** — Find granules intersecting an AOI for a date range
+2. **Prepare** — Generate grid cells and create extraction tasks
+3. **Extract** — Download and process raw data into GeoTIFFs
+4. **Output** — Files organized by `location/date/satellite/product/band/resolution`
+
+> 📖 New to AER? Read the [root README](../README.md) for the full quickstart and API overview.
 
 ---
 
@@ -8,58 +61,48 @@ This directory contains example notebooks, datasets, and visualizations demonstr
 
 ```
 examples/
-├── extraction/         # Data extraction notebooks by sensor
-├── grid/             # Grid system and filtering demonstrations
-├── visualization/    # Multi-sensor visualization examples
-├── *.geojson         # Sample AOIs (Buenos Aires, Cordoba, Bari, etc.)
-└── extract_*/        # Extracted output directories (auto-generated)
+├── extraction/           # Extraction notebooks (one per sensor)
+├── grid/                 # Grid system and filtering demonstrations
+├── visualization/        # Multi-sensor visualization examples
+├── data/                 # Shared sample AOIs (GeoJSON files)
+│   ├── buenos_aires.geojson
+│   ├── cordoba.geojson
+│   ├── bari.geojson
+│   └── test_aoi.geojson
+└── extract_*/            # Extracted output directories (auto-generated, not in git)
 ```
 
 ---
 
-## Extraction Examples (`extraction/`)
+## Core Concepts
 
-Notebooks demonstrating how to search and extract data from different satellite sensors:
+After running your first notebook, here are the key abstractions:
 
-| Notebook | Sensor | Description |
-|----------|--------|-------------|
-| `goes_abi_extraction.ipynb` | GOES-16 ABI | Full-disk geostationary imagery |
-| `modis_terra_extraction.ipynb` | MODIS Terra | Global daily coverage, 250m-1km |
-| `sentinel2_msi_extraction.ipynb` | Sentinel-2 MSI | 10m resolution optical imagery |
-| `sentinel3_olci_extraction.ipynb` | Sentinel-3 OLCI | Ocean and land color instrument |
-| `viirs_extraction.ipynb` | VIIRS (NOAA-21) | Day/night band and thermal imagery |
-
-Each notebook follows the same pattern:
-1. **Search**: Find granules intersecting an AOI for a date range
-2. **Prepare**: Generate grid cells and create extraction tasks
-3. **Extract**: Download and process raw data into GeoTIFFs
-4. **Output**: Organized by `location/date/satellite/product/band/resolution`
+| Concept | What it does |
+|---------|--------------|
+| **`AerClient`** | Central orchestrator. Auto-discovers plugins, routes searches, delegates extraction. |
+| **`ExtractionProfile`** | Blueprint: which bands to extract, target resolution, plugin-specific params. |
+| **`prepare_for_extraction`** | Groups results by profile and time, generates grid cells, chunks into tasks. |
+| **`extract_batches`** | Executes tasks — sequential or parallel via `ProcessPoolExecutor`. |
+| **EOIDS** | Output file structure: `loc-<cell>/date-<YYYYMMDD>/sat-<platform>/...tif` |
 
 ---
 
 ## Grid Filtering (`grid/`)
 
-### Grid Cell Filtering Modes
+When preparing extraction tasks, grid cells can be filtered based on their relationship to the satellite swath footprint. This prevents extracting near-empty cells.
 
-When preparing extraction tasks, grid cells can be filtered based on their relationship to the asset geometry (the actual satellite swath footprint, not just its bounding box). This prevents extracting near-empty cells that only have valid data for a small fraction of their area.
-
-#### The Problem
-
-By default, AER uses **intersection** filtering: any grid cell that touches the asset geometry is selected. This can lead to cells that are 95% empty (NaN) because the satellite swath only grazes the corner of the cell.
-
-#### Three Filter Modes
+### Three Filter Modes
 
 | Mode | Parameter | Behavior | Use Case |
 |------|-----------|----------|----------|
-| **Intersection** | `grid_filter_mode='intersection'` (default) | Cell touches asset geometry at any point | Maximize coverage, accept partial cells |
-| **Within** | `grid_filter_mode='within'` | Cell is fully contained inside asset geometry | Only fully valid cells, minimize edge effects |
-| **Coverage** | `grid_filter_mode='coverage'` + `min_coverage=0.5` | Cell has ≥X% of its area inside asset geometry | Balanced approach, configurable threshold |
+| **Intersection** | `grid_filter_mode='intersection'` (default) | Cell touches asset geometry at any point | Maximize coverage |
+| **Within** | `grid_filter_mode='within'` | Cell is fully inside asset geometry | Only fully valid cells |
+| **Coverage** | `grid_filter_mode='coverage'` + `min_coverage=0.5` | Cell has ≥X% area inside geometry | Balanced approach |
 
-#### Visual Comparison
+### Visual Comparison
 
 Using a real VIIRS granule over Buenos Aires (13 grid cells total):
-
-**Side-by-side comparison of all three modes:**
 
 ![Grid Filter Modes Comparison](grid/grid_filter_modes_comparison.png)
 
@@ -68,27 +111,23 @@ Using a real VIIRS granule over Buenos Aires (13 grid cells total):
 - **Light blue**: Asset geometry (actual satellite swath footprint)
 - **Black outline**: Area of Interest (AOI)
 
-**Coverage percentages for each cell:**
+**Coverage percentages per cell:**
 
 ![Grid Filter Coverage Detail](grid/grid_filter_coverage_detail.png)
 
-This heatmap shows the exact coverage percentage of each cell. Cells near the boundary may have only 10-30% valid data, while central cells are 100% covered.
+| Filter Mode | Cells Selected | Cells Discarded |
+|-------------|:--------------:|:---------------:|
+| `intersection` | 8 | 5 |
+| `within` | 3 | 10 |
+| `coverage >= 50%` | 5 | 8 |
 
-#### Results for Buenos Aires VIIRS Example
-
-| Filter Mode | Cells Selected | Cells Discarded | Description |
-|-------------|---------------|-----------------|-------------|
-| `intersection` | 8 | 5 | Default. Includes cells barely touched by swath |
-| `within` | 3 | 10 | Conservative. Only fully contained cells |
-| `coverage >= 50%` | 5 | 8 | Balanced. Requires meaningful overlap |
-
-#### Usage
+### Usage
 
 ```python
 client.prepare_for_extraction(
     search_results=results,
     profiles=profiles,
-    uri="/tmp/output",
+    uri="output/extraction",
     prepare_params={
         "grid_filter_mode": "coverage",   # or "intersection", "within"
         "min_coverage": 0.5,               # 0.0 to 1.0, only for "coverage" mode
@@ -97,9 +136,7 @@ client.prepare_for_extraction(
 )
 ```
 
-#### Notebook
-
-See `grid/grid_filter_modes_demo.ipynb` for the full demonstration with interactive code.
+See [grid/grid_filter_modes_demo.ipynb](grid/grid_filter_modes_demo.ipynb) for the full demonstration.
 
 ---
 
@@ -107,30 +144,30 @@ See `grid/grid_filter_modes_demo.ipynb` for the full demonstration with interact
 
 | Notebook | Description |
 |----------|-------------|
-| `multi_constellation_visualization.ipynb` | Compare multiple sensors (GOES, MODIS, Sentinel-2, Sentinel-3, VIIRS) in a single view |
+| [multi_constellation_visualization.ipynb](visualization/multi_constellation_visualization.ipynb) | Compare multiple sensors (GOES, MODIS, Sentinel-2, Sentinel-3, VIIRS) in a single view |
 
-**Output example:**
+**Output example — Same grid cell viewed by four sensors:**
 
-- `multi_date_mosaic_fixed.png` — Time-series mosaic composite
-
-![Multi-date Mosaic](visualization/multi_date_mosaic_fixed.png)
+![Single Cell Comparison](visualization/single_cell_comparison.png)
 
 ---
 
 ## Sample AOIs
 
+All sample AOIs are in the `data/` directory and shared across notebooks:
+
 | File | Region | Coordinates (approx) |
 |------|--------|---------------------|
-| `buenos_aires.geojson` | Buenos Aires province, Argentina | -63.5,-41 to -57,-34 |
-| `cordoba.geojson` | Cordoba province, Argentina | -65.5,-33 to -62,-29 |
-| `bari.geojson` | Bari, Italy | 16.5,40.8 to 17.5,41.2 |
-| `test_aoi.geojson` | Small test polygon | Minimal bounding box |
+| `data/buenos_aires.geojson` | Buenos Aires province, Argentina | -63.5,-41 to -57,-34 |
+| `data/cordoba.geojson` | Cordoba province, Argentina | -65.5,-33 to -62,-29 |
+| `data/bari.geojson` | Bari, Italy | 16.5,40.8 to 17.5,41.2 |
+| `data/test_aoi.geojson` | Small test polygon | Minimal bounding box |
 
 ---
 
-## Extracted Data Directories
+## EOIDS Output Structure
 
-Directories named `extract_*` contain actual extraction outputs organized as:
+Extracted data follows the [Earth Observation Imaging Data Structure](../docs/eoids.md) convention:
 
 ```
 extract_buenos_aires_viirs/
@@ -138,45 +175,16 @@ extract_buenos_aires_viirs/
 │   └── date-20260401/
 │       └── sat-NOAA21/
 │           └── loc-15D21L_start-..._band-I04_res-400m.tif
-├── VJ202IMG.A2026091.1818.021...nc   # Source granule
 └── ...
 ```
 
-These are generated by running the extraction notebooks and are **not** tracked in git.
-
----
-
-## Running the Examples
-
-All notebooks use the AER virtual environment at `/root/repos/aer/.venv`:
-
-```bash
-cd /root/repos/aer
-.venv/bin/jupyter notebook examples/
-```
-
-Or convert to script and run:
-
-```bash
-cd /root/repos/aer/examples/extraction
-.venv/bin/jupyter nbconvert --to script viirs_extraction.ipynb
-.venv/bin/python viirs_extraction.py
-```
-
----
-
-## Requirements
-
-The examples assume:
-- AER framework installed (`/root/repos/aer`)
-- Earthdata authentication (for NASA datasets: MODIS, VIIRS)
-- Sufficient disk space for satellite granules (500MB-2GB per sensor)
+These directories are generated by running extraction notebooks and are **not** tracked in git.
 
 ---
 
 ## Notes
 
-- **Grid cell size**: Default is 256km (`target_grid_dist=256000`). Adjust based on sensor resolution and AOI size.
+- **Grid cell size**: Default is 256 km (`target_grid_dist=256000`). Adjust based on sensor resolution and AOI size.
 - **Padding**: Default 2 pixels. Increases extracted area slightly to avoid edge artifacts.
 - **Resampling**: Default `nearest`. Alternatives: `bilinear`, `native`.
 - **Workers**: `max_batch_workers=2` for parallel extraction. Set to `None` for sequential (safer for memory).

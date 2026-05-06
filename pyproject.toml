@@ -5,10 +5,10 @@ requires = [ "hatchling" ]
 [project]
 name = "aer"
 version = "0.1.0"
-description = "A Python Polylith template code repo"
+description = "Modular satellite data discovery, extraction, and processing framework"
 readme = "README.md"
 license = "MIT"
-authors = [ { name = "Your Name" } ]
+authors = [ { name = "Francisco Dorr" } ]
 requires-python = ">=3.13"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
