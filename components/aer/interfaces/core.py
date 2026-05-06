@@ -272,6 +272,36 @@ class Extractor(AerPlugin, plugin_abstract=True):
                 if not all_cells:
                     continue
 
+                # 5b. Optional grid cell filtering by asset coverage
+                grid_filter_mode = str(
+                    prepare_params.get("grid_filter_mode", "intersection")
+                ).lower()
+                if grid_filter_mode != "intersection":
+                    min_coverage = float(prepare_params.get("min_coverage", 0.0))
+                    filtered_cells = []
+                    for cell in all_cells:
+                        cell_geom = cell.geom
+                        if grid_filter_mode == "within":
+                            if group_geom.contains(cell_geom):
+                                filtered_cells.append(cell)
+                        elif grid_filter_mode == "coverage":
+                            intersection = cell_geom.intersection(group_geom)
+                            coverage = (
+                                intersection.area / cell_geom.area
+                                if cell_geom.area > 0
+                                else 0.0
+                            )
+                            if coverage >= min_coverage:
+                                filtered_cells.append(cell)
+                        else:
+                            raise ValueError(
+                                f"Unknown grid_filter_mode: {grid_filter_mode}. "
+                                f"Use 'intersection', 'within', or 'coverage'."
+                            )
+                    all_cells = filtered_cells
+                    if not all_cells:
+                        continue
+
                 # 6. Chunk cells and create tasks
                 cell_chunks = [
                     all_cells[i : i + cells_per_chunk]
