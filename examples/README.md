@@ -109,11 +109,11 @@ See `grid/grid_filter_modes_demo.ipynb` for the full demonstration with interact
 |----------|-------------|
 | `multi_constellation_visualization.ipynb` | Compare multiple sensors (GOES, MODIS, Sentinel-2, Sentinel-3, VIIRS) in a single view |
 
-**Output examples:**
+**Output example:**
 
-- `multi_constellation_5panel.png` — Side-by-side comparison of all 5 sensors
-- `multi_constellation_mosaic_test.png` — Mosaic test composite
-- `multi_date_mosaic.png` / `multi_date_mosaic_fixed.png` — Time-series mosaics
+- `multi_date_mosaic_fixed.png` — Time-series mosaic composite
+
+![Multi-date Mosaic](visualization/multi_date_mosaic_fixed.png)
 
 ---
 
