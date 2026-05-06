@@ -1,181 +1,157 @@
 # aer 🪐
 
-**aer** (from the Greek word for *air*) is a modular, high-performance Python framework for satellite data discovery, extraction, and processing. Built with the Polylith architecture, it provides an extensible foundation for handling multi-sensor Earth observation data with a focus on type-safety and cloud-native workflows.
+**aer** (from the Greek word for *air*) is a plugin-based Python framework for satellite data discovery, extraction, and processing. Install only the sensor plugins you need — `aer` handles search, spatial gridding, and extraction into analysis-ready GeoTIFFs.
+
+> From zero to analysis-ready satellite GeoTIFFs in minutes.
+
+![Same grid cell (loc-16D20L) viewed by four different sensors: GOES-19 ABI, MODIS Terra, VIIRS NOAA-21, and Sentinel-3 OLCI](examples/visualization/single_cell_comparison.png)
 
 ---
 
-## ⚡️ Quickstart: The Simplest Example Ever
+## 🌐 Built on Major TOM
 
-We designed `aer` so you can go from zero to extracted satellite data in minutes.
+`aer`'s spatial grid engine is built on [**Major TOM**](https://github.com/ESA-PhiLab/Major-TOM) (Terrestrial Observation Metaset), an open framework by [ESA Φ-lab](https://huggingface.co/ESA-philab) for curating large-scale Earth Observation datasets.
 
-### 1. Installation
+Major TOM provides a **globally uniform grid** that partitions Earth's surface into consistent cells with standard UTM projections — ensuring pixel-perfect alignment across different sensors and resolutions.
 
-Install the core framework. We highly recommend using [`uv`](https://github.com/astral-sh/uv) to manage your Python projects!
+`aer` extends this with `GridDefinition` (generates cells over any polygon), `GridCell` (carries unique ID, CRS, and resampling footprint), and `area_def()` (builds [pyresample](https://pyresample.readthedocs.io/)-compatible area definitions). Data extracted by `aer` is spatially indexed and interoperable with the [Major TOM ecosystem](https://huggingface.co/Major-TOM).
+
+> 📄 *Major TOM: Expandable Datasets for Earth Observation* — [arxiv.org/abs/2402.12095](https://arxiv.org/abs/2402.12095)
+
+---
+
+## 📡 Extensible by Design
+
+`aer` is **not limited to a fixed set of sensors**. It is a plugin-based framework — any satellite mission can be supported by installing or writing a plugin. The `aer-search-earthaccess` plugin alone can search [any collection available in NASA's CMR catalog](https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html), and `aer-extract-satpy` can extract data for [any reader supported by Satpy](https://satpy.readthedocs.io/en/stable/). The combination covers **hundreds of missions and products** out of the box.
+
+Here are some examples of sensor configurations that have been tested end-to-end:
+
+| Sensor | Example Collection(s) | Search Plugin | Extract Plugin | Auth |
+|--------|----------------------|---------------|----------------|:----:|
+| GOES ABI | `ABI-L1b-RadF`, `ABI-L2-AODF` | `aer-search-aws-goes` | `aer-extract-satpy` | None ✅ |
+| MODIS Terra | `MOD021KM` | `aer-search-earthaccess` | `aer-extract-satpy` | Earthdata 🔐 |
+| Sentinel-2 MSI | *(via STAC)* | `aer-search-pc-sentinel2` | `aer-extract-pc-sentinel2` | None ✅ |
+| Sentinel-3 OLCI | `S3A_OL_1_EFR` | `aer-search-earthaccess` | `aer-extract-satpy` | None ✅ |
+| VIIRS (NOAA-21) | `VJ202IMG`, `VJ203IMG` | `aer-search-earthaccess` | `aer-extract-satpy` | Earthdata 🔐 |
+
+> Collection names are **case-insensitive** — `abi-l1b-radf` and `ABI-L1b-RadF` both work.
+>
+> Want to add a new sensor or data source? Write a plugin in ~50 lines — see the [Plugin Developer Guide](./docs/build-your-own-plugin.md).
+
+---
+
+## ⚡️ Quickstart
+
+### 1. Install
 
 ```bash
-pip install aer-core
-
-# Optional: Install any community plugins you need for specific satellites.
-# e.g., pip install aer-search-aws-goes
+# Core + GOES plugins (public S3, no auth needed)
+pip install aer-core aer-search-aws-goes aer-extract-satpy
 ```
 
-### 2. The One-Liner Pipeline
+### 2. Search → Prepare → Extract
 
-The easiest way to use `aer` is via the `run_pipeline` method. Give it a collection and a time range, and `aer` automatically handles searching, preparing, and extracting the data behind the scenes.
+`aer` follows a three-step pipeline: **Search** (discover granules), **Prepare** (generate grid-aligned tasks), and **Extract** (download and process into GeoTIFFs).
 
 ```python
 from datetime import datetime, timezone
-from aer.client import AerClient, FailureMode
+from aer.client import AerClient
+from aer.interfaces import ExtractionProfile
 
-# 1. Initialize the client (auto-discovers your installed plugins)
+# Initialize — auto-discovers installed plugins
 client = AerClient()
 
-# 2. Run the end-to-end pipeline
-results_df = client.run_pipeline(
-    collections=["abi-l1b-radc"], # Use any collection supported by an installed plugin
-    start_datetime=datetime(2026, 1, 1, 10, 0, tzinfo=timezone.utc),
-    end_datetime=datetime(2026, 1, 1, 11, 0, tzinfo=timezone.utc),
-    failure_mode=FailureMode.BEST_EFFORT,
-)
-
-print(f"Success! Pipeline completed with {len(results_df)} artifacts.")
-```
-
----
-
-## 📈 Intermediate: Step-by-Step Control
-
-Sometimes you need more control than the automated pipeline. `aer` allows you to break the process into explicit, manageable steps: **Search**, **Prepare**, and **Extract**.
-
-### Step 1: Search (Discovery)
-Find available satellite data before committing time to download or process it. Results are returned as a schema-validated GeoDataFrame.
-
-```python
+# 1. Search: find granules intersecting your AOI
 search_results = client.search(
-    collections=["abi-l1b-radc"],
+    collections=["ABI-L1b-RadF"],
     start_datetime=datetime(2026, 1, 1, 10, 0, tzinfo=timezone.utc),
     end_datetime=datetime(2026, 1, 1, 11, 0, tzinfo=timezone.utc),
+    search_params={"ABI-L1b-RadF": {"satellite": "GOES-19"}},
 )
-print(f"Found {len(search_results)} matching assets across providers.")
-```
 
-### Step 2: Prepare (Task Generation)
-Group your search results into logical extraction tasks. This is where you declare your output resolution or remote storage locations.
-
-```python
+# 2. Prepare: define what to extract and generate grid-aligned tasks
+profiles = [
+    ExtractionProfile(
+        name="goes_c07",
+        resolution=2000,
+        collection_variables_map={"ABI-L1b-RadF": ["C07"]},
+        extra_params={"reader": "abi_l1b"},
+    )
+]
 tasks = client.prepare_for_extraction(
     search_results,
-    resolution=1000.0,
-    uri="s3://my-aer-bucket/processed_data/",
+    profiles=profiles,
+    uri="output/goes_extraction",
 )
-```
 
-### Step 3: Extract (Processing)
-Execute the prepared tasks. `aer` automatically routes tasks to the correct extraction plugins.
-
-```python
+# 3. Extract: download, resample, and write GeoTIFFs
 artifacts = client.extract_batches(
     tasks,
-    failure_mode=FailureMode.BEST_EFFORT,
-    max_batch_workers=4  # 🚀 Enable multi-core parallel extraction!
+    extract_params={"padding": 2, "resampling": "nearest", "calibration": "radiance"},
+    max_batch_workers=4,
 )
-print(f"Successfully processed {len(artifacts)} files.")
+print(f"Done! {len(artifacts)} GeoTIFFs written.")
 ```
 
 > [!TIP]
-> Use `max_batch_workers` to parallelize extraction across multiple CPU cores. This is particularly effective for I/O bound tasks like downloading and resampling satellite granules.
+> Use `max_batch_workers` to parallelize extraction across CPU cores.
 
 ---
 
-## 🧠 Advanced: Building Plugins & Extending `aer`
+## 🔌 Plugin System
 
-`aer` is powered by an extensible plugin system based on standard Python entry points. If you need support for an unsupported satellite or catalog, you can just build a new plugin.
-
-### The Plugin Registry
-When you initialize `aer`, it scans your python environment for registered plugins. You can explore them manually:
+Plugins are standard Python packages that declare `SearchProvider` or `Extractor` interfaces and register via `entry_points`. The `AerRegistry` discovers them at runtime — no manual wiring needed.
 
 ```python
 from aer.registry import AerRegistry
-
 registry = AerRegistry()
-
-# See exactly what your current environment is capable of processing
-print("Supported collections:", registry.list_supported_collections())
+print(registry.list_supported_collections())
 ```
 
-### Core Architecture Concepts
-`aer` consists of specialized, interoperable components decoupled into reusable Python Polylith blocks:
-*   **Instrument-Agnostic Models**: Strongly typed data models for spectral bands, spatial grids, and temporal ranges.
-*   **Vectorized Grid Engine**: A MajorTOM-compatible grid engine that uses vectorized grid cell generation and standard UTM projections.
-*   **Extensible Extraction Profiles**: `ExtractionProfile` defines blueprints for extraction (resolution, variables) and includes an `extra_params` container for plugin-specific configuration (e.g., Satpy reader mappings).
-*   **Decoupled Extraction Tasks**: `ExtractionTask` objects are now first-class citizens with explicit `aoi` and `prepare_params` attributes, making it easier to build plugins that respond to user constraints.
-
-
-### Creating Your First Plugin
-
-Plugins use object-oriented patterns under strict interfaces (`SearchProvider` and `Extractor`).
-
-**1. Inherit from the interface:**
+To create a plugin, subclass the interface and register it in your `pyproject.toml`:
 
 ```python
 from aer.interfaces import SearchProvider
-from datetime import datetime
-from typing import Sequence, Mapping, Any
 
-class MyAwesomeSearch(SearchProvider):
-    # MANDATORY: Declare what you handle!
-    supported_collections = ["my-custom-sensor-l1"]
-
-    def search(
-        self,
-        collections: Sequence[str],
-        intersects: Any | None = None,
-        start_datetime: datetime | None = None, # ...
-    ):
-        # Return a matched GeoDataFrame of results!
+class MySearch(SearchProvider):
+    supported_collections = ["my-sensor-l1"]
+    def search(self, collections, **kwargs):
         ...
 ```
 
-**2. Hook it in via `pyproject.toml`:**
-
 ```toml
 [project.entry-points."aer.plugins"]
-my_search = "my_package.plugin:MyAwesomeSearch"
+my_search = "my_package:MySearch"
 ```
 
-For the full, detailed tutorial, check out the [Plugin Developer Guide](./docs/build-your-own-plugin.md).
+Full tutorial → [Plugin Developer Guide](./docs/build-your-own-plugin.md)
 
 ---
 
-## 🤝 Participating in Development
-
-`aer` uses the **Polylith** architecture to make building, testing, and scaling large multi-module repositories a breeze.
-
-### Setup locally
-```bash
-git clone https://github.com/frandorr/aer.git
-cd aer
-uv sync
-```
-
-### Testing
-Because components are fully decoupled, you can test specifically what you change:
+## 🤝 Development
 
 ```bash
-# Run tests for a specific component only
-uv run pytest test/components/aer/spatial/
-
-# Run the entire test suite
-uv run pytest
+git clone https://github.com/frandorr/aer.git && cd aer && uv sync
+uv run pytest test/components/aer/spatial/   # test one component
+uv run pytest                                 # full suite
+uv run poly create component --name my_feat   # add a new component
 ```
 
-### Adding New Components
-Use the `uv poly` toolsuite to seamlessly spawn new infrastructure:
-```bash
-uv run poly create component --name my_feature
-```
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Pipeline Architecture](docs/pipeline-architecture.md) | Three-phase pipeline with UML diagrams and data flow |
+| [EOIDS Format](docs/eoids.md) | Output file structure convention (BIDS-inspired) |
+| [Plugin System](docs/plugins.md) | How plugins are discovered and routed |
+| [Build Your Own Plugin](docs/build-your-own-plugin.md) | Step-by-step guide for custom search/extract plugins |
+| [Installation Guide](docs/installation.md) | Core + plugin installation for users and developers |
+| [Examples](examples/README.md) | Jupyter notebooks for every supported sensor |
 
 ---
 
 ## 📄 License
+
 MIT License

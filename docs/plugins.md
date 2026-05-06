@@ -54,7 +54,6 @@ Plugins must declare `supported_collections` as a sequence of strings.
 ```python
 from typing import Any
 from pandera.typing.geopandas import GeoDataFrame
-
 from aer.interfaces import Extractor
 from aer.schemas import AssetSchema, ArtifactSchema
 
@@ -78,33 +77,50 @@ class MyExtractor(Extractor):
 
 ## Using the High-Level API (Recommended)
 
-The `AerClient` module provides a simple, robust interface that handles object discovery, mapping collections to plugins, parallel search execution, and unified error handling (`FailureMode`).
+The `AerClient` provides a simple, robust interface that handles plugin discovery, collection routing, parallel search, and configurable error handling.
+
+### Usage
 
 ```python
-from datetime import datetime
-from aer.client import AerClient, FailureMode
+from datetime import datetime, timezone
+from aer.client import AerClient
+from aer.interfaces import ExtractionProfile
 
 client = AerClient()
 
-# 1. Run the entire pipeline in one go
-artifacts_df = client.run_pipeline(
-    collections=["my-satellite-data"],
-    start_datetime=datetime(2023, 1, 1),
-    end_datetime=datetime(2023, 1, 31),
-    failure_mode=FailureMode.BEST_EFFORT, # Continue if some plugins fail
+# 1. Search
+search_results = client.search(
+    collections=["ABI-L1b-RadF"],
+    start_datetime=datetime(2026, 1, 1, 10, 0, tzinfo=timezone.utc),
+    end_datetime=datetime(2026, 1, 1, 11, 0, tzinfo=timezone.utc),
+    plugin_hints={"search_aws_goes": ["ABI-L1b-RadF"]},
+)
+print(f"Found {len(search_results)} assets.")
+
+# 2. Prepare tasks
+profiles = [
+    ExtractionProfile(
+        name="goes_c07",
+        resolution=2000,
+        collection_variables_map={"ABI-L1b-RadF": ["C07"]},
+        extra_params={"reader": "abi_l1b"},
+    )
+]
+tasks = client.prepare_for_extraction(
+    search_results,
+    profiles=profiles,
+    uri="output/goes",
+    plugin_hints={"extract_satpy": ["ABI-L1b-RadF"]},
 )
 
-# 2. Or, run step-by-step for more control
-search_ctx = client.search(
-    collections=["my-satellite-data"],
-    start_datetime=datetime(2023, 1, 1),
-    end_datetime=datetime(2023, 1, 31)
+# 3. Extract
+artifacts_df = client.extract_batches(
+    tasks,
+    extract_params={"padding": 2, "resampling": "nearest"},
+    plugin_hints={"extract_satpy": ["ABI-L1b-RadF"]},
+    max_batch_workers=4,
 )
-
-print(f"Found {len(search_ctx.search_results)} assets.")
-
-prep_ctx = search_ctx.prepare(prepare_params={"chunk_size": 10})
-final_df = prep_ctx.extract(extract_params={"bands": ["B04"]})
+print(f"Extracted {len(artifacts_df)} artifacts.")
 ```
 
 ## Advanced: Manual Plugin Management
@@ -120,21 +136,19 @@ registry = AerRegistry()
 print(registry.list_supported_collections())
 
 # Find which plugins can handle a specific collection
-extractor_names = registry.find_extractors_for("my-satellite-data")
+extractor_names = registry.find_extractors_for("ABI-L1b-RadF")
 
 # Instantiate a specialized extractor
-extractor = registry.get_extractor(extractor_names[0], global_config="...")
+extractor = registry.get_extractor(extractor_names[0])
 ```
 
 ## Entry Points & Discovery
 
-Plugins are discovered automatically via Python `entry_points`. Declare them in `pyproject.toml` under explicitly defined groups:
+Plugins are discovered automatically via Python `entry_points`. Declare them in `pyproject.toml` under the unified `aer.plugins` group:
 
 ```toml
-[project.entry-points."aer.search_providers"]
+[project.entry-points."aer.plugins"]
 my_searcher = "my_package.module:MySearchProvider"
-
-[project.entry-points."aer.extractors"]
 my_extractor = "my_package.extraction:MyExtractor"
 ```
 

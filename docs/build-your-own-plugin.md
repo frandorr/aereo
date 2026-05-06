@@ -181,19 +181,29 @@ Test your plugin using the high-level `AerClient` API:
 
 ```python
 from aer.client import AerClient
+from aer.interfaces import ExtractionProfile
 from datetime import datetime
 
-# The client automatically searches system paths for your entry points!
+# The client automatically discovers your entry points!
 client = AerClient()
 
-# Test the end-to-end pipeline
-artifacts_df = client.run_pipeline(
+# 1. Search
+results = client.search(
     collections=["acme-l1"],
     start_datetime=datetime(2023, 1, 1),
-    end_datetime=datetime(2023, 1, 31)
+    end_datetime=datetime(2023, 1, 31),
 )
 
-print(artifacts_df[["id", "status", "file_path"]])
+# 2. Prepare
+tasks = client.prepare_for_extraction(
+    results,
+    profiles=[ExtractionProfile(name="test", resolution=100)],
+    uri="output/acme",
+)
+
+# 3. Extract
+artifacts = client.extract_batches(tasks)
+print(artifacts[["id", "uri"]])
 ```
 
 ## Step 6: Distribute
