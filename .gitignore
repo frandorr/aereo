@@ -1,4 +1,16 @@
+# Satellite data extraction outputs (can be multi-GB)
 extract_test*
+examples/extract_*
+output/
+*.nc
+*.hdf
+*.h5
+*.tif
+*.tiff
+*.zip
+*.tgz
+*.tar.gz
+*.SEN3/
 codemap.csv
 local
 .planning
