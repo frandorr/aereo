@@ -46,7 +46,7 @@ Here are some examples of sensor configurations that have been tested end-to-end
 
 ```bash
 # Core + GOES plugins (public S3, no auth needed)
-pip install aer-core aer-search-aws-goes aer-extract-satpy
+pip install aer-eo aer-search-aws-goes aer-extract-satpy
 ```
 
 ### 2. Search → Prepare → Extract

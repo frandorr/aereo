@@ -1,8 +1,8 @@
-# aer-core
+# aer-eo
 
 `aer` is a modular, high-performance capability-graph framework for downloading, parsing, and transforming Earth Observation sensor data.
 
-This `aer-core` package includes the base registries, spatial transforms, dependency grids, and foundational typing rules meant to be extended by third-party Python plugin components.
+This `aer-eo` package includes the base registries, spatial transforms, dependency grids, and foundational typing rules meant to be extended by third-party Python plugin components.
 
 ## Features
 

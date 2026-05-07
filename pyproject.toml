@@ -75,7 +75,7 @@ build.dev-mode-dirs = [ "components", "bases", "development", "../majortom", "."
 metadata.allow-direct-references = true
 
 [tool.uv]
-sources.aer-core = { path = "projects/aer-core", editable = true }
+sources.aer-eo = { path = "projects/aer-core", editable = true }
 sources.aer-extract-aws-goes = { path = "../aer-extract-aws-goes/projects/aer-extract-aws-goes", editable = true }
 sources.aer-extract-odc-stac = { path = "../aer-extract-odc-stac/projects/aer-extract-odc-stac", editable = true }
 sources.aer-extract-satpy = { path = "../aer-extract-satpy/projects/aer-extract-satpy", editable = true }

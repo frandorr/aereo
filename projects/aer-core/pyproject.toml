@@ -3,7 +3,7 @@ build-backend = "hatchling.build"
 requires = [ "hatch-polylith-bricks", "hatchling" ]
 
 [project]
-name = "aer-core"
+name = "aer-eo"
 version = "1.0.0"
 description = "A modular, high-performance capability-graph framework for processing Earth Observation sensor data."
 readme = "README.md"
