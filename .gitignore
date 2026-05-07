@@ -213,3 +213,31 @@ docs/.obsidian/plugins/
 docs/.obsidian/graph.json
 
 *.bak
+
+# Agent-specific files & directories
+.agents/
+AGENTS.md
+GEMINI.md
+
+# Binary grid artifacts
+*.pkl
+*.dat
+*.idx
+single_cell_comparison.png
+
+
+# Runtime data directories
+areas/
+data/
+satpy_cache/
+
+# Examples: keep notebooks, scripts, README; remove PNGs & non-BA geojsons
+examples/*.geojson
+!examples/buenos_aires*.geojson
+examples/data/*.geojson
+!examples/data/buenos_aires*.geojson
+examples/extraction/extract_buenos_aires_sentinel2_pc/
+examples/grid/*.png
+examples/visualization/*.png
+examples/PIPELINE_ARCHITECTURE.md
+examples/test_aoi.geojson
