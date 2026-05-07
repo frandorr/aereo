@@ -45,17 +45,19 @@ optional-dependencies.earthaccess = [ "aer-search-earthaccess>=1.1.1" ]
 [dependency-groups]
 dev = [
   "aer-extract-aws-goes",
-  "aer-extract-pc-sentinel2",
+  "aer-extract-odc-stac",
   "aer-extract-satpy",
   "aer-search-aws-goes>=2",
   "aer-search-earthaccess>=2.0.3,<3",
-  "aer-search-pc-sentinel2",
+  "aer-search-planetary-computer",
   "basedpyright>=1.38",
   "cartopy>=0.25",
   "graphviz>=0.21",
   "icechunk>=2.0.3",
+  "jupyter>=1.1.1",
   "marimo[mcp]>=0.21.1",
   "matplotlib>=3.10.8",
+  "nbformat>=5.10.4",
   "obstore>=0.9.3",
   "polylith-cli>=1.42.5,<2",
   "pytest>=9.0.2,<10",
@@ -75,11 +77,11 @@ metadata.allow-direct-references = true
 [tool.uv]
 sources.aer-core = { path = "projects/aer-core", editable = true }
 sources.aer-extract-aws-goes = { path = "../aer-extract-aws-goes/projects/aer-extract-aws-goes", editable = true }
-sources.aer-extract-pc-sentinel2 = { path = "../aer-extract-pc-sentinel2/projects/aer-extract-pc-sentinel2", editable = true }
+sources.aer-extract-odc-stac = { path = "../aer-extract-odc-stac/projects/aer-extract-odc-stac", editable = true }
 sources.aer-extract-satpy = { path = "../aer-extract-satpy/projects/aer-extract-satpy", editable = true }
 sources.aer-search-aws-goes = { path = "../aer-search-aws-goes/projects/aer-search-aws-goes", editable = true }
 sources.aer-search-earthaccess = { path = "../aer-search-earthaccess/projects/aer-search-earthaccess", editable = true }
-sources.aer-search-pc-sentinel2 = { path = "../aer-search-pc-sentinel2/projects/aer-search-pc-sentinel2", editable = true }
+sources.aer-search-planetary-computer = { path = "../aer-search-planetary-computer/projects/aer-search-planetary-computer", editable = true }
 managed = true
 workspace.members = [ "projects/*" ]
 

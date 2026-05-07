@@ -1,0 +1,21 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"name": "Buenos Aires city center"},
+      "geometry": {
+        "coordinates": [
+          [
+            [-58.45, -34.55],
+            [-58.45, -34.65],
+            [-58.35, -34.65],
+            [-58.35, -34.55],
+            [-58.45, -34.55]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    }
+  ]
+}

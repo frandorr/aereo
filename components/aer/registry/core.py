@@ -113,16 +113,28 @@ class AerRegistry:
     def find_searchers_for(self, collection_name: str) -> List[str]:
         """Returns names of search plugins that support the requested collection.
 
-        Case-insensitive lookup.
+        Case-insensitive lookup. Wildcard plugins (supported_collections=["*"])
+        are returned for any collection.
         """
-        return self._collection_to_searchers.get(collection_name.lower(), [])
+        results = list(self._collection_to_searchers.get(collection_name.lower(), []))
+        # Add wildcard plugins
+        for plugin_name in self._collection_to_searchers.get("*", []):
+            if plugin_name not in results:
+                results.append(plugin_name)
+        return results
 
     def find_extractors_for(self, collection_name: str) -> List[str]:
         """Returns names of extraction plugins that support the requested collection.
 
-        Case-insensitive lookup.
+        Case-insensitive lookup. Wildcard plugins (supported_collections=["*"])
+        are returned for any collection.
         """
-        return self._collection_to_extractors.get(collection_name.lower(), [])
+        results = list(self._collection_to_extractors.get(collection_name.lower(), []))
+        # Add wildcard plugins
+        for plugin_name in self._collection_to_extractors.get("*", []):
+            if plugin_name not in results:
+                results.append(plugin_name)
+        return results
 
     def get_searcher_collections(self, plugin_name: str) -> List[str]:
         if plugin_name in self._searchers:
