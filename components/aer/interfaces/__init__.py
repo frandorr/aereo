@@ -8,6 +8,7 @@ By defining these interfaces, we ensure that all implementations adhere to a con
 
 from aer.interfaces.core import (
     AerPlugin,
+    AerProfile,
     Downloader,
     ExtractionProfile,
     ExtractionTask,
@@ -17,6 +18,7 @@ from aer.interfaces.core import (
 
 __all__ = [
     "AerPlugin",
+    "AerProfile",
     "Downloader",
     "ExtractionProfile",
     "ExtractionTask",

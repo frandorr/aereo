@@ -90,23 +90,33 @@ class SearchProvider(AerPlugin, plugin_abstract=True):
 
 
 @attrs.frozen
-class ExtractionProfile:
-    """
-    Defines a blueprint for extraction, specifying which collections and variables
-    to extract and at what resolution.
+class AerProfile:
+    """Ground-truth configuration for a single search + extraction unit.
 
-    Attributes:
-        name: A unique identifier for this profile (e.g., 'viirs_cloud_mask').
-        resolution: Resolution for extraction in meters for this specific profile.
-        collection_variables_map: Mapping of collection to variables.
-        extra_params: A container for user-specific or plugin-specific attributes
-            (e.g., a mapping for Satpy readers).
+    A profile bundles together:
+    - What to search for (collections, channels, satellite)
+    - How to extract it (resolution, variables, reader, padding, resampling, calibration)
+    - Which plugins to use (plugin_hints)
+
+    One profile = one coherent pipeline configuration.
     """
 
     name: str
     resolution: float
+    collections: Sequence[str] = attrs.field(factory=tuple)
     collection_variables_map: Mapping[str, Sequence[str]] = attrs.field(factory=dict)
+    channels: Sequence[str] | None = None
+    satellite: str | None = None
+    reader: str | None = None
+    padding: int | None = None
+    resampling: str | None = None
+    calibration: str | None = None
+    plugin_hints: Mapping[str, str] = attrs.field(factory=dict)
     extra_params: Mapping[str, Any] = attrs.field(factory=dict)
+
+
+# Backward-compat alias — will be removed in a later task.
+ExtractionProfile = AerProfile
 
 
 @attrs.frozen
@@ -117,7 +127,7 @@ class ExtractionTask:
     Attributes:
         assets: GeoDataFrame of assets to extract. It can group multiple collections
             (for example Imagery + Geolocation). Schema is defined in `aer.schemas.AssetSchema`.
-        profile: The ExtractionProfile containing target variables and resolution.
+        profile: The AerProfile containing target variables and resolution.
         uri: Destination URI for extracted artifacts.
         grid_cells: Spatial grid cells this task covers.
         aoi: Optional area-of-interest geometry used to clip the extraction region.
@@ -129,7 +139,7 @@ class ExtractionTask:
     """
 
     assets: GeoDataFrame[AssetSchema]
-    profile: ExtractionProfile
+    profile: AerProfile
     uri: str
     grid_cells: Sequence[GridCell]
     aoi: BaseGeometry | None = None
@@ -200,7 +210,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
         target_grid_dist: int | None = None,
         target_grid_overlap: bool | None = None,
         uri: str | None = None,
-        profiles: Sequence[ExtractionProfile] | None = None,
+        profiles: Sequence[AerProfile] | None = None,
         prepare_params: Mapping[str, Any] | None = None,
     ) -> Sequence[ExtractionTask]:
         """Prepare extraction tasks by grouping assets by profile and start time, then chunking grid cells."""
@@ -337,9 +347,11 @@ class Extractor(AerPlugin, plugin_abstract=True):
             extraction_task: An ExtractionTask containing a batch of assets to extract.
                 This is one of the items returned by the `prepare_for_extraction` method.
                     extraction_task.task_context holds batch-specific data generated during preparation
-            extract_params: Additional parameters for extraction,
-                user defined and specific to the collection, provider, outputs, etc.
-                Holds global configuration (e.g. max_retries, credentials).
+            extract_params: Meta-level or tool-level parameters for the extraction
+                (e.g. ``max_retries``, ``credentials``, ``downloader`` callables).
+                Domain-specific configuration such as ``padding``, ``calibration``,
+                ``reader``, etc. should be defined on ``extraction_task.profile``
+                (via its explicit fields or ``extra_params``) rather than here.
                 Per-task preparation parameters are available on ``extraction_task.prepare_params``.
 
         Returns:
@@ -372,8 +384,9 @@ class Extractor(AerPlugin, plugin_abstract=True):
         Args:
             extraction_task_batch: A sequence of ExtractionTask, where each one contains a batch
                 of assets to extract. This is the output of the `prepare_for_extraction` method.
-            extract_params: Additional parameters for extraction,
-                user defined and specific to the collection, provider, outputs, etc.
+            extract_params: Meta-level or tool-level parameters for the extraction
+                (e.g. ``max_retries``, ``credentials``, ``downloader`` callables).
+                Domain-specific configuration should live on each task's ``profile``.
             max_batch_workers: Maximum number of worker processes for parallel execution.
                 ``None`` (default) disables parallelism and runs sequentially.
         Returns:

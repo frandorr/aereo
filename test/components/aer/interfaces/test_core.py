@@ -95,9 +95,9 @@ def test_extractor_extract_batches(monkeypatch):
         {"id": [2]}, geometry=[Polygon([[1, 1], [2, 1], [2, 2], [1, 2]])]
     )
 
-    from aer.interfaces.core import ExtractionProfile
+    from aer.interfaces.core import AerProfile
 
-    profile = ExtractionProfile(name="default", resolution=10.0)
+    profile = AerProfile(name="default", resolution=10.0)
 
     task1 = ExtractionTask(
         assets=cast(Any, df1),
@@ -130,9 +130,9 @@ def test_extractor_extract_batches_parallel(monkeypatch):
         {"id": [2]}, geometry=[Polygon([[1, 1], [2, 1], [2, 2], [1, 2]])]
     )
 
-    from aer.interfaces.core import ExtractionProfile
+    from aer.interfaces.core import AerProfile
 
-    profile = ExtractionProfile(name="default", resolution=10.0)
+    profile = AerProfile(name="default", resolution=10.0)
 
     task1 = ExtractionTask(
         assets=cast(Any, df1),
@@ -172,7 +172,7 @@ def test_extractor_prepare_for_extraction():
 
     from datetime import datetime
 
-    from aer.interfaces.core import ExtractionProfile
+    from aer.interfaces.core import AerProfile
 
     # Needs a GeoDataFrame with collection and start_time
     df = gpd.GeoDataFrame(
@@ -193,7 +193,7 @@ def test_extractor_prepare_for_extraction():
     ):
         extractor.prepare_for_extraction(cast(Any, df))
 
-    profile = ExtractionProfile(name="test_profile", resolution=10.0)
+    profile = AerProfile(name="test_profile", resolution=10.0)
 
     # Should raise error if profiles not provided
     with pytest.raises(
@@ -217,3 +217,54 @@ def test_extractor_prepare_for_extraction():
     assert tasks[0].aoi is None
     assert len(tasks[0].assets) == 2  # Both assets have same start_time and collection
     assert "start_time" in tasks[0].task_context
+
+
+def test_aer_profile_has_all_fields():
+    from aer.interfaces.core import AerProfile
+
+    profile = AerProfile(
+        name="goes_16_abi",
+        resolution=1000.0,
+        collections=["ABI-L1b-RadC"],
+        channels=["C01", "C02"],
+        satellite="GOES-16",
+        plugin_hints={
+            "search": "aer-search-aws-goes",
+            "extract": "aer-extract-aws-goes",
+        },
+    )
+    assert profile.collections == ["ABI-L1b-RadC"]
+    assert profile.channels == ["C01", "C02"]
+    assert profile.satellite == "GOES-16"
+    assert profile.plugin_hints["search"] == "aer-search-aws-goes"
+
+
+def test_aer_profile_defaults():
+    from aer.interfaces.core import AerProfile
+
+    profile = AerProfile(name="minimal", resolution=100.0)
+    assert profile.collections == ()
+    assert profile.channels is None
+    assert profile.satellite is None
+    assert profile.plugin_hints == {}
+
+
+def test_extraction_task_accepts_aer_profile():
+    import geopandas as gpd
+    from shapely.geometry import Polygon
+
+    from aer.interfaces.core import AerProfile, ExtractionTask
+    from pandera.typing.geopandas import GeoDataFrame
+
+    df = gpd.GeoDataFrame(
+        {"collection": ["GOES"], "start_time": ["2023-01-01"]},
+        geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
+    )
+    profile = AerProfile(name="test", resolution=10.0, collections=["GOES"])
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, df),
+        profile=profile,
+        uri="test",
+        grid_cells=[],
+    )
+    assert task.profile.name == "test"
