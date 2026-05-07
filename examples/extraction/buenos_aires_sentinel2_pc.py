@@ -90,29 +90,65 @@ def main():
 
         # --- Visualize a single grid cell ---
         first_artifact = results_df.iloc[0]
-        raster_path = first_artifact["uri"]
         grid_cell_id = first_artifact["grid_cell"]
 
-        print(f"Visualizing grid cell {grid_cell_id} from {raster_path}", flush=True)
+        print(f"Visualizing grid cell {grid_cell_id}", flush=True)
+
+        # Find the B04, B03, B02 artifacts for this grid cell
+        cell_artifacts = results_df[results_df["grid_cell"] == grid_cell_id]
+        band_files = {}
+        for _, row in cell_artifacts.iterrows():
+            uri_path = Path(str(row["uri"]))
+            # Extract band name from filename
+            band_name = None
+            for part in uri_path.stem.split("_"):
+                if part.startswith("band-"):
+                    band_name = part.replace("band-", "")
+                    break
+            if band_name:
+                band_files[band_name] = uri_path
+
+        if set(band_files.keys()) != {"B04", "B03", "B02"}:
+            print(
+                f"Warning: missing bands for visualization. Found: {list(band_files.keys())}"
+            )
+
+        # Read each band
+        red = np.zeros((1, 1), dtype=np.float32)
+        green = np.zeros((1, 1), dtype=np.float32)
+        blue = np.zeros((1, 1), dtype=np.float32)
+        transform = None
+
+        if "B04" in band_files:
+            with rasterio.open(band_files["B04"]) as src:
+                red = src.read(1).astype(np.float32)
+                transform = src.transform
+        if "B03" in band_files:
+            with rasterio.open(band_files["B03"]) as src:
+                green = src.read(1).astype(np.float32)
+        if "B02" in band_files:
+            with rasterio.open(band_files["B02"]) as src:
+                blue = src.read(1).astype(np.float32)
+
+        rgb = np.stack([red, green, blue], axis=0)
+
+        # Mask NaN and nodata values
+        valid_mask = (~np.isnan(rgb)) & (rgb != 0)
+
+        # Percentile stretch per band
+        rgb_stretched = np.zeros_like(rgb)
+        for i in range(3):
+            band = rgb[i]
+            valid = band[valid_mask[i]]
+            if len(valid) > 0:
+                vmin = np.percentile(valid, 2)
+                vmax = np.percentile(valid, 98)
+                band_stretched = np.clip((band - vmin) / (vmax - vmin + 1e-9), 0, 1)
+                band_stretched[~valid_mask[i]] = 0
+                rgb_stretched[i] = band_stretched
 
         fig, ax = plt.subplots(figsize=(8, 8))
-        with rasterio.open(raster_path) as src:
-            # Read RGB bands (assuming B04=red, B03=green, B02=blue)
-            # For visualization, scale to 0-1 range
-            red = src.read(1)
-            green = src.read(1) if src.count > 1 else red
-            blue = src.read(1) if src.count > 1 else red
-
-            # Simple percentile stretch
-            from numpy import percentile
-
-            rgb = np.stack([red, green, blue], axis=0)
-            vmin = percentile(rgb, 2)
-            vmax = percentile(rgb, 98)
-            rgb = np.clip((rgb - vmin) / (vmax - vmin + 1e-9), 0, 1)
-
-            show(rgb, ax=ax, transform=src.transform)
-
+        show(rgb_stretched, ax=ax, transform=transform)
         ax.set_title(f"Sentinel-2 L2A RGB\nGrid cell: {grid_cell_id}")
         ax.axis("off")
 
