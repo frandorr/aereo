@@ -18,14 +18,14 @@ We recommend using the [`aer-plugin-template`](https://github.com/frandorr/aer-p
 
 Your plugin only needs to depend on the core `aer` package to access its interfaces and schemas.
 
-Update your `pyproject.toml` dependencies to include `aer-core`:
+Update your `pyproject.toml` dependencies to include `aer-eo`:
 
 ```toml
 [project]
 name = "aer-plugin-acme"
 version = "0.1.0"
 dependencies = [
-    "aer-core",
+    "aer-eo",
     "geopandas",  # For returning standard schemas
     "pandera",    # For schema validation (Optional but recommended)
 ]
@@ -238,7 +238,7 @@ If you are developing your plugin *simultaneously* with the `aer` core framework
 
 This happens because `aer` uses `hatch-polylith-bricks`, which by default bundles files during an editable install.
 
-To fix this and force `hatchling` to use `.pth` namespace pointer files instead of copying physical files, add `build.dev-mode-dirs` to the `[tool.hatch]` configuration in both your plugin's and `aer-core`'s `pyproject.toml` files:
+To fix this and force `hatchling` to use `.pth` namespace pointer files instead of copying physical files, add `build.dev-mode-dirs` to the `[tool.hatch]` configuration in both your plugin's and `aer-eo`'s `pyproject.toml` files:
 
 ```toml
 [tool.hatch]
@@ -249,6 +249,6 @@ build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", 
 Then clear the cached packages and reinstall:
 ```bash
 rm -rf .venv/lib/python*/site-packages/aer
-uv sync --reinstall-package aer-core --reinstall-package aer-plugin-acme
+uv sync --reinstall-package aer-eo --reinstall-package aer-plugin-acme
 ```
 Your local imports will now properly resolve directly to your hot-reloading `components/` directory.

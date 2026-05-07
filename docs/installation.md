@@ -5,7 +5,7 @@
 ### 1. Install the Core
 
 ```bash
-pip install aer-core
+pip install aer-eo
 ```
 
 This installs the `aer` package with all base components: `aer.client`, `aer.interfaces`, `aer.registry`, `aer.schemas`, `aer.spectral`, `aer.spatial`, `aer.grid`, and `aer.eoids`.
