@@ -79,33 +79,23 @@ def test_aer_profile_downloader_defaults_to_none():
 
 ### Phase 2 — Extract Plugins
 
-#### Task 2.1: `aer-extract-satpy`
+#### Task 2.1: `aer-extract-satpy` ✅
 **File:** `components/aer/extract_satpy/core.py`
 **Action:**
-- Replace `downloader = params.get("downloader")` with explicit precedence logic:
+- Replaced `downloader = params.get("downloader")` with explicit precedence logic:
   ```python
   downloader = (
       extraction_task.profile.downloader
       or extract_params.get("downloader")
   )
   ```
-- Remove `"downloader"` from the generic `params` merge if it was implicitly included.
 
-**Tests:**
-```python
-def test_extract_uses_profile_downloader():
-    mock_downloader = MagicMock()
-    profile = AerProfile(
-        name="test", resolution=1000.0,
-        collections=["VJ202IMG"],
-        downloader=mock_downloader,
-    )
-    task = make_task(profile=profile)
-    # Run extraction (may fail on actual data, but verifies downloader is passed)
-    with pytest.raises(Exception):
-        extractor.extract(task)
-    # Assert mock_downloader was configured to be used in download_asset_safely
-```
+**Tests:** Added three tests in `test/components/aer/extract_satpy/test_core.py`:
+- `test_extract_uses_profile_downloader` — verifies profile-level downloader is passed to `download_asset_safely`
+- `test_extract_falls_back_to_batch_downloader` — verifies batch-level fallback works
+- `test_extract_prefers_profile_downloader_over_batch` — verifies profile wins when both are present
+
+All tests pass (3/3). basedpyright reports 0 new errors (3 pre-existing unrelated errors in satpy typing).
 
 #### Task 2.2: `aer-extract-aws-goes`
 **File:** `components/aer/extract_aws_goes/core.py`
