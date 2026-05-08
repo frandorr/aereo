@@ -54,6 +54,7 @@ dev = [
   "cartopy>=0.25",
   "graphviz>=0.21",
   "icechunk>=2.0.3",
+  "ipykernel>=7.2",
   "jupyter>=1.1.1",
   "marimo[mcp]>=0.21.1",
   "matplotlib>=3.10.8",

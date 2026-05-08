@@ -101,6 +101,7 @@ class AerProfile:
     - What to search for (collections, channels, satellite)
     - How to extract it (resolution, variables, reader, padding, resampling, calibration)
     - Which plugins to use (plugin_hints)
+    - How to download assets (downloader)
 
     One profile = one coherent pipeline configuration.
     """
@@ -116,6 +117,7 @@ class AerProfile:
     resampling: str | None = None
     calibration: str | None = None
     plugin_hints: Mapping[str, str] = attrs.field(factory=dict)
+    downloader: Downloader | None = None
     extra_params: Mapping[str, Any] = attrs.field(factory=dict)
 
 
@@ -357,6 +359,12 @@ class Extractor(AerPlugin, plugin_abstract=True):
                 ``reader``, etc. should be defined on ``extraction_task.profile``
                 (via its explicit fields or ``extra_params``) rather than here.
                 Per-task preparation parameters are available on ``extraction_task.prepare_params``.
+
+                .. note::
+                    When a downloader is needed, extractors should resolve it in this order:
+                    1. ``extraction_task.profile.downloader`` (per-profile, highest priority)
+                    2. ``extract_params.get("downloader")`` (batch-level fallback)
+                    3. Built-in default download logic.
 
         Returns:
             A GeoDataFrame of extracted artifacts, where each row corresponds to an extracted asset

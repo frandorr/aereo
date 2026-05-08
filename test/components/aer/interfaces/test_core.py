@@ -269,6 +269,25 @@ def test_aer_profile_has_all_fields():
     assert profile.plugin_hints["search"] == "aer-search-aws-goes"
 
 
+def test_aer_profile_accepts_downloader():
+    from pathlib import Path
+
+    from aer.interfaces.core import AerProfile
+
+    def my_dl(url: str, local_path: Path) -> None:
+        pass
+
+    profile = AerProfile(name="test", resolution=100.0, downloader=my_dl)
+    assert profile.downloader is my_dl
+
+
+def test_aer_profile_downloader_defaults_to_none():
+    from aer.interfaces.core import AerProfile
+
+    profile = AerProfile(name="test", resolution=100.0)
+    assert profile.downloader is None
+
+
 def test_aer_profile_defaults():
     from aer.interfaces.core import AerProfile
 
