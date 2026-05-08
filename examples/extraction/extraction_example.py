@@ -8,7 +8,6 @@ from pathlib import Path
 import geopandas as gpd
 from aer.client import AerClient
 from aer.interfaces import AerProfile
-from aer.search_earthaccess import earthaccess_download_wrapper
 from aer.viz import plot_aoi
 
 # --- Configuration ---
@@ -27,62 +26,14 @@ aoi = gdf.geometry.iloc[0]
 
 
 # %%
-# Profiles unify search + extraction config in a single ground-truth object.
-# Each profile declares its collections, variables, channels, satellite, and
-# which plugins to use (via plugin_hints).
-profiles = [
-    AerProfile(
-        name="viirs_i1",
-        resolution=375,
-        collections=["VJ202IMG", "VJ203IMG"],
-        collection_variables_map={"VJ202IMG": ["I01"], "VJ203IMG": []},
-        channels=["I01"],
-        reader="viirs_l1b",
-        padding=2,
-        resampling="nearest",
-        calibration="reflectance",
-        satellite="NOAA21",
-        plugin_hints={"search": "search_earthaccess", "extract": "extract_satpy"},
-        downloader=earthaccess_download_wrapper,
-    ),
-    AerProfile(
-        name="goes_c01",
-        resolution=1000,
-        collections=["ABI-L1b-RadF"],
-        collection_variables_map={"ABI-L1b-RadF": ["C01"]},
-        channels=["C01"],
-        reader="abi_l1b",
-        padding=2,
-        resampling="nearest",
-        calibration="reflectance",
-        satellite="GOES-19",
-        plugin_hints={"search": "search_aws_goes", "extract": "extract_satpy"},
-    ),
-    AerProfile(
-        name="modis_thermal",
-        resolution=1000,
-        collections=["MOD021KM"],
-        collection_variables_map={"MOD021KM": ["1"]},
-        reader="modis_l1b",
-        padding=2,
-        resampling="nearest",
-        calibration="reflectance",
-        plugin_hints={"search": "search_earthaccess", "extract": "extract_satpy"},
-        downloader=earthaccess_download_wrapper,
-    ),
-    AerProfile(
-        name="olci_rgb",
-        resolution=300,
-        collections=["S3A_OL_1_EFR"],
-        collection_variables_map={"S3A_OL_1_EFR": ["Oa08"]},
-        reader="olci_l1b",
-        padding=2,
-        resampling="nearest",
-        calibration="reflectance",
-        plugin_hints={"search": "search_earthaccess", "extract": "extract_satpy"},
-        downloader=earthaccess_download_wrapper,
-    ),
-]
+# Profiles are loaded from a YAML config file.  Each profile declares its
+# collections, variables, channels, satellite, and which plugins to use (via
+# plugin_hints).  The *downloader* field accepts a dotted import path string
+# (e.g. ``aer.search_earthaccess.earthaccess_download_wrapper``) which
+# Pydantic resolves to a live callable at load time.
+profiles = AerProfile.from_yaml(Path(__file__).parent / ".." / "profiles.yaml")
+# Verify the downloader was resolved from a string to a callable
+assert profiles[0].downloader is not None
 
 # --- Client Setup ---
 client = AerClient()
