@@ -5,7 +5,7 @@ from typing import Any, Mapping, Optional, Sequence, cast
 
 import pandas as pd
 import json
-from aer.interfaces import AerProfile, ExtractionTask
+from aer.interfaces import AerProfile, ExtractionTask, merge_params
 from aer.registry import AerRegistry
 from aer.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -177,6 +177,7 @@ class AerClient:
             end_datetime (Optional[datetime]): Optional end datetime for temporal filtering.
             search_params (Optional[Mapping[str, Any]]): Meta-level parameters to pass to search plugins
                 (credentials, timeouts, etc.). Domain-specific config lives on each AerProfile.
+                Per-profile ``search_params`` overrides batch-level values (profile wins).
             init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for plugin instantiation.
                 Can be a flat dict (applied to every searcher) or use collection names as top-level keys
                 for per-collection overrides, following the same pattern as ``search_params``::
@@ -226,7 +227,8 @@ class AerClient:
 
             # Resolve targeted parameters using the first collection for per-collection overrides
             first_collection = profile.collections[0] if profile.collections else ""
-            c_params = self._resolve_params(search_params, first_collection)
+            batch_resolved = self._resolve_params(search_params, first_collection)
+            c_params = merge_params(batch_resolved, profile.search_params)
             p_key = get_params_key(c_params)
 
             group_key = (target_plugin, p_key)

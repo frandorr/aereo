@@ -299,6 +299,36 @@ def test_search_with_profile_plugin_hint(monkeypatch):
     mock_registry.get_searcher.assert_called_once_with("aer-search-aws-goes")
 
 
+def test_search_merges_profile_search_params(monkeypatch):
+    """Profile search_params should override batch search_params passed to the searcher."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
+
+    mock_searcher = MagicMock()
+    monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "MOD021KM"
+    mock_searcher.search.return_value = valid_df
+    mock_registry.get_searcher.return_value = mock_searcher
+
+    client = AerClient(registry=mock_registry)
+    profile = AerProfile(
+        name="modis_thermal",
+        resolution=1000.0,
+        collections=["MOD021KM"],
+        search_params={"version": "061"},
+    )
+    client.search(
+        profiles=[profile],
+        search_params={"version": "000", "cloud_cover": 20},
+    )
+
+    call_kwargs = mock_searcher.search.call_args.kwargs
+    assert call_kwargs["search_params"]["version"] == "061"
+    assert call_kwargs["search_params"]["cloud_cover"] == 20
+
+
 # ---------------------------------------------------------------------------
 # prepare_for_extraction – target_grid_dist / target_grid_overlap forwarding
 # ---------------------------------------------------------------------------
