@@ -169,9 +169,11 @@ results_df = client.extract_batches(
 
 ### Phase 4 — Integration Tests
 
-#### Task 4.1: Mixed-profile downloader test
-**File:** `test/bases/aer/client/test_core.py` or new integration test
-**Action:** Create two profiles with different downloaders (or one with, one without). Verify each task receives the correct downloader.
+#### Task 4.1: Mixed-profile downloader test ✅
+**File:** `test/bases/aer/client/test_core.py`
+**Action:** Created two profiles with different downloaders. Verified each task receives the correct downloader via the mock extractor's `extract_batches` call.
+
+**Tests pass:** 26/26 in `test/bases/aer/client/test_core.py`. basedpyright reports 0 errors.
 
 **Test:**
 ```python
@@ -198,8 +200,11 @@ def test_extract_batches_uses_profile_specific_downloaders(monkeypatch):
     # can assert the downloader was available in the task profile
 ```
 
-#### Task 4.2: Batch-level fallback test
-**Action:** Verify that `extract_params["downloader"]` still works when `profile.downloader` is `None`.
+#### Task 4.2: Batch-level fallback test ✅
+**File:** `test/bases/aer/client/test_core.py`
+**Action:** Verified that `extract_params["downloader"]` is still passed through to the extractor when `profile.downloader` is `None`.
+
+**Tests pass:** 26/26 in `test/bases/aer/client/test_core.py`. basedpyright reports 0 errors.
 
 **Test:**
 ```python
@@ -213,7 +218,7 @@ def test_extract_falls_back_to_batch_downloader():
 ## 5. Checklist
 
 When updating an extract plugin:
-1. [ ] Read `extraction_task.profile.downloader` first
-2. [ ] Fall back to `extract_params.get("downloader")`
-3. [ ] Pass the resolved downloader to `download_asset_safely()`
-4. [ ] Update plugin tests to cover both profile-level and batch-level downloader
+1. [x] Read `extraction_task.profile.downloader` first
+2. [x] Fall back to `extract_params.get("downloader")`
+3. [x] Pass the resolved downloader to `download_asset_safely()`
+4. [x] Update plugin tests to cover both profile-level and batch-level downloader

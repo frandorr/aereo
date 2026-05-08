@@ -447,3 +447,103 @@ def test_extract_batches_with_profile_hint(monkeypatch):
     )
     client.extract_batches([task])
     mock_registry.get_extractor.assert_called_once_with("aer-extract-aws-goes")
+
+
+def test_extract_batches_uses_profile_specific_downloaders(monkeypatch):
+    """Tasks with different profile downloaders must be passed to extractor intact."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry.has_extractor.return_value = True
+    mock_registry.find_extractors_for.return_value = []
+    mock_extractor = MagicMock()
+    monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
+    empty_artifact_df = pd.DataFrame()
+    mock_extractor.extract_batches.return_value = empty_artifact_df
+    mock_registry.get_extractor.return_value = mock_extractor
+
+    client = AerClient(registry=mock_registry)
+
+    dl_a = MagicMock()
+    dl_b = MagicMock()
+
+    profile_a = AerProfile(
+        name="a",
+        resolution=100.0,
+        collections=["C1"],
+        plugin_hints={"extract": "dummy_extractor"},
+        downloader=dl_a,
+    )
+    profile_b = AerProfile(
+        name="b",
+        resolution=100.0,
+        collections=["C1"],
+        plugin_hints={"extract": "dummy_extractor"},
+        downloader=dl_b,
+    )
+
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "C1"
+
+    task_a = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        profile=profile_a,
+        uri="test",
+        grid_cells=[],
+    )
+    task_b = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        profile=profile_b,
+        uri="test",
+        grid_cells=[],
+    )
+
+    client.extract_batches([task_a, task_b])
+
+    passed_tasks = mock_extractor.extract_batches.call_args.args[0]
+    assert passed_tasks[0].profile.downloader is dl_a
+    assert passed_tasks[1].profile.downloader is dl_b
+
+
+def test_extract_batches_falls_back_to_batch_downloader(monkeypatch):
+    """When profile.downloader is None, extract_params['downloader'] must still be passed through."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry.has_extractor.return_value = True
+    mock_registry.find_extractors_for.return_value = []
+    mock_extractor = MagicMock()
+    monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
+    empty_artifact_df = pd.DataFrame()
+    mock_extractor.extract_batches.return_value = empty_artifact_df
+    mock_registry.get_extractor.return_value = mock_extractor
+
+    client = AerClient(registry=mock_registry)
+
+    batch_downloader = MagicMock()
+    profile = AerProfile(
+        name="no_dl",
+        resolution=100.0,
+        collections=["C1"],
+        plugin_hints={"extract": "dummy_extractor"},
+        downloader=None,
+    )
+
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "C1"
+
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        profile=profile,
+        uri="test",
+        grid_cells=[],
+    )
+
+    client.extract_batches([task], extract_params={"downloader": batch_downloader})
+
+    passed_tasks = mock_extractor.extract_batches.call_args.args[0]
+    assert passed_tasks[0].profile.downloader is None
+    passed_extract_params = mock_extractor.extract_batches.call_args.kwargs[
+        "extract_params"
+    ]
+    assert passed_extract_params["downloader"] is batch_downloader
