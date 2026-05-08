@@ -17,6 +17,10 @@ from shapely.geometry.base import BaseGeometry
 class GridCell(BaseGridCell):
     """
     A grid cell that represents a polygon and whether it is a primary or overlapping cell.
+
+    ``area_def()`` returns an :class:`odc.geo.geobox.GeoBox` aligned to the cell's
+    UTM footprint.  Use ``area_name()`` when you need a human-readable identifier
+    for the cell at a given resolution.
     """
 
     def __init__(
