@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Any, cast
 from unittest.mock import MagicMock
 
 import pytest
@@ -577,3 +577,135 @@ def test_extract_batches_falls_back_to_batch_downloader(monkeypatch):
         "extract_params"
     ]
     assert passed_extract_params["downloader"] is batch_downloader
+
+
+# ---------------------------------------------------------------------------
+# End-to-end search + extract with per-profile params
+# ---------------------------------------------------------------------------
+
+
+def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
+    """Profile search_params and extract_params override batch-level params."""
+    from aer.interfaces.core import Extractor
+
+    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry.has_searcher.return_value = True
+    mock_registry.has_extractor.return_value = True
+    mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
+    mock_registry.find_extractors_for.return_value = ["dummy_extractor"]
+
+    # -- Searcher mock -------------------------------------------------------
+    mock_searcher = MagicMock()
+    monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "C1"
+    mock_searcher.search.return_value = valid_df
+    mock_registry.get_searcher.return_value = mock_searcher
+
+    # -- Profiles with divergent params --------------------------------------
+    profile_a = AerProfile(
+        name="profile_a",
+        resolution=100.0,
+        collections=["C1"],
+        search_params={"version": "061", "cloud_cover": 10},
+        extract_params={"calibration": "reflectance", "padding": 2},
+    )
+    profile_b = AerProfile(
+        name="profile_b",
+        resolution=100.0,
+        collections=["C1"],
+        search_params={"version": "062", "cloud_cover": 20},
+        extract_params={"calibration": "radiance", "padding": 4},
+    )
+
+    client = AerClient(registry=mock_registry)
+
+    # -- Search phase --------------------------------------------------------
+    client.search(
+        profiles=[profile_a, profile_b],
+        search_params={"version": "000", "cloud_cover": 5, "limit": 100},
+    )
+
+    assert mock_searcher.search.call_count == 2
+    params_by_profile: dict[str, dict[str, Any]] = {}
+    for call in mock_searcher.search.call_args_list:
+        kwargs = call.kwargs
+        prof = kwargs["profiles"][0]
+        params_by_profile[prof.name] = dict(kwargs["search_params"])
+
+    assert params_by_profile["profile_a"] == {
+        "version": "061",
+        "cloud_cover": 10,
+        "limit": 100,
+    }
+    assert params_by_profile["profile_b"] == {
+        "version": "062",
+        "cloud_cover": 20,
+        "limit": 100,
+    }
+
+    # -- Extractor mock (real subclass so base-class merge runs) -------------
+    _captured: list[dict[str, Any]] = []
+
+    class _CapturingExtractor(Extractor):
+        supported_collections = ["C1"]
+
+        @property
+        def target_grid_d(self) -> int:
+            return 10_000
+
+        def extract(
+            self,
+            extraction_task: ExtractionTask,
+            extract_params: dict[str, Any] | None,
+        ) -> Any:
+            _captured.append(
+                {
+                    "profile_name": extraction_task.profile.name,
+                    "params": dict(extract_params) if extract_params else {},
+                }
+            )
+            import geopandas as gpd
+            from shapely.geometry import Polygon
+
+            return gpd.GeoDataFrame(
+                {"id": [1]},
+                geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
+            )
+
+    mock_registry.get_extractor.return_value = _CapturingExtractor()
+    monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
+
+    task_a = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        profile=profile_a,
+        uri="test",
+        grid_cells=[],
+    )
+    task_b = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        profile=profile_b,
+        uri="test",
+        grid_cells=[],
+    )
+
+    client.extract_batches(
+        [task_a, task_b],
+        extract_params={"calibration": "brightness_temp", "reader": "modis_l1b"},
+    )
+
+    assert len(_captured) == 2
+    by_name = {c["profile_name"]: c["params"] for c in _captured}
+
+    assert by_name["profile_a"] == {
+        "calibration": "reflectance",
+        "padding": 2,
+        "reader": "modis_l1b",
+    }
+    assert by_name["profile_b"] == {
+        "calibration": "radiance",
+        "padding": 4,
+        "reader": "modis_l1b",
+    }
