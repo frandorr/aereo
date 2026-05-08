@@ -33,7 +33,7 @@ DATE_START = datetime(2026, 4, 1, 15, 0, tzinfo=timezone.utc)
 DATE_END = datetime(2026, 4, 4, 15, 2, tzinfo=timezone.utc)
 
 # Load AOI (Buenos Aires province)
-geojson_path = Path("buenos_aires.geojson")
+geojson_path = Path("buenos_aires_city.geojson")
 gdf = gpd.read_file(geojson_path)
 aoi = gdf.geometry.iloc[0]
 
@@ -88,7 +88,12 @@ profiles = [
     ExtractionProfile(
         name="viirs_i4",
         resolution=400,
-        collection_variables_map={"VJ202IMG": ["I04"], "VJ203IMG": []},
+        collection_variables_map={"VJ202IMG": ["I01"], "VJ203IMG": []},
+        reader="viirs_l1b",
+        padding=2,
+        resampling="nearest",
+        calibration="reflectance",
+        satellite="NOAA21",
     )
 ]
 
@@ -120,12 +125,9 @@ uri_path.mkdir(parents=True)
 print("Extracting...", flush=True)
 start_time = time.time()
 
+# extract_params is reserved for meta-level / tool-level parameters.
+# Domain-specific config (padding, calibration, reader, etc.) lives on the profile.
 extract_params = {
-    "padding": 2,
-    "resampling": "nearest",
-    "calibration": "radiance",
-    "satellite": "NOAA21",
-    "reader": "viirs_l1b",
     "downloader": earthaccess_download_wrapper,
 }
 
