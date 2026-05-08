@@ -135,6 +135,7 @@ class AerProfile(BaseModel):
     padding: int | None = None
     resampling: str | None = None
     calibration: str | None = None
+    conform_to_max_shape: bool = False
     plugin_hints: Mapping[str, str] = Field(default_factory=dict)
     downloader: ImportString[Callable[[str, Path], None]] | None = None
     search_params: Mapping[str, Any] = Field(default_factory=dict)
