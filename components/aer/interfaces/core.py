@@ -364,6 +364,9 @@ class Extractor(AerPlugin, plugin_abstract=True):
             if profile_assets.empty:
                 continue
 
+            # First pass: collect all cells across time groups for this profile
+            profile_cell_groups: list[tuple[Any, GeoDataFrame, list[GridCell]]] = []
+
             # 2. Group by exact start_time
             for start_time, time_group in profile_assets.groupby("start_time"):
                 # 3. Determine base geometry union of the group
@@ -419,6 +422,31 @@ class Extractor(AerPlugin, plugin_abstract=True):
                     if not all_cells:
                         continue
 
+                profile_cell_groups.append(
+                    (start_time, cast(GeoDataFrame, time_group), all_cells)
+                )
+
+            if not profile_cell_groups:
+                continue
+
+            # Compute common shape if conforming is enabled for this profile
+            conform_to_shape: tuple[int, int] | None = None
+            if profile.conform_to_max_shape:
+                all_profile_cells: list[GridCell] = []
+                for _, _, cells in profile_cell_groups:
+                    all_profile_cells.extend(cells)
+                resolution = int(profile.resolution)
+                padding = profile.padding or 0
+                conform_to_shape = grid_def.max_shape(
+                    all_profile_cells, resolution, padding
+                )
+                # Pre-warm area_def cache with conformed shape for all cells
+                for _, _, cells in profile_cell_groups:
+                    for cell in cells:
+                        cell.area_def(resolution, padding, conform_to=conform_to_shape)
+
+            # Second pass: chunk cells and create tasks
+            for start_time, time_group, all_cells in profile_cell_groups:
                 # 6. Chunk cells and create tasks
                 cell_chunks = [
                     all_cells[i : i + cells_per_chunk]
@@ -426,18 +454,22 @@ class Extractor(AerPlugin, plugin_abstract=True):
                 ]
 
                 for chunk_idx, cells in enumerate(cell_chunks):
+                    task_context: dict[str, Any] = {
+                        "chunk_id": chunk_idx,
+                        "total_chunks": len(cell_chunks),
+                        "start_time": str(start_time),
+                    }
+                    if conform_to_shape is not None:
+                        task_context["conform_to_shape"] = conform_to_shape
+
                     task = ExtractionTask(
-                        assets=cast(GeoDataFrame, time_group),
+                        assets=time_group,
                         profile=profile,
                         uri=uri,
                         grid_cells=cells,
                         aoi=target_aoi,
                         prepare_params=prepare_params,
-                        task_context={
-                            "chunk_id": chunk_idx,
-                            "total_chunks": len(cell_chunks),
-                            "start_time": str(start_time),
-                        },
+                        task_context=task_context,
                     )
                     tasks.append(task)
 
