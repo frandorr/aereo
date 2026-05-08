@@ -400,7 +400,7 @@ def test_search_filters_by_profile_channels():
 
 **Result:** All 6 unit tests pass. Type check: 0 errors, 0 warnings, 0 notes.
 
-#### Task 2.2: `aer-search-earthaccess`
+#### Task 2.2: `aer-search-earthaccess` ✅ DONE
 **File:** `components/aer/search_earthaccess/core.py`
 **Action:** Same refactor as 2.1. Extract collections from `profiles`. No channels/satellite specific logic here, but update signature.
 
@@ -411,6 +411,8 @@ def test_search_reads_collections_from_profiles():
     result = plugin.search(profiles=[profile], ...)
     assert len(result) > 0
 ```
+
+**Result:** All 12 unit tests pass. Type check: 0 errors in core.py (3 pre-existing errors in test file unrelated to changes).
 
 #### Task 2.3: `aer-search-planetary-computer`
 **File:** `components/aer/search_planetary_computer/core.py`
