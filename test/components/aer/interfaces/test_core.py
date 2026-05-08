@@ -2,7 +2,13 @@ from typing import Any, Sequence, cast
 
 import geopandas as gpd
 import pytest
-from aer.interfaces import AerPlugin, ExtractionTask, Extractor, SearchProvider
+from aer.interfaces import (
+    AerPlugin,
+    ExtractionTask,
+    Extractor,
+    SearchProvider,
+    merge_params,
+)
 from aer.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
 from pydantic import ValidationError
@@ -356,3 +362,19 @@ def test_aer_profile_invalid_import_string():
             resolution=100.0,
             downloader="this.does.not.exist",  # pyright: ignore[reportArgumentType]
         )
+
+
+def test_merge_params_batch_only():
+    assert merge_params({"a": 1}, {}) == {"a": 1}
+
+
+def test_merge_params_profile_overrides():
+    assert merge_params({"a": 1}, {"a": 2}) == {"a": 2}
+
+
+def test_merge_params_combined():
+    assert merge_params({"a": 1}, {"b": 2}) == {"a": 1, "b": 2}
+
+
+def test_merge_params_none_batch():
+    assert merge_params(None, {"a": 1}) == {"a": 1}

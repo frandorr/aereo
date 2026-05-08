@@ -21,6 +21,19 @@ from shapely.geometry.base import BaseGeometry
 logger = logging.getLogger(__name__)
 
 
+def merge_params(
+    batch_params: Mapping[str, Any] | None,
+    profile_params: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Merge profile-level params over batch-level params.
+
+    Profile wins on key collision.
+    """
+    merged = dict(batch_params or {})
+    merged.update(profile_params)
+    return merged
+
+
 class Downloader(Protocol):
     """Callable that downloads a URL to a local path."""
 

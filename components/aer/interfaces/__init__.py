@@ -14,6 +14,7 @@ from aer.interfaces.core import (
     ExtractionTask,
     Extractor,
     SearchProvider,
+    merge_params,
 )
 
 __all__ = [
@@ -24,4 +25,5 @@ __all__ = [
     "ExtractionTask",
     "Extractor",
     "SearchProvider",
+    "merge_params",
 ]
