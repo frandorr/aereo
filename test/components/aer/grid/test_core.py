@@ -80,8 +80,12 @@ def test_grid_cell_area_name_and_def():
     assert cell.area_name(50) == "0U_0R_dist-10000m_res-50m"
     area = cell.area_def(50)
     assert area.area_id == "0U_0R_dist-10000m_res-50m"
-    assert area.width == 10000 // 50
-    assert area.height == 10000 // 50
+    # width/height should reflect natural UTM footprint bounds, not self.D
+    bounds = cell.utm_footprint.bounds
+    expected_width = round((bounds[2] - bounds[0]) / 50)
+    expected_height = round((bounds[3] - bounds[1]) / 50)
+    assert area.width == expected_width
+    assert area.height == expected_height
 
 
 def test_to_esa_compatible_dataframe():
@@ -147,8 +151,12 @@ def test_area_def_returns_area_def_type():
     cell = core.GridCell(d=100000, geom=polygon, is_primary=True, cell_id="0U_0R")
     ad = cell.area_def(2000)
     assert isinstance(ad, core.AreaDef)
-    assert ad.width == 100000 // 2000
-    assert ad.height == 100000 // 2000
+    # width/height should reflect natural UTM footprint bounds, not self.D
+    bounds = cell.utm_footprint.bounds
+    expected_width = round((bounds[2] - bounds[0]) / 2000)
+    expected_height = round((bounds[3] - bounds[1]) / 2000)
+    assert ad.width == expected_width
+    assert ad.height == expected_height
     # projection can be "EPSG:32631" or just "32631"
     epsg_code = ad.projection.split(":")[-1] if ":" in ad.projection else ad.projection
     assert epsg_code.isdigit()
@@ -163,11 +171,41 @@ def test_area_def_from_generated_cell():
     assert len(cells) > 0
     ad = cells[0].area_def(2000)
     assert isinstance(ad, core.AreaDef)
-    assert ad.width == 50
-    assert ad.height == 50
+    # width/height should reflect natural UTM footprint bounds, not self.D
+    bounds = cells[0].utm_footprint.bounds
+    expected_width = round((bounds[2] - bounds[0]) / 2000)
+    expected_height = round((bounds[3] - bounds[1]) / 2000)
+    assert ad.width == expected_width
+    assert ad.height == expected_height
     # Extent should have min < max for both x and y
     assert ad.area_extent[0] < ad.area_extent[2]
     assert ad.area_extent[1] < ad.area_extent[3]
+
+
+def test_area_def_uses_natural_bounds():
+    """A cell's area_def extent should match its utm_footprint, not self.D."""
+    from shapely.geometry import Point
+
+    grid = core.GridDefinition(d=100_000)
+    cells = grid.generate_grid_cells(Point(-64.0, -31.4).buffer(0.1))
+    cell = cells[0]
+    area = cell.area_def(2000)
+    # The extent should be derived from utm_footprint.bounds, not from D=100_000
+    bounds = cell.utm_footprint.bounds
+    expected_width = round((bounds[2] - bounds[0]) / 2000)
+    expected_height = round((bounds[3] - bounds[1]) / 2000)
+    assert area.width == expected_width
+    assert area.height == expected_height
+
+
+def test_area_def_conform_to():
+    """When conform_to is given, width/height should match target + padding."""
+    cell = core.GridCell(
+        d=10000, geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]), cell_id="test"
+    )
+    area = cell.area_def(100, padding=1, conform_to=(50, 60))
+    assert area.width == 52  # 50 + 2*1
+    assert area.height == 62  # 60 + 2*1
 
 
 def test_area_def_yaml_round_trip_with_pyresample():
