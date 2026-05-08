@@ -99,6 +99,12 @@ profiles:
     extract_params:
       reader: abi_l1b
     downloader: my_package.downloaders.custom_downloader
+
+  # Use conform_to_max_shape when you need fixed tensor shapes (e.g. ML training)
+  - name: modis_ml
+    resolution: 1000
+    collections: ["MOD021KM"]
+    conform_to_max_shape: true
 ```
 
 ```python
@@ -107,6 +113,8 @@ from aer.interfaces import AerProfile
 profiles = AerProfile.from_yaml("profiles.yaml")
 # profiles[0].downloader is now a live callable
 ```
+
+> 💡 **Natural vs. conformed shapes** — By default every grid cell uses its *natural* UTM footprint, so adjacent cells tile edge-to-edge with no gaps. Set `conform_to_max_shape: true` when you need every cell in a batch to share the same `(width, height)` (e.g. for neural-network training). The extra area is filled with `NaN`.
 
 Supported loaders:
 - `AerProfile.from_yaml(path)` — load a YAML file
