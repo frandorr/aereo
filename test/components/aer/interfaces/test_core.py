@@ -303,6 +303,14 @@ def test_aer_profile_defaults():
     assert profile.channels is None
     assert profile.satellite is None
     assert profile.plugin_hints == {}
+    assert profile.conform_to_max_shape is False
+
+
+def test_aer_profile_accepts_conform_to_max_shape():
+    from aer.interfaces.core import AerProfile
+
+    profile = AerProfile(name="test", resolution=100.0, conform_to_max_shape=True)
+    assert profile.conform_to_max_shape is True
 
 
 def test_extraction_task_accepts_aer_profile():
