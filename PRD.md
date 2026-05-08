@@ -97,22 +97,16 @@ def test_aer_profile_downloader_defaults_to_none():
 
 All tests pass (3/3). basedpyright reports 0 new errors (3 pre-existing unrelated errors in satpy typing).
 
-#### Task 2.2: `aer-extract-aws-goes`
+#### Task 2.2: `aer-extract-aws-goes` ✅
 **File:** `components/aer/extract_aws_goes/core.py`
-**Action:** Add the same precedence logic. Currently this plugin uses `download_asset_safely` directly without a custom downloader; add support for `profile.downloader` override.
+**Action:** Added downloader precedence logic in `extract()` and passed the resolved `downloader` to all three `download_asset_safely()` calls (`_extract_odc_zone`, `_extract_odc_cell`, `_extract_pyresample`).
 
-**Tests:**
-```python
-def test_extract_uses_profile_downloader():
-    mock_downloader = MagicMock()
-    profile = AerProfile(
-        name="test", resolution=1000.0,
-        collections=["ABI-L1b-RadF"],
-        downloader=mock_downloader,
-    )
-    task = make_task(profile=profile)
-    # Verify downloader precedence is respected
-```
+**Tests:** Added three tests in `test/components/aer/extract_aws_goes/test_core.py`:
+- `test_extract_uses_profile_downloader` — verifies profile-level downloader is passed to `download_asset_safely`
+- `test_extract_falls_back_to_batch_downloader` — verifies batch-level fallback works
+- `test_extract_prefers_profile_downloader_over_batch` — verifies profile wins when both are present
+
+All tests pass (22/22). basedpyright reports 0 new errors (6 pre-existing unrelated errors in satpy/odc-geo typing).
 
 #### Task 2.3: `aer-extract-odc-stac`
 **File:** `components/aer/extract_odc_stac/core.py`
