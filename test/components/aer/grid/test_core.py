@@ -1,6 +1,8 @@
 from aer.grid import core
 from shapely.geometry import Polygon
 import geopandas as gpd
+import pytest
+from odc.geo.geobox import GeoBox
 
 
 def test_grid_definition_init():
@@ -79,13 +81,12 @@ def test_grid_cell_area_name_and_def():
 
     assert cell.area_name(50) == "0U_0R_dist-10000m_res-50m"
     area = cell.area_def(50)
-    assert area.area_id == "0U_0R_dist-10000m_res-50m"
     # width/height should reflect natural UTM footprint bounds, not self.D
     bounds = cell.utm_footprint.bounds
     expected_width = round((bounds[2] - bounds[0]) / 50)
     expected_height = round((bounds[3] - bounds[1]) / 50)
-    assert area.width == expected_width
-    assert area.height == expected_height
+    assert area.shape.x >= expected_width
+    assert area.shape.y >= expected_height
 
 
 def test_to_esa_compatible_dataframe():
@@ -105,81 +106,56 @@ def test_to_esa_compatible_dataframe():
     assert gdf.crs == "EPSG:4326"
 
 
-# --- AreaDef tests ---
+# --- GeoBox tests ---
 
 
-def test_area_def_is_frozen():
-    """AreaDef must be immutable (attrs.frozen)."""
-    ad = core.AreaDef(
-        area_id="test",
-        description="test area",
-        projection="EPSG:32720",
-        width=50,
-        height=50,
-        area_extent=(0.0, 0.0, 100000.0, 100000.0),
+def test_area_def_removed():
+    """AreaDef should no longer exist in aer.grid.core."""
+    with pytest.raises(AttributeError):
+        getattr(core, "AreaDef")
+
+
+def test_area_def_returns_geobox():
+    cell = core.GridCell(
+        d=10000, geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]), cell_id="test"
     )
-    import attrs
-    import pytest
-
-    with pytest.raises(attrs.exceptions.FrozenInstanceError):
-        ad.area_id = "changed"  # type: ignore[misc]
-
-
-def test_area_def_to_yaml_structure():
-    """to_yaml() must produce valid YAML with all required pyresample keys."""
-    ad = core.AreaDef(
-        area_id="cell_1",
-        description="Area defined for cell_1 in EPSG:32720",
-        projection="EPSG:32720",
-        width=50,
-        height=50,
-        area_extent=(500000.0, 6000000.0, 600000.0, 6100000.0),
-    )
-    yaml_str = ad.to_yaml()
-    assert "cell_1:" in yaml_str
-    assert "EPSG: 32720" in yaml_str
-    assert "height: 50" in yaml_str
-    assert "width: 50" in yaml_str
-    assert "lower_left_xy: [500000.0, 6000000.0]" in yaml_str
-    assert "upper_right_xy: [600000.0, 6100000.0]" in yaml_str
-    assert "units: m" in yaml_str
+    gb = cell.area_def(100)
+    assert isinstance(gb, GeoBox)
+    assert gb.crs is not None
+    assert gb.crs.to_epsg() == int(cell.utm_crs.split(":")[-1])
 
 
-def test_area_def_returns_area_def_type():
-    """GridCell.area_def() must return an AreaDef instance."""
-    polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
-    cell = core.GridCell(d=100000, geom=polygon, is_primary=True, cell_id="0U_0R")
-    ad = cell.area_def(2000)
-    assert isinstance(ad, core.AreaDef)
-    # width/height should reflect natural UTM footprint bounds, not self.D
+def test_area_def_natural_shape_matches_utm_footprint():
+    from shapely.geometry import Point
+
+    grid = core.GridDefinition(d=100_000)
+    cells = grid.generate_grid_cells(Point(-64.0, -31.4).buffer(0.1))
+    cell = cells[0]
+    gb = cell.area_def(2000)
     bounds = cell.utm_footprint.bounds
-    expected_width = round((bounds[2] - bounds[0]) / 2000)
-    expected_height = round((bounds[3] - bounds[1]) / 2000)
-    assert ad.width == expected_width
-    assert ad.height == expected_height
-    # projection can be "EPSG:32631" or just "32631"
-    epsg_code = ad.projection.split(":")[-1] if ":" in ad.projection else ad.projection
-    assert epsg_code.isdigit()
+    # GeoBox rounds up to whole pixels; shape must be >= natural
+    assert gb.shape.x >= round((bounds[2] - bounds[0]) / 2000)
+    assert gb.shape.y >= round((bounds[3] - bounds[1]) / 2000)
 
 
 def test_area_def_from_generated_cell():
-    """AreaDef from a real grid-generated cell should have valid extent and CRS."""
+    """GeoBox from a real grid-generated cell should have valid extent and CRS."""
     from shapely.geometry import Point
 
     grid = core.GridDefinition(d=100000)
     cells = grid.generate_grid_cells(Point(-64.0, -31.4).buffer(0.1))
     assert len(cells) > 0
     ad = cells[0].area_def(2000)
-    assert isinstance(ad, core.AreaDef)
+    assert isinstance(ad, GeoBox)
     # width/height should reflect natural UTM footprint bounds, not self.D
     bounds = cells[0].utm_footprint.bounds
     expected_width = round((bounds[2] - bounds[0]) / 2000)
     expected_height = round((bounds[3] - bounds[1]) / 2000)
-    assert ad.width == expected_width
-    assert ad.height == expected_height
+    assert ad.shape.x >= expected_width
+    assert ad.shape.y >= expected_height
     # Extent should have min < max for both x and y
-    assert ad.area_extent[0] < ad.area_extent[2]
-    assert ad.area_extent[1] < ad.area_extent[3]
+    assert ad.extent.boundingbox.left < ad.extent.boundingbox.right
+    assert ad.extent.boundingbox.bottom < ad.extent.boundingbox.top
 
 
 def test_area_def_uses_natural_bounds():
@@ -194,8 +170,8 @@ def test_area_def_uses_natural_bounds():
     bounds = cell.utm_footprint.bounds
     expected_width = round((bounds[2] - bounds[0]) / 2000)
     expected_height = round((bounds[3] - bounds[1]) / 2000)
-    assert area.width == expected_width
-    assert area.height == expected_height
+    assert area.shape.x >= expected_width
+    assert area.shape.y >= expected_height
 
 
 def test_area_def_conform_to():
@@ -204,8 +180,20 @@ def test_area_def_conform_to():
         d=10000, geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]), cell_id="test"
     )
     area = cell.area_def(100, padding=1, conform_to=(50, 60))
-    assert area.width == 52  # 50 + 2*1
-    assert area.height == 62  # 60 + 2*1
+    assert area.shape.x == 52  # 50 + 2*1
+    assert area.shape.y == 62  # 60 + 2*1
+
+
+def test_area_def_geobox_kwargs():
+    cell = core.GridCell(
+        d=10000, geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]), cell_id="test"
+    )
+    gb_edge = cell.area_def(100, anchor="edge")
+    gb_center = cell.area_def(100, anchor="center", tight=True)
+    # Same resolution, same cell, but different anchors should produce
+    # different (but valid) extents.
+    assert gb_edge.shape == gb_center.shape  # for this evenly-divisible test case
+    assert gb_edge.extent != gb_center.extent
 
 
 def test_max_shape_across_cells():
@@ -219,8 +207,8 @@ def test_max_shape_across_cells():
     # Every cell should fit inside max_shape when padded to it
     for cell in cells:
         area = cell.area_def(100, conform_to=(max_w, max_h))
-        assert area.width == max_w
-        assert area.height == max_h
+        assert area.shape.x == max_w
+        assert area.shape.y == max_h
 
 
 def test_max_shape_with_padding():
@@ -232,27 +220,3 @@ def test_max_shape_with_padding():
     max_w, max_h = grid.max_shape(cells, resolution=100, padding=0)
     assert max_w_padded == max_w + 4
     assert max_h_padded == max_h + 4
-
-
-def test_area_def_yaml_round_trip_with_pyresample():
-    """to_yaml() output must be loadable by pyresample.area_config.load_area_from_string."""
-    try:
-        from pyresample.area_config import load_area_from_string
-    except ImportError:
-        import pytest
-
-        pytest.skip("pyresample not installed")
-
-    ad = core.AreaDef(
-        area_id="test_roundtrip",
-        description="Round-trip test area in EPSG:32720",
-        projection="EPSG:32720",
-        width=50,
-        height=50,
-        area_extent=(500000.0, 6000000.0, 600000.0, 6100000.0),
-    )
-    area = load_area_from_string(ad.to_yaml(), ad.area_id)
-    assert area is not None and not isinstance(area, list)
-    assert area.width == ad.width
-    assert area.height == ad.height
-    assert area.area_extent == ad.area_extent

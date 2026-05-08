@@ -1,7 +1,6 @@
-from functools import cached_property, lru_cache
+from functools import cached_property
 from typing import Sequence, cast
 
-import attrs
 import geopandas as gpd
 import numpy as np
 import shapely
@@ -9,56 +8,10 @@ from aer.schemas import GridSchema
 from aer.spatial import get_utm_epsg_from_geometry, reproject_geom
 from majortom_eg.MajorTom import GridCell as BaseGridCell
 from majortom_eg.MajorTom import MajorTomGrid
+from odc.geo.geobox import GeoBox
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Point, Polygon
 from shapely.geometry.base import BaseGeometry
-
-
-@attrs.frozen
-class AreaDef:
-    """Lightweight, pyresample-free area definition.
-
-    Holds the geometric parameters that fully describe a pyresample
-    AreaDefinition without importing it.  Use :meth:`to_yaml` to produce
-    a YAML string loadable by
-    ``pyresample.area_config.load_area_from_string``.
-    """
-
-    area_id: str
-    description: str
-    projection: str  # EPSG string, e.g. "EPSG:32720"
-    width: int
-    height: int
-    area_extent: tuple[float, float, float, float]  # (min_x, min_y, max_x, max_y)
-
-    def to_yaml(self) -> str:
-        """Serialise to a YAML string that pyresample can load.
-
-        Usage in downstream plugins::
-
-            from pyresample.area_config import load_area_from_string
-            area = load_area_from_string(my_area.to_yaml(), my_area.area_id)
-        """
-        # Extract numeric EPSG code regardless of whether projection
-        # is stored as "EPSG:32720" or plain "32720"
-        epsg_code = (
-            self.projection.split(":")[-1]
-            if ":" in self.projection
-            else self.projection
-        )
-        return (
-            f"{self.area_id}:\n"
-            f"  description: {self.description}\n"
-            f"  projection:\n"
-            f"    EPSG: {epsg_code}\n"
-            f"  shape:\n"
-            f"    height: {self.height}\n"
-            f"    width: {self.width}\n"
-            f"  area_extent:\n"
-            f"    lower_left_xy: [{self.area_extent[0]}, {self.area_extent[1]}]\n"
-            f"    upper_right_xy: [{self.area_extent[2]}, {self.area_extent[3]}]\n"
-            f"    units: m\n"
-        )
 
 
 class GridCell(BaseGridCell):
@@ -121,82 +74,56 @@ class GridCell(BaseGridCell):
         """
         return f"{self.id()}_dist-{self.D}m_res-{resolution}m"
 
-    @lru_cache(maxsize=16)
     def area_def(
         self,
         resolution: int,
         padding: int = 0,
         conform_to: tuple[int, int] | None = None,
-    ) -> AreaDef:
-        """Creates an AreaDef for this grid cell's UTM footprint.
+        **geobox_kwargs,
+    ) -> GeoBox:
+        """Return an odc-geo GeoBox for this cell's UTM footprint.
 
-        By default the extent matches the cell's *natural* UTM footprint
-        (derived from ``self.utm_footprint.bounds``).  This means different
-        cells can have different ``width`` and ``height``.
-
-        Args:
-            resolution (int): Resolution in meters.
-            padding (int): Number of extra pixels to add on **each side**.
-                The footprint is expanded symmetrically before width/height
-                are computed.  Useful when you want a border of context
-                pixels around the natural cell.
-            conform_to: When given as ``(target_width, target_height)``, the
-                natural extent is centred inside a larger box so that the
-                final ``width == target_width`` and ``height == target_height``.
-                The extra area is filled with NaNs by downstream extractors.
-                This is typically computed by ``GridDefinition.max_shape()``
-                across a batch of cells.
-
-        Returns:
-            AreaDef: Lightweight area definition. Use ``to_yaml()`` to
-                convert to a YAML string loadable by pyresample.
+        Parameters
+        ----------
+        resolution:
+            Pixel size in metres.
+        padding:
+            Extra pixels to add on all sides (uses ``GeoBox.pad``).
+        conform_to:
+            Force a uniform ``(width, height)`` across a batch. When provided,
+            ``anchor='center'`` and ``tight=True`` are enforced internally so
+            that every cell has the exact same pixel dimensions.
+        **geobox_kwargs:
+            Forwarded to ``GeoBox.from_bbox``. The default ``anchor`` is
+            ``'edge'`` (top-left pixel-grid alignment).
         """
-        bounds = self.utm_footprint.bounds  # minx, miny, maxx, maxy
-
-        # Natural size in metres
-        natural_width_m = bounds[2] - bounds[0]
-        natural_height_m = bounds[3] - bounds[1]
-
-        # Centre snapped to resolution grid
-        cx = round(((bounds[0] + bounds[2]) / 2) / resolution) * resolution
-        cy = round(((bounds[1] + bounds[3]) / 2) / resolution) * resolution
-
-        pad_m = padding * resolution
+        bounds = self.utm_footprint.bounds
+        crs = self.utm_crs
 
         if conform_to is not None:
-            target_width, target_height = conform_to
-            half_w = (target_width * resolution) / 2
-            half_h = (target_height * resolution) / 2
-            snapped_extent = (
-                cx - half_w - pad_m,
-                cy - half_h - pad_m,
-                cx + half_w + pad_m,
-                cy + half_h + pad_m,
+            target_w, target_h = conform_to
+            cx = (bounds[0] + bounds[2]) / 2
+            cy = (bounds[1] + bounds[3]) / 2
+            half_w = (target_w * resolution) / 2
+            half_h = (target_h * resolution) / 2
+            bbox = (cx - half_w, cy - half_h, cx + half_w, cy + half_h)
+            geobox = GeoBox.from_bbox(
+                bbox,
+                crs,
+                resolution=resolution,
+                anchor="center",
+                tight=True,
             )
-            width = target_width + 2 * padding
-            height = target_height + 2 * padding
         else:
-            # Natural extent: exactly covers the UTM footprint, snapped to pixel grid
-            half_w = round((natural_width_m / 2) / resolution) * resolution
-            half_h = round((natural_height_m / 2) / resolution) * resolution
-            snapped_extent = (
-                cx - half_w - pad_m,
-                cy - half_h - pad_m,
-                cx + half_w + pad_m,
-                cy + half_h + pad_m,
+            geobox_kwargs.setdefault("anchor", "edge")
+            geobox = GeoBox.from_bbox(
+                bounds, crs, resolution=resolution, **geobox_kwargs
             )
-            width = round((natural_width_m + 2 * pad_m) / resolution)
-            height = round((natural_height_m + 2 * pad_m) / resolution)
 
-        area_name = self.area_name(resolution)
-        return AreaDef(
-            area_id=area_name,
-            description=f"Area defined for {area_name} in {self.utm_crs}",
-            projection=str(self.utm_crs),
-            width=width,
-            height=height,
-            area_extent=snapped_extent,
-        )
+        if padding:
+            geobox = geobox.pad(padding)
+
+        return geobox
 
 
 class GridDefinition(MajorTomGrid):
@@ -399,6 +326,7 @@ class GridDefinition(MajorTomGrid):
         cells: Sequence[GridCell],
         resolution: int,
         padding: int = 0,
+        **geobox_kwargs,
     ) -> tuple[int, int]:
         """Return the maximum (width, height) in pixels across *cells*.
 
@@ -410,18 +338,20 @@ class GridDefinition(MajorTomGrid):
             resolution: Pixel size in metres.
             padding: Number of extra pixels added on each side (same semantics as
                 :meth:`GridCell.area_def`).
+            **geobox_kwargs: Forwarded to :meth:`GridCell.area_def`.
 
         Returns:
             Tuple of ``(max_width, max_height)`` in pixels.
         """
-        max_w = 0
-        max_h = 0
-        for cell in cells:
-            bounds = cell.utm_footprint.bounds
-            w = round((bounds[2] - bounds[0]) / resolution) + 2 * padding
-            h = round((bounds[3] - bounds[1]) / resolution) + 2 * padding
-            max_w = max(max_w, w)
-            max_h = max(max_h, h)
+        shapes = [
+            cell.area_def(resolution, padding=0, **geobox_kwargs).shape
+            for cell in cells
+        ]
+        max_w = max((s.x for s in shapes), default=0)
+        max_h = max((s.y for s in shapes), default=0)
+        if padding:
+            max_w += 2 * padding
+            max_h += 2 * padding
         return max_w, max_h
 
     def to_esa_compatible_dataframe(self, cells: Sequence[GridCell]) -> GeoDataFrame:
