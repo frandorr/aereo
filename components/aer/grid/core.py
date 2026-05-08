@@ -122,53 +122,71 @@ class GridCell(BaseGridCell):
         return f"{self.id()}_dist-{self.D}m_res-{resolution}m"
 
     @lru_cache(maxsize=16)
-    def area_def(self, resolution: int, padding: int = 0) -> AreaDef:
+    def area_def(
+        self,
+        resolution: int,
+        padding: int = 0,
+        conform_to: tuple[int, int] | None = None,
+    ) -> AreaDef:
         """Creates an AreaDef for this grid cell's UTM footprint.
 
-        The output extent is a centred D x D metre box in UTM space, with its
-        centre snapped to the resolution grid.  This guarantees that:
-
-        * ``width == height == D // resolution + 2 * padding`` (fixed tensor shape for ML).
-        * Pixel size is **exactly** ``resolution`` metres (no stretching).
-        * Extractions of the same cell from different constellations
-          (GOES, VIIRS, MODIS ...) at the same resolution share an identical
-          spatial footprint, making pixel-wise stacking valid.
-
-        The optional ``padding`` argument extends the box by ``padding`` pixels
-        on **every side**.  This creates a border that overlaps neighbouring
-        cells, guaranteeing full spatial coverage with no gaps at cell edges.
-        A padding of 1-2 pixels is sufficient for most use cases.
+        By default the extent matches the cell's *natural* UTM footprint
+        (derived from ``self.utm_footprint.bounds``).  This means different
+        cells can have different ``width`` and ``height``.
 
         Args:
             resolution (int): Resolution in meters.
-            padding (int): Number of extra pixels to add on each side (default 0).
-                           The resulting shape is ``(D // resolution + 2*padding) ** 2``.
+            padding (int): Number of extra pixels to add on **each side**.
+                The footprint is expanded symmetrically before width/height
+                are computed.  Useful when you want a border of context
+                pixels around the natural cell.
+            conform_to: When given as ``(target_width, target_height)``, the
+                natural extent is centred inside a larger box so that the
+                final ``width == target_width`` and ``height == target_height``.
+                The extra area is filled with NaNs by downstream extractors.
+                This is typically computed by ``GridDefinition.max_shape()``
+                across a batch of cells.
+
         Returns:
             AreaDef: Lightweight area definition. Use ``to_yaml()`` to
                 convert to a YAML string loadable by pyresample.
         """
         bounds = self.utm_footprint.bounds  # minx, miny, maxx, maxy
 
-        # Compute UTM centroid and snap it to the resolution grid so that the
-        # pixel edges are deterministic regardless of which instrument is used.
-        cx = (bounds[0] + bounds[2]) / 2
-        cy = (bounds[1] + bounds[3]) / 2
-        cx = round(cx / resolution) * resolution
-        cy = round(cy / resolution) * resolution
+        # Natural size in metres
+        natural_width_m = bounds[2] - bounds[0]
+        natural_height_m = bounds[3] - bounds[1]
 
-        # Core D x D box, expanded symmetrically by padding pixels on each side.
+        # Centre snapped to resolution grid
+        cx = round(((bounds[0] + bounds[2]) / 2) / resolution) * resolution
+        cy = round(((bounds[1] + bounds[3]) / 2) / resolution) * resolution
+
         pad_m = padding * resolution
-        half = self.D / 2
-        snapped_extent = (
-            cx - half - pad_m,
-            cy - half - pad_m,
-            cx + half + pad_m,
-            cy + half + pad_m,
-        )
 
-        core_pixels = self.D // resolution
-        width = core_pixels + 2 * padding
-        height = core_pixels + 2 * padding
+        if conform_to is not None:
+            target_width, target_height = conform_to
+            half_w = (target_width * resolution) / 2
+            half_h = (target_height * resolution) / 2
+            snapped_extent = (
+                cx - half_w - pad_m,
+                cy - half_h - pad_m,
+                cx + half_w + pad_m,
+                cy + half_h + pad_m,
+            )
+            width = target_width + 2 * padding
+            height = target_height + 2 * padding
+        else:
+            # Natural extent: exactly covers the UTM footprint, snapped to pixel grid
+            half_w = round((natural_width_m / 2) / resolution) * resolution
+            half_h = round((natural_height_m / 2) / resolution) * resolution
+            snapped_extent = (
+                cx - half_w - pad_m,
+                cy - half_h - pad_m,
+                cx + half_w + pad_m,
+                cy + half_h + pad_m,
+            )
+            width = round((natural_width_m + 2 * pad_m) / resolution)
+            height = round((natural_height_m + 2 * pad_m) / resolution)
 
         area_name = self.area_name(resolution)
         return AreaDef(
