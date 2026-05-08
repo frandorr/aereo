@@ -364,6 +364,75 @@ def test_aer_profile_invalid_import_string():
         )
 
 
+def test_aer_profile_has_search_and_extract_params():
+    from aer.interfaces.core import AerProfile
+
+    profile = AerProfile(
+        name="test",
+        resolution=100.0,
+        search_params={"version": "061"},
+        extract_params={"calibration": "reflectance"},
+    )
+    assert profile.search_params["version"] == "061"
+    assert profile.extract_params["calibration"] == "reflectance"
+
+
+def test_aer_profile_rejects_extra_params():
+    from aer.interfaces.core import AerProfile
+
+    with pytest.raises(ValidationError):
+        AerProfile(name="test", resolution=100.0, extra_params={"foo": "bar"})  # pyright: ignore[reportCallIssue]
+
+
+_captured_extract_params: list[dict[str, Any] | None] = []
+
+
+def test_extract_batches_merges_profile_extract_params(monkeypatch):
+    """Profile extract_params should override batch extract_params."""
+    _captured_extract_params.clear()
+
+    class _CapturingExtractor(Extractor):
+        supported_collections = ["GOES"]
+
+        @property
+        def target_grid_d(self) -> int:
+            return 10000
+
+        def extract(
+            self,
+            extraction_task: ExtractionTask,
+            extract_params: dict[str, Any] | None,
+        ) -> GeoDataFrame[ArtifactSchema]:
+            _captured_extract_params.append(extract_params)
+            return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
+
+    extractor = _CapturingExtractor()
+    monkeypatch.setattr("aer.schemas.ArtifactSchema.validate", lambda x: x)
+
+    df = gpd.GeoDataFrame(
+        {"id": [1]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
+    )
+
+    from aer.interfaces.core import AerProfile
+
+    profile = AerProfile(
+        name="test",
+        resolution=10.0,
+        extract_params={"calibration": "reflectance"},
+    )
+    task = ExtractionTask(
+        assets=cast(Any, df),
+        grid_cells=[],
+        profile=profile,
+        uri="test1",
+    )
+
+    extractor.extract_batches([task], extract_params={"calibration": "radiance"})
+
+    assert len(_captured_extract_params) == 1
+    assert _captured_extract_params[0] == {"calibration": "reflectance"}
+
+
 def test_merge_params_batch_only():
     assert merge_params({"a": 1}, {}) == {"a": 1}
 
