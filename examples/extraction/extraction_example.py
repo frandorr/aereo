@@ -43,6 +43,7 @@ profiles = [
         calibration="reflectance",
         satellite="NOAA21",
         plugin_hints={"search": "search_earthaccess", "extract": "extract_satpy"},
+        downloader=earthaccess_download_wrapper,
     ),
     AerProfile(
         name="goes_c01",
@@ -67,6 +68,7 @@ profiles = [
         resampling="nearest",
         calibration="reflectance",
         plugin_hints={"search": "search_earthaccess", "extract": "extract_satpy"},
+        downloader=earthaccess_download_wrapper,
     ),
     AerProfile(
         name="olci_rgb",
@@ -78,6 +80,7 @@ profiles = [
         resampling="nearest",
         calibration="reflectance",
         plugin_hints={"search": "search_earthaccess", "extract": "extract_satpy"},
+        downloader=earthaccess_download_wrapper,
     ),
 ]
 
@@ -155,15 +158,8 @@ uri_path.mkdir(parents=True)
 print("Extracting...", flush=True)
 start_time = time.time()
 
-# extract_params is reserved for meta-level / tool-level parameters.
-# Domain-specific config (padding, calibration, reader, etc.) lives on the profile.
-extract_params = {
-    "downloader": earthaccess_download_wrapper,
-}
-
 results_df = client.extract_batches(
     tasks,
-    extract_params=extract_params,
     max_batch_workers=None,
 )
 

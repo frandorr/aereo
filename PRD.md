@@ -121,11 +121,13 @@ All tests pass (10/10). basedpyright reports 0 new errors (12 pre-existing unrel
 
 ### Phase 3 — Example
 
-#### Task 3.1: Update extraction example
+#### Task 3.1: Update extraction example ✅
 **File:** `examples/extraction/extraction_example.py`
 **Action:**
-- Move `downloader=earthaccess_download_wrapper` from `extract_params` into the relevant `AerProfile.extra_params` or the new `downloader` field.
-- Since earthaccess is only needed for earthaccess-backed collections (VIIRS, MODIS, OLCI), add it only to those profiles. GOES uses direct S3 and doesn't need it.
+- Moved `downloader=earthaccess_download_wrapper` from `extract_params` into the relevant `AerProfile` definitions.
+- Added `downloader=earthaccess_download_wrapper` to the VIIRS, MODIS, and OLCI profiles (earthaccess-backed collections).
+- Left GOES profile without a downloader since it uses direct S3.
+- Removed the `extract_params` dict and its usage in `client.extract_batches()`.
 
 **Before:**
 ```python
