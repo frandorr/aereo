@@ -4,6 +4,17 @@ import pytest
 from aer.interfaces.core import AerProfile
 
 
+def test_from_json_example_loads_profiles():
+    """Verify the checked-in examples/profiles.json loads correctly."""
+    json_path = Path(__file__).parents[4] / "examples" / "profiles.json"
+    profiles = AerProfile.from_json(json_path)
+    assert len(profiles) == 4
+    names = {p.name for p in profiles}
+    assert names == {"viirs_i1", "goes_c01", "modis_thermal", "olci_rgb"}
+    # Verify ImportString resolution works from JSON too
+    assert profiles[0].downloader is not None
+
+
 def test_from_yaml_string_loads_profiles():
     yaml_text = """
     profiles:
