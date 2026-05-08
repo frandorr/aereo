@@ -137,7 +137,8 @@ class AerProfile(BaseModel):
     calibration: str | None = None
     plugin_hints: Mapping[str, str] = Field(default_factory=dict)
     downloader: ImportString[Callable[[str, Path], None]] | None = None
-    extra_params: Mapping[str, Any] = Field(default_factory=dict)
+    search_params: Mapping[str, Any] = Field(default_factory=dict)
+    extract_params: Mapping[str, Any] = Field(default_factory=dict)
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> list[Self]:
@@ -456,7 +457,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
                 (e.g. ``max_retries``, ``credentials``, ``downloader`` callables).
                 Domain-specific configuration such as ``padding``, ``calibration``,
                 ``reader``, etc. should be defined on ``extraction_task.profile``
-                (via its explicit fields or ``extra_params``) rather than here.
+                (via its explicit fields or ``extract_params``) rather than here.
                 Per-task preparation parameters are available on ``extraction_task.prepare_params``.
 
                 .. note::
@@ -509,7 +510,10 @@ class Extractor(AerPlugin, plugin_abstract=True):
             # Sequential path (original behaviour)
             results = []
             for batch in extraction_task_batch:
-                results.append(self.extract(batch, extract_params))
+                effective_params = merge_params(
+                    extract_params, batch.profile.extract_params
+                )
+                results.append(self.extract(batch, effective_params))
             concatenated = pd.concat(results, ignore_index=True)
             validated = ArtifactSchema.validate(concatenated)
             return cast(GeoDataFrame[ArtifactSchema], validated)
@@ -518,7 +522,10 @@ class Extractor(AerPlugin, plugin_abstract=True):
         results: list[GeoDataFrame[ArtifactSchema]] = []
         errors: list[str] = []
 
-        tasks = [(self, batch, extract_params) for batch in extraction_task_batch]
+        tasks = [
+            (self, batch, merge_params(extract_params, batch.profile.extract_params))
+            for batch in extraction_task_batch
+        ]
 
         mp_context = get_context("spawn" if sys.platform == "win32" else "forkserver")
         with ProcessPoolExecutor(
