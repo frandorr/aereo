@@ -394,6 +394,36 @@ class GridDefinition(MajorTomGrid):
 
         return cells
 
+    def max_shape(
+        self,
+        cells: Sequence[GridCell],
+        resolution: int,
+        padding: int = 0,
+    ) -> tuple[int, int]:
+        """Return the maximum (width, height) in pixels across *cells*.
+
+        This is the shape you pass to ``GridCell.area_def(..., conform_to=...)``
+        when you want every cell in the batch to share an identical tensor shape.
+
+        Args:
+            cells: Sequence of GridCell objects to evaluate.
+            resolution: Pixel size in metres.
+            padding: Number of extra pixels added on each side (same semantics as
+                :meth:`GridCell.area_def`).
+
+        Returns:
+            Tuple of ``(max_width, max_height)`` in pixels.
+        """
+        max_w = 0
+        max_h = 0
+        for cell in cells:
+            bounds = cell.utm_footprint.bounds
+            w = round((bounds[2] - bounds[0]) / resolution) + 2 * padding
+            h = round((bounds[3] - bounds[1]) / resolution) + 2 * padding
+            max_w = max(max_w, w)
+            max_h = max(max_h, h)
+        return max_w, max_h
+
     def to_esa_compatible_dataframe(self, cells: Sequence[GridCell]) -> GeoDataFrame:
         """
         Converts a sequence of GridCells into a GeoDataFrame that perfectly
