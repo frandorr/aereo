@@ -175,17 +175,94 @@ acme_search = "acme_plugin.search:AcmeSearchProvider"
 acme_extract = "acme_plugin.extract:AcmeExtractor"
 ```
 
-## Step 5: Test Your Plugin
+## Step 5: Configure Your Profiles
+
+`AerProfile` (also available as the backward-compat alias `ExtractionProfile`) is a **Pydantic `BaseModel`**. This means you get declarative validation, frozen immutability, and native JSON/YAML deserialization out of the box.
+
+### Constructing profiles in code
+
+Pydantic models accept keyword arguments just like the old attrs class:
+
+```python
+from aer.interfaces import AerProfile
+
+profile = AerProfile(
+    name="acme_l1",
+    resolution=250,
+    collections=["acme-l1"],
+    channels=["B01"],
+    plugin_hints={"search": "acme_search", "extract": "acme_extract"},
+)
+```
+
+`AerProfile` is frozen (`model_config = {"frozen": True}`) and forbids unknown fields (`"extra": "forbid"`), so typos raise a clear `ValidationError` immediately.
+
+### Loading profiles from YAML or JSON
+
+You can keep profiles in config files instead of code:
+
+```yaml
+# profiles.yaml
+profiles:
+  - name: acme_l1
+    resolution: 250
+    collections: ["acme-l1"]
+    channels: ["B01"]
+    plugin_hints:
+      search: acme_search
+      extract: acme_extract
+```
+
+Load them with the class methods provided on `AerProfile`:
+
+```python
+from pathlib import Path
+from aer.interfaces import AerProfile
+
+# From a YAML file
+profiles = AerProfile.from_yaml(Path("profiles.yaml"))
+
+# From a YAML string
+profiles = AerProfile.from_yaml_string(yaml_text)
+
+# From a JSON file
+profiles = AerProfile.from_json(Path("profiles.json"))
+
+# From a directory containing *.yaml / *.yml / *.json
+profiles = AerProfile.from_config_dir(Path("configs/"))
+```
+
+### Referencing a downloader by import path
+
+The `downloader` field accepts either a live callable or a **dotted import path string**. When loading from config, write the string and Pydantic's `ImportString` resolves it to a callable at validation time:
+
+```yaml
+profiles:
+  - name: acme_l1
+    resolution: 250
+    collections: ["acme-l1"]
+    downloader: my_package.downloaders.custom_downloader
+```
+
+The resolved callable must match the `Downloader` signature: `Callable[[str, Path], None]`.
+
+If the module or attribute does not exist, Pydantic raises a clear `ValidationError` pointing to the exact import path.
+
+## Step 6: Test Your Plugin
 
 Test your plugin using the high-level `AerClient` API:
 
 ```python
 from aer.client import AerClient
-from aer.interfaces import ExtractionProfile
+from aer.interfaces import AerProfile
 from datetime import datetime
+from pathlib import Path
 
 # The client automatically discovers your entry points!
 client = AerClient()
+
+# Load profiles from config (or build them in code)
+profiles = AerProfile.from_yaml(Path("profiles.yaml"))
 
 # 1. Search
 results = client.search(
@@ -197,7 +274,7 @@ results = client.search(
 # 2. Prepare
 tasks = client.prepare_for_extraction(
     results,
-    profiles=[ExtractionProfile(name="test", resolution=100)],
+    profiles=profiles,
     uri="output/acme",
 )
 
@@ -206,7 +283,7 @@ artifacts = client.extract_batches(tasks)
 print(artifacts[["id", "uri"]])
 ```
 
-## Step 6: Distribute
+## Step 7: Distribute
 
 Your plugin is just a standard Python package. Publish it to PyPI:
 
