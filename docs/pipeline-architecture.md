@@ -153,7 +153,7 @@ Each `ExtractionTask` (from `aer.interfaces.core`) contains:
 | `grid_cells` | `Sequence[GridCell]` | Spatial cells this task covers. |
 | `aoi` | `BaseGeometry \| None` | Clipping geometry used during preparation. |
 | `prepare_params` | `Mapping[str, Any]` | Params that drove task construction (e.g. `chunk_id`, `cells_per_chunk`). |
-| `task_context` | `Mapping[str, Any]` | Observability metadata: `chunk_id`, `total_chunks`, `start_time`. |
+| `task_context` | `Mapping[str, Any]` | Observability metadata: `chunk_id`, `total_chunks`, `start_time`. May also contain `conform_to_shape` when the profile enables fixed-shape batching. |
 
 ### `ExtractionProfile` Fields
 
@@ -164,6 +164,18 @@ Each `ExtractionTask` (from `aer.interfaces.core`) contains:
 | `collection_variables_map` | `Mapping[str, Sequence[str]]` | Which bands/variables to extract per collection. |
 | `search_params` | `Mapping[str, Any]` | Per-profile search overrides (e.g. `{"version": "061"}`). |
 | `extract_params` | `Mapping[str, Any]` | Per-profile extract overrides (e.g. `{"reader": "abi_l1b"}`). |
+| `conform_to_max_shape` | `bool` | When `True`, every cell in the batch is padded to the same `(width, height)` shape (filled with NaN). Useful for ML pipelines that need fixed-size tensors. Default: `False`. |
+
+---
+
+### Grid Cell Shapes: Natural vs. Conformed
+
+`GridCell.area_def()` determines the pixel extent of each extracted tile. By default it uses the **natural** UTM footprint of the cell:
+
+- **Natural shape** (default): `width` and `height` are derived from `utm_footprint.bounds`, so adjacent cells tile edge-to-edge without gaps or overlap. Different cells can have different dimensions, which is ideal for analysis and visualisation.
+- **Conformed shape**: When `conform_to_max_shape=True` in the profile, `prepare_for_extraction()` computes the maximum `(width, height)` across all cells in the batch and stores it as `conform_to_shape` in `task_context`. Every cell's `area_def` is then centred inside that common box. The extra area is filled with NaNs by downstream extractors. This is the mode to use when you need fixed-size tensors (e.g. neural-network training).
+
+> **Note on `padding`**: `padding` adds extra pixels on all sides of the natural footprint to give contextual border pixels (e.g. for CNN receptive fields). It is **not** a workaround for gaps — natural shapes already tile seamlessly. If you use padding with natural shapes, neighbouring tiles will overlap by `2 × padding` pixels.
 
 ---
 
