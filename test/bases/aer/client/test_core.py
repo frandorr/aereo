@@ -1,11 +1,15 @@
+from typing import cast
 from unittest.mock import MagicMock
+
 import pytest
 import pandas as pd
 from shapely.geometry import Point
 
+from aer.interfaces.core import AerProfile, ExtractionTask
 from aer.registry.core import AerRegistry
 from aer.client.core import AerClient, FailureMode, normalize_geometry
 from aer.schemas.core import AssetSchema
+from pandera.typing.geopandas import GeoDataFrame
 
 
 def test_normalize_geometry_dict_to_shapely():
@@ -41,9 +45,11 @@ def test_client_search_success(monkeypatch):
 
     client = AerClient(registry=mock_registry)
 
+    profile = AerProfile(name="modis", resolution=1000.0, collections=["MODIS"])
+
     # 1. Search
     search_results = client.search(
-        collections=["MODIS"], intersects={"type": "Point", "coordinates": [0, 0]}
+        profiles=[profile], intersects={"type": "Point", "coordinates": [0, 0]}
     )
 
     # Validations
@@ -54,47 +60,26 @@ def test_client_search_success(monkeypatch):
     assert isinstance(search_results, pd.DataFrame)
 
 
-def test_client_search_normalizes_collections(monkeypatch):
-    """Verify that collection names are mapped to plugin's declared format before being passed to plugins."""
+def test_client_search_accepts_profiles(monkeypatch):
+    """search() must pass profiles (not collections) to the plugin."""
     mock_registry = MagicMock(spec=AerRegistry)
-
-    # Setup mock registry to return valid dummy data for lowercase collection name
     mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
-
-    # Setup mock mapping to return plugin's declared format (lowercase in this case)
-    mock_registry.get_collection_mapping_for_searcher.return_value = ["goes-abi1"]
 
     mock_searcher = MagicMock()
     monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
-    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
     valid_df["geometry"] = Point(0, 0)
-    valid_df["collection"] = "GOES-Abi1"
+    valid_df["collection"] = "MODIS"
     mock_searcher.search.return_value = valid_df
-
     mock_registry.get_searcher.return_value = mock_searcher
 
     client = AerClient(registry=mock_registry)
+    profile = AerProfile(name="p1", resolution=10.0, collections=["MODIS"])
+    client.search(profiles=[profile])
 
-    # Search with uppercase collection name - should be mapped to plugin's format
-    client.search(
-        collections=["GOES-Abi1"],
-        start_datetime=None,
-        end_datetime=None,
-    )
-
-    # Verify mapping was called
-    mock_registry.get_collection_mapping_for_searcher.assert_called_once_with(
-        "dummy_searcher", ["GOES-Abi1"]
-    )
-
-    # The plugin should receive mapped collection name
-    call_args = mock_searcher.search.call_args
-    assert call_args is not None
-    passed_collections = list(call_args.kwargs.get("collections", []))
-    assert "goes-abi1" in passed_collections, (
-        f"Expected mapped collection, got: {passed_collections}"
-    )
+    call_kwargs = mock_searcher.search.call_args.kwargs
+    assert "profiles" in call_kwargs
+    assert call_kwargs["profiles"][0].name == "p1"
 
 
 def test_client_search_all_fail_strict():
@@ -106,9 +91,10 @@ def test_client_search_all_fail_strict():
     mock_registry.get_searcher.return_value = mock_searcher
 
     client = AerClient(registry=mock_registry)
+    profile = AerProfile(name="modis", resolution=1000.0, collections=["MODIS"])
 
     with pytest.raises(RuntimeError, match="All search plugins failed strictly"):
-        client.search(collections=["MODIS"], failure_mode=FailureMode.STRICT)
+        client.search(profiles=[profile], failure_mode=FailureMode.STRICT)
 
 
 def test_client_search_all_fail_best_effort():
@@ -120,10 +106,11 @@ def test_client_search_all_fail_best_effort():
     mock_registry.get_searcher.return_value = mock_searcher
 
     client = AerClient(registry=mock_registry)
+    profile = AerProfile(name="modis", resolution=1000.0, collections=["MODIS"])
 
     # Will not raise, returns an empty geometry
     search_results = client.search(
-        collections=["MODIS"], failure_mode=FailureMode.BEST_EFFORT
+        profiles=[profile], failure_mode=FailureMode.BEST_EFFORT
     )
     assert len(search_results) == 0
 
@@ -212,62 +199,85 @@ def test_resolve_params_strips_other_collection_keys_case_insensitive():
 
 
 # ---------------------------------------------------------------------------
-# _normalize_hints – case-insensitive plugin_hints helper
+# _resolve_plugin_for_profile
 # ---------------------------------------------------------------------------
 
 
-def test_normalize_hints_lowercases_keys():
-    result = AerClient._normalize_hints(
-        {"Sentinel-2-L2A": "my_plugin", "ABI-L1b-RadF": "goes_plugin"}
-    )
-    assert result == {"sentinel-2-l2a": "my_plugin", "abi-l1b-radf": "goes_plugin"}
-
-
-def test_normalize_hints_empty():
-    assert AerClient._normalize_hints({}) == {}
-
-
-def test_normalize_hints_inverted_format():
-    """Inverted format: plugin -> [collections] should expand to collection -> plugin."""
-    result = AerClient._normalize_hints({"extract_satpy": ["VJ202IMG", "VJ203IMG"]})
-    assert result == {
-        "vj202img": "extract_satpy",
-        "vj203img": "extract_satpy",
-    }
-
-
-def test_normalize_hints_inverted_format_lowercases_collections():
-    """Collection names in inverted format should be lower-cased."""
-    result = AerClient._normalize_hints(
-        {"MyPlugin": ["Sentinel-2-L2A", "ABI-L1b-RadF"]}
-    )
-    assert result == {
-        "sentinel-2-l2a": "MyPlugin",
-        "abi-l1b-radf": "MyPlugin",
-    }
-
-
-def test_normalize_hints_mixed_formats():
-    """Legacy and inverted formats can coexist (though not recommended)."""
-    result = AerClient._normalize_hints(
-        {
-            "MODIS": "legacy_plugin",  # legacy
-            "extract_satpy": ["VJ202IMG", "VJ203IMG"],  # inverted
-        }
-    )
-    assert result == {
-        "modis": "legacy_plugin",
-        "vj202img": "extract_satpy",
-        "vj203img": "extract_satpy",
-    }
-
-
-def test_search_plugin_hint_inverted_format(monkeypatch):
-    """Inverted plugin_hints should resolve correctly for search."""
+def _make_client_for_profile_resolution() -> tuple[AerClient, MagicMock]:
     mock_registry = MagicMock(spec=AerRegistry)
-    mock_registry.find_searchers_for.return_value = []  # No auto-discovery
-    mock_registry.get_collection_mapping_for_searcher.return_value = ["modis"]
-    mock_registry.list_supported_collections.return_value = ["modis"]
+    mock_registry.has_searcher.return_value = True
+    mock_registry.has_extractor.return_value = True
+    mock_registry.find_searchers_for.return_value = ["auto_searcher"]
+    mock_registry.find_extractors_for.return_value = ["auto_extractor"]
+    client = AerClient(registry=mock_registry)
+    return client, mock_registry
+
+
+def test_resolve_plugin_for_profile_uses_hint():
+    client, mock_registry = _make_client_for_profile_resolution()
+    profile = AerProfile(
+        name="p1",
+        resolution=10.0,
+        collections=["X"],
+        plugin_hints={"search": "hinted_searcher"},
+    )
+    result = client._resolve_plugin_for_profile("searcher", profile)
+    assert result == "hinted_searcher"
+    mock_registry.has_searcher.assert_called_with("hinted_searcher")
+
+
+def test_resolve_plugin_for_profile_auto_discovers():
+    client, mock_registry = _make_client_for_profile_resolution()
+    profile = AerProfile(name="p1", resolution=10.0, collections=["MODIS"])
+    result = client._resolve_plugin_for_profile("searcher", profile)
+    assert result == "auto_searcher"
+    mock_registry.find_searchers_for.assert_called_with("MODIS")
+
+
+def test_resolve_plugin_for_profile_hinted_not_registered():
+    client, mock_registry = _make_client_for_profile_resolution()
+    mock_registry.has_searcher.return_value = False
+    profile = AerProfile(
+        name="p1",
+        resolution=10.0,
+        collections=["X"],
+        plugin_hints={"search": "missing_searcher"},
+    )
+    with pytest.raises(ValueError, match="not a registered Searcher"):
+        client._resolve_plugin_for_profile("searcher", profile)
+
+
+def test_resolve_plugin_for_profile_no_collections_returns_none():
+    client, mock_registry = _make_client_for_profile_resolution()
+    mock_registry.find_searchers_for.return_value = []
+    profile = AerProfile(name="p1", resolution=10.0, collections=[])
+    result = client._resolve_plugin_for_profile("searcher", profile)
+    assert result is None
+
+
+def test_resolve_plugin_for_profile_extract_hint():
+    client, mock_registry = _make_client_for_profile_resolution()
+    profile = AerProfile(
+        name="p1",
+        resolution=10.0,
+        collections=["X"],
+        plugin_hints={"extract": "hinted_extractor"},
+    )
+    result = client._resolve_plugin_for_profile("extractor", profile)
+    assert result == "hinted_extractor"
+    mock_registry.has_extractor.assert_called_with("hinted_extractor")
+
+
+# ---------------------------------------------------------------------------
+# search with profile plugin hints
+# ---------------------------------------------------------------------------
+
+
+def test_search_with_profile_plugin_hint(monkeypatch):
+    """Profile-level plugin_hints['search'] should drive plugin selection."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry.has_searcher.return_value = True
+    mock_registry.find_searchers_for.return_value = []
 
     mock_searcher = MagicMock()
     monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
@@ -278,37 +288,15 @@ def test_search_plugin_hint_inverted_format(monkeypatch):
     mock_registry.get_searcher.return_value = mock_searcher
 
     client = AerClient(registry=mock_registry)
-    client.search(
-        collections=["modis"],
-        plugin_hints={"preferred_searcher": ["modis"]},  # inverted
+    profile = AerProfile(
+        name="goes",
+        resolution=1000.0,
+        collections=["ABI-L1b-RadC"],
+        satellite="GOES-16",
+        plugin_hints={"search": "aer-search-aws-goes"},
     )
-    mock_registry.get_searcher.assert_called_with("preferred_searcher")
-
-
-def test_search_plugin_hint_case_insensitive(monkeypatch):
-    """plugin_hints key 'MODIS' should match collection 'modis' and vice-versa."""
-    mock_registry = MagicMock(spec=AerRegistry)
-    mock_registry.find_searchers_for.return_value = []  # No auto-discovery result
-    mock_registry.get_collection_mapping_for_searcher.return_value = ["modis"]
-    mock_registry.list_supported_collections.return_value = ["modis"]
-
-    mock_searcher = MagicMock()
-    monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
-    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
-    valid_df["geometry"] = Point(0, 0)
-    valid_df["collection"] = "modis"
-    mock_searcher.search.return_value = valid_df
-    mock_registry.get_searcher.return_value = mock_searcher
-
-    client = AerClient(registry=mock_registry)
-
-    # User passes upper-case hint key, lower-case collection
-    client.search(
-        collections=["modis"],
-        plugin_hints={"MODIS": "preferred_searcher"},  # upper-case key
-    )
-
-    mock_registry.get_searcher.assert_called_with("preferred_searcher")
+    client.search(profiles=[profile])
+    mock_registry.get_searcher.assert_called_once_with("aer-search-aws-goes")
 
 
 # ---------------------------------------------------------------------------
@@ -318,19 +306,16 @@ def test_search_plugin_hint_case_insensitive(monkeypatch):
 
 def _make_prepare_client(monkeypatch, valid_search_df):
     """Return a client whose extractor mock captures prepare_for_extraction calls."""
-    from aer.interfaces.core import ExtractionProfile, ExtractionTask
-    from typing import cast
-    from pandera.typing.geopandas import GeoDataFrame
-
     mock_registry = MagicMock(spec=AerRegistry)
     monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
 
+    mock_registry.has_extractor.return_value = True
     mock_registry.find_extractors_for.return_value = ["dummy_extractor"]
     mock_extractor = MagicMock()
 
     task = ExtractionTask(
         assets=cast(GeoDataFrame, valid_search_df),
-        profile=ExtractionProfile(name="test", resolution=10),
+        profile=AerProfile(name="test", resolution=10),
         uri="test-uri",
         grid_cells=[],
     )
@@ -351,9 +336,6 @@ def _make_valid_search_df():
 
 def test_prepare_for_extraction_passes_target_grid_dist(monkeypatch):
     """target_grid_dist kwarg must be forwarded to extractor.prepare_for_extraction."""
-    from typing import cast
-    from pandera.typing.geopandas import GeoDataFrame
-
     valid_search_df = _make_valid_search_df()
     client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
 
@@ -370,9 +352,6 @@ def test_prepare_for_extraction_passes_target_grid_dist(monkeypatch):
 
 def test_prepare_for_extraction_passes_target_grid_overlap(monkeypatch):
     """target_grid_overlap kwarg must be forwarded to extractor.prepare_for_extraction."""
-    from typing import cast
-    from pandera.typing.geopandas import GeoDataFrame
-
     valid_search_df = _make_valid_search_df()
     client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
 
@@ -389,9 +368,6 @@ def test_prepare_for_extraction_passes_target_grid_overlap(monkeypatch):
 
 def test_prepare_for_extraction_passes_none_grid_params_by_default(monkeypatch):
     """When not supplied, both grid params should be forwarded as None (defer to extractor)."""
-    from typing import cast
-    from pandera.typing.geopandas import GeoDataFrame
-
     valid_search_df = _make_valid_search_df()
     client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
 
@@ -404,3 +380,70 @@ def test_prepare_for_extraction_passes_none_grid_params_by_default(monkeypatch):
     call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
     assert call_kwargs.get("target_grid_dist") is None
     assert call_kwargs.get("target_grid_overlap") is None
+
+
+def test_prepare_uses_profile_extract_hint(monkeypatch):
+    """prepare_for_extraction must resolve extractor from profile.plugin_hints['extract']."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry.has_extractor.return_value = True
+    mock_registry.find_extractors_for.return_value = []
+    mock_extractor = MagicMock()
+    mock_extractor.prepare_for_extraction.return_value = []
+    mock_registry.get_extractor.return_value = mock_extractor
+
+    monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "MODIS"
+
+    client = AerClient(registry=mock_registry)
+    profile = AerProfile(
+        name="p1",
+        resolution=10.0,
+        collections=["MODIS"],
+        plugin_hints={"extract": "my_extractor"},
+    )
+    client.prepare_for_extraction(
+        search_results=cast(GeoDataFrame, valid_df),
+        profiles=[profile],
+        uri="s3://out",
+    )
+    mock_registry.get_extractor.assert_called_with("my_extractor")
+
+
+# ---------------------------------------------------------------------------
+# extract_batches
+# ---------------------------------------------------------------------------
+
+
+def test_extract_batches_with_profile_hint(monkeypatch):
+    """extract_batches must resolve extractor from each task's profile hint."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry.has_extractor.return_value = True
+    mock_registry.find_extractors_for.return_value = []
+    mock_extractor = MagicMock()
+    monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
+    empty_artifact_df = pd.DataFrame()
+    mock_extractor.extract_batches.return_value = empty_artifact_df
+    mock_registry.get_extractor.return_value = mock_extractor
+
+    client = AerClient(registry=mock_registry)
+    profile = AerProfile(
+        name="goes",
+        resolution=1000.0,
+        collections=["ABI-L1b-RadC"],
+        plugin_hints={"extract": "aer-extract-aws-goes"},
+    )
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "ABI-L1b-RadC"
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        profile=profile,
+        uri="test",
+        grid_cells=[],
+    )
+    client.extract_batches([task])
+    mock_registry.get_extractor.assert_called_once_with("aer-extract-aws-goes")

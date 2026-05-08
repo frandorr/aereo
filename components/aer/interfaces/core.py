@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import sys
 from abc import ABC, abstractmethod
@@ -65,7 +67,7 @@ class SearchProvider(AerPlugin, plugin_abstract=True):
     @abstractmethod
     def search(
         self,
-        collections: Sequence[str],
+        profiles: Sequence[AerProfile],
         intersects: BaseGeometry | None,
         start_datetime: datetime | None,
         end_datetime: datetime | None,
@@ -74,12 +76,14 @@ class SearchProvider(AerPlugin, plugin_abstract=True):
         """Search for collections data matching the query.
 
         Args:
-            collections: List of collection identifiers to search within.
+            profiles: Sequence of AerProfile objects defining what to search for.
+                Collections, channels, satellite, and other domain-specific config
+                are read from each profile.
             intersects: Optional shapely BaseGeometry to filter results by spatial intersection.
             start_datetime: Optional start datetime to filter results by temporal range.
             end_datetime: Optional end datetime to filter results by temporal range.
-            search_params: Additional parameters for the search, specific to
-                the collection or provider.
+            search_params: Additional meta-level parameters for the search (credentials,
+                timeouts, etc.). Domain-specific config lives on each AerProfile.
 
         Returns:
             A GeoDataFrame of search results, where each row represents a dataset
