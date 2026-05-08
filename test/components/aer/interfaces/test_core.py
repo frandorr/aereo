@@ -5,6 +5,7 @@ import pytest
 from aer.interfaces import AerPlugin, ExtractionTask, Extractor, SearchProvider
 from aer.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
+from pydantic import ValidationError
 from shapely.geometry import Polygon
 
 
@@ -317,3 +318,41 @@ def test_extraction_task_accepts_aer_profile():
         grid_cells=[],
     )
     assert task.profile.name == "test"
+
+
+def test_aer_profile_is_frozen():
+    from aer.interfaces.core import AerProfile
+
+    profile = AerProfile(name="test", resolution=100.0)
+    with pytest.raises(ValidationError):
+        profile.resolution = 200.0
+
+
+def test_aer_profile_forbids_extra_fields():
+    from aer.interfaces.core import AerProfile
+
+    with pytest.raises(ValidationError):
+        AerProfile(name="test", resolution=100.0, unknown_field=42)  # pyright: ignore[reportCallIssue]
+
+
+def test_aer_profile_import_string_downloader():
+    from aer.interfaces.core import AerProfile
+
+    # Use a stdlib callable as a stand-in for a real downloader
+    profile = AerProfile(
+        name="test",
+        resolution=100.0,
+        downloader="os.path.join",  # pyright: ignore[reportArgumentType]
+    )
+    assert callable(profile.downloader)
+
+
+def test_aer_profile_invalid_import_string():
+    from aer.interfaces.core import AerProfile
+
+    with pytest.raises(ValidationError):
+        AerProfile(
+            name="test",
+            resolution=100.0,
+            downloader="this.does.not.exist",  # pyright: ignore[reportArgumentType]
+        )
