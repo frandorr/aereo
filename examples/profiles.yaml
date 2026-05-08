@@ -1,5 +1,23 @@
 # Example AER profiles loaded via AerProfile.from_yaml()
 # The *downloader* field can be either a live callable or a dotted import path.
+#
+# NOTE: Natural cell shapes (default)
+#   By default, each grid cell extracts at its natural UTM footprint size.
+#   Cells tile edge-to-edge with no gaps and no redundant overlap.
+#
+# NOTE: Fixed tensor shapes (ML training)
+#   Add `conform_to_max_shape: true` to a profile when you need every cell
+#   in a batch to share an identical (width, height).  The extraction
+#   pipeline computes the maximum natural shape across the batch and pads
+#   smaller cells with NaNs.  This is useful for neural-network training
+#   pipelines that require fixed-size tensors.
+#
+#   Example:
+#     - name: modis_thermal_ml
+#       resolution: 1000
+#       collections: [MOD021KM]
+#       conform_to_max_shape: true
+
 profiles:
   - name: viirs_i1
     resolution: 375
