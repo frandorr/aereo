@@ -208,6 +208,32 @@ def test_area_def_conform_to():
     assert area.height == 62  # 60 + 2*1
 
 
+def test_max_shape_across_cells():
+    """max_shape should return the maximum natural pixel dimensions across cells."""
+    grid = core.GridDefinition(d=10_000)
+    polygon = Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]])
+    cells = grid.generate_grid_cells(polygon)
+    max_w, max_h = grid.max_shape(cells, resolution=100)
+    assert max_w > 0
+    assert max_h > 0
+    # Every cell should fit inside max_shape when padded to it
+    for cell in cells:
+        area = cell.area_def(100, conform_to=(max_w, max_h))
+        assert area.width == max_w
+        assert area.height == max_h
+
+
+def test_max_shape_with_padding():
+    """Padding should be accounted for in max_shape."""
+    grid = core.GridDefinition(d=10_000)
+    polygon = Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]])
+    cells = grid.generate_grid_cells(polygon)
+    max_w_padded, max_h_padded = grid.max_shape(cells, resolution=100, padding=2)
+    max_w, max_h = grid.max_shape(cells, resolution=100, padding=0)
+    assert max_w_padded == max_w + 4
+    assert max_h_padded == max_h + 4
+
+
 def test_area_def_yaml_round_trip_with_pyresample():
     """to_yaml() output must be loadable by pyresample.area_config.load_area_from_string."""
     try:
