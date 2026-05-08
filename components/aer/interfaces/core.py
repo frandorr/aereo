@@ -7,10 +7,12 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
 from multiprocessing import get_context
 from pathlib import Path
-from typing import Any, Mapping, Protocol, Sequence, cast
+import json
+from typing import Any, Callable, Mapping, Protocol, Self, Sequence, cast
 
 import attrs
 import pandas as pd
+from pydantic import BaseModel, Field, ImportString, TypeAdapter
 from aer.grid import GridCell
 from aer.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -93,9 +95,11 @@ class SearchProvider(AerPlugin, plugin_abstract=True):
         ...
 
 
-@attrs.frozen
-class AerProfile:
+class AerProfile(BaseModel):
     """Ground-truth configuration for a single search + extraction unit.
+
+    Can be constructed in code or loaded from JSON/YAML. The *downloader*
+    field accepts either a live callable or a dotted import path string.
 
     A profile bundles together:
     - What to search for (collections, channels, satellite)
@@ -106,19 +110,101 @@ class AerProfile:
     One profile = one coherent pipeline configuration.
     """
 
+    model_config = {"extra": "forbid", "frozen": True}
+
     name: str
     resolution: float
-    collections: Sequence[str] = attrs.field(factory=tuple)
-    collection_variables_map: Mapping[str, Sequence[str]] = attrs.field(factory=dict)
+    collections: Sequence[str] = Field(default_factory=tuple)
+    collection_variables_map: Mapping[str, Sequence[str]] = Field(default_factory=dict)
     channels: Sequence[str] | None = None
     satellite: str | None = None
     reader: str | None = None
     padding: int | None = None
     resampling: str | None = None
     calibration: str | None = None
-    plugin_hints: Mapping[str, str] = attrs.field(factory=dict)
-    downloader: Downloader | None = None
-    extra_params: Mapping[str, Any] = attrs.field(factory=dict)
+    plugin_hints: Mapping[str, str] = Field(default_factory=dict)
+    downloader: ImportString[Callable[[str, Path], None]] | None = None
+    extra_params: Mapping[str, Any] = Field(default_factory=dict)
+
+    @classmethod
+    def from_yaml(cls, path: str | Path) -> list[Self]:
+        """Load profiles from a YAML file.
+
+        The file must contain a top-level ``profiles`` key mapping to a list
+        of profile dictionaries.
+        """
+        try:
+            import yaml
+        except ImportError as exc:
+            raise ImportError(
+                "YAML support requires PyYAML. Install it with: pip install 'aer[yaml]'"
+            ) from exc
+        path = Path(path)
+        data = yaml.safe_load(path.read_text())
+        return cls._from_raw(data)
+
+    @classmethod
+    def from_yaml_string(cls, text: str) -> list[Self]:
+        """Load profiles from a YAML string."""
+        try:
+            import yaml
+        except ImportError as exc:
+            raise ImportError(
+                "YAML support requires PyYAML. Install it with: pip install 'aer[yaml]'"
+            ) from exc
+        data = yaml.safe_load(text)
+        return cls._from_raw(data)
+
+    @classmethod
+    def from_json(cls, path: str | Path) -> list[Self]:
+        """Load profiles from a JSON file."""
+        path = Path(path)
+        data = json.loads(path.read_text())
+        return cls._from_raw(data)
+
+    @classmethod
+    def from_config_dir(
+        cls,
+        directory: str | Path,
+        *,
+        allow_duplicate_names: bool = False,
+    ) -> list[Self]:
+        """Load all ``*.yaml`` / ``*.yml`` / ``*.json`` files in *directory*."""
+        directory = Path(directory)
+        profiles: list[Self] = []
+        for ext in ("*.yaml", "*.yml", "*.json"):
+            for fp in directory.glob(ext):
+                profiles.extend(
+                    cls.from_yaml(fp) if fp.suffix != ".json" else cls.from_json(fp)
+                )
+        cls._validate_names(profiles, allow_duplicate_names=allow_duplicate_names)
+        return profiles
+
+    # --- helpers ---
+
+    @classmethod
+    def _from_raw(cls, data: dict[str, Any]) -> list[Self]:
+        if not isinstance(data, dict) or "profiles" not in data:
+            raise ValueError("Config must be a dict with a 'profiles' key.")
+        raw_profiles = data["profiles"]
+        adapter = TypeAdapter(list[cls])
+        profiles = adapter.validate_python(raw_profiles)
+        cls._validate_names(profiles)
+        return profiles
+
+    @classmethod
+    def _validate_names(
+        cls,
+        profiles: list[Self],
+        allow_duplicate_names: bool = False,
+    ) -> None:
+        if allow_duplicate_names:
+            return
+        seen = set()
+        for p in profiles:
+            if p.name in seen:
+                raise ValueError(f"Duplicate profile name: {p.name!r}")
+            seen.add(p.name)
 
 
 # Backward-compat alias — will be removed in a later task.
