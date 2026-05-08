@@ -49,6 +49,8 @@ profiles:
     plugin_hints:
       search: search_earthaccess
       extract: extract_satpy
+    search_params:
+      version: "061"
     downloader: aer.search_earthaccess.earthaccess_download_wrapper
 
   - name: olci_rgb

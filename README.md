@@ -28,7 +28,7 @@ results = client.search(
 profiles = [ExtractionProfile(
     name="c07", resolution=2000,
     collection_variables_map={"ABI-L1b-RadF": ["C07"]},
-    extra_params={"reader": "abi_l1b"},
+    extract_params={"reader": "abi_l1b"},
 )]
 tasks = client.prepare_for_extraction(results, profiles=profiles, uri="out")
 artifacts = client.extract_batches(tasks)
@@ -96,7 +96,7 @@ profiles:
     collections: ["ABI-L1b-RadF"]
     collection_variables_map:
       ABI-L1b-RadF: ["C07"]
-    extra_params:
+    extract_params:
       reader: abi_l1b
     downloader: my_package.downloaders.custom_downloader
 ```
