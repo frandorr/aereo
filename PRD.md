@@ -368,13 +368,13 @@ def test_resolve_plugin_for_profile_auto_discovers():
 
 ### Phase 2 — Search Plugins (active)
 
-#### Task 2.1: `aer-search-aws-goes`
+#### Task 2.1: `aer-search-aws-goes` ✅ DONE
 **File:** `components/aer/search_aws_goes/core.py`
 **Action:**
 - Update `search()` signature to accept `profiles: Sequence[AerProfile]`.
 - Extract collections: `[c for p in profiles for c in p.collections]`.
-- Extract `channels` from `profiles[0].channels` (or union across profiles) instead of `search_params["channels"]`.
-- Extract `satellite` from `profiles[0].satellite` instead of `search_params["satellites"]` / `search_params["satellite"]`.
+- Extract `channels` from union across profiles instead of `search_params["channels"]`.
+- Extract `satellite` from union across profiles instead of `search_params["satellites"]` / `search_params["satellite"]`.
 - Remove reliance on `search_params` for domain config.
 
 **Tests:**
@@ -397,6 +397,8 @@ def test_search_filters_by_profile_channels():
     result = plugin.search(profiles=[profile], ...)
     assert all(r.channel_id == "1" for r in result)
 ```
+
+**Result:** All 6 unit tests pass. Type check: 0 errors, 0 warnings, 0 notes.
 
 #### Task 2.2: `aer-search-earthaccess`
 **File:** `components/aer/search_earthaccess/core.py`
