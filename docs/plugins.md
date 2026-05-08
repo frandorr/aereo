@@ -103,7 +103,7 @@ profiles = [
         name="goes_c07",
         resolution=2000,
         collection_variables_map={"ABI-L1b-RadF": ["C07"]},
-        extra_params={"reader": "abi_l1b"},
+        extract_params={"reader": "abi_l1b"},
     )
 ]
 tasks = client.prepare_for_extraction(

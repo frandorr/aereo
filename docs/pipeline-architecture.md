@@ -148,7 +148,7 @@ Each `ExtractionTask` (from `aer.interfaces.core`) contains:
 | Attribute | Type | Description |
 |-----------|------|-------------|
 | `assets` | `GeoDataFrame[AssetSchema]` | The granule batch this task will extract. |
-| `profile` | `ExtractionProfile` | Target bands, resolution, and extra params. |
+| `profile` | `ExtractionProfile` | Target bands, resolution, search_params, and extract_params. |
 | `uri` | `str` | Destination path for artifacts. |
 | `grid_cells` | `Sequence[GridCell]` | Spatial cells this task covers. |
 | `aoi` | `BaseGeometry \| None` | Clipping geometry used during preparation. |
@@ -162,7 +162,8 @@ Each `ExtractionTask` (from `aer.interfaces.core`) contains:
 | `name` | `str` | Label for bookkeeping. |
 | `resolution` | `float` | Target pixel size in metres. |
 | `collection_variables_map` | `Mapping[str, Sequence[str]]` | Which bands/variables to extract per collection. |
-| `extra_params` | `Mapping[str, Any]` | Plugin-specific settings (e.g. `{"reader": "abi_l1b"}`). |
+| `search_params` | `Mapping[str, Any]` | Per-profile search overrides (e.g. `{"version": "061"}`). |
+| `extract_params` | `Mapping[str, Any]` | Per-profile extract overrides (e.g. `{"reader": "abi_l1b"}`). |
 
 ---
 
@@ -299,7 +300,7 @@ User Query
 │    Output: Sequence[ExtractionTask]                                         │
 │    ──────────────────────────────────────────────────────────────────────── │
 │    task.assets  → GeoDataFrame[AssetSchema]                                 │
-│    task.profile → ExtractionProfile (bands, resolution, extra_params)       │
+│    task.profile → ExtractionProfile (bands, resolution, search_params, extract_params) │
 │    task.grid_cells → Sequence[GridCell] (with UTM CRS & area_def)           │
 │    task.uri     → output path                                               │
 │    task.task_context → {chunk_id, total_chunks, start_time}                 │
