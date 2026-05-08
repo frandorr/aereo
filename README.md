@@ -84,6 +84,41 @@ Collection names are **case-insensitive**.
 </details>
 
 <details>
+<summary>⚙️ Configuration-driven profiles</summary>
+
+`AerProfile` is a Pydantic `BaseModel` — define profiles in YAML or JSON and load them at runtime.
+
+```yaml
+# profiles.yaml
+profiles:
+  - name: c07
+    resolution: 2000
+    collections: ["ABI-L1b-RadF"]
+    collection_variables_map:
+      ABI-L1b-RadF: ["C07"]
+    extra_params:
+      reader: abi_l1b
+    downloader: my_package.downloaders.custom_downloader
+```
+
+```python
+from aer.interfaces import AerProfile
+
+profiles = AerProfile.from_yaml("profiles.yaml")
+# profiles[0].downloader is now a live callable
+```
+
+Supported loaders:
+- `AerProfile.from_yaml(path)` — load a YAML file
+- `AerProfile.from_yaml_string(text)` — load from a YAML string
+- `AerProfile.from_json(path)` — load a JSON file
+- `AerProfile.from_config_dir(dir)` — load all `*.yaml` / `*.yml` / `*.json` files in a directory
+
+See [`examples/profiles.yaml`](examples/profiles.yaml) for a full multi-sensor example.
+
+</details>
+
+<details>
 <summary>🔌 Build your own plugin</summary>
 
 Plugins are standard Python packages that declare `SearchProvider` or `Extractor` interfaces and register via `entry_points`. The `AerRegistry` discovers them at runtime — no manual wiring needed.
