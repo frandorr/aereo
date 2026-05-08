@@ -108,22 +108,16 @@ All tests pass (3/3). basedpyright reports 0 new errors (3 pre-existing unrelate
 
 All tests pass (22/22). basedpyright reports 0 new errors (6 pre-existing unrelated errors in satpy/odc-geo typing).
 
-#### Task 2.3: `aer-extract-odc-stac`
+#### Task 2.3: `aer-extract-odc-stac` ✅
 **File:** `components/aer/extract_odc_stac/core.py`
-**Action:** Add the same precedence logic for `downloader`.
+**Action:** Added downloader precedence logic in `extract()` for API consistency. Note: `odc.stac.load` streams data directly from signed URLs, so a custom downloader is not currently invoked by this extractor.
 
-**Tests:**
-```python
-def test_extract_uses_profile_downloader():
-    mock_downloader = MagicMock()
-    profile = AerProfile(
-        name="test", resolution=10.0,
-        collections=["sentinel-2-l2a"],
-        downloader=mock_downloader,
-    )
-    task = make_task(profile=profile)
-    # Verify downloader precedence is respected
-```
+**Tests:** Added three tests in `test/components/aer/extract_odc_stac/test_core.py`:
+- `test_extract_uses_profile_downloader` — verifies profile-level downloader does not break extraction
+- `test_extract_falls_back_to_batch_downloader` — verifies batch-level fallback works
+- `test_extract_prefers_profile_downloader_over_batch` — verifies profile wins when both are present
+
+All tests pass (10/10). basedpyright reports 0 new errors (12 pre-existing unrelated errors in aer import resolution and typing).
 
 ### Phase 3 — Example
 
