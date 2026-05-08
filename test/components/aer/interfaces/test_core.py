@@ -455,3 +455,105 @@ def test_merge_params_combined():
 
 def test_merge_params_none_batch():
     assert merge_params(None, {"a": 1}) == {"a": 1}
+
+
+def test_prepare_computes_common_shape_when_conform_enabled():
+    """When profile has conform_to_max_shape=True, task_context should contain conform_to_shape."""
+    from datetime import datetime
+
+    from aer.interfaces.core import AerProfile
+
+    class ConformExtractor(Extractor):
+        supported_collections = ["C1"]
+
+        @property
+        def target_grid_d(self) -> int:
+            return 100000  # Large grid to keep cell count low
+
+        def extract(
+            self,
+            extraction_task: ExtractionTask,
+            extract_params: dict[str, Any] | None,
+        ) -> GeoDataFrame[ArtifactSchema]:
+            return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
+
+    extractor = ConformExtractor()
+
+    df = gpd.GeoDataFrame(
+        {
+            "id": [1],
+            "collection": ["C1"],
+            "start_time": [datetime(2023, 1, 1, 12, 0)],
+        },
+        geometry=[
+            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
+        ],
+    )
+
+    profile = AerProfile(
+        name="test",
+        resolution=100.0,
+        collections=["C1"],
+        conform_to_max_shape=True,
+    )
+
+    tasks = extractor.prepare_for_extraction(
+        cast(Any, df),
+        profiles=[profile],
+        uri="test_uri",
+    )
+
+    assert len(tasks) > 0
+    assert "conform_to_shape" in tasks[0].task_context
+    assert isinstance(tasks[0].task_context["conform_to_shape"], tuple)
+    assert len(tasks[0].task_context["conform_to_shape"]) == 2
+
+
+def test_prepare_does_not_compute_common_shape_when_conform_disabled():
+    """When profile has conform_to_max_shape=False, task_context should NOT contain conform_to_shape."""
+    from datetime import datetime
+
+    from aer.interfaces.core import AerProfile
+
+    class NoConformExtractor(Extractor):
+        supported_collections = ["C1"]
+
+        @property
+        def target_grid_d(self) -> int:
+            return 100000
+
+        def extract(
+            self,
+            extraction_task: ExtractionTask,
+            extract_params: dict[str, Any] | None,
+        ) -> GeoDataFrame[ArtifactSchema]:
+            return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
+
+    extractor = NoConformExtractor()
+
+    df = gpd.GeoDataFrame(
+        {
+            "id": [1],
+            "collection": ["C1"],
+            "start_time": [datetime(2023, 1, 1, 12, 0)],
+        },
+        geometry=[
+            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
+        ],
+    )
+
+    profile = AerProfile(
+        name="test",
+        resolution=100.0,
+        collections=["C1"],
+        conform_to_max_shape=False,
+    )
+
+    tasks = extractor.prepare_for_extraction(
+        cast(Any, df),
+        profiles=[profile],
+        uri="test_uri",
+    )
+
+    assert len(tasks) > 0
+    assert "conform_to_shape" not in tasks[0].task_context
