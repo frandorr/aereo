@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Any, Sequence, cast
 
 import geopandas as gpd
 import pytest
@@ -72,6 +72,36 @@ def test_search_provider_abstract():
         TypeError, match="Can't instantiate abstract class DummySearcher"
     ):
         DummySearcher()  # pyright: ignore[reportAbstractUsage]
+
+
+def test_search_provider_signature_has_profiles():
+    """The abstract search() signature must accept profiles parameter."""
+    import inspect
+
+    sig = inspect.signature(SearchProvider.search)
+    assert "profiles" in sig.parameters
+    assert "collections" not in sig.parameters
+
+
+def test_search_provider_accepts_profiles_signature():
+    """A concrete searcher using the new profiles signature can be instantiated."""
+    from aer.interfaces.core import AerProfile
+
+    class GoodSearcher(SearchProvider):
+        supported_collections = ["X"]
+
+        def search(
+            self,
+            profiles: Sequence[AerProfile],
+            intersects: Any,
+            start_datetime: Any,
+            end_datetime: Any,
+            search_params: Any,
+        ) -> Any: ...
+
+    # Should instantiate without error
+    searcher = GoodSearcher()
+    assert searcher is not None
 
 
 def test_extractor_abstract():

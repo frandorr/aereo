@@ -256,27 +256,32 @@ def test_extraction_task_accepts_aer_profile():
     assert task.profile.name == "test"
 ```
 
-#### Task 1.3: Update `SearchProvider.search()` abstract signature
+#### Task 1.3: Update `SearchProvider.search()` abstract signature ✅ DONE
 **File:** `components/aer/interfaces/core.py`
-**Action:** Update abstract method signature. Update docstring.
+**Action:** Updated abstract method signature: `collections` → `profiles`. Updated docstring. Added `from __future__ import annotations` to handle forward reference to `AerProfile`.
 
 **Tests:**
 ```python
-def test_search_provider_enforces_new_signature():
-    class BadSearcher(SearchProvider, plugin_abstract=False):
-        supported_collections = ["X"]
-        def search(self, collections, ...): ...  # old signature
+def test_search_provider_signature_has_profiles():
+    import inspect
+    sig = inspect.signature(SearchProvider.search)
+    assert "profiles" in sig.parameters
+    assert "collections" not in sig.parameters
 
-    with pytest.raises(TypeError):
-        BadSearcher()
+def test_search_provider_accepts_profiles_signature():
+    class GoodSearcher(SearchProvider):
+        supported_collections = ["X"]
+        def search(self, profiles, ...): ...
+    searcher = GoodSearcher()
+    assert searcher is not None
 ```
 
-#### Task 1.4: Update `AerClient.search()`
+#### Task 1.4: Update `AerClient.search()` ✅ DONE
 **File:** `bases/aer/client/core.py`
 **Action:**
-- Replace `collections` param with `profiles`.
-- Remove `plugin_hints` param.
-- Refactor grouping logic: group `profiles` by resolved search plugin instead of grouping `collections`.
+- Replaced `collections` param with `profiles`.
+- Removed `plugin_hints` param.
+- Refactored grouping logic: group `profiles` by resolved search plugin.
 - Build `execution_groups: dict[(plugin_name, params_key), list[AerProfile]]`.
 - Pass `profiles` (not `collections`) to `plugin.search()`.
 
@@ -298,17 +303,18 @@ def test_client_search_accepts_profiles(monkeypatch):
     assert call_kwargs["profiles"][0].name == "p1"
 ```
 
-#### Task 1.5: Update `AerClient.prepare_for_extraction()` plugin resolution
+#### Task 1.5: Update `AerClient.prepare_for_extraction()` plugin resolution ✅ DONE
 **File:** `bases/aer/client/core.py`
 **Action:**
-- Remove `plugin_hints` param.
+- Removed `plugin_hints` param.
 - Resolve extractor using `profile.plugin_hints.get("extract")` instead of client-level hints.
+- Added fallback to search result collections for default profiles created from `resolution` arg.
 
 **Tests:**
 ```python
 def test_prepare_uses_profile_extract_hint(monkeypatch):
     mock_registry = MagicMock(spec=AerRegistry)
-    mock_registry.find_extractors_for.return_value = []
+    mock_registry.find_extractors_for.return_value = ["dummy_extractor"]
     mock_registry.has_extractor.return_value = True
     mock_extractor = MagicMock()
     mock_extractor.prepare_for_extraction.return_value = []
@@ -327,12 +333,12 @@ def test_prepare_uses_profile_extract_hint(monkeypatch):
     mock_registry.get_extractor.assert_called_with("my_extractor")
 ```
 
-#### Task 1.6: Update internal helpers
+#### Task 1.6: Update internal helpers ✅ DONE
 **File:** `bases/aer/client/core.py`
 **Action:**
-- Replace `_resolve_plugin_for_collection` with `_resolve_plugin_for_profile`.
-- Update `_normalize_hints` — can be removed entirely since hints are no longer passed at client level.
-- Update `extract_batches` to resolve from profile hints.
+- Replaced `_resolve_plugin_for_collection` with `_resolve_plugin_for_profile`.
+- Removed `_normalize_hints` entirely since hints are no longer passed at client level.
+- Updated `extract_batches` to resolve from profile hints.
 
 **Tests:**
 ```python
@@ -354,9 +360,9 @@ def test_resolve_plugin_for_profile_auto_discovers():
     assert result == "auto_searcher"
 ```
 
-#### Task 1.7: Update core tests
+#### Task 1.7: Update core tests ✅ DONE
 **File:** `test/bases/aer/client/test_core.py`, `test/components/aer/interfaces/test_core.py`
-**Action:** Update all call sites that use `ExtractionProfile` or pass `collections` / `plugin_hints` to `AerClient` methods.
+**Action:** Updated all call sites that use `ExtractionProfile` or pass `collections` / `plugin_hints` to `AerClient` methods. Added new tests for `_resolve_plugin_for_profile`, profile-based search hints, and profile-based extract hints. All 39 interface + client tests pass. Type check: 0 errors, 0 warnings, 0 notes.
 
 ---
 
