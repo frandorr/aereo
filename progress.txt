@@ -10,3 +10,12 @@ Task 1.2: Exclude includes/abbreviations.md from nav strict-check — COMPLETE
 - mkdocs build --strict: no longer lists abbreviations.md as omitted
 - pytest (grid + eoids): 53 passed
 - basedpyright: 0 errors, 0 warnings, 0 notes
+
+Task 4.1: Rewrite docs/quickstart.md — COMPLETE
+- Rewrote quickstart.md as step-by-step Search → Prepare → Extract narrative
+- Defined `aoi` explicitly with `shapely.geometry.box`
+- Added inline install block and explanations between code cells
+- Added target_grid_dist/target_grid_overlap explanation with Grid docs link
+- Created stub pipeline.md and using-plugins.md for cross-link resolution
+- pytest (grid + eoids): 53 passed
+- mkdocs build --strict: 0 warnings

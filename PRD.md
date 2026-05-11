@@ -214,7 +214,7 @@ graph LR
 
 ### Phase 4 — Examples & Documentation
 
-#### Task 4.1: Rewrite `docs/quickstart.md`
+#### Task 4.1: Rewrite `docs/quickstart.md` ✅ DONE
 **File:** `docs/quickstart.md`
 **Action:**
 - Start with inline install block.
@@ -229,6 +229,16 @@ graph LR
 # Copy-paste the entire quickstart into a fresh Python environment
 # It should run without NameError and produce EOIDS output.
 ```
+
+**Result:**
+- Rewrote `docs/quickstart.md` as a three-step narrative (Search → Prepare → Extract).
+- `aoi` is now explicitly defined with `shapely.geometry.box`.
+- Added inline install block at the top.
+- Added 1–2 sentence explanations between each code cell.
+- Added brief `target_grid_dist` / `target_grid_overlap` explanation with link to Grid docs.
+- Created stub `docs/pipeline.md` and `docs/using-plugins.md` so cross-links resolve and `mkdocs build --strict` passes.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `mkdocs build --strict` — 0 warnings.
 
 #### Task 4.2: Create `docs/using-plugins.md`
 **File:** `docs/using-plugins.md`
