@@ -1,17 +1,87 @@
-site_name: AER Documentation
+site_name: ""
 site_url: https://frandorr.github.io/aer
 repo_url: https://github.com/frandorr/aer
 edit_uri: edit/main/docs/
 
+# SEO & Social
+site_description: >-
+  AER — Plugin-based satellite data extraction framework.
+  From search to analysis-ready GeoTIFF in minutes.
+site_author: Francisco Dorr
+copyright: Copyright &copy; 2026 Francisco Dorr
+
+# Theme — Material with deep UX polish
 theme:
   name: material
-  features:
-    - navigation.tabs
-    - navigation.sections
-    - content.code.copy
+  custom_dir: docs/overrides
 
+  # Typography
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+  # Iconography
+  icon:
+    logo: material/satellite-variant
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+
+  # Color system — day/night with accessible contrast
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+  # UX Features
+  features:
+    # Navigation
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - toc.follow
+    - toc.integrate
+
+    # Content actions
+    - content.action.edit
+    - content.action.view
+    - content.code.copy
+    - content.code.annotate
+    - content.code.select
+    - content.tooltips
+
+    # Search
+    - search.suggest
+    - search.highlight
+    - search.share
+
+    # Header
+    - header.autohide
+
+# Plugins
 plugins:
-  - search
+  - search:
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?=\w)'
+      lang: en
+  - minify:
+      minify_html: true
   - mkdocstrings:
       handlers:
         python:
@@ -20,15 +90,118 @@ plugins:
             docstring_style: google
             show_source: true
             show_root_heading: true
+            show_root_full_path: true
             show_category_heading: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            show_signature: true
+            show_signature_annotations: true
+            separate_signature: true
+            line_length: 80
+            merge_init_into_class: true
+            members_order: source
+            filters: ["!^_"]
 
+          import:
+            - https://docs.python.org/3/objects.inv
+
+# Markdown processing
+markdown_extensions:
+  # Python-Markdown core
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      permalink_title: Anchor link to this section
+      toc_depth: 3
+
+  # PyMdownX extensions — rich content
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      use_pygments: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - docs/includes/abbreviations.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Extra CSS & JS
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+# Extra site variables
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/frandorr/aer
+      name: AER on GitHub
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/aer-eo/
+      name: AER on PyPI
+  version:
+    provider: mike
+  analytics:
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: >-
+            Thanks for your feedback! Help us improve by opening an issue
+            if something is unclear.
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: >-
+            Thanks for your feedback! Please open an issue to tell us
+            what we can do better.
+
+# Navigation structure
 nav:
   - Home: index.md
-  - Installation: installation.md
-  - Architecture: pipeline-architecture.md
-  - Plugins: plugins.md
-  - Building Plugins: build-your-own-plugin.md
-  - EOIDS: eoids.md
+  - Getting Started:
+      - Installation: installation.md
+      - Quick Start: quickstart.md
+  - Core Concepts:
+      - Architecture: pipeline-architecture.md
+      - EOIDS: eoids.md
+      - Grid System: grid.md
+  - Plugins:
+      - Overview: plugins.md
+      - Build Your Own: build-your-own-plugin.md
   - API Reference:
       - Client: api/client.md
       - Interfaces: api/interfaces.md
@@ -41,3 +214,4 @@ nav:
       - Asset Downloader: api/asset_downloader.md
       - Repository: api/repository.md
       - Viz: api/viz.md
+  - Contributing: contributing.md
