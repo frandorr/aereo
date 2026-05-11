@@ -39,7 +39,6 @@ def build_eoids_path(
     cell_id: str | None = None,
     start_time: datetime.datetime | None = None,
     end_time: datetime.datetime | None = None,
-    resolution: str | int | None = None,
     derivative: str | None = None,
     desc: str | None = None,
     suffix: str = "tif",
@@ -94,15 +93,8 @@ def build_eoids_path(
         if variables:
             parts.append(f"variable-{('+').join(variables)}")
 
-    if resolution is not None:
-        if isinstance(resolution, int) or str(resolution).isdigit():
-            res_str = f"{resolution}m"
-        else:
-            res_str = str(resolution)
-        parts.append(f"res-{res_str}")
-    elif profile.resolution is not None:
-        res_str = f"{int(profile.resolution)}m"
-        parts.append(f"res-{res_str}")
+    res_str = f"{int(profile.resolution)}m"
+    parts.append(f"res-{res_str}")
     if desc:
         parts.append(f"desc-{desc}")
 
