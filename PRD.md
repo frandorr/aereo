@@ -290,7 +290,7 @@ graph LR
 - `uv run mkdocs build --strict` — 0 warnings, exit 0.
 - `uv run basedpyright bases/aer/client/core.py` — 0 errors, 0 warnings, 0 notes.
 
-#### Task 4.5: Expand `docs/grid.md`
+#### Task 4.5: Expand `docs/grid.md` ✅ DONE
 **File:** `docs/grid.md`
 **Action:**
 - Add `GridDefinition` — how to create one from an AOI, cell size, snapping.
@@ -299,6 +299,18 @@ graph LR
 - Document grid filtering modes: `intersection`, `within`, `coverage` with `min_coverage`.
 - Add small ASCII or Mermaid diagram showing which cells survive each filter.
 - Link to `examples/grid/grid_filter_modes_demo.ipynb` for interactive visualization.
+
+**Result:**
+- Expanded `docs/grid.md` from 37 lines to a comprehensive guide covering `GridDefinition`, `GridCell`, `area_def`, and filtering modes.
+- Added `target_grid_dist` vs. `resolution` comparison table and `target_grid_overlap` explanation with code snippet.
+- Documented all three filter modes (`intersection`, `within`, `coverage`) with parameters and use cases.
+- Added ASCII diagram showing cell selection for each mode.
+- Linked to the interactive notebook via GitHub URL to avoid MkDocs cross-directory link warnings.
+- Moved `docs/last_session.md` to repo root to resolve a pre-existing `--strict` warning (Task 4.10 precursor).
+- Added `pipeline.md` to `mkdocs.yml` nav under Getting Started to resolve a pre-existing `--strict` warning.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
+- `uv run basedpyright components/aer/grid/core.py components/aer/eoids/core.py` — 0 errors, 0 warnings, 0 notes.
 
 #### Task 4.6: Improve `docs/index.md`
 **File:** `docs/index.md`

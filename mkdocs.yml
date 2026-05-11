@@ -174,8 +174,9 @@ extra:
 nav:
     - Home: index.md
     - Getting Started:
-          - Using Plugins: using-plugins.md
           - Quick Start: quickstart.md
+          - Running the Pipeline: pipeline.md
+          - Using Plugins: using-plugins.md
     - Core Concepts:
           - Architecture: pipeline-architecture.md
           - EOIDS: eoids.md

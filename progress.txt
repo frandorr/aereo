@@ -42,3 +42,12 @@ Task 4.4: Create docs/pipeline.md — COMPLETE
 - pytest (grid + eoids): 53 passed
 - mkdocs build --strict: 0 warnings, exit 0
 - basedpyright bases/aer/client/core.py: 0 errors, 0 warnings, 0 notes
+
+Task 4.5: Expand docs/grid.md — COMPLETE
+- Expanded docs/grid.md with GridDefinition, target_grid_dist vs resolution, overlap, and filter modes
+- Added ASCII diagram for intersection / within / coverage
+- Linked to grid_filter_modes_demo.ipynb via GitHub URL
+- Resolved pre-existing mkdocs strict warnings by moving last_session.md out of docs/ and adding pipeline.md to nav
+- pytest (grid + eoids): 53 passed
+- mkdocs build --strict: 0 warnings, exit 0
+- basedpyright: 0 errors, 0 warnings, 0 notes
