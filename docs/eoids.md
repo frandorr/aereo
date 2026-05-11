@@ -21,14 +21,16 @@ EOIDS groups data geographically, temporally, and by platform. This limits the m
 
 ```text
 dataset/
-├── profile-goes_c01/                   <-- 1. Profile name
+├── loc-36D61L/                         <-- 1. Geographic cell
 │   ├── date-20260101/                  <-- 2. Date of Observation
-│   │   ├── collection-ABI-L1b-RadF/    <-- 3. Collection
-│   │   │   ├── variable-C01/           <-- 4. Variable / Band
-│   │   │   │   ├── loc-36D61L_start-2026...
-│   │   │   │   ├── loc-36D61L_start-2026...
+│   │   ├── profile-goes_c01/           <-- 3. Profile name
+│   │   │   ├── profile.json            <-- 4. Profile metadata sidecar
+│   │   │   ├── loc-36D61L_start-2026...
+│   │   │   ├── loc-36D61L_start-2026...
 │   ├── date-20260102/
 ```
+
+Because `collection` and `variable` are declared inside the `AerProfile`, they are encoded directly in the filename rather than as extra subdirectories. This keeps the hierarchy flat and avoids redundant nesting.
 
 ### Derivatives
 Just like BIDS, if the data is processed or derived from the raw source (e.g., a cloud mask, a machine learning prediction, or a composite), it should be placed in a `derivatives/` folder at the root:
@@ -39,8 +41,25 @@ dataset/
 │   ├── cloud_mask/
 │   │   ├── loc-36D61L/
 │   │   │   ├── date-20260101/
-│   │   │   │   ├── loc-36D61L_start-20260101T100022_desc-cloudprob.nc
+│   │   │   │   ├── profile-goes_c01/
+│   │   │   │   │   ├── loc-36D61L_start-20260101T100022_desc-cloudprob.nc
 ```
+
+### `profile.json` sidecar
+
+Every profile directory may contain a `profile.json` file that stores the full serialized `AerProfile` metadata (resolution, padding, plugin hints, search parameters, etc.). It is written automatically on the first call to `build_eoids_path` and enables external inspection or BIDS-style inheritance:
+
+```json
+{
+  "name": "goes_c01",
+  "resolution": 1000.0,
+  "collections": {
+    "ABI-L1b-RadF": ["C01"]
+  }
+}
+```
+
+The `downloader` callable is intentionally excluded from serialization because it cannot be represented in JSON.
 
 ---
 
@@ -58,13 +77,23 @@ Filenames consist of strict `key-value` entities.
 * `start`: Start timestamp in `%Y%m%dT%H%M%S` format.
 * `end`: End timestamp in `%Y%m%dT%H%M%S` format.
 * `profile`: Profile name (e.g., `goes_c01`).
-* `collection`: Collection identifier (e.g., `ABI-L1b-RadF`).
-* `variable`: Specific variable or band (e.g., `C01`, `B04`).
+* `collection`: Collection identifier (e.g., `ABI-L1b-RadF`). Auto-derived from the profile.
+* `variable`: Specific variable or band (e.g., `C01`, `B04`). Auto-derived from the profile.
 * `res`: Spatial resolution (e.g., `1000m`).
 * `desc`: Custom descriptor, typically used for derived data (e.g., `cloudmask`).
 
 **Example:**
 `loc-36D61L_start-20260101T100022_end-20260101T100932_profile-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif`
+
+### `+` concatenation for multi-collection / multi-variable profiles
+
+When a profile declares more than one collection or variable, the values are joined by `+` in the filename:
+
+```text
+loc-1U10L_start-20260101T100000_profile-viirs_geo_collection-IMG202+IMG203_variable-I04+I05_res-375m.tif
+```
+
+This preserves the exact profile configuration in a single filename while remaining machine-parseable.
 
 **Why this is powerful:**
 Any downstream script can trivially parse the metadata without opening the file:
@@ -85,9 +114,14 @@ import datetime
 from aer.eoids import build_eoids_path
 from aer.interfaces import AerProfile
 
-profile = AerProfile(name="goes_c01", resolution=1000)
+profile = AerProfile(
+    name="goes_c01",
+    resolution=1000,
+    collections={"ABI-L1b-RadF": ["C01"]},
+)
 
-# All parameters (except local_dir and profile) are optional.
+# collection and variable are derived automatically from profile.collections.
+# All other parameters (except local_dir and profile) are optional.
 # If omitted, they simply won't appear in the directory path or filename.
 path = build_eoids_path(
     local_dir="/my/dataset",
@@ -95,8 +129,6 @@ path = build_eoids_path(
     cell_id="36D61L",
     start_time=datetime.datetime(2026, 1, 1, 10, 0, 22),
     end_time=datetime.datetime(2026, 1, 1, 10, 9, 32),
-    collection="ABI-L1b-RadF",
-    variable="C01",
 )
 
 # Derived Data Example
@@ -110,3 +142,9 @@ mask_path = build_eoids_path(
     suffix="nc"
 )
 ```
+
+---
+
+## 4. majortom Integration Note
+
+While `profile.json` provides on-disk metadata for external inspection, the **authoritative source** for collection/variable mapping in a pipeline context is the `ArtifactSchema` inside the `majortom` geodataframe. The sidecar file is intended for recovery, sharing, and debugging; runtime decisions should always use the in-memory schema attached to the active dataframe.
