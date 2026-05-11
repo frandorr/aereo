@@ -4,3 +4,9 @@ Task 1.1: Fix Griffe docstring warnings — COMPLETE
 - mkdocs build --strict: passes (0 Griffe warnings)
 - pytest (grid + eoids): 53 passed
 - basedpyright: 0 errors, 0 warnings, 0 notes
+
+Task 1.2: Exclude includes/abbreviations.md from nav strict-check — COMPLETE
+- Added `not_in_nav: | includes/abbreviations.md` to `mkdocs.yml`
+- mkdocs build --strict: no longer lists abbreviations.md as omitted
+- pytest (grid + eoids): 53 passed
+- basedpyright: 0 errors, 0 warnings, 0 notes
