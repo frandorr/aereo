@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Sequence, cast
+from typing import Any, Sequence, cast
 
 import geopandas as gpd
 import numpy as np
@@ -83,7 +83,7 @@ class GridCell(BaseGridCell):
         resolution: int,
         padding: int = 0,
         conform_to: tuple[int, int] | None = None,
-        **geobox_kwargs,
+        **geobox_kwargs: Any,
     ) -> GeoBox:
         """Return an odc-geo GeoBox for this cell's UTM footprint.
 
@@ -329,7 +329,7 @@ class GridDefinition(MajorTomGrid):
         cells: Sequence[GridCell],
         resolution: int,
         padding: int = 0,
-        **geobox_kwargs,
+        **geobox_kwargs: Any,
     ) -> tuple[int, int]:
         """Return the maximum (width, height) in pixels across *cells*.
 

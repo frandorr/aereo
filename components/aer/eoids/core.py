@@ -61,8 +61,6 @@ def build_eoids_path(
         cell_id: Geographic cell identifier (e.g., '36D61L').
         start_time: Start time of the observation.
         end_time: End time of the observation.
-        resolution: Spatial resolution (e.g., 1000 or '1000m'). When *None*,
-            ``profile.resolution`` is used.
         derivative: Name of the derivative pipeline (places file in derivatives/<name>/).
         desc: Custom descriptor for the file (e.g., 'cloudmask').
         suffix: File extension (default: 'tif').
