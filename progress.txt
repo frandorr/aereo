@@ -1,0 +1,6 @@
+Task 1.1: Fix Griffe docstring warnings — COMPLETE
+- Fixed stray `resolution` docstring param in `components/aer/eoids/core.py`
+- Added `Any` annotation to `**geobox_kwargs` in `components/aer/grid/core.py`
+- mkdocs build --strict: passes (0 Griffe warnings)
+- pytest (grid + eoids): 53 passed
+- basedpyright: 0 errors, 0 warnings, 0 notes
