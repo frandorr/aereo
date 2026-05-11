@@ -240,7 +240,7 @@ graph LR
 - `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
 - `mkdocs build --strict` — 0 warnings.
 
-#### Task 4.2: Create `docs/using-plugins.md`
+#### Task 4.2: Create `docs/using-plugins.md` ✅ DONE
 **File:** `docs/using-plugins.md`
 **Action:**
 - Rename from `installation.md`.
@@ -251,6 +251,13 @@ graph LR
   4. Earthdata auth setup (NASA sensors only)
 - Remove all developer/Polylith content.
 - Add frontmatter redirect from `installation.md` if MkDocs supports it, or update all internal links.
+
+**Result:**
+- Wrote `docs/using-plugins.md` with core install, plugin table, registry snippet, and Earthdata auth.
+- Deleted `docs/installation.md`; updated internal links in `docs/index.md` and `README.md`.
+- Updated `mkdocs.yml` nav entry from `installation.md` to `using-plugins.md`.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
 
 #### Task 4.3: Create `docs/contributing/dev-setup.md`
 **File:** `docs/contributing/dev-setup.md`

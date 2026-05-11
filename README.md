@@ -60,7 +60,7 @@ echo "machine urs.earthdata.nasa.gov login YOUR_USER password YOUR_PASS" >> ~/.n
 chmod 600 ~/.netrc
 ```
 
-Full guide → [docs/installation.md](docs/installation.md)
+Full guide → [docs/using-plugins.md](docs/using-plugins.md)
 </details>
 
 <details>
