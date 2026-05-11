@@ -1,8 +1,8 @@
-from aer.grid import core
-from shapely.geometry import Polygon
 import geopandas as gpd
 import pytest
+from aer.grid import core
 from odc.geo.geobox import GeoBox
+from shapely.geometry import Polygon
 
 
 def test_grid_definition_init():
@@ -189,11 +189,10 @@ def test_area_def_geobox_kwargs():
         d=10000, geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]), cell_id="test"
     )
     gb_edge = cell.area_def(100, anchor="edge")
-    gb_center = cell.area_def(100, anchor="center", tight=True)
-    # Same resolution, same cell, but different anchors should produce
-    # different (but valid) extents.
-    assert gb_edge.shape == gb_center.shape  # for this evenly-divisible test case
-    assert gb_edge.extent != gb_center.extent
+    gb_tight = cell.area_def(100, tight=True)
+    # tight=True disables pixel snapping, so extent can differ from edge-aligned.
+    assert gb_edge.shape == gb_tight.shape  # for this evenly-divisible test case
+    assert gb_edge.extent != gb_tight.extent
 
 
 def test_max_shape_across_cells():
