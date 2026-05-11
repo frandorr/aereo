@@ -344,10 +344,16 @@ graph LR
 - `uv run mkdocs build --strict` — 0 warnings, exit 0.
 - `uv run basedpyright bases/aer/client/core.py` — 0 errors, 0 warnings, 0 notes.
 
-#### Task 4.8: Fix `docs/build-your-own-plugin.md` YAML error
+#### Task 4.8: Fix `docs/build-your-own-plugin.md` YAML error ✅ DONE
 **File:** `docs/build-your-own-plugin.md`
 **Action:**
 - Change `collections: ["acme-l1"]` to `collections: {"acme-l1": ["B01"]}` in the YAML snippet.
+
+**Result:**
+- Fixed the YAML snippet on line 242 to use dict-style `collections` (`acme-l1: ["B01"]`) instead of a list.
+- This aligns with the `AerProfile` Pydantic model and the other code/YAML examples in the same file.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
 
 #### Task 4.9: Fix `docs/contributing.md` clone URL
 **File:** `docs/contributing.md`
