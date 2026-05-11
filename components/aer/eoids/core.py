@@ -39,33 +39,37 @@ def build_eoids_path(
     cell_id: str | None = None,
     start_time: datetime.datetime | None = None,
     end_time: datetime.datetime | None = None,
-    collection: str | None = None,
-    variable: str | None = None,
     resolution: str | int | None = None,
     derivative: str | None = None,
     desc: str | None = None,
     suffix: str = "tif",
+    write_profile_meta: bool = True,
 ) -> Path:
     """Build an Earth Observation Imaging Data Structure (EOIDS) compliant file path.
 
-    This follows a BIDS-like approach where metadata is explicitly encoded in
-    hierarchical folders and key-value pairs in the filename. It allows omitting
-    parameters (e.g. for static masks without time) and supports derived data.
+    ``collection`` and ``variable`` are automatically derived from
+    ``profile.collections`` and encoded in the filename (joined by ``+`` when
+    multiple values exist).  The directory hierarchy is flattened — there are no
+    ``collection-<name>/`` or ``variable-<name>/`` subdirectories.
+
+    On the first call for a given profile, a ``profile.json`` sidecar is written
+    next to the data file so the full profile metadata can be recovered from disk.
 
     Args:
         local_dir: Root directory for the dataset.
-        profile: The AerProfile used for extraction. Provides the profile name
-            and default resolution.
+        profile: The AerProfile used for extraction. Provides the profile name,
+            default resolution, and collection/variable mapping.
         cell_id: Geographic cell identifier (e.g., '36D61L').
         start_time: Start time of the observation.
         end_time: End time of the observation.
-        collection: Collection identifier (e.g., 'ABI-L1b-RadF').
-        variable: Variable or band identifier (e.g., 'C01').
         resolution: Spatial resolution (e.g., 1000 or '1000m'). When *None*,
             ``profile.resolution`` is used.
         derivative: Name of the derivative pipeline (places file in derivatives/<name>/).
         desc: Custom descriptor for the file (e.g., 'cloudmask').
         suffix: File extension (default: 'tif').
+        write_profile_meta: When *True* (the default), serialize the full
+            ``AerProfile`` to ``profile.json`` in the profile directory on the
+            first call.
     """
     parts: list[str] = []
 
@@ -80,10 +84,16 @@ def build_eoids_path(
     if end_time:
         parts.append(f"end-{end_time.strftime('%Y%m%dT%H%M%S')}")
     parts.append(f"profile-{profile.name}")
-    if collection:
-        parts.append(f"collection-{collection}")
-    if variable:
-        parts.append(f"variable-{variable}")
+
+    # Derive collection and variable from profile.collections
+    if profile.collections:
+        collections = list(profile.collections.keys())
+        variables = [v for vars_list in profile.collections.values() for v in vars_list]
+        if collections:
+            parts.append(f"collection-{('+').join(collections)}")
+        if variables:
+            parts.append(f"variable-{('+').join(variables)}")
+
     if resolution is not None:
         if isinstance(resolution, int) or str(resolution).isdigit():
             res_str = f"{resolution}m"
@@ -115,13 +125,16 @@ def build_eoids_path(
 
     base_dir = base_dir / f"profile-{profile.name}"
 
-    if collection:
-        base_dir = base_dir / f"collection-{collection}"
-
-    if variable:
-        base_dir = base_dir / f"variable-{variable}"
-
     base_dir.mkdir(parents=True, exist_ok=True)
+
+    if write_profile_meta:
+        profile_path = base_dir / "profile.json"
+        if not profile_path.exists():
+            profile_path.write_text(
+                profile.model_dump_json(exclude={"downloader"}, indent=2),
+                encoding="utf-8",
+            )
+
     return base_dir / filename
 
 
@@ -162,6 +175,19 @@ def parse_eoids_filename(path: str | Path) -> dict[str, str]:
 # ---------------------------------------------------------------------------
 # Scanning
 # ---------------------------------------------------------------------------
+
+
+def _matches_filter(filter_value: str | None, file_value: str | None) -> bool:
+    """Return *True* if *filter_value* is contained in *file_value*.
+
+    When *file_value* uses ``+`` concatenation (e.g. ``"C01+C02"``), the
+    filter matches if the requested value is one of the split components.
+    """
+    if filter_value is None:
+        return True
+    if file_value is None:
+        return False
+    return filter_value in file_value.split("+")
 
 
 def scan_eoids_dir(
@@ -218,9 +244,9 @@ def scan_eoids_dir(
             continue
         if profile is not None and meta.get("profile") != profile:
             continue
-        if collection is not None and meta.get("collection") != collection:
+        if not _matches_filter(collection, meta.get("collection")):
             continue
-        if variable is not None and meta.get("variable") != variable:
+        if not _matches_filter(variable, meta.get("variable")):
             continue
         if cell_id is not None and meta.get("loc") != cell_id.replace("_", ""):
             continue

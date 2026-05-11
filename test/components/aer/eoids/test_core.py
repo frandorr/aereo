@@ -1,4 +1,5 @@
 import datetime
+import json
 from pathlib import Path
 
 import numpy as np
@@ -46,15 +47,10 @@ def test_build_eoids_path_basic(dummy_profile):
         cell_id="36D_61L",
         start_time=st,
         end_time=et,
-        collection="ABI-L1b-RadF",
-        variable="C01",
         resolution=1000,
     )
 
-    expected_dir = (
-        Path("/tmp/dataset/loc-36D61L/date-20260101/profile-goes_c01")
-        / "collection-ABI-L1b-RadF/variable-C01"
-    )
+    expected_dir = Path("/tmp/dataset/loc-36D61L/date-20260101/profile-goes_c01")
     expected_filename = (
         "loc-36D61L_start-20260101T100022_end-20260101T100932_"
         "profile-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
@@ -81,7 +77,8 @@ def test_build_eoids_path_derivatives(dummy_profile):
         "/tmp/dataset/derivatives/cloud_mask/loc-36D61L/date-20260101/profile-goes_c01"
     )
     expected_filename = (
-        "loc-36D61L_start-20260101T100022_profile-goes_c01_res-1000m_desc-cloudprob.nc"
+        "loc-36D61L_start-20260101T100022_profile-goes_c01_"
+        "collection-ABI-L1b-RadF_variable-C01_res-1000m_desc-cloudprob.nc"
     )
 
     assert path.parent == expected_dir
@@ -93,14 +90,11 @@ def test_build_eoids_path_no_time(dummy_profile):
         local_dir="/tmp/dataset",
         profile=dummy_profile,
         cell_id="36D_61L",
-        collection="StaticMask",
     )
 
-    expected_dir = Path(
-        "/tmp/dataset/loc-36D61L/profile-goes_c01/collection-StaticMask"
-    )
+    expected_dir = Path("/tmp/dataset/loc-36D61L/profile-goes_c01")
     expected_filename = (
-        "loc-36D61L_profile-goes_c01_collection-StaticMask_res-1000m.tif"
+        "loc-36D61L_profile-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
     )
 
     assert path.parent == expected_dir
@@ -133,6 +127,59 @@ def test_build_eoids_path_resolution_override():
         resolution=500,
     )
     assert "res-500m" in path.name
+
+
+def test_build_eoids_path_multiple_collections_and_variables():
+    profile = AerProfile(
+        name="viirs_geo",
+        resolution=375.0,
+        collections={"IMG202": ["I04"], "IMG203": ["I05"]},
+    )
+    path = build_eoids_path(
+        "/tmp/ds",
+        profile=profile,
+        cell_id="1U_10L",
+        start_time=datetime.datetime(2026, 1, 1, 10, 0, 0),
+    )
+
+    assert "collection-IMG202+IMG203" in path.name
+    assert "variable-I04+I05" in path.name
+    assert path.parent == Path("/tmp/ds/loc-1U10L/date-20260101/profile-viirs_geo")
+
+
+def test_build_eoids_path_empty_collections():
+    profile = AerProfile(name="mask", resolution=500.0, collections={})
+    path = build_eoids_path("/tmp/ds", profile=profile, cell_id="1U_10L")
+
+    assert "collection-" not in path.name
+    assert "variable-" not in path.name
+    assert path.parent == Path("/tmp/ds/loc-1U10L/profile-mask")
+
+
+def test_build_eoids_path_writes_profile_json(tmp_path):
+    profile = AerProfile(
+        name="goes_c01", resolution=1000.0, collections={"ABI-L1b-RadF": ["C01"]}
+    )
+    path = build_eoids_path(tmp_path, profile=profile, cell_id="36D61L")
+
+    profile_json = path.parent / "profile.json"
+    assert profile_json.exists()
+    data = json.loads(profile_json.read_text())
+    assert data["name"] == "goes_c01"
+    assert data["resolution"] == 1000.0
+    assert "downloader" not in data
+
+
+def test_build_eoids_path_skips_existing_profile_json(tmp_path):
+    profile = AerProfile(
+        name="goes_c01", resolution=1000.0, collections={"ABI-L1b-RadF": ["C01"]}
+    )
+    profile_json = tmp_path / "profile-goes_c01" / "profile.json"
+    profile_json.parent.mkdir(parents=True)
+    profile_json.write_text('{"custom": true}')
+
+    build_eoids_path(tmp_path, profile=profile, cell_id="36D61L")
+    assert profile_json.read_text() == '{"custom": true}'
 
 
 # -----------------------------------------------------------------------
@@ -181,6 +228,13 @@ class TestParseEoidsFilename:
         meta = parse_eoids_filename(Path("/some/dir/loc-1U2L_variable-C02.tif"))
         assert meta == {"loc": "1U2L", "variable": "C02"}
 
+    def test_parse_eoids_filename_with_plus_concatenation(self):
+        meta = parse_eoids_filename(
+            "loc-0U38L_profile-viirs_geo_collection-IMG202+IMG203_variable-I04+I05_res-375m.tif"
+        )
+        assert meta["collection"] == "IMG202+IMG203"
+        assert meta["variable"] == "I04+I05"
+
 
 # -----------------------------------------------------------------------
 # Fixtures for scan / load / mosaic tests
@@ -220,13 +274,7 @@ def eoids_tree(tmp_path):
     collection = "ABI-L1b-RadF"
 
     # Cell A — UTM zone 20S
-    cell_a_dir = (
-        root
-        / "loc-5D40L"
-        / "date-20260101"
-        / f"profile-{profile_name}"
-        / f"collection-{collection}"
-    )
+    cell_a_dir = root / "loc-5D40L" / "date-20260101" / f"profile-{profile_name}"
     _create_test_tif(
         cell_a_dir
         / (
@@ -239,13 +287,7 @@ def eoids_tree(tmp_path):
     )
 
     # Cell B — UTM zone 21S
-    cell_b_dir = (
-        root
-        / "loc-5D41L"
-        / "date-20260101"
-        / f"profile-{profile_name}"
-        / f"collection-{collection}"
-    )
+    cell_b_dir = root / "loc-5D41L" / "date-20260101" / f"profile-{profile_name}"
     _create_test_tif(
         cell_b_dir
         / (
@@ -258,13 +300,7 @@ def eoids_tree(tmp_path):
     )
 
     # Cell C — different date
-    cell_c_dir = (
-        root
-        / "loc-5D42L"
-        / "date-20260102"
-        / f"profile-{profile_name}"
-        / f"collection-{collection}"
-    )
+    cell_c_dir = root / "loc-5D42L" / "date-20260102" / f"profile-{profile_name}"
     _create_test_tif(
         cell_c_dir
         / (
@@ -339,6 +375,22 @@ class TestScanEoidsDir:
         for entry in results:
             assert "date" in entry
             assert entry["date"] is not None
+
+    def test_scan_eoids_dir_filter_with_plus_concatenation(self, tmp_path):
+        profile = AerProfile(
+            name="rgb",
+            resolution=1000.0,
+            collections={"ABI-L1b-RadF": ["C01", "C02", "C03"]},
+        )
+        path = build_eoids_path(tmp_path, profile=profile, cell_id="36D61L")
+        # Create the file so scan_eoids_dir can discover it
+        path.write_text("")
+
+        results = scan_eoids_dir(tmp_path, variable="C02")
+        assert len(results) == 1
+
+        results = scan_eoids_dir(tmp_path, variable="C99")
+        assert len(results) == 0
 
 
 # -----------------------------------------------------------------------
@@ -422,8 +474,6 @@ class TestMosaicEoidsTiles:
                 cell_id=cell,
                 start_time=st,
                 end_time=et,
-                collection="ABI-L1b-RadF",
-                variable="C01",
                 resolution=1000,
             )
             _create_test_tif(
