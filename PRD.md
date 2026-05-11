@@ -312,7 +312,7 @@ graph LR
 - `uv run mkdocs build --strict` — 0 warnings, exit 0.
 - `uv run basedpyright components/aer/grid/core.py components/aer/eoids/core.py` — 0 errors, 0 warnings, 0 notes.
 
-#### Task 4.6: Improve `docs/index.md`
+#### Task 4.6: Improve `docs/index.md` ✅ DONE
 **File:** `docs/index.md`
 **Action:**
 - Rephrase tagline to: "Plugin-based satellite data extraction — from search to analysis-ready Major TOM grid in minutes."
@@ -320,6 +320,15 @@ graph LR
 - Add simple Mermaid architecture diagram after the "What is AER?" section.
 - Keep existing HTML comment placeholders (user request).
 - Update documentation table to link to Quick Start, Running the Pipeline, Using Plugins, etc.
+
+**Result:**
+- Updated tagline to emphasize "Major TOM grid".
+- Added a 5-line tl;dr code block (`client.search` → `prepare_for_extraction` → `extract_batches`) right after the tagline.
+- Added a Mermaid diagram (`Search → Prepare → Extract → EOIDS Output`) after the "What is AER?" section.
+- Preserved all HTML comment placeholders.
+- Updated the documentation table to include Quick Start, Running the Pipeline, Grid System, and existing pages.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
 
 #### Task 4.7: Add human-written intro to `docs/api/client.md`
 **File:** `docs/api/client.md`

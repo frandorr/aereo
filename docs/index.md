@@ -5,9 +5,22 @@
 <!--<h1 align="center">aer 🪐</h1>-->
 
 <h1 align="center">
-  Plugin-based satellite data extraction — from search to analysis-ready MajorTom in minutes.
+  Plugin-based satellite data extraction — from search to analysis-ready Major TOM grid in minutes.
 </h1>
 
+---
+
+## TL;DR
+
+```python
+from aer.client import AerClient
+from aer.interfaces import AerProfile
+
+client = AerClient()
+results = client.search(profiles=[...], start_datetime=..., end_datetime=...)
+tasks = client.prepare_for_extraction(results, profiles=[...], uri="out")
+artifacts = client.extract_batches(tasks)
+```
 
 ---
 
@@ -16,6 +29,13 @@
 **AER** is a Python framework that makes extracting satellite imagery as easy as running a few lines of code. It handles the entire pipeline — **search**, **prepare**, and **extract** — so you can go from raw sensor archives to a grid-aligned GeoTIFF (or PNG) in minutes, not hours.
 
 Whether you are working with **GOES**, **MODIS**, **VIIRS**, **Sentinel-2**, or **Sentinel-3**, AER lets you mix and match sensors through a unified interface. No need to learn a different API for every data provider.
+
+```mermaid
+graph LR
+    A[Search] --> B[Prepare]
+    B --> C[Extract]
+    C --> D[EOIDS Output]
+```
 
 <p align="center">
   <!-- ARCHITECTURE DIAGRAM PLACEHOLDER -->
@@ -165,8 +185,11 @@ plt.savefig(f"{URI}/extraction_mosaic.png", dpi=150)
 
 | Document | Description |
 |----------|-------------|
+| [Quick Start](quickstart.md) | Step-by-step Search → Prepare → Extract walkthrough |
+| [Running the Pipeline](pipeline.md) | Practical guide for `search()`, `prepare_for_extraction()`, and `extract_batches()` |
 | [Using Plugins](using-plugins.md) | Install core, plugins, and Earthdata auth |
 | [Pipeline Architecture](pipeline-architecture.md) | Three-phase pipeline with UML diagrams and data flow |
+| [Grid System](grid.md) | Grid definitions, filtering modes, and overlap options |
 | [Plugin System](plugins.md) | How plugins are discovered and routed |
 | [Build Your Own Plugin](build-your-own-plugin.md) | Developer guide for creating new plugins |
 | [EOIDS](eoids.md) | Output file structure convention (BIDS-inspired) |
