@@ -16,14 +16,16 @@ keywords = [
 ]
 license = { text = "Apache-2.0" }
 authors = [ { name = "Francisco Dorr", email = "fran.dorr@gmail.com" } ]
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 classifiers = [
-  "License :: OSI Approved :: MIT License",
-  "Operating System :: OS Independent",
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
-  "Topic :: Scientific/Engineering :: GIS",
+  "Topic :: Scientific/Engineering :: Atmospheric Science",
 ]
 dependencies = [
   "attrs>=25.4",
@@ -37,6 +39,7 @@ dependencies = [
   "structlog>=25.5",
   "utm>=0.8.1",
 ]
+urls.Documentation = "https://frandorr.github.io/aer"
 urls.Homepage = "https://github.com/frandorr/aer"
 urls.Issues = "https://github.com/frandorr/aer/issues"
 urls.Repository = "https://github.com/frandorr/aer"
