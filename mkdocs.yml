@@ -174,7 +174,7 @@ extra:
 nav:
     - Home: index.md
     - Getting Started:
-          - Installation: installation.md
+          - Using Plugins: using-plugins.md
           - Quick Start: quickstart.md
     - Core Concepts:
           - Architecture: pipeline-architecture.md

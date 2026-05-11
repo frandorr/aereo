@@ -19,3 +19,10 @@ Task 4.1: Rewrite docs/quickstart.md — COMPLETE
 - Created stub pipeline.md and using-plugins.md for cross-link resolution
 - pytest (grid + eoids): 53 passed
 - mkdocs build --strict: 0 warnings
+
+Task 4.2: Create docs/using-plugins.md — COMPLETE
+- Wrote docs/using-plugins.md with core install, plugin table, registry snippet, and Earthdata auth
+- Deleted docs/installation.md; updated internal links in docs/index.md and README.md
+- Updated mkdocs.yml nav entry from installation.md to using-plugins.md
+- pytest (grid + eoids): 53 passed
+- mkdocs build --strict: 0 warnings, exit 0
