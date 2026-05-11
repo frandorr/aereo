@@ -84,40 +84,37 @@ The `AerClient` provides a simple, robust interface that handles plugin discover
 ```python
 from datetime import datetime, timezone
 from aer.client import AerClient
-from aer.interfaces import ExtractionProfile
+from aer.interfaces import AerProfile
 
 client = AerClient()
 
+profiles = [
+    AerProfile(
+        name="goes_c07",
+        resolution=2000,
+        collections={"ABI-L1b-RadF": ["C07"]},
+        extract_params={"reader": "abi_l1b"},
+    )
+]
+
 # 1. Search
 search_results = client.search(
-    collections=["ABI-L1b-RadF"],
+    profiles=profiles,
     start_datetime=datetime(2026, 1, 1, 10, 0, tzinfo=timezone.utc),
     end_datetime=datetime(2026, 1, 1, 11, 0, tzinfo=timezone.utc),
-    plugin_hints={"search_aws_goes": ["ABI-L1b-RadF"]},
 )
 print(f"Found {len(search_results)} assets.")
 
 # 2. Prepare tasks
-profiles = [
-    ExtractionProfile(
-        name="goes_c07",
-        resolution=2000,
-        collection_variables_map={"ABI-L1b-RadF": ["C07"]},
-        extract_params={"reader": "abi_l1b"},
-    )
-]
 tasks = client.prepare_for_extraction(
     search_results,
     profiles=profiles,
     uri="output/goes",
-    plugin_hints={"extract_satpy": ["ABI-L1b-RadF"]},
 )
 
 # 3. Extract
 artifacts_df = client.extract_batches(
     tasks,
-    extract_params={"padding": 2, "resampling": "nearest"},
-    plugin_hints={"extract_satpy": ["ABI-L1b-RadF"]},
     max_batch_workers=4,
 )
 print(f"Extracted {len(artifacts_df)} artifacts.")

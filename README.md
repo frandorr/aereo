@@ -15,21 +15,24 @@ pip install aer-eo aer-search-aws-goes aer-extract-satpy
 ```python
 from datetime import datetime, timezone
 from aer.client import AerClient
-from aer.interfaces import ExtractionProfile
+from aer.interfaces import AerProfile
 import rasterio, matplotlib.pyplot as plt
 
 client = AerClient()
+profiles = [
+    AerProfile(
+        name="c07",
+        resolution=2000,
+        collections={"ABI-L1b-RadF": ["C07"]},
+        search_params={"satellite": "GOES-19"},
+        extract_params={"reader": "abi_l1b"},
+    )
+]
 results = client.search(
-    collections=["ABI-L1b-RadF"],
+    profiles=profiles,
     start_datetime=datetime(2026, 4, 1, 15, 0, tzinfo=timezone.utc),
     end_datetime=datetime(2026, 4, 1, 15, 10, tzinfo=timezone.utc),
-    search_params={"ABI-L1b-RadF": {"satellite": "GOES-19"}},
 )
-profiles = [ExtractionProfile(
-    name="c07", resolution=2000,
-    collection_variables_map={"ABI-L1b-RadF": ["C07"]},
-    extract_params={"reader": "abi_l1b"},
-)]
 tasks = client.prepare_for_extraction(results, profiles=profiles, uri="out")
 artifacts = client.extract_batches(tasks)
 
@@ -93,18 +96,18 @@ Collection names are **case-insensitive**.
 profiles:
   - name: c07
     resolution: 2000
-    collections: ["ABI-L1b-RadF"]
-    collection_variables_map:
+    collections:
       ABI-L1b-RadF: ["C07"]
     extract_params:
       reader: abi_l1b
     downloader: my_package.downloaders.custom_downloader
 
-  # Use conform_to_max_shape when you need fixed tensor shapes (e.g. ML training)
+  # Use conform_to when you need fixed tensor shapes (e.g. ML training)
   - name: modis_ml
     resolution: 1000
-    collections: ["MOD021KM"]
-    conform_to_max_shape: true
+    collections:
+      MOD021KM: ["1"]
+    conform_to: [256, 256]
 ```
 
 ```python
@@ -114,7 +117,7 @@ profiles = AerProfile.from_yaml("profiles.yaml")
 # profiles[0].downloader is now a live callable
 ```
 
-> 💡 **Natural vs. conformed shapes** — By default every grid cell uses its *natural* UTM footprint, so adjacent cells tile edge-to-edge with no gaps. Set `conform_to_max_shape: true` when you need every cell in a batch to share the same `(width, height)` (e.g. for neural-network training). The extra area is filled with `NaN`.
+> 💡 **Natural vs. conformed shapes** — By default every grid cell uses its *natural* UTM footprint, so adjacent cells tile edge-to-edge with no gaps. Set `conform_to: [W, H]` when you need every cell in a batch to share the same `(width, height)` (e.g. for neural-network training). The extra area is filled with `NaN`.
 
 Supported loaders:
 - `AerProfile.from_yaml(path)` — load a YAML file

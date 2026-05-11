@@ -189,8 +189,7 @@ from aer.interfaces import AerProfile
 profile = AerProfile(
     name="acme_l1",
     resolution=250,
-    collections=["acme-l1"],
-    channels=["B01"],
+    collections={"acme-l1": ["B01"]},
     plugin_hints={"search": "acme_search", "extract": "acme_extract"},
 )
 ```
@@ -206,8 +205,8 @@ You can keep profiles in config files instead of code:
 profiles:
   - name: acme_l1
     resolution: 250
-    collections: ["acme-l1"]
-    channels: ["B01"]
+    collections:
+      acme-l1: ["B01"]
     plugin_hints:
       search: acme_search
       extract: acme_extract

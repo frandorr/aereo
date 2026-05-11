@@ -28,8 +28,8 @@ aoi = gdf.geometry.iloc[0]
 
 # %%
 # Profiles are loaded from a YAML config file.  Each profile declares its
-# collections, variables, channels, satellite, and which plugins to use (via
-# plugin_hints).  The *downloader* field accepts a dotted import path string
+# collections, variables, and which plugins to use (via plugin_hints).
+# The *downloader* field accepts a dotted import path string
 # (e.g. ``aer.search_earthaccess.earthaccess_download_wrapper``) which
 # Pydantic resolves to a live callable at load time.
 profiles = AerProfile.from_yaml(profiles_path)

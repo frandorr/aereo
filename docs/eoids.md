@@ -21,11 +21,12 @@ EOIDS groups data geographically, temporally, and by platform. This limits the m
 
 ```text
 dataset/
-├── loc-36D61L/                         <-- 1. Location (Grid Cell)
+├── profile-goes_c01/                   <-- 1. Profile name
 │   ├── date-20260101/                  <-- 2. Date of Observation
-│   │   ├── sat-goes_east/              <-- 3. Platform / Instrument
-│   │   │   ├── loc-36D61L_start-2026...
-│   │   │   ├── loc-36D61L_start-2026...
+│   │   ├── collection-ABI-L1b-RadF/    <-- 3. Collection
+│   │   │   ├── variable-C01/           <-- 4. Variable / Band
+│   │   │   │   ├── loc-36D61L_start-2026...
+│   │   │   │   ├── loc-36D61L_start-2026...
 │   ├── date-20260102/
 ```
 
@@ -56,14 +57,14 @@ Filenames consist of strict `key-value` entities.
 * `loc`: Geographic cell or region identifier (must not contain underscores).
 * `start`: Start timestamp in `%Y%m%dT%H%M%S` format.
 * `end`: End timestamp in `%Y%m%dT%H%M%S` format.
-* `sat`: Satellite or platform identifier (e.g., `goes_east`).
-* `prod`: Product type (e.g., `RadF`, `L2_AOD`).
-* `band`: Specific instrument band (e.g., `C01`, `B04`).
+* `profile`: Profile name (e.g., `goes_c01`).
+* `collection`: Collection identifier (e.g., `ABI-L1b-RadF`).
+* `variable`: Specific variable or band (e.g., `C01`, `B04`).
 * `res`: Spatial resolution (e.g., `1000m`).
 * `desc`: Custom descriptor, typically used for derived data (e.g., `cloudmask`).
 
 **Example:**
-`loc-36D61L_start-20260101T100022_end-20260101T100932_sat-goes_east_prod-RadF_band-C01_res-1000m.tif`
+`loc-36D61L_start-20260101T100022_end-20260101T100932_profile-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif`
 
 **Why this is powerful:**
 Any downstream script can trivially parse the metadata without opening the file:
@@ -82,23 +83,26 @@ To ensure strict compliance across all plugins, use the `build_eoids_path` funct
 ```python
 import datetime
 from aer.eoids import build_eoids_path
+from aer.interfaces import AerProfile
 
-# All parameters (except local_dir) are optional.
+profile = AerProfile(name="goes_c01", resolution=1000)
+
+# All parameters (except local_dir and profile) are optional.
 # If omitted, they simply won't appear in the directory path or filename.
 path = build_eoids_path(
     local_dir="/my/dataset",
+    profile=profile,
     cell_id="36D61L",
     start_time=datetime.datetime(2026, 1, 1, 10, 0, 22),
     end_time=datetime.datetime(2026, 1, 1, 10, 9, 32),
-    satellite="goes_east",
-    product="RadF",
-    band="C01",
-    resolution=1000
+    collection="ABI-L1b-RadF",
+    variable="C01",
 )
 
 # Derived Data Example
 mask_path = build_eoids_path(
     local_dir="/my/dataset",
+    profile=profile,
     cell_id="36D61L",
     start_time=datetime.datetime(2026, 1, 1, 10, 0, 22),
     derivative="cloud_mask",

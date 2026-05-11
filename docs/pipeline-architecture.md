@@ -108,7 +108,7 @@ Transform search results into a batch of `ExtractionTask` objects. Groups assets
          │                          │     collections)               │
          │                          │                                │
          │                          │─── 2. Filter assets per profile │
-         │                          │    (collection_variables_map)  │
+         │                          │    (profile.collections keys)  │
          │                          │                                │
          │                          │─── 3. Group by start_time ────▶│
          │                          │                                │
@@ -132,7 +132,7 @@ Transform search results into a batch of `ExtractionTask` objects. Groups assets
 |-----------|------|----------|-------------|
 | `search_results` | `GeoDataFrame[AssetSchema]` | Yes | Output from `search()`. |
 | `target_aoi` | `BaseGeometry \| dict \| None` | No | AOI to clip grid generation. If `None`, uses the union of all asset geometries. |
-| `profiles` | `Sequence[ExtractionProfile]` | Yes** | Blueprints for extraction. **Required** if `resolution` is not provided. |
+| `profiles` | `Sequence[AerProfile]` | Yes** | Blueprints for extraction. **Required** if `resolution` is not provided. |
 | `resolution` | `float \| None` | Yes** | Fallback target resolution (creates a default profile). **Required** if `profiles` is not provided. |
 | `uri` | `str \| None` | No | Base output directory or URI prefix for artifacts. |
 | `prepare_params` | `Mapping[str, Any] \| None` | No | Params forwarded to the extractor's `prepare_for_extraction`. Common keys: `cells_per_chunk`, `grid_filter_mode`, `min_coverage`. |
@@ -148,7 +148,7 @@ Each `ExtractionTask` (from `aer.interfaces.core`) contains:
 | Attribute | Type | Description |
 |-----------|------|-------------|
 | `assets` | `GeoDataFrame[AssetSchema]` | The granule batch this task will extract. |
-| `profile` | `ExtractionProfile` | Target bands, resolution, search_params, and extract_params. |
+| `profile` | `AerProfile` | Target bands, resolution, search_params, and extract_params. |
 | `uri` | `str` | Destination path for artifacts. |
 | `grid_cells` | `Sequence[GridCell]` | Spatial cells this task covers. |
 | `aoi` | `BaseGeometry \| None` | Clipping geometry used during preparation. |
@@ -161,10 +161,10 @@ Each `ExtractionTask` (from `aer.interfaces.core`) contains:
 |-------|------|-------------|
 | `name` | `str` | Label for bookkeeping. |
 | `resolution` | `float` | Target pixel size in metres. |
-| `collection_variables_map` | `Mapping[str, Sequence[str]]` | Which bands/variables to extract per collection. |
+| `collections` | `Mapping[str, Sequence[str]]` | Which bands/variables to extract per collection. |
 | `search_params` | `Mapping[str, Any]` | Per-profile search overrides (e.g. `{"version": "061"}`). |
 | `extract_params` | `Mapping[str, Any]` | Per-profile extract overrides (e.g. `{"reader": "abi_l1b"}`). |
-| `conform_to_max_shape` | `bool` | When `True`, every cell in the batch is padded to the same `(width, height)` shape (filled with NaN). Useful for ML pipelines that need fixed-size tensors. Default: `False`. |
+| `conform_to` | `tuple[int, int] \| None` | When set, every cell in the batch is padded to exactly this `(width, height)` shape (filled with NaN). Useful for ML pipelines that need fixed-size tensors. Default: `None`. |
 
 ---
 
@@ -173,7 +173,7 @@ Each `ExtractionTask` (from `aer.interfaces.core`) contains:
 `GridCell.area_def()` determines the pixel extent of each extracted tile. By default it uses the **natural** UTM footprint of the cell:
 
 - **Natural shape** (default): `width` and `height` are derived from `utm_footprint.bounds`, so adjacent cells tile edge-to-edge without gaps or overlap. Different cells can have different dimensions, which is ideal for analysis and visualisation.
-- **Conformed shape**: When `conform_to_max_shape=True` in the profile, `prepare_for_extraction()` computes the maximum `(width, height)` across all cells in the batch and stores it as `conform_to_shape` in `task_context`. Every cell's `area_def` is then centred inside that common box. The extra area is filled with NaNs by downstream extractors. This is the mode to use when you need fixed-size tensors (e.g. neural-network training).
+- **Conformed shape**: When `conform_to=(W, H)` is set in the profile, `prepare_for_extraction()` creates grid cells with exactly that `(width, height)` and stores it as `conform_to_shape` in `task_context`. Every cell's `area_def` uses that fixed box. The extra area is filled with NaNs by downstream extractors. This is the mode to use when you need fixed-size tensors (e.g. neural-network training).
 
 > **Note on `padding`**: `padding` adds extra pixels on all sides of the natural footprint to give contextual border pixels (e.g. for CNN receptive fields). It is **not** a workaround for gaps — natural shapes already tile seamlessly. If you use padding with natural shapes, neighbouring tiles will overlap by `2 × padding` pixels.
 
@@ -217,7 +217,7 @@ Execute all `ExtractionTask` objects. Can run sequentially or in parallel via `P
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `extraction_task_batch` | `Sequence[ExtractionTask]` | Yes | Output from `prepare_for_extraction()`. |
-| `extract_params` | `Mapping[str, Any] \| None` | No | Flat dict forwarded directly to the extractor plugin. Common keys: `padding`, `resampling`/`resampler`, `calibration`, `reader`, `downloader`, `satellite`. |
+| `extract_params` | `Mapping[str, Any] \| None` | No | Flat dict forwarded directly to the extractor plugin. Common keys: `padding`, `resampling`/`resampler`, `calibration`, `reader`, `downloader`. |
 | `init_params` | `Mapping[str, Any] \| None` | No | Constructor kwargs for extractor instantiation. |
 | `plugin_hints` | `Mapping[str, str \| Sequence[str]] \| None` | No | Force extractor plugin. |
 | `failure_mode` | `FailureMode` | No | `STRICT` or `BEST_EFFORT`. Default: `STRICT` for extraction. |
@@ -252,12 +252,14 @@ Artifacts are written to disk following the **Earth Observation Imaging Data Str
 <uri>/
   loc-<cell_id>/
     date-<YYYYMMDD>/
-      sat-<platform>/
-        loc-<cell_id>_start-<ISO>_end-<ISO>_sat-<platform>_prod-<product>_band-<band>_res-<resolution>m.tif
+      profile-<name>/
+        collection-<collection>/
+          variable-<variable>/
+            loc-<cell_id>_start-<ISO>_end-<ISO>_profile-<name>_collection-<collection>_variable-<variable>_res-<resolution>m.tif
 ```
 
 This makes it trivial to:
-- Filter by cell, date, satellite, band, or resolution.
+- Filter by cell, date, profile, collection, variable, or resolution.
 - Feed into `mosaic_eoids_tiles()` for reprojection and merging.
 - Load into ML pipelines where the filename itself carries metadata.
 
@@ -312,7 +314,7 @@ User Query
 │    Output: Sequence[ExtractionTask]                                         │
 │    ──────────────────────────────────────────────────────────────────────── │
 │    task.assets  → GeoDataFrame[AssetSchema]                                 │
-│    task.profile → ExtractionProfile (bands, resolution, search_params, extract_params) │
+│    task.profile → AerProfile (bands, resolution, search_params, extract_params) │
 │    task.grid_cells → Sequence[GridCell] (with UTM CRS & area_def)           │
 │    task.uri     → output path                                               │
 │    task.task_context → {chunk_id, total_chunks, start_time}                 │
@@ -331,7 +333,7 @@ User Query
     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ EOIDS on Disk                                                               │
-│ loc-<cell>/date-<YYYYMMDD>/sat-<platform>/loc-..._band-..._res-...m.tif     │
+│ loc-<cell>/date-<YYYYMMDD>/profile-<name>/collection-<col>/variable-<var>/loc-..._res-...m.tif │
 └─────────────────────────────────────────────────────────────────────────────┘
     │
     ▼
