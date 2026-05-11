@@ -239,7 +239,8 @@ The `downloader` field accepts either a live callable or a **dotted import path 
 profiles:
   - name: acme_l1
     resolution: 250
-    collections: ["acme-l1"]
+    collections:
+      acme-l1: ["B01"]
     downloader: my_package.downloaders.custom_downloader
 ```
 
