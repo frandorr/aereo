@@ -259,12 +259,19 @@ graph LR
 - `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
 - `uv run mkdocs build --strict` — 0 warnings, exit 0.
 
-#### Task 4.3: Create `docs/contributing/dev-setup.md`
+#### Task 4.3: Create `docs/contributing/dev-setup.md` ✅ DONE
 **File:** `docs/contributing/dev-setup.md`
 **Action:**
 - Move "For Developers" section from old `installation.md`.
 - Cover: clone, `uv sync`, Polylith workspace basics, `hatch-polylith-bricks` dev mode, plugin discovery mechanics.
 - Add cross-link from `contributing.md`.
+
+**Result:**
+- Created `docs/contributing/dev-setup.md` with Prerequisites, Clone and Install, Polylith Workspace overview, Plugin Discovery Mechanics, and hatch-polylith-bricks Dev Mode sections.
+- Added cross-link in `docs/contributing.md` pointing to `contributing/dev-setup.md`.
+- Updated `mkdocs.yml` nav to nest `contributing.md` and `contributing/dev-setup.md` under a `Contributing` section.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
 
 #### Task 4.4: Create `docs/pipeline.md`
 **File:** `docs/pipeline.md`
