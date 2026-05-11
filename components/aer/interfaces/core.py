@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import sys
 from abc import ABC, abstractmethod
@@ -7,15 +8,14 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
 from multiprocessing import get_context
 from pathlib import Path
-import json
 from typing import Any, Callable, Mapping, Protocol, Self, Sequence, cast
 
 import attrs
 import pandas as pd
-from pydantic import BaseModel, Field, ImportString, TypeAdapter
 from aer.grid import GridCell
 from aer.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
+from pydantic import BaseModel, Field, ImportString, TypeAdapter
 from shapely.geometry.base import BaseGeometry
 
 logger = logging.getLogger(__name__)
@@ -92,8 +92,8 @@ class SearchProvider(AerPlugin, plugin_abstract=True):
 
         Args:
             profiles: Sequence of AerProfile objects defining what to search for.
-                Collections, channels, satellite, and other domain-specific config
-                are read from each profile.
+                Collections and other domain-specific config are read from each
+                profile (via ``collections``, ``search_params``, etc.).
             intersects: Optional shapely BaseGeometry to filter results by spatial intersection.
             start_datetime: Optional start datetime to filter results by temporal range.
             end_datetime: Optional end datetime to filter results by temporal range.
@@ -115,10 +115,14 @@ class AerProfile(BaseModel):
     field accepts either a live callable or a dotted import path string.
 
     A profile bundles together:
-    - What to search for (collections, channels, satellite)
-    - How to extract it (resolution, variables, reader, padding, resampling, calibration)
-    - Which plugins to use (plugin_hints)
-    - How to download assets (downloader)
+    - What to search for (``collections`` mapping collection names to variables)
+    - How to extract it (``resolution``, ``padding``, ``conform_to``)
+    - Which plugins to use (``plugin_hints``)
+    - How to download assets (``downloader``)
+
+    Plugin-specific settings (e.g. ``reader``, ``calibration``, ``resampling``)
+    belong in ``extract_params`` or ``search_params`` rather than top-level
+    fields.
 
     One profile = one coherent pipeline configuration.
     """
@@ -127,15 +131,9 @@ class AerProfile(BaseModel):
 
     name: str
     resolution: float
-    collections: Sequence[str] = Field(default_factory=tuple)
-    collection_variables_map: Mapping[str, Sequence[str]] = Field(default_factory=dict)
-    channels: Sequence[str] | None = None
-    satellite: str | None = None
-    reader: str | None = None
-    padding: int | None = None
-    resampling: str | None = None
-    calibration: str | None = None
-    conform_to_max_shape: bool = False
+    collections: Mapping[str, Sequence[str]] = Field(default_factory=dict)
+    padding: int | None = 0
+    conform_to: tuple[int, int] | None = None
     plugin_hints: Mapping[str, str] = Field(default_factory=dict)
     downloader: ImportString[Callable[[str, Path], None]] | None = None
     search_params: Mapping[str, Any] = Field(default_factory=dict)
@@ -257,13 +255,13 @@ class ExtractionTask:
         if self.assets is None or len(self.assets) == 0:
             raise ValueError("assets cannot be empty")
 
-        if self.profile.collection_variables_map:
+        if self.profile.collections:
             if "collection" in self.assets.columns:
                 asset_collections = set(self.assets["collection"])
-                for col in self.profile.collection_variables_map:
+                for col in self.profile.collections:
                     if col not in asset_collections:
                         raise ValueError(
-                            f"Collection '{col}' in collection_variables_map not found in assets collection column."
+                            f"Collection '{col}' in collections not found in assets collection column."
                         )
 
     def __repr__(self) -> str:
@@ -352,11 +350,9 @@ class Extractor(AerPlugin, plugin_abstract=True):
         # 1. Iterate over each profile
         for profile in profiles:
             # Filter assets by profile collections if specified
-            if profile.collection_variables_map:
+            if profile.collections:
                 profile_assets = search_results[
-                    search_results["collection"].isin(
-                        list(profile.collection_variables_map.keys())
-                    )
+                    search_results["collection"].isin(list(profile.collections.keys()))
                 ].copy()
             else:
                 profile_assets = search_results.copy()
@@ -431,15 +427,10 @@ class Extractor(AerPlugin, plugin_abstract=True):
 
             # Compute common shape if conforming is enabled for this profile
             conform_to_shape: tuple[int, int] | None = None
-            if profile.conform_to_max_shape:
-                all_profile_cells: list[GridCell] = []
-                for _, _, cells in profile_cell_groups:
-                    all_profile_cells.extend(cells)
+            if profile.conform_to is not None:
+                conform_to_shape = profile.conform_to
                 resolution = int(profile.resolution)
                 padding = profile.padding or 0
-                conform_to_shape = grid_def.max_shape(
-                    all_profile_cells, resolution, padding
-                )
                 # Pre-warm area_def cache with conformed shape for all cells
                 for _, _, cells in profile_cell_groups:
                     for cell in cells:
@@ -488,9 +479,9 @@ class Extractor(AerPlugin, plugin_abstract=True):
                     extraction_task.task_context holds batch-specific data generated during preparation
             extract_params: Meta-level or tool-level parameters for the extraction
                 (e.g. ``max_retries``, ``credentials``, ``downloader`` callables).
-                Domain-specific configuration such as ``padding``, ``calibration``,
-                ``reader``, etc. should be defined on ``extraction_task.profile``
-                (via its explicit fields or ``extract_params``) rather than here.
+                Domain-specific configuration such as ``padding`` should be
+                defined on ``extraction_task.profile`` (via its explicit
+                fields or ``extract_params``) rather than here.
                 Per-task preparation parameters are available on ``extraction_task.prepare_params``.
 
                 .. note::

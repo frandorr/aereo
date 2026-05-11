@@ -45,7 +45,9 @@ def test_client_search_success(monkeypatch):
 
     client = AerClient(registry=mock_registry)
 
-    profile = AerProfile(name="modis", resolution=1000.0, collections=["MODIS"])
+    profile = AerProfile(
+        name="modis", resolution=1000.0, collections={"MODIS": ["var1"]}
+    )
 
     # 1. Search
     search_results = client.search(
@@ -74,7 +76,7 @@ def test_client_search_accepts_profiles(monkeypatch):
     mock_registry.get_searcher.return_value = mock_searcher
 
     client = AerClient(registry=mock_registry)
-    profile = AerProfile(name="p1", resolution=10.0, collections=["MODIS"])
+    profile = AerProfile(name="p1", resolution=10.0, collections={"MODIS": ["var1"]})
     client.search(profiles=[profile])
 
     call_kwargs = mock_searcher.search.call_args.kwargs
@@ -91,7 +93,9 @@ def test_client_search_all_fail_strict():
     mock_registry.get_searcher.return_value = mock_searcher
 
     client = AerClient(registry=mock_registry)
-    profile = AerProfile(name="modis", resolution=1000.0, collections=["MODIS"])
+    profile = AerProfile(
+        name="modis", resolution=1000.0, collections={"MODIS": ["var1"]}
+    )
 
     with pytest.raises(RuntimeError, match="All search plugins failed strictly"):
         client.search(profiles=[profile], failure_mode=FailureMode.STRICT)
@@ -106,7 +110,9 @@ def test_client_search_all_fail_best_effort():
     mock_registry.get_searcher.return_value = mock_searcher
 
     client = AerClient(registry=mock_registry)
-    profile = AerProfile(name="modis", resolution=1000.0, collections=["MODIS"])
+    profile = AerProfile(
+        name="modis", resolution=1000.0, collections={"MODIS": ["var1"]}
+    )
 
     # Will not raise, returns an empty geometry
     search_results = client.search(
@@ -218,7 +224,7 @@ def test_resolve_plugin_for_profile_uses_hint():
     profile = AerProfile(
         name="p1",
         resolution=10.0,
-        collections=["X"],
+        collections={"X": ["var1"]},
         plugin_hints={"search": "hinted_searcher"},
     )
     result = client._resolve_plugin_for_profile("searcher", profile)
@@ -228,7 +234,7 @@ def test_resolve_plugin_for_profile_uses_hint():
 
 def test_resolve_plugin_for_profile_auto_discovers():
     client, mock_registry = _make_client_for_profile_resolution()
-    profile = AerProfile(name="p1", resolution=10.0, collections=["MODIS"])
+    profile = AerProfile(name="p1", resolution=10.0, collections={"MODIS": ["var1"]})
     result = client._resolve_plugin_for_profile("searcher", profile)
     assert result == "auto_searcher"
     mock_registry.find_searchers_for.assert_called_with("MODIS")
@@ -240,7 +246,7 @@ def test_resolve_plugin_for_profile_hinted_not_registered():
     profile = AerProfile(
         name="p1",
         resolution=10.0,
-        collections=["X"],
+        collections={"X": ["var1"]},
         plugin_hints={"search": "missing_searcher"},
     )
     with pytest.raises(ValueError, match="not a registered Searcher"):
@@ -250,7 +256,7 @@ def test_resolve_plugin_for_profile_hinted_not_registered():
 def test_resolve_plugin_for_profile_no_collections_returns_none():
     client, mock_registry = _make_client_for_profile_resolution()
     mock_registry.find_searchers_for.return_value = []
-    profile = AerProfile(name="p1", resolution=10.0, collections=[])
+    profile = AerProfile(name="p1", resolution=10.0, collections={})
     result = client._resolve_plugin_for_profile("searcher", profile)
     assert result is None
 
@@ -260,7 +266,7 @@ def test_resolve_plugin_for_profile_extract_hint():
     profile = AerProfile(
         name="p1",
         resolution=10.0,
-        collections=["X"],
+        collections={"X": ["var1"]},
         plugin_hints={"extract": "hinted_extractor"},
     )
     result = client._resolve_plugin_for_profile("extractor", profile)
@@ -291,8 +297,7 @@ def test_search_with_profile_plugin_hint(monkeypatch):
     profile = AerProfile(
         name="goes",
         resolution=1000.0,
-        collections=["ABI-L1b-RadC"],
-        satellite="GOES-16",
+        collections={"ABI-L1b-RadC": ["C01"]},
         plugin_hints={"search": "aer-search-aws-goes"},
     )
     client.search(profiles=[profile])
@@ -316,7 +321,7 @@ def test_search_merges_profile_search_params(monkeypatch):
     profile = AerProfile(
         name="modis_thermal",
         resolution=1000.0,
-        collections=["MOD021KM"],
+        collections={"MOD021KM": ["var1"]},
         search_params={"version": "061"},
     )
     client.search(
@@ -345,7 +350,7 @@ def _make_prepare_client(monkeypatch, valid_search_df):
 
     task = ExtractionTask(
         assets=cast(GeoDataFrame, valid_search_df),
-        profile=AerProfile(name="test", resolution=10),
+        profile=AerProfile(name="test", resolution=10, collections={"MODIS": ["var1"]}),
         uri="test-uri",
         grid_cells=[],
     )
@@ -431,7 +436,7 @@ def test_prepare_uses_profile_extract_hint(monkeypatch):
     profile = AerProfile(
         name="p1",
         resolution=10.0,
-        collections=["MODIS"],
+        collections={"MODIS": ["var1"]},
         plugin_hints={"extract": "my_extractor"},
     )
     client.prepare_for_extraction(
@@ -462,7 +467,7 @@ def test_extract_batches_with_profile_hint(monkeypatch):
     profile = AerProfile(
         name="goes",
         resolution=1000.0,
-        collections=["ABI-L1b-RadC"],
+        collections={"ABI-L1b-RadC": ["C01"]},
         plugin_hints={"extract": "aer-extract-aws-goes"},
     )
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
@@ -498,14 +503,14 @@ def test_extract_batches_uses_profile_specific_downloaders(monkeypatch):
     profile_a = AerProfile(
         name="a",
         resolution=100.0,
-        collections=["C1"],
+        collections={"C1": ["var1"]},
         plugin_hints={"extract": "dummy_extractor"},
         downloader=dl_a,
     )
     profile_b = AerProfile(
         name="b",
         resolution=100.0,
-        collections=["C1"],
+        collections={"C1": ["var1"]},
         plugin_hints={"extract": "dummy_extractor"},
         downloader=dl_b,
     )
@@ -552,7 +557,7 @@ def test_extract_batches_falls_back_to_batch_downloader(monkeypatch):
     profile = AerProfile(
         name="no_dl",
         resolution=100.0,
-        collections=["C1"],
+        collections={"C1": ["var1"]},
         plugin_hints={"extract": "dummy_extractor"},
         downloader=None,
     )
@@ -608,14 +613,14 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
     profile_a = AerProfile(
         name="profile_a",
         resolution=100.0,
-        collections=["C1"],
+        collections={"C1": ["var1"]},
         search_params={"version": "061", "cloud_cover": 10},
         extract_params={"calibration": "reflectance", "padding": 2},
     )
     profile_b = AerProfile(
         name="profile_b",
         resolution=100.0,
-        collections=["C1"],
+        collections={"C1": ["var1"]},
         search_params={"version": "062", "cloud_cover": 20},
         extract_params={"calibration": "radiance", "padding": 4},
     )

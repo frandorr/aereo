@@ -226,7 +226,9 @@ class AerClient:
                 continue
 
             # Resolve targeted parameters using the first collection for per-collection overrides
-            first_collection = profile.collections[0] if profile.collections else ""
+            first_collection = (
+                next(iter(profile.collections)) if profile.collections else ""
+            )
             batch_resolved = self._resolve_params(search_params, first_collection)
             c_params = merge_params(batch_resolved, profile.search_params)
             p_key = get_params_key(c_params)
@@ -255,7 +257,7 @@ class AerClient:
                         p_name,
                         **self._resolve_params(
                             init_params,
-                            s_profiles[0].collections[0]
+                            next(iter(s_profiles[0].collections))
                             if s_profiles and s_profiles[0].collections
                             else "",
                         ),
@@ -374,7 +376,7 @@ class AerClient:
                 # Fallback to search result collections for default/empty profiles
                 for collection in unique_collections:
                     fallback_profile = AerProfile(
-                        name="fallback", resolution=0, collections=[str(collection)]
+                        name="fallback", resolution=0, collections={str(collection): []}
                     )
                     target_plugin = self._resolve_plugin_for_profile(
                         "extractor", fallback_profile
@@ -395,7 +397,7 @@ class AerClient:
 
         target_plugin = plugin_set.pop()
         first_collection = (
-            resolved_profiles[0].collections[0]
+            next(iter(resolved_profiles[0].collections))
             if resolved_profiles and resolved_profiles[0].collections
             else ""
         )
@@ -480,7 +482,7 @@ class AerClient:
 
         target_plugin = plugin_set.pop()
         first_collection = (
-            extraction_task_batch[0].profile.collections[0]
+            next(iter(extraction_task_batch[0].profile.collections))
             if extraction_task_batch and extraction_task_batch[0].profile.collections
             else ""
         )
