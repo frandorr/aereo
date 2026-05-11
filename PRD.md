@@ -202,9 +202,15 @@ graph LR
 - `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
 - `basedpyright components/aer/grid/core.py components/aer/eoids/core.py` — 0 errors, 0 warnings, 0 notes.
 
-#### Task 1.2: Exclude `includes/abbreviations.md` from nav strict-check
+#### Task 1.2: Exclude `includes/abbreviations.md` from nav strict-check ✅ DONE
 **File:** `mkdocs.yml`
-**Action:** Add `exclude: [includes/abbreviations.md]` (or equivalent `extra:` / `not_in_nav:` config supported by the MkDocs version) so `--strict` does not flag the auto-included snippet file.
+**Action:** Add `not_in_nav` config so `--strict` does not flag the auto-included snippet file.
+
+**Result:**
+- Added `not_in_nav: | includes/abbreviations.md` to `mkdocs.yml`.
+- `mkdocs build --strict` no longer lists `includes/abbreviations.md` as an omitted file.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `basedpyright components/aer/grid/core.py components/aer/eoids/core.py` — 0 errors, 0 warnings, 0 notes.
 
 ### Phase 4 — Examples & Documentation
 
