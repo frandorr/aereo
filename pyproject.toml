@@ -46,6 +46,7 @@ dependencies = [
   "utm>=0.8.1",
 ]
 optional-dependencies.aws-goes = [ "aer-search-aws-goes>=2" ]
+optional-dependencies.docs = [ "mkdocs-material>=9", "mkdocstrings[python]>=0.24" ]
 optional-dependencies.earthaccess = [ "aer-search-earthaccess>=1.1.1" ]
 urls.Documentation = "https://frandorr.github.io/aer"
 urls.Homepage = "https://github.com/frandorr/aer"

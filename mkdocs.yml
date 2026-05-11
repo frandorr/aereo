@@ -1,0 +1,43 @@
+site_name: AER Documentation
+site_url: https://frandorr.github.io/aer
+repo_url: https://github.com/frandorr/aer
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [components, bases]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_category_heading: true
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Architecture: pipeline-architecture.md
+  - Plugins: plugins.md
+  - Building Plugins: build-your-own-plugin.md
+  - EOIDS: eoids.md
+  - API Reference:
+      - Client: api/client.md
+      - Interfaces: api/interfaces.md
+      - Registry: api/registry.md
+      - Schemas: api/schemas.md
+      - Grid: api/grid.md
+      - Spatial: api/spatial.md
+      - Spectral: api/spectral.md
+      - EOIDS: api/eoids.md
+      - Asset Downloader: api/asset_downloader.md
+      - Repository: api/repository.md
+      - Viz: api/viz.md
