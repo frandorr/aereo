@@ -26,3 +26,10 @@ Task 4.2: Create docs/using-plugins.md — COMPLETE
 - Updated mkdocs.yml nav entry from installation.md to using-plugins.md
 - pytest (grid + eoids): 53 passed
 - mkdocs build --strict: 0 warnings, exit 0
+
+Task 4.3: Create docs/contributing/dev-setup.md — COMPLETE
+- Created docs/contributing/dev-setup.md with clone, uv sync, Polylith workspace, plugin discovery, and hatch-polylith-bricks dev mode
+- Added cross-link in docs/contributing.md to contributing/dev-setup.md
+- Updated mkdocs.yml nav for Contributing section
+- pytest (grid + eoids): 53 passed
+- mkdocs build --strict: 0 warnings, exit 0

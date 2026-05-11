@@ -27,6 +27,8 @@ For feature requests, describe the use case and the problem you're trying to sol
 
 ## Development Setup
 
+For a detailed step-by-step guide, see [Developer Setup](contributing/dev-setup.md).
+
 AER uses [uv](https://docs.astral.sh/uv/) for dependency management and [Polylith](https://polylith.gitbook.io/polylith) for code organization.
 
 ### Prerequisites

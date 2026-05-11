@@ -195,4 +195,6 @@ nav:
           - Asset Downloader: api/asset_downloader.md
           - Repository: api/repository.md
           - Viz: api/viz.md
-    - Contributing: contributing.md
+    - Contributing:
+          - Guidelines: contributing.md
+          - Developer Setup: contributing/dev-setup.md
