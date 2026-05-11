@@ -12,8 +12,19 @@ from rasterio.transform import Affine
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import Resampling
 
+from aer.interfaces import AerProfile
+
 # Known EOIDS key tokens — order matters for greedy matching
-_EOIDS_KEYS = ("loc", "start", "end", "sat", "prod", "band", "res", "desc")
+_EOIDS_KEYS = (
+    "loc",
+    "start",
+    "end",
+    "profile",
+    "collection",
+    "variable",
+    "res",
+    "desc",
+)
 _EOIDS_PATTERN = re.compile(
     r"(" + "|".join(_EOIDS_KEYS) + r")-"
     r"([^_]+(?:_[^-]+)*?)"
@@ -23,12 +34,13 @@ _EOIDS_PATTERN = re.compile(
 
 def build_eoids_path(
     local_dir: str | Path,
+    profile: AerProfile,
+    *,
     cell_id: str | None = None,
     start_time: datetime.datetime | None = None,
     end_time: datetime.datetime | None = None,
-    satellite: str | None = None,
-    product: str | None = None,
-    band: str | None = None,
+    collection: str | None = None,
+    variable: str | None = None,
     resolution: str | int | None = None,
     derivative: str | None = None,
     desc: str | None = None,
@@ -42,13 +54,15 @@ def build_eoids_path(
 
     Args:
         local_dir: Root directory for the dataset.
+        profile: The AerProfile used for extraction. Provides the profile name
+            and default resolution.
         cell_id: Geographic cell identifier (e.g., '36D61L').
         start_time: Start time of the observation.
         end_time: End time of the observation.
-        satellite: Satellite or platform identifier (e.g., 'goes_east').
-        product: Product identifier (e.g., 'RadF').
-        band: Band identifier (e.g., 'C01').
-        resolution: Spatial resolution (e.g., 1000 or '1000m').
+        collection: Collection identifier (e.g., 'ABI-L1b-RadF').
+        variable: Variable or band identifier (e.g., 'C01').
+        resolution: Spatial resolution (e.g., 1000 or '1000m'). When *None*,
+            ``profile.resolution`` is used.
         derivative: Name of the derivative pipeline (places file in derivatives/<name>/).
         desc: Custom descriptor for the file (e.g., 'cloudmask').
         suffix: File extension (default: 'tif').
@@ -65,17 +79,19 @@ def build_eoids_path(
         parts.append(f"start-{start_time.strftime('%Y%m%dT%H%M%S')}")
     if end_time:
         parts.append(f"end-{end_time.strftime('%Y%m%dT%H%M%S')}")
-    if satellite:
-        parts.append(f"sat-{satellite}")
-    if product:
-        parts.append(f"prod-{product}")
-    if band:
-        parts.append(f"band-{band}")
+    parts.append(f"profile-{profile.name}")
+    if collection:
+        parts.append(f"collection-{collection}")
+    if variable:
+        parts.append(f"variable-{variable}")
     if resolution is not None:
         if isinstance(resolution, int) or str(resolution).isdigit():
             res_str = f"{resolution}m"
         else:
             res_str = str(resolution)
+        parts.append(f"res-{res_str}")
+    elif profile.resolution is not None:
+        res_str = f"{int(profile.resolution)}m"
         parts.append(f"res-{res_str}")
     if desc:
         parts.append(f"desc-{desc}")
@@ -97,8 +113,13 @@ def build_eoids_path(
     if start_time:
         base_dir = base_dir / f"date-{start_time.strftime('%Y%m%d')}"
 
-    if satellite:
-        base_dir = base_dir / f"sat-{satellite}"
+    base_dir = base_dir / f"profile-{profile.name}"
+
+    if collection:
+        base_dir = base_dir / f"collection-{collection}"
+
+    if variable:
+        base_dir = base_dir / f"variable-{variable}"
 
     base_dir.mkdir(parents=True, exist_ok=True)
     return base_dir / filename
@@ -112,7 +133,7 @@ def build_eoids_path(
 def parse_eoids_filename(path: str | Path) -> dict[str, str]:
     """Extract metadata key-value pairs from an EOIDS-compliant filename.
 
-    Values whose keys contain underscores (e.g. ``sat-goes_east``) are handled
+    Values whose keys contain underscores (e.g. ``profile-goes_c01``) are handled
     correctly thanks to a greedy regex that stops only at the next recognised
     EOIDS key token.
 
@@ -120,18 +141,19 @@ def parse_eoids_filename(path: str | Path) -> dict[str, str]:
         path: Full path or bare filename following the EOIDS naming convention.
 
     Returns:
-        Dictionary mapping EOIDS keys (``loc``, ``start``, ``end``, ``sat``,
-        ``prod``, ``band``, ``res``, ``desc``) to their string values.
+        Dictionary mapping EOIDS keys (``loc``, ``start``, ``end``, ``profile``,
+        ``collection``, ``variable``, ``res``, ``desc``) to their string values.
         Only keys present in the filename are included.
 
     Example::
 
         >>> parse_eoids_filename(
         ...     "loc-0U38L_start-20260101T100022_end-20260101T100953_"
-        ...     "sat-goes_east_prod-RadF_band-C01_res-1000m.tif"
+        ...     "profile-goes_east_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
         ... )
         {'loc': '0U38L', 'start': '20260101T100022', 'end': '20260101T100953',
-         'sat': 'goes_east', 'prod': 'RadF', 'band': 'C01', 'res': '1000m'}
+         'profile': 'goes_east', 'collection': 'ABI-L1b-RadF',
+         'variable': 'C01', 'res': '1000m'}
     """
     stem = Path(path).stem
     return dict(_EOIDS_PATTERN.findall(stem))
@@ -146,10 +168,10 @@ def scan_eoids_dir(
     root_dir: str | Path,
     *,
     date: str | None = None,
-    satellite: str | None = None,
-    band: str | None = None,
+    profile: str | None = None,
+    collection: str | None = None,
+    variable: str | None = None,
     cell_id: str | None = None,
-    product: str | None = None,
     suffix: str = "tif",
 ) -> list[dict[str, Any]]:
     """Recursively discover EOIDS files under *root_dir* with optional filtering.
@@ -162,10 +184,10 @@ def scan_eoids_dir(
         root_dir: Top-level EOIDS dataset directory.
         date: Filter by date string as it appears in the directory hierarchy
             (e.g. ``"20260101"``).
-        satellite: Filter by satellite value (e.g. ``"goes_east"``).
-        band: Filter by band value (e.g. ``"C01"``).
+        profile: Filter by profile name (e.g. ``"goes_c01"``).
+        collection: Filter by collection value (e.g. ``"ABI-L1b-RadF"``).
+        variable: Filter by variable value (e.g. ``"C01"``).
         cell_id: Filter by cell identifier (e.g. ``"0U38L"``).
-        product: Filter by product identifier (e.g. ``"RadF"``).
         suffix: File extension to search for (default ``"tif"``).
 
     Returns:
@@ -194,13 +216,13 @@ def scan_eoids_dir(
         # Apply filters — skip if any filter doesn't match
         if date is not None and file_date != date:
             continue
-        if satellite is not None and meta.get("sat") != satellite:
+        if profile is not None and meta.get("profile") != profile:
             continue
-        if band is not None and meta.get("band") != band:
+        if collection is not None and meta.get("collection") != collection:
+            continue
+        if variable is not None and meta.get("variable") != variable:
             continue
         if cell_id is not None and meta.get("loc") != cell_id.replace("_", ""):
-            continue
-        if product is not None and meta.get("prod") != product:
             continue
 
         results.append(entry)
@@ -217,10 +239,10 @@ def load_eoids_tiles(
     root_dir: str | Path,
     *,
     date: str | None = None,
-    satellite: str | None = None,
-    band: str | None = None,
+    profile: str | None = None,
+    collection: str | None = None,
+    variable: str | None = None,
     cell_id: str | None = None,
-    product: str | None = None,
     suffix: str = "tif",
 ) -> list[rasterio.DatasetReader]:
     """Open matching EOIDS tiles as rasterio dataset readers.
@@ -232,10 +254,10 @@ def load_eoids_tiles(
     Args:
         root_dir: Top-level EOIDS dataset directory.
         date: Filter by date string (e.g. ``"20260101"``).
-        satellite: Filter by satellite (e.g. ``"goes_east"``).
-        band: Filter by band (e.g. ``"C01"``).
+        profile: Filter by profile name (e.g. ``"goes_c01"``).
+        collection: Filter by collection (e.g. ``"ABI-L1b-RadF"``).
+        variable: Filter by variable (e.g. ``"C01"``).
         cell_id: Filter by cell identifier (e.g. ``"0U38L"``).
-        product: Filter by product (e.g. ``"RadF"``).
         suffix: File extension to search for (default ``"tif"``).
 
     Returns:
@@ -244,10 +266,10 @@ def load_eoids_tiles(
     entries = scan_eoids_dir(
         root_dir,
         date=date,
-        satellite=satellite,
-        band=band,
+        profile=profile,
+        collection=collection,
+        variable=variable,
         cell_id=cell_id,
-        product=product,
         suffix=suffix,
     )
     return [rasterio.open(e["path"]) for e in entries]
@@ -262,10 +284,10 @@ def mosaic_eoids_tiles(
     root_dir: str | Path,
     *,
     date: str | None = None,
-    satellite: str | None = None,
-    band: str | None = None,
+    profile: str | None = None,
+    collection: str | None = None,
+    variable: str | None = None,
     cell_id: str | None = None,
-    product: str | None = None,
     suffix: str = "tif",
     target_crs: str | CRS = "EPSG:4326",
     resampling: Resampling = Resampling.nearest,
@@ -281,10 +303,10 @@ def mosaic_eoids_tiles(
     Args:
         root_dir: Top-level EOIDS dataset directory.
         date: Filter by date string (e.g. ``"20260101"``).
-        satellite: Filter by satellite (e.g. ``"goes_east"``).
-        band: Filter by band (e.g. ``"C01"``).
+        profile: Filter by profile name (e.g. ``"goes_c01"``).
+        collection: Filter by collection (e.g. ``"ABI-L1b-RadF"``).
+        variable: Filter by variable (e.g. ``"C01"``).
         cell_id: Filter by cell identifier (e.g. ``"0U38L"``).
-        product: Filter by product (e.g. ``"RadF"``).
         suffix: File extension to search for (default ``"tif"``).
         target_crs: The CRS to reproject all tiles into before merging.
             Defaults to ``"EPSG:4326"``.
@@ -304,10 +326,10 @@ def mosaic_eoids_tiles(
     entries = scan_eoids_dir(
         root_dir,
         date=date,
-        satellite=satellite,
-        band=band,
+        profile=profile,
+        collection=collection,
+        variable=variable,
         cell_id=cell_id,
-        product=product,
         suffix=suffix,
     )
     if not entries:
