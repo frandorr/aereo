@@ -330,12 +330,19 @@ graph LR
 - `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
 - `uv run mkdocs build --strict` — 0 warnings, exit 0.
 
-#### Task 4.7: Add human-written intro to `docs/api/client.md`
+#### Task 4.7: Add human-written intro to `docs/api/client.md` ✅ DONE
 **File:** `docs/api/client.md`
 **Action:**
 - Add 3–4 sentences before `::: aer.client`:
   > `AerClient` is the single entry point for almost all AER workflows. Create one instance and call `search()`, `prepare_for_extraction()`, and `extract_batches()` in sequence. The sections below document every parameter and return type.
 - Add a 5-line example code block.
+
+**Result:**
+- Added human-written intro to `docs/api/client.md` with a description of `AerClient` and a minimal 5-line example.
+- Added cross-links to `quickstart.md` and `pipeline.md` for further reading.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
+- `uv run basedpyright bases/aer/client/core.py` — 0 errors, 0 warnings, 0 notes.
 
 #### Task 4.8: Fix `docs/build-your-own-plugin.md` YAML error
 **File:** `docs/build-your-own-plugin.md`

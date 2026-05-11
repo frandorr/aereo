@@ -60,3 +60,10 @@ Task 4.6: Improve docs/index.md — COMPLETE
 - Updated documentation table with Quick Start, Running the Pipeline, Grid System
 - pytest (grid + eoids): 53 passed
 - mkdocs build --strict: 0 warnings, exit 0
+
+Task 4.7: Add human-written intro to docs/api/client.md — COMPLETE
+- Added intro paragraph and 5-line example code block to docs/api/client.md
+- Added cross-links to quickstart.md and pipeline.md
+- pytest (grid + eoids): 53 passed
+- mkdocs build --strict: 0 warnings, exit 0
+- basedpyright bases/aer/client/core.py: 0 errors, 0 warnings, 0 notes
