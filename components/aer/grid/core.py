@@ -95,8 +95,8 @@ class GridCell(BaseGridCell):
             Extra pixels to add on all sides (uses ``GeoBox.pad``).
         conform_to:
             Force a uniform ``(width, height)`` across a batch. When provided,
-            ``anchor='center'`` and ``tight=True`` are enforced internally so
-            that every cell has the exact same pixel dimensions.
+            ``tight=True`` is enforced internally so that every cell has the
+            exact same pixel dimensions (``anchor`` is ignored in tight mode).
         **geobox_kwargs:
             Forwarded to ``GeoBox.from_bbox``. The default ``anchor`` is
             ``'edge'`` (top-left pixel-grid alignment).
@@ -115,7 +115,6 @@ class GridCell(BaseGridCell):
                 bbox,
                 crs,
                 resolution=resolution,
-                anchor="center",
                 tight=True,
             )
         else:
