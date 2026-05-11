@@ -262,17 +262,13 @@ def test_aer_profile_has_all_fields():
     profile = AerProfile(
         name="goes_16_abi",
         resolution=1000.0,
-        collections=["ABI-L1b-RadC"],
-        channels=["C01", "C02"],
-        satellite="GOES-16",
+        collections={"ABI-L1b-RadC": ["C01", "C02"]},
         plugin_hints={
             "search": "aer-search-aws-goes",
             "extract": "aer-extract-aws-goes",
         },
     )
-    assert profile.collections == ["ABI-L1b-RadC"]
-    assert profile.channels == ["C01", "C02"]
-    assert profile.satellite == "GOES-16"
+    assert profile.collections == {"ABI-L1b-RadC": ["C01", "C02"]}
     assert profile.plugin_hints["search"] == "aer-search-aws-goes"
 
 
@@ -299,18 +295,16 @@ def test_aer_profile_defaults():
     from aer.interfaces.core import AerProfile
 
     profile = AerProfile(name="minimal", resolution=100.0)
-    assert profile.collections == ()
-    assert profile.channels is None
-    assert profile.satellite is None
+    assert profile.collections == {}
     assert profile.plugin_hints == {}
-    assert profile.conform_to_max_shape is False
+    assert profile.conform_to is None
 
 
-def test_aer_profile_accepts_conform_to_max_shape():
+def test_aer_profile_accepts_conform_to():
     from aer.interfaces.core import AerProfile
 
-    profile = AerProfile(name="test", resolution=100.0, conform_to_max_shape=True)
-    assert profile.conform_to_max_shape is True
+    profile = AerProfile(name="test", resolution=100.0, conform_to=(256, 256))
+    assert profile.conform_to == (256, 256)
 
 
 def test_extraction_task_accepts_aer_profile():
@@ -324,7 +318,7 @@ def test_extraction_task_accepts_aer_profile():
         {"collection": ["GOES"], "start_time": ["2023-01-01"]},
         geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
     )
-    profile = AerProfile(name="test", resolution=10.0, collections=["GOES"])
+    profile = AerProfile(name="test", resolution=10.0, collections={"GOES": ["var1"]})
     task = ExtractionTask(
         assets=cast(GeoDataFrame, df),
         profile=profile,
@@ -458,7 +452,7 @@ def test_merge_params_none_batch():
 
 
 def test_prepare_computes_common_shape_when_conform_enabled():
-    """When profile has conform_to_max_shape=True, task_context should contain conform_to_shape."""
+    """When profile has conform_to set, task_context should contain conform_to_shape."""
     from datetime import datetime
 
     from aer.interfaces.core import AerProfile
@@ -493,8 +487,8 @@ def test_prepare_computes_common_shape_when_conform_enabled():
     profile = AerProfile(
         name="test",
         resolution=100.0,
-        collections=["C1"],
-        conform_to_max_shape=True,
+        collections={"C1": ["var1"]},
+        conform_to=(256, 256),
     )
 
     tasks = extractor.prepare_for_extraction(
@@ -510,7 +504,7 @@ def test_prepare_computes_common_shape_when_conform_enabled():
 
 
 def test_prepare_does_not_compute_common_shape_when_conform_disabled():
-    """When profile has conform_to_max_shape=False, task_context should NOT contain conform_to_shape."""
+    """When profile has conform_to=None, task_context should NOT contain conform_to_shape."""
     from datetime import datetime
 
     from aer.interfaces.core import AerProfile
@@ -545,8 +539,8 @@ def test_prepare_does_not_compute_common_shape_when_conform_disabled():
     profile = AerProfile(
         name="test",
         resolution=100.0,
-        collections=["C1"],
-        conform_to_max_shape=False,
+        collections={"C1": ["var1"]},
+        conform_to=None,
     )
 
     tasks = extractor.prepare_for_extraction(
