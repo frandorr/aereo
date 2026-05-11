@@ -79,3 +79,15 @@ Task 4.9: Fix docs/contributing.md clone URL — COMPLETE
 - pytest (grid + eoids): 53 passed
 - mkdocs build --strict: 0 warnings, exit 0
 - basedpyright: 0 errors, 0 warnings, 0 notes
+
+Task 4.10: Remove docs/last_session.md from published docs — COMPLETE
+- docs/last_session.md was already moved to repo root in prior session
+- Verified file no longer exists in docs/; mkdocs build --strict passes
+- pytest (grid + eoids): 53 passed
+- mkdocs build --strict: 0 warnings, exit 0
+
+Task 4.11: Handle orphaned codemap.csv and schema.puml — COMPLETE
+- Confirmed neither file is referenced in published docs
+- Moved both files to docs/assets/orphaned/ to preserve history
+- pytest (grid + eoids): 53 passed
+- mkdocs build --strict: 0 warnings, exit 0
