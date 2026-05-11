@@ -47,7 +47,6 @@ def test_build_eoids_path_basic(dummy_profile):
         cell_id="36D_61L",
         start_time=st,
         end_time=et,
-        resolution=1000,
     )
 
     expected_dir = Path("/tmp/dataset/loc-36D61L/date-20260101/profile-goes_c01")
@@ -117,16 +116,6 @@ def test_build_eoids_path_uses_profile_resolution():
         cell_id="1U_10L",
     )
     assert "res-250m" in path.name
-
-
-def test_build_eoids_path_resolution_override():
-    profile = AerProfile(name="test_prof", resolution=250.0, collections={})
-    path = build_eoids_path(
-        "/tmp/ds",
-        profile=profile,
-        resolution=500,
-    )
-    assert "res-500m" in path.name
 
 
 def test_build_eoids_path_multiple_collections_and_variables():
@@ -474,7 +463,6 @@ class TestMosaicEoidsTiles:
                 cell_id=cell,
                 start_time=st,
                 end_time=et,
-                resolution=1000,
             )
             _create_test_tif(
                 path,

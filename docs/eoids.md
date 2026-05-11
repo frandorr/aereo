@@ -116,12 +116,11 @@ from aer.interfaces import AerProfile
 
 profile = AerProfile(
     name="goes_c01",
-    resolution=1000,
     collections={"ABI-L1b-RadF": ["C01"]},
 )
 
-# collection and variable are derived automatically from profile.collections.
-# All other parameters (except local_dir and profile) are optional.
+# collection, variable, and resolution are derived automatically from the
+# AerProfile. All other parameters (except local_dir and profile) are optional.
 # If omitted, they simply won't appear in the directory path or filename.
 path = build_eoids_path(
     local_dir="/my/dataset",
