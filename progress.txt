@@ -51,3 +51,12 @@ Task 4.5: Expand docs/grid.md — COMPLETE
 - pytest (grid + eoids): 53 passed
 - mkdocs build --strict: 0 warnings, exit 0
 - basedpyright: 0 errors, 0 warnings, 0 notes
+
+Task 4.6: Improve docs/index.md — COMPLETE
+- Updated tagline to emphasize "Major TOM grid"
+- Added 5-line tl;dr code block after the tagline
+- Added Mermaid diagram (Search → Prepare → Extract → EOIDS Output) after "What is AER?"
+- Preserved HTML comment placeholders
+- Updated documentation table with Quick Start, Running the Pipeline, Grid System
+- pytest (grid + eoids): 53 passed
+- mkdocs build --strict: 0 warnings, exit 0
