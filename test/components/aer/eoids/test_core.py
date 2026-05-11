@@ -14,40 +14,62 @@ from aer.eoids import (
     parse_eoids_filename,
     scan_eoids_dir,
 )
+from aer.interfaces import AerProfile
 
 
 # -----------------------------------------------------------------------
-# Existing tests for build_eoids_path (preserved)
+# Fixtures
 # -----------------------------------------------------------------------
 
 
-def test_build_eoids_path_basic():
+@pytest.fixture()
+def dummy_profile():
+    return AerProfile(
+        name="goes_c01",
+        resolution=1000.0,
+        collections={"ABI-L1b-RadF": ["C01"]},
+    )
+
+
+# -----------------------------------------------------------------------
+# Tests for build_eoids_path
+# -----------------------------------------------------------------------
+
+
+def test_build_eoids_path_basic(dummy_profile):
     st = datetime.datetime(2026, 1, 1, 10, 0, 22)
     et = datetime.datetime(2026, 1, 1, 10, 9, 32)
 
     path = build_eoids_path(
         local_dir="/tmp/dataset",
+        profile=dummy_profile,
         cell_id="36D_61L",
         start_time=st,
         end_time=et,
-        satellite="goes_east",
-        product="RadF",
-        band="C01",
+        collection="ABI-L1b-RadF",
+        variable="C01",
         resolution=1000,
     )
 
-    expected_dir = Path("/tmp/dataset/loc-36D61L/date-20260101/sat-goes_east")
-    expected_filename = "loc-36D61L_start-20260101T100022_end-20260101T100932_sat-goes_east_prod-RadF_band-C01_res-1000m.tif"
+    expected_dir = (
+        Path("/tmp/dataset/loc-36D61L/date-20260101/profile-goes_c01")
+        / "collection-ABI-L1b-RadF/variable-C01"
+    )
+    expected_filename = (
+        "loc-36D61L_start-20260101T100022_end-20260101T100932_"
+        "profile-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
+    )
 
     assert path.parent == expected_dir
     assert path.name == expected_filename
 
 
-def test_build_eoids_path_derivatives():
+def test_build_eoids_path_derivatives(dummy_profile):
     st = datetime.datetime(2026, 1, 1, 10, 0, 22)
 
     path = build_eoids_path(
         local_dir="/tmp/dataset",
+        profile=dummy_profile,
         cell_id="36D_61L",
         start_time=st,
         derivative="cloud_mask",
@@ -55,23 +77,62 @@ def test_build_eoids_path_derivatives():
         suffix="nc",
     )
 
-    expected_dir = Path("/tmp/dataset/derivatives/cloud_mask/loc-36D61L/date-20260101")
-    expected_filename = "loc-36D61L_start-20260101T100022_desc-cloudprob.nc"
-
-    assert path.parent == expected_dir
-    assert path.name == expected_filename
-
-
-def test_build_eoids_path_no_time():
-    path = build_eoids_path(
-        local_dir="/tmp/dataset", cell_id="36D_61L", product="StaticMask"
+    expected_dir = Path(
+        "/tmp/dataset/derivatives/cloud_mask/loc-36D61L/date-20260101/profile-goes_c01"
+    )
+    expected_filename = (
+        "loc-36D61L_start-20260101T100022_profile-goes_c01_res-1000m_desc-cloudprob.nc"
     )
 
-    expected_dir = Path("/tmp/dataset/loc-36D61L")
-    expected_filename = "loc-36D61L_prod-StaticMask.tif"
+    assert path.parent == expected_dir
+    assert path.name == expected_filename
+
+
+def test_build_eoids_path_no_time(dummy_profile):
+    path = build_eoids_path(
+        local_dir="/tmp/dataset",
+        profile=dummy_profile,
+        cell_id="36D_61L",
+        collection="StaticMask",
+    )
+
+    expected_dir = Path(
+        "/tmp/dataset/loc-36D61L/profile-goes_c01/collection-StaticMask"
+    )
+    expected_filename = (
+        "loc-36D61L_profile-goes_c01_collection-StaticMask_res-1000m.tif"
+    )
 
     assert path.parent == expected_dir
     assert path.name == expected_filename
+
+
+def test_build_eoids_path_with_profile_only():
+    profile = AerProfile(name="test_prof", resolution=500.0, collections={})
+    path = build_eoids_path("/tmp/ds", profile=profile)
+
+    assert path.parent == Path("/tmp/ds/profile-test_prof")
+    assert path.name == "profile-test_prof_res-500m.tif"
+
+
+def test_build_eoids_path_uses_profile_resolution():
+    profile = AerProfile(name="test_prof", resolution=250.0, collections={})
+    path = build_eoids_path(
+        "/tmp/ds",
+        profile=profile,
+        cell_id="1U_10L",
+    )
+    assert "res-250m" in path.name
+
+
+def test_build_eoids_path_resolution_override():
+    profile = AerProfile(name="test_prof", resolution=250.0, collections={})
+    path = build_eoids_path(
+        "/tmp/ds",
+        profile=profile,
+        resolution=500,
+    )
+    assert "res-500m" in path.name
 
 
 # -----------------------------------------------------------------------
@@ -83,30 +144,30 @@ class TestParseEoidsFilename:
     def test_full_filename(self):
         meta = parse_eoids_filename(
             "loc-0U38L_start-20260101T100022_end-20260101T100953_"
-            "sat-goes_east_prod-RadF_band-C01_res-1000m.tif"
+            "profile-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
         )
         assert meta == {
             "loc": "0U38L",
             "start": "20260101T100022",
             "end": "20260101T100953",
-            "sat": "goes_east",
-            "prod": "RadF",
-            "band": "C01",
+            "profile": "goes_c01",
+            "collection": "ABI-L1b-RadF",
+            "variable": "C01",
             "res": "1000m",
         }
 
     def test_with_full_path(self):
         meta = parse_eoids_filename(
-            "/data/loc-5D40L/date-20260101/sat-goes_east/"
+            "/data/loc-5D40L/date-20260101/profile-goes_c01/"
             "loc-5D40L_start-20260101T100022_end-20260101T100953_"
-            "sat-goes_east_prod-RadF_band-C01_res-1000m.tif"
+            "profile-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
         )
         assert meta["loc"] == "5D40L"
-        assert meta["sat"] == "goes_east"
+        assert meta["profile"] == "goes_c01"
 
     def test_minimal_filename(self):
-        meta = parse_eoids_filename("loc-36D61L_prod-StaticMask.tif")
-        assert meta == {"loc": "36D61L", "prod": "StaticMask"}
+        meta = parse_eoids_filename("loc-36D61L_collection-StaticMask_res-1000m.tif")
+        assert meta == {"loc": "36D61L", "collection": "StaticMask", "res": "1000m"}
 
     def test_with_desc(self):
         meta = parse_eoids_filename("loc-36D61L_desc-cloudprob.nc")
@@ -117,8 +178,8 @@ class TestParseEoidsFilename:
         assert meta == {}
 
     def test_path_object(self):
-        meta = parse_eoids_filename(Path("/some/dir/loc-1U2L_band-C02.tif"))
-        assert meta == {"loc": "1U2L", "band": "C02"}
+        meta = parse_eoids_filename(Path("/some/dir/loc-1U2L_variable-C02.tif"))
+        assert meta == {"loc": "1U2L", "variable": "C02"}
 
 
 # -----------------------------------------------------------------------
@@ -155,32 +216,61 @@ def _create_test_tif(
 def eoids_tree(tmp_path):
     """Build a small EOIDS directory tree with tiles in two different UTM zones."""
     root = tmp_path / "extract_test"
+    profile_name = "goes_c01"
+    collection = "ABI-L1b-RadF"
 
     # Cell A — UTM zone 20S
-    cell_a_dir = root / "loc-5D40L" / "date-20260101" / "sat-goes_east"
+    cell_a_dir = (
+        root
+        / "loc-5D40L"
+        / "date-20260101"
+        / f"profile-{profile_name}"
+        / f"collection-{collection}"
+    )
     _create_test_tif(
         cell_a_dir
-        / "loc-5D40L_start-20260101T100022_end-20260101T100953_sat-goes_east_prod-RadF_band-C01_res-1000m.tif",
+        / (
+            "loc-5D40L_start-20260101T100022_end-20260101T100953_"
+            f"profile-{profile_name}_collection-{collection}_variable-C01_res-1000m.tif"
+        ),
         crs="EPSG:32720",
         bounds=(200000, 9400000, 300000, 9500000),
         value=10.0,
     )
 
     # Cell B — UTM zone 21S
-    cell_b_dir = root / "loc-5D41L" / "date-20260101" / "sat-goes_east"
+    cell_b_dir = (
+        root
+        / "loc-5D41L"
+        / "date-20260101"
+        / f"profile-{profile_name}"
+        / f"collection-{collection}"
+    )
     _create_test_tif(
         cell_b_dir
-        / "loc-5D41L_start-20260101T100022_end-20260101T100953_sat-goes_east_prod-RadF_band-C01_res-1000m.tif",
+        / (
+            "loc-5D41L_start-20260101T100022_end-20260101T100953_"
+            f"profile-{profile_name}_collection-{collection}_variable-C01_res-1000m.tif"
+        ),
         crs="EPSG:32721",
         bounds=(200000, 9400000, 300000, 9500000),
         value=20.0,
     )
 
     # Cell C — different date
-    cell_c_dir = root / "loc-5D42L" / "date-20260102" / "sat-goes_east"
+    cell_c_dir = (
+        root
+        / "loc-5D42L"
+        / "date-20260102"
+        / f"profile-{profile_name}"
+        / f"collection-{collection}"
+    )
     _create_test_tif(
         cell_c_dir
-        / "loc-5D42L_start-20260102T100022_end-20260102T100953_sat-goes_east_prod-RadF_band-C02_res-1000m.tif",
+        / (
+            "loc-5D42L_start-20260102T100022_end-20260102T100953_"
+            f"profile-{profile_name}_collection-{collection}_variable-C02_res-1000m.tif"
+        ),
         crs="EPSG:32720",
         bounds=(300000, 9400000, 400000, 9500000),
         value=30.0,
@@ -205,18 +295,18 @@ class TestScanEoidsDir:
         for entry in results:
             assert entry["date"] == "20260101"
 
-    def test_filter_by_satellite(self, eoids_tree):
-        results = scan_eoids_dir(eoids_tree, satellite="goes_east")
+    def test_filter_by_profile(self, eoids_tree):
+        results = scan_eoids_dir(eoids_tree, profile="goes_c01")
         assert len(results) == 3
 
     def test_filter_no_match(self, eoids_tree):
-        results = scan_eoids_dir(eoids_tree, satellite="goes_west")
+        results = scan_eoids_dir(eoids_tree, profile="nonexistent")
         assert len(results) == 0
 
-    def test_filter_by_band(self, eoids_tree):
-        results = scan_eoids_dir(eoids_tree, band="C02")
+    def test_filter_by_variable(self, eoids_tree):
+        results = scan_eoids_dir(eoids_tree, variable="C02")
         assert len(results) == 1
-        assert results[0]["band"] == "C02"
+        assert results[0]["variable"] == "C02"
 
     def test_filter_by_cell_id(self, eoids_tree):
         results = scan_eoids_dir(eoids_tree, cell_id="5D40L")
@@ -228,13 +318,13 @@ class TestScanEoidsDir:
         results = scan_eoids_dir(eoids_tree, cell_id="5D_40L")
         assert len(results) == 1
 
-    def test_filter_by_product(self, eoids_tree):
-        results = scan_eoids_dir(eoids_tree, product="RadF")
+    def test_filter_by_collection(self, eoids_tree):
+        results = scan_eoids_dir(eoids_tree, collection="ABI-L1b-RadF")
         assert len(results) == 3
 
     def test_combined_filters(self, eoids_tree):
         results = scan_eoids_dir(
-            eoids_tree, date="20260101", band="C01", satellite="goes_east"
+            eoids_tree, date="20260101", variable="C01", profile="goes_c01"
         )
         assert len(results) == 2
 
@@ -268,7 +358,7 @@ class TestLoadEoidsTiles:
                 t.close()
 
     def test_load_empty(self, eoids_tree):
-        tiles = load_eoids_tiles(eoids_tree, satellite="nonexistent")
+        tiles = load_eoids_tiles(eoids_tree, profile="nonexistent")
         assert tiles == []
 
 
@@ -297,7 +387,7 @@ class TestMosaicEoidsTiles:
 
     def test_mosaic_no_match_raises(self, eoids_tree):
         with pytest.raises(FileNotFoundError, match="No EOIDS tiles found"):
-            mosaic_eoids_tiles(eoids_tree, satellite="nonexistent")
+            mosaic_eoids_tiles(eoids_tree, profile="nonexistent")
 
     def test_mosaic_same_crs_no_reproject(self, eoids_tree):
         """When target CRS matches the tile CRS, no VRT warping is needed."""
@@ -318,17 +408,22 @@ class TestMosaicEoidsTiles:
         root = tmp_path / "roundtrip"
         st = datetime.datetime(2026, 6, 15, 12, 0, 0)
         et = datetime.datetime(2026, 6, 15, 12, 10, 0)
+        profile = AerProfile(
+            name="goes_c01",
+            resolution=1000.0,
+            collections={"ABI-L1b-RadF": ["C01"]},
+        )
 
         # Write two tiles via build_eoids_path
         for cell, lon_offset in [("1U_10L", 0), ("1U_11L", 1)]:
             path = build_eoids_path(
                 local_dir=root,
+                profile=profile,
                 cell_id=cell,
                 start_time=st,
                 end_time=et,
-                satellite="goes_east",
-                product="RadF",
-                band="C01",
+                collection="ABI-L1b-RadF",
+                variable="C01",
                 resolution=1000,
             )
             _create_test_tif(

@@ -183,25 +183,25 @@ def _plot_mosaic(
     ax.axis("off")
 
 
-# Discover unique products that were actually extracted
+# Discover unique collections that were actually extracted
 entries = scan_eoids_dir(URI)
-products = sorted({e["prod"] for e in entries})
-print(f"Products to mosaic: {products}")
+collections = sorted({e["collection"] for e in entries})
+print(f"Collections to mosaic: {collections}")
 
-n = len(products)
+n = len(collections)
 cols = min(n, 3)
 rows = (n + cols - 1) // cols
 fig, axes = plt.subplots(rows, cols, figsize=(4 * cols, 3.5 * rows), squeeze=False)
 fig.suptitle("Extracted artifacts", fontsize=12, fontweight="bold")
 
-for ax, prod in zip(axes.flat, products):
-    print(f"Mosaicking {prod} ...", flush=True)
+for ax, col in zip(axes.flat, collections):
+    print(f"Mosaicking {col} ...", flush=True)
     try:
-        mosaic, transform, crs = mosaic_eoids_tiles(URI, product=prod)
-        is_viirs = "VJ202IMG" in prod or "VJ203IMG" in prod
-        _plot_mosaic(ax, mosaic, transform, prod, is_viirs=is_viirs, aoi_geom=aoi)
+        mosaic, transform, crs = mosaic_eoids_tiles(URI, collection=col)
+        is_viirs = "VJ202IMG" in col or "VJ203IMG" in col
+        _plot_mosaic(ax, mosaic, transform, col, is_viirs=is_viirs, aoi_geom=aoi)
     except Exception as exc:
-        ax.set_title(f"{prod}\n{exc}")
+        ax.set_title(f"{col}\n{exc}")
         ax.axis("off")
 
 for ax in axes.flat[n:]:
