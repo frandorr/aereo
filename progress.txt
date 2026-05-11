@@ -91,3 +91,23 @@ Task 4.11: Handle orphaned codemap.csv and schema.puml — COMPLETE
 - Moved both files to docs/assets/orphaned/ to preserve history
 - pytest (grid + eoids): 53 passed
 - mkdocs build --strict: 0 warnings, exit 0
+
+Task 4.12: Sync README.md with docs/index.md — COMPLETE
+- Rewrote README.md as a concise subset of docs/index.md (~40 lines vs. 164)
+- Kept tagline, 3 benefit bullets, 5-line TL;DR, and docs table
+- Removed full copy-paste example and <details> sections
+- pytest (grid + eoids): 53 passed
+- mkdocs build --strict: 0 warnings, exit 0
+
+Task 4.13: Add Examples nav link — COMPLETE
+- Created docs/examples.md with notebooks table and GitHub links
+- Added Examples under Getting Started in mkdocs.yml
+- pytest (grid + eoids): 53 passed
+- mkdocs build --strict: 0 warnings, exit 0
+
+Task 4.14: Update mkdocs.yml nav — COMPLETE
+- Restructured nav to match PRD Section 3.1
+- Core Concepts now: Pipeline Architecture, Grid System, EOIDS, Plugins
+- Plugins moved into Core Concepts; Building Plugins added as top-level
+- pytest (grid + eoids): 53 passed
+- mkdocs build --strict: 0 warnings, exit 0

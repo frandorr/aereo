@@ -177,13 +177,14 @@ nav:
           - Quick Start: quickstart.md
           - Running the Pipeline: pipeline.md
           - Using Plugins: using-plugins.md
+          - Examples: examples.md
     - Core Concepts:
-          - Architecture: pipeline-architecture.md
-          - EOIDS: eoids.md
+          - Pipeline Architecture: pipeline-architecture.md
           - Grid System: grid.md
-    - Plugins:
-          - Overview: plugins.md
-          - Build Your Own: build-your-own-plugin.md
+          - EOIDS: eoids.md
+          - Plugins: plugins.md
+    - Building Plugins:
+          - Build Your Own Plugin: build-your-own-plugin.md
     - API Reference:
           - Client: api/client.md
           - Interfaces: api/interfaces.md
