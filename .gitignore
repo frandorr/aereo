@@ -229,6 +229,7 @@ single_cell_comparison.png
 # Runtime data directories
 areas/
 data/
+!test/components/aer/data/
 satpy_cache/
 
 # Examples: keep notebooks, scripts, README; remove PNGs & non-BA geojsons
