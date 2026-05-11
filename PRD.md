@@ -355,7 +355,19 @@ graph LR
 - `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
 - `uv run mkdocs build --strict` — 0 warnings, exit 0.
 
-#### Task 4.9: Fix `docs/contributing.md` clone URL
+#### Task 4.9: Fix `docs/contributing.md` clone URL ✅ DONE
+**File:** `docs/contributing.md`
+**Action:**
+- Replace `github.com/<org>/aer.git` with `github.com/frandorr/aer.git`.
+- Also replace `github.com/<org>/aer/discussions` with `github.com/frandorr/aer/discussions`.
+
+**Result:**
+- Fixed clone URL on line 43 and discussions link on line 165.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
+- `uv run basedpyright components/aer/grid/core.py components/aer/eoids/core.py` — 0 errors, 0 warnings, 0 notes.
+
+#### Task 4.10: Remove `docs/last_session.md` from published docs
 **File:** `docs/contributing.md`
 **Action:**
 - Replace `github.com/<org>/aer.git` with `github.com/frandorr/aer.git`.

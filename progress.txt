@@ -73,3 +73,9 @@ Task 4.8: Fix docs/build-your-own-plugin.md YAML error — COMPLETE
 - Aligns with AerProfile Pydantic model and other examples in the file
 - pytest (grid + eoids): 53 passed
 - mkdocs build --strict: 0 warnings, exit 0
+
+Task 4.9: Fix docs/contributing.md clone URL — COMPLETE
+- Replaced <org> placeholder with frandorr in clone URL and discussions link
+- pytest (grid + eoids): 53 passed
+- mkdocs build --strict: 0 warnings, exit 0
+- basedpyright: 0 errors, 0 warnings, 0 notes

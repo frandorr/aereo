@@ -40,7 +40,7 @@ AER uses [uv](https://docs.astral.sh/uv/) for dependency management and [Polylit
 ### Clone and Install
 
 ```bash
-git clone https://github.com/<org>/aer.git
+git clone https://github.com/frandorr/aer.git
 cd aer
 uv sync --all-extras
 ```
@@ -162,4 +162,4 @@ Configuration is in `pyproject.toml`.
 
 ## Questions?
 
-Feel free to open a [Discussion](https://github.com/<org>/aer/discussions) or reach out in an existing issue.
+Feel free to open a [Discussion](https://github.com/frandorr/aer/discussions) or reach out in an existing issue.
