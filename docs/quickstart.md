@@ -30,9 +30,8 @@ results = client.search(
         AerProfile(
             name="goes_c07",
             resolution=2000,
-            collections=["ABI-L1b-RadF"],
-            channels=["C07"],
-            satellite="GOES-19",
+            collections={"ABI-L1b-RadF": ["C07"]},
+            search_params={"satellite": "GOES-19"},
         )
     ],
     start_datetime=datetime(2026, 4, 1, 15, 0, tzinfo=timezone.utc),

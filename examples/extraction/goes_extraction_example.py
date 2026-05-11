@@ -17,7 +17,7 @@ aoi = box(
 
 # %%
 # Profiles are usually loaded from a YAML or JSON config file (AerProfile.from_yaml or AerProfile.from_json).
-# Each profile declares its collections, variables, channels, satellite, and which plugins to use (via
+# Each profile declares its collections, variables, and which plugins to use (via
 # plugin_hints). This time we just create the AerProfile directly from a dict.
 profiles = [
     AerProfile(
