@@ -273,13 +273,22 @@ graph LR
 - `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
 - `uv run mkdocs build --strict` — 0 warnings, exit 0.
 
-#### Task 4.4: Create `docs/pipeline.md`
+#### Task 4.4: Create `docs/pipeline.md` ✅ DONE
 **File:** `docs/pipeline.md`
 **Action:**
 - Write unified user guide with H2 sections: Search, Prepare, Extract.
 - Each section: purpose, minimal example, key parameters, common pattern, return-value inspection, gotcha.
 - Cross-link to `pipeline-architecture.md` for sequence diagrams and schema tables.
 - Cross-link to `grid.md` for grid parameters.
+
+**Result:**
+- Wrote `docs/pipeline.md` as a practical user guide with H2 sections for Search, Prepare, and Extract.
+- Each section includes: purpose sentence, minimal runnable example, key parameters table, common pattern, return-value inspection, and a gotcha.
+- Cross-links to `pipeline-architecture.md` for deep technical reference and to `grid.md` for grid parameters.
+- Includes EOIDS mosaicking example in the Extract section.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
+- `uv run basedpyright bases/aer/client/core.py` — 0 errors, 0 warnings, 0 notes.
 
 #### Task 4.5: Expand `docs/grid.md`
 **File:** `docs/grid.md`
