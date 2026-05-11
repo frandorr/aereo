@@ -396,25 +396,47 @@ graph LR
 - `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
 - `uv run mkdocs build --strict` — 0 warnings, exit 0.
 
-#### Task 4.12: Sync `README.md` with `docs/index.md`
+#### Task 4.12: Sync `README.md` with `docs/index.md` ✅ DONE
 **File:** `README.md`
 **Action:**
 - Make `README.md` a concise subset of `docs/index.md`:
   - Tagline, 3 benefit bullets, 5-line tl;dr, link to full docs.
 - Remove the full 95-line example from `README.md` (it lives in `docs/index.md` and `quickstart.md`).
 
-#### Task 4.13: Add Examples nav link
-**File:** `mkdocs.yml`
+**Result:**
+- Rewrote `README.md` as a concise subset of `docs/index.md` (~40 lines vs. 164).
+- Kept the tagline, 3 benefit bullets, 5-line TL;DR code block, and a documentation table linking to the live docs site.
+- Removed the full copy-paste example and all `<details>` sections; those live in `docs/index.md`, `docs/quickstart.md`, and `docs/using-plugins.md`.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
+
+#### Task 4.13: Add Examples nav link ✅ DONE
+**File:** `docs/examples.md`, `mkdocs.yml`
 **Action:**
 - Add an "Examples" nav item under Getting Started or Core Concepts that links to `examples/README.md` content. If MkDocs cannot reference files outside `docs/`, either:
   - Copy/symlink `examples/README.md` into `docs/examples.md`, or
   - Add a `docs/examples.md` page that links to the GitHub repo `examples/` directory.
 
-#### Task 4.14: Update `mkdocs.yml` nav
+**Result:**
+- Created `docs/examples.md` with a notebooks table, links to the GitHub `examples/` directory, and a pointer to the Quick Start guide.
+- Added `Examples: examples.md` under the `Getting Started` section in `mkdocs.yml`.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
+
+#### Task 4.14: Update `mkdocs.yml` nav ✅ DONE
 **File:** `mkdocs.yml`
 **Action:**
 - Apply the nav structure from Section 3.1.
 - Verify `mkdocs build --strict` passes with zero warnings.
+
+**Result:**
+- Restructured `nav` to match Section 3.1:
+  - `Core Concepts` now ordered: Pipeline Architecture, Grid System, EOIDS, Plugins.
+  - `Plugins` moved from a top-level section into `Core Concepts`.
+  - `Building Plugins` added as a top-level section containing `Build Your Own Plugin`.
+- `API Reference` and `Contributing` sections remain unchanged.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
 
 ## 5. Checklist
 
