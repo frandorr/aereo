@@ -372,17 +372,29 @@ graph LR
 **Action:**
 - Replace `github.com/<org>/aer.git` with `github.com/frandorr/aer.git`.
 
-#### Task 4.10: Remove `docs/last_session.md` from published docs
+#### Task 4.10: Remove `docs/last_session.md` from published docs ✅ DONE
 **File:** `docs/last_session.md`
 **Action:**
 - Move to repo root as `last_session.md` or `notes.md`, or delete if no longer needed.
 - Ensure it is no longer in the `docs/` directory so `--strict` stops flagging it.
 
-#### Task 4.11: Handle orphaned `codemap.csv` and `schema.puml`
+**Result:**
+- `docs/last_session.md` was already moved to repo root (`last_session.md`) in a prior session.
+- Verified `docs/last_session.md` no longer exists; `mkdocs build --strict` no longer flags it.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
+
+#### Task 4.11: Handle orphaned `codemap.csv` and `schema.puml` ✅ DONE
 **File:** `docs/codemap.csv`, `docs/schema.puml`
 **Action:**
 - If referenced by `pipeline-architecture.md`, move to `docs/assets/` or `docs/diagrams/` and update links.
 - If truly unused, delete or archive in `docs/assets/orphaned/`.
+
+**Result:**
+- Confirmed neither file is referenced anywhere in `docs/` or other published documentation.
+- Moved both files to `docs/assets/orphaned/` to preserve history while keeping the docs directory clean.
+- `pytest test/components/aer/grid/ test/components/aer/eoids/` — 53 passed.
+- `uv run mkdocs build --strict` — 0 warnings, exit 0.
 
 #### Task 4.12: Sync `README.md` with `docs/index.md`
 **File:** `README.md`
