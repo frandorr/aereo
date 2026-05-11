@@ -158,4 +158,4 @@ uv run poly create component --name my_feat   # add a new component
 
 ---
 
-MIT License
+Apache License 2.0
