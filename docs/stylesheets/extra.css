@@ -1,44 +1,49 @@
 /* =========================================================
    AER Documentation — Custom Material Theme Overrides
+   Bourdeaux · Lilac · Violet Palette
    ========================================================= */
+
+/* Self-host font imports as fallback for blocked Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap');
 
 /* ---------------------------------------------------------
    1. Color Palette (CSS Custom Properties)
+   Bourdeaux / Wine primary + Violet / Lilac accent
    --------------------------------------------------------- */
 :root {
-  /* Primary brand colors */
-  --aer-primary: #1a237e;
-  --aer-primary-light: #534bae;
-  --aer-primary-dark: #000051;
+  /* Primary brand — deep wine / bourdeaux */
+  --aer-primary: #7b1e3a;
+  --aer-primary-light: #b44d6a;
+  --aer-primary-dark: #4a0018;
 
-  /* Accent / interactive */
-  --aer-accent: #00838f;
-  --aer-accent-light: #4fb3bf;
-  --aer-accent-dark: #005662;
+  /* Accent — violet / lilac */
+  --aer-accent: #7c4dff;
+  --aer-accent-light: #b388ff;
+  --aer-accent-dark: #3f1dcb;
 
   /* Neutrals */
   --aer-surface: #fafafa;
   --aer-surface-elevated: #ffffff;
-  --aer-text-primary: #212121;
-  --aer-text-secondary: #616161;
+  --aer-text-primary: #1a1a1a;
+  --aer-text-secondary: #555555;
 
   /* Code surfaces */
-  --aer-code-bg: #263238;
-  --aer-code-inline-bg: #f5f5f5;
+  --aer-code-bg: #1e1e2e;
+  --aer-code-inline-bg: #f0eef5;
 
   /* Semantic */
   --aer-success: #2e7d32;
-  --aer-warning: #f9a825;
+  --aer-warning: #e65100;
   --aer-danger: #c62828;
-  --aer-info: #0277bd;
+  --aer-info: #00695c;
 
   /* Typography scale */
   --aer-text-xs: 0.75rem;
   --aer-text-sm: 0.875rem;
   --aer-text-base: 1rem;
   --aer-text-lg: 1.125rem;
-  --aer-text-xl: 1.25rem;
-  --aer-text-2xl: 1.5rem;
+  --aer-text-xl: 1.35rem;
+  --aer-text-2xl: 1.7rem;
 
   /* Spacing */
   --aer-radius-sm: 4px;
@@ -50,15 +55,30 @@
 
 /* Dark mode overrides */
 [data-md-color-scheme="slate"] {
-  --aer-surface: #1e1e2e;
-  --aer-surface-elevated: #252535;
-  --aer-text-primary: #e0e0e0;
-  --aer-text-secondary: #a0a0b0;
-  --aer-code-inline-bg: #2d2d44;
+  --aer-surface: #1a1218;
+  --aer-surface-elevated: #221a22;
+  --aer-text-primary: #ece0ec;
+  --aer-text-secondary: #a090a0;
+  --aer-code-inline-bg: #2d1f2d;
 }
 
 /* ---------------------------------------------------------
-   2. Header & Navigation
+   2. Font Enforcement
+   --------------------------------------------------------- */
+body,
+.md-typeset {
+  font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+.md-typeset code,
+.md-typeset pre,
+.md-typeset .highlight span.filename,
+.md-nav__item--section > .md-nav__link {
+  font-family: "Roboto Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+/* ---------------------------------------------------------
+   3. Header & Navigation
    --------------------------------------------------------- */
 .md-header {
   background: linear-gradient(135deg, var(--aer-primary) 0%, var(--aer-primary-dark) 100%);
@@ -95,7 +115,7 @@
 }
 
 /* ---------------------------------------------------------
-   3. Typography & Content
+   4. Typography & Content
    --------------------------------------------------------- */
 .md-typeset {
   font-size: var(--aer-text-base);
@@ -157,7 +177,7 @@
 }
 
 /* ---------------------------------------------------------
-   4. Code Blocks — The Star of the Show
+   5. Code Blocks
    --------------------------------------------------------- */
 .md-typeset pre {
   border-radius: var(--aer-radius-md);
@@ -166,17 +186,16 @@
 }
 
 .md-typeset code {
-  font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
   font-size: 0.85em;
   font-feature-settings: "liga" 0;
 }
 
 .md-typeset code:not(pre code) {
   background: var(--aer-code-inline-bg);
-  color: var(--aer-danger);
+  color: var(--aer-primary);
   padding: 0.15em 0.4em;
   border-radius: var(--aer-radius-sm);
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(123, 30, 58, 0.12);
   word-break: break-word;
 }
 
@@ -184,7 +203,6 @@
 .md-typeset .highlight span.filename {
   background: var(--aer-primary-dark);
   color: #fff;
-  font-family: "Roboto Mono", monospace;
   font-size: var(--aer-text-xs);
   font-weight: 500;
   text-transform: uppercase;
@@ -222,11 +240,27 @@
 
 .md-clipboard:hover {
   color: var(--aer-accent);
-  background: rgba(0, 131, 143, 0.08);
+  background: rgba(124, 77, 255, 0.10);
+}
+
+/* FIXED: Copy feedback tooltip — readable text on dark background */
+.md-clipboard::after {
+  background: var(--aer-primary-dark);
+  color: #ffffff;
+  font-size: var(--aer-text-xs);
+  font-weight: 500;
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--aer-radius-sm);
+  box-shadow: var(--aer-shadow-md);
+}
+
+.md-clipboard.md-clipboard--active::after {
+  background: var(--aer-primary);
+  color: #ffffff;
 }
 
 /* ---------------------------------------------------------
-   5. Admonitions (Callouts)
+   6. Admonitions (Callouts)
    --------------------------------------------------------- */
 .md-typeset .admonition {
   border-radius: var(--aer-radius-md);
@@ -246,7 +280,7 @@
   border-left-color: var(--aer-info);
 }
 .md-typeset .admonition.note > .admonition-title {
-  background: rgba(2, 119, 189, 0.08);
+  background: rgba(0, 105, 92, 0.08);
   color: var(--aer-info);
 }
 
@@ -262,8 +296,8 @@
   border-left-color: var(--aer-warning);
 }
 .md-typeset .admonition.warning > .admonition-title {
-  background: rgba(249, 168, 37, 0.08);
-  color: #8d6e00;
+  background: rgba(230, 81, 0, 0.08);
+  color: #bf360c;
 }
 
 .md-typeset .admonition.danger {
@@ -278,12 +312,12 @@
   border-left-color: var(--aer-accent);
 }
 .md-typeset .admonition.info > .admonition-title {
-  background: rgba(0, 131, 143, 0.08);
-  color: var(--aer-accent);
+  background: rgba(124, 77, 255, 0.08);
+  color: var(--aer-accent-dark);
 }
 
 /* ---------------------------------------------------------
-   6. Content Tabs
+   7. Content Tabs
    --------------------------------------------------------- */
 .md-typeset .tabbed-labels {
   background: var(--aer-surface);
@@ -311,7 +345,7 @@
 }
 
 /* ---------------------------------------------------------
-   7. Tables
+   8. Tables
    --------------------------------------------------------- */
 .md-typeset table:not([class]) {
   border-radius: var(--aer-radius-md);
@@ -340,11 +374,11 @@
 }
 
 .md-typeset table:not([class]) tr:hover td {
-  background: rgba(0, 131, 143, 0.03);
+  background: rgba(124, 77, 255, 0.04);
 }
 
 /* ---------------------------------------------------------
-   8. Navigation Sidebar
+   9. Navigation Sidebar
    --------------------------------------------------------- */
 .md-nav__title {
   font-weight: 700;
@@ -364,18 +398,18 @@
 }
 
 .md-nav__link:hover {
-  background: rgba(0, 131, 143, 0.06);
+  background: rgba(124, 77, 255, 0.08);
   color: var(--aer-accent);
 }
 
 .md-nav__link--active {
   font-weight: 600;
   color: var(--aer-accent);
-  background: rgba(0, 131, 143, 0.08);
+  background: rgba(124, 77, 255, 0.10);
 }
 
 /* ---------------------------------------------------------
-   9. Search
+   10. Search
    --------------------------------------------------------- */
 .md-search__input {
   border-radius: var(--aer-radius-md);
@@ -399,19 +433,19 @@
 
 /* Search results highlight */
 .md-search-result__item:hover {
-  background: rgba(0, 131, 143, 0.05);
+  background: rgba(124, 77, 255, 0.05);
 }
 
 .md-search-result mark {
-  background: rgba(0, 131, 143, 0.15);
-  color: var(--aer-accent-dark);
+  background: rgba(124, 77, 255, 0.18);
+  color: var(--aer-primary-dark);
   font-weight: 600;
   border-radius: 2px;
   padding: 0 2px;
 }
 
 /* ---------------------------------------------------------
-   10. Scrollbars & Focus
+   11. Scrollbars & Focus
    --------------------------------------------------------- */
 ::-webkit-scrollbar {
   width: 8px;
@@ -448,7 +482,7 @@ button:focus-visible,
 }
 
 /* ---------------------------------------------------------
-   11. Footer
+   12. Footer
    --------------------------------------------------------- */
 .md-footer {
   background: var(--aer-surface-elevated);
@@ -465,12 +499,12 @@ button:focus-visible,
 }
 
 /* ---------------------------------------------------------
-   12. Homepage Hero (if used)
+   13. Homepage Hero
    --------------------------------------------------------- */
 .md-typeset .mdx-hero {
   text-align: center;
   padding: 3rem 1rem;
-  background: linear-gradient(135deg, rgba(26,35,126,0.03) 0%, rgba(0,131,143,0.03) 100%);
+  background: linear-gradient(135deg, rgba(123,30,58,0.04) 0%, rgba(124,77,255,0.04) 100%);
   border-radius: var(--aer-radius-lg);
   margin-bottom: 2rem;
 }
