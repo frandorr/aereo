@@ -7,13 +7,19 @@ name = "aer"
 version = "1.0.0"
 description = "Modular satellite data discovery, extraction, and processing framework"
 readme = "README.md"
+keywords = [ "aer", "earth-observation", "plugin", "remote-sensing", "satellite" ]
 license = "Apache-2.0"
 authors = [ { name = "Francisco Dorr" } ]
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Atmospheric Science",
 ]
 dependencies = [
   "attrs>=25.4",
@@ -41,6 +47,10 @@ dependencies = [
 ]
 optional-dependencies.aws-goes = [ "aer-search-aws-goes>=2" ]
 optional-dependencies.earthaccess = [ "aer-search-earthaccess>=1.1.1" ]
+urls.Documentation = "https://frandorr.github.io/aer"
+urls.Homepage = "https://github.com/frandorr/aer"
+urls.Issues = "https://github.com/frandorr/aer/issues"
+urls.Repository = "https://github.com/frandorr/aer"
 
 [dependency-groups]
 dev = [
@@ -95,7 +105,7 @@ ini_options.markers = [
 [tool.basedpyright]
 typeCheckingMode = "basic"
 reportMissingTypeStubs = false
-pythonVersion = "3.13"
+pythonVersion = "3.12"
 autoImportCompletions = true
 useLibraryCodeForTypes = true
 reportUnknownMemberType = false
