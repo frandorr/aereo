@@ -45,3 +45,14 @@ def test_03_multi_constellation_runs():
             f"(exit={result.returncode}). stderr: {result.stderr[:200]}"
         )
     assert Path("/tmp/03_multi_constellation.png").exists()
+
+
+def test_04_conform_to_ml_runs():
+    result = subprocess.run(
+        [sys.executable, str(EXAMPLES_DIR / "04_conform_to_ml.py")],
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    assert result.returncode == 0, result.stderr
+    assert Path("/tmp/04_conform_to_montage.png").exists()
