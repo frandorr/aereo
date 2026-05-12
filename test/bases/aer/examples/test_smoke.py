@@ -15,3 +15,14 @@ def test_01_goes_abi_runs():
     )
     assert result.returncode == 0, result.stderr
     assert Path("/tmp/01_goes_abi_mosaic.png").exists()
+
+
+def test_02_sentinel2_msi_runs():
+    result = subprocess.run(
+        [sys.executable, str(EXAMPLES_DIR / "02_sentinel2_msi.py")],
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    assert result.returncode == 0, result.stderr
+    assert Path("/tmp/02_sentinel2_rgb.png").exists()
