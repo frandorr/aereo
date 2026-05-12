@@ -43,6 +43,7 @@ def build_eoids_path(
     desc: str | None = None,
     suffix: str = "tif",
     write_profile_meta: bool = True,
+    **_kwargs: Any,
 ) -> Path:
     """Build an Earth Observation Imaging Data Structure (EOIDS) compliant file path.
 
