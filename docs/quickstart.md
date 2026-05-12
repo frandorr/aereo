@@ -10,6 +10,40 @@ Install AER and the GOES plugins:
 pip install aer-eo aer-search-aws-goes aer-extract-satpy
 ```
 
+## Understanding `AerProfile`
+
+Everything in AER revolves around the **`AerProfile`** — a single object that describes *what* you want to extract, *from which sensor*, and *how*.
+
+An `AerProfile` can be created in **Python**, loaded from **YAML**, or parsed from **JSON**:
+
+```python
+from aer.interfaces import AerProfile
+
+profile = AerProfile(
+    name="goes_c02",                          # human-readable identifier
+    resolution=500,                           # output pixel size in metres
+    collections={"ABI-L1b-RadF": ["C02"]},    # sensor collection → variables
+    plugin_hints={"search": "search_aws_goes", "extract": "extract_satpy"},
+    search_params={"satellite": "GOES-19"},   # forwarded to the search plugin
+    extract_params={"reader": "abi_l1b", "calibration": "reflectance"},
+)
+```
+
+**Key fields:**
+
+| Field | Purpose |
+|-------|---------|
+| `name` | Identifier for this profile (used in filenames and logs). |
+| `resolution` | Target pixel size in **metres** (e.g. `500` for 500 m). |
+| `collections` | Dict mapping collection names to variable/band lists. |
+| `plugin_hints` | Tells AER which search/extract plugins to use. |
+| `search_params` | Extra arguments forwarded to the search plugin (sensor-specific). |
+| `extract_params` | Extra arguments forwarded to the extract plugin (format-specific). |
+
+You can also load profiles from YAML — see [Using Plugins](using-plugins.md) for examples.
+
+---
+
 ## Step 1: Search
 
 Find granules matching your time range, area of interest, and profile.
