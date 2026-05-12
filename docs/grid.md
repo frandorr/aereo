@@ -113,23 +113,16 @@ client.prepare_for_extraction(
 
 ### Visual summary
 
-Imagine a circular satellite swath overlapping a 3 × 3 cell grid:
+Real VIIRS granule over Buenos Aires with a 128 km grid. Green cells are selected for extraction; red cells are discarded.
 
-```
-Intersection (default)          Within (fully inside)           Coverage ≥ 50 %
-┌───┬───┬───┐                   ┌───┬───┬───┐                   ┌───┬───┬───┐
-│ ✓ │ ✓ │ ✗ │                   │ ✗ │ ✗ │ ✗ │                   │ ✗ │ ✓ │ ✗ │
-├───┼───┼───┤                   ├───┼───┼───┤                   ├───┼───┼───┤
-│ ✓ │ ✓ │ ✗ │                   │ ✗ │ ✓ │ ✗ │                   │ ✗ │ ✓ │ ✗ │
-├───┼───┼───┤                   ├───┼───┼───┤                   ├───┼───┼───┤
-│ ✗ │ ✗ │ ✗ │                   │ ✗ │ ✗ │ ✗ │                   │ ✗ │ ✗ │ ✗ │
-└───┴───┴───┘                   └───┴───┴───┘                   └───┴───┴───┘
-```
+![Grid cell filtering modes comparison](assets/grid_filter_modes_comparison.png)
 
-*✓ = selected for extraction, ✗ = discarded*
+- **Intersection** (left, 34 cells selected) — keeps every cell the swath touches, even at a corner. Maximises coverage but may include mostly-empty cells.
+- **Within** (centre, 24 cells selected) — keeps only cells fully inside the asset geometry. Conservative; avoids edge effects.
+- **Coverage ≥ 50 %** (right, 29 cells selected) — keeps cells where at least half the cell area lies inside the swath. Tunable balance.
 
-- **Intersection** keeps every cell the swath touches, even at a corner.
-- **Within** keeps only the centre cell that is fully covered.
-- **Coverage** keeps cells where at least half the cell area lies inside the swath.
+The coverage heatmap below shows the exact overlap fraction for every cell. Green = fully covered, red = barely covered.
+
+![Cell coverage percentages](assets/grid_filter_coverage_detail.png)
 
 For an interactive demonstration with real satellite data, see the [Grid Filtering Modes notebook](https://github.com/frandorr/aer/blob/main/examples/grid/grid_filter_modes_demo.ipynb).
