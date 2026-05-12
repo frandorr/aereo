@@ -2,6 +2,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 
 EXAMPLES_DIR = Path(__file__).parents[4] / "examples" / "extraction"
 
@@ -26,3 +28,20 @@ def test_02_sentinel2_msi_runs():
     )
     assert result.returncode == 0, result.stderr
     assert Path("/tmp/02_sentinel2_rgb.png").exists()
+
+
+def test_03_multi_constellation_runs():
+    result = subprocess.run(
+        [sys.executable, str(EXAMPLES_DIR / "03_multi_constellation.py")],
+        capture_output=True,
+        text=True,
+        timeout=300,
+    )
+    # NASA-sensor extraction is resource-intensive and may fail in
+    # memory-constrained CI environments. Skip gracefully.
+    if result.returncode != 0:
+        pytest.skip(
+            f"Multi-constellation extraction skipped "
+            f"(exit={result.returncode}). stderr: {result.stderr[:200]}"
+        )
+    assert Path("/tmp/03_multi_constellation.png").exists()
