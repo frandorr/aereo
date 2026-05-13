@@ -21,10 +21,6 @@ class _PicklableExtractor(Extractor):
 
     supported_collections = ["GOES"]
 
-    @property
-    def target_grid_d(self) -> int:
-        return 10000
-
     def extract(
         self,
         extraction_task: ExtractionTask,
@@ -122,6 +118,24 @@ def test_extractor_abstract():
         DummyExtractor()  # pyright: ignore[reportAbstractUsage]
 
 
+def test_extractor_no_longer_requires_target_grid_d():
+    """Instantiating an extractor should not require target_grid_d."""
+    import pandas as pd
+
+    class DummyExtractor(Extractor, plugin_abstract=False):
+        supported_collections = ["test"]
+
+        def extract(
+            self,
+            extraction_task: ExtractionTask,
+            extract_params: dict[str, Any] | None,
+        ) -> GeoDataFrame[ArtifactSchema]:
+            return cast(GeoDataFrame[ArtifactSchema], pd.DataFrame())
+
+    extractor = DummyExtractor()
+    assert hasattr(extractor, "extract")
+
+
 def test_extractor_extract_batches(monkeypatch):
     extractor = _PicklableExtractor()
     monkeypatch.setattr("aer.schemas.ArtifactSchema.validate", lambda x: x)
@@ -136,18 +150,21 @@ def test_extractor_extract_batches(monkeypatch):
     from aer.interfaces.core import AerProfile
 
     profile = AerProfile(name="default", resolution=10.0)
+    grid_config = GridConfig(target_grid_dist=10_000)
 
     task1 = ExtractionTask(
         assets=cast(Any, df1),
         grid_cells=[],
         profile=profile,
         uri="test1",
+        grid_config=grid_config,
     )
     task2 = ExtractionTask(
         assets=cast(Any, df2),
         grid_cells=[],
         profile=profile,
         uri="test2",
+        grid_config=grid_config,
     )
 
     result = extractor.extract_batches([task1, task2])
@@ -171,18 +188,21 @@ def test_extractor_extract_batches_parallel(monkeypatch):
     from aer.interfaces.core import AerProfile
 
     profile = AerProfile(name="default", resolution=10.0)
+    grid_config = GridConfig(target_grid_dist=10_000)
 
     task1 = ExtractionTask(
         assets=cast(Any, df1),
         grid_cells=[],
         profile=profile,
         uri="test1",
+        grid_config=grid_config,
     )
     task2 = ExtractionTask(
         assets=cast(Any, df2),
         grid_cells=[],
         profile=profile,
         uri="test2",
+        grid_config=grid_config,
     )
 
     result = extractor.extract_batches([task1, task2], max_batch_workers=2)
@@ -194,10 +214,6 @@ def test_extractor_extract_batches_parallel(monkeypatch):
 def test_extractor_prepare_for_extraction():
     class LargeGridExtractor(Extractor):
         supported_collections = ["GOES"]
-
-        @property
-        def target_grid_d(self) -> int:
-            return 1000000  # Large grid to keep cell count low
 
         def extract(
             self,
@@ -225,33 +241,37 @@ def test_extractor_prepare_for_extraction():
         ],
     )
 
+    grid_config = GridConfig(target_grid_dist=1_000_000)
+    profile = AerProfile(name="test_profile", resolution=10.0)
+
     # Should raise error if uri not provided
     with pytest.raises(
         ValueError, match="Default prepare_for_extraction requires uri to be defined"
     ):
-        extractor.prepare_for_extraction(cast(Any, df))
-
-    profile = AerProfile(name="test_profile", resolution=10.0)
+        extractor.prepare_for_extraction(cast(Any, df), grid_config=grid_config)
 
     # Should raise error if profiles not provided
     with pytest.raises(
         ValueError,
         match="Default prepare_for_extraction requires at least one profile to be defined",
     ):
-        extractor.prepare_for_extraction(cast(Any, df), uri="test_uri")
+        extractor.prepare_for_extraction(
+            cast(Any, df), grid_config=grid_config, uri="test_uri"
+        )
 
     tasks = extractor.prepare_for_extraction(
         cast(Any, df),
+        grid_config=grid_config,
         profiles=[profile],
         uri="test_uri",
-        prepare_params={"cells_per_chunk": 1},
+        cells_per_chunk=1,
     )
 
     assert len(tasks) > 0
     assert tasks[0].profile.resolution == 10.0
     assert tasks[0].profile.name == "test_profile"
     assert tasks[0].uri == "test_uri"
-    assert tasks[0].prepare_params == {"cells_per_chunk": 1}
+    assert tasks[0].grid_config == grid_config
     assert tasks[0].aoi is None
     assert len(tasks[0].assets) == 2  # Both assets have same start_time and collection
     assert "start_time" in tasks[0].task_context
@@ -320,11 +340,13 @@ def test_extraction_task_accepts_aer_profile():
         geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
     )
     profile = AerProfile(name="test", resolution=10.0, collections={"GOES": ["var1"]})
+    grid_config = GridConfig(target_grid_dist=10_000)
     task = ExtractionTask(
         assets=cast(GeoDataFrame, df),
         profile=profile,
         uri="test",
         grid_cells=[],
+        grid_config=grid_config,
     )
     assert task.profile.name == "test"
 
@@ -397,10 +419,6 @@ def test_extract_batches_merges_profile_extract_params(monkeypatch):
     class _CapturingExtractor(Extractor):
         supported_collections = ["GOES"]
 
-        @property
-        def target_grid_d(self) -> int:
-            return 10000
-
         def extract(
             self,
             extraction_task: ExtractionTask,
@@ -423,11 +441,13 @@ def test_extract_batches_merges_profile_extract_params(monkeypatch):
         resolution=10.0,
         extract_params={"calibration": "reflectance"},
     )
+    grid_config = GridConfig(target_grid_dist=10_000)
     task = ExtractionTask(
         assets=cast(Any, df),
         grid_cells=[],
         profile=profile,
         uri="test1",
+        grid_config=grid_config,
     )
 
     extractor.extract_batches([task], extract_params={"calibration": "radiance"})
@@ -453,17 +473,13 @@ def test_merge_params_none_batch():
 
 
 def test_prepare_computes_common_shape_when_conform_enabled():
-    """When profile has conform_to set, task_context should contain conform_to_shape."""
+    """When profile has conform_to set, conform_to is read from profile, not task_context."""
     from datetime import datetime
 
     from aer.interfaces.core import AerProfile
 
     class ConformExtractor(Extractor):
         supported_collections = ["C1"]
-
-        @property
-        def target_grid_d(self) -> int:
-            return 100000  # Large grid to keep cell count low
 
         def extract(
             self,
@@ -492,30 +508,26 @@ def test_prepare_computes_common_shape_when_conform_enabled():
         conform_to=(256, 256),
     )
 
+    grid_config = GridConfig(target_grid_dist=100_000)
     tasks = extractor.prepare_for_extraction(
         cast(Any, df),
+        grid_config=grid_config,
         profiles=[profile],
         uri="test_uri",
     )
 
     assert len(tasks) > 0
-    assert "conform_to_shape" in tasks[0].task_context
-    assert isinstance(tasks[0].task_context["conform_to_shape"], tuple)
-    assert len(tasks[0].task_context["conform_to_shape"]) == 2
+    assert tasks[0].profile.conform_to == (256, 256)
 
 
 def test_prepare_does_not_compute_common_shape_when_conform_disabled():
-    """When profile has conform_to=None, task_context should NOT contain conform_to_shape."""
+    """When profile has conform_to=None, profile.conform_to is None."""
     from datetime import datetime
 
     from aer.interfaces.core import AerProfile
 
     class NoConformExtractor(Extractor):
         supported_collections = ["C1"]
-
-        @property
-        def target_grid_d(self) -> int:
-            return 100000
 
         def extract(
             self,
@@ -544,14 +556,16 @@ def test_prepare_does_not_compute_common_shape_when_conform_disabled():
         conform_to=None,
     )
 
+    grid_config = GridConfig(target_grid_dist=100_000)
     tasks = extractor.prepare_for_extraction(
         cast(Any, df),
+        grid_config=grid_config,
         profiles=[profile],
         uri="test_uri",
     )
 
     assert len(tasks) > 0
-    assert "conform_to_shape" not in tasks[0].task_context
+    assert tasks[0].profile.conform_to is None
 
 
 def test_grid_config_defaults_require_explicit_dist():

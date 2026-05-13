@@ -11,7 +11,7 @@ from pathlib import Path
 
 import geopandas as gpd
 from aer.client import AerClient
-from aer.interfaces import AerProfile
+from aer.interfaces import AerProfile, GridConfig
 
 # --- Configuration ---
 DATE_START = datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc)
@@ -56,14 +56,18 @@ print(results[["collection", "start_time", "end_time"]].to_string())
 # Prepare extraction tasks using the same profiles.
 # We use a coarse target_grid_dist (512 km) because GOES ABI native resolution is ~2 km.
 # cells_per_chunk=1 keeps the example fast and lightweight.
+grid = GridConfig(
+    target_grid_dist=512_000,
+    target_grid_overlap=False,
+)
+
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
+    grid_config=grid,
     target_aoi=aoi,
     uri=URI,
     profiles=profiles,
-    target_grid_dist=512_000,
-    target_grid_overlap=False,
-    prepare_params={"cells_per_chunk": 1},
+    cells_per_chunk=1,
 )
 
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)

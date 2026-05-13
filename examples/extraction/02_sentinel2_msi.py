@@ -15,7 +15,7 @@ from pathlib import Path
 
 import geopandas as gpd
 from aer.client import AerClient
-from aer.interfaces import AerProfile
+from aer.interfaces import AerProfile, GridConfig
 
 # --- Configuration ---
 # Use a historical date known to have Sentinel-2 coverage over Chocon AOI.
@@ -80,16 +80,20 @@ print(f"Kept {len(results)} representative result(s)")
 # We use a fine target_grid_dist (25.6 km) because Sentinel-2 MSI native
 # resolution is 10 m, so ~2560 px per cell.
 # cells_per_chunk=1 keeps the example fast and lightweight.
+grid = GridConfig(
+    target_grid_dist=50_000,
+    target_grid_overlap=False,
+    target_grid_margin=6.8,
+    grid_filter_mode="intersection",
+)
+
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
+    grid_config=grid,
     target_aoi=aoi,
     uri=URI,
     profiles=profiles,
-    target_grid_dist=25_600,
-    target_grid_overlap=False,
-    target_grid_margin=6.8,
-    grid_filter_mode="within",
-    prepare_params={"cells_per_chunk": 1},
+    cells_per_chunk=1,
 )
 
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)
@@ -101,7 +105,7 @@ print(f"Extracting {len(tasks)} task(s)...", flush=True)
 
 results_df = client.extract_batches(
     tasks,
-    max_batch_workers=8,
+    max_batch_workers=2,
 )
 print(f"Extracted {len(results_df)} artifacts")
 # %%
@@ -131,26 +135,24 @@ if artifact_paths:
         print(f"  Bands: {src.count} (expected 3 for B04+B03+B02)")
         print(f"  Shape: {src.shape}")
 
-# Mosaic each band separately and stack into RGB.
+# One AerProfile produces exactly one multi-band artifact.
+# Load it once via ``profile=profiles[0]`` (which derives collection and
+# variable from the AerProfile) and index the bands directly.
 # We set ``sort_by_coverage=False`` because Sentinel-2 tiles are dense
 # rectangles — the coverage sort would read every tile into memory just
 # to count pixels, which is very slow when mosaicking many tiles.
 # ``target_resolution=0.001`` (~100 m in degrees) keeps the preview fast
 # while still looking sharp on an 8" plot at 150 dpi.
-band_order = ["B04", "B03", "B02"]  # Red, Green, Blue
-band_mosaics = []
-for band in band_order:
-    mosaic, transform, crs = mosaic_eoids_tiles(
-        URI,
-        collection=collections[0],
-        variable=band,
-        sort_by_coverage=False,
-        target_resolution=0.001,
-    )
-    band_mosaics.append(mosaic[0])  # (1, H, W) -> (H, W)
+mosaic, transform, crs = mosaic_eoids_tiles(
+    URI,
+    profile=profiles[0],  # type: ignore[reportArgumentType]
+    sort_by_coverage=False,
+    target_resolution=0.001,
+)
 
-# Stack to (H, W, 3) for RGB display
-rgb = np.stack(band_mosaics, axis=-1).astype(np.float32)
+# Band order in the mosaic matches profile.collections order:
+# Band 1 = B04 (Red), Band 2 = B03 (Green), Band 3 = B02 (Blue)
+rgb = mosaic.transpose(1, 2, 0).astype(np.float32)  # (3, H, W) -> (H, W, 3)
 
 # Mask invalid pixels (nodata = 0, NaN)
 valid_mask = np.all((rgb > 0) & np.isfinite(rgb), axis=-1)
@@ -185,3 +187,9 @@ ax.set_ylabel("Latitude")
 plt.tight_layout()
 plt.savefig("/tmp/02_sentinel2_rgb.png", dpi=150)
 print("Saved RGB mosaic to /tmp/02_sentinel2_rgb.png")
+# %%
+import rioxarray  # noqa: E402
+
+rioxarray.open_rasterio(
+    "/tmp/02_sentinel2_msi_extraction/loc-89D118L/date-20240409/profile-s2_rgb/loc-89D118L_start-20240409T142711_end-20240409T142711_profile-s2_rgb_collection-sentinel-2-l2a_variable-B04+B03+B02_res-10m.tif"
+)

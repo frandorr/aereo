@@ -311,10 +311,8 @@ class ExtractionTask:
         profile: The AerProfile containing target variables and resolution.
         uri: Destination URI for extracted artifacts.
         grid_cells: Spatial grid cells this task covers.
+        grid_config: Tiling specification shared by all tasks in this run.
         aoi: Optional area-of-interest geometry used to clip the extraction region.
-        prepare_params: Parameters forwarded from ``prepare_for_extraction`` that drove
-            task construction (e.g. ``dataset_names``, ``cells_per_chunk``). Plugins can
-            read these in ``extract()`` without needing them re-passed via ``extract_params``.
         task_context: Observability metadata generated during task preparation
             (e.g. ``chunk_id``, ``total_chunks``, ``start_time``).
     """
@@ -323,8 +321,8 @@ class ExtractionTask:
     profile: AerProfile
     uri: str
     grid_cells: Sequence[GridCell]
+    grid_config: GridConfig
     aoi: BaseGeometry | None = None
-    prepare_params: Mapping[str, Any] = attrs.field(factory=dict)
     task_context: Mapping[str, Any] = attrs.field(factory=dict)
 
     def __attrs_post_init__(self) -> None:
@@ -373,28 +371,21 @@ def _extract_wrapper(
 
 
 class Extractor(AerPlugin, plugin_abstract=True):
-    @property
-    @abstractmethod
-    def target_grid_d(self) -> int:
-        """The size of the square grid cell in meters (e.g., 100000)."""
-        pass
+    """Base class for AER extraction plugins.
 
-    @property
-    def target_grid_overlap(self) -> bool:
-        """Default overlap setting. Subclasses can override this."""
-        return False
+    Subclasses must implement ``extract()``. Grid parameters are no longer
+    declared as plugin properties; they are supplied at preparation time via
+    ``GridConfig``.
+    """
 
     def prepare_for_extraction(
         self,
         search_results: GeoDataFrame[AssetSchema],
+        grid_config: GridConfig,
         target_aoi: BaseGeometry | None = None,
-        target_grid_dist: int | None = None,
-        target_grid_overlap: bool | None = None,
-        target_grid_margin: float = 0.0,
-        grid_filter_mode: str = "intersection",
         uri: str | None = None,
         profiles: Sequence[AerProfile] | None = None,
-        prepare_params: Mapping[str, Any] | None = None,
+        cells_per_chunk: int = 50,
     ) -> Sequence[ExtractionTask]:
         """Prepare extraction tasks by grouping assets by profile and start time, then chunking grid cells."""
         if uri is None:
@@ -407,17 +398,15 @@ class Extractor(AerPlugin, plugin_abstract=True):
                 "Default prepare_for_extraction requires at least one profile to be defined."
             )
 
-        prepare_params = prepare_params or {}
-        cells_per_chunk = int(prepare_params.get("cells_per_chunk", 50))
-
-        grid_dist = (
-            target_grid_dist if target_grid_dist is not None else self.target_grid_d
-        )
-        grid_overlap = (
-            target_grid_overlap
-            if target_grid_overlap is not None
-            else self.target_grid_overlap
-        )
+        grid_dist = grid_config.target_grid_dist
+        if grid_dist is None:
+            raise ValueError(
+                "GridConfig.target_grid_dist must be an explicit integer (e.g. 50_000)."
+            )
+        grid_overlap = grid_config.target_grid_overlap
+        target_grid_margin = grid_config.target_grid_margin
+        grid_filter_mode = grid_config.grid_filter_mode
+        min_coverage = grid_config.min_coverage
 
         from aer.grid import GridDefinition
 
@@ -469,7 +458,6 @@ class Extractor(AerPlugin, plugin_abstract=True):
                 # 5b. Optional grid cell filtering by asset coverage
                 _grid_filter_mode = str(grid_filter_mode).lower()
                 if _grid_filter_mode != "intersection":
-                    min_coverage = float(prepare_params.get("min_coverage", 0.0))
                     filtered_cells = []
                     for cell in all_cells:
                         cell_geom = cell.geom
@@ -531,17 +519,14 @@ class Extractor(AerPlugin, plugin_abstract=True):
                         "total_chunks": len(cell_chunks),
                         "start_time": str(start_time),
                     }
-                    if conform_to_shape is not None:
-                        task_context["conform_to_shape"] = conform_to_shape
-                    task_context["target_grid_margin"] = target_grid_margin
 
                     task = ExtractionTask(
                         assets=time_group,
                         profile=profile,
                         uri=uri,
                         grid_cells=cells,
+                        grid_config=grid_config,
                         aoi=target_aoi,
-                        prepare_params=prepare_params,
                         task_context=task_context,
                     )
                     tasks.append(task)
@@ -564,7 +549,6 @@ class Extractor(AerPlugin, plugin_abstract=True):
                 Domain-specific configuration such as ``padding`` should be
                 defined on ``extraction_task.profile`` (via its explicit
                 fields or ``extract_params``) rather than here.
-                Per-task preparation parameters are available on ``extraction_task.prepare_params``.
 
                 .. note::
                     When a downloader is needed, extractors should resolve it in this order:
