@@ -6,7 +6,8 @@
 #   1. Using old plugin name ``search_pc_sentinel2`` → PluginNotFoundError.
 #      Use ``search_planetary_computer`` (generic PC search) instead.
 #   2. Wrong collection name (``sentinel-2-l1c`` vs ``sentinel-2-l2a``) → empty results.
-#   3. Bands are declared in ``profile.collections``, not ``extract_params["assets"]``.
+#   3. Bands are declared in ``profile.collections``, n
+# ot ``extract_params["assets"]``.
 #      ``extract_odc_stac`` reads bands from the collections mapping directly.
 
 from datetime import datetime, timezone
@@ -64,9 +65,11 @@ results = client.search(
     intersects=aoi,
 )
 print(results[["collection", "start_time", "end_time"]].to_string())
-
+# %%
+_ = results.head(10)
+# %%
 # Keep a single representative asset to keep the example fast
-results = results.drop_duplicates(subset=["collection"])
+# results = results.drop_duplicates(subset=["collection"])
 print(f"Kept {len(results)} representative result(s)")
 
 # %%
@@ -81,6 +84,8 @@ tasks = client.prepare_for_extraction(
     profiles=profiles,
     target_grid_dist=25_600,
     target_grid_overlap=False,
+    target_grid_margin=6.8,
+    grid_filter_mode="within",
     prepare_params={"cells_per_chunk": 1},
 )
 
@@ -88,15 +93,16 @@ print(f"Prepared {len(tasks)} extraction tasks", flush=True)
 
 # For the smoke test we keep only the first task to stay within memory limits.
 # In production you would extract all tasks.
-tasks = tasks[:1]
+# tasks = tasks[:1]
 print(f"Extracting {len(tasks)} task(s)...", flush=True)
 
 results_df = client.extract_batches(
     tasks,
-    max_batch_workers=None,
+    max_batch_workers=8,
 )
 print(f"Extracted {len(results_df)} artifacts")
-
+# %%
+_ = tasks
 # %%
 # --- Mosaic & plot RGB composite ---
 import matplotlib.pyplot as plt  # noqa: E402
@@ -105,18 +111,26 @@ from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir  # noqa: E402
 from pyproj import Transformer  # noqa: E402
 from shapely.ops import transform as shapely_transform  # noqa: E402
 
-
 # Discover unique collections that were actually extracted
 entries = scan_eoids_dir(URI)
 collections = sorted({e["collection"] for e in entries})
 print(f"Collections to mosaic: {collections}")
 
-# Mosaic each band separately and stack into RGB
+# Mosaic each band separately and stack into RGB.
+# We set ``sort_by_coverage=False`` because Sentinel-2 tiles are dense
+# rectangles — the coverage sort would read every tile into memory just
+# to count pixels, which is very slow when mosaicking many tiles.
+# ``target_resolution=0.001`` (~100 m in degrees) keeps the preview fast
+# while still looking sharp on an 8" plot at 150 dpi.
 band_order = ["B04", "B03", "B02"]  # Red, Green, Blue
 band_mosaics = []
 for band in band_order:
     mosaic, transform, crs = mosaic_eoids_tiles(
-        URI, collection=collections[0], variable=band
+        URI,
+        collection=collections[0],
+        variable=band,
+        sort_by_coverage=False,
+        target_resolution=0.001,
     )
     band_mosaics.append(mosaic[0])  # (1, H, W) -> (H, W)
 
@@ -140,6 +154,7 @@ extent = (
     transform.f + transform.e * rgb.shape[0],
     transform.f,
 )
+print(rgb.shape)
 ax.imshow(rgb, extent=extent)
 
 # Reproject AOI boundary to mosaic CRS and overlay it

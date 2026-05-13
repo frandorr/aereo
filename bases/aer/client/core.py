@@ -322,6 +322,8 @@ class AerClient:
         init_params: Optional[Mapping[str, Any]] = None,
         target_grid_dist: Optional[int] = None,
         target_grid_overlap: Optional[bool] = None,
+        target_grid_margin: float = 0.0,
+        grid_filter_mode: str = "intersection",
     ) -> Sequence[ExtractionTask]:
         """Groups search results by collection and distributes batches to appropriate Extractors.
 
@@ -346,6 +348,12 @@ class AerClient:
                 property is used.
             target_grid_overlap (Optional[bool]): Override the extractor's default grid overlap setting.
                 When ``None``, the extractor's ``target_grid_overlap`` property is used.
+            target_grid_margin (float): Percentage margin added to each grid cell's
+                nominal size (e.g. ``6.8`` for a 6.8% overlap like MajorTOM Core).
+            grid_filter_mode (str): How to filter grid cells against the AOI.
+                ``"intersection"`` keeps any cell that intersects the AOI (default).
+                ``"within"`` keeps only cells fully inside the AOI.
+                ``"coverage"`` keeps cells with at least ``min_coverage`` overlap.
 
         Returns:
             A Sequence of prepared ExtractionTasks.
@@ -419,6 +427,8 @@ class AerClient:
             target_aoi=norm_intersects,
             target_grid_dist=target_grid_dist,
             target_grid_overlap=target_grid_overlap,
+            target_grid_margin=target_grid_margin,
+            grid_filter_mode=grid_filter_mode,
             uri=uri,
             profiles=resolved_profiles,
             prepare_params=c_params,

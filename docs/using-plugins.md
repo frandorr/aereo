@@ -21,7 +21,7 @@ Pick the combination that matches your data source and copy-paste the command:
 | Sensor | Search Plugin | Extract Plugin | Install Command |
 |--------|---------------|----------------|-----------------|
 | **GOES ABI** (public S3, no auth) | `aer-search-aws-goes` | `aer-extract-satpy` | `pip install aer-search-aws-goes aer-extract-satpy` |
-| **Sentinel-2** (Planetary Computer) | `aer-search-pc-sentinel2` | `aer-extract-pc-sentinel2` | `pip install aer-search-pc-sentinel2 aer-extract-pc-sentinel2` |
+| **Sentinel-2** (Planetary Computer) | `aer-search-planetary-computer` | `aer-extract-odc-stac` | `pip install aer-search-planetary-computer aer-extract-odc-stac` |
 | **MODIS / VIIRS** (NASA Earthdata) | `aer-search-earthaccess` | `aer-extract-satpy` | `pip install aer-search-earthaccess aer-extract-satpy` |
 
 ```bash
@@ -29,7 +29,7 @@ Pick the combination that matches your data source and copy-paste the command:
 pip install aer-search-aws-goes aer-extract-satpy
 
 # Sentinel-2
-pip install aer-search-pc-sentinel2 aer-extract-pc-sentinel2
+pip install aer-search-planetary-computer aer-extract-odc-stac
 
 # NASA sensors (MODIS, VIIRS, Sentinel-3)
 pip install aer-search-earthaccess aer-extract-satpy
