@@ -5,7 +5,7 @@ from typing import Any, Mapping, Optional, Sequence, cast
 
 import pandas as pd
 import json
-from aer.interfaces import AerProfile, ExtractionTask, merge_params
+from aer.interfaces import AerProfile, ExtractionTask, GridConfig, merge_params
 from aer.registry import AerRegistry
 from aer.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -314,46 +314,26 @@ class AerClient:
     def prepare_for_extraction(
         self,
         search_results: GeoDataFrame[AssetSchema],
+        grid_config: GridConfig,
         target_aoi: Optional[BaseGeometry | dict] = None,
         resolution: Optional[float] = None,
         uri: Optional[str] = None,
         profiles: Optional[Sequence[AerProfile]] = None,
-        prepare_params: Optional[Mapping[str, Any]] = None,
+        cells_per_chunk: int = 50,
         init_params: Optional[Mapping[str, Any]] = None,
-        target_grid_dist: Optional[int] = None,
-        target_grid_overlap: Optional[bool] = None,
-        target_grid_margin: float = 0.0,
-        grid_filter_mode: str = "intersection",
     ) -> Sequence[ExtractionTask]:
         """Groups search results by collection and distributes batches to appropriate Extractors.
 
         Args:
             search_results: The merged GeoDataFrame of search results to prepare.
+            grid_config: Explicit tiling specification. All profiles share this grid.
             target_aoi: Optional area of interest as a shapely geometry.
             resolution: The desired resolution for extraction. If provided, a default profile is created.
             uri: An optional URI defining output path or identifier.
             profiles: A sequence of AerProfile objects. If provided, they take precedence over resolution.
-            prepare_params: Additional parameters to pass to prepare_for_extraction method.
+            cells_per_chunk: Max grid cells per ExtractionTask (default 50).
             init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for extractor instantiation.
-                Supports global and per-collection overrides, matching the ``prepare_params`` pattern::
-
-                    # Override target_grid_d for a specific collection
-                    init_params={"ABI-L1b-RadC": {"target_grid_d": 50_000}}
-
-                    # Or globally for all extractors
-                    init_params={"target_grid_d": 50_000}
-
-            target_grid_dist (Optional[int]): Override the extractor's default grid cell size in meters
-                (e.g. ``100_000`` for 100 km cells).  When ``None``, the extractor's ``target_grid_d``
-                property is used.
-            target_grid_overlap (Optional[bool]): Override the extractor's default grid overlap setting.
-                When ``None``, the extractor's ``target_grid_overlap`` property is used.
-            target_grid_margin (float): Percentage margin added to each grid cell's
-                nominal size (e.g. ``6.8`` for a 6.8% overlap like MajorTOM Core).
-            grid_filter_mode (str): How to filter grid cells against the AOI.
-                ``"intersection"`` keeps any cell that intersects the AOI (default).
-                ``"within"`` keeps only cells fully inside the AOI.
-                ``"coverage"`` keeps cells with at least ``min_coverage`` overlap.
+                Passed as a flat dict to the extractor constructor.
 
         Returns:
             A Sequence of prepared ExtractionTasks.
@@ -410,10 +390,9 @@ class AerClient:
             else ""
         )
 
-        # Resolve init and prepare params
+        # Resolve init params and instantiate extractor
         c_init = self._resolve_params(init_params, first_collection)
         extractor = self.registry.get_extractor(target_plugin, **c_init)
-        c_params = self._resolve_params(prepare_params, first_collection)
 
         logger.debug(
             "prepare_batches_start",
@@ -424,14 +403,11 @@ class AerClient:
         # Pass full search results to extractor (profile filtering happens there)
         batches = extractor.prepare_for_extraction(
             cast(GeoDataFrame, search_results),
+            grid_config=grid_config,
             target_aoi=norm_intersects,
-            target_grid_dist=target_grid_dist,
-            target_grid_overlap=target_grid_overlap,
-            target_grid_margin=target_grid_margin,
-            grid_filter_mode=grid_filter_mode,
             uri=uri,
             profiles=resolved_profiles,
-            prepare_params=c_params,
+            cells_per_chunk=cells_per_chunk,
         )
 
         all_tasks.extend(batches)

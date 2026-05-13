@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 
 from aer.client import AerClient
-from aer.interfaces import AerProfile
+from aer.interfaces import AerProfile, GridConfig
 from shapely.geometry import box
 
 # --- Configuration ---
@@ -43,14 +43,18 @@ results = client.search(
 print(results[["collection", "start_time", "end_time"]].to_string())
 # %%
 # Now we prepare the extraction tasks using the same profiles
+grid = GridConfig(
+    target_grid_dist=256_000,
+    target_grid_overlap=False,
+)
+
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
+    grid_config=grid,
     target_aoi=aoi,
     uri=URI,
     profiles=profiles,
-    target_grid_dist=256000,
-    target_grid_overlap=False,
-    prepare_params={"cells_per_chunk": 10},
+    cells_per_chunk=10,
 )
 
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)

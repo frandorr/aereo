@@ -17,7 +17,7 @@ from pathlib import Path
 
 import geopandas as gpd
 from aer.client import AerClient
-from aer.interfaces import AerProfile
+from aer.interfaces import AerProfile, GridConfig
 
 # --- Configuration ---
 # Use a historical date known to have Sentinel-2 coverage over Chocon AOI.
@@ -75,14 +75,18 @@ print(f"Kept {len(results)} representative result(s)")
 # Prepare extraction tasks with conform_to and padding.
 # padding=16 means each side gets 16 extra pixels, so the total raster
 # dimensions are conform_shape + 2*padding = (288, 288).
+grid = GridConfig(
+    target_grid_dist=PATCH_KM,
+    target_grid_overlap=False,
+)
+
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
+    grid_config=grid,
     target_aoi=aoi,
     uri=URI,
     profiles=profiles,
-    target_grid_dist=PATCH_KM,
-    target_grid_overlap=False,
-    prepare_params={"cells_per_chunk": 1},
+    cells_per_chunk=1,
 )
 
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)

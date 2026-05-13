@@ -19,7 +19,7 @@ from pathlib import Path
 
 import geopandas as gpd
 from aer.client import AerClient
-from aer.interfaces import AerProfile
+from aer.interfaces import AerProfile, GridConfig
 from aer.search_earthaccess import earthaccess_download_wrapper
 
 # --- Configuration ---
@@ -114,14 +114,18 @@ print(results[["collection", "start_time", "end_time"]].to_string())  # type: ig
 # Prepare extraction tasks.  A compromise target_grid_dist (256 km) lets all
 # sensors extract the same geographic region despite very different native
 # resolutions.
+grid = GridConfig(
+    target_grid_dist=256_000,
+    target_grid_overlap=False,
+)
+
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
+    grid_config=grid,
     target_aoi=aoi,
     uri=URI,
     profiles=profiles,
-    target_grid_dist=256_000,
-    target_grid_overlap=False,
-    prepare_params={"cells_per_chunk": 10},
+    cells_per_chunk=10,
 )
 
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)

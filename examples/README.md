@@ -219,15 +219,20 @@ Using a real VIIRS granule over Buenos Aires (13 grid cells total):
 ### Usage
 
 ```python
+from aer.interfaces import GridConfig
+
+grid = GridConfig(
+    target_grid_dist=50_000,
+    grid_filter_mode="coverage",
+    min_coverage=0.5,
+)
+
 client.prepare_for_extraction(
     search_results=results,
+    grid_config=grid,
     profiles=profiles,
     uri="output/extraction",
-    prepare_params={
-        "grid_filter_mode": "coverage",   # or "intersection", "within"
-        "min_coverage": 0.5,               # 0.0 to 1.0, only for "coverage" mode
-        "cells_per_chunk": 10,
-    },
+    cells_per_chunk=10,
 )
 ```
 

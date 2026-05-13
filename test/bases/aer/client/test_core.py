@@ -5,7 +5,7 @@ import pytest
 import pandas as pd
 from shapely.geometry import Point
 
-from aer.interfaces.core import AerProfile, ExtractionTask
+from aer.interfaces.core import AerProfile, ExtractionTask, GridConfig
 from aer.registry.core import AerRegistry
 from aer.client.core import AerClient, FailureMode, normalize_geometry
 from aer.schemas.core import AssetSchema
@@ -348,11 +348,13 @@ def _make_prepare_client(monkeypatch, valid_search_df):
     mock_registry.find_extractors_for.return_value = ["dummy_extractor"]
     mock_extractor = MagicMock()
 
+    grid_config = GridConfig(target_grid_dist=10_000)
     task = ExtractionTask(
         assets=cast(GeoDataFrame, valid_search_df),
         profile=AerProfile(name="test", resolution=10, collections={"MODIS": ["var1"]}),
         uri="test-uri",
         grid_cells=[],
+        grid_config=grid_config,
     )
     mock_extractor.prepare_for_extraction.return_value = [task]
     mock_registry.get_extractor.return_value = mock_extractor
@@ -369,52 +371,52 @@ def _make_valid_search_df():
     return valid_df
 
 
-def test_prepare_for_extraction_passes_target_grid_dist(monkeypatch):
-    """target_grid_dist kwarg must be forwarded to extractor.prepare_for_extraction."""
+def test_prepare_for_extraction_passes_grid_config(monkeypatch):
+    """grid_config must be forwarded to extractor.prepare_for_extraction."""
     valid_search_df = _make_valid_search_df()
     client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
 
+    grid_config = GridConfig(target_grid_dist=50_000)
     client.prepare_for_extraction(
         search_results=cast(GeoDataFrame, valid_search_df),
-        resolution=100.0,
-        uri="s3://bucket/out/",
-        target_grid_dist=50_000,
-    )
-
-    call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
-    assert call_kwargs.get("target_grid_dist") == 50_000
-
-
-def test_prepare_for_extraction_passes_target_grid_overlap(monkeypatch):
-    """target_grid_overlap kwarg must be forwarded to extractor.prepare_for_extraction."""
-    valid_search_df = _make_valid_search_df()
-    client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
-
-    client.prepare_for_extraction(
-        search_results=cast(GeoDataFrame, valid_search_df),
-        resolution=100.0,
-        uri="s3://bucket/out/",
-        target_grid_overlap=True,
-    )
-
-    call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
-    assert call_kwargs.get("target_grid_overlap") is True
-
-
-def test_prepare_for_extraction_passes_none_grid_params_by_default(monkeypatch):
-    """When not supplied, both grid params should be forwarded as None (defer to extractor)."""
-    valid_search_df = _make_valid_search_df()
-    client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
-
-    client.prepare_for_extraction(
-        search_results=cast(GeoDataFrame, valid_search_df),
+        grid_config=grid_config,
         resolution=100.0,
         uri="s3://bucket/out/",
     )
 
     call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
-    assert call_kwargs.get("target_grid_dist") is None
-    assert call_kwargs.get("target_grid_overlap") is None
+    assert call_kwargs.get("grid_config") == grid_config
+
+
+def test_prepare_for_extraction_passes_cells_per_chunk(monkeypatch):
+    """cells_per_chunk must be forwarded to extractor.prepare_for_extraction."""
+    valid_search_df = _make_valid_search_df()
+    client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
+
+    grid_config = GridConfig(target_grid_dist=50_000)
+    client.prepare_for_extraction(
+        search_results=cast(GeoDataFrame, valid_search_df),
+        grid_config=grid_config,
+        resolution=100.0,
+        uri="s3://bucket/out/",
+        cells_per_chunk=10,
+    )
+
+    call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
+    assert call_kwargs.get("cells_per_chunk") == 10
+
+
+def test_prepare_for_extraction_requires_grid_config(monkeypatch):
+    """grid_config is a required positional argument."""
+    valid_search_df = _make_valid_search_df()
+    client, _ = _make_prepare_client(monkeypatch, valid_search_df)
+
+    with pytest.raises(TypeError):
+        client.prepare_for_extraction(
+            search_results=cast(GeoDataFrame, valid_search_df),
+            resolution=100.0,
+            uri="s3://bucket/out/",
+        )  # type: ignore[reportCallIssue]
 
 
 def test_prepare_uses_profile_extract_hint(monkeypatch):
@@ -439,8 +441,10 @@ def test_prepare_uses_profile_extract_hint(monkeypatch):
         collections={"MODIS": ["var1"]},
         plugin_hints={"extract": "my_extractor"},
     )
+    grid_config = GridConfig(target_grid_dist=50_000)
     client.prepare_for_extraction(
         search_results=cast(GeoDataFrame, valid_df),
+        grid_config=grid_config,
         profiles=[profile],
         uri="s3://out",
     )
@@ -474,11 +478,13 @@ def test_extract_batches_with_profile_hint(monkeypatch):
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
     valid_df["geometry"] = Point(0, 0)
     valid_df["collection"] = "ABI-L1b-RadC"
+    grid_config = GridConfig(target_grid_dist=50_000)
     task = ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
         profile=profile,
         uri="test",
         grid_cells=[],
+        grid_config=grid_config,
     )
     client.extract_batches([task])
     mock_registry.get_extractor.assert_called_once_with("aer-extract-aws-goes")
@@ -520,17 +526,20 @@ def test_extract_batches_uses_profile_specific_downloaders(monkeypatch):
     valid_df["geometry"] = Point(0, 0)
     valid_df["collection"] = "C1"
 
+    grid_config = GridConfig(target_grid_dist=50_000)
     task_a = ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
         profile=profile_a,
         uri="test",
         grid_cells=[],
+        grid_config=grid_config,
     )
     task_b = ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
         profile=profile_b,
         uri="test",
         grid_cells=[],
+        grid_config=grid_config,
     )
 
     client.extract_batches([task_a, task_b])
@@ -567,11 +576,13 @@ def test_extract_batches_falls_back_to_batch_downloader(monkeypatch):
     valid_df["geometry"] = Point(0, 0)
     valid_df["collection"] = "C1"
 
+    grid_config = GridConfig(target_grid_dist=50_000)
     task = ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
         profile=profile,
         uri="test",
         grid_cells=[],
+        grid_config=grid_config,
     )
 
     client.extract_batches([task], extract_params={"downloader": batch_downloader})
@@ -683,17 +694,20 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
     mock_registry.get_extractor.return_value = _CapturingExtractor()
     monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
 
+    grid_config = GridConfig(target_grid_dist=50_000)
     task_a = ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
         profile=profile_a,
         uri="test",
         grid_cells=[],
+        grid_config=grid_config,
     )
     task_b = ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
         profile=profile_b,
         uri="test",
         grid_cells=[],
+        grid_config=grid_config,
     )
 
     client.extract_batches(
