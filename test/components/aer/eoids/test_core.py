@@ -5,9 +5,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 import rasterio
-from rasterio.crs import CRS
-from rasterio.transform import from_bounds
-
 from aer.eoids import (
     build_eoids_path,
     load_eoids_tiles,
@@ -16,7 +13,8 @@ from aer.eoids import (
     scan_eoids_dir,
 )
 from aer.interfaces import AerProfile
-
+from rasterio.crs import CRS
+from rasterio.transform import from_bounds
 
 # -----------------------------------------------------------------------
 # Fixtures
@@ -476,3 +474,34 @@ class TestMosaicEoidsTiles:
         )
         assert mosaic.shape[0] == 1
         assert np.any(mosaic == 42.0)
+
+    def test_mosaic_sort_by_coverage_false(self, eoids_tree):
+        """Skipping coverage sort should still produce a valid mosaic."""
+        mosaic, transform, crs = mosaic_eoids_tiles(
+            eoids_tree,
+            date="20260101",
+            target_crs="EPSG:4326",
+            sort_by_coverage=False,
+        )
+        assert isinstance(mosaic, np.ndarray)
+        assert mosaic.ndim == 3
+        assert crs == CRS.from_epsg(4326)
+
+    def test_mosaic_target_resolution(self, eoids_tree):
+        """Downsampling via target_resolution should shrink the output."""
+        mosaic_full, _, _ = mosaic_eoids_tiles(
+            eoids_tree,
+            date="20260101",
+            target_crs="EPSG:4326",
+            sort_by_coverage=False,
+        )
+        mosaic_down, _, _ = mosaic_eoids_tiles(
+            eoids_tree,
+            date="20260101",
+            target_crs="EPSG:4326",
+            sort_by_coverage=False,
+            target_resolution=1.0,
+        )
+        # A 1-degree resolution mosaic must be smaller than the native one.
+        assert mosaic_down.shape[1] < mosaic_full.shape[1]
+        assert mosaic_down.shape[2] < mosaic_full.shape[2]

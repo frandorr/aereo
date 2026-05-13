@@ -1,18 +1,18 @@
 import datetime
 import re
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import rasterio
+from aer.interfaces import AerProfile
 from numpy.typing import NDArray
 from rasterio.crs import CRS
 from rasterio.merge import merge
 from rasterio.transform import Affine
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import Resampling
-
-from aer.interfaces import AerProfile
 
 # Known EOIDS key tokens — order matters for greedy matching
 _EOIDS_KEYS = (
@@ -309,6 +309,8 @@ def mosaic_eoids_tiles(
     target_crs: str | CRS = "EPSG:4326",
     resampling: Resampling = Resampling.nearest,
     nodata: float | None = None,
+    sort_by_coverage: bool = True,
+    target_resolution: float | None = None,
 ) -> tuple[NDArray[np.floating[Any]], Affine, CRS]:
     """Load and mosaic EOIDS tiles into a single array in a common CRS.
 
@@ -330,6 +332,18 @@ def mosaic_eoids_tiles(
         resampling: Resampling method for warping (default: nearest).
         nodata: Value to treat as nodata.  When *None*, the value embedded in
             each GeoTIFF is used (if available).
+        sort_by_coverage: When ``True`` (default), tiles are ordered by
+            descending valid-pixel count so that tiles with the most coverage
+            are processed first by ``merge(method='first')``.  This prevents
+            sparse tiles from blocking valid data in overlapping areas, but
+            requires reading every tile into memory and can be very slow for
+            large numbers of dense tiles.  Set to ``False`` to skip this step
+            when all tiles are known to be fully valid (e.g. Sentinel-2).
+        target_resolution: If provided, the mosaic is built at this output
+            resolution (in the units of *target_crs*).  For example, ``100``
+            builds a 100 m mosaic from 10 m source tiles.  This dramatically
+            reduces memory use and compute time when you only need a coarse
+            preview.  If *None* (default), the native source resolution is used.
 
     Returns:
         A 3-tuple of ``(mosaic, transform, crs)`` where *mosaic* is a
@@ -356,16 +370,28 @@ def mosaic_eoids_tiles(
 
     dst_crs = CRS.from_user_input(target_crs)
 
-    # Sort by descending valid-pixel count so that tiles with the most
-    # coverage are processed first by merge(method='first').  This prevents
-    # sparse tiles (which may contain NaN outside the actual swath) from
-    # blocking valid data in overlapping areas.
-    def _valid_count(entry: dict[str, Any]) -> int:
-        with rasterio.open(entry["path"]) as src:
-            data = src.read(1)
-            return int(np.sum(~np.isnan(data) & (data != 0)))
+    if sort_by_coverage:
+        # Sort by descending valid-pixel count so that tiles with the most
+        # coverage are processed first by merge(method='first').  This prevents
+        # sparse tiles (which may contain NaN outside the actual swath) from
+        # blocking valid data in overlapping areas.
+        def _valid_count(entry: dict[str, Any]) -> int:
+            with rasterio.open(entry["path"]) as src:
+                data = src.read(1)
+                return int(np.sum(~np.isnan(data) & (data != 0)))
 
-    entries.sort(key=_valid_count, reverse=True)
+        # Parallelise the reads — they are I/O-bound so threads work well.
+        if len(entries) > 1:
+            with ThreadPoolExecutor(max_workers=min(8, len(entries))) as ex:
+                counts = list(ex.map(_valid_count, entries))
+            entries = [
+                e
+                for _, e in sorted(
+                    zip(counts, entries), key=lambda ce: ce[0], reverse=True
+                )
+            ]
+        else:
+            entries.sort(key=_valid_count, reverse=True)
 
     datasets: list[WarpedVRT | rasterio.DatasetReader] = []
     opened: list[rasterio.DatasetReader] = []
@@ -387,7 +413,10 @@ def mosaic_eoids_tiles(
                 )
                 datasets.append(vrt)
 
-        mosaic, out_transform = merge(datasets, nodata=nodata)
+        merge_kwargs: dict[str, Any] = {"nodata": nodata}
+        if target_resolution is not None:
+            merge_kwargs["res"] = target_resolution
+        mosaic, out_transform = merge(datasets, **merge_kwargs)
     finally:
         for ds in datasets:
             if isinstance(ds, WarpedVRT):

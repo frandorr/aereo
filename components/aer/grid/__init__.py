@@ -1,9 +1,10 @@
 """
 Grid module built on the Major TOM grid (via ``majortom_eg``).
 
-``GridCell.area_def()`` returns an :class:`odc.geo.geobox.GeoBox` aligned to the
-cell's UTM footprint.  ``GridDefinition.max_shape()`` builds real GeoBox
-instances to determine the largest pixel dimensions across a batch of cells.
+``GridCell.area_def()`` returns an :class:`odc.geo.geobox.GeoBox` centred on the
+cell's grid point with a fixed size of ``D * (1 + margin/100)`` metres.
+``GridDefinition.max_shape()`` builds real GeoBox instances to determine the
+largest pixel dimensions across a batch of cells.
 
 The legacy ``AreaDef`` dataclass has been removed — downstream code that needs
 pyresample YAML should construct it locally with ``_geobox_to_pyresample_yaml()``

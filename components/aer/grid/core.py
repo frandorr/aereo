@@ -18,8 +18,9 @@ class GridCell(BaseGridCell):
     """
     A grid cell that represents a polygon and whether it is a primary or overlapping cell.
 
-    ``area_def()`` returns an :class:`odc.geo.geobox.GeoBox` aligned to the cell's
-    UTM footprint.  Use ``area_name()`` when you need a human-readable identifier
+    ``area_def()`` returns an :class:`odc.geo.geobox.GeoBox` centred on the
+    cell's grid point with a fixed size of ``D * (1 + margin/100)`` metres.
+    Use ``area_name()`` when you need a human-readable identifier
     for the cell at a given resolution.
     """
 
@@ -82,10 +83,16 @@ class GridCell(BaseGridCell):
         self,
         resolution: int,
         padding: int = 0,
+        margin: float = 0.0,
         conform_to: tuple[int, int] | None = None,
         **geobox_kwargs: Any,
     ) -> GeoBox:
         """Return an odc-geo GeoBox for this cell's UTM footprint.
+
+        The extent is a fixed-size square centred on the MajorTOM grid point
+        (the WGS84 centroid reprojected to UTM).  This guarantees that
+        extractions of the same cell from different scenes align pixel-wise,
+        and that neighbouring cells overlap slightly when ``margin > 0``.
 
         Parameters
         ----------
@@ -93,6 +100,12 @@ class GridCell(BaseGridCell):
             Pixel size in metres.
         padding:
             Extra pixels to add on all sides (uses ``GeoBox.pad``).
+        margin:
+            Percentage margin added to the nominal cell size ``self.D``
+            when computing the extraction extent.  For example,
+            ``margin=6.8`` produces a 10.68 km × 10.68 km box for a
+            D=10 km cell (the MajorTOM Core standard).  Adjacent cells
+            then overlap by design, eliminating gaps at cell edges.
         conform_to:
             Force a uniform ``(width, height)`` across a batch. When provided,
             ``tight=True`` is enforced internally so that every cell has the
@@ -101,13 +114,21 @@ class GridCell(BaseGridCell):
             Forwarded to ``GeoBox.from_bbox``. The default ``anchor`` is
             ``'edge'`` (top-left pixel-grid alignment).
         """
-        bounds = self.utm_footprint.bounds
+        # MajorTOM grid point in UTM — the deterministic anchor for this cell
+        utm_centroid = cast(
+            Point,
+            reproject_geom(
+                self.geom.centroid, src_epsg="epsg:4326", dst_epsg=self.utm_crs
+            ),
+        )
+        # Snap centre to the resolution grid so that pixel edges are
+        # deterministic and identical across all cells at the same resolution.
+        cx = round(utm_centroid.x / resolution) * resolution
+        cy = round(utm_centroid.y / resolution) * resolution
         crs = self.utm_crs
 
         if conform_to is not None:
             target_w, target_h = conform_to
-            cx = (bounds[0] + bounds[2]) / 2
-            cy = (bounds[1] + bounds[3]) / 2
             half_w = (target_w * resolution) / 2
             half_h = (target_h * resolution) / 2
             bbox = (cx - half_w, cy - half_h, cx + half_w, cy + half_h)
@@ -119,9 +140,9 @@ class GridCell(BaseGridCell):
             )
         else:
             geobox_kwargs.setdefault("anchor", "edge")
-            geobox = GeoBox.from_bbox(
-                bounds, crs, resolution=resolution, **geobox_kwargs
-            )
+            half = (self.D * (1 + margin / 100)) / 2
+            bbox = (cx - half, cy - half, cx + half, cy + half)
+            geobox = GeoBox.from_bbox(bbox, crs, resolution=resolution, **geobox_kwargs)
 
         if padding:
             geobox = geobox.pad(padding)
@@ -329,6 +350,7 @@ class GridDefinition(MajorTomGrid):
         cells: Sequence[GridCell],
         resolution: int,
         padding: int = 0,
+        margin: float = 0.0,
         **geobox_kwargs: Any,
     ) -> tuple[int, int]:
         """Return the maximum (width, height) in pixels across *cells*.
@@ -341,13 +363,15 @@ class GridDefinition(MajorTomGrid):
             resolution: Pixel size in metres.
             padding: Number of extra pixels added on each side (same semantics as
                 :meth:`GridCell.area_def`).
+            margin: Percentage margin added to ``self.D`` (same semantics as
+                :meth:`GridCell.area_def`).
             **geobox_kwargs: Forwarded to :meth:`GridCell.area_def`.
 
         Returns:
             Tuple of ``(max_width, max_height)`` in pixels.
         """
         shapes = [
-            cell.area_def(resolution, padding=0, **geobox_kwargs).shape
+            cell.area_def(resolution, padding=0, margin=margin, **geobox_kwargs).shape
             for cell in cells
         ]
         max_w = max((s.x for s in shapes), default=0)

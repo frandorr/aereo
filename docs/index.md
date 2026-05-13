@@ -8,9 +8,25 @@
   Plugin-based satellite data extraction — from search to analysis-ready Major TOM grid in minutes.
 </h1>
 
+
 ---
 
-## TL;DR
+## What is AER?
+
+**AER** is a Python framework that makes extracting satellite imagery as easy as running a few lines of code. It handles the entire pipeline — **search**, **prepare**, and **extract** — so you can go from raw sensor archives to a grid-aligned GeoTIFF (or whatever format you prefer).
+
+Whether you are working with **GOES**, **MODIS**, **VIIRS**, **Sentinel-2**, **Sentinel-3**, or any other satellite, AER lets you mix and match sensors through a unified interface by using a **plugin-based approach**. No need to learn a different API for every data provider.
+
+```mermaid
+graph LR
+    A[Search] --> B[Prepare]
+    B --> C[Extract]
+    C --> D[MajorTom Grid]
+```
+
+---
+
+Or in plain Python:
 
 ```python
 from aer.client import AerClient
@@ -22,20 +38,6 @@ tasks = client.prepare_for_extraction(results, profiles=[...], uri="out")
 artifacts = client.extract_batches(tasks)
 ```
 
----
-
-## What is AER?
-
-**AER** is a Python framework that makes extracting satellite imagery as easy as running a few lines of code. It handles the entire pipeline — **search**, **prepare**, and **extract** — so you can go from raw sensor archives to a grid-aligned GeoTIFF (or PNG) in minutes, not hours.
-
-Whether you are working with **GOES**, **MODIS**, **VIIRS**, **Sentinel-2**, or **Sentinel-3**, AER lets you mix and match sensors through a unified interface. No need to learn a different API for every data provider.
-
-```mermaid
-graph LR
-    A[Search] --> B[Prepare]
-    B --> C[Extract]
-    C --> D[EOIDS Output]
-```
 
 <p align="center">
   <!-- ARCHITECTURE DIAGRAM PLACEHOLDER -->
@@ -50,16 +52,17 @@ graph LR
 ### **AER is declarative and always runs the same way**
 
 - **Profiles** define what you want to extract — resolution, variables, and sensor settings in a single object.
-- **Batch extraction** handles multiple granules and grid cells in one call.
+- **Search** — discovers the data from the configured search providers.
+- **Prepare and Extract** — processes the data using the configured extractor plugins.
 - **Configuration-driven** — load extraction profiles from YAML or JSON and keep your experiments reproducible.
 
 ### **Plugins unlock any sensor**
 
-- **Swap sensors without rewriting code** — the same `AerClient` API works for GOES, MODIS, VIIRS, Sentinel-2, Sentinel-3, and more.
+- **Swap sensors without rewriting code** — the same `AerClient` API works for GOES, MODIS, VIIRS, Sentinel-2, Sentinel-3, and whatever plugins you install (or write yourself).
 - **Plugin ecosystem** — install only what you need: search plugins find the data, extract plugins process it.
 - **Build your own** — implementing a new `SearchProvider` or `Extractor` is standard Python packaging with entry points. AER discovers them automatically.
 
-### **Major TOM grid = interoperable pixels**
+### **Major TOM grid for interoperable ML ready pixels**
 
 - **Globally uniform spatial index** — every cell shares the same UTM-aligned footprint regardless of sensor.
 - **Pixels align across sensors** — compare GOES, MODIS, and Sentinel data in the same grid cell without manual reprojection.

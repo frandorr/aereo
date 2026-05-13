@@ -314,6 +314,8 @@ class Extractor(AerPlugin, plugin_abstract=True):
         target_aoi: BaseGeometry | None = None,
         target_grid_dist: int | None = None,
         target_grid_overlap: bool | None = None,
+        target_grid_margin: float = 0.0,
+        grid_filter_mode: str = "intersection",
         uri: str | None = None,
         profiles: Sequence[AerProfile] | None = None,
         prepare_params: Mapping[str, Any] | None = None,
@@ -389,19 +391,17 @@ class Extractor(AerPlugin, plugin_abstract=True):
                     continue
 
                 # 5b. Optional grid cell filtering by asset coverage
-                grid_filter_mode = str(
-                    prepare_params.get("grid_filter_mode", "intersection")
-                ).lower()
-                if grid_filter_mode != "intersection":
+                _grid_filter_mode = str(grid_filter_mode).lower()
+                if _grid_filter_mode != "intersection":
                     min_coverage = float(prepare_params.get("min_coverage", 0.0))
                     filtered_cells = []
                     for cell in all_cells:
                         cell_geom = cell.geom
-                        if grid_filter_mode == "within":
-                            if group_geom.contains(cell_geom):
+                        if _grid_filter_mode == "within":
+                            if aoi_geom.contains(cell_geom):
                                 filtered_cells.append(cell)
-                        elif grid_filter_mode == "coverage":
-                            intersection = cell_geom.intersection(group_geom)
+                        elif _grid_filter_mode == "coverage":
+                            intersection = cell_geom.intersection(aoi_geom)
                             coverage = (
                                 intersection.area / cell_geom.area
                                 if cell_geom.area > 0
@@ -411,7 +411,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
                                 filtered_cells.append(cell)
                         else:
                             raise ValueError(
-                                f"Unknown grid_filter_mode: {grid_filter_mode}. "
+                                f"Unknown grid_filter_mode: {_grid_filter_mode}. "
                                 f"Use 'intersection', 'within', or 'coverage'."
                             )
                     all_cells = filtered_cells
@@ -434,7 +434,12 @@ class Extractor(AerPlugin, plugin_abstract=True):
                 # Pre-warm area_def cache with conformed shape for all cells
                 for _, _, cells in profile_cell_groups:
                     for cell in cells:
-                        cell.area_def(resolution, padding, conform_to=conform_to_shape)
+                        cell.area_def(
+                            resolution,
+                            padding,
+                            margin=target_grid_margin,
+                            conform_to=conform_to_shape,
+                        )
 
             # Second pass: chunk cells and create tasks
             for start_time, time_group, all_cells in profile_cell_groups:
@@ -452,6 +457,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
                     }
                     if conform_to_shape is not None:
                         task_context["conform_to_shape"] = conform_to_shape
+                    task_context["target_grid_margin"] = target_grid_margin
 
                     task = ExtractionTask(
                         assets=time_group,

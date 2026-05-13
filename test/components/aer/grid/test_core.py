@@ -1,3 +1,5 @@
+from typing import cast
+
 import geopandas as gpd
 import pytest
 from aer.grid import core
@@ -81,12 +83,9 @@ def test_grid_cell_area_name_and_def():
 
     assert cell.area_name(50) == "0U_0R_dist-10000m_res-50m"
     area = cell.area_def(50)
-    # width/height should reflect natural UTM footprint bounds, not self.D
-    bounds = cell.utm_footprint.bounds
-    expected_width = round((bounds[2] - bounds[0]) / 50)
-    expected_height = round((bounds[3] - bounds[1]) / 50)
-    assert area.shape.x >= expected_width
-    assert area.shape.y >= expected_height
+    # With margin=0 the box is D x D metres (≈200 px at 50 m)
+    assert area.shape.x == pytest.approx(10000 / 50, abs=1)
+    assert area.shape.y == pytest.approx(10000 / 50, abs=1)
 
 
 def test_to_esa_compatible_dataframe():
@@ -125,17 +124,16 @@ def test_area_def_returns_geobox():
     assert gb.crs.to_epsg() == int(cell.utm_crs.split(":")[-1])
 
 
-def test_area_def_natural_shape_matches_utm_footprint():
+def test_area_def_fixed_shape_matches_d():
     from shapely.geometry import Point
 
     grid = core.GridDefinition(d=100_000)
     cells = grid.generate_grid_cells(Point(-64.0, -31.4).buffer(0.1))
     cell = cells[0]
     gb = cell.area_def(2000)
-    bounds = cell.utm_footprint.bounds
-    # GeoBox rounds up to whole pixels; shape must be >= natural
-    assert gb.shape.x >= round((bounds[2] - bounds[0]) / 2000)
-    assert gb.shape.y >= round((bounds[3] - bounds[1]) / 2000)
+    # GeoBox rounds to whole pixels; shape must be ≈ D / resolution
+    assert gb.shape.x == pytest.approx(100_000 / 2000, abs=1)
+    assert gb.shape.y == pytest.approx(100_000 / 2000, abs=1)
 
 
 def test_area_def_from_generated_cell():
@@ -147,31 +145,25 @@ def test_area_def_from_generated_cell():
     assert len(cells) > 0
     ad = cells[0].area_def(2000)
     assert isinstance(ad, GeoBox)
-    # width/height should reflect natural UTM footprint bounds, not self.D
-    bounds = cells[0].utm_footprint.bounds
-    expected_width = round((bounds[2] - bounds[0]) / 2000)
-    expected_height = round((bounds[3] - bounds[1]) / 2000)
-    assert ad.shape.x >= expected_width
-    assert ad.shape.y >= expected_height
+    # With margin=0 the box is D x D metres (≈50 px at 2000 m)
+    assert ad.shape.x == pytest.approx(100_000 / 2000, abs=1)
+    assert ad.shape.y == pytest.approx(100_000 / 2000, abs=1)
     # Extent should have min < max for both x and y
     assert ad.extent.boundingbox.left < ad.extent.boundingbox.right
     assert ad.extent.boundingbox.bottom < ad.extent.boundingbox.top
 
 
-def test_area_def_uses_natural_bounds():
-    """A cell's area_def extent should match its utm_footprint, not self.D."""
+def test_area_def_uses_fixed_size():
+    """A cell's area_def extent should be a fixed D x D square, not natural bounds."""
     from shapely.geometry import Point
 
     grid = core.GridDefinition(d=100_000)
     cells = grid.generate_grid_cells(Point(-64.0, -31.4).buffer(0.1))
     cell = cells[0]
     area = cell.area_def(2000)
-    # The extent should be derived from utm_footprint.bounds, not from D=100_000
-    bounds = cell.utm_footprint.bounds
-    expected_width = round((bounds[2] - bounds[0]) / 2000)
-    expected_height = round((bounds[3] - bounds[1]) / 2000)
-    assert area.shape.x >= expected_width
-    assert area.shape.y >= expected_height
+    # The extent should be D x D metres (≈50 px), not derived from utm_footprint.bounds
+    assert area.shape.x == pytest.approx(100_000 / 2000, abs=1)
+    assert area.shape.y == pytest.approx(100_000 / 2000, abs=1)
 
 
 def test_area_def_conform_to():
@@ -190,20 +182,51 @@ def test_area_def_geobox_kwargs():
     )
     gb_edge = cell.area_def(100, anchor="edge")
     gb_tight = cell.area_def(100, tight=True)
-    # tight=True disables pixel snapping, so extent can differ from edge-aligned.
-    assert gb_edge.shape == gb_tight.shape  # for this evenly-divisible test case
-    assert gb_edge.extent != gb_tight.extent
+    # With the centre snapped to the resolution grid, both modes can produce
+    # identical extents when the box is perfectly pixel-aligned.
+    assert abs(gb_edge.shape.x - gb_tight.shape.x) <= 1
+    assert abs(gb_edge.shape.y - gb_tight.shape.y) <= 1
+
+
+def test_area_def_centered_on_grid_point():
+    """area_def should be centred on the reprojected WGS84 centroid."""
+    from aer.spatial import reproject_geom
+    from shapely.geometry import Point
+
+    grid = core.GridDefinition(d=100_000)
+    cells = grid.generate_grid_cells(Point(-64.0, -31.4).buffer(0.1))
+    cell = cells[0]
+    gb = cell.area_def(2000)
+    utm_centroid = cast(
+        Point,
+        reproject_geom(cell.geom.centroid, src_epsg="epsg:4326", dst_epsg=cell.utm_crs),
+    )
+    bbox = gb.boundingbox
+    cx = (bbox.left + bbox.right) / 2
+    cy = (bbox.bottom + bbox.top) / 2
+    assert cx == pytest.approx(utm_centroid.x, abs=2000)
+    assert cy == pytest.approx(utm_centroid.y, abs=2000)
+
+
+def test_area_def_with_margin():
+    """margin should expand the box beyond D x D."""
+    polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+    cell = core.GridCell(d=10000, geom=polygon, is_primary=True, cell_id="0U_0R")
+    gb_no_margin = cell.area_def(50, margin=0.0)
+    gb_with_margin = cell.area_def(50, margin=6.8)
+    assert gb_with_margin.shape.x > gb_no_margin.shape.x
+    assert gb_with_margin.shape.y > gb_no_margin.shape.y
 
 
 def test_max_shape_across_cells():
-    """max_shape should return the maximum natural pixel dimensions across cells."""
+    """max_shape should return the maximum pixel dimensions across cells."""
     grid = core.GridDefinition(d=10_000)
     polygon = Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]])
     cells = grid.generate_grid_cells(polygon)
     max_w, max_h = grid.max_shape(cells, resolution=100)
     assert max_w > 0
     assert max_h > 0
-    # Every cell should fit inside max_shape when padded to it
+    # Every cell should fit inside max_shape when conformed to it
     for cell in cells:
         area = cell.area_def(100, conform_to=(max_w, max_h))
         assert area.shape.x == max_w
