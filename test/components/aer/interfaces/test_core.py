@@ -627,3 +627,23 @@ def test_grid_config_from_json(tmp_path):
     gc = GridConfig.from_json(path)
     assert gc.target_grid_dist == 25_000
     assert gc.min_coverage == 0.5
+
+
+@pytest.mark.parametrize(
+    "config_file",
+    [
+        "goes_512km.json",
+        "goes_256km.json",
+        "sentinel2_50km.json",
+        "ml_patch_2_56km.json",
+    ],
+)
+def test_example_grid_configs_load(config_file):
+    from pathlib import Path
+
+    grid_configs_dir = Path(__file__).parents[4] / "examples" / "grid_configs"
+    path = grid_configs_dir / config_file
+    assert path.exists(), f"Example grid config not found: {path}"
+    gc = GridConfig.from_json(path)
+    assert gc.target_grid_dist is not None
+    assert isinstance(gc.target_grid_overlap, bool)
