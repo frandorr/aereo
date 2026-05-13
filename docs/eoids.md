@@ -61,6 +61,23 @@ Every profile directory may contain a `profile.json` file that stores the full s
 
 The `downloader` callable is intentionally excluded from serialization because it cannot be represented in JSON.
 
+### One Profile = One Artifact File
+
+An `AerProfile` produces **exactly one artifact file per grid cell**.  All
+variables declared in `profile.collections` are stored as separate **bands**
+inside that single file — they are never split into multiple files.
+
+This means:
+
+* A profile with `collections = {"sentinel-2-l2a": ["B04", "B03", "B02"]}`
+  yields a single 3-band GeoTIFF per cell.
+* The `variable` segment in the EOIDS filename (e.g.
+  `variable-B04+B03+B02`) describes the **set of bands contained in the
+  file**, not a request to write separate files.
+
+If an extractor truly needs one file per variable, it must define a
+separate `AerProfile` for each.
+
 ---
 
 ## 2. Filename Specification
