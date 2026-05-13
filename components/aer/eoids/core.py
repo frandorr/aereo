@@ -49,7 +49,10 @@ def build_eoids_path(
 
     ``collection`` and ``variable`` are automatically derived from
     ``profile.collections`` and encoded in the filename (joined by ``+`` when
-    multiple values exist).  The directory hierarchy is flattened — there are no
+    multiple values exist).  The ``variable`` segment names the *set* of bands
+    that will be stored as separate raster bands inside the single file — it
+    does **not** cause the variables to be split into separate files.
+    The directory hierarchy is flattened — there are no
     ``collection-<name>/`` or ``variable-<name>/`` subdirectories.
 
     On the first call for a given profile, a ``profile.json`` sidecar is written
