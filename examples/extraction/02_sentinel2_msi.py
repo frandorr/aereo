@@ -47,6 +47,9 @@ profiles = [
     AerProfile(
         name="s2_rgb",
         resolution=10,
+        # One AerProfile produces exactly one artifact file per grid cell.
+        # All variables declared here (B04, B03, B02) become separate bands
+        # inside that single GeoTIFF — not separate files.
         collections={"sentinel-2-l2a": ["B04", "B03", "B02"]},
         plugin_hints={
             "search": "search_planetary_computer",
@@ -115,6 +118,18 @@ from shapely.ops import transform as shapely_transform  # noqa: E402
 entries = scan_eoids_dir(URI)
 collections = sorted({e["collection"] for e in entries})
 print(f"Collections to mosaic: {collections}")
+
+# --- Verify one profile = one multi-band file ---
+# The s2_rgb profile above declares three bands. By design this produces a
+# single 3-band GeoTIFF per grid cell (Band 1 = B04, Band 2 = B03, Band 3 = B02).
+artifact_paths = [e["path"] for e in entries if e.get("profile") == "s2_rgb"]
+if artifact_paths:
+    import rasterio  # noqa: E402
+
+    with rasterio.open(artifact_paths[0]) as src:
+        print(f"Verified artifact: {artifact_paths[0].name}")
+        print(f"  Bands: {src.count} (expected 3 for B04+B03+B02)")
+        print(f"  Shape: {src.shape}")
 
 # Mosaic each band separately and stack into RGB.
 # We set ``sort_by_coverage=False`` because Sentinel-2 tiles are dense
