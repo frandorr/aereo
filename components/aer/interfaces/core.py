@@ -8,7 +8,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
 from multiprocessing import get_context
 from pathlib import Path
-from typing import Any, Callable, Mapping, Protocol, Self, Sequence, cast
+from typing import Any, Callable, Literal, Mapping, Protocol, Self, Sequence, cast
 
 import attrs
 import pandas as pd
@@ -32,6 +32,82 @@ def merge_params(
     merged = dict(batch_params or {})
     merged.update(profile_params)
     return merged
+
+
+class GridConfig(BaseModel):
+    """Tiling specification for a single extraction run.
+
+    All profiles in the same ``prepare_for_extraction`` call share one
+    ``GridConfig``. This guarantees that every profile extracts the same
+    geographic bounding box for a given cell ID.
+    """
+
+    model_config = {"extra": "forbid", "frozen": True}
+
+    target_grid_dist: int | None = Field(
+        default=None,
+        description="Grid cell size in metres. None means the user must choose explicitly (no defaults).",
+    )
+    target_grid_overlap: bool = Field(
+        default=False,
+        description="Whether grid cells overlap.",
+    )
+    target_grid_margin: float = Field(
+        default=0.0,
+        description="Percentage margin added to each cell's nominal size (e.g. 6.8 for 6.8 %).",
+    )
+    grid_filter_mode: Literal["intersection", "within", "coverage"] = Field(
+        default="intersection",
+        description="How to filter grid cells against the AOI.",
+    )
+    min_coverage: float = Field(
+        default=0.0,
+        description="Minimum AOI coverage ratio required when grid_filter_mode='coverage'.",
+    )
+
+    @classmethod
+    def from_yaml(cls, path: str | Path) -> "GridConfig":
+        """Load a GridConfig from a YAML file.
+
+        The file may contain either a top-level ``grid_config`` key mapping
+        to a grid config dictionary, or the grid config fields directly.
+        """
+        try:
+            import yaml
+        except ImportError as exc:
+            raise ImportError(
+                "YAML support requires PyYAML. Install it with: pip install 'aer[yaml]'"
+            ) from exc
+        path = Path(path)
+        data = yaml.safe_load(path.read_text())
+        return cls._from_raw(data)
+
+    @classmethod
+    def from_yaml_string(cls, text: str) -> "GridConfig":
+        """Load a GridConfig from a YAML string."""
+        try:
+            import yaml
+        except ImportError as exc:
+            raise ImportError(
+                "YAML support requires PyYAML. Install it with: pip install 'aer[yaml]'"
+            ) from exc
+        data = yaml.safe_load(text)
+        return cls._from_raw(data)
+
+    @classmethod
+    def from_json(cls, path: str | Path) -> "GridConfig":
+        """Load a GridConfig from a JSON file."""
+        path = Path(path)
+        data = json.loads(path.read_text())
+        return cls._from_raw(data)
+
+    @classmethod
+    def _from_raw(cls, data: dict[str, Any]) -> "GridConfig":
+        if not isinstance(data, dict):
+            raise ValueError("GridConfig data must be a dict.")
+        if "grid_config" in data:
+            data = data["grid_config"]
+        return cls.model_validate(data)
 
 
 class Downloader(Protocol):

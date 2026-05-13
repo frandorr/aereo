@@ -13,6 +13,7 @@ from aer.interfaces.core import (
     ExtractionProfile,
     ExtractionTask,
     Extractor,
+    GridConfig,
     SearchProvider,
     merge_params,
 )
@@ -24,6 +25,7 @@ __all__ = [
     "ExtractionProfile",
     "ExtractionTask",
     "Extractor",
+    "GridConfig",
     "SearchProvider",
     "merge_params",
 ]

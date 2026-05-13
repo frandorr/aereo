@@ -6,6 +6,7 @@ from aer.interfaces import (
     AerPlugin,
     ExtractionTask,
     Extractor,
+    GridConfig,
     SearchProvider,
     merge_params,
 )
@@ -551,3 +552,64 @@ def test_prepare_does_not_compute_common_shape_when_conform_disabled():
 
     assert len(tasks) > 0
     assert "conform_to_shape" not in tasks[0].task_context
+
+
+def test_grid_config_defaults_require_explicit_dist():
+    gc = GridConfig(target_grid_dist=50_000)
+    assert gc.target_grid_dist == 50_000
+    assert gc.target_grid_overlap is False
+    assert gc.target_grid_margin == 0.0
+    assert gc.grid_filter_mode == "intersection"
+
+
+def test_grid_config_literal_validation():
+    with pytest.raises(ValidationError):
+        GridConfig(grid_filter_mode="invalid")  # pyright: ignore[reportArgumentType]
+
+
+def test_grid_config_from_yaml_string():
+    yaml_text = """
+    target_grid_dist: 100000
+    target_grid_margin: 6.8
+    """
+    gc = GridConfig.from_yaml_string(yaml_text)
+    assert gc.target_grid_dist == 100_000
+    assert gc.target_grid_margin == 6.8
+
+
+def test_grid_config_is_frozen():
+    gc = GridConfig(target_grid_dist=50_000)
+    with pytest.raises(ValidationError):
+        gc.target_grid_dist = 100_000
+
+
+def test_grid_config_forbids_extra_fields():
+    with pytest.raises(ValidationError):
+        GridConfig(target_grid_dist=50_000, unknown_field=42)  # pyright: ignore[reportCallIssue]
+
+
+def test_grid_config_from_yaml_with_wrapper():
+    yaml_text = """
+    grid_config:
+      target_grid_dist: 50000
+      target_grid_overlap: false
+      target_grid_margin: 6.8
+      grid_filter_mode: intersection
+      min_coverage: 0.0
+    """
+    gc = GridConfig.from_yaml_string(yaml_text)
+    assert gc.target_grid_dist == 50_000
+    assert gc.target_grid_overlap is False
+    assert gc.target_grid_margin == 6.8
+    assert gc.grid_filter_mode == "intersection"
+    assert gc.min_coverage == 0.0
+
+
+def test_grid_config_from_json(tmp_path):
+    import json
+
+    path = tmp_path / "grid.json"
+    path.write_text(json.dumps({"target_grid_dist": 25000, "min_coverage": 0.5}))
+    gc = GridConfig.from_json(path)
+    assert gc.target_grid_dist == 25_000
+    assert gc.min_coverage == 0.5
