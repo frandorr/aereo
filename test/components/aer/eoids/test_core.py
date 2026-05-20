@@ -12,6 +12,7 @@ from aer.eoids import (
     parse_eoids_filename,
     scan_eoids_dir,
 )
+from aer.eoids.core import _matches_filter
 from aer.interfaces import AerProfile
 from rasterio.crs import CRS
 from rasterio.transform import from_bounds
@@ -344,6 +345,30 @@ class TestScanEoidsDir:
     def test_filter_by_collection(self, eoids_tree):
         results = scan_eoids_dir(eoids_tree, collection="ABI-L1b-RadF")
         assert len(results) == 3
+
+    def test_matches_filter_single_to_concatenated(self):
+        """Filtering 'A' against file value 'A+B' should match."""
+        assert _matches_filter("A", "A+B") is True
+
+    def test_matches_filter_concatenated_to_concatenated(self):
+        """Filtering 'A+B' against file value 'A+B' should match."""
+        assert _matches_filter("A+B", "A+B") is True
+
+    def test_matches_filter_concatenated_to_single(self):
+        """Filtering 'A+B' against file value 'A' should match."""
+        assert _matches_filter("A+B", "A") is True
+
+    def test_matches_filter_no_overlap(self):
+        """Filtering 'A' against file value 'B+C' should not match."""
+        assert _matches_filter("A", "B+C") is False
+
+    def test_matches_filter_none_filter(self):
+        """None filter should always match."""
+        assert _matches_filter(None, "A+B") is True
+
+    def test_matches_filter_none_file(self):
+        """None file value should never match a non-None filter."""
+        assert _matches_filter("A", None) is False
 
     def test_combined_filters(self, eoids_tree):
         results = scan_eoids_dir(

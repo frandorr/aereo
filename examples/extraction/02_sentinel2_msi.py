@@ -1,62 +1,46 @@
 # %%
 # 02_sentinel2_msi.py
 # Sentinel-2 MSI via Planetary Computer: search → extract → true-color RGB composite.
-#
-# Common AerProfile pitfalls (documented inline):
-#   1. Using old plugin name ``search_pc_sentinel2`` → PluginNotFoundError.
-#      Use ``search_planetary_computer`` (generic PC search) instead.
-#   2. Wrong collection name (``sentinel-2-l1c`` vs ``sentinel-2-l2a``) → empty results.
-#   3. Bands are declared in ``profile.collections``, n
-# ot ``extract_params["assets"]``.
-#      ``extract_odc_stac`` reads bands from the collections mapping directly.
+
 
 from datetime import datetime, timezone
 from pathlib import Path
+import time
 
 import geopandas as gpd
+import matplotlib.pyplot as plt
+import numpy as np
+from pyproj import Transformer
+import rasterio
+from shapely.ops import transform as shapely_transform
+
 from aer.client import AerClient
+from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir
 from aer.interfaces import AerProfile, GridConfig
 
 # --- Configuration ---
-# Use a historical date known to have Sentinel-2 coverage over Chocon AOI.
-# (Planetary Computer STAC does not have future-dated data.)
-DATE_START = datetime(2024, 4, 9, 14, 0, tzinfo=timezone.utc)
+# Use a historical date known to have Sentinel-2 coverage over AOI.
+DATE_START = datetime(2024, 4, 8, 14, 0, tzinfo=timezone.utc)
 DATE_END = datetime(2024, 4, 9, 15, 0, tzinfo=timezone.utc)
 URI = "/tmp/02_sentinel2_msi_extraction"
 
 # Shared AOI — path relative to this script so it works regardless of CWD
 try:
-    geojson_path = Path(__file__).parent / ".." / "data" / "chocon.geojson"
+    data_dir = Path(__file__).parent / ".." / "data"
 except NameError:
-    geojson_path = Path().resolve() / "examples" / "data" / "chocon.geojson"
+    data_dir = Path().resolve() / "examples" / "data"
 
+geojson_path = data_dir / "chocon.geojson"
 gdf = gpd.read_file(geojson_path)
 aoi = gdf.geometry.iloc[0]
 
 # %%
-# Profiles are usually loaded from a YAML or JSON config file. Here we create the
-# AerProfile directly to keep the example self-contained.
-#
-# Key differences from satpy-based examples:
-#   - No ``reader`` or ``calibration`` in extract_params — odc-stac reads STAC
-#     assets directly from Planetary Computer signed URLs.
-#   - ``collections`` uses the Planetary Computer collection ID (``sentinel-2-l2a``).
-#   - ``plugin_hints["search"]`` points to ``search_planetary_computer`` (generic
-#     STAC search), NOT the old ``search_pc_sentinel2``.
-profiles = [
-    AerProfile(
-        name="s2_rgb",
-        resolution=10,
-        # One AerProfile produces exactly one artifact file per grid cell.
-        # All variables declared here (B04, B03, B02) become separate bands
-        # inside that single GeoTIFF — not separate files.
-        collections={"sentinel-2-l2a": ["B04", "B03", "B02"]},
-        plugin_hints={
-            "search": "search_planetary_computer",
-            "extract": "extract_odc_stac",
-        },
-    )
-]
+# Load profiles and grid config from YAML.
+all_profiles = {p.name: p for p in AerProfile.from_yaml(data_dir / "profiles.yaml")}
+grid = GridConfig.from_yaml(data_dir / "grid_config.yaml")
+
+# Select the profile to use for extraction.
+profiles = [all_profiles["s2_rgb"]]
 
 # --- Client Setup ---
 client = AerClient()
@@ -69,7 +53,11 @@ results = client.search(
 )
 print(results[["collection", "start_time", "end_time"]].to_string())
 # %%
-_ = results.head(10)
+# plt union_all and aoi as overlay
+fig, ax = plt.subplots()
+results.geometry.plot(ax=ax, color="blue", alpha=0.5)
+xs, ys = aoi.exterior.xy
+ax.plot(xs, ys, color="red", linewidth=2, label="AOI boundary")
 # %%
 # Keep a single representative asset to keep the example fast
 # results = results.drop_duplicates(subset=["collection"])
@@ -77,23 +65,14 @@ print(f"Kept {len(results)} representative result(s)")
 
 # %%
 # Prepare extraction tasks using the same profiles.
-# We use a fine target_grid_dist (25.6 km) because Sentinel-2 MSI native
-# resolution is 10 m, so ~2560 px per cell.
 # cells_per_chunk=1 keeps the example fast and lightweight.
-grid = GridConfig(
-    target_grid_dist=50_000,
-    target_grid_overlap=False,
-    target_grid_margin=6.8,
-    grid_filter_mode="intersection",
-)
-
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
     grid_config=grid,
     target_aoi=aoi,
     uri=URI,
     profiles=profiles,
-    cells_per_chunk=1,
+    cells_per_chunk=3,
 )
 
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)
@@ -102,22 +81,16 @@ print(f"Prepared {len(tasks)} extraction tasks", flush=True)
 # In production you would extract all tasks.
 # tasks = tasks[:1]
 print(f"Extracting {len(tasks)} task(s)...", flush=True)
-
+start_time = time.time()
 results_df = client.extract_batches(
     tasks,
-    max_batch_workers=2,
+    max_batch_workers=8,
 )
+print(f"Extraction completed in {time.time() - start_time:.2f} seconds")
 print(f"Extracted {len(results_df)} artifacts")
-# %%
-_ = tasks
+
 # %%
 # --- Mosaic & plot RGB composite ---
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
-from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir  # noqa: E402
-from pyproj import Transformer  # noqa: E402
-from shapely.ops import transform as shapely_transform  # noqa: E402
-
 # Discover unique collections that were actually extracted
 entries = scan_eoids_dir(URI)
 collections = sorted({e["collection"] for e in entries})
@@ -128,16 +101,14 @@ print(f"Collections to mosaic: {collections}")
 # single 3-band GeoTIFF per grid cell (Band 1 = B04, Band 2 = B03, Band 3 = B02).
 artifact_paths = [e["path"] for e in entries if e.get("profile") == "s2_rgb"]
 if artifact_paths:
-    import rasterio  # noqa: E402
-
     with rasterio.open(artifact_paths[0]) as src:
         print(f"Verified artifact: {artifact_paths[0].name}")
         print(f"  Bands: {src.count} (expected 3 for B04+B03+B02)")
         print(f"  Shape: {src.shape}")
 
 # One AerProfile produces exactly one multi-band artifact.
-# Load it once via ``profile=profiles[0]`` (which derives collection and
-# variable from the AerProfile) and index the bands directly.
+# Load it once via ``profile=profiles[0].name`` (which derives collection
+# and variable from the AerProfile) and index the bands directly.
 # We set ``sort_by_coverage=False`` because Sentinel-2 tiles are dense
 # rectangles — the coverage sort would read every tile into memory just
 # to count pixels, which is very slow when mosaicking many tiles.
@@ -145,9 +116,9 @@ if artifact_paths:
 # while still looking sharp on an 8" plot at 150 dpi.
 mosaic, transform, crs = mosaic_eoids_tiles(
     URI,
-    profile=profiles[0],  # type: ignore[reportArgumentType]
-    sort_by_coverage=False,
-    target_resolution=0.001,
+    profile=profiles[0].name,
+    sort_by_coverage=True,
+    target_resolution=0.01,
 )
 
 # Band order in the mosaic matches profile.collections order:

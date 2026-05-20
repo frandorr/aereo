@@ -10,36 +10,36 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import geopandas as gpd
+import matplotlib.pyplot as plt
+import numpy as np
+from pyproj import Transformer
+from shapely.ops import transform as shapely_transform
+
 from aer.client import AerClient
+from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir
 from aer.interfaces import AerProfile, GridConfig
 
 # --- Configuration ---
 DATE_START = datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc)
-DATE_END = datetime(2026, 4, 2, 15, 0, tzinfo=timezone.utc)
+DATE_END = datetime(2026, 4, 2, 14, 9, tzinfo=timezone.utc)
 URI = "/tmp/01_goes_abi_extraction"
 
 # Shared AOI — path relative to this script so it works regardless of CWD
 try:
-    geojson_path = Path(__file__).parent / ".." / "data" / "chocon.geojson"
+    data_dir = Path(__file__).parent / ".." / "data"
 except NameError:
-    geojson_path = Path().resolve() / "examples" / "data" / "chocon.geojson"
+    data_dir = Path().resolve() / "examples" / "data"
 
+geojson_path = data_dir / "chocon.geojson"
 gdf = gpd.read_file(geojson_path)
 aoi = gdf.geometry.iloc[0]
 
 # %%
-# Profiles are usually loaded from a YAML or JSON config file. Here we create the
-# AerProfile directly to keep the example self-contained.
-profiles = [
-    AerProfile(
-        name="goes_c02",
-        resolution=1000,
-        collections={"ABI-L1b-RadF": ["C02"]},
-        plugin_hints={"search": "search_aws_goes", "extract": "extract_satpy"},
-        extract_params={"reader": "abi_l1b", "calibration": "reflectance"},
-        search_params={"satellite": "GOES-19"},
-    )
-]
+# Load shared profiles and grid config from YAML.
+all_profiles = {p.name: p for p in AerProfile.from_yaml(data_dir / "profiles.yaml")}
+grid = GridConfig.from_yaml(data_dir / "grid_config.yaml")
+
+profiles = [all_profiles["goes_c02"]]
 
 # --- Client Setup ---
 client = AerClient()
@@ -54,12 +54,7 @@ print(results[["collection", "start_time", "end_time"]].to_string())
 
 # %%
 # Prepare extraction tasks using the same profiles.
-# We use a coarse target_grid_dist (512 km) because GOES ABI native resolution is ~2 km.
 # cells_per_chunk=1 keeps the example fast and lightweight.
-grid = GridConfig(
-    target_grid_dist=512_000,
-    target_grid_overlap=False,
-)
 
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
@@ -75,18 +70,12 @@ print("Extracting...", flush=True)
 
 results_df = client.extract_batches(
     tasks,
-    max_batch_workers=None,
+    max_batch_workers=4,
 )
 print(f"Extracted {len(results_df)} artifacts")
 
 # %%
 # --- Mosaic & plot extracted artifacts ---
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
-from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir  # noqa: E402
-from pyproj import Transformer  # noqa: E402
-from shapely.ops import transform as shapely_transform  # noqa: E402
-
 # Discover unique collections that were actually extracted
 entries = scan_eoids_dir(URI)
 collections = sorted({e["collection"] for e in entries})
