@@ -1,0 +1,8 @@
+# Shared GridConfig for all extraction examples.
+# Load via GridConfig.from_yaml().
+
+grid_config:
+  target_grid_dist: 50000
+  target_grid_overlap: false
+  target_grid_margin: 6.8
+  grid_filter_mode: intersection
