@@ -242,5 +242,7 @@ examples/grid/*.png
 examples/visualization/*.png
 examples/PIPELINE_ARCHITECTURE.md
 examples/test_aoi.geojson
+*.pyc
+
 # AER public-release hygiene
 .venv/
