@@ -172,16 +172,18 @@ def parse_eoids_filename(path: str | Path) -> dict[str, str]:
 
 
 def _matches_filter(filter_value: str | None, file_value: str | None) -> bool:
-    """Return *True* if *filter_value* is contained in *file_value*.
+    """Return *True* if *filter_value* overlaps with *file_value*.
 
-    When *file_value* uses ``+`` concatenation (e.g. ``"C01+C02"``), the
-    filter matches if the requested value is one of the split components.
+    Both sides may use ``+`` concatenation (e.g. ``"C01+C02"``).  The filter
+    matches when at least one component appears on both sides.
     """
     if filter_value is None:
         return True
     if file_value is None:
         return False
-    return filter_value in file_value.split("+")
+    filter_parts = set(filter_value.split("+"))
+    file_parts = set(file_value.split("+"))
+    return bool(filter_parts & file_parts)
 
 
 def scan_eoids_dir(

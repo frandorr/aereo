@@ -18,9 +18,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import geopandas as gpd
+import matplotlib.pyplot as plt
+import numpy as np
+from pyproj import Transformer
+from shapely.ops import transform as shapely_transform
+
 from aer.client import AerClient
+from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir
 from aer.interfaces import AerProfile, GridConfig
-from aer.search_earthaccess import earthaccess_download_wrapper
 
 # --- Configuration ---
 DATE_START = datetime(2026, 4, 2, 0, 0, tzinfo=timezone.utc)
@@ -29,50 +34,23 @@ URI = "/tmp/03_multi_constellation_extraction"
 
 # Shared AOI — path relative to this script so it works regardless of CWD
 try:
-    geojson_path = Path(__file__).parent / ".." / "data" / "chocon.geojson"
+    data_dir = Path(__file__).parent / ".." / "data"
 except NameError:
-    geojson_path = Path().resolve() / "examples" / "data" / "chocon.geojson"
+    data_dir = Path().resolve() / "examples" / "data"
 
+geojson_path = data_dir / "chocon.geojson"
 gdf = gpd.read_file(geojson_path)
 aoi = gdf.geometry.iloc[0]
 
 # %%
-# Profiles for three different sensors, each using the appropriate search and
-# extract plugins.  VIIRS and Sentinel-3 use earthaccess (NASA) which requires
-# the downloader callable.
+# Load shared profiles and grid config from YAML.
+all_profiles = {p.name: p for p in AerProfile.from_yaml(data_dir / "profiles.yaml")}
+grid = GridConfig.from_yaml(data_dir / "grid_config.yaml")
+
 profiles = [
-    AerProfile(
-        name="goes_c02",
-        resolution=1000,
-        collections={"ABI-L1b-RadF": ["C02"]},
-        plugin_hints={"search": "search_aws_goes", "extract": "extract_satpy"},
-        extract_params={"reader": "abi_l1b", "calibration": "reflectance"},
-        search_params={"satellite": "GOES-19"},
-    ),
-    AerProfile(
-        name="viirs_i1",
-        resolution=375,
-        collections={"VJ202IMG": ["I01"], "VJ203IMG": []},
-        plugin_hints={"search": "search_earthaccess", "extract": "extract_satpy"},
-        extract_params={
-            "reader": "viirs_l1b",
-            "calibration": "reflectance",
-            "resampling": "nearest",
-        },
-        downloader=earthaccess_download_wrapper,
-    ),
-    AerProfile(
-        name="olci_o08",
-        resolution=300,
-        collections={"S3A_OL_1_EFR": ["Oa08"]},
-        plugin_hints={"search": "search_earthaccess", "extract": "extract_satpy"},
-        extract_params={
-            "reader": "olci_l1b",
-            "calibration": "reflectance",
-            "resampling": "nearest",
-        },
-        downloader=earthaccess_download_wrapper,
-    ),
+    all_profiles["goes_c02"],
+    all_profiles["viirs_i1"],
+    all_profiles["olci_o08"],
 ]
 
 # --- Client Setup ---
@@ -111,13 +89,7 @@ print(f"Kept {len(results)} representative result(s) containing AOI")
 print(results[["collection", "start_time", "end_time"]].to_string())  # type: ignore[union-attr]
 
 # %%
-# Prepare extraction tasks.  A compromise target_grid_dist (256 km) lets all
-# sensors extract the same geographic region despite very different native
-# resolutions.
-grid = GridConfig(
-    target_grid_dist=256_000,
-    target_grid_overlap=False,
-)
+# Prepare extraction tasks.
 
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
@@ -125,7 +97,7 @@ tasks = client.prepare_for_extraction(
     target_aoi=aoi,
     uri=URI,
     profiles=profiles,
-    cells_per_chunk=10,
+    cells_per_chunk=30,
 )
 
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)
@@ -133,15 +105,12 @@ print("Extracting...", flush=True)
 
 results_df = client.extract_batches(
     tasks,
-    max_batch_workers=None,
+    max_batch_workers=2,
 )
 print(f"Extracted {len(results_df)} artifacts")
 
 # %%
 # --- Mosaic & plot side-by-side ---
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
-from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir  # noqa: E402
 
 
 def _mask_invalid(data, is_viirs=False):
@@ -195,7 +164,28 @@ for ax, col in zip(axes.flat, collections):
             ax.axis("off")
             continue
         vmin, vmax = _robust_vmin_vmax(band)
-        ax.imshow(band, cmap="viridis", vmin=vmin, vmax=vmax, interpolation="nearest")
+        h, w = band.shape
+        extent = (
+            transform.c,
+            transform.c + transform.a * w,
+            transform.f + transform.e * h,
+            transform.f,
+        )
+        ax.imshow(
+            band,
+            cmap="viridis",
+            vmin=vmin,
+            vmax=vmax,
+            interpolation="nearest",
+            extent=extent,
+        )
+
+        # Reproject AOI boundary to mosaic CRS and overlay it
+        transformer = Transformer.from_crs("EPSG:4326", crs, always_xy=True)
+        aoi_projected = shapely_transform(transformer.transform, aoi)
+        xs, ys = aoi_projected.exterior.xy
+        ax.plot(xs, ys, color="red", linewidth=2, label="AOI boundary")
+
         ax.set_title(_titles.get(col, col), fontsize=10)
         ax.axis("off")
     except Exception as exc:
@@ -208,3 +198,4 @@ for ax in axes.flat[n:]:
 plt.tight_layout()
 plt.savefig("/tmp/03_multi_constellation.png", dpi=150)
 print("Saved mosaic to /tmp/03_multi_constellation.png")
+# %%
