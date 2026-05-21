@@ -215,7 +215,8 @@ docs/.obsidian/graph.json
 *.bak
 
 # Agent-specific files & directories
-.agents/
+.agents/*
+!.agents/skills/
 AGENTS.md
 GEMINI.md
 
