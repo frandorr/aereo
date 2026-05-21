@@ -1,0 +1,87 @@
+# Shared AER profiles for all extraction examples.
+# Load via AerProfile.from_yaml() and select by name.
+# The *downloader* field accepts a dotted import path string (resolved by pydantic ImportString).
+
+profiles:
+    - name: goes_c02
+      resolution: 1000
+      collections:
+          ABI-L1b-RadF: ["C02"]
+      extract_params:
+          reader: abi_l1b
+          calibration: reflectance
+          delay_writes: true
+      search_params:
+          satellite: GOES-19
+      plugin_hints:
+          search: search_aws_goes
+          extract: extract_satpy
+
+    - name: s2_rgb
+      resolution: 10
+      collections:
+          sentinel-2-l2a: ["B04", "B03", "B02"]
+      plugin_hints:
+          search: search_planetary_computer
+          extract: extract_odc_stac
+
+    - name: viirs_i1
+      resolution: 375
+      collections:
+          VJ202IMG: ["I01"]
+          VJ203IMG: []
+      extract_params:
+          reader: viirs_l1b
+          calibration: reflectance
+          resampling: nearest
+          delay_writes: true
+      plugin_hints:
+          search: search_earthaccess
+          extract: extract_satpy
+      downloader: aer.search_earthaccess.earthaccess_download_wrapper
+
+    - name: olci_o08
+      resolution: 300
+      collections:
+          S3A_OL_1_EFR: ["Oa08"]
+      extract_params:
+          reader: olci_l1b
+          calibration: radiance
+          resampling: nearest
+          delay_writes: true
+      plugin_hints:
+          search: search_earthaccess
+          extract: extract_satpy
+      downloader: aer.search_earthaccess.earthaccess_download_wrapper
+
+    - name: alphaearth_emb
+      resolution: 10
+      collections:
+          opengeoai-alphaearth: []
+      extract_params:
+          dequantize: true
+          resampling: bilinear
+      plugin_hints:
+          search: search_opengeoai
+          extract: extract_opengeoai
+
+    - name: tessera_emb
+      resolution: 10
+      collections:
+          opengeoai-tessera: []
+      extract_params:
+          resampling: bilinear
+      plugin_hints:
+          search: search_opengeoai
+          extract: extract_opengeoai
+
+    - name: tessera_zarr_emb
+      resolution: 10
+      collections:
+          geotessera-zarr: []
+      extract_params:
+          resampling: bilinear
+          max_cell_pixels: 10000000
+      plugin_hints:
+          search: search_geotessera_zarr
+          extract: extract_geotessera_zarr
