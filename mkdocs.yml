@@ -157,6 +157,8 @@ extra_javascript:
 # Files not in navigation (auto-included snippets)
 not_in_nav: |
     includes/abbreviations.md
+    examples/README.md
+    examples/grid_configs/README.md
 
 # Extra site variables
 extra:
