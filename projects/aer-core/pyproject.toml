@@ -4,7 +4,7 @@ requires = [ "hatch-polylith-bricks", "hatchling" ]
 
 [project]
 name = "aer-eo"
-version = "1.0.1"
+version = "1.0.2"
 description = "A modular, high-performance capability-graph framework for processing Earth Observation sensor data."
 readme = "README.md"
 keywords = [
@@ -14,7 +14,7 @@ keywords = [
   "remote-sensing",
   "satellite",
 ]
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
 authors = [ { name = "Francisco Dorr", email = "fran.dorr@gmail.com" } ]
 requires-python = ">=3.12"
 classifiers = [
