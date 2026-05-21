@@ -1,5 +1,108 @@
-from aer.asset_downloader import core
+import threading
+import zipfile
+from pathlib import Path
 
 
-def test_sample():
-    assert core is not None
+from aer.asset_downloader import extract_asset_safely
+
+
+def _make_zip(archive: Path, members: dict[str, str]) -> None:
+    with zipfile.ZipFile(archive, "w") as zf:
+        for name, data in members.items():
+            zf.writestr(name, data)
+
+
+def test_extract_asset_safely_basic(tmp_path: Path) -> None:
+    archive = tmp_path / "test.zip"
+    _make_zip(archive, {"data.txt": "hello", "sub/nested.bin": "world"})
+
+    extract_dir = tmp_path / "extracted"
+    extract_asset_safely(archive, extract_dir)
+
+    assert (extract_dir / "data.txt").read_text() == "hello"
+    assert (extract_dir / "sub" / "nested.bin").read_text() == "world"
+    assert (extract_dir.with_suffix(".extracted")).exists()
+
+
+def test_extract_asset_safely_idempotent(tmp_path: Path) -> None:
+    archive = tmp_path / "test.zip"
+    _make_zip(archive, {"data.txt": "hello"})
+
+    extract_dir = tmp_path / "extracted"
+    extract_asset_safely(archive, extract_dir)
+    # Second call should be a no-op
+    extract_asset_safely(archive, extract_dir)
+
+    assert (extract_dir / "data.txt").read_text() == "hello"
+
+
+def test_extract_asset_safely_single_root_dir(tmp_path: Path) -> None:
+    """SEN3-style zip: one root directory inside the archive.
+
+    Without hoisting, the root directory is preserved inside *extract_dir*.
+    """
+    archive = tmp_path / "product.SEN3.zip"
+    _make_zip(
+        archive,
+        {
+            "product.SEN3/data.txt": "hello",
+            "product.SEN3/meta.xml": "<xml/>",
+        },
+    )
+
+    extract_dir = tmp_path / "product.SEN3"
+    extract_asset_safely(archive, extract_dir)
+
+    assert (extract_dir / "product.SEN3" / "data.txt").read_text() == "hello"
+    assert (extract_dir / "product.SEN3" / "meta.xml").read_text() == "<xml/>"
+    # The marker should exist
+    assert (extract_dir.with_suffix(".extracted")).exists()
+
+
+def test_extract_asset_safely_default_extract_dir(tmp_path: Path) -> None:
+    archive = tmp_path / "product.SEN3.zip"
+    _make_zip(archive, {"product.SEN3/data.txt": "hello"})
+
+    # extract_dir omitted → defaults to archive_path.with_suffix("")
+    extract_asset_safely(archive)
+
+    expected = tmp_path / "product.SEN3"
+    assert (expected / "product.SEN3" / "data.txt").read_text() == "hello"
+
+
+def test_extract_asset_safely_concurrent(tmp_path: Path) -> None:
+    archive = tmp_path / "test.zip"
+    _make_zip(archive, {"data.txt": "hello"})
+
+    extract_dir = tmp_path / "extracted"
+    errors: list[Exception] = []
+
+    def worker() -> None:
+        try:
+            extract_asset_safely(archive, extract_dir)
+        except Exception as exc:  # noqa: BLE001
+            errors.append(exc)
+
+    threads = [threading.Thread(target=worker) for _ in range(8)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert not errors
+    assert (extract_dir / "data.txt").read_text() == "hello"
+
+
+def test_extract_asset_safely_recovers_from_stale_dir(tmp_path: Path) -> None:
+    archive = tmp_path / "test.zip"
+    _make_zip(archive, {"data.txt": "hello"})
+
+    extract_dir = tmp_path / "extracted"
+    # Simulate a stale partial extraction (no marker)
+    extract_dir.mkdir()
+    (extract_dir / "partial.tmp").write_text("incomplete")
+
+    extract_asset_safely(archive, extract_dir)
+
+    assert not (extract_dir / "partial.tmp").exists()
+    assert (extract_dir / "data.txt").read_text() == "hello"
