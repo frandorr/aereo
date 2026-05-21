@@ -98,6 +98,20 @@ managed = true
 workspace.members = [ "projects/*" ]
 
 [tool.pytest]
+ini_options.testpaths = [ "test" ]
+ini_options.norecursedirs = [
+  ".git",
+  ".venv",
+  ".local_ci_env",
+  "site",
+  "dist",
+  "build",
+  "*.egg-info",
+  "__pycache__",
+  ".pytest_cache",
+  ".mypy_cache",
+  ".ruff_cache",
+]
 ini_options.markers = [
   "slow: marks tests as slow (deselect with '-m \"not slow\"')",
   "integration: marks tests as integration tests",
