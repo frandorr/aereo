@@ -35,14 +35,17 @@ dependencies = [
   "pandas>=3.0.1",
   "pandera[geopandas]>=0.24",
   "pyproj>=3.7.1",
+  "rich>=13",
   "shapely>=2.1.2",
   "structlog>=25.5",
+  "typer>=0.12",
   "utm>=0.8.1",
 ]
 urls.Documentation = "https://frandorr.github.io/aer"
 urls.Homepage = "https://github.com/frandorr/aer"
 urls.Issues = "https://github.com/frandorr/aer/issues"
 urls.Repository = "https://github.com/frandorr/aer"
+scripts.aer = "aer.cli.main:app"
 
 [tool.hatch]
 build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", "." ]
@@ -50,6 +53,7 @@ build.hooks.polylith-bricks = {}
 build.targets.wheel.packages = [ "aer" ]
 
 [tool.polylith]
+bricks."../../bases/aer/cli" = "aer/cli"
 bricks."../../components/aer/asset_downloader" = "aer/asset_downloader"
 bricks."../../components/aer/data" = "aer/data"
 bricks."../../components/aer/eoids" = "aer/eoids"
