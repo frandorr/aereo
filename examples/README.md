@@ -24,7 +24,7 @@ Runnable `.py` examples (with `# %%` cell markers for Jupyter compatibility) dem
 
 ## Quick Start: Pick an Example
 
-The four numbered examples build on each other. Start with **01** and work upward.
+The six numbered examples build on each other. Start with **01** and work upward.
 
 | Example | Sensor | Plugins | Auth | ⏱ Est. Time | 💾 Disk | Recommended |
 |---------|--------|---------|------|:-----------:|:-------:|:-----------:|
@@ -32,6 +32,8 @@ The four numbered examples build on each other. Start with **01** and work upwar
 | [`02_sentinel2_msi.py`](extraction/02_sentinel2_msi.py) | Sentinel-2 MSI | planetary-computer + odc-stac | None ✅ | ~5 min | ~500 MB | |
 | [`03_multi_constellation.py`](extraction/03_multi_constellation.py) | VIIRS + GOES + S3 OLCI | earthaccess + satpy / aws-goes + satpy | Earthdata 🔐 | ~10 min | ~1 GB | |
 | [`04_conform_to_ml.py`](extraction/04_conform_to_ml.py) | Sentinel-2 MSI | planetary-computer + odc-stac | None ✅ | ~5 min | ~500 MB | |
+| [`05_opengeoai_embeddings.py`](extraction/05_opengeoai_embeddings.py) | AlphaEarth + Tessera (tile) | opengeoai | None ✅ | ~5 min | ~200 MB | |
+| [`06_geotessera_zarr.py`](extraction/06_geotessera_zarr.py) | Tessera (Zarr streaming) | geotessera-zarr | None ✅ | ~3 min | ~150 MB | |
 
 ### Running an Example
 
@@ -63,11 +65,13 @@ Every example follows the same 4-step pattern:
 
 ```
 examples/
-├── extraction/           # Numbered extraction examples (01 → 04)
+├── extraction/           # Numbered extraction examples (01 → 06)
 │   ├── 01_goes_abi.py
 │   ├── 02_sentinel2_msi.py
 │   ├── 03_multi_constellation.py
 │   ├── 04_conform_to_ml.py
+│   ├── 05_opengeoai_embeddings.py
+│   ├── 06_geotessera_zarr.py
 │   ├── goes_extraction_example.py      # legacy
 │   └── extraction_example.py           # legacy
 ├── grid/                 # Grid system and filtering demonstrations

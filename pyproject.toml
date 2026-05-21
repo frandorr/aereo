@@ -58,10 +58,12 @@ urls.Repository = "https://github.com/frandorr/aer"
 [dependency-groups]
 dev = [
   "aer-extract-aws-goes",
+  "aer-extract-geotessera-zarr",
   "aer-extract-odc-stac",
   "aer-extract-satpy",
   "aer-search-aws-goes>=2",
   "aer-search-earthaccess>=2.0.3,<3",
+  "aer-search-geotessera-zarr",
   "aer-search-planetary-computer",
   "basedpyright>=1.38",
   "cartopy>=0.25",
@@ -91,10 +93,12 @@ metadata.allow-direct-references = true
 [tool.uv]
 sources.aer-eo = { path = "projects/aer-core", editable = true }
 sources.aer-extract-aws-goes = { path = "../aer-extract-aws-goes/projects/aer-extract-aws-goes", editable = true }
+sources.aer-extract-geotessera-zarr = { path = "../aer-extract-geotessera-zarr/projects/aer-extract-geotessera-zarr", editable = true }
 sources.aer-extract-odc-stac = { path = "../aer-extract-odc-stac/projects/aer-extract-odc-stac", editable = true }
 sources.aer-extract-satpy = { path = "../aer-extract-satpy/projects/aer-extract-satpy", editable = true }
 sources.aer-search-aws-goes = { path = "../aer-search-aws-goes/projects/aer-search-aws-goes", editable = true }
 sources.aer-search-earthaccess = { path = "../aer-search-earthaccess/projects/aer-search-earthaccess", editable = true }
+sources.aer-search-geotessera-zarr = { path = "../aer-search-geotessera-zarr/projects/aer-search-geotessera-zarr", editable = true }
 sources.aer-search-planetary-computer = { path = "../aer-search-planetary-computer/projects/aer-search-planetary-computer", editable = true }
 managed = true
 workspace.members = [ "projects/*" ]
