@@ -73,16 +73,19 @@ def _search_results_from_json(records: list[dict[str, Any]]) -> Any:
     """Reconstruct a GeoDataFrame from JSON records."""
     df = gpd.GeoDataFrame.from_records(records)
     if "geometry" in df.columns:
-        df["geometry"] = (
-            gpd.GeoSeries.from_wkt(df["geometry"])
-            if df["geometry"].dtype == "object"
-            else gpd.GeoSeries(df["geometry"])
-        )
+        from shapely.geometry import shape
+
+        def _to_geom(g: Any) -> Any:
+            if isinstance(g, dict):
+                return shape(g)
+            return g
+
+        df["geometry"] = gpd.GeoSeries(df["geometry"].apply(_to_geom))
         df.set_crs(epsg=4326, inplace=True)
     for key in ("start_time", "end_time"):
         if key in df.columns:
             df[key] = gpd.pd.to_datetime(df[key])
-    return AssetSchema.validate(df)
+    return gpd.GeoDataFrame(AssetSchema.validate(df))
 
 
 def _print_search_table(df: gpd.GeoDataFrame) -> None:
