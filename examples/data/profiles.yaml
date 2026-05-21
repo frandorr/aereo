@@ -3,50 +3,53 @@
 # The *downloader* field accepts a dotted import path string (resolved by pydantic ImportString).
 
 profiles:
-  - name: goes_c02
-    resolution: 1000
-    collections:
-      ABI-L1b-RadF: ["C02"]
-    extract_params:
-      reader: abi_l1b
-      calibration: reflectance
-    search_params:
-      satellite: GOES-19
-    plugin_hints:
-      search: search_aws_goes
-      extract: extract_satpy
+    - name: goes_c02
+      resolution: 1000
+      collections:
+          ABI-L1b-RadF: ["C02"]
+      extract_params:
+          reader: abi_l1b
+          calibration: reflectance
+          delay_writes: true
+      search_params:
+          satellite: GOES-19
+      plugin_hints:
+          search: search_aws_goes
+          extract: extract_satpy
 
-  - name: s2_rgb
-    resolution: 10
-    collections:
-      sentinel-2-l2a: ["B04", "B03", "B02"]
-    plugin_hints:
-      search: search_planetary_computer
-      extract: extract_odc_stac
+    - name: s2_rgb
+      resolution: 10
+      collections:
+          sentinel-2-l2a: ["B04", "B03", "B02"]
+      plugin_hints:
+          search: search_planetary_computer
+          extract: extract_odc_stac
 
-  - name: viirs_i1
-    resolution: 375
-    collections:
-      VJ202IMG: ["I01"]
-      VJ203IMG: []
-    extract_params:
-      reader: viirs_l1b
-      calibration: reflectance
-      resampling: nearest
-    plugin_hints:
-      search: search_earthaccess
-      extract: extract_satpy
-    downloader: aer.search_earthaccess.earthaccess_download_wrapper
+    - name: viirs_i1
+      resolution: 375
+      collections:
+          VJ202IMG: ["I01"]
+          VJ203IMG: []
+      extract_params:
+          reader: viirs_l1b
+          calibration: reflectance
+          resampling: nearest
+          delay_writes: true
+      plugin_hints:
+          search: search_earthaccess
+          extract: extract_satpy
+      downloader: aer.search_earthaccess.earthaccess_download_wrapper
 
-  - name: olci_o08
-    resolution: 300
-    collections:
-      S3A_OL_1_EFR: ["Oa08"]
-    extract_params:
-      reader: olci_l1b
-      calibration: radiance
-      resampling: nearest
-    plugin_hints:
-      search: search_earthaccess
-      extract: extract_satpy
-    downloader: aer.search_earthaccess.earthaccess_download_wrapper
+    - name: olci_o08
+      resolution: 300
+      collections:
+          S3A_OL_1_EFR: ["Oa08"]
+      extract_params:
+          reader: olci_l1b
+          calibration: radiance
+          resampling: nearest
+          delay_writes: true
+      plugin_hints:
+          search: search_earthaccess
+          extract: extract_satpy
+      downloader: aer.search_earthaccess.earthaccess_download_wrapper
