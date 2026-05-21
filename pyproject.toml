@@ -38,11 +38,13 @@ dependencies = [
   "python-geotiepoints>=1.9",
   "pyyaml>=6.0.3",
   "returns[compatible-mypy]>=0.26",
+  "rich>=13",
   "rtree>=1.4.1",
   "s3fs>=2025.2",
   "scikit-learn>=1.8",
   "shapely>=2.1.2",
   "structlog>=25.5",
+  "typer>=0.12",
   "utm>=0.8.1",
 ]
 optional-dependencies.aws-goes = [ "aer-search-aws-goes>=2" ]
@@ -140,4 +142,5 @@ bricks."components/aer/schemas" = "aer/schemas"
 bricks."components/aer/spatial" = "aer/spatial"
 bricks."components/aer/spectral" = "aer/spectral"
 bricks."components/aer/asset_downloader" = "aer/asset_downloader"
+bricks."bases/aer/cli" = "aer/cli"
 bricks."bases/aer/client" = "aer/client"
