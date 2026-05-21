@@ -81,6 +81,7 @@ def _search_results_from_json(records: list[dict[str, Any]]) -> Any:
             return g
 
         df["geometry"] = gpd.GeoSeries(df["geometry"].apply(_to_geom))
+        df = gpd.GeoDataFrame(df, geometry="geometry")
         df.set_crs(epsg=4326, inplace=True)
     for key in ("start_time", "end_time"):
         if key in df.columns:
