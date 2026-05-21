@@ -55,7 +55,7 @@ Every example follows the same 4-step pattern:
 3. **Extract** — Download and process raw data into GeoTIFFs
 4. **Output** — Files organized by `location/date/profile/collection/variable/resolution`
 
-> 📖 New to AER? Read the [root README](../README.md) for the full quickstart and API overview.
+> 📖 New to AER? Read the [root README](../index.md) for the full quickstart and API overview.
 
 ---
 
@@ -199,7 +199,7 @@ When preparing extraction tasks, grid cells can be filtered based on their relat
 
 Using a real VIIRS granule over Buenos Aires (13 grid cells total):
 
-![Grid Filter Modes Comparison](grid/grid_filter_modes_comparison.png)
+![Grid Filter Modes Comparison](../assets/grid_filter_modes_comparison.png)
 
 - **Green cells**: Selected for extraction
 - **Red cells**: Discarded by the filter
@@ -208,7 +208,7 @@ Using a real VIIRS granule over Buenos Aires (13 grid cells total):
 
 **Coverage percentages per cell:**
 
-![Grid Filter Coverage Detail](grid/grid_filter_coverage_detail.png)
+![Grid Filter Coverage Detail](../assets/grid_filter_coverage_detail.png)
 
 | Filter Mode | Cells Selected | Cells Discarded |
 |-------------|:--------------:|:---------------:|
@@ -256,7 +256,7 @@ All sample AOIs are in the `data/` directory and shared across examples:
 
 ## EOIDS Output Structure
 
-Extracted data follows the [Earth Observation Imaging Data Structure](../docs/eoids.md) convention:
+Extracted data follows the [Earth Observation Imaging Data Structure](../eoids.md) convention:
 
 ```
 extract_buenos_aires_viirs/

@@ -20,12 +20,11 @@ from pathlib import Path
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
-from pyproj import Transformer
-from shapely.ops import transform as shapely_transform
-
 from aer.client import AerClient
 from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir
 from aer.interfaces import AerProfile, GridConfig
+from pyproj import Transformer
+from shapely.ops import transform as shapely_transform
 
 # --- Configuration ---
 DATE_START = datetime(2026, 4, 2, 0, 0, tzinfo=timezone.utc)
@@ -62,7 +61,6 @@ results = client.search(
     end_datetime=DATE_END,
     intersects=aoi,
 )
-print(results[["collection", "start_time", "end_time"]].to_string())  # type: ignore[union-attr]
 
 # Keep one representative asset per collection and ensure full AOI coverage.
 # We further filter to known daytime granules that contain the bands we need.
@@ -86,7 +84,6 @@ results = results[
 ]
 results = results[results.geometry.contains(aoi)]
 print(f"Kept {len(results)} representative result(s) containing AOI")
-print(results[["collection", "start_time", "end_time"]].to_string())  # type: ignore[union-attr]
 
 # %%
 # Prepare extraction tasks.
@@ -97,7 +94,7 @@ tasks = client.prepare_for_extraction(
     target_aoi=aoi,
     uri=URI,
     profiles=profiles,
-    cells_per_chunk=30,
+    cells_per_chunk=2,
 )
 
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)
@@ -105,7 +102,7 @@ print("Extracting...", flush=True)
 
 results_df = client.extract_batches(
     tasks,
-    max_batch_workers=2,
+    max_batch_workers=8,
 )
 print(f"Extracted {len(results_df)} artifacts")
 

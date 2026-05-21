@@ -57,6 +57,70 @@ def download_asset_safely(
                 raise FileNotFoundError(f"Source file not found at {href}")
 
 
+def extract_asset_safely(
+    archive_path: Path,
+    extract_dir: Optional[Path] = None,
+    lock_path: Optional[Path] = None,
+) -> None:
+    """Extract a zip archive safely with file locking.
+
+    Uses atomic extraction (temp directory + rename) so that other
+    processes never see a partially extracted directory.  An
+    ``.extracted`` marker file is written on success; if the marker
+    exists the function returns immediately.
+
+    Args:
+        archive_path: Path to the zip archive.
+        extract_dir: Destination directory.  Defaults to
+            ``archive_path.with_suffix("")``.
+        lock_path: Path to the lock file.  Defaults to
+            ``extract_dir.with_suffix(".lock")``.
+    """
+    import filelock
+    import shutil
+    import tempfile
+    import zipfile
+
+    archive_path = Path(archive_path)
+    if extract_dir is None:
+        extract_dir = archive_path.with_suffix("")
+    extract_dir = Path(extract_dir)
+
+    if lock_path is None:
+        lock_path = extract_dir.with_suffix(".lock")
+    lock_path = Path(lock_path)
+
+    marker_path = extract_dir.with_suffix(".extracted")
+
+    with filelock.FileLock(str(lock_path)):
+        # Already extracted and marked complete
+        if marker_path.exists() and extract_dir.exists():
+            return
+
+        # Remove any stale partial extraction
+        if extract_dir.exists():
+            shutil.rmtree(extract_dir, ignore_errors=True)
+
+        extract_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        # Extract to a temporary directory so other processes never
+        # see an incomplete destination.
+        temp_dir = tempfile.mkdtemp(
+            prefix=extract_dir.name + "_tmp_",
+            dir=extract_dir.parent,
+        )
+        try:
+            with zipfile.ZipFile(archive_path, "r") as zf:
+                zf.extractall(temp_dir)
+
+            Path(temp_dir).rename(extract_dir)
+        except Exception:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            raise
+
+        marker_path.touch()
+
+
 def cleanup_asset_safely(
     local_path: Path, chunk_id: Optional[int] = None, total_chunks: int = 1
 ) -> None:

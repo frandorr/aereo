@@ -246,3 +246,9 @@ examples/test_aoi.geojson
 
 # AER public-release hygiene
 .venv/
+
+# Generated example outputs & dev artifacts
+/*.png
+examples/extraction/satpy_resampler.py
+examples/extraction/sentine2_test.ipynb
+examples/extraction/sentinel2_test.py
