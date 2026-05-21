@@ -215,6 +215,9 @@ def prepare(
         Optional[Path],
         typer.Option("--output", "-o", help="Output pickle file for tasks"),
     ] = None,
+    cells_per_chunk: Annotated[
+        int, typer.Option("--cells-per-chunk", help="Max grid cells per task")
+    ] = 50,
     verbose: Annotated[
         bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
     ] = False,
@@ -252,6 +255,7 @@ def prepare(
             grid_config=grid_config,
             profiles=profiles,
             uri=str(output_dir),
+            cells_per_chunk=cells_per_chunk,
         )
     except Exception as exc:
         console.print(f"[red]Prepare failed:[/red] {exc}")
@@ -259,7 +263,9 @@ def prepare(
 
     task_file = output or (output_dir / "tasks.pkl")
     task_file.write_bytes(pickle.dumps(tasks))
-    console.print(f"[green]✓ Prepared {len(tasks)} tasks across grid.[/green]")
+    console.print(
+        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cells_per_chunk}).[/green]"
+    )
     console.print(f"[green]Wrote tasks to[/green] {task_file}")
 
 
@@ -304,7 +310,12 @@ def extract(
         console.print(f"[red]Extraction failed:[/red] {exc}")
         raise typer.Exit(code=1)
 
+    # Write full GeoDataFrame to parquet
+    parquet_path = output_dir / "artifacts.parquet"
+    artifacts.to_parquet(parquet_path)
+
     console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
+    console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
     console.print(f"[green]Output directory:[/green] {output_dir}")
 
 
@@ -332,6 +343,9 @@ def run(
     workers: Annotated[
         int, typer.Option("--workers", "-w", help="Max batch workers")
     ] = 1,
+    cells_per_chunk: Annotated[
+        int, typer.Option("--cells-per-chunk", help="Max grid cells per task")
+    ] = 50,
     extract_params: Annotated[
         Optional[str],
         typer.Option("--extract-params", help="JSON string of extra extraction params"),
@@ -391,11 +405,14 @@ def run(
             grid_config=grid_config,
             profiles=profiles,
             uri=str(output_dir),
+            cells_per_chunk=cells_per_chunk,
         )
     except Exception as exc:
         console.print(f"[red]Prepare failed:[/red] {exc}")
         raise typer.Exit(code=1)
-    console.print(f"[green]✓ Prepared {len(tasks)} tasks.[/green]")
+    console.print(
+        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cells_per_chunk}).[/green]"
+    )
 
     # Extract
     console.print("[bold blue]⛏️ Extracting...[/bold blue]")
@@ -408,7 +425,12 @@ def run(
     except Exception as exc:
         console.print(f"[red]Extraction failed:[/red] {exc}")
         raise typer.Exit(code=1)
+
+    parquet_path = output_dir / "artifacts.parquet"
+    artifacts.to_parquet(parquet_path)
+
     console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
+    console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
     console.print(f"[green]Output:[/green] {output_dir}")
 
 
