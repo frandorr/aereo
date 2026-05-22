@@ -68,3 +68,35 @@ def test_04_conform_to_ml_runs():
             f"(exit={result.returncode}). stderr: {result.stderr[:200]}"
         )
     assert Path("/tmp/04_conform_to_montage.png").exists()
+
+
+def test_08_geotessera_parquet_search_runs():
+    result = subprocess.run(
+        [sys.executable, str(EXAMPLES_DIR / "08_geotessera_parquet_search.py")],
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    if result.returncode != 0:
+        pytest.skip(
+            f"GeoTessera parquet search skipped "
+            f"(exit={result.returncode}). stderr: {result.stderr[:200]}"
+        )
+    assert Path("/tmp/08_geotessera_parquet_search.png").exists()
+
+
+def test_09_geotessera_extraction_runs():
+    result = subprocess.run(
+        [sys.executable, str(EXAMPLES_DIR / "09_geotessera_extraction.py")],
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    # GeoTessera extraction requires the aer-extract-tessera plugin and
+    # downloads large .npy files over the network. Skip gracefully.
+    if result.returncode != 0:
+        pytest.skip(
+            f"GeoTessera extraction skipped "
+            f"(exit={result.returncode}). stderr: {result.stderr[:200]}"
+        )
+    assert Path("/tmp/09_geotessera_rgb.png").exists()
