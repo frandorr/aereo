@@ -33,7 +33,7 @@ from aer.interfaces import AerProfile, GridConfig
 # GeoTessera covers 2017–2025. We use 2024 which has coverage for the Chocon AOI.
 DATE_START = datetime(2024, 1, 1, tzinfo=timezone.utc)
 DATE_END = datetime(2024, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
-URI = "/tmp/09_geotessera_extraction"
+URI = "/root/repos/aer/examples/extraction/09_geotessera_extraction_output"
 
 # Shared AOI — path relative to this script so it works regardless of CWD
 try:
@@ -78,7 +78,7 @@ tasks = client.prepare_for_extraction(
     target_aoi=aoi,
     uri=URI,
     profiles=profiles,
-    cells_per_chunk=1,
+    cells_per_chunk=4,
 )
 
 print(f"Prepared {len(tasks)} extraction task(s)", flush=True)
@@ -91,7 +91,7 @@ start_time = time.time()
 results_df = client.extract_batches(
     tasks,
     extract_params={"max_download_workers": 4, "resampling": "nearest"},
-    max_batch_workers=2,
+    max_batch_workers=None,
 )
 print(f"Extraction completed in {time.time() - start_time:.2f}s")
 print(f"Extracted {len(results_df)} artifacts")
@@ -162,8 +162,8 @@ if mosaic.shape[0] >= 3:
     ax.set_xlabel("Longitude")
     ax.set_ylabel("Latitude")
     plt.tight_layout()
-    plt.savefig("/tmp/09_geotessera_rgb.png", dpi=150)
-    print("Saved RGB mosaic to /tmp/09_geotessera_rgb.png")
+    plt.savefig("/root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png", dpi=150)
+    print("Saved RGB mosaic to /root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png")
 
 # %%
 # Also visualize a single embedding dimension (band 1 = dim 0) with a colormap.
@@ -192,7 +192,7 @@ if valid.size > 0:
     ax.set_xlabel("Longitude")
     ax.set_ylabel("Latitude")
     plt.tight_layout()
-    plt.savefig("/tmp/09_geotessera_single_band.png", dpi=150)
-    print("Saved single-band mosaic to /tmp/09_geotessera_single_band.png")
+    plt.savefig("/root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_single_band.png", dpi=150)
+    print("Saved single-band mosaic to /root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_single_band.png")
 else:
     print("Warning: no valid pixels found for single-band visualization")
