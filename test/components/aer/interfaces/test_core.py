@@ -275,6 +275,8 @@ def test_extractor_prepare_for_extraction():
     assert tasks[0].aoi is None
     assert len(tasks[0].assets) == 2  # Both assets have same start_time and collection
     assert "start_time" in tasks[0].task_context
+    assert "extractor_hint" in tasks[0].task_context
+    assert tasks[0].task_context["extractor_hint"] is None
 
 
 def test_aer_profile_has_all_fields():
@@ -566,6 +568,48 @@ def test_prepare_does_not_compute_common_shape_when_conform_disabled():
 
     assert len(tasks) > 0
     assert tasks[0].profile.conform_to is None
+
+
+def test_prepare_for_extraction_includes_extractor_hint():
+    class HintExtractor(Extractor):
+        supported_collections = ["C1"]
+
+        def extract(
+            self,
+            extraction_task: ExtractionTask,
+            extract_params: dict[str, Any] | None,
+        ) -> GeoDataFrame[ArtifactSchema]:
+            return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
+
+    extractor = HintExtractor()
+
+    from datetime import datetime
+    from aer.interfaces.core import AerProfile
+
+    df = gpd.GeoDataFrame(
+        {
+            "id": [1],
+            "collection": ["C1"],
+            "start_time": [datetime(2023, 1, 1, 12, 0)],
+        },
+        geometry=[
+            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
+        ],
+    )
+
+    grid_config = GridConfig(target_grid_dist=1_000_000)
+    profile = AerProfile(name="test_profile", resolution=10.0)
+
+    tasks = extractor.prepare_for_extraction(
+        cast(Any, df),
+        grid_config=grid_config,
+        profiles=[profile],
+        uri="test_uri",
+        extractor_hint="aer-extract-dummy",
+    )
+
+    assert len(tasks) > 0
+    assert tasks[0].task_context["extractor_hint"] == "aer-extract-dummy"
 
 
 def test_grid_config_defaults_require_explicit_dist():

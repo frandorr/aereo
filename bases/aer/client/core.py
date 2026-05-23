@@ -408,6 +408,7 @@ class AerClient:
             uri=uri,
             profiles=resolved_profiles,
             cells_per_chunk=cells_per_chunk,
+            extractor_hint=target_plugin,
         )
 
         all_tasks.extend(batches)
