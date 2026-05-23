@@ -90,7 +90,7 @@ print(f"Extracting {len(tasks)} task(s)...", flush=True)
 start_time = time.time()
 results_df = client.extract_batches(
     tasks,
-    extract_params={"max_download_workers": 4, "resampling": "nearest"},
+    extract_params={"max_download_workers": 4, "resampling": "nearest", "tmp_dir": URI},
     max_batch_workers=None,
 )
 print(f"Extraction completed in {time.time() - start_time:.2f}s")
@@ -162,8 +162,13 @@ if mosaic.shape[0] >= 3:
     ax.set_xlabel("Longitude")
     ax.set_ylabel("Latitude")
     plt.tight_layout()
-    plt.savefig("/root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png", dpi=150)
-    print("Saved RGB mosaic to /root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png")
+    plt.savefig(
+        "/root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png",
+        dpi=150,
+    )
+    print(
+        "Saved RGB mosaic to /root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png"
+    )
 
 # %%
 # Also visualize a single embedding dimension (band 1 = dim 0) with a colormap.
@@ -192,7 +197,12 @@ if valid.size > 0:
     ax.set_xlabel("Longitude")
     ax.set_ylabel("Latitude")
     plt.tight_layout()
-    plt.savefig("/root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_single_band.png", dpi=150)
-    print("Saved single-band mosaic to /root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_single_band.png")
+    plt.savefig(
+        "/root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_single_band.png",
+        dpi=150,
+    )
+    print(
+        "Saved single-band mosaic to /root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_single_band.png"
+    )
 else:
     print("Warning: no valid pixels found for single-band visualization")

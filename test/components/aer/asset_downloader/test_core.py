@@ -3,7 +3,7 @@ import zipfile
 from pathlib import Path
 
 
-from aer.asset_downloader import extract_asset_safely
+from aer.asset_downloader import download_assets_safely, extract_asset_safely
 
 
 def _make_zip(archive: Path, members: dict[str, str]) -> None:
@@ -106,3 +106,62 @@ def test_extract_asset_safely_recovers_from_stale_dir(tmp_path: Path) -> None:
 
     assert not (extract_dir / "partial.tmp").exists()
     assert (extract_dir / "data.txt").read_text() == "hello"
+
+
+def test_download_assets_safely_basic(tmp_path: Path) -> None:
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    dest_dir = tmp_path / "dest"
+    dest_dir.mkdir()
+
+    file1 = src_dir / "file1.txt"
+    file2 = src_dir / "file2.txt"
+    file1.write_text("content1")
+    file2.write_text("content2")
+
+    dest1 = dest_dir / "file1_dest.txt"
+    dest2 = dest_dir / "file2_dest.txt"
+
+    download_assets_safely(
+        hrefs=[str(file1), str(file2)],
+        local_paths=[dest1, dest2],
+    )
+
+    assert dest1.read_text() == "content1"
+    assert dest2.read_text() == "content2"
+
+
+def test_download_assets_safely_downloader(tmp_path: Path) -> None:
+    dest_dir = tmp_path / "dest"
+    dest_dir.mkdir()
+
+    dest1 = dest_dir / "file1_dest.txt"
+    dest2 = dest_dir / "file2_dest.txt"
+
+    called_args = []
+
+    def custom_downloader(url: str, local_path: Path) -> None:
+        called_args.append((url, local_path))
+        local_path.write_text(f"downloaded:{url}")
+
+    download_assets_safely(
+        hrefs=["mock://file1", "mock://file2"],
+        local_paths=[dest1, dest2],
+        downloader=custom_downloader,
+    )
+
+    assert dest1.read_text() == "downloaded:mock://file1"
+    assert dest2.read_text() == "downloaded:mock://file2"
+    assert len(called_args) == 2
+
+
+def test_download_assets_safely_length_mismatch(tmp_path: Path) -> None:
+    import pytest
+
+    with pytest.raises(
+        ValueError, match="hrefs and local_paths must have the same length"
+    ):
+        download_assets_safely(
+            hrefs=["mock://file1"],
+            local_paths=[],
+        )

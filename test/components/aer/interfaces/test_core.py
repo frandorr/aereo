@@ -647,3 +647,53 @@ def test_example_grid_configs_load(config_file):
     gc = GridConfig.from_json(path)
     assert gc.target_grid_dist is not None
     assert isinstance(gc.target_grid_overlap, bool)
+
+
+def test_prepare_for_extraction_spatial_filtering():
+    """Verify that prepare_for_extraction filters assets to only those intersecting chunk grid cells."""
+    from datetime import datetime
+    from aer.interfaces.core import AerProfile
+    from shapely.geometry import Polygon
+
+    class DummyExtractor(Extractor):
+        supported_collections = ["C1"]
+
+        def extract(self, extraction_task, extract_params):
+            return cast(Any, extraction_task.assets)
+
+    # Asset 1 at coordinates (0, 0)
+    # Asset 2 at coordinates (10, 10) - very far away
+    df = gpd.GeoDataFrame(
+        {
+            "id": ["asset_1", "asset_2"],
+            "collection": ["C1", "C1"],
+            "start_time": [datetime(2023, 1, 1, 12, 0), datetime(2023, 1, 1, 12, 0)],
+        },
+        geometry=[
+            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
+            Polygon([[10, 10], [11, 10], [11, 11], [10, 11]]),
+        ],
+    )
+
+    profile = AerProfile(name="test", resolution=1000.0, collections={"C1": ["var1"]})
+    grid_config = GridConfig(target_grid_dist=100_000)
+    extractor = DummyExtractor()
+
+    tasks = extractor.prepare_for_extraction(
+        cast(Any, df),
+        grid_config=grid_config,
+        profiles=[profile],
+        uri="test_uri",
+        cells_per_chunk=1,
+    )
+
+    # Check that every task only contains 1 asset (either asset_1 or asset_2) because
+    # the cells in each chunk only intersect one of the two far-apart assets.
+    for task in tasks:
+        assert len(task.assets) == 1
+
+    # Check that both assets are represented across all tasks
+    all_assigned = set()
+    for task in tasks:
+        all_assigned.update(task.assets["id"])
+    assert all_assigned == {"asset_1", "asset_2"}
