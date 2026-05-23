@@ -1,4 +1,5 @@
 import shutil
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
@@ -55,6 +56,43 @@ def download_asset_safely(
                     shutil.copy(href, local_path)
             else:
                 raise FileNotFoundError(f"Source file not found at {href}")
+
+
+def download_assets_safely(
+    hrefs: list[str],
+    local_paths: list[Path],
+    s3_client: Optional[Any] = None,
+    http_session: Optional[Any] = None,
+    downloader: Optional["Downloader"] = None,
+    max_workers: Optional[int] = None,
+) -> None:
+    """Download multiple assets concurrently using a thread pool.
+
+    Args:
+        hrefs: List of URLs or local paths to the assets.
+        local_paths: List of destination paths for the downloaded files.
+        s3_client: Optional authenticated S3FileSystem for S3 access.
+        http_session: Optional authenticated requests.Session for HTTPS downloads.
+        downloader: Optional callable that handles the download itself.
+        max_workers: The maximum number of threads to use. Defaults to None.
+    """
+    if len(hrefs) != len(local_paths):
+        raise ValueError("hrefs and local_paths must have the same length")
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [
+            executor.submit(
+                download_asset_safely,
+                href=href,
+                local_path=local_path,
+                s3_client=s3_client,
+                http_session=http_session,
+                downloader=downloader,
+            )
+            for href, local_path in zip(hrefs, local_paths, strict=True)
+        ]
+        for future in futures:
+            future.result()
 
 
 def extract_asset_safely(

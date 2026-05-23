@@ -2,11 +2,9 @@ from __future__ import annotations
 
 import json
 import logging
-import sys
 from abc import ABC, abstractmethod
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
-from multiprocessing import get_context
 from pathlib import Path
 from typing import Any, Callable, Literal, Mapping, Protocol, Self, Sequence, cast
 
@@ -416,6 +414,9 @@ class Extractor(AerPlugin, plugin_abstract=True):
 
         # 1. Iterate over each profile
         for profile in profiles:
+            resolution = int(profile.resolution)
+            padding = profile.padding or 0
+
             # Filter assets by profile collections if specified
             if profile.collections:
                 profile_assets = search_results[
@@ -493,8 +494,6 @@ class Extractor(AerPlugin, plugin_abstract=True):
             conform_to_shape: tuple[int, int] | None = None
             if profile.conform_to is not None:
                 conform_to_shape = profile.conform_to
-                resolution = int(profile.resolution)
-                padding = profile.padding or 0
                 # Pre-warm area_def cache with conformed shape for all cells
                 for _, _, cells in profile_cell_groups:
                     for cell in cells:
@@ -514,6 +513,33 @@ class Extractor(AerPlugin, plugin_abstract=True):
                 ]
 
                 for chunk_idx, cells in enumerate(cell_chunks):
+                    # Filter assets to only those that spatially intersect these grid cells' footprints,
+                    # accounting for resolution, padding, and margin.
+                    import geopandas as gpd
+
+                    cell_geoms = []
+                    for cell in cells:
+                        geobox = cell.area_def(
+                            resolution,
+                            padding=padding,
+                            margin=target_grid_margin,
+                            conform_to=conform_to_shape,
+                        )
+                        cell_geoms.append(geobox.extent.to_crs("epsg:4326").geom)
+
+                    if hasattr(gpd.GeoSeries(cell_geoms), "union_all"):
+                        cells_union = gpd.GeoSeries(cell_geoms).union_all()
+                    else:
+                        cells_union = gpd.GeoSeries(cell_geoms).unary_union
+
+                    intersecting_mask = (
+                        time_group.intersects(cells_union) | time_group.geometry.isna()
+                    )
+                    chunk_assets = cast(
+                        GeoDataFrame[AssetSchema],
+                        time_group[intersecting_mask].copy(),
+                    )
+
                     task_context: dict[str, Any] = {
                         "chunk_id": chunk_idx,
                         "total_chunks": len(cell_chunks),
@@ -521,7 +547,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
                     }
 
                     task = ExtractionTask(
-                        assets=time_group,
+                        assets=chunk_assets,
                         profile=profile,
                         uri=uri,
                         grid_cells=cells,
@@ -617,10 +643,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
             for batch in extraction_task_batch
         ]
 
-        mp_context = get_context("spawn" if sys.platform == "win32" else "forkserver")
-        with ProcessPoolExecutor(
-            max_workers=max_batch_workers, mp_context=mp_context
-        ) as executor:
+        with ProcessPoolExecutor(max_workers=max_batch_workers) as executor:
             futures = {
                 executor.submit(_extract_wrapper, *t): i for i, t in enumerate(tasks)
             }

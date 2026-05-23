@@ -54,34 +54,10 @@ profiles:
           extract: extract_satpy
       downloader: aer.search_earthaccess.earthaccess_download_wrapper
 
-    - name: alphaearth_emb
+    - name: geotessera
       resolution: 10
       collections:
-          opengeoai-alphaearth: []
-      extract_params:
-          dequantize: true
-          resampling: bilinear
+          geotessera: []
       plugin_hints:
-          search: search_opengeoai
-          extract: extract_opengeoai
-
-    - name: tessera_emb
-      resolution: 10
-      collections:
-          opengeoai-tessera: []
-      extract_params:
-          resampling: bilinear
-      plugin_hints:
-          search: search_opengeoai
-          extract: extract_opengeoai
-
-    - name: tessera_zarr_emb
-      resolution: 10
-      collections:
-          geotessera-zarr: []
-      extract_params:
-          resampling: bilinear
-          max_cell_pixels: 10000000
-      plugin_hints:
-          search: search_geotessera_zarr
-          extract: extract_geotessera_zarr
+          search: search_tessera
+          extract: extract_tessera
