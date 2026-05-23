@@ -384,6 +384,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
         uri: str | None = None,
         profiles: Sequence[AerProfile] | None = None,
         cells_per_chunk: int = 50,
+        extractor_hint: str | None = None,
     ) -> Sequence[ExtractionTask]:
         """Prepare extraction tasks by grouping assets by profile and start time, then chunking grid cells."""
         if uri is None:
@@ -544,6 +545,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
                         "chunk_id": chunk_idx,
                         "total_chunks": len(cell_chunks),
                         "start_time": str(start_time),
+                        "extractor_hint": extractor_hint,
                     }
 
                     task = ExtractionTask(

@@ -451,6 +451,38 @@ def test_prepare_uses_profile_extract_hint(monkeypatch):
     mock_registry.get_extractor.assert_called_with("my_extractor")
 
 
+def test_prepare_for_extraction_passes_extractor_hint(monkeypatch):
+    """prepare_for_extraction must pass the resolved plugin name as extractor_hint."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry.has_extractor.return_value = True
+    mock_registry.find_extractors_for.return_value = ["resolved_extractor"]
+    mock_extractor = MagicMock()
+    mock_extractor.prepare_for_extraction.return_value = []
+    mock_registry.get_extractor.return_value = mock_extractor
+
+    monkeypatch.setattr("aer.schemas.core.AssetSchema.validate", lambda x: x)
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "MODIS"
+
+    client = AerClient(registry=mock_registry)
+    profile = AerProfile(
+        name="p1",
+        resolution=10.0,
+        collections={"MODIS": ["var1"]},
+    )
+    grid_config = GridConfig(target_grid_dist=50_000)
+    client.prepare_for_extraction(
+        search_results=cast(GeoDataFrame, valid_df),
+        grid_config=grid_config,
+        profiles=[profile],
+        uri="s3://out",
+    )
+    call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
+    assert call_kwargs.get("extractor_hint") == "resolved_extractor"
+
+
 # ---------------------------------------------------------------------------
 # extract_batches
 # ---------------------------------------------------------------------------
