@@ -35,7 +35,10 @@ from aer.interfaces import AerProfile
 client = AerClient()
 results = client.search(profiles=[...], start_datetime=..., end_datetime=...)
 tasks = client.prepare_for_extraction(results, profiles=[...], uri="out")
-artifacts = client.extract_batches(tasks)
+from aer.execution import LocalProcessBackend
+
+backend = LocalProcessBackend()
+artifacts = client.execute_tasks(tasks, backend=backend)
 ```
 
 
@@ -130,10 +133,10 @@ tasks = client.prepare_for_extraction(
 )
 
 # ############################## EXTRACT ####################################
-results_df = client.extract_batches(
-    tasks,
-    max_batch_workers=None,
-)
+from aer.execution import LocalProcessBackend
+
+backend = LocalProcessBackend(max_workers=4)
+results_df = client.execute_tasks(tasks, backend=backend)
 
 # ############################## PLOT ####################################
 entries = scan_eoids_dir(URI)
@@ -189,7 +192,7 @@ plt.savefig(f"{URI}/extraction_mosaic.png", dpi=150)
 | Document | Description |
 |----------|-------------|
 | [Quick Start](quickstart.md) | Step-by-step Search → Prepare → Extract walkthrough |
-| [Running the Pipeline](pipeline.md) | Practical guide for `search()`, `prepare_for_extraction()`, and `extract_batches()` |
+| [Running the Pipeline](pipeline.md) | Practical guide for `search()`, `prepare_for_extraction()`, and `execute_tasks()` |
 | [Using Plugins](using-plugins.md) | Install core, plugins, and Earthdata auth |
 | [Pipeline Architecture](pipeline-architecture.md) | Three-phase pipeline with UML diagrams and data flow |
 | [Grid System](grid.md) | Grid definitions, filtering modes, and overlap options |

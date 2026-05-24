@@ -179,7 +179,7 @@ Each `ExtractionTask` (from `aer.interfaces.core`) contains:
 
 ---
 
-## Phase 3: Extract Batches
+## Phase 3: Execute Tasks
 
 ### Purpose
 Execute all `ExtractionTask` objects. Can run sequentially or in parallel via `ProcessPoolExecutor`. Each task is handed to the registered **Extractor** plugin, which downloads granules, resamples to the target grid, and writes GeoTIFFs in EOIDS format.
@@ -192,16 +192,16 @@ Execute all `ExtractionTask` objects. Can run sequentially or in parallel via `P
 │   ExtractionTask]   │          │             │              │  (plugin)           │
 └──────────┬──────────┘          └──────┬──────┘              └──────────┬──────────┘
            │                            │                                │
-           │  extract_batches(          │                                │
+           │  execute_tasks(            │                                │
            │    tasks,                  │                                │
-           │    extract_params)         │                                │
+           │    backend)                │                                │
            │───────────────────────────▶│                                │
            │                            │                                │
            │                            │─── 1. Resolve extractor ──────▶│
            │                            │                                │
-           │                            │─── 2. Sequential or Parallel ─▶│
-           │                            │    (ProcessPoolExecutor if      │
-           │                            │     max_batch_workers set)     │
+           │                            │─── 2. Delegate to backend ────▶│
+           │                            │    (LocalProcessBackend,       │
+           │                            │     ThreadBackend, Lambda)     │
            │                            │                                │
            │                            │◀── 3. Per-task GeoDataFrame ──│
            │                            │    [ArtifactSchema]            │
@@ -216,12 +216,9 @@ Execute all `ExtractionTask` objects. Can run sequentially or in parallel via `P
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `extraction_task_batch` | `Sequence[ExtractionTask]` | Yes | Output from `prepare_for_extraction()`. |
-| `extract_params` | `Mapping[str, Any] \| None` | No | Flat dict forwarded directly to the extractor plugin. Common keys: `padding`, `resampling`/`resampler`, `calibration`, `reader`, `downloader`. |
-| `init_params` | `Mapping[str, Any] \| None` | No | Constructor kwargs for extractor instantiation. |
-| `plugin_hints` | `Mapping[str, str \| Sequence[str]] \| None` | No | Force extractor plugin. |
-| `failure_mode` | `FailureMode` | No | `STRICT` or `BEST_EFFORT`. Default: `STRICT` for extraction. |
-| `max_batch_workers` | `int \| None` | No | Number of parallel processes. `None` = sequential. |
+| `tasks` | `Sequence[ExtractionTask]` | Yes | Output from `prepare_for_extraction()`. |
+| `backend` | `ExecutionBackend \| None` | No | `LocalProcessBackend()`, `ThreadBackend(max_workers=...)`, or `LambdaBackend(...)`. Defaults to sequential `LocalProcessBackend()`. |
+| `failure_mode` | `FailureMode` | No | `STRICT` or `BEST_EFFORT`. Default: `STRICT`. |
 
 ### Output Schema: `ArtifactSchema`
 
@@ -322,8 +319,8 @@ User Query
     │
     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ 3. EXTRACT BATCHES                                                          │
-│    Input:  tasks, extract_params, max_batch_workers                         │
+│ 3. EXECUTE TASKS                                                            │
+│    Input:  tasks, backend, failure_mode                                     │
 │    Output: GeoDataFrame[ArtifactSchema]                                     │
 │    ──────────────────────────────────────────────────────────────────────── │
 │    id | source_ids | start_time | end_time | uri | geometry | collection     │
