@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import os
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Iterable, Protocol, Sequence
@@ -136,24 +135,11 @@ class TaskRunner:
         return extractor.extract(task, effective_params)
 
 
-def setup_gdal_worker() -> None:
-    """Configure GDAL environment variables once per process lifecycle.
-
-    These settings cache connections and headers, improving performance for
-    remote COG access via VSICURL.
-    """
-    os.environ["GDAL_DISABLE_READDIR_ON_OPEN"] = "EMPTY_DIR"
-    os.environ["GDAL_HTTP_MERGE_CONSECUTIVE_RANGES"] = "YES"
-    os.environ["GDAL_HTTP_MULTIPLEX"] = "YES"
-    os.environ["CPL_VSIL_CURL_ALLOWED_EXTENSIONS"] = ".tif,.tiff,.vrt,.xml,.json"
-
-
 class LocalProcessBackend:
     """Execute tasks locally using sequential or process-based parallelism.
 
     When *max_workers* is ``None`` or there is only one task, execution is
-    sequential.  Otherwise a :class:`ProcessPoolExecutor` is used with
-    :func:`setup_gdal_worker` as the worker initializer.
+    sequential.  Otherwise a :class:`ProcessPoolExecutor` is used.
     """
 
     def __init__(self, max_workers: int | None = None):
@@ -172,10 +158,7 @@ class LocalProcessBackend:
             return [runner.run(t) for t in tasks]
 
         results: list[GeoDataFrame[ArtifactSchema] | None] = [None] * len(tasks)
-        with ProcessPoolExecutor(
-            max_workers=self.max_workers,
-            initializer=setup_gdal_worker,
-        ) as executor:
+        with ProcessPoolExecutor(max_workers=self.max_workers) as executor:
             futures = {
                 executor.submit(runner.run, task): i for i, task in enumerate(tasks)
             }

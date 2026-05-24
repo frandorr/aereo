@@ -1,6 +1,12 @@
 """AER CLI — command-line interface for the AER satellite data framework."""
 
+# ruff: noqa: E402
+# GDAL env vars must be set before any geospatial imports (rasterio, geopandas, etc.)
 from __future__ import annotations
+
+from aer.gdal_env import configure_gdal
+
+configure_gdal()
 
 import json
 import pickle
