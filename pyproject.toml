@@ -77,6 +77,7 @@ dev = [
   "obstore>=0.9.3",
   "polylith-cli>=1.42.5,<2",
   "pytest>=9.0.2,<10",
+  "pytest-cov>=6",
   "python-semantic-release>=10.5.3,<11",
   "rasterio>=1.5",
   "rioxarray>=0.22",
@@ -122,6 +123,30 @@ ini_options.markers = [
   "slow: marks tests as slow (deselect with '-m \"not slow\"')",
   "integration: marks tests as integration tests",
 ]
+
+[tool.coverage]
+run.branch = true
+run.omit = [
+  "*/.venv/*",
+  "*/__pycache__/*",
+  "*/build/*",
+  "*/development/*",
+  "*/dist/*",
+  "*/site/*",
+  "*/test*",
+]
+run.source = [ "bases", "components" ]
+report.exclude_also = [
+  "def __repr__",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "raise AssertionError",
+  "raise NotImplementedError",
+]
+report.fail_under = 0
+report.show_missing = true
+report.skip_covered = false
+html.directory = "htmlcov"
 
 [tool.basedpyright]
 typeCheckingMode = "basic"
