@@ -4,19 +4,33 @@
 
 ---
 
-## 1. Install the Core
+## Curated starter kits
 
-```bash
-pip install aer-eo
-```
+Pick your sensor and copy-paste:
 
-This installs the base framework: `aer.client`, `aer.interfaces`, `aer.registry`, `aer.schemas`, `aer.spatial`, `aer.grid`, and `aer.eoids`.
+=== "GOES ABI (public S3, no auth)"
+
+    ```bash
+    pip install aer-eo aer-search-aws-goes aer-extract-satpy
+    ```
+
+=== "Sentinel-2 (Planetary Computer)"
+
+    ```bash
+    pip install aer-eo aer-search-planetary-computer aer-extract-odc-stac
+    ```
+
+=== "MODIS / VIIRS / Sentinel-3 (NASA Earthdata)"
+
+    ```bash
+    pip install aer-eo aer-search-earthaccess aer-extract-satpy
+    ```
+
+> **Not sure which plugin you need?** Start with the GOES example — it requires no authentication.
 
 ---
 
-## 2. Install Plugins by Sensor
-
-Pick the combination that matches your data source and copy-paste the command:
+## Plugin reference
 
 | Sensor | Search Plugin | Extract Plugin | Install Command |
 |--------|---------------|----------------|-----------------|
@@ -24,20 +38,9 @@ Pick the combination that matches your data source and copy-paste the command:
 | **Sentinel-2** (Planetary Computer) | `aer-search-planetary-computer` | `aer-extract-odc-stac` | `pip install aer-search-planetary-computer aer-extract-odc-stac` |
 | **MODIS / VIIRS** (NASA Earthdata) | `aer-search-earthaccess` | `aer-extract-satpy` | `pip install aer-search-earthaccess aer-extract-satpy` |
 
-```bash
-# GOES ABI — recommended for first use
-pip install aer-search-aws-goes aer-extract-satpy
-
-# Sentinel-2
-pip install aer-search-planetary-computer aer-extract-odc-stac
-
-# NASA sensors (MODIS, VIIRS, Sentinel-3)
-pip install aer-search-earthaccess aer-extract-satpy
-```
-
 ---
 
-## 3. Verify Installation
+## Verify installation
 
 ```python
 from aer.registry import AerRegistry
@@ -52,7 +55,7 @@ print("Supported collections:", registry.list_supported_collections())
 
 ---
 
-## 4. Earthdata Authentication (NASA sensors only)
+## Earthdata authentication (NASA sensors only)
 
 MODIS, VIIRS, and Sentinel-3 data are hosted by NASA and require [Earthdata](https://urs.earthdata.nasa.gov/) credentials:
 
@@ -68,7 +71,7 @@ export EARTHDATA_PASSWORD=YOUR_PASS
 
 ---
 
-## Next Steps
+## Next steps
 
 - Follow the [Quick Start](quickstart.md) for a complete Search → Prepare → Extract walkthrough.
 - Read the [Plugin System](plugins.md) overview to understand how discovery and routing work.
