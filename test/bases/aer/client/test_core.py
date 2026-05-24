@@ -622,7 +622,7 @@ def test_execute_tasks_failure_mode_strict(monkeypatch):
 
 
 def test_execute_tasks_failure_mode_best_effort(monkeypatch):
-    """BEST_EFFORT failure mode returns empty GeoDataFrame when a task fails."""
+    """BEST_EFFORT failure mode returns empty GeoDataFrame when all tasks fail."""
     mock_registry = MagicMock(spec=AerRegistry)
     mock_registry.has_extractor.return_value = True
     mock_extractor = MagicMock()
@@ -651,6 +651,129 @@ def test_execute_tasks_failure_mode_best_effort(monkeypatch):
 
     result = client.execute_tasks([task], failure_mode=FailureMode.BEST_EFFORT)
     assert len(result) == 0
+
+
+def test_execute_tasks_best_effort_partial_results(monkeypatch):
+    """BEST_EFFORT returns partial results when only some tasks fail."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry.has_extractor.return_value = True
+    mock_extractor = MagicMock()
+    monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
+
+    # Task 0 succeeds, task 1 fails, task 2 succeeds
+    def _extract(task, extract_params=None):
+        if task.profile.name == "fail":
+            raise RuntimeError("intentional failure")
+        return pd.DataFrame({"artifact_id": [task.profile.name]})
+
+    mock_extractor.extract.side_effect = _extract
+    mock_registry.get_extractor.return_value = mock_extractor
+
+    client = AerClient(registry=mock_registry)
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "C1"
+    grid_config = GridConfig(target_grid_dist=50_000)
+
+    task_ok_1 = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        profile=AerProfile(
+            name="ok_1",
+            resolution=100.0,
+            collections={"C1": ["var1"]},
+            plugin_hints={"extract": "dummy_extractor"},
+        ),
+        uri="test",
+        grid_cells=[],
+        grid_config=grid_config,
+    )
+    task_fail = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        profile=AerProfile(
+            name="fail",
+            resolution=100.0,
+            collections={"C1": ["var1"]},
+            plugin_hints={"extract": "dummy_extractor"},
+        ),
+        uri="test",
+        grid_cells=[],
+        grid_config=grid_config,
+    )
+    task_ok_2 = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        profile=AerProfile(
+            name="ok_2",
+            resolution=100.0,
+            collections={"C1": ["var1"]},
+            plugin_hints={"extract": "dummy_extractor"},
+        ),
+        uri="test",
+        grid_cells=[],
+        grid_config=grid_config,
+    )
+
+    result = client.execute_tasks(
+        [task_ok_1, task_fail, task_ok_2],
+        failure_mode=FailureMode.BEST_EFFORT,
+    )
+    assert len(result) == 2
+    assert set(result["artifact_id"]) == {"ok_1", "ok_2"}
+
+
+def test_execute_tasks_strict_mode_raises_on_first_failure(monkeypatch):
+    """STRICT mode still raises immediately on the first failing task."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry.has_extractor.return_value = True
+    mock_extractor = MagicMock()
+    monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
+
+    call_count = 0
+
+    def _extract(task, extract_params=None):
+        nonlocal call_count
+        call_count += 1
+        if task.profile.name == "fail":
+            raise RuntimeError("intentional failure")
+        return pd.DataFrame({"artifact_id": [task.profile.name]})
+
+    mock_extractor.extract.side_effect = _extract
+    mock_registry.get_extractor.return_value = mock_extractor
+
+    client = AerClient(registry=mock_registry)
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "C1"
+    grid_config = GridConfig(target_grid_dist=50_000)
+
+    task_ok = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        profile=AerProfile(
+            name="ok",
+            resolution=100.0,
+            collections={"C1": ["var1"]},
+            plugin_hints={"extract": "dummy_extractor"},
+        ),
+        uri="test",
+        grid_cells=[],
+        grid_config=grid_config,
+    )
+    task_fail = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        profile=AerProfile(
+            name="fail",
+            resolution=100.0,
+            collections={"C1": ["var1"]},
+            plugin_hints={"extract": "dummy_extractor"},
+        ),
+        uri="test",
+        grid_cells=[],
+        grid_config=grid_config,
+    )
+
+    with pytest.raises(RuntimeError, match="intentional failure"):
+        client.execute_tasks([task_ok, task_fail], failure_mode=FailureMode.STRICT)
 
 
 # ---------------------------------------------------------------------------

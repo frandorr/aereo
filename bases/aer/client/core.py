@@ -433,8 +433,9 @@ class AerClient:
             tasks: A sequence of ExtractionTasks, usually from prepare_for_extraction.
             backend: An ExecutionBackend implementation. Defaults to
                 LocalProcessBackend() (sequential execution).
-            failure_mode: STRICT raises errors; BEST_EFFORT returns an empty
-                GeoDataFrame on failure.
+            failure_mode: STRICT raises on the first failure; BEST_EFFORT
+                processes tasks individually and returns partial results,
+                skipping only the tasks that fail.
 
         Returns:
             A unified GeoDataFrame containing all extracted Artifacts.
@@ -450,15 +451,30 @@ class AerClient:
             "execute_tasks_start",
             task_count=len(tasks),
             backend=backend.__class__.__name__,
+            failure_mode=failure_mode.value,
         )
 
+        if failure_mode == FailureMode.BEST_EFFORT:
+            results: list[GeoDataFrame[ArtifactSchema]] = []
+            for task in tasks:
+                try:
+                    task_results = list(backend.run_tasks([task], runner))
+                    if task_results:
+                        results.append(task_results[0])
+                except Exception:
+                    logger.warning("task_failed_best_effort", exc_info=True)
+            if not results:
+                logger.warning("execute_tasks_empty_result")
+                return cast(GeoDataFrame, ArtifactSchema.empty())
+            concatenated = pd.concat(results, ignore_index=True)
+            return cast(GeoDataFrame, ArtifactSchema.validate(concatenated))
+
+        # STRICT mode — batch for efficiency, raise on first failure
         try:
             results = list(backend.run_tasks(tasks, runner))
         except Exception:
             logger.error("execute_tasks_failed", exc_info=True)
-            if failure_mode == FailureMode.STRICT:
-                raise
-            return cast(GeoDataFrame, ArtifactSchema.empty())
+            raise
 
         if not results:
             logger.warning("execute_tasks_empty_result")
