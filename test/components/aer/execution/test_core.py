@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Any, cast
 from unittest.mock import MagicMock, patch
 
@@ -253,6 +254,46 @@ def test_local_backend_parallel_with_multiple_tasks():
     # Results must be in task order, not completion order
     for i, result in enumerate(results):
         assert result["i"].iloc[0] == i
+
+
+def test_local_backend_parallel_with_callable_downloader():
+    """ProcessPoolExecutor works when tasks contain live callable downloaders."""
+    from aer.interfaces.core import AerProfile
+
+    def my_dl(url: str, path: Path) -> None:
+        pass
+
+    backend = LocalProcessBackend(max_workers=2)
+    runner = _PicklableRunner(
+        [
+            gpd.GeoDataFrame({"i": [0]}),
+            gpd.GeoDataFrame({"i": [1]}),
+        ]
+    )
+
+    tasks = [
+        _make_task(
+            profile=AerProfile(
+                name="p1",
+                resolution=100.0,
+                downloader=my_dl,  # pyright: ignore[reportArgumentType]
+            ),
+            task_context={"test_idx": 0},
+        ),
+        _make_task(
+            profile=AerProfile(
+                name="p2",
+                resolution=100.0,
+                downloader=lambda url, path: None,  # pyright: ignore[reportArgumentType]
+            ),
+            task_context={"test_idx": 1},
+        ),
+    ]
+    results = list(backend.run_tasks(tasks, cast(TaskRunner, runner)))
+
+    assert len(results) == 2
+    assert results[0]["i"].iloc[0] == 0
+    assert results[1]["i"].iloc[0] == 1
 
 
 def test_local_backend_empty_tasks():

@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Sequence, cast
 
 import geopandas as gpd
@@ -14,6 +15,11 @@ from aer.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
 from pydantic import ValidationError
 from shapely.geometry import Polygon
+
+
+def _module_level_downloader(url: str, path: Path) -> None:
+    """Module-level callable used for pickling tests."""
+    pass
 
 
 def test_plugin_missing_supported_collections():
@@ -301,6 +307,75 @@ def test_aer_profile_invalid_import_string():
             resolution=100.0,
             downloader="this.does.not.exist",  # pyright: ignore[reportArgumentType]
         )
+
+
+# ---------------------------------------------------------------------------
+# Pickling
+# ---------------------------------------------------------------------------
+
+
+def test_aer_profile_pickle_module_level_callable_downloader():
+    """A module-level callable downloader round-trips through pickle."""
+    import os
+    import pickle
+
+    from aer.interfaces.core import AerProfile
+
+    profile = AerProfile(
+        name="test",
+        resolution=100.0,
+        downloader="os.path.join",  # pyright: ignore[reportArgumentType]
+    )
+    roundtripped = pickle.loads(pickle.dumps(profile))
+    assert roundtripped.downloader is os.path.join
+
+
+def test_aer_profile_pickle_lambda_downloader_becomes_none():
+    """A lambda downloader pickles without crashing and becomes None."""
+    import pickle
+
+    from aer.interfaces.core import AerProfile
+
+    profile = AerProfile(
+        name="test",
+        resolution=100.0,
+        downloader=lambda url, path: None,  # pyright: ignore[reportArgumentType]
+    )
+    roundtripped = pickle.loads(pickle.dumps(profile))
+    assert roundtripped.downloader is None
+
+
+def test_extraction_task_pickle_with_callable_downloader():
+    """An ExtractionTask containing a live callable downloader pickles correctly."""
+    import pickle
+
+    import geopandas as gpd
+    from shapely.geometry import Polygon
+
+    from aer.interfaces.core import AerProfile, ExtractionTask
+    from pandera.typing.geopandas import GeoDataFrame
+
+    df = gpd.GeoDataFrame(
+        {"collection": ["GOES"], "start_time": ["2023-01-01"]},
+        geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
+    )
+    profile = AerProfile(
+        name="test",
+        resolution=10.0,
+        collections={"GOES": ["var1"]},
+        downloader=_module_level_downloader,  # pyright: ignore[reportArgumentType]
+    )
+    grid_config = GridConfig(target_grid_dist=10_000)
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, df),
+        profile=profile,
+        uri="test",
+        grid_cells=[],
+        grid_config=grid_config,
+    )
+    roundtripped = pickle.loads(pickle.dumps(task))
+    assert roundtripped.profile.name == "test"
+    assert roundtripped.profile.downloader is _module_level_downloader
 
 
 def test_aer_profile_has_search_and_extract_params():

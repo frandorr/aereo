@@ -211,6 +211,27 @@ class AerProfile(BaseModel):
     search_params: Mapping[str, Any] = Field(default_factory=dict)
     extract_params: Mapping[str, Any] = Field(default_factory=dict)
 
+    def __getstate__(self) -> dict[str, Any]:
+        """Serialize to a dict, converting live callables to dotted paths.
+
+        Non-importable callables (lambdas, nested functions, bound methods)
+        are replaced with ``None`` so that pickling never crashes.
+        """
+        state = self.model_dump(mode="json")
+        downloader_path = state.get("downloader")
+        if downloader_path is not None:
+            try:
+                ta = TypeAdapter(ImportString[Callable[[str, Path], None]] | None)
+                ta.validate_python(downloader_path)
+            except Exception:
+                state["downloader"] = None
+        return state
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        """Reconstruct from a validated dict."""
+        obj = self.__class__.model_validate(state)
+        object.__setattr__(self, "__dict__", obj.__dict__)
+
     @classmethod
     def from_yaml(cls, path: str | Path) -> list[Self]:
         """Load profiles from a YAML file.
