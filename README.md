@@ -4,42 +4,51 @@
 
 ---
 
-## TL;DR
+## Install
 
-```python
-from aer.client import AerClient
-from aer.interfaces import AerProfile
+Pick your sensor and copy-paste:
 
-client = AerClient()
-results = client.search(profiles=[...], start_datetime=..., end_datetime=...)
-tasks = client.prepare_for_extraction(results, profiles=[...], uri="out")
-from aer.execution import LocalProcessBackend
-backend = LocalProcessBackend()
-artifacts = client.execute_tasks(tasks, backend=backend)
+```bash
+# GOES ABI (public S3, no auth)
+pip install aer-eo aer-search-aws-goes aer-extract-satpy
+
+# Sentinel-2 (Planetary Computer)
+pip install aer-eo aer-search-planetary-computer aer-extract-odc-stac
+
+# MODIS / VIIRS / Sentinel-3 (NASA Earthdata)
+pip install aer-eo aer-search-earthaccess aer-extract-satpy
 ```
 
----
-
-## Why AER?
-
-- **Declarative and reproducible** — Define extraction profiles once (resolution, bands, sensor settings) and run them the same way every time. Load profiles from YAML or JSON to keep experiments reproducible.
-- **Plugins unlock any sensor** — The same `AerClient` API works for GOES, MODIS, VIIRS, Sentinel-2, Sentinel-3, and more. Install only the search and extract plugins you need.
-- **Major TOM grid = interoperable pixels** — Every cell shares the same UTM-aligned footprint regardless of sensor. Compare data across sensors without manual reprojection, and drop straight into the [Major TOM ecosystem](https://huggingface.co/Major-TOM).
+> **Note:** The PyPI package is `aer-eo` because `aer` is already taken.
 
 ---
 
-## Documentation
+## 10-line example
 
-| Document | Description |
-|----------|-------------|
-| [Quick Start](https://frandorr.github.io/aer/quickstart/) | Step-by-step Search → Prepare → Extract walkthrough |
-| [Running the Pipeline](https://frandorr.github.io/aer/pipeline/) | Practical guide for `search()`, `prepare_for_extraction()`, and `execute_tasks()` |
-| [Using Plugins](https://frandorr.github.io/aer/using-plugins/) | Install core, plugins, and Earthdata auth |
-| [Grid System](https://frandorr.github.io/aer/grid/) | Grid definitions, filtering modes, and overlap options |
-| [Build Your Own Plugin](https://frandorr.github.io/aer/build-your-own-plugin/) | Developer guide for creating new plugins |
-| [API Reference](https://frandorr.github.io/aer/api/client/) | Python API documentation |
+```python
+from datetime import datetime, timezone
+from aer.client import AerClient
+from aer.interfaces import AerProfile, GridConfig
+from shapely.geometry import box
 
-Full docs → [frandorr.github.io/aer](https://frandorr.github.io/aer)
+client = AerClient()
+aoi = box(-70, -40, -68, -39)
+profile = AerProfile(name="goes", resolution=1000, collections={"ABI-L1b-RadF": ["C01"]}, plugin_hints={"search": "search_aws_goes", "extract": "extract_satpy"}, search_params={"satellite": "GOES-19"}, extract_params={"reader": "abi_l1b"})
+results = client.search(profiles=[profile], start_datetime=datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc), end_datetime=datetime(2026, 4, 2, 14, 10, tzinfo=timezone.utc), intersects=aoi)
+tasks = client.prepare_for_extraction(results, profiles=[profile], uri="./out", grid_config=GridConfig(target_grid_dist=256000), target_aoi=aoi)
+client.execute_tasks(tasks)
+```
+
+Open `./out/` — you have GeoTIFFs.
+
+---
+
+## Docs & Examples
+
+- [Quick Start](https://frandorr.github.io/aer/quickstart/) — first extraction in 3 minutes
+- [Examples](https://frandorr.github.io/aer/examples/) — GOES, Sentinel-2, multi-sensor, ML-ready
+- [CLI](https://frandorr.github.io/aer/cli/) — zero-code `aer run`
+- [Build a Plugin](https://frandorr.github.io/aer/build-your-own-plugin/) — extend AER
 
 ---
 
