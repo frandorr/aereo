@@ -75,7 +75,7 @@ class ExecutionBackend(Protocol):
     def run_tasks(
         self,
         tasks: Sequence[ExtractionTask],
-        runner: TaskRunner,
+        runner: TaskRunner | None = None,
     ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
         """Execute *tasks* and yield or return their results.
 
@@ -148,8 +148,10 @@ class LocalProcessBackend:
     def run_tasks(
         self,
         tasks: Sequence[ExtractionTask],
-        runner: TaskRunner,
+        runner: TaskRunner | None = None,
     ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
+        if runner is None:
+            raise ValueError("LocalProcessBackend requires a runner")
         if not tasks:
             return []
 
@@ -195,8 +197,10 @@ class ThreadBackend:
     def run_tasks(
         self,
         tasks: Sequence[ExtractionTask],
-        runner: TaskRunner,
+        runner: TaskRunner | None = None,
     ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
+        if runner is None:
+            raise ValueError("ThreadBackend requires a runner")
         if not tasks:
             return []
 

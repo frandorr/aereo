@@ -307,6 +307,13 @@ def test_local_backend_empty_tasks():
     mock_runner.run.assert_not_called()
 
 
+def test_local_backend_requires_runner():
+    """LocalProcessBackend raises ValueError when runner is None."""
+    backend = LocalProcessBackend()
+    with pytest.raises(ValueError, match="requires a runner"):
+        list(backend.run_tasks([_make_task()], runner=None))
+
+
 def test_local_backend_exception_propagates():
     """Exceptions from runner.run() propagate in strict mode."""
     backend = LocalProcessBackend(max_workers=None)
@@ -449,6 +456,13 @@ def test_thread_backend_empty_tasks():
 
     assert results == []
     mock_runner.run.assert_not_called()
+
+
+def test_thread_backend_requires_runner():
+    """ThreadBackend raises ValueError when runner is None."""
+    backend = ThreadBackend()
+    with pytest.raises(ValueError, match="requires a runner"):
+        list(backend.run_tasks([_make_task()], runner=None))
 
 
 def test_thread_backend_exception_propagates():
