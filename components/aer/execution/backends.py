@@ -92,7 +92,7 @@ class LambdaBackend:
     def run_tasks(
         self,
         tasks: Sequence[ExtractionTask],
-        runner: TaskRunner,
+        runner: TaskRunner | None = None,
     ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
         """Execute *tasks* via AWS Lambda.
 

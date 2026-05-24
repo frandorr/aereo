@@ -459,6 +459,35 @@ def test_safe_truncate_redacts_credentials():
     assert "AKIAIOSFODNN7EXAMPLE" not in result
 
 
+def test_lambda_backend_run_tasks_with_no_runner():
+    """LambdaBackend accepts runner=None (default) since it ignores the runner."""
+    mock_client = MagicMock()
+    mock_boto3 = MagicMock()
+    mock_boto3.client.return_value = mock_client
+
+    staging = _FakeStaging()
+    staging.artifacts_to_return = [_make_empty_artifacts()]
+    task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
+
+    mock_payload = MagicMock()
+    mock_payload.read.return_value = json.dumps(
+        {"manifest_uri": "s3://bucket/m.json"}
+    ).encode("utf-8")
+    mock_client.invoke.return_value = {
+        "Payload": mock_payload,
+        "StatusCode": 200,
+    }
+
+    with patch.dict(sys.modules, {"boto3": mock_boto3}):
+        backend = LambdaBackend(
+            function_name="aer-extract",
+            staging=staging,
+        )
+        results = list(backend.run_tasks([task]))
+
+    assert len(results) == 1
+
+
 def test_safe_truncate_truncates_long_text():
     """_safe_truncate truncates text exceeding max_len."""
     from aer.execution.backends import _safe_truncate
