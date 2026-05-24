@@ -8,7 +8,7 @@ Runnable `.py` examples (with `# %%` cell markers for Jupyter compatibility) dem
 
 1. **Python ≥ 3.13** — `python --version`
 2. **aer installed** — run `uv sync` from the repo root
-3. **Earthdata login** (only for NASA sensors in example 03: VIIRS, Sentinel-3):
+3. **Earthdata login** (only for NASA sensors in example 04: VIIRS, Sentinel-3):
    ```bash
    # Option 1: Create a .netrc file
    echo "machine urs.earthdata.nasa.gov login YOUR_USER password YOUR_PASS" >> ~/.netrc
@@ -28,11 +28,12 @@ The numbered examples demonstrate different features. Start with **01** and work
 
 | Example | Sensor | Plugins | Auth | ⏱ Est. Time | 💾 Disk | Recommended |
 |---------|--------|---------|------|:-----------:|:-------:|:-----------:|
-| [`01_goes_abi.py`](extraction/01_goes_abi.py) | GOES-19 ABI | aws-goes + satpy | None ✅ | ~3 min | ~200 MB | ⭐ **Start here** |
-| [`02_sentinel2_msi.py`](extraction/02_sentinel2_msi.py) | Sentinel-2 MSI | planetary-computer + odc-stac | None ✅ | ~5 min | ~500 MB | |
-| [`03_multi_constellation.py`](extraction/03_multi_constellation.py) | VIIRS + GOES + S3 OLCI | earthaccess + satpy / aws-goes + satpy | Earthdata 🔐 | ~10 min | ~1 GB | |
-| [`04_conform_to_ml.py`](extraction/04_conform_to_ml.py) | Sentinel-2 MSI | planetary-computer + odc-stac | None ✅ | ~5 min | ~500 MB | |
-| [`08_geotessera_parquet_search.py`](extraction/08_geotessera_parquet_search.py) | GeoTessera (Parquet search) | search-tessera | None ✅ | <1s | None ✅ | |
+| [`01_minimal_goes.py`](extraction/01_minimal_goes.py) | GOES-19 ABI | aws-goes + satpy | None ✅ | ~3 min | ~200 MB | ⭐ **Start here** |
+| [`02_goes_mosaic_plot.py`](extraction/02_goes_mosaic_plot.py) | GOES-19 ABI | aws-goes + satpy | None ✅ | ~3 min | ~200 MB | |
+| [`03_sentinel2_msi.py`](extraction/03_sentinel2_msi.py) | Sentinel-2 MSI | planetary-computer + odc-stac | None ✅ | ~5 min | ~500 MB | |
+| [`04_multi_constellation.py`](extraction/04_multi_constellation.py) | VIIRS + GOES + S3 OLCI | earthaccess + satpy / aws-goes + satpy | Earthdata 🔐 | ~10 min | ~1 GB | |
+| [`05_conform_to_ml.py`](extraction/05_conform_to_ml.py) | Sentinel-2 MSI | planetary-computer + odc-stac | None ✅ | ~5 min | ~500 MB | |
+| [`06_geotessera.py`](extraction/06_geotessera.py) | GeoTessera | search-tessera + extract-tessera | None ✅ | ~2 min | ~100 MB | |
 
 ### Running an Example
 
@@ -40,14 +41,14 @@ Directly with Python:
 
 ```bash
 cd aer/examples/extraction
-uv run python 01_goes_abi.py
+uv run python 01_minimal_goes.py
 ```
 
 Or open in VS Code / Jupyter with `# %%` cell markers:
 
 ```bash
 cd aer
-uv run jupyter notebook examples/extraction/01_goes_abi.py
+uv run jupyter notebook examples/extraction/01_minimal_goes.py
 ```
 
 Every example follows the same 4-step pattern:
@@ -65,13 +66,12 @@ Every example follows the same 4-step pattern:
 ```
 examples/
 ├── extraction/           # Numbered extraction examples
-│   ├── 01_goes_abi.py
-│   ├── 02_sentinel2_msi.py
-│   ├── 03_multi_constellation.py
-│   ├── 04_conform_to_ml.py
-│   ├── 08_geotessera_parquet_search.py
-│   ├── goes_extraction_example.py      # legacy
-│   └── extraction_example.py           # legacy
+│   ├── 01_minimal_goes.py
+│   ├── 02_goes_mosaic_plot.py
+│   ├── 03_sentinel2_msi.py
+│   ├── 04_multi_constellation.py
+│   ├── 05_conform_to_ml.py
+│   └── 06_geotessera.py
 ├── grid/                 # Grid system and filtering demonstrations
 ├── data/                 # Shared sample AOIs (GeoJSON files)
 │   ├── chocon.geojson
@@ -103,14 +103,14 @@ After running your first example, here are the key abstractions:
 
 The most common failures when running AER examples are incorrect `AerProfile` definitions. Here is a single reference for the pitfalls each example documents inline.
 
-### GOES (examples 01, 03)
+### GOES (examples 02, 04)
 
 | Error | Cause | Fix |
 |-------|-------|-----|
 | Search returns empty or wrong satellite | Missing `search_params={"satellite": "GOES-19"}` | Add `search_params` to the profile |
 | `ReaderNotAvailable` from satpy | Missing `extract_params["reader"]` | Add `extract_params={"reader": "abi_l1b", ...}` |
 
-### Sentinel-2 (examples 02, 04)
+### Sentinel-2 (examples 03, 05)
 
 | Error | Cause | Fix |
 |-------|-------|-----|
@@ -118,7 +118,7 @@ The most common failures when running AER examples are incorrect `AerProfile` de
 | Empty search results | Wrong collection name (`sentinel-2-l1c` vs `sentinel-2-l2a`) | Use `sentinel-2-l2a` |
 | `odc-stac` cannot resolve bands | Bands declared in wrong place | Declare bands in `profile.collections` mapping; `extract_odc_stac` reads from there |
 
-### VIIRS (example 03)
+### VIIRS (example 04)
 
 | Error | Cause | Fix |
 |-------|-------|-----|
@@ -126,7 +126,7 @@ The most common failures when running AER examples are incorrect `AerProfile` de
 | Assets cannot be downloaded | Missing `downloader` | Set `downloader="aer.search_earthaccess.earthaccess_download_wrapper"` |
 | `ReaderNotAvailable` from satpy | Missing `extract_params["reader"]` | Add `extract_params={"reader": "viirs_l1b", ...}` |
 
-### Sentinel-3 OLCI (example 03)
+### Sentinel-3 OLCI (example 04)
 
 | Error | Cause | Fix |
 |-------|-------|-----|
@@ -135,7 +135,7 @@ The most common failures when running AER examples are incorrect `AerProfile` de
 
 ---
 
-## ML-Ready `conform_to` Workflows (example 04)
+## ML-Ready `conform_to` Workflows (example 05)
 
 `conform_to` forces every extracted tile to identical pixel dimensions, which is essential for PyTorch / TensorFlow pipelines.
 
@@ -175,13 +175,13 @@ import numpy as np
 import rasterio
 from pathlib import Path
 
-tifs = sorted(Path("/tmp/04_conform_to_ml_extraction").rglob("*.tif"))
+tifs = sorted(Path("/tmp/05_conform_to_ml_extraction").rglob("*.tif"))
 arrays = [rasterio.open(tif).read() for tif in tifs]  # each is (C, H, W)
 stack = np.stack(arrays)  # (N, C, H, W)
 assert stack.shape[-2:] == conform_shape
 ```
 
-See [`04_conform_to_ml.py`](extraction/04_conform_to_ml.py) for the full runnable example including montage visualization.
+See [`05_conform_to_ml.py`](extraction/05_conform_to_ml.py) for the full runnable example including montage visualization.
 
 ---
 

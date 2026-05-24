@@ -8,24 +8,39 @@ import pytest
 EXAMPLES_DIR = Path(__file__).parents[4] / "examples" / "extraction"
 
 
-def test_01_goes_abi_runs():
+def test_01_minimal_goes_runs():
     result = subprocess.run(
-        [sys.executable, str(EXAMPLES_DIR / "01_goes_abi.py")],
+        [sys.executable, str(EXAMPLES_DIR / "01_minimal_goes.py")],
         capture_output=True,
         text=True,
         timeout=60,
     )
     if result.returncode != 0:
         pytest.skip(
-            f"GOES ABI extraction skipped "
+            f"Minimal GOES extraction skipped "
             f"(exit={result.returncode}). stderr: {result.stderr[:200]}"
         )
-    assert Path("/tmp/01_goes_abi_mosaic.png").exists()
+    assert list(Path("/tmp/01_minimal_goes_out").rglob("*.tif"))
 
 
-def test_02_sentinel2_msi_runs():
+def test_02_goes_mosaic_plot_runs():
     result = subprocess.run(
-        [sys.executable, str(EXAMPLES_DIR / "02_sentinel2_msi.py")],
+        [sys.executable, str(EXAMPLES_DIR / "02_goes_mosaic_plot.py")],
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    if result.returncode != 0:
+        pytest.skip(
+            f"GOES ABI mosaic extraction skipped "
+            f"(exit={result.returncode}). stderr: {result.stderr[:200]}"
+        )
+    assert Path("/tmp/02_goes_mosaic_plot.png").exists()
+
+
+def test_03_sentinel2_msi_runs():
+    result = subprocess.run(
+        [sys.executable, str(EXAMPLES_DIR / "03_sentinel2_msi.py")],
         capture_output=True,
         text=True,
         timeout=60,
@@ -35,12 +50,12 @@ def test_02_sentinel2_msi_runs():
             f"Sentinel-2 MSI extraction skipped "
             f"(exit={result.returncode}). stderr: {result.stderr[:200]}"
         )
-    assert Path("/tmp/02_sentinel2_rgb.png").exists()
+    assert Path("/tmp/03_sentinel2_rgb.png").exists()
 
 
-def test_03_multi_constellation_runs():
+def test_04_multi_constellation_runs():
     result = subprocess.run(
-        [sys.executable, str(EXAMPLES_DIR / "03_multi_constellation.py")],
+        [sys.executable, str(EXAMPLES_DIR / "04_multi_constellation.py")],
         capture_output=True,
         text=True,
         timeout=60,
@@ -52,12 +67,12 @@ def test_03_multi_constellation_runs():
             f"Multi-constellation extraction skipped "
             f"(exit={result.returncode}). stderr: {result.stderr[:200]}"
         )
-    assert Path("/tmp/03_multi_constellation.png").exists()
+    assert Path("/tmp/04_multi_constellation.png").exists()
 
 
-def test_04_conform_to_ml_runs():
+def test_05_conform_to_ml_runs():
     result = subprocess.run(
-        [sys.executable, str(EXAMPLES_DIR / "04_conform_to_ml.py")],
+        [sys.executable, str(EXAMPLES_DIR / "05_conform_to_ml.py")],
         capture_output=True,
         text=True,
         timeout=60,
@@ -67,27 +82,12 @@ def test_04_conform_to_ml_runs():
             f"ML conform extraction skipped "
             f"(exit={result.returncode}). stderr: {result.stderr[:200]}"
         )
-    assert Path("/tmp/04_conform_to_montage.png").exists()
+    assert Path("/tmp/05_conform_to_montage.png").exists()
 
 
-def test_08_geotessera_parquet_search_runs():
+def test_06_geotessera_runs():
     result = subprocess.run(
-        [sys.executable, str(EXAMPLES_DIR / "08_geotessera_parquet_search.py")],
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
-    if result.returncode != 0:
-        pytest.skip(
-            f"GeoTessera parquet search skipped "
-            f"(exit={result.returncode}). stderr: {result.stderr[:200]}"
-        )
-    assert Path("/tmp/08_geotessera_parquet_search.png").exists()
-
-
-def test_09_geotessera_extraction_runs():
-    result = subprocess.run(
-        [sys.executable, str(EXAMPLES_DIR / "09_geotessera_extraction.py")],
+        [sys.executable, str(EXAMPLES_DIR / "06_geotessera.py")],
         capture_output=True,
         text=True,
         timeout=120,
@@ -99,4 +99,6 @@ def test_09_geotessera_extraction_runs():
             f"GeoTessera extraction skipped "
             f"(exit={result.returncode}). stderr: {result.stderr[:200]}"
         )
-    assert Path("/tmp/09_geotessera_rgb.png").exists()
+    assert Path(
+        "/root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png"
+    ).exists()

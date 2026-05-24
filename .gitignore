@@ -250,6 +250,4 @@ examples/test_aoi.geojson
 
 # Generated example outputs & dev artifacts
 /*.png
-examples/extraction/satpy_resampler.py
-examples/extraction/sentine2_test.ipynb
-examples/extraction/sentinel2_test.py
+examples/extraction/09_geotessera_extraction_output/

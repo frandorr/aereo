@@ -23,7 +23,7 @@ tasks = client.prepare_for_extraction(
 
 | File | `target_grid_dist` | `target_grid_margin` | Used in example |
 |------|-------------------:|---------------------:|:----------------|
-| `goes_512km.json` | 512 000 m | 0.0 % | [`01_goes_abi.py`](../extraction/01_goes_abi.py) |
-| `goes_256km.json` | 256 000 m | 0.0 % | [`03_multi_constellation.py`](../extraction/03_multi_constellation.py), legacy examples |
-| `sentinel2_50km.json` | 50 000 m | 6.8 % | [`02_sentinel2_msi.py`](../extraction/02_sentinel2_msi.py) |
-| `ml_patch_2_56km.json` | 2 560 m | 0.0 % | [`04_conform_to_ml.py`](../extraction/04_conform_to_ml.py) |
+| `goes_512km.json` | 512 000 m | 0.0 % | [`01_minimal_goes.py`](../extraction/01_minimal_goes.py), [`02_goes_mosaic_plot.py`](../extraction/02_goes_mosaic_plot.py) |
+| `goes_256km.json` | 256 000 m | 0.0 % | [`04_multi_constellation.py`](../extraction/04_multi_constellation.py), legacy examples |
+| `sentinel2_50km.json` | 50 000 m | 6.8 % | [`03_sentinel2_msi.py`](../extraction/03_sentinel2_msi.py) |
+| `ml_patch_2_56km.json` | 2 560 m | 0.0 % | [`05_conform_to_ml.py`](../extraction/05_conform_to_ml.py) |
