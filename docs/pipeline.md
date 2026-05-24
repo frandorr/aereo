@@ -1,6 +1,6 @@
 # Running the Pipeline
 
-AER's entire user experience is built around three `AerClient` methods: `search()`, `prepare_for_extraction()`, and `extract_batches()`. This page shows you how to use each one with practical examples, common patterns, and the gotchas that matter in production.
+AER's entire user experience is built around three `AerClient` methods: `search()`, `prepare_for_extraction()`, and `execute_tasks()`. This page shows you how to use each one with practical examples, common patterns, and the gotchas that matter in production.
 
 For deep technical internals — UML diagrams, exact schema tables, and sequence diagrams — see [Pipeline Architecture](pipeline-architecture.md).
 
@@ -164,10 +164,10 @@ Run the extraction. Each `ExtractionTask` is handed to the registered **Extracto
 ### Minimal example
 
 ```python
-artifacts = client.extract_batches(
-    tasks,
-    max_batch_workers=None,  # set to e.g. 4 for parallel extraction
-)
+from aer.execution import LocalProcessBackend
+
+backend = LocalProcessBackend(max_workers=4)
+artifacts = client.execute_tasks(tasks, backend=backend)
 print(f"Extracted {len(artifacts)} artifacts")
 print(artifacts[["id", "grid_cell", "uri"]].head())
 ```
@@ -176,14 +176,14 @@ print(artifacts[["id", "grid_cell", "uri"]].head())
 
 | Parameter | What it does |
 |-----------|--------------|
-| `extraction_task_batch` | **Required.** Output from `prepare_for_extraction()`. |
-| `extract_params` | Meta-level dict forwarded to the extractor. Domain-specific config (e.g. `padding`, `calibration`, `reader`) should live on `task.profile.extract_params`; batch-level params are merged but profile wins. |
-| `max_batch_workers` | `None` = sequential. Set to an `int` (e.g. `4`) for parallel `ProcessPoolExecutor` using `forkserver` context. |
+| `tasks` | **Required.** Output from `prepare_for_extraction()`. |
+| `backend` | `ExecutionBackend` implementation. Defaults to `LocalProcessBackend()` (sequential). Use `LocalProcessBackend(max_workers=4)` for process parallelism, `ThreadBackend(max_workers=8)` for thread parallelism, or `LambdaBackend(...)` for remote execution. |
+| `failure_mode` | `STRICT` (default) raises on any failure. `BEST_EFFORT` returns an empty GeoDataFrame on failure. |
 | `failure_mode` | **Defaults to `STRICT`** (unlike `search()`). `BEST_EFFORT` logs and continues. |
 
 ### Return value: `ArtifactSchema` GeoDataFrame
 
-`extract_batches()` returns a `GeoDataFrame[ArtifactSchema]` with these key columns:
+`execute_tasks()` returns a `GeoDataFrame[ArtifactSchema]` with these key columns:
 
 | Column | Description |
 |--------|-------------|
@@ -209,4 +209,4 @@ See [EOIDS](eoids.md) for the full directory layout and mosaic options.
 
 ### Gotcha: plugin-specific errors surface here
 
-If a granule is missing, a band is unsupported, or a download times out, the error usually appears during `extract_batches()`, not `search()` or `prepare_for_extraction()`. Use `failure_mode=BEST_EFFORT` to skip bad granules and keep the rest, or wrap the call in your own retry logic. Remember that `max_batch_workers` uses processes — exceptions in worker processes are captured and re-raised (or logged) by the client.
+If a granule is missing, a band is unsupported, or a download times out, the error usually appears during `execute_tasks()`, not `search()` or `prepare_for_extraction()`. Use `failure_mode=BEST_EFFORT` to skip bad granules and keep the rest, or wrap the call in your own retry logic. The `LocalProcessBackend` uses `ProcessPoolExecutor` — exceptions in worker processes are captured and re-raised (or logged) by the client.

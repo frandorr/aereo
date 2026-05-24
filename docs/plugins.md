@@ -112,11 +112,11 @@ tasks = client.prepare_for_extraction(
     uri="output/goes",
 )
 
+from aer.execution import LocalProcessBackend
+
 # 3. Extract
-artifacts_df = client.extract_batches(
-    tasks,
-    max_batch_workers=4,
-)
+backend = LocalProcessBackend(max_workers=4)
+artifacts_df = client.execute_tasks(tasks, backend=backend)
 print(f"Extracted {len(artifacts_df)} artifacts.")
 ```
 

@@ -107,10 +107,10 @@ print(f"Prepared {len(tasks)} extraction tasks")
 Run the extraction. Each task is handed to the extractor plugin, which downloads granules, resamples to the target grid, and writes GeoTIFFs in EOIDS format.
 
 ```python
-artifacts = client.extract_batches(
-    tasks,
-    max_batch_workers=None,  # set to e.g. 4 for parallel extraction
-)
+from aer.execution import LocalProcessBackend
+
+backend = LocalProcessBackend(max_workers=4)
+artifacts = client.execute_tasks(tasks, backend=backend)
 print(f"Extracted {len(artifacts)} artifacts")
 ```
 
