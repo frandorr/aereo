@@ -10,6 +10,7 @@ from shapely.geometry import Polygon
 from aer.execution.core import (
     LocalProcessBackend,
     TaskRunner,
+    ThreadBackend,
     setup_gdal_worker,
 )
 from aer.interfaces.core import AerProfile, ExtractionTask, GridConfig
@@ -268,6 +269,92 @@ def test_local_backend_empty_tasks():
 def test_local_backend_exception_propagates():
     """Exceptions from runner.run() propagate in strict mode."""
     backend = LocalProcessBackend(max_workers=None)
+    mock_runner = MagicMock(spec=TaskRunner)
+    mock_runner.run.side_effect = RuntimeError("task failed")
+
+    tasks = [_make_task()]
+    with pytest.raises(RuntimeError, match="task failed"):
+        list(backend.run_tasks(tasks, mock_runner))
+
+
+# ---------------------------------------------------------------------------
+# setup_gdal_worker
+# ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# ThreadBackend
+# ---------------------------------------------------------------------------
+
+
+def test_thread_backend_sequential_when_max_workers_none():
+    """When max_workers is None, tasks run sequentially."""
+    backend = ThreadBackend(max_workers=None)
+    mock_runner = MagicMock(spec=TaskRunner)
+    expected = [gpd.GeoDataFrame({"i": [i]}) for i in range(3)]
+    mock_runner.run.side_effect = expected
+
+    tasks = [_make_task() for _ in range(3)]
+    results = list(backend.run_tasks(tasks, mock_runner))
+
+    assert len(results) == 3
+    assert mock_runner.run.call_count == 3
+    for i, result in enumerate(results):
+        assert result["i"].iloc[0] == i
+
+
+def test_thread_backend_sequential_when_single_task():
+    """Even with max_workers > 1, a single task runs sequentially."""
+    backend = ThreadBackend(max_workers=4)
+    mock_runner = MagicMock(spec=TaskRunner)
+    expected = gpd.GeoDataFrame({"id": [42]})
+    mock_runner.run.return_value = expected
+
+    tasks = [_make_task()]
+    results = list(backend.run_tasks(tasks, mock_runner))
+
+    assert len(results) == 1
+    mock_runner.run.assert_called_once()
+
+
+def test_thread_backend_parallel_with_multiple_tasks():
+    """ThreadPoolExecutor path runs tasks in parallel and preserves order."""
+    backend = ThreadBackend(max_workers=2)
+    runner = _PicklableRunner(
+        [
+            gpd.GeoDataFrame({"i": [0]}),
+            gpd.GeoDataFrame({"i": [1]}),
+            gpd.GeoDataFrame({"i": [2]}),
+        ]
+    )
+
+    tasks = [
+        _make_task(task_context={"test_idx": 0}),
+        _make_task(task_context={"test_idx": 1}),
+        _make_task(task_context={"test_idx": 2}),
+    ]
+    results = list(backend.run_tasks(tasks, cast(TaskRunner, runner)))
+
+    assert len(results) == 3
+    # Results must be in task order, not completion order
+    for i, result in enumerate(results):
+        assert result["i"].iloc[0] == i
+
+
+def test_thread_backend_empty_tasks():
+    """Empty task list returns empty iterable."""
+    backend = ThreadBackend()
+    mock_runner = MagicMock(spec=TaskRunner)
+
+    results = list(backend.run_tasks([], mock_runner))
+
+    assert results == []
+    mock_runner.run.assert_not_called()
+
+
+def test_thread_backend_exception_propagates():
+    """Exceptions from runner.run() propagate."""
+    backend = ThreadBackend(max_workers=None)
     mock_runner = MagicMock(spec=TaskRunner)
     mock_runner.run.side_effect = RuntimeError("task failed")
 

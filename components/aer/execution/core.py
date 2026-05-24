@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Iterable, Protocol, Sequence
 
@@ -179,4 +179,50 @@ class LocalProcessBackend:
                     raise
 
         # Filter out any None values (shouldn't happen unless empty input)
+        return [r for r in results if r is not None]
+
+
+class ThreadBackend:
+    """Execute tasks locally using thread-based parallelism.
+
+    This backend is ideal for **I/O-bound** extractors (e.g. those that spend
+    most of their time waiting on HTTP requests for COG tiles).  Because
+    threads share memory, there is no pickling overhead and no need for
+    extractors to be serialisable across process boundaries.
+
+    When *max_workers* is ``None`` or there is only one task, execution is
+    sequential.  Otherwise a :class:`ThreadPoolExecutor` is used.
+    """
+
+    def __init__(self, max_workers: int | None = None):
+        self.max_workers = max_workers
+
+    def run_tasks(
+        self,
+        tasks: Sequence[ExtractionTask],
+        runner: TaskRunner,
+    ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
+        if not tasks:
+            return []
+
+        if self.max_workers is None or len(tasks) == 1:
+            # Sequential path — simplest, easiest to debug
+            return [runner.run(t) for t in tasks]
+
+        results: list[GeoDataFrame[ArtifactSchema] | None] = [None] * len(tasks)
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            futures = {
+                executor.submit(runner.run, task): i for i, task in enumerate(tasks)
+            }
+            for future in as_completed(futures):
+                idx = futures[future]
+                try:
+                    results[idx] = future.result()
+                except Exception as exc:
+                    logger.error(
+                        "thread_task_failed",
+                        extra={"task_index": idx, "error": str(exc)},
+                    )
+                    raise
+
         return [r for r in results if r is not None]
