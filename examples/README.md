@@ -93,7 +93,7 @@ After running your first example, here are the key abstractions:
 | **`AerClient`** | Central orchestrator. Auto-discovers plugins, routes searches, delegates extraction. |
 | **`AerProfile`** | Blueprint: which bands to extract, target resolution, plugin-specific params. |
 | **`prepare_for_extraction`** | Groups results by profile and time, generates grid cells, chunks into tasks. |
-| **`extract_batches`** | Executes tasks — sequential or parallel via `ProcessPoolExecutor`. |
+| **`execute_tasks`** | Executes tasks through a configurable `ExecutionBackend` (sequential, process pool, or remote). |
 | **`conform_to`** | When set to `(W, H)`, every cell in the batch is padded to the same `(width, height)` for fixed tensor shapes. |
 | **EOIDS** | Output file structure: `loc-<cell>/date-<YYYYMMDD>/sat-<platform>/...tif` |
 

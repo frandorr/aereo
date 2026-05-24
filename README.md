@@ -13,7 +13,9 @@ from aer.interfaces import AerProfile
 client = AerClient()
 results = client.search(profiles=[...], start_datetime=..., end_datetime=...)
 tasks = client.prepare_for_extraction(results, profiles=[...], uri="out")
-artifacts = client.extract_batches(tasks)
+from aer.execution import LocalProcessBackend
+backend = LocalProcessBackend()
+artifacts = client.execute_tasks(tasks, backend=backend)
 ```
 
 ---
@@ -31,7 +33,7 @@ artifacts = client.extract_batches(tasks)
 | Document | Description |
 |----------|-------------|
 | [Quick Start](https://frandorr.github.io/aer/quickstart/) | Step-by-step Search → Prepare → Extract walkthrough |
-| [Running the Pipeline](https://frandorr.github.io/aer/pipeline/) | Practical guide for `search()`, `prepare_for_extraction()`, and `extract_batches()` |
+| [Running the Pipeline](https://frandorr.github.io/aer/pipeline/) | Practical guide for `search()`, `prepare_for_extraction()`, and `execute_tasks()` |
 | [Using Plugins](https://frandorr.github.io/aer/using-plugins/) | Install core, plugins, and Earthdata auth |
 | [Grid System](https://frandorr.github.io/aer/grid/) | Grid definitions, filtering modes, and overlap options |
 | [Build Your Own Plugin](https://frandorr.github.io/aer/build-your-own-plugin/) | Developer guide for creating new plugins |
