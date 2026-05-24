@@ -3,6 +3,7 @@
 from datetime import datetime, timezone
 
 from aer.client import AerClient
+from aer.execution import LocalProcessBackend
 from aer.interfaces import AerProfile, GridConfig
 from shapely.geometry import box
 
@@ -60,10 +61,8 @@ tasks = client.prepare_for_extraction(
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)
 print("Extracting...", flush=True)
 
-results_df = client.extract_batches(
-    tasks,
-    max_batch_workers=None,
-)
+backend = LocalProcessBackend(max_workers=None)
+results_df = client.execute_tasks(tasks, backend=backend)
 print(f"Extracted {len(results_df)} artifacts")
 # %%
 # --- Mosaic & plot extracted artifacts ---

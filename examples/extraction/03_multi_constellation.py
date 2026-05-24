@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from aer.client import AerClient
 from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir
+from aer.execution import LocalProcessBackend
 from aer.interfaces import AerProfile, GridConfig
 from pyproj import Transformer
 from shapely.ops import transform as shapely_transform
@@ -100,10 +101,8 @@ tasks = client.prepare_for_extraction(
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)
 print("Extracting...", flush=True)
 
-results_df = client.extract_batches(
-    tasks,
-    max_batch_workers=8,
-)
+backend = LocalProcessBackend(max_workers=8)
+results_df = client.execute_tasks(tasks, backend=backend)
 print(f"Extracted {len(results_df)} artifacts")
 
 # %%

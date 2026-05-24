@@ -17,6 +17,7 @@ from pathlib import Path
 
 import geopandas as gpd
 from aer.client import AerClient
+from aer.execution import LocalProcessBackend
 from aer.interfaces import AerProfile, GridConfig
 
 # --- Configuration ---
@@ -96,10 +97,8 @@ print(f"Prepared {len(tasks)} extraction tasks", flush=True)
 tasks = tasks[:1]
 print(f"Extracting {len(tasks)} task(s)...", flush=True)
 
-results_df = client.extract_batches(
-    tasks,
-    max_batch_workers=None,
-)
+backend = LocalProcessBackend(max_workers=None)
+results_df = client.execute_tasks(tasks, backend=backend)
 print(f"Extracted {len(results_df)} artifacts")
 
 # %%
