@@ -59,6 +59,7 @@ urls.Repository = "https://github.com/frandorr/aer"
 dev = [
   "aer-extract-aws-goes",
   "aer-extract-odc-stac",
+  "aer-extract-remote",
   "aer-extract-satpy",
   "aer-extract-tessera",
   "aer-search-aws-goes>=2",
@@ -95,6 +96,7 @@ metadata.allow-direct-references = true
 sources.aer-eo = { path = "projects/aer-core", editable = true }
 sources.aer-extract-aws-goes = { path = "../aer-extract-aws-goes/projects/aer-extract-aws-goes", editable = true }
 sources.aer-extract-odc-stac = { path = "../aer-extract-odc-stac/projects/aer-extract-odc-stac", editable = true }
+sources.aer-extract-remote = { path = "../aer-extract-remote", editable = true }
 sources.aer-extract-satpy = { path = "../aer-extract-satpy/projects/aer-extract-satpy", editable = true }
 sources.aer-extract-tessera = { path = "../aer-extract-tessera/projects/aer-extract-tessera", editable = true }
 sources.aer-search-aws-goes = { path = "../aer-search-aws-goes/projects/aer-search-aws-goes", editable = true }

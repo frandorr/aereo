@@ -5,19 +5,26 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from aer_extract_remote.lambda_handler import handle
+
 logger = logging.getLogger(__name__)
 
 
 def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     """AER Lambda handler entrypoint.
 
-    Expected event schema (defined by LambdaBackend):
-    {
-        "task_uri": "s3://bucket/aer-tasks/job_id/0/task_meta.json",
-        "output_prefix": "s3://bucket/results/job_id/0/"
-    }
+    Delegates to :func:`aer_extract_remote.lambda_handler.handle` for
+    deserialization, execution, and result upload.
 
-    Returns:
+    Expected event schema (defined by LambdaBackend)::
+
+        {
+            "task_uri": "s3://bucket/aer-tasks/job_id/0/task_meta.json",
+            "output_prefix": "s3://bucket/results/job_id/0/"
+        }
+
+    Returns::
+
         {"statusCode": 200, "manifest_uri": "s3://bucket/results/job_id/0/manifest.json"}
     """
     logger.info("aer_lambda_invoked", extra={"event": event})
@@ -31,12 +38,4 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             "error": "Missing required fields: task_uri, output_prefix",
         }
 
-    # TODO (aer-extract-remote integration):
-    #   from aer_extract_remote.lambda_handler import handle
-    #   return handle(event, context)
-
-    # Placeholder for Phase 1 — health-check / skeleton only
-    return {
-        "statusCode": 200,
-        "manifest_uri": f"{output_prefix}manifest.json",
-    }
+    return handle(event, context)
