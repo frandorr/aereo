@@ -175,31 +175,33 @@ extra:
 # Navigation structure
 nav:
     - Home: index.md
-    - Getting Started:
+    - 🚀 Getting Started:
           - Quick Start: quickstart.md
-          - Running the Pipeline: pipeline.md
-          - Using Plugins: using-plugins.md
+          - Installation & Plugins: using-plugins.md
+          - CLI: cli.md
           - Examples: examples.md
-    - Core Concepts:
+    - 📖 User Guide:
+          - Running the Pipeline: pipeline.md
+          - Grid System: grid.md
+          - EOIDS Output: eoids.md
+          - Troubleshooting: troubleshooting.md
+    - 🛠️ Contributor Guide:
           - Pipeline Architecture: pipeline-architecture.md
           - Execution Backends: execution.md
-          - Grid System: grid.md
-          - EOIDS: eoids.md
-          - Plugins: plugins.md
-    - Building Plugins:
+          - Plugin System: plugins.md
           - Build Your Own Plugin: build-your-own-plugin.md
-    - API Reference:
-          - Client: api/client.md
-          - Interfaces: api/interfaces.md
-          - Registry: api/registry.md
-          - Schemas: api/schemas.md
-          - Grid: api/grid.md
-          - Spatial: api/spatial.md
-          - Spectral: api/spectral.md
-          - EOIDS: api/eoids.md
-          - Asset Downloader: api/asset_downloader.md
-          - Repository: api/repository.md
-          - Viz: api/viz.md
-    - Contributing:
+          - API Reference:
+                - Client: api/client.md
+                - Interfaces: api/interfaces.md
+                - Registry: api/registry.md
+                - Schemas: api/schemas.md
+                - Grid: api/grid.md
+                - Spatial: api/spatial.md
+                - Spectral: api/spectral.md
+                - EOIDS: api/eoids.md
+                - Asset Downloader: api/asset_downloader.md
+                - Repository: api/repository.md
+                - Viz: api/viz.md
+    - 🤝 Contributing:
           - Guidelines: contributing.md
           - Developer Setup: contributing/dev-setup.md
