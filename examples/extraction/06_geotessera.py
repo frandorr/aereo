@@ -1,5 +1,5 @@
 # %%
-# 09_geotessera_extraction.py
+# 06_geotessera.py
 # GeoTessera embedding extraction: search → extract → visualize embedding bands.
 #
 # This example demonstrates the full pipeline for GeoTessera satellite

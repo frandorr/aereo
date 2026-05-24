@@ -1,5 +1,5 @@
 # %%
-# 02_sentinel2_msi.py
+# 03_sentinel2_msi.py
 # Sentinel-2 MSI via Planetary Computer: search → extract → true-color RGB composite.
 
 
@@ -23,7 +23,7 @@ from aer.interfaces import AerProfile, GridConfig
 # Use a historical date known to have Sentinel-2 coverage over AOI.
 DATE_START = datetime(2024, 4, 8, 14, 0, tzinfo=timezone.utc)
 DATE_END = datetime(2024, 4, 9, 15, 0, tzinfo=timezone.utc)
-URI = "/tmp/02_sentinel2_msi_extraction"
+URI = "/tmp/03_sentinel2_msi_extraction"
 
 # Shared AOI — path relative to this script so it works regardless of CWD
 try:
@@ -155,11 +155,11 @@ ax.set_title(f"Sentinel-2 L2A RGB @ 10 m – {collections[0]}")
 ax.set_xlabel("Longitude")
 ax.set_ylabel("Latitude")
 plt.tight_layout()
-plt.savefig("/tmp/02_sentinel2_rgb.png", dpi=150)
-print("Saved RGB mosaic to /tmp/02_sentinel2_rgb.png")
+plt.savefig("/tmp/03_sentinel2_rgb.png", dpi=150)
+print("Saved RGB mosaic to /tmp/03_sentinel2_rgb.png")
 # %%
 import rioxarray  # noqa: E402
 
 rioxarray.open_rasterio(
-    "/tmp/02_sentinel2_msi_extraction/loc-89D118L/date-20240409/profile-s2_rgb/loc-89D118L_start-20240409T142711_end-20240409T142711_profile-s2_rgb_collection-sentinel-2-l2a_variable-B04+B03+B02_res-10m.tif"
+    "/tmp/03_sentinel2_msi_extraction/loc-89D118L/date-20240409/profile-s2_rgb/loc-89D118L_start-20240409T142711_end-20240409T142711_profile-s2_rgb_collection-sentinel-2-l2a_variable-B04+B03+B02_res-10m.tif"
 )

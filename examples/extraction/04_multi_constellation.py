@@ -1,5 +1,5 @@
 # %%
-# 03_multi_constellation.py
+# 04_multi_constellation.py
 # Multi-sensor comparison: search VIIRS + GOES + Sentinel-3 over a broad window,
 # filter to one asset per sensor, extract all into the same EOIDS directory,
 # then mosaic side-by-side.
@@ -30,7 +30,7 @@ from shapely.ops import transform as shapely_transform
 # --- Configuration ---
 DATE_START = datetime(2026, 4, 2, 0, 0, tzinfo=timezone.utc)
 DATE_END = datetime(2026, 4, 3, 0, 0, tzinfo=timezone.utc)
-URI = "/tmp/03_multi_constellation_extraction"
+URI = "/tmp/04_multi_constellation_extraction"
 
 # Shared AOI — path relative to this script so it works regardless of CWD
 try:
@@ -192,6 +192,6 @@ for ax in axes.flat[n:]:
     ax.axis("off")
 
 plt.tight_layout()
-plt.savefig("/tmp/03_multi_constellation.png", dpi=150)
-print("Saved mosaic to /tmp/03_multi_constellation.png")
+plt.savefig("/tmp/04_multi_constellation.png", dpi=150)
+print("Saved mosaic to /tmp/04_multi_constellation.png")
 # %%

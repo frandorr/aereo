@@ -1,6 +1,6 @@
 # %%
-# 01_goes_abi.py
-# Simplest possible AER workflow: search GOES-19 ABI, extract one cell, mosaic and plot.
+# 02_goes_mosaic_plot.py
+# GOES-19 ABI workflow: search, extract, mosaic and plot.
 #
 # Common AerProfile pitfalls (documented inline):
 #   1. Forgetting search_params={"satellite": "GOES-19"} → search returns empty or wrong satellite.
@@ -23,7 +23,7 @@ from aer.interfaces import AerProfile, GridConfig
 # --- Configuration ---
 DATE_START = datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc)
 DATE_END = datetime(2026, 4, 2, 14, 9, tzinfo=timezone.utc)
-URI = "/tmp/01_goes_abi_extraction"
+URI = "/tmp/02_goes_mosaic_plot_extraction"
 
 # Shared AOI — path relative to this script so it works regardless of CWD
 try:
@@ -112,5 +112,5 @@ ax.set_title(f"GOES-19 C02 @ 1000 m – {collections[0]}")
 ax.set_xlabel("Longitude")
 ax.set_ylabel("Latitude")
 plt.tight_layout()
-plt.savefig("/tmp/01_goes_abi_mosaic.png", dpi=150)
-print("Saved mosaic to /tmp/01_goes_abi_mosaic.png")
+plt.savefig("/tmp/02_goes_mosaic_plot.png", dpi=150)
+print("Saved mosaic to /tmp/02_goes_mosaic_plot.png")
