@@ -15,6 +15,7 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
+  "aer-extract-remote>=1",
   "attrs>=25.4",
   "boto3>=1.34",
   "cattrs>=26.1",
