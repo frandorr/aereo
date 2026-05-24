@@ -7,8 +7,8 @@ from aer.execution.core import (
     TaskRunner,
     TaskStaging,
     ThreadBackend,
-    setup_gdal_worker,
 )
+from aer.gdal_env import configure_gdal, setup_gdal_worker
 
 __all__ = [
     "ExecutionBackend",
@@ -18,5 +18,6 @@ __all__ = [
     "TaskRunner",
     "TaskStaging",
     "ThreadBackend",
+    "configure_gdal",
     "setup_gdal_worker",
 ]
