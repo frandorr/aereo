@@ -14,6 +14,7 @@ from rich.console import Console
 from rich.table import Table
 
 from aer.client import AerClient
+from aer.execution import LocalProcessBackend
 from aer.interfaces import AerProfile, GridConfig
 from aer.schemas import AssetSchema
 
@@ -278,10 +279,6 @@ def extract(
     workers: Annotated[
         int, typer.Option("--workers", "-w", help="Max batch workers")
     ] = 1,
-    extract_params: Annotated[
-        Optional[str],
-        typer.Option("--extract-params", help="JSON string of extra extraction params"),
-    ] = None,
     verbose: Annotated[
         bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
     ] = False,
@@ -297,15 +294,11 @@ def extract(
         raise typer.Exit(code=1)
 
     task_list = pickle.loads(tasks.read_bytes())
-    ep: dict[str, Any] = json.loads(extract_params) if extract_params else {}
 
+    backend = LocalProcessBackend(max_workers=workers)
     client = AerClient()
     try:
-        artifacts = client.extract_batches(
-            extraction_task_batch=task_list,
-            extract_params=ep,
-            max_batch_workers=workers,
-        )
+        artifacts = client.execute_tasks(task_list, backend=backend)
     except Exception as exc:
         console.print(f"[red]Extraction failed:[/red] {exc}")
         raise typer.Exit(code=1)
@@ -346,10 +339,6 @@ def run(
     cells_per_chunk: Annotated[
         int, typer.Option("--cells-per-chunk", help="Max grid cells per task")
     ] = 50,
-    extract_params: Annotated[
-        Optional[str],
-        typer.Option("--extract-params", help="JSON string of extra extraction params"),
-    ] = None,
     verbose: Annotated[
         bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
     ] = False,
@@ -374,7 +363,6 @@ def run(
     intersects = _load_geometry(geojson) if geojson and geojson.exists() else None
     start_dt = datetime.fromisoformat(start) if start else None
     end_dt = datetime.fromisoformat(end) if end else None
-    ep: dict[str, Any] = json.loads(extract_params) if extract_params else {}
 
     output_dir.mkdir(parents=True, exist_ok=True)
     client = AerClient()
@@ -416,12 +404,9 @@ def run(
 
     # Extract
     console.print("[bold blue]⛏️ Extracting...[/bold blue]")
+    backend = LocalProcessBackend(max_workers=workers)
     try:
-        artifacts = client.extract_batches(
-            extraction_task_batch=tasks,
-            extract_params=ep,
-            max_batch_workers=workers,
-        )
+        artifacts = client.execute_tasks(tasks, backend=backend)
     except Exception as exc:
         console.print(f"[red]Extraction failed:[/red] {exc}")
         raise typer.Exit(code=1)

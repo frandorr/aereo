@@ -484,19 +484,27 @@ def test_prepare_for_extraction_passes_extractor_hint(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# extract_batches
+# execute_tasks
 # ---------------------------------------------------------------------------
 
 
-def test_extract_batches_with_profile_hint(monkeypatch):
-    """extract_batches must resolve extractor from each task's profile hint."""
+def test_execute_tasks_empty():
+    """execute_tasks with no tasks returns an empty GeoDataFrame."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    client = AerClient(registry=mock_registry)
+    result = client.execute_tasks([])
+    assert len(result) == 0
+
+
+def test_execute_tasks_with_profile_hint(monkeypatch):
+    """execute_tasks must resolve extractor from each task's profile hint."""
     mock_registry = MagicMock(spec=AerRegistry)
     mock_registry.has_extractor.return_value = True
     mock_registry.find_extractors_for.return_value = []
     mock_extractor = MagicMock()
     monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
     empty_artifact_df = pd.DataFrame()
-    mock_extractor.extract_batches.return_value = empty_artifact_df
+    mock_extractor.extract.return_value = empty_artifact_df
     mock_registry.get_extractor.return_value = mock_extractor
 
     client = AerClient(registry=mock_registry)
@@ -518,11 +526,11 @@ def test_extract_batches_with_profile_hint(monkeypatch):
         grid_cells=[],
         grid_config=grid_config,
     )
-    client.extract_batches([task])
+    client.execute_tasks([task])
     mock_registry.get_extractor.assert_called_once_with("aer-extract-aws-goes")
 
 
-def test_extract_batches_uses_profile_specific_downloaders(monkeypatch):
+def test_execute_tasks_uses_profile_specific_downloaders(monkeypatch):
     """Tasks with different profile downloaders must be passed to extractor intact."""
     mock_registry = MagicMock(spec=AerRegistry)
     mock_registry.has_extractor.return_value = True
@@ -530,7 +538,7 @@ def test_extract_batches_uses_profile_specific_downloaders(monkeypatch):
     mock_extractor = MagicMock()
     monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
     empty_artifact_df = pd.DataFrame()
-    mock_extractor.extract_batches.return_value = empty_artifact_df
+    mock_extractor.extract.return_value = empty_artifact_df
     mock_registry.get_extractor.return_value = mock_extractor
 
     client = AerClient(registry=mock_registry)
@@ -574,40 +582,32 @@ def test_extract_batches_uses_profile_specific_downloaders(monkeypatch):
         grid_config=grid_config,
     )
 
-    client.extract_batches([task_a, task_b])
+    client.execute_tasks([task_a, task_b])
 
-    passed_tasks = mock_extractor.extract_batches.call_args.args[0]
+    passed_tasks = [call.args[0] for call in mock_extractor.extract.call_args_list]
     assert passed_tasks[0].profile.downloader is dl_a
     assert passed_tasks[1].profile.downloader is dl_b
 
 
-def test_extract_batches_falls_back_to_batch_downloader(monkeypatch):
-    """When profile.downloader is None, extract_params['downloader'] must still be passed through."""
+def test_execute_tasks_failure_mode_strict(monkeypatch):
+    """STRICT failure mode raises when a task fails."""
     mock_registry = MagicMock(spec=AerRegistry)
     mock_registry.has_extractor.return_value = True
-    mock_registry.find_extractors_for.return_value = []
     mock_extractor = MagicMock()
-    monkeypatch.setattr("aer.schemas.core.ArtifactSchema.validate", lambda x: x)
-    empty_artifact_df = pd.DataFrame()
-    mock_extractor.extract_batches.return_value = empty_artifact_df
+    mock_extractor.extract.side_effect = RuntimeError("extract failed")
     mock_registry.get_extractor.return_value = mock_extractor
 
     client = AerClient(registry=mock_registry)
-
-    batch_downloader = MagicMock()
     profile = AerProfile(
-        name="no_dl",
+        name="test",
         resolution=100.0,
         collections={"C1": ["var1"]},
         plugin_hints={"extract": "dummy_extractor"},
-        downloader=None,
     )
-
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
     valid_df["geometry"] = Point(0, 0)
     valid_df["collection"] = "C1"
-
     grid_config = GridConfig(target_grid_dist=50_000)
     task = ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
@@ -617,14 +617,40 @@ def test_extract_batches_falls_back_to_batch_downloader(monkeypatch):
         grid_config=grid_config,
     )
 
-    client.extract_batches([task], extract_params={"downloader": batch_downloader})
+    with pytest.raises(RuntimeError, match="extract failed"):
+        client.execute_tasks([task], failure_mode=FailureMode.STRICT)
 
-    passed_tasks = mock_extractor.extract_batches.call_args.args[0]
-    assert passed_tasks[0].profile.downloader is None
-    passed_extract_params = mock_extractor.extract_batches.call_args.kwargs[
-        "extract_params"
-    ]
-    assert passed_extract_params["downloader"] is batch_downloader
+
+def test_execute_tasks_failure_mode_best_effort(monkeypatch):
+    """BEST_EFFORT failure mode returns empty GeoDataFrame when a task fails."""
+    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry.has_extractor.return_value = True
+    mock_extractor = MagicMock()
+    mock_extractor.extract.side_effect = RuntimeError("extract failed")
+    mock_registry.get_extractor.return_value = mock_extractor
+
+    client = AerClient(registry=mock_registry)
+    profile = AerProfile(
+        name="test",
+        resolution=100.0,
+        collections={"C1": ["var1"]},
+        plugin_hints={"extract": "dummy_extractor"},
+    )
+    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    valid_df["geometry"] = Point(0, 0)
+    valid_df["collection"] = "C1"
+    grid_config = GridConfig(target_grid_dist=50_000)
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        profile=profile,
+        uri="test",
+        grid_cells=[],
+        grid_config=grid_config,
+    )
+
+    result = client.execute_tasks([task], failure_mode=FailureMode.BEST_EFFORT)
+    assert len(result) == 0
 
 
 # ---------------------------------------------------------------------------
@@ -633,7 +659,7 @@ def test_extract_batches_falls_back_to_batch_downloader(monkeypatch):
 
 
 def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
-    """Profile search_params and extract_params override batch-level params."""
+    """Profile search_params and extract_params are passed through correctly."""
     from aer.interfaces.core import Extractor
 
     mock_registry = MagicMock(spec=AerRegistry)
@@ -742,10 +768,7 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
         grid_config=grid_config,
     )
 
-    client.extract_batches(
-        [task_a, task_b],
-        extract_params={"calibration": "brightness_temp", "reader": "modis_l1b"},
-    )
+    client.execute_tasks([task_a, task_b])
 
     assert len(_captured) == 2
     by_name = {c["profile_name"]: c["params"] for c in _captured}
@@ -753,10 +776,8 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
     assert by_name["profile_a"] == {
         "calibration": "reflectance",
         "padding": 2,
-        "reader": "modis_l1b",
     }
     assert by_name["profile_b"] == {
         "calibration": "radiance",
         "padding": 4,
-        "reader": "modis_l1b",
     }

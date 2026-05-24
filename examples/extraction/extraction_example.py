@@ -7,6 +7,7 @@ from pathlib import Path
 
 import geopandas as gpd
 from aer.client import AerClient
+from aer.execution import LocalProcessBackend
 from aer.interfaces import AerProfile, GridConfig
 from aer.viz import plot_aoi
 
@@ -119,10 +120,8 @@ uri_path.mkdir(parents=True)
 print("Extracting...", flush=True)
 start_time = time.time()
 
-results_df = client.extract_batches(
-    tasks,
-    max_batch_workers=None,
-)
+backend = LocalProcessBackend(max_workers=None)
+results_df = client.execute_tasks(tasks, backend=backend)
 
 end_time = time.time()
 print(f"Extraction took {end_time - start_time:.2f}s")
