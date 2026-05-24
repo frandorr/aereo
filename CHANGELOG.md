@@ -1,6 +1,12 @@
-# CHANGELOG
+# Changelog
 
-<!-- version list -->
+## 1.0.2 (2026-05-24)
+
+- Initial stable release.
+- Supported sensors: GOES ABI, Sentinel-2 MSI, MODIS, VIIRS, Sentinel-3 OLCI.
+- Plugin-based search/extract architecture with entry-point discovery.
+- Major TOM grid alignment.
+- CLI: `aer run`, `aer plugins`, `aer validate`.
 
 ## v1.0.1 (2026-05-07)
 
