@@ -182,6 +182,7 @@ nav:
           - Examples: examples.md
     - Core Concepts:
           - Pipeline Architecture: pipeline-architecture.md
+          - Execution Backends: execution.md
           - Grid System: grid.md
           - EOIDS: eoids.md
           - Plugins: plugins.md
