@@ -3,13 +3,11 @@ from __future__ import annotations
 import json
 import logging
 from abc import ABC, abstractmethod
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Literal, Mapping, Protocol, Self, Sequence, cast
 
 import attrs
-import pandas as pd
 from aer.grid import GridCell
 from aer.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -359,15 +357,6 @@ class ExtractionTask:
         )
 
 
-def _extract_wrapper(
-    extractor: "Extractor",
-    task: "ExtractionTask",
-    extract_params: Mapping[str, Any] | None,
-) -> "GeoDataFrame[ArtifactSchema]":
-    """Module-level wrapper so ProcessPoolExecutor can pickle the call."""
-    return extractor.extract(task, extract_params)
-
-
 class Extractor(AerPlugin, plugin_abstract=True):
     """Base class for AER extraction plugins.
 
@@ -590,82 +579,3 @@ class Extractor(AerPlugin, plugin_abstract=True):
             time range, and any other relevant attributes.
         """
         ...
-
-    def extract_batches(
-        self,
-        extraction_task_batch: Sequence[ExtractionTask],
-        extract_params: Mapping[str, Any] | None = None,
-        max_batch_workers: int | None = None,
-    ) -> GeoDataFrame[ArtifactSchema]:
-        """
-        Execute extraction over multiple batches, optionally in parallel.
-
-        When ``max_batch_workers`` is set, batches are processed in parallel
-        using ``ProcessPoolExecutor`` with a ``forkserver`` context (Unix) or
-        ``spawn`` context (Windows).  This avoids thread-safety issues that can
-        occur with the default ``fork`` start method when threaded libraries
-        such as dask or rasterio have already been imported in the parent
-        process.  Failed batches are logged and collected; if *all* batches fail
-        a ``RuntimeError`` is raised.
-
-        When ``max_batch_workers`` is ``None`` (default), falls back to
-        sequential execution.
-
-        Args:
-            extraction_task_batch: A sequence of ExtractionTask, where each one contains a batch
-                of assets to extract. This is the output of the `prepare_for_extraction` method.
-            extract_params: Meta-level or tool-level parameters for the extraction
-                (e.g. ``max_retries``, ``credentials``, ``downloader`` callables).
-                Domain-specific configuration should live on each task's ``profile``.
-            max_batch_workers: Maximum number of worker processes for parallel execution.
-                ``None`` (default) disables parallelism and runs sequentially.
-        Returns:
-            A GeoDataFrame of extracted artifacts, where each row corresponds to an extracted asset
-            and its corresponding grid_cell, and includes metadata such as collection, geometry,
-            time range, and any other relevant attributes.
-        """
-        if max_batch_workers is None:
-            # Sequential path (original behaviour)
-            results = []
-            for batch in extraction_task_batch:
-                effective_params = merge_params(
-                    extract_params, batch.profile.extract_params
-                )
-                results.append(self.extract(batch, effective_params))
-            concatenated = pd.concat(results, ignore_index=True)
-            validated = ArtifactSchema.validate(concatenated)
-            return cast(GeoDataFrame[ArtifactSchema], validated)
-
-        # Parallel path
-        results: list[GeoDataFrame[ArtifactSchema]] = []
-        errors: list[str] = []
-
-        tasks = [
-            (self, batch, merge_params(extract_params, batch.profile.extract_params))
-            for batch in extraction_task_batch
-        ]
-
-        with ProcessPoolExecutor(max_workers=max_batch_workers) as executor:
-            futures = {
-                executor.submit(_extract_wrapper, *t): i for i, t in enumerate(tasks)
-            }
-
-            for future in as_completed(futures):
-                batch_idx = futures[future]
-                try:
-                    results.append(future.result())
-                except Exception as exc:  # noqa: BLE001
-                    logger.error(
-                        "batch_extract_failed",
-                        extra={"batch": batch_idx, "error": str(exc)},
-                    )
-                    errors.append(str(exc))
-
-        if not results:
-            raise RuntimeError(
-                f"All {len(extraction_task_batch)} batches failed. Errors: {errors}"
-            )
-
-        concatenated = pd.concat(results, ignore_index=True)
-        validated = ArtifactSchema.validate(concatenated)
-        return cast(GeoDataFrame[ArtifactSchema], validated)

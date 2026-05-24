@@ -16,19 +16,6 @@ from pydantic import ValidationError
 from shapely.geometry import Polygon
 
 
-class _PicklableExtractor(Extractor):
-    """Module-level extractor so ProcessPoolExecutor can pickle it."""
-
-    supported_collections = ["GOES"]
-
-    def extract(
-        self,
-        extraction_task: ExtractionTask,
-        extract_params: dict[str, Any] | None,
-    ) -> GeoDataFrame[ArtifactSchema]:
-        return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
-
-
 def test_plugin_missing_supported_collections():
     with pytest.raises(
         TypeError, match="must define the 'supported_collections' attribute"
@@ -134,81 +121,6 @@ def test_extractor_no_longer_requires_target_grid_d():
 
     extractor = DummyExtractor()
     assert hasattr(extractor, "extract")
-
-
-def test_extractor_extract_batches(monkeypatch):
-    extractor = _PicklableExtractor()
-    monkeypatch.setattr("aer.schemas.ArtifactSchema.validate", lambda x: x)
-
-    df1 = gpd.GeoDataFrame(
-        {"id": [1]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
-    )
-    df2 = gpd.GeoDataFrame(
-        {"id": [2]}, geometry=[Polygon([[1, 1], [2, 1], [2, 2], [1, 2]])]
-    )
-
-    from aer.interfaces.core import AerProfile
-
-    profile = AerProfile(name="default", resolution=10.0)
-    grid_config = GridConfig(target_grid_dist=10_000)
-
-    task1 = ExtractionTask(
-        assets=cast(Any, df1),
-        grid_cells=[],
-        profile=profile,
-        uri="test1",
-        grid_config=grid_config,
-    )
-    task2 = ExtractionTask(
-        assets=cast(Any, df2),
-        grid_cells=[],
-        profile=profile,
-        uri="test2",
-        grid_config=grid_config,
-    )
-
-    result = extractor.extract_batches([task1, task2])
-
-    assert len(result) == 2
-    assert list(result["id"]) == [1, 2]
-
-
-def test_extractor_extract_batches_parallel(monkeypatch):
-    """Parallel path uses forkserver/spawn and succeeds with picklable objects."""
-    extractor = _PicklableExtractor()
-    monkeypatch.setattr("aer.schemas.ArtifactSchema.validate", lambda x: x)
-
-    df1 = gpd.GeoDataFrame(
-        {"id": [1]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
-    )
-    df2 = gpd.GeoDataFrame(
-        {"id": [2]}, geometry=[Polygon([[1, 1], [2, 1], [2, 2], [1, 2]])]
-    )
-
-    from aer.interfaces.core import AerProfile
-
-    profile = AerProfile(name="default", resolution=10.0)
-    grid_config = GridConfig(target_grid_dist=10_000)
-
-    task1 = ExtractionTask(
-        assets=cast(Any, df1),
-        grid_cells=[],
-        profile=profile,
-        uri="test1",
-        grid_config=grid_config,
-    )
-    task2 = ExtractionTask(
-        assets=cast(Any, df2),
-        grid_cells=[],
-        profile=profile,
-        uri="test2",
-        grid_config=grid_config,
-    )
-
-    result = extractor.extract_batches([task1, task2], max_batch_workers=2)
-
-    assert len(result) == 2
-    assert sorted(result["id"].tolist()) == [1, 2]
 
 
 def test_extractor_prepare_for_extraction():
@@ -409,53 +321,6 @@ def test_aer_profile_rejects_extra_params():
 
     with pytest.raises(ValidationError):
         AerProfile(name="test", resolution=100.0, extra_params={"foo": "bar"})  # pyright: ignore[reportCallIssue]
-
-
-_captured_extract_params: list[dict[str, Any] | None] = []
-
-
-def test_extract_batches_merges_profile_extract_params(monkeypatch):
-    """Profile extract_params should override batch extract_params."""
-    _captured_extract_params.clear()
-
-    class _CapturingExtractor(Extractor):
-        supported_collections = ["GOES"]
-
-        def extract(
-            self,
-            extraction_task: ExtractionTask,
-            extract_params: dict[str, Any] | None,
-        ) -> GeoDataFrame[ArtifactSchema]:
-            _captured_extract_params.append(extract_params)
-            return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
-
-    extractor = _CapturingExtractor()
-    monkeypatch.setattr("aer.schemas.ArtifactSchema.validate", lambda x: x)
-
-    df = gpd.GeoDataFrame(
-        {"id": [1]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
-    )
-
-    from aer.interfaces.core import AerProfile
-
-    profile = AerProfile(
-        name="test",
-        resolution=10.0,
-        extract_params={"calibration": "reflectance"},
-    )
-    grid_config = GridConfig(target_grid_dist=10_000)
-    task = ExtractionTask(
-        assets=cast(Any, df),
-        grid_cells=[],
-        profile=profile,
-        uri="test1",
-        grid_config=grid_config,
-    )
-
-    extractor.extract_batches([task], extract_params={"calibration": "radiance"})
-
-    assert len(_captured_extract_params) == 1
-    assert _captured_extract_params[0] == {"calibration": "reflectance"}
 
 
 def test_merge_params_batch_only():
