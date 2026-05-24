@@ -52,6 +52,18 @@ class TaskStaging(Protocol):
         """
         ...
 
+    def result_prefix(self, job_id: str, task_idx: int) -> str:
+        """Return the URI prefix where the remote worker should write results.
+
+        Args:
+            job_id: Logical job identifier.
+            task_idx: Index of the task within the job.
+
+        Returns:
+            A URI prefix (e.g. ``s3://bucket/results/{job_id}/{task_idx}/``).
+        """
+        ...
+
 
 class ExecutionBackend(Protocol):
     """Protocol for pluggable task execution backends.

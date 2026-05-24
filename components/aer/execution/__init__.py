@@ -1,6 +1,6 @@
 """Execution backends and task runner for AER extraction tasks."""
 
-from aer.execution.backends import LambdaBackend
+from aer.execution.backends import LambdaBackend, RetryableLambdaError
 from aer.execution.core import (
     ExecutionBackend,
     LocalProcessBackend,
@@ -14,6 +14,7 @@ __all__ = [
     "ExecutionBackend",
     "LambdaBackend",
     "LocalProcessBackend",
+    "RetryableLambdaError",
     "TaskRunner",
     "TaskStaging",
     "ThreadBackend",

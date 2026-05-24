@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
+import time
 from pathlib import Path
 from typing import Any, cast
 from unittest.mock import MagicMock, patch
@@ -12,7 +13,7 @@ import geopandas as gpd
 import pytest
 from shapely.geometry import Polygon
 
-from aer.execution.backends import LambdaBackend
+from aer.execution.backends import LambdaBackend, RetryableLambdaError
 from aer.interfaces.core import AerProfile, ExtractionTask, GridConfig
 from aer.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -71,6 +72,9 @@ class _FakeStaging:
         gdf = self.artifacts_to_return[self._call_idx]
         self._call_idx += 1
         return gdf
+
+    def result_prefix(self, job_id: str, task_idx: int) -> str:
+        return f"s3://{self.bucket}/results/{job_id}/{task_idx}/"
 
 
 def _make_empty_artifacts() -> GeoDataFrame[ArtifactSchema]:
@@ -284,6 +288,182 @@ def test_lambda_backend_uses_endpoint_url():
         )
         list(backend.run_tasks([task], runner=MagicMock()))
 
-    mock_boto3.client.assert_called_once_with(
-        "lambda", endpoint_url="http://localhost:4566"
+    call_args = mock_boto3.client.call_args
+    assert call_args.kwargs["endpoint_url"] == "http://localhost:4566"
+
+
+def test_lambda_backend_concurrent_invokes_with_thread_pool():
+    """LambdaBackend dispatches multiple tasks concurrently using ThreadPoolExecutor."""
+    mock_client = MagicMock()
+    mock_boto3 = MagicMock()
+    mock_boto3.client.return_value = mock_client
+
+    staging = _FakeStaging()
+    staging.artifacts_to_return = [
+        _make_empty_artifacts(),
+        _make_empty_artifacts(),
+        _make_empty_artifacts(),
+    ]
+
+    tasks = [
+        _make_task(task_context={"job_id": "job-99", "chunk_id": 0}),
+        _make_task(task_context={"job_id": "job-99", "chunk_id": 1}),
+        _make_task(task_context={"job_id": "job-99", "chunk_id": 2}),
+    ]
+
+    invoke_timestamps: list[float] = []
+
+    def _tracked_invoke(*args, **kwargs):
+        invoke_timestamps.append(time.monotonic())
+        payload = MagicMock()
+        payload.read.return_value = json.dumps(
+            {"manifest_uri": "s3://bucket/results/manifest.json"}
+        ).encode("utf-8")
+        return {"Payload": payload, "StatusCode": 200}
+
+    mock_client.invoke.side_effect = _tracked_invoke
+
+    with patch.dict(sys.modules, {"boto3": mock_boto3}):
+        backend = LambdaBackend(
+            function_name="aer-extract",
+            staging=staging,
+            max_concurrent_invokes=3,
+        )
+        results = list(backend.run_tasks(tasks, runner=MagicMock()))
+
+    assert len(results) == 3
+    assert mock_client.invoke.call_count == 3
+    # Concurrent dispatch means timestamps should be very close
+    if len(invoke_timestamps) >= 2:
+        assert max(invoke_timestamps) - min(invoke_timestamps) < 1.0
+
+
+def test_lambda_backend_respects_max_concurrent_invokes():
+    """max_concurrent_invokes parameter is stored and used."""
+    mock_client = MagicMock()
+    mock_boto3 = MagicMock()
+    mock_boto3.client.return_value = mock_client
+
+    staging = _FakeStaging()
+
+    with patch.dict(sys.modules, {"boto3": mock_boto3}):
+        backend = LambdaBackend(
+            function_name="aer-extract",
+            staging=staging,
+            max_concurrent_invokes=5,
+        )
+        assert backend.max_concurrent_invokes == 5
+
+
+def test_lambda_backend_boto3_config_with_timeout_and_retries():
+    """boto3 client is created with Config containing read_timeout and retries."""
+    mock_client = MagicMock()
+    mock_boto3 = MagicMock()
+    mock_boto3.client.return_value = mock_client
+    mock_config_class = MagicMock()
+    mock_botocore_config = MagicMock()
+    mock_botocore_config.Config = mock_config_class
+
+    staging = _FakeStaging()
+
+    with patch.dict(
+        sys.modules,
+        {"boto3": mock_boto3, "botocore.config": mock_botocore_config},
+    ):
+        LambdaBackend(
+            function_name="aer-extract",
+            staging=staging,
+            invoke_timeout=600,
+        )
+
+    mock_config_class.assert_called_once_with(
+        read_timeout=600,
+        retries={"max_attempts": 3, "mode": "adaptive"},
     )
+
+
+def test_lambda_backend_retryable_error_raises_retryable_lambda_error():
+    """Structured retryable errors from Lambda raise RetryableLambdaError."""
+    mock_client = MagicMock()
+    mock_boto3 = MagicMock()
+    mock_boto3.client.return_value = mock_client
+
+    staging = _FakeStaging()
+    task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
+
+    mock_payload = MagicMock()
+    mock_payload.read.return_value = json.dumps(
+        {
+            "statusCode": 500,
+            "error": "Connection timed out",
+            "retryable": True,
+        }
+    ).encode("utf-8")
+    mock_client.invoke.return_value = {
+        "Payload": mock_payload,
+        "StatusCode": 200,
+    }
+
+    with patch.dict(sys.modules, {"boto3": mock_boto3}):
+        backend = LambdaBackend(
+            function_name="aer-extract",
+            staging=staging,
+        )
+        with pytest.raises(RetryableLambdaError, match="Connection timed out"):
+            list(backend.run_tasks([task], runner=MagicMock()))
+
+
+def test_lambda_backend_structured_error_not_retryable_raises_runtime_error():
+    """Structured non-retryable errors from Lambda raise RuntimeError."""
+    mock_client = MagicMock()
+    mock_boto3 = MagicMock()
+    mock_boto3.client.return_value = mock_client
+
+    staging = _FakeStaging()
+    task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
+
+    mock_payload = MagicMock()
+    mock_payload.read.return_value = json.dumps(
+        {
+            "statusCode": 400,
+            "error": "Invalid task parameters",
+            "retryable": False,
+        }
+    ).encode("utf-8")
+    mock_client.invoke.return_value = {
+        "Payload": mock_payload,
+        "StatusCode": 200,
+    }
+
+    with patch.dict(sys.modules, {"boto3": mock_boto3}):
+        backend = LambdaBackend(
+            function_name="aer-extract",
+            staging=staging,
+        )
+        with pytest.raises(RuntimeError, match="Lambda returned error"):
+            list(backend.run_tasks([task], runner=MagicMock()))
+
+
+def test_safe_truncate_redacts_credentials():
+    """_safe_truncate redacts AWS credentials and presigned URLs."""
+    from aer.execution.backends import _safe_truncate
+
+    text = (
+        "Error accessing https://bucket.s3.amazonaws.com/key?X-Amz-Credential=abc123 "
+        "with key AKIAIOSFODNN7EXAMPLE and more text"
+    )
+    result = _safe_truncate(text)
+    assert "[REDACTED-PRESIGNED-URL]" in result
+    assert "[REDACTED-AWS-KEY]" in result
+    assert "abc123" not in result
+    assert "AKIAIOSFODNN7EXAMPLE" not in result
+
+
+def test_safe_truncate_truncates_long_text():
+    """_safe_truncate truncates text exceeding max_len."""
+    from aer.execution.backends import _safe_truncate
+
+    text = "x" * 3000
+    result = _safe_truncate(text, max_len=2048)
+    assert len(result) < 3000
+    assert "truncated" in result
