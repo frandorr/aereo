@@ -93,7 +93,7 @@ grid_config:
   grid_filter_mode: intersection
 ```
 
-These files are also available in [`examples/data/`](examples/data/).
+These files are also available in `examples/data/` in the repository.
 
 ---
 
