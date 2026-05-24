@@ -1,8 +1,8 @@
 services:
   aer-lambda:
     build:
-      context: ../..
-      dockerfile: projects/aer-lambda/Dockerfile
+      context: ../../..
+      dockerfile: aer/projects/aer-lambda/Dockerfile
     ports:
       - "9000:8080"
     environment:

@@ -21,21 +21,31 @@ dependencies = [
   "cattrs>=26.1",
   "geopandas>=1.1.2",
   "majortom-eg",
+  "netcdf4>=1.7.4",
   "numpy",
   "odc-geo>=0.5.1",
+  "odc-stac>=0.5.2",
   "pandas>=3.0.1",
   "pandera[geopandas]>=0.24",
+  "planetary-computer>=1",
+  "protobuf>=7.34.1",
   "pydantic>=2.12.5",
   "pyproj>=3.7.1",
+  "pystac-client>=0.9",
+  "rasterio>=1.5",
+  "rioxarray>=0.22",
+  "satpy>=0.60",
   "shapely>=2.1.2",
   "structlog>=25.5",
   "utm>=0.8.1",
+  "xarray>=2026.4",
 ]
 
 [tool.hatch]
 build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", "." ]
 build.hooks.polylith-bricks = {}
 build.targets.wheel.packages = [ "aer" ]
+build.targets.wheel.force-include."../../components/aer/gdal_env.py" = "aer/gdal_env.py"
 
 [tool.polylith]
 bricks."../../bases/aer/lambda_handler" = "aer/lambda_handler"
@@ -46,3 +56,5 @@ bricks."../../components/aer/serialization" = "aer/serialization"
 bricks."../../components/aer/registry" = "aer/registry"
 bricks."../../components/aer/grid" = "aer/grid"
 bricks."../../components/aer/spatial" = "aer/spatial"
+bricks."../../components/aer/eoids" = "aer/eoids"
+bricks."../../components/aer/asset_downloader" = "aer/asset_downloader"
