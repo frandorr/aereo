@@ -6,6 +6,7 @@ from aer.execution.core import (
     LocalProcessBackend,
     TaskRunner,
     TaskStaging,
+    ThreadBackend,
     setup_gdal_worker,
 )
 
@@ -15,5 +16,6 @@ __all__ = [
     "LocalProcessBackend",
     "TaskRunner",
     "TaskStaging",
+    "ThreadBackend",
     "setup_gdal_worker",
 ]
