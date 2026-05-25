@@ -388,8 +388,8 @@ def test_prepare_for_extraction_passes_grid_config(monkeypatch):
     assert call_kwargs.get("grid_config") == grid_config
 
 
-def test_prepare_for_extraction_passes_cells_per_chunk(monkeypatch):
-    """cells_per_chunk must be forwarded to extractor.prepare_for_extraction."""
+def test_prepare_for_extraction_passes_cells_per_task(monkeypatch):
+    """cells_per_task must be forwarded to extractor.prepare_for_extraction."""
     valid_search_df = _make_valid_search_df()
     client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
 
@@ -399,24 +399,24 @@ def test_prepare_for_extraction_passes_cells_per_chunk(monkeypatch):
         grid_config=grid_config,
         resolution=100.0,
         uri="s3://bucket/out/",
-        cells_per_chunk=10,
+        cells_per_task=10,
     )
 
     call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
-    assert call_kwargs.get("cells_per_chunk") == 10
+    assert call_kwargs.get("cells_per_task") == 10
 
 
 def test_prepare_for_extraction_requires_grid_config(monkeypatch):
-    """grid_config is a required positional argument."""
+    """grid_config must be provided either as argument or client default."""
     valid_search_df = _make_valid_search_df()
     client, _ = _make_prepare_client(monkeypatch, valid_search_df)
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError, match="grid_config must be provided"):
         client.prepare_for_extraction(
             search_results=cast(GeoDataFrame, valid_search_df),
             resolution=100.0,
             uri="s3://bucket/out/",
-        )  # type: ignore[reportCallIssue]
+        )
 
 
 def test_prepare_uses_profile_extract_hint(monkeypatch):

@@ -182,7 +182,7 @@ def test_extractor_prepare_for_extraction():
         grid_config=grid_config,
         profiles=[profile],
         uri="test_uri",
-        cells_per_chunk=1,
+        cells_per_task=1,
     )
 
     assert len(tasks) > 0
@@ -668,7 +668,7 @@ def test_prepare_for_extraction_spatial_filtering():
         grid_config=grid_config,
         profiles=[profile],
         uri="test_uri",
-        cells_per_chunk=1,
+        cells_per_task=1,
     )
 
     # Check that every task only contains 1 asset (either asset_1 or asset_2) because
