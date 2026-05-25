@@ -16,6 +16,7 @@ Find satellite granules that match your time range, area of interest, and sensor
 from datetime import datetime, timezone
 from shapely.geometry import box
 from aer.client import AerClient
+from aer.grid import GridConfig
 from aer.interfaces import AerProfile
 
 aoi = box(-69.76, -39.98, -68.24, -39.05)
@@ -30,13 +31,14 @@ profiles = [
     )
 ]
 
-client = AerClient()
+client = AerClient(
+    profiles=profiles,
+    aoi=aoi,
+)
 
 results = client.search(
-    profiles=profiles,
     start_datetime=datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc),
     end_datetime=datetime(2026, 4, 2, 14, 9, tzinfo=timezone.utc),
-    intersects=aoi,
 )
 print(f"Found {len(results)} assets")
 print(results[["id", "collection", "start_time"]].head())
@@ -74,9 +76,12 @@ profiles = [
     ),
 ]
 
-results = client.search(
+client = AerClient(
     profiles=profiles,
-    intersects=aoi,
+    aoi=aoi,
+)
+
+results = client.search(
     start_datetime=datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc),
     end_datetime=datetime(2026, 4, 2, 14, 9, tzinfo=timezone.utc),
 )
@@ -107,14 +112,16 @@ Turn search results into a list of `ExtractionTask` objects. AER builds a grid o
 ### Minimal example
 
 ```python
+client = AerClient(
+    profiles=profiles,
+    aoi=aoi,
+    grid_config=GridConfig(target_grid_dist=256_000, target_grid_overlap=False),
+    cells_per_task=10,
+)
+
 tasks = client.prepare_for_extraction(
     search_results=results,
-    target_aoi=aoi,
     uri="/tmp/goes_extraction",
-    profiles=profiles,
-    target_grid_dist=256000,      # cell size in metres
-    target_grid_overlap=False,
-    prepare_params={"cells_per_chunk": 10},
 )
 print(f"Prepared {len(tasks)} extraction tasks")
 print(f"Task 0 covers {len(tasks[0].grid_cells)} cells")
@@ -128,7 +135,7 @@ print(f"Task 0 covers {len(tasks[0].grid_cells)} cells")
 | `profiles` / `resolution` | **At least one is required.** If `profiles` is omitted, a default profile named `"default"` is created with the given `resolution`. |
 | `target_aoi` | Clipping geometry. If `None`, the extractor uses the union of all asset geometries. |
 | `uri` | Base output directory for extracted artifacts. |
-| `prepare_params` | Forwarded to the extractor. Common keys: `cells_per_chunk` (default 50), `grid_filter_mode` (`"intersection"`, `"within"`, `"coverage"`), `min_coverage` (float 0.0–1.0). |
+| `prepare_params` | Forwarded to the extractor. Common keys: `cells_per_task` (default 50), `grid_filter_mode` (`"intersection"`, `"within"`, `"coverage"`), `min_coverage` (float 0.0–1.0). |
 | `target_grid_dist` | Override grid cell size in metres (e.g. `256000` for 256 km cells). |
 | `target_grid_overlap` | Override whether grid cells are allowed to overlap. |
 
@@ -137,12 +144,15 @@ print(f"Task 0 covers {len(tasks[0].grid_cells)} cells")
 Pass the same `profiles` list you used in `search()`. `prepare_for_extraction()` uses `profile.resolution`, `profile.extract_params`, and `profile.conform_to` to build tasks.
 
 ```python
-# profiles was used for both search() and prepare_for_extraction()
+# profiles and grid_config were used for both search() and prepare_for_extraction()
+client = AerClient(
+    profiles=profiles,
+    grid_config=GridConfig(target_grid_dist=128_000),
+)
+
 tasks = client.prepare_for_extraction(
     results,
-    profiles=profiles,
     uri="/tmp/output",
-    target_grid_dist=128000,
 )
 ```
 

@@ -148,7 +148,7 @@ AerProfile(
 Large mosaics or high-resolution extractions can exhaust RAM.
 
 **Fixes:**
-- Reduce `cells_per_chunk` (e.g., `1` instead of `50`).
+- Reduce `cells_per_task` (e.g., `1` instead of `50`).
 - Reduce `max_workers` (e.g., `1` instead of `8`).
 - Use a smaller AOI or coarser `target_grid_dist`.
 - Process one profile at a time instead of multiple sensors in parallel.

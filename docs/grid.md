@@ -106,7 +106,7 @@ client.prepare_for_extraction(
     prepare_params={
         "grid_filter_mode": "coverage",
         "min_coverage": 0.5,
-        "cells_per_chunk": 10,
+        "cells_per_task": 10,
     },
 )
 ```
