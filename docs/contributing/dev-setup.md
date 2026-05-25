@@ -30,7 +30,7 @@ AER is organized as a Polylith workspace:
 
 | Directory | Purpose |
 |-----------|---------|
-| `components/` | Reusable bricks (e.g., `aer/data`, `aer/grid`) |
+| `components/` | Reusable bricks (e.g., `aer/grid`, `aer/eoids`) |
 | `bases/` | Entry points (e.g., `aer/client`) |
 | `projects/` | Publishable packages (e.g., `projects/aer-core`) |
 | `test/` | Mirrors the `components/` and `bases/` structure |

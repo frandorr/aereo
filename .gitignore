@@ -252,3 +252,4 @@ examples/test_aoi.geojson
 /*.png
 examples/extraction/09_geotessera_extraction_output/
 .ralph-tui/
+site/
