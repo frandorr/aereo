@@ -5,7 +5,7 @@ edit_uri: edit/main/docs/
 
 # SEO & Social
 site_description: >-
-    AER — Plugin-based satellite data extraction framework.
+    AER.EO — Plugin-based satellite data extraction framework.
     From search to analysis-ready GeoTIFF in minutes.
 site_author: Francisco Dorr
 copyright: Copyright &copy; 2026 Francisco Dorr
@@ -165,10 +165,10 @@ extra:
     social:
         - icon: fontawesome/brands/github
           link: https://github.com/frandorr/aereo
-          name: AER on GitHub
+          name: AER.EO on GitHub
         - icon: fontawesome/brands/python
           link: https://pypi.org/project/aereo/
-          name: AER on PyPI
+          name: AER.EO on PyPI
     version:
         provider: mike
 
