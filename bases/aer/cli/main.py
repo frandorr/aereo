@@ -222,8 +222,8 @@ def prepare(
         Optional[Path],
         typer.Option("--output", "-o", help="Output pickle file for tasks"),
     ] = None,
-    cells_per_chunk: Annotated[
-        int, typer.Option("--cells-per-chunk", help="Max grid cells per task")
+    cells_per_task: Annotated[
+        int, typer.Option("--cells-per-task", help="Max grid cells per task")
     ] = 50,
     verbose: Annotated[
         bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
@@ -262,7 +262,7 @@ def prepare(
             grid_config=grid_config,
             profiles=profiles,
             uri=str(output_dir),
-            cells_per_chunk=cells_per_chunk,
+            cells_per_task=cells_per_task,
         )
     except Exception as exc:
         console.print(f"[red]Prepare failed:[/red] {exc}")
@@ -271,7 +271,7 @@ def prepare(
     task_file = output or (output_dir / "tasks.pkl")
     task_file.write_bytes(pickle.dumps(tasks))
     console.print(
-        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cells_per_chunk}).[/green]"
+        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cells_per_task}).[/green]"
     )
     console.print(f"[green]Wrote tasks to[/green] {task_file}")
 
@@ -342,8 +342,8 @@ def run(
     workers: Annotated[
         int, typer.Option("--workers", "-w", help="Max batch workers")
     ] = 1,
-    cells_per_chunk: Annotated[
-        int, typer.Option("--cells-per-chunk", help="Max grid cells per task")
+    cells_per_task: Annotated[
+        int, typer.Option("--cells-per-task", help="Max grid cells per task")
     ] = 50,
     verbose: Annotated[
         bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
@@ -399,13 +399,13 @@ def run(
             grid_config=grid_config,
             profiles=profiles,
             uri=str(output_dir),
-            cells_per_chunk=cells_per_chunk,
+            cells_per_task=cells_per_task,
         )
     except Exception as exc:
         console.print(f"[red]Prepare failed:[/red] {exc}")
         raise typer.Exit(code=1)
     console.print(
-        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cells_per_chunk}).[/green]"
+        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cells_per_task}).[/green]"
     )
 
     # Extract
