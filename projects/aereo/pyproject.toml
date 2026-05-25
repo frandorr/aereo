@@ -54,14 +54,14 @@ build.targets.wheel.packages = [ "aereo" ]
 
 [tool.polylith]
 bricks."../../bases/aereo/cli" = "aereo/cli"
+bricks."../../bases/aereo/client" = "aereo/client"
 bricks."../../components/aereo/asset_downloader" = "aereo/asset_downloader"
-bricks."../../components/aereo/data" = "aereo/data"
 bricks."../../components/aereo/eoids" = "aereo/eoids"
+bricks."../../components/aereo/execution" = "aereo/execution"
 bricks."../../components/aereo/grid" = "aereo/grid"
 bricks."../../components/aereo/interfaces" = "aereo/interfaces"
 bricks."../../components/aereo/registry" = "aereo/registry"
-bricks."../../components/aereo/repository" = "aereo/repository"
 bricks."../../components/aereo/schemas" = "aereo/schemas"
+bricks."../../components/aereo/serialization" = "aereo/serialization"
 bricks."../../components/aereo/spatial" = "aereo/spatial"
-bricks."../../components/aereo/spectral" = "aereo/spectral"
-bricks."../../bases/aereo/client" = "aereo/client"
+bricks."../../components/aereo/viz" = "aereo/viz"
