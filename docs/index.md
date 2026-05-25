@@ -8,6 +8,8 @@
 
 ---
 
+Satellite data lives in a dozen different catalogs, each with its own API, authentication, and file format. **AER** unifies them into a single pipeline: **search** across catalogs, **extract** assets, and receive everything reprojected to the same **Major TOM grid** — ready for multi-sensor model training.
+
 ## Install
 
 Pick your sensor and copy-paste:
@@ -32,11 +34,14 @@ Pick your sensor and copy-paste:
 
 > **Note:** The PyPI package is `aer-eo` because `aer` is already taken.
 
+> These plugins ship ready to use. AER's architecture makes adding new sensors trivial — a **search plugin** connects the catalog, an **extract plugin** handles the assets, and reprojection to the **Major TOM grid** happens automatically.
+
 ---
 
 ## 10-line example
 
 ```python
+from datetime import datetime, timezone
 from aer.client import AerClient
 from aer.interfaces import AerProfile, GridConfig
 from shapely.geometry import box
@@ -50,8 +55,18 @@ profile = AerProfile(
     search_params={"satellite": "GOES-19"},
     extract_params={"reader": "abi_l1b"},
 )
-results = client.search(profiles=[profile], start_datetime=..., end_datetime=..., intersects=box(-70, -40, -68, -39))
-tasks = client.prepare_for_extraction(results, profiles=[profile], uri="./out", grid_config=GridConfig(target_grid_dist=256000))
+results = client.search(
+    profiles=[profile],
+    start_datetime=datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc),
+    end_datetime=datetime(2026, 4, 2, 14, 10, tzinfo=timezone.utc),
+    intersects=box(-70, -40, -68, -39),
+)
+tasks = client.prepare_for_extraction(
+    results,
+    profiles=[profile],
+    uri="./out",
+    grid_config=GridConfig(target_grid_dist=256000),
+)
 client.execute_tasks(tasks)
 ```
 

@@ -57,6 +57,8 @@ print(results[["id", "collection", "start_time"]].head())
 Pass several profiles at once. AER will dispatch them to the right plugins automatically.
 
 ```python
+from datetime import datetime, timezone
+
 profiles = [
     AerProfile(
         name="goes_c02",
@@ -72,7 +74,12 @@ profiles = [
     ),
 ]
 
-results = client.search(profiles=profiles, intersects=aoi, ...)
+results = client.search(
+    profiles=profiles,
+    intersects=aoi,
+    start_datetime=datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc),
+    end_datetime=datetime(2026, 4, 2, 14, 9, tzinfo=timezone.utc),
+)
 ```
 
 ### Return value inspection
