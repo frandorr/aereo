@@ -3,7 +3,7 @@ build-backend = "hatchling.build"
 requires = [ "hatchling" ]
 
 [project]
-name = "aereo"
+name = "aereo-workspace"
 version = "1.0.0"
 description = "Modular satellite data discovery, extraction, and processing framework"
 readme = "README.md"
