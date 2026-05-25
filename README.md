@@ -1,4 +1,4 @@
-# aer 🪐
+# aereo 🪐
 
 > Plugin-based satellite data extraction — from search to analysis-ready Major TOM grid in minutes.
 
@@ -12,16 +12,16 @@ Pick your sensor and copy-paste:
 
 ```bash
 # GOES ABI (public S3, no auth)
-pip install aer-eo aer-search-aws-goes aer-extract-satpy
+pip install aereo aereo-search-aws-goes aereo-extract-satpy
 
 # Sentinel-2 (Planetary Computer)
-pip install aer-eo aer-search-planetary-computer aer-extract-odc-stac
+pip install aereo aereo-search-planetary-computer aereo-extract-odc-stac
 
 # MODIS / VIIRS / Sentinel-3 (NASA Earthdata)
-pip install aer-eo aer-search-earthaccess aer-extract-satpy
+pip install aereo aereo-search-earthaccess aereo-extract-satpy
 ```
 
-> **Note:** The PyPI package is `aer-eo` because `aer` is already taken.
+> **Note:** The PyPI package is `aereo` because `aereo` is already taken.
 
 > These plugins ship ready to use. AER's architecture makes adding new sensors trivial — a **search plugin** connects the catalog, an **extract plugin** handles the assets, and reprojection to the **Major TOM grid** happens automatically.
 
@@ -31,8 +31,8 @@ pip install aer-eo aer-search-earthaccess aer-extract-satpy
 
 ```python
 from datetime import datetime, timezone
-from aer.client import AerClient
-from aer.interfaces import AerProfile, GridConfig
+from aereo.client import AerClient
+from aereo.interfaces import AerProfile, GridConfig
 from shapely.geometry import box
 
 client = AerClient()
@@ -49,10 +49,10 @@ Open `./out/` — you have GeoTIFFs.
 
 ## Docs & Examples
 
-- [Quick Start](https://frandorr.github.io/aer/quickstart/) — first extraction in 3 minutes
-- [Examples](https://frandorr.github.io/aer/examples/) — GOES, Sentinel-2, multi-sensor, ML-ready
-- [CLI](https://frandorr.github.io/aer/cli/) — zero-code `aer run`
-- [Build a Plugin](https://frandorr.github.io/aer/build-your-own-plugin/) — extend AER
+- [Quick Start](https://frandorr.github.io/aereo/quickstart/) — first extraction in 3 minutes
+- [Examples](https://frandorr.github.io/aereo/examples/) — GOES, Sentinel-2, multi-sensor, ML-ready
+- [CLI](https://frandorr.github.io/aereo/cli/) — zero-code `aereo run`
+- [Build a Plugin](https://frandorr.github.io/aereo/build-your-own-plugin/) — extend AER
 
 ---
 

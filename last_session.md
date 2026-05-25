@@ -5,4 +5,4 @@
 - Redefinición de los parámetros de cada hook para facilitar su futura implementación.
 
 ## Próximos Pasos
-- Continuar trabajando a partir del archivo `components/aer/hookspecs/core.py` para seguir implementando y utilizando los hooks.
+- Continuar trabajando a partir del archivo `components/aereo/hookspecs/core.py` para seguir implementando y utilizando los hooks.

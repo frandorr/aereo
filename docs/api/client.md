@@ -5,9 +5,9 @@
 ```python
 from datetime import datetime, timezone
 from shapely.geometry import box
-from aer.client import AerClient
-from aer.interfaces import AerProfile
-from aer.execution import LocalProcessBackend
+from aereo.client import AerClient
+from aereo.interfaces import AerProfile
+from aereo.execution import LocalProcessBackend
 
 client = AerClient()
 

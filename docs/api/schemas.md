@@ -1,3 +1,3 @@
-# aer.schemas
+# aereo.schemas
 
 ::: aer.schemas

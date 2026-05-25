@@ -1,31 +1,31 @@
-# Build Your Own `aer` Plugin
+# Build Your Own `aereo` Plugin
 
-The `aer` framework is designed to be fully extensible using Python's standard `entry_points` mechanism. Third-party developers can create standalone Python packages that seamlessly integrate into the `aer` ecosystem.
+The `aereo` framework is designed to be fully extensible using Python's standard `entry_points` mechanism. Third-party developers can create standalone Python packages that seamlessly integrate into the `aereo` ecosystem.
 
 ## Quick Start
 
-The **best and easiest approach** for building an `aer` plugin is to create a separate repository. This allows you to develop, test, and release your integration independently, without dealing with the core repository's Polylith architecture constraints.
+The **best and easiest approach** for building an `aereo` plugin is to create a separate repository. This allows you to develop, test, and release your integration independently, without dealing with the core repository's Polylith architecture constraints.
 
 ## Step 1: Bootstrap Your Repository
 
-We recommend using the [`aer-plugin-template`](https://github.com/frandorr/aer-plugin-template) as the foundation for your plugin. It comes pre-configured with the standard Python tooling (`uv`, `ruff`, `pyright`, `pytest` etc.) used across the `aer` ecosystem.
+We recommend using the [`aereo-plugin-template`](https://github.com/frandorr/aereo-plugin-template) as the foundation for your plugin. It comes pre-configured with the standard Python tooling (`uv`, `ruff`, `pyright`, `pytest` etc.) used across the `aereo` ecosystem.
 
-1. Go to [https://github.com/frandorr/aer-plugin-template](https://github.com/frandorr/aer-plugin-template).
+1. Go to [https://github.com/frandorr/aereo-plugin-template](https://github.com/frandorr/aereo-plugin-template).
 2. Click **Use this template** -> **Create a new repository**.
 3. Name your repository (e.g., `aer-plugin-acme`) and clone it locally.
 
 ## Step 2: Add Dependencies
 
-Your plugin only needs to depend on the core `aer` package to access its interfaces and schemas.
+Your plugin only needs to depend on the core `aereo` package to access its interfaces and schemas.
 
-Update your `pyproject.toml` dependencies to include `aer-eo`:
+Update your `pyproject.toml` dependencies to include `aereo`:
 
 ```toml
 [project]
 name = "aer-plugin-acme"
 version = "0.1.0"
 dependencies = [
-    "aer-eo",
+    "aereo",
     "geopandas",  # For returning standard schemas
     "pandera",    # For schema validation (Optional but recommended)
 ]
@@ -54,8 +54,8 @@ import pandas as pd
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
 
-from aer.interfaces import SearchProvider
-from aer.schemas import AssetSchema
+from aereo.interfaces import SearchProvider
+from aereo.schemas import AssetSchema
 
 
 class AcmeSearchProvider(SearchProvider):
@@ -104,8 +104,8 @@ Create your extractor (e.g., in `acme_plugin/extract.py`). Extract plugins MUST 
 from typing import Any
 
 from pandera.typing.geopandas import GeoDataFrame
-from aer.interfaces import Extractor
-from aer.schemas import AssetSchema, ArtifactSchema
+from aereo.interfaces import Extractor
+from aereo.schemas import AssetSchema, ArtifactSchema
 
 
 class AcmeExtractor(Extractor):
@@ -164,12 +164,12 @@ class AcmeExtractor(Extractor):
 
 ## Step 4: Register the Entry Point
 
-`aer` discovers third-party plugins automatically using **Python Entry Points**.
+`aereo` discovers third-party plugins automatically using **Python Entry Points**.
 
-Add the plugin class paths to your `pyproject.toml` under the unified `aer.plugins` group:
+Add the plugin class paths to your `pyproject.toml` under the unified `aereo.plugins` group:
 
 ```toml
-[project.entry-points."aer.plugins"]
+[project.entry-points."aereo.plugins"]
 # alias = "module.path:ClassName"
 acme_search = "acme_plugin.search:AcmeSearchProvider"
 acme_extract = "acme_plugin.extract:AcmeExtractor"
@@ -184,7 +184,7 @@ acme_extract = "acme_plugin.extract:AcmeExtractor"
 Pydantic models accept keyword arguments just like the old attrs class:
 
 ```python
-from aer.interfaces import AerProfile
+from aereo.interfaces import AerProfile
 
 profile = AerProfile(
     name="acme_l1",
@@ -216,7 +216,7 @@ Load them with the class methods provided on `AerProfile`:
 
 ```python
 from pathlib import Path
-from aer.interfaces import AerProfile
+from aereo.interfaces import AerProfile
 
 # From a YAML file
 profiles = AerProfile.from_yaml(Path("profiles.yaml"))
@@ -253,8 +253,8 @@ If the module or attribute does not exist, Pydantic raises a clear `ValidationEr
 Test your plugin using the high-level `AerClient` API:
 
 ```python
-from aer.client import AerClient
-from aer.interfaces import AerProfile
+from aereo.client import AerClient
+from aereo.interfaces import AerProfile
 from datetime import datetime
 from pathlib import Path
 
@@ -279,7 +279,7 @@ tasks = client.prepare_for_extraction(
 )
 
 # 3. Extract
-from aer.execution import LocalProcessBackend
+from aereo.execution import LocalProcessBackend
 
 backend = LocalProcessBackend()
 artifacts = client.execute_tasks(tasks, backend=backend)
@@ -298,7 +298,7 @@ uv publish
 Users install it like any other package:
 
 ```bash
-pip install aer-plugin-acme
+pip install aereo-plugin-acme
 ```
 
 ## Available Interfaces
@@ -312,13 +312,13 @@ See the `aer.interfaces` module for detailed documentation.
 
 ---
 
-## Troubleshooting: Local Development alongside `aer`
+## Troubleshooting: Local Development alongside `aereo`
 
-If you are developing your plugin *simultaneously* with the `aer` core framework on the same machine (e.g., using `uv` workspace paths), you might notice that `uv sync` installs the dependencies into your `.venv` and masks your local source edits.
+If you are developing your plugin *simultaneously* with the `aereo` core framework on the same machine (e.g., using `uv` workspace paths), you might notice that `uv sync` installs the dependencies into your `.venv` and masks your local source edits.
 
-This happens because `aer` uses `hatch-polylith-bricks`, which by default bundles files during an editable install.
+This happens because `aereo` uses `hatch-polylith-bricks`, which by default bundles files during an editable install.
 
-To fix this and force `hatchling` to use `.pth` namespace pointer files instead of copying physical files, add `build.dev-mode-dirs` to the `[tool.hatch]` configuration in both your plugin's and `aer-eo`'s `pyproject.toml` files:
+To fix this and force `hatchling` to use `.pth` namespace pointer files instead of copying physical files, add `build.dev-mode-dirs` to the `[tool.hatch]` configuration in both your plugin's and `aereo`'s `pyproject.toml` files:
 
 ```toml
 [tool.hatch]
@@ -329,6 +329,6 @@ build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", 
 Then clear the cached packages and reinstall:
 ```bash
 rm -rf .venv/lib/python*/site-packages/aer
-uv sync --reinstall-package aer-eo --reinstall-package aer-plugin-acme
+uv sync --reinstall-package aereo --reinstall-package aer-plugin-acme
 ```
 Your local imports will now properly resolve directly to your hot-reloading `components/` directory.

@@ -2,9 +2,9 @@
 # --- Plot AOI on a map ---
 from datetime import datetime, timezone
 
-from aer.client import AerClient
-from aer.execution import LocalProcessBackend
-from aer.interfaces import AerProfile, GridConfig
+from aereo.client import AerClient
+from aereo.execution import LocalProcessBackend
+from aereo.interfaces import AerProfile, GridConfig
 from shapely.geometry import box
 
 # --- Configuration ---
@@ -68,7 +68,7 @@ print(f"Extracted {len(results_df)} artifacts")
 # --- Mosaic & plot extracted artifacts ---
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir  # noqa: E402
+from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir  # noqa: E402
 from pyproj import Transformer  # noqa: E402
 from shapely.ops import transform as shapely_transform  # noqa: E402
 

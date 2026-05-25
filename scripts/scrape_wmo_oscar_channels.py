@@ -3,7 +3,7 @@
 
 Reads wmo_oscar_instruments.csv, fetches each instrument's OSCAR page,
 extracts the "Detailed characteristics" frequency table, and writes
-one JSON file per instrument to components/aer/data/wmo_oscar_instruments/.
+one JSON file per instrument to components/aereo/data/wmo_oscar_instruments/.
 """
 
 import argparse
@@ -19,7 +19,7 @@ import httpx
 from bs4 import BeautifulSoup
 
 BASE_URL = "https://space.oscar.wmo.int/instruments/view/"
-DATA_DIR = Path(__file__).resolve().parent.parent / "components" / "aer" / "data"
+DATA_DIR = Path(__file__).resolve().parent.parent / "components" / "aereo" / "data"
 INSTRUMENTS_CSV = DATA_DIR / "wmo_oscar_instruments.csv"
 OUTPUT_DIR = DATA_DIR / "wmo_oscar_instruments"
 

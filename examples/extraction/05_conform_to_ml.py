@@ -16,9 +16,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import geopandas as gpd
-from aer.client import AerClient
-from aer.execution import LocalProcessBackend
-from aer.interfaces import AerProfile, GridConfig
+from aereo.client import AerClient
+from aereo.execution import LocalProcessBackend
+from aereo.interfaces import AerProfile, GridConfig
 
 # --- Configuration ---
 # Use a historical date known to have Sentinel-2 coverage over Chocon AOI.

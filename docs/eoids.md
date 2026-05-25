@@ -128,8 +128,8 @@ To ensure strict compliance across all plugins, use the `build_eoids_path` funct
 
 ```python
 import datetime
-from aer.eoids import build_eoids_path
-from aer.interfaces import AerProfile
+from aereo.eoids import build_eoids_path
+from aereo.interfaces import AerProfile
 
 profile = AerProfile(
     name="goes_c01",

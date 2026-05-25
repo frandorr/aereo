@@ -1,3 +1,3 @@
-# aer.viz
+# aereo.viz
 
 ::: aer.viz

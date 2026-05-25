@@ -1,0 +1,60 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatch-polylith-bricks", "hatchling" ]
+
+[project]
+name = "aereo-lambda"
+version = "1.0.0"
+description = "AER Lambda container image — polylith project"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+  "aereo-extract-remote>=1",
+  "attrs>=25.4",
+  "boto3>=1.34",
+  "cattrs>=26.1",
+  "geopandas>=1.1.2",
+  "majortom-eg",
+  "netcdf4>=1.7.4",
+  "numpy",
+  "odc-geo>=0.5.1",
+  "odc-stac>=0.5.2",
+  "pandas>=3.0.1",
+  "pandera[geopandas]>=0.24",
+  "planetary-computer>=1",
+  "protobuf>=7.34.1",
+  "pydantic>=2.12.5",
+  "pyproj>=3.7.1",
+  "pystac-client>=0.9",
+  "rasterio>=1.5",
+  "rioxarray>=0.22",
+  "satpy>=0.60",
+  "shapely>=2.1.2",
+  "structlog>=25.5",
+  "utm>=0.8.1",
+  "xarray>=2026.4",
+]
+
+[tool.hatch]
+build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", "." ]
+build.hooks.polylith-bricks = {}
+build.targets.wheel.packages = [ "aereo" ]
+build.targets.wheel.force-include."../../components/aereo/gdal_env.py" = "aereo/gdal_env.py"
+
+[tool.polylith]
+bricks."../../bases/aereo/lambda_handler" = "aereo/lambda_handler"
+bricks."../../components/aereo/interfaces" = "aereo/interfaces"
+bricks."../../components/aereo/schemas" = "aereo/schemas"
+bricks."../../components/aereo/execution" = "aereo/execution"
+bricks."../../components/aereo/serialization" = "aereo/serialization"
+bricks."../../components/aereo/registry" = "aereo/registry"
+bricks."../../components/aereo/grid" = "aereo/grid"
+bricks."../../components/aereo/spatial" = "aereo/spatial"
+bricks."../../components/aereo/eoids" = "aereo/eoids"
+bricks."../../components/aereo/asset_downloader" = "aereo/asset_downloader"

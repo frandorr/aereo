@@ -143,7 +143,7 @@ Transform search results into a batch of `ExtractionTask` objects. Groups assets
 
 ### Output: `Sequence[ExtractionTask]`
 
-Each `ExtractionTask` (from `aer.interfaces.core`) contains:
+Each `ExtractionTask` (from `aereo.interfaces.core`) contains:
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
@@ -264,12 +264,12 @@ This makes it trivial to:
 
 ## Plugin Discovery & Registration
 
-Plugins are discovered automatically via Python `entry_points(group="aer.plugins")`. Each plugin must inherit from `SearchProvider` or `Extractor` and declare `supported_collections`.
+Plugins are discovered automatically via Python `entry_points(group="aereo.plugins")`. Each plugin must inherit from `SearchProvider` or `Extractor` and declare `supported_collections`.
 
 ```
 ┌─────────────────────────────────────────┐
 │           Python Entry Points           │
-│         (group="aer.plugins")            │
+│         (group="aereo.plugins")            │
 └─────────────────────────────────────────┘
                     │
         ┌──────────┴──────────┐

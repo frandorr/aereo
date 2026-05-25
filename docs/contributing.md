@@ -40,7 +40,7 @@ AER uses [uv](https://docs.astral.sh/uv/) for dependency management and [Polylit
 ### Clone and Install
 
 ```bash
-git clone https://github.com/frandorr/aer.git
+git clone https://github.com/frandorr/aereo.git
 cd aer
 uv sync --all-extras
 ```
@@ -69,7 +69,7 @@ uv run pytest
 ### Specific Test Directory
 
 ```bash
-uv run pytest test/components/aer/grid
+uv run pytest test/components/aereo/grid
 ```
 
 ### With Type Checking
@@ -162,4 +162,4 @@ Configuration is in `pyproject.toml`.
 
 ## Questions?
 
-Feel free to open a [Discussion](https://github.com/frandorr/aer/discussions) or reach out in an existing issue.
+Feel free to open a [Discussion](https://github.com/frandorr/aereo/discussions) or reach out in an existing issue.

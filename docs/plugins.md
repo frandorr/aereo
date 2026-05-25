@@ -1,6 +1,6 @@
-# aer Plugin System
+# aereoeo Plugin System
 
-`aer` uses a modular, object-oriented plugin architecture built around standard Python `entry_points`. This allows developers to seamlessly register new search providers and extractors for satellite data collections without needing complex third-party hook libraries like `pluggy`.
+`aereo` uses a modular, object-oriented plugin architecture built around standard Python `entry_points`. This allows developers to seamlessly register new search providers and extractors for satellite data collections without needing complex third-party hook libraries like `pluggy`.
 
 ## How it Works
 
@@ -29,8 +29,8 @@ from datetime import datetime
 from shapely.geometry.base import BaseGeometry
 from pandera.typing.geopandas import GeoDataFrame
 
-from aer.interfaces import SearchProvider
-from aer.schemas import AssetSchema
+from aereo.interfaces import SearchProvider
+from aereo.schemas import AssetSchema
 
 class MySearchProvider(SearchProvider):
     supported_collections = ["my-satellite-data"]
@@ -54,8 +54,8 @@ Plugins must declare `supported_collections` as a sequence of strings.
 ```python
 from typing import Any
 from pandera.typing.geopandas import GeoDataFrame
-from aer.interfaces import Extractor
-from aer.schemas import AssetSchema, ArtifactSchema
+from aereo.interfaces import Extractor
+from aereo.schemas import AssetSchema, ArtifactSchema
 
 class MyExtractor(Extractor):
     supported_collections = ["my-satellite-data"]
@@ -83,8 +83,8 @@ The `AerClient` provides a simple, robust interface that handles plugin discover
 
 ```python
 from datetime import datetime, timezone
-from aer.client import AerClient
-from aer.interfaces import AerProfile
+from aereo.client import AerClient
+from aereo.interfaces import AerProfile
 
 client = AerClient()
 
@@ -112,7 +112,7 @@ tasks = client.prepare_for_extraction(
     uri="output/goes",
 )
 
-from aer.execution import LocalProcessBackend
+from aereo.execution import LocalProcessBackend
 
 # 3. Extract
 backend = LocalProcessBackend(max_workers=4)
@@ -125,7 +125,7 @@ print(f"Extracted {len(artifacts_df)} artifacts.")
 If you need fine-grained control, use the `AerRegistry` directly. It parses `entry_points` and provides instantiated plugin objects.
 
 ```python
-from aer.registry import AerRegistry
+from aereo.registry import AerRegistry
 
 registry = AerRegistry()
 
@@ -141,10 +141,10 @@ extractor = registry.get_extractor(extractor_names[0])
 
 ## Entry Points & Discovery
 
-Plugins are discovered automatically via Python `entry_points`. Declare them in `pyproject.toml` under the unified `aer.plugins` group:
+Plugins are discovered automatically via Python `entry_points`. Declare them in `pyproject.toml` under the unified `aereo.plugins` group:
 
 ```toml
-[project.entry-points."aer.plugins"]
+[project.entry-points."aereo.plugins"]
 my_searcher = "my_package.module:MySearchProvider"
 my_extractor = "my_package.extraction:MyExtractor"
 ```

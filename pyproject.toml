@@ -3,11 +3,11 @@ build-backend = "hatchling.build"
 requires = [ "hatchling" ]
 
 [project]
-name = "aer"
+name = "aereo"
 version = "1.0.0"
 description = "Modular satellite data discovery, extraction, and processing framework"
 readme = "README.md"
-keywords = [ "aer", "earth-observation", "plugin", "remote-sensing", "satellite" ]
+keywords = [ "aereo", "earth-observation", "plugin", "remote-sensing", "satellite" ]
 license = "Apache-2.0"
 authors = [ { name = "Francisco Dorr" } ]
 requires-python = ">=3.12"
@@ -47,25 +47,25 @@ dependencies = [
   "typer>=0.12",
   "utm>=0.8.1",
 ]
-optional-dependencies.aws-goes = [ "aer-search-aws-goes>=2" ]
+optional-dependencies.aws-goes = [ "aereo-search-aws-goes>=2" ]
 optional-dependencies.docs = [ "mkdocs-material>=9", "mkdocs-minify-plugin>=0.8", "mkdocstrings[python]>=0.24" ]
-optional-dependencies.earthaccess = [ "aer-search-earthaccess>=1.1.1" ]
-urls.Documentation = "https://frandorr.github.io/aer"
-urls.Homepage = "https://github.com/frandorr/aer"
-urls.Issues = "https://github.com/frandorr/aer/issues"
-urls.Repository = "https://github.com/frandorr/aer"
+optional-dependencies.earthaccess = [ "aereo-search-earthaccess>=1.1.1" ]
+urls.Documentation = "https://frandorr.github.io/aereo"
+urls.Homepage = "https://github.com/frandorr/aereo"
+urls.Issues = "https://github.com/frandorr/aereo/issues"
+urls.Repository = "https://github.com/frandorr/aereo"
 
 [dependency-groups]
 dev = [
-  "aer-extract-aws-goes",
-  "aer-extract-odc-stac",
-  "aer-extract-remote",
-  "aer-extract-satpy",
-  "aer-extract-tessera",
-  "aer-search-aws-goes>=2",
-  "aer-search-earthaccess>=2.0.3,<3",
-  "aer-search-planetary-computer",
-  "aer-search-tessera",
+  "aereo-extract-aws-goes",
+  "aereo-extract-odc-stac",
+  "aereo-extract-remote",
+  "aereo-extract-satpy",
+  "aereo-extract-tessera",
+  "aereo-search-aws-goes>=2",
+  "aereo-search-earthaccess>=2.0.3,<3",
+  "aereo-search-planetary-computer",
+  "aereo-search-tessera",
   "basedpyright>=1.38",
   "cartopy>=0.25",
   "graphviz>=0.21",
@@ -93,16 +93,16 @@ build.dev-mode-dirs = [ "components", "bases", "development", "../majortom", "."
 metadata.allow-direct-references = true
 
 [tool.uv]
-sources.aer-eo = { path = "projects/aer-core", editable = true }
-sources.aer-extract-aws-goes = { path = "../aer-extract-aws-goes/projects/aer-extract-aws-goes", editable = true }
-sources.aer-extract-odc-stac = { path = "../aer-extract-odc-stac/projects/aer-extract-odc-stac", editable = true }
-sources.aer-extract-remote = { path = "../aer-extract-remote", editable = true }
-sources.aer-extract-satpy = { path = "../aer-extract-satpy/projects/aer-extract-satpy", editable = true }
-sources.aer-extract-tessera = { path = "../aer-extract-tessera/projects/aer-extract-tessera", editable = true }
-sources.aer-search-aws-goes = { path = "../aer-search-aws-goes/projects/aer-search-aws-goes", editable = true }
-sources.aer-search-earthaccess = { path = "../aer-search-earthaccess/projects/aer-search-earthaccess", editable = true }
-sources.aer-search-planetary-computer = { path = "../aer-search-planetary-computer/projects/aer-search-planetary-computer", editable = true }
-sources.aer-search-tessera = { path = "../aer-search-tessera/projects/aer-search-tessera", editable = true }
+sources.aereo = { path = "projects/aereo", editable = true }
+sources.aereo-extract-aws-goes = { path = "../aereo-extract-aws-goes/projects/aereo-extract-aws-goes", editable = true }
+sources.aereo-extract-odc-stac = { path = "../aereo-extract-odc-stac/projects/aereo-extract-odc-stac", editable = true }
+sources.aereo-extract-remote = { path = "../aereo-extract-remote", editable = true }
+sources.aereo-extract-satpy = { path = "../aereo-extract-satpy/projects/aereo-extract-satpy", editable = true }
+sources.aereo-extract-tessera = { path = "../aereo-extract-tessera/projects/aereo-extract-tessera", editable = true }
+sources.aereo-search-aws-goes = { path = "../aereo-search-aws-goes/projects/aereo-search-aws-goes", editable = true }
+sources.aereo-search-earthaccess = { path = "../aereo-search-earthaccess/projects/aereo-search-earthaccess", editable = true }
+sources.aereo-search-planetary-computer = { path = "../aereo-search-planetary-computer/projects/aereo-search-planetary-computer", editable = true }
+sources.aereo-search-tessera = { path = "../aereo-search-tessera/projects/aereo-search-tessera", editable = true }
 managed = true
 workspace.members = [ "projects/*" ]
 
@@ -163,13 +163,13 @@ reportMissingImports = false
 extraPaths = [ "components", "bases", "development" ]
 
 [tool.polylith]
-bricks."components/aer/eoids" = "aer/eoids"
-bricks."components/aer/grid" = "aer/grid"
-bricks."components/aer/interfaces" = "aer/interfaces"
-bricks."components/aer/registry" = "aer/registry"
-bricks."components/aer/schemas" = "aer/schemas"
-bricks."components/aer/spatial" = "aer/spatial"
-bricks."components/aer/asset_downloader" = "aer/asset_downloader"
-bricks."bases/aer/cli" = "aer/cli"
-bricks."bases/aer/client" = "aer/client"
-bricks."bases/aer/lambda_handler" = "aer/lambda_handler"
+bricks."components/aereo/eoids" = "aereo/eoids"
+bricks."components/aereo/grid" = "aereo/grid"
+bricks."components/aereo/interfaces" = "aereo/interfaces"
+bricks."components/aereo/registry" = "aereo/registry"
+bricks."components/aereo/schemas" = "aereo/schemas"
+bricks."components/aereo/spatial" = "aereo/spatial"
+bricks."components/aereo/asset_downloader" = "aereo/asset_downloader"
+bricks."bases/aereo/cli" = "aereo/cli"
+bricks."bases/aereo/client" = "aereo/client"
+bricks."bases/aereo/lambda_handler" = "aereo/lambda_handler"

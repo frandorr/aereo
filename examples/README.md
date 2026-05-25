@@ -7,7 +7,7 @@ Runnable `.py` examples (with `# %%` cell markers for Jupyter compatibility) dem
 ## Before You Start
 
 1. **Python ≥ 3.13** — `python --version`
-2. **aer installed** — run `uv sync` from the repo root
+2. **aereo installed** — run `uv sync` from the repo root
 3. **Earthdata login** (only for NASA sensors in example 04: VIIRS, Sentinel-3):
    ```bash
    # Option 1: Create a .netrc file
@@ -221,7 +221,7 @@ Using a real VIIRS granule over Buenos Aires (13 grid cells total):
 ### Usage
 
 ```python
-from aer.interfaces import GridConfig
+from aereo.interfaces import GridConfig
 
 grid = GridConfig(
     target_grid_dist=50_000,

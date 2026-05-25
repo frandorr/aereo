@@ -6,10 +6,10 @@ AER ships with a command-line interface for users who prefer YAML configuration 
 
 ## Installation
 
-The CLI is included with `aer-eo`:
+The CLI is included with `aereo`:
 
 ```bash
-pip install aer-eo aer-search-aws-goes aer-extract-satpy
+pip install aereo aereo-search-aws-goes aereo-extract-satpy
 ```
 
 ---
@@ -19,7 +19,7 @@ pip install aer-eo aer-search-aws-goes aer-extract-satpy
 List every search and extract plugin AER can discover:
 
 ```bash
-aer plugins
+aereo plugins
 ```
 
 If a plugin is missing, install the corresponding pip package and run the command again.
@@ -28,10 +28,10 @@ If a plugin is missing, install the corresponding pip package and run the comman
 
 ## One-shot extraction
 
-`aer run` performs search → prepare → extract in a single command.
+`aereo run` performs search → prepare → extract in a single command.
 
 ```bash
-aer run \
+aereo run \
   --profile goes.yaml \
   --geojson chocon.geojson \
   --start 2026-04-02T14:00 \
@@ -104,7 +104,7 @@ For finer control, run each phase separately. This is useful when you want to in
 ### 1. Search
 
 ```bash
-aer search \
+aereo search \
   --profile goes.yaml \
   --geojson aoi.geojson \
   --start 2026-04-02T14:00 \
@@ -117,7 +117,7 @@ aer search \
 ### 2. Prepare
 
 ```bash
-aer prepare \
+aereo prepare \
   --profile goes.yaml \
   --config grid.yaml \
   --output-dir ./out \
@@ -130,7 +130,7 @@ aer prepare \
 ### 3. Extract
 
 ```bash
-aer extract \
+aereo extract \
   --output-dir ./out \
   --workers 4 \
   tasks.pkl
@@ -146,10 +146,10 @@ Catch schema errors before starting a long extraction:
 
 ```bash
 # Validate a profile
-aer validate --profile goes.yaml
+aereo validate --profile goes.yaml
 
 # Validate a grid config
-aer validate --config grid.yaml
+aereo validate --config grid.yaml
 ```
 
 Validation exits with code `0` on success and code `1` on failure, printing the specific validation error.
@@ -160,7 +160,7 @@ Validation exits with code `0` on success and code `1` on failure, printing the 
 
 - **Multiple profiles** — pass `--profile` more than once to extract several sensors in one run:
   ```bash
-  aer run -p goes.yaml -p s2.yaml -g aoi.geojson --start 2026-04-02T14:00 --end 2026-04-02T14:10
+  aereo run -p goes.yaml -p s2.yaml -g aoi.geojson --start 2026-04-02T14:00 --end 2026-04-02T14:10
   ```
 - **Date formats** — any ISO 8601 string works (`2026-04-02`, `2026-04-02T14:00`, `2026-04-02T14:00:00Z`).
 - **AOI from GeoJSON** — the file can be a `Feature`, `FeatureCollection`, or raw `Geometry`. AER uses the first feature found.

@@ -1,6 +1,6 @@
 site_name: ""
-site_url: https://frandorr.github.io/aer
-repo_url: https://github.com/frandorr/aer
+site_url: https://frandorr.github.io/aereo
+repo_url: https://github.com/frandorr/aereo
 edit_uri: edit/main/docs/
 
 # SEO & Social
@@ -164,10 +164,10 @@ not_in_nav: |
 extra:
     social:
         - icon: fontawesome/brands/github
-          link: https://github.com/frandorr/aer
+          link: https://github.com/frandorr/aereo
           name: AER on GitHub
         - icon: fontawesome/brands/python
-          link: https://pypi.org/project/aer-eo/
+          link: https://pypi.org/project/aereo/
           name: AER on PyPI
     version:
         provider: mike

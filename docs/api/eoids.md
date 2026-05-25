@@ -1,3 +1,3 @@
-# aer.eoids
+# aereo.eoids
 
 ::: aer.eoids

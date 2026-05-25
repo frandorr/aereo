@@ -3,11 +3,11 @@
 # GeoTessera embedding extraction: search → extract → visualize embedding bands.
 #
 # This example demonstrates the full pipeline for GeoTessera satellite
-# embeddings using the aer-search-tessera and aer-extract-tessera plugins.
+# embeddings using the aereo-search-tessera and aereo-extract-tessera plugins.
 #
 # Plugins used:
-#   - aer-search-tessera  (search provider)
-#   - aer-extract-tessera (extractor)
+#   - aereo-search-tessera  (search provider)
+#   - aereo-extract-tessera (extractor)
 #
 # The GeoTessera dataset provides 128-dimensional embedding tensors
 # (shape H×W×128) stored as remote .npy files. The extractor downloads
@@ -25,16 +25,16 @@ from pyproj import Transformer
 import rasterio
 from shapely.ops import transform as shapely_transform
 
-from aer.client import AerClient
-from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir
-from aer.execution import LocalProcessBackend
-from aer.interfaces import AerProfile, GridConfig
+from aereo.client import AerClient
+from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir
+from aereo.execution import LocalProcessBackend
+from aereo.interfaces import AerProfile, GridConfig
 
 # --- Configuration ---
 # GeoTessera covers 2017–2025. We use 2024 which has coverage for the Chocon AOI.
 DATE_START = datetime(2024, 1, 1, tzinfo=timezone.utc)
 DATE_END = datetime(2024, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
-URI = "/root/repos/aer/examples/extraction/09_geotessera_extraction_output"
+URI = "/root/repos/aereo/examples/extraction/09_geotessera_extraction_output"
 
 # Shared AOI — path relative to this script so it works regardless of CWD
 try:
@@ -161,11 +161,11 @@ if mosaic.shape[0] >= 3:
     ax.set_ylabel("Latitude")
     plt.tight_layout()
     plt.savefig(
-        "/root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png",
+        "/root/repos/aereo/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png",
         dpi=150,
     )
     print(
-        "Saved RGB mosaic to /root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png"
+        "Saved RGB mosaic to /root/repos/aereo/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png"
     )
 
 # %%
@@ -196,11 +196,11 @@ if valid.size > 0:
     ax.set_ylabel("Latitude")
     plt.tight_layout()
     plt.savefig(
-        "/root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_single_band.png",
+        "/root/repos/aereo/examples/extraction/09_geotessera_extraction_output/09_geotessera_single_band.png",
         dpi=150,
     )
     print(
-        "Saved single-band mosaic to /root/repos/aer/examples/extraction/09_geotessera_extraction_output/09_geotessera_single_band.png"
+        "Saved single-band mosaic to /root/repos/aereo/examples/extraction/09_geotessera_extraction_output/09_geotessera_single_band.png"
     )
 else:
     print("Warning: no valid pixels found for single-band visualization")

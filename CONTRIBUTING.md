@@ -67,7 +67,7 @@ uv run pytest
 ### Specific Test Directory
 
 ```bash
-uv run pytest test/components/aer/grid
+uv run pytest test/components/aereo/grid
 ```
 
 ### With Type Checking

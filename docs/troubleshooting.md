@@ -6,21 +6,21 @@ This page distills the most common failures and their fixes. If you hit a proble
 
 ## 1. Installation issues
 
-### `aer-eo` vs `aer`
+### `aereo` vs `aereo`
 
-The PyPI package is **`aer-eo`** because the name `aer` is already taken by another project.
+The PyPI package is **`aereo`** because the name `aereo` is already taken by another project.
 
 ```bash
 # ✅ Correct
-pip install aer-eo
+pip install aereo
 
 # ❌ Wrong
-pip install aer
+pip install aereo
 ```
 
 ### Missing plugins
 
-AER is a plugin-based framework. Installing only `aer-eo` gives you the core client and interfaces, but you cannot search or extract anything without at least one search plugin and one extract plugin.
+AER is a plugin-based framework. Installing only `aereo` gives you the core client and interfaces, but you cannot search or extract anything without at least one search plugin and one extract plugin.
 
 **Symptom:**
 ```
@@ -31,19 +31,19 @@ PluginNotFoundError: No search plugin found for collection ...
 
 ```bash
 # GOES ABI (public S3, no auth)
-pip install aer-search-aws-goes aer-extract-satpy
+pip install aereo-search-aws-goes aereo-extract-satpy
 
 # Sentinel-2 (Planetary Computer)
-pip install aer-search-planetary-computer aer-extract-odc-stac
+pip install aereo-search-planetary-computer aereo-extract-odc-stac
 
 # NASA sensors (MODIS, VIIRS, Sentinel-3)
-pip install aer-search-earthaccess aer-extract-satpy
+pip install aereo-search-earthaccess aereo-extract-satpy
 ```
 
 Verify what is installed:
 
 ```bash
-aer plugins
+aereo plugins
 ```
 
 ---
@@ -92,7 +92,7 @@ Plugin names were simplified in recent releases. If you are following an old blo
 
 ### Missing pip install
 
-Even if the plugin name is correct, the package must be installed in the same environment as `aer-eo`.
+Even if the plugin name is correct, the package must be installed in the same environment as `aereo`.
 
 ```bash
 # Verify the plugin is importable

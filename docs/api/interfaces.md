@@ -1,3 +1,3 @@
-# aer.interfaces
+# aereo.interfaces
 
 ::: aer.interfaces

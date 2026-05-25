@@ -7,7 +7,7 @@ Get from zero to your first extracted satellite image in under 5 minutes.
 Install AER and the GOES plugins (public S3, no authentication required):
 
 ```bash
-pip install aer-eo aer-search-aws-goes aer-extract-satpy
+pip install aereo aereo-search-aws-goes aereo-extract-satpy
 ```
 
 ## 2. Define a profile
@@ -15,7 +15,7 @@ pip install aer-eo aer-search-aws-goes aer-extract-satpy
 An `AerProfile` describes *what* you want to extract, *from which sensor*, and *how*.
 
 ```python
-from aer.interfaces import AerProfile
+from aereo.interfaces import AerProfile
 
 profile = AerProfile(
     name="goes_c02",
@@ -34,7 +34,7 @@ Find granules matching your time range and area of interest:
 ```python
 from datetime import datetime, timezone
 from shapely.geometry import box
-from aer.client import AerClient
+from aereo.client import AerClient
 
 aoi = box(-70, -40, -68, -39)
 client = AerClient()
@@ -53,7 +53,7 @@ print(f"Found {len(results)} assets")
 Turn search results into extraction tasks. AER builds a grid over your AOI and chunks everything into parallelizable tasks.
 
 ```python
-from aer.interfaces import GridConfig
+from aereo.interfaces import GridConfig
 
 tasks = client.prepare_for_extraction(
     results,

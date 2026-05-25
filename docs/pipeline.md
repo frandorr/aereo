@@ -15,8 +15,8 @@ Find satellite granules that match your time range, area of interest, and sensor
 ```python
 from datetime import datetime, timezone
 from shapely.geometry import box
-from aer.client import AerClient
-from aer.interfaces import AerProfile
+from aereo.client import AerClient
+from aereo.interfaces import AerProfile
 
 aoi = box(-69.76, -39.98, -68.24, -39.05)
 
@@ -171,7 +171,7 @@ Run the extraction. Each `ExtractionTask` is handed to the registered **Extracto
 ### Minimal example
 
 ```python
-from aer.execution import LocalProcessBackend
+from aereo.execution import LocalProcessBackend
 
 backend = LocalProcessBackend(max_workers=4)
 artifacts = client.execute_tasks(tasks, backend=backend)
@@ -207,7 +207,7 @@ print(artifacts[["id", "grid_cell", "uri"]].head())
 Artifacts are written to disk following the **EOIDS** convention. After extraction, you can mosaic tiles:
 
 ```python
-from aer.eoids import mosaic_eoids_tiles
+from aereo.eoids import mosaic_eoids_tiles
 
 mosaic, transform, crs = mosaic_eoids_tiles("/tmp/goes_extraction", target_crs="EPSG:4326")
 ```

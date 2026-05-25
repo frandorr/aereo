@@ -1,0 +1,23 @@
+"""Execution backends and task runner for AER extraction tasks."""
+
+from aereo.execution.backends import LambdaBackend, RetryableLambdaError
+from aereo.execution.core import (
+    ExecutionBackend,
+    LocalProcessBackend,
+    TaskRunner,
+    TaskStaging,
+    ThreadBackend,
+)
+from aereo.gdal_env import configure_gdal, setup_gdal_worker
+
+__all__ = [
+    "ExecutionBackend",
+    "LambdaBackend",
+    "LocalProcessBackend",
+    "RetryableLambdaError",
+    "TaskRunner",
+    "TaskStaging",
+    "ThreadBackend",
+    "configure_gdal",
+    "setup_gdal_worker",
+]

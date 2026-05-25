@@ -4,8 +4,8 @@
 
 from datetime import datetime, timezone
 
-from aer.client import AerClient
-from aer.interfaces import AerProfile, GridConfig
+from aereo.client import AerClient
+from aereo.interfaces import AerProfile, GridConfig
 from shapely.geometry import box
 
 client = AerClient()

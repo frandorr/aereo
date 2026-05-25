@@ -14,10 +14,10 @@ from pyproj import Transformer
 import rasterio
 from shapely.ops import transform as shapely_transform
 
-from aer.client import AerClient
-from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir
-from aer.execution import LocalProcessBackend
-from aer.interfaces import AerProfile, GridConfig
+from aereo.client import AerClient
+from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir
+from aereo.execution import LocalProcessBackend
+from aereo.interfaces import AerProfile, GridConfig
 
 # --- Configuration ---
 # Use a historical date known to have Sentinel-2 coverage over AOI.

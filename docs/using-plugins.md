@@ -1,6 +1,6 @@
 # Using Plugins
 
-`aer` is a plugin-based framework. Install the core package first, then add only the plugins you need for your target sensors.
+`aereo` is a plugin-based framework. Install the core package first, then add only the plugins you need for your target sensors.
 
 ---
 
@@ -11,19 +11,19 @@ Pick your sensor and copy-paste:
 === "GOES ABI (public S3, no auth)"
 
     ```bash
-    pip install aer-eo aer-search-aws-goes aer-extract-satpy
+    pip install aereo aereo-search-aws-goes aereo-extract-satpy
     ```
 
 === "Sentinel-2 (Planetary Computer)"
 
     ```bash
-    pip install aer-eo aer-search-planetary-computer aer-extract-odc-stac
+    pip install aereo aereo-search-planetary-computer aereo-extract-odc-stac
     ```
 
 === "MODIS / VIIRS / Sentinel-3 (NASA Earthdata)"
 
     ```bash
-    pip install aer-eo aer-search-earthaccess aer-extract-satpy
+    pip install aereo aereo-search-earthaccess aereo-extract-satpy
     ```
 
 > **Not sure which plugin you need?** Start with the GOES example — it requires no authentication.
@@ -34,16 +34,16 @@ Pick your sensor and copy-paste:
 
 | Sensor | Search Plugin | Extract Plugin | Install Command |
 |--------|---------------|----------------|-----------------|
-| **GOES ABI** (public S3, no auth) | `aer-search-aws-goes` | `aer-extract-satpy` | `pip install aer-search-aws-goes aer-extract-satpy` |
-| **Sentinel-2** (Planetary Computer) | `aer-search-planetary-computer` | `aer-extract-odc-stac` | `pip install aer-search-planetary-computer aer-extract-odc-stac` |
-| **MODIS / VIIRS** (NASA Earthdata) | `aer-search-earthaccess` | `aer-extract-satpy` | `pip install aer-search-earthaccess aer-extract-satpy` |
+| **GOES ABI** (public S3, no auth) | `aereo-search-aws-goes` | `aereo-extract-satpy` | `pip install aereo-search-aws-goes aereo-extract-satpy` |
+| **Sentinel-2** (Planetary Computer) | `aereo-search-planetary-computer` | `aereo-extract-odc-stac` | `pip install aereo-search-planetary-computer aereo-extract-odc-stac` |
+| **MODIS / VIIRS** (NASA Earthdata) | `aereo-search-earthaccess` | `aereo-extract-satpy` | `pip install aereo-search-earthaccess aereo-extract-satpy` |
 
 ---
 
 ## Verify installation
 
 ```python
-from aer.registry import AerRegistry
+from aereo.registry import AerRegistry
 
 registry = AerRegistry()
 print("Supported collections:", registry.list_supported_collections())

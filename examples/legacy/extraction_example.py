@@ -6,10 +6,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import geopandas as gpd
-from aer.client import AerClient
-from aer.execution import LocalProcessBackend
-from aer.interfaces import AerProfile, GridConfig
-from aer.viz import plot_aoi
+from aereo.client import AerClient
+from aereo.execution import LocalProcessBackend
+from aereo.interfaces import AerProfile, GridConfig
+from aereo.viz import plot_aoi
 
 # --- Configuration ---
 DATE_START = datetime(2026, 4, 2, 9, 0, tzinfo=timezone.utc)
@@ -133,7 +133,7 @@ print(results_df)
 # --- Mosaic & plot extracted artifacts ---
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir  # noqa: E402
+from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir  # noqa: E402
 
 
 def _mask_invalid(data, is_viirs=False):

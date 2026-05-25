@@ -9,7 +9,7 @@ AER partitions the Earth into analysis-ready cells using the ESA Major TOM grid 
 A `GridDefinition` creates the cells that intersect any polygon. It is the first thing built during `prepare_for_extraction` (unless the extractor provides its own defaults).
 
 ```python
-from aer.grid import GridDefinition
+from aereo.grid import GridDefinition
 from shapely.geometry import box
 
 # Create a grid with 256 km cells and no overlap
@@ -59,7 +59,7 @@ Overlapping cells are generated **in addition to** primary cells. They are offse
 The fundamental unit of extraction. A `GridCell` represents a geographic area with a known coordinate reference system, resolution, and pixel alignment.
 
 ```python
-from aer.grid import GridCell
+from aereo.grid import GridCell
 from shapely.geometry import Polygon
 
 cell = GridCell(
@@ -125,4 +125,4 @@ The coverage heatmap below shows the exact overlap fraction for every cell. Gree
 
 ![Cell coverage percentages](assets/grid_filter_coverage_detail.png)
 
-For an interactive demonstration with real satellite data, see the [Grid Filtering Modes notebook](https://github.com/frandorr/aer/blob/main/examples/grid/grid_filter_modes_demo.ipynb).
+For an interactive demonstration with real satellite data, see the [Grid Filtering Modes notebook](https://github.com/frandorr/aereo/blob/main/examples/grid/grid_filter_modes_demo.ipynb).

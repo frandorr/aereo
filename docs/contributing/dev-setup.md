@@ -11,7 +11,7 @@ AER uses [uv](https://docs.astral.sh/uv/) for dependency management and [Polylit
 ## Clone and Install
 
 ```bash
-git clone https://github.com/frandorr/aer.git
+git clone https://github.com/frandorr/aereo.git
 cd aer
 uv sync --all-extras
 ```
@@ -21,7 +21,7 @@ The `--all-extras` flag installs optional dependencies for all plugins so you ca
 Verify everything is wired correctly:
 
 ```bash
-uv run python -c "from aer.registry import AerRegistry; r = AerRegistry(); print(r.list_supported_collections())"
+uv run python -c "from aereo.registry import AerRegistry; r = AerRegistry(); print(r.list_supported_collections())"
 ```
 
 ## Polylith Workspace
@@ -39,9 +39,9 @@ When adding new functionality, prefer creating or extending a component in `comp
 
 ## Plugin Discovery Mechanics
 
-`aer` discovers plugins automatically using Python's standard `importlib.metadata` entry points mechanism:
+`aereo` discovers plugins automatically using Python's standard `importlib.metadata` entry points mechanism:
 
-1. Plugins declare their classes in `pyproject.toml` under `[project.entry-points."aer.plugins"]`.
+1. Plugins declare their classes in `pyproject.toml` under `[project.entry-points."aereo.plugins"]`.
 2. The `AerRegistry` scans installed packages for these hooks dynamically upon instantiation.
 3. Classes listed in entry points are stored, matching their declared `supported_collections` for fast lookup.
 
@@ -58,7 +58,7 @@ AER uses `hatch-polylith-bricks` to bundle bricks during an editable install. Th
 build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", "." ]
 ```
 
-If you are developing a plugin simultaneously with the `aer` core framework on the same machine and notice that `uv sync` masks your local source edits, see the [Troubleshooting section in Build Your Own Plugin](../build-your-own-plugin.md#troubleshooting-local-development-alongside-aer) for how to align `build.dev-mode-dirs` across both packages.
+If you are developing a plugin simultaneously with the `aereo` core framework on the same machine and notice that `uv sync` masks your local source edits, see the [Troubleshooting section in Build Your Own Plugin](../build-your-own-plugin.md#troubleshooting-local-development-alongside-aer) for how to align `build.dev-mode-dirs` across both packages.
 
 ## Running Tests
 
@@ -67,7 +67,7 @@ If you are developing a plugin simultaneously with the `aer` core framework on t
 uv run pytest
 
 # Specific component
-uv run pytest test/components/aer/grid/
+uv run pytest test/components/aereo/grid/
 
 # With type checking
 uv run basedpyright components/ bases/

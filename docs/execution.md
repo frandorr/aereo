@@ -9,8 +9,8 @@ The default is sequential local execution, but you can swap in process pools, th
 ## Overview
 
 ```python
-from aer.client import AerClient
-from aer.execution import LocalProcessBackend, ThreadBackend
+from aereo.client import AerClient
+from aereo.execution import LocalProcessBackend, ThreadBackend
 
 client = AerClient()
 
@@ -37,7 +37,7 @@ Executes tasks locally using `ProcessPoolExecutor` when `max_workers` is set, or
 **Best for:** CPU-heavy extractors that release the GIL (satpy, GDAL/rasterio).
 
 ```python
-from aer.execution import LocalProcessBackend
+from aereo.execution import LocalProcessBackend
 
 backend = LocalProcessBackend(max_workers=4)
 artifacts = client.execute_tasks(tasks, backend=backend)
@@ -54,7 +54,7 @@ Executes tasks locally using `ThreadPoolExecutor` when `max_workers` is set.
 **Best for:** I/O-bound extractors that spend most of their time waiting on HTTP or S3 (lightweight COG readers, metadata fetching).
 
 ```python
-from aer.execution import ThreadBackend
+from aereo.execution import ThreadBackend
 
 backend = ThreadBackend(max_workers=8)
 artifacts = client.execute_tasks(tasks, backend=backend)
@@ -71,8 +71,8 @@ Dispatches tasks to an AWS Lambda function for serverless extraction.
 **Best for:** Burst workloads, large-scale parallel extraction, or offloading heavy processing from local machines.
 
 ```python
-from aer.execution import LambdaBackend
-from aer_extract_remote import S3TaskStaging
+from aereo.execution import LambdaBackend
+from aereo_extract_remote import S3TaskStaging
 
 backend = LambdaBackend(
     function_name="aer-extract",
@@ -124,9 +124,9 @@ Any class implementing the `ExecutionBackend` Protocol can be used:
 
 ```python
 from typing import Iterable, Sequence
-from aer.execution import ExecutionBackend, TaskRunner
-from aer.interfaces import ExtractionTask
-from aer.schemas import ArtifactSchema
+from aereo.execution import ExecutionBackend, TaskRunner
+from aereo.interfaces import ExtractionTask
+from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
 
 class MyBackend:

@@ -7,7 +7,7 @@ They demonstrate the principle that **grid parameters are a user concern**: the 
 ## Usage
 
 ```python
-from aer.interfaces import GridConfig
+from aereo.interfaces import GridConfig
 
 grid = GridConfig.from_json("grid_configs/sentinel2_50km.json")
 
