@@ -251,3 +251,4 @@ examples/test_aoi.geojson
 # Generated example outputs & dev artifacts
 /*.png
 examples/extraction/09_geotessera_extraction_output/
+.ralph-tui/
