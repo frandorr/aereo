@@ -51,6 +51,7 @@ scripts.aereo = "aereo.cli.main:app"
 build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", "." ]
 build.hooks.polylith-bricks = {}
 build.targets.wheel.packages = [ "aereo" ]
+build.targets.wheel.force-include."../../components/aereo/gdal_env.py" = "aereo/gdal_env.py"
 
 [tool.polylith]
 bricks."../../bases/aereo/cli" = "aereo/cli"
