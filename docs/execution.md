@@ -10,10 +10,11 @@ The default is sequential local execution, but you can swap in process pools, th
 
 ```python
 from aer.client import AerClient
-from aer.execution import LocalProcessBackend, ThreadBackend, LambdaBackend
+from aer.execution import LocalProcessBackend, ThreadBackend
 
 client = AerClient()
-tasks = client.prepare_for_extraction(...)
+
+# Assuming 'tasks' was created by client.prepare_for_extraction()
 
 # Sequential (default)
 artifacts = client.execute_tasks(tasks)

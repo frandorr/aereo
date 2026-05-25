@@ -185,23 +185,25 @@ nav:
           - Grid System: grid.md
           - EOIDS Output: eoids.md
           - Troubleshooting: troubleshooting.md
-    - 🛠️ Contributor Guide:
-          - Pipeline Architecture: pipeline-architecture.md
-          - Execution Backends: execution.md
-          - Plugin System: plugins.md
-          - Build Your Own Plugin: build-your-own-plugin.md
-          - API Reference:
-                - Client: api/client.md
-                - Interfaces: api/interfaces.md
-                - Registry: api/registry.md
-                - Schemas: api/schemas.md
-                - Grid: api/grid.md
-                - Spatial: api/spatial.md
-                - Spectral: api/spectral.md
-                - EOIDS: api/eoids.md
-                - Asset Downloader: api/asset_downloader.md
-                - Repository: api/repository.md
-                - Viz: api/viz.md
-    - 🤝 Contributing:
-          - Guidelines: contributing.md
-          - Developer Setup: contributing/dev-setup.md
+    - 🛠️ For Developers:
+          - Contributing:
+                - Guidelines: contributing.md
+                - Developer Setup: contributing/dev-setup.md
+          - Architecture:
+                - Pipeline Architecture: pipeline-architecture.md
+                - Execution Backends: execution.md
+                - Plugin System: plugins.md
+          - Building Plugins:
+                - Build Your Own Plugin: build-your-own-plugin.md
+    - 📚 API Reference:
+          - Client: api/client.md
+          - Interfaces: api/interfaces.md
+          - Registry: api/registry.md
+          - Schemas: api/schemas.md
+          - Grid: api/grid.md
+          - Spatial: api/spatial.md
+          - Spectral: api/spectral.md
+          - EOIDS: api/eoids.md
+          - Asset Downloader: api/asset_downloader.md
+          - Repository: api/repository.md
+          - Viz: api/viz.md

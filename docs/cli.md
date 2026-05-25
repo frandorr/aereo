@@ -160,7 +160,7 @@ Validation exits with code `0` on success and code `1` on failure, printing the 
 
 - **Multiple profiles** — pass `--profile` more than once to extract several sensors in one run:
   ```bash
-  aer run -p goes.yaml -p s2.yaml -g aoi.geojson --start ... --end ...
+  aer run -p goes.yaml -p s2.yaml -g aoi.geojson --start 2026-04-02T14:00 --end 2026-04-02T14:10
   ```
 - **Date formats** — any ISO 8601 string works (`2026-04-02`, `2026-04-02T14:00`, `2026-04-02T14:00:00Z`).
 - **AOI from GeoJSON** — the file can be a `Feature`, `FeatureCollection`, or raw `Geometry`. AER uses the first feature found.
