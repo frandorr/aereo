@@ -1,3 +1,3 @@
 # aereo.registry
 
-::: aer.registry
+::: aereo.registry

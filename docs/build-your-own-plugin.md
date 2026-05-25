@@ -38,14 +38,14 @@ uv sync
 
 ## Step 3: Write Your Plugin Logic
 
-Plugins are standard Python classes that inherit from `SearchProvider` or `Extractor` base classes defined in `aer.interfaces`.
+Plugins are standard Python classes that inherit from `SearchProvider` or `Extractor` base classes defined in `aereo.interfaces`.
 
 ### Search Plugin Example
 
 Create your search provider (e.g., in `acme_plugin/search.py`). Search plugins MUST declare `supported_collections`.
 
 ```python
-"""ACME search plugin for aer."""
+"""ACME search plugin for aereo."""
 
 from datetime import datetime
 from typing import Any, Mapping, Sequence
@@ -99,7 +99,7 @@ class AcmeSearchProvider(SearchProvider):
 Create your extractor (e.g., in `acme_plugin/extract.py`). Extract plugins MUST declare `supported_collections` and implement both `prepare_for_extraction` and `extract`.
 
 ```python
-"""ACME extract plugin for aer."""
+"""ACME extract plugin for aereo."""
 
 from typing import Any
 
@@ -308,7 +308,7 @@ pip install aereo-plugin-acme
 | `SearchProvider` | Query satellite data | `search` |
 | `Extractor` | Configure and run extractions | `prepare_for_extraction`, `extract` |
 
-See the `aer.interfaces` module for detailed documentation.
+See the `aereo.interfaces` module for detailed documentation.
 
 ---
 

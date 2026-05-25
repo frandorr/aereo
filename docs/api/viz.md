@@ -1,3 +1,3 @@
 # aereo.viz
 
-::: aer.viz
+::: aereo.viz

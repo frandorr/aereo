@@ -139,7 +139,7 @@ NASA Earthdata assets require a downloader because the URLs are behind URS authe
 ```python
 AerProfile(
     ...,
-    downloader="aer.search_earthaccess.earthaccess_download_wrapper",
+    downloader="aereo.search_earthaccess.earthaccess_download_wrapper",
 )
 ```
 

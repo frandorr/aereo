@@ -124,7 +124,7 @@ metadata = dict(chunk.split('-') for chunk in filename.split('.')[0].split('_'))
 
 ## 3. Usage in Code
 
-To ensure strict compliance across all plugins, use the `build_eoids_path` function provided by the `aer.eoids` component.
+To ensure strict compliance across all plugins, use the `build_eoids_path` function provided by the `aereo.eoids` component.
 
 ```python
 import datetime

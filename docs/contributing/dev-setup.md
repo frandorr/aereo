@@ -58,7 +58,7 @@ AER uses `hatch-polylith-bricks` to bundle bricks during an editable install. Th
 build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", "." ]
 ```
 
-If you are developing a plugin simultaneously with the `aereo` core framework on the same machine and notice that `uv sync` masks your local source edits, see the [Troubleshooting section in Build Your Own Plugin](../build-your-own-plugin.md#troubleshooting-local-development-alongside-aer) for how to align `build.dev-mode-dirs` across both packages.
+If you are developing a plugin simultaneously with the `aereo` core framework on the same machine and notice that `uv sync` masks your local source edits, see the [Troubleshooting section in Build Your Own Plugin](../build-your-own-plugin.md#troubleshooting-local-development-alongside-aereo) for how to align `build.dev-mode-dirs` across both packages.
 
 ## Running Tests
 

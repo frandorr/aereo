@@ -1,3 +1,3 @@
 # aereo.spatial
 
-::: aer.spatial
+::: aereo.spatial

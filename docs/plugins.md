@@ -4,7 +4,7 @@
 
 ## How it Works
 
-The plugin system relies on clear, strongly-typed interfaces defined in `aer.interfaces`. Plugins subclass these base classes, and an internal `AerRegistry` discovers them at runtime.
+The plugin system relies on clear, strongly-typed interfaces defined in `aereo.interfaces`. Plugins subclass these base classes, and an internal `AereoRegistry` discovers them at runtime.
 
 ### The Pipeline (`AerClient`)
 
@@ -16,7 +16,7 @@ The data orchestration lifecycle consists of three core stages, managed cohesive
 
 ## The API Surface
 
-`aer.interfaces` provides the core interfaces that plugins must implement:
+`aereo.interfaces` provides the core interfaces that plugins must implement:
 
 ### `SearchProvider`
 
@@ -122,7 +122,7 @@ print(f"Extracted {len(artifacts_df)} artifacts.")
 
 ## Advanced: Manual Plugin Management
 
-If you need fine-grained control, use the `AerRegistry` directly. It parses `entry_points` and provides instantiated plugin objects.
+If you need fine-grained control, use the `AereoRegistry` directly. It parses `entry_points` and provides instantiated plugin objects.
 
 ```python
 from aereo.registry import AerRegistry

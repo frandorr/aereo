@@ -128,7 +128,7 @@ flowchart TB
 | Layer | Component | What it does |
 |-------|-----------|--------------|
 | **Entry** | `aer.cli` | Terminal commands (`search`, `run`, `plugins`) |
-| **Entry** | `aer.client` | Python API — `AerClient` class |
+| **Entry** | `aereo.client` | Python API — `AerClient` class |
 | **Entry** | `aer.lambda_handler` | AWS Lambda entrypoint |
 | **Core** | `aer.interfaces` | Contracts — `SearchProvider`, `Extractor`, `AerProfile`, `GridConfig` |
 | **Core** | `aer.registry` | Plugin discovery via `entry_points` |

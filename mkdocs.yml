@@ -191,6 +191,7 @@ nav:
                 - Developer Setup: contributing/dev-setup.md
           - Architecture:
                 - Pipeline Architecture: pipeline-architecture.md
+                - Visual Architecture Guide: aer-architecture-visualization.md
                 - Execution Backends: execution.md
                 - Plugin System: plugins.md
           - Building Plugins:

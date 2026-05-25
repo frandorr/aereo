@@ -1,3 +1,3 @@
 # aereo.asset_downloader
 
-::: aer.asset_downloader
+::: aereo.asset_downloader
