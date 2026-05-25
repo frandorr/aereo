@@ -1,3 +1,0 @@
-# aer.spectral
-
-::: aer.spectral
