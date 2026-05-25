@@ -1,107 +1,115 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://frandorr.github.io/aer/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/build-your-own-plugin/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/aer-architecture-visualization/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/contributing/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/build-your-own-plugin/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/eoids/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/cli/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/examples/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/contributing/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/grid/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/eoids/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/pipeline-architecture/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/examples/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/pipeline/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/execution/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/plugins/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/grid/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/quickstart/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/pipeline-architecture/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/using-plugins/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/pipeline/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/api/asset_downloader/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/plugins/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/api/client/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/quickstart/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/api/eoids/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/troubleshooting/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/api/grid/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/using-plugins/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/api/interfaces/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/api/asset_downloader/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/api/registry/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/api/client/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/api/repository/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/api/eoids/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/api/schemas/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/api/grid/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/api/spatial/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/api/interfaces/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/api/spectral/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/api/registry/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/api/viz/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/api/schemas/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/contributing/dev-setup/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/api/spatial/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/examples/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/api/viz/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/examples/grid_configs/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/contributing/dev-setup/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
     <url>
-         <loc>https://frandorr.github.io/aer/includes/abbreviations/</loc>
-         <lastmod>2026-05-21</lastmod>
+         <loc>https://frandorr.github.io/aereo/examples/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
+         <loc>https://frandorr.github.io/aereo/examples/grid_configs/</loc>
+         <lastmod>2026-05-25</lastmod>
+    </url>
+    <url>
+         <loc>https://frandorr.github.io/aereo/includes/abbreviations/</loc>
+         <lastmod>2026-05-25</lastmod>
     </url>
 </urlset>

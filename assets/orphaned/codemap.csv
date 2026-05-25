@@ -1,31 +1,31 @@
 filepath|summary|public_api|dependencies
-components/aer/asset_downloader|Safe asset downloading and cleanup routines|cleanup_asset_safely, download_asset_safely|interfaces
-components/aer/data|CSV and YAML dataset storage|core|
-components/aer/eoids|eoids component|build_eoids_path, load_eoids_tiles, mosaic_eoids_tiles, parse_eoids_filename, scan_eoids_dir|
-components/aer/grid|Implementation of MajorTOM Grid using as base majortom_eg package. Adds extended grid cell and grid functionalities|AreaDef, GridCell, GridDefinition|schemas, spatial
-components/aer/interfaces|Abstract classes that should be used as contract. Includes SearchProvider, Extractor, etc.  It is important to note that these are abstract classes and should not be instantiated directly. They serve as a blueprint for the actual implementations of extractors and search providers that will be used in the AER framework. By defining these interfaces, we ensure that all implementations adhere to a consistent structure and can be easily integrated into the system.|AerPlugin, Downloader, ExtractionProfile, ExtractionTask, Extractor, SearchProvider|grid, schemas
-components/aer/registry|AER plugin registry. It acts as the central nervous system of aer, dynamically discovering plugins installed in the environment, validating them against interfaces contract, and routing user requests to the correct implementations.|AerRegistry|interfaces
-components/aer/repository|Repository component for data persistence and retrieval.|ChannelType, Instrument, Satellite, AerLocalSpectralRepository, AerSpectralRepository|spectral
-components/aer/schemas|aer.schemas - Pandera schema component.  Public API for pandera schemas used for validating dataframes.|AssetSchema, ArtifactSchema, GridSchema|
-components/aer/spatial|Spatial component for storing geometry features, AOI types, and other spatial abstractions.|get_utm_epsg_from_geometry, get_utm_zone_from_latlng, reproject_geom|
-components/aer/spectral|spectral defines the canonical, instrument-agnostic data model for spectral measurements used across the system. It provides the structural types, typestate markers, and taxonomy primitives required to represent Earth observation bands in a consistent and type-safe way.  This component contains no IO, no satellite-specific logic, and no transformation algorithms. It encodes structure and invariants only.|ChannelType, Instrument, Satellite, create_channel, BaseChannel, OpticalChannel, MicrowaveChannel, SARChannel, SpectrometerChannel|
-bases/aer/client|client component|AerClient, FailureMode|interfaces, registry, schemas
-components/aer/asset_downloader/core.py|||interfaces
-components/aer/data/core.py|Core data storage utilities for CSV and YAML datasets.||
-components/aer/data/normalize_instruments.py|Normalize WMO OSCAR instrument data from scraped JSON files.  Parses raw instrument channel data, classifies instruments by type (optical, microwave, SAR, spectrometer), normalizes field names, assigns canonical channel names from explicit mappings, and outputs cleaned JSON files ready for repository consumption.||
-components/aer/data/oscar_fetcher.py|OSCAR API Data Fetcher  This module provides functions to fetch satellite and instrument data from the WMO OSCAR (Observing Systems Capability Analysis and Review) API.  API Documentation: https://space.oscar.wmo.int/apidoc/ Base URL: https://space.oscar.wmo.int/api/v1  Example usage:     from components.data.oscar_fetcher import (         fetch_oscar_satellites,         fetch_oscar_instruments,         satellites_to_dataframe,         extract_instruments_from_satellites,     )      # Fetch all satellites     satellites = fetch_oscar_satellites()     df_satellites = satellites_to_dataframe(satellites)      # Extract instruments from satellite data     df_instruments = extract_instruments_from_satellites(satellites)||
-components/aer/data/scrape_missing_instruments.py|Scrape missing instrument data from WMO OSCAR website.  Fetches instrument channel tables from the WMO OSCAR space website for operational satellites, parses the HTML to extract channel characteristics, and saves them as JSON files for use by the normalize_instruments script.||
-components/aer/eoids/core.py|||
-components/aer/grid/core.py|||schemas, spatial
-components/aer/interfaces/core.py|||grid, schemas
-components/aer/registry/core.py|||interfaces
-components/aer/repository/core.py|Abstract repository interfaces for spectral and spatial data access.  Defines AerSpectralRepository for satellite/instrument/channel retrieval and AerSpatialRepository for grid cell queries with spatial filtering.||spectral
-components/aer/repository/spectral.py|Local file-based implementation of AerSpectralRepository.  Reads satellite, instrument, and channel data from CSV and JSON files extracted from the WMO OSCAR database, providing cached retrieval by acronym with disambiguation support.||repository, spectral
-components/aer/schemas/core.py|Pandera schemas for validating aer dataframes.  Contains schema definitions for search results and grid dataframes used across the aer plugin system.||
-components/aer/spatial/core.py|||
-components/aer/spatial/utils.py|Reproject a polygon to a different coordinate system.     Args:         polygon (Polygon): Shapely Polygon in source coordinate system         src_epsg (str): Source EPSG code         dst_epsg (str): Destination EPSG code     Returns:         Polygon: Reprojected Shapely Polygon in destination coordinate system||
-components/aer/spectral/core.py|Core spectral data models and channel factory.  Defines typed channel classes (OpticalChannel, MicrowaveChannel, SARChannel, SpectrometerChannel), Instrument and Satellite models, and the create_channel() factory for constructing channels from normalized WMO OSCAR data.||
-bases/aer/client/core.py|||interfaces, registry, schemas
+components/aereo/asset_downloader|Safe asset downloading and cleanup routines|cleanup_asset_safely, download_asset_safely|interfaces
+components/aereo/data|CSV and YAML dataset storage|core|
+components/aereo/eoids|eoids component|build_eoids_path, load_eoids_tiles, mosaic_eoids_tiles, parse_eoids_filename, scan_eoids_dir|
+components/aereo/grid|Implementation of MajorTOM Grid using as base majortom_eg package. Adds extended grid cell and grid functionalities|AreaDef, GridCell, GridDefinition|schemas, spatial
+components/aereo/interfaces|Abstract classes that should be used as contract. Includes SearchProvider, Extractor, etc.  It is important to note that these are abstract classes and should not be instantiated directly. They serve as a blueprint for the actual implementations of extractors and search providers that will be used in the AER framework. By defining these interfaces, we ensure that all implementations adhere to a consistent structure and can be easily integrated into the system.|AerPlugin, Downloader, ExtractionProfile, ExtractionTask, Extractor, SearchProvider|grid, schemas
+components/aereo/registry|AER plugin registry. It acts as the central nervous system of aer, dynamically discovering plugins installed in the environment, validating them against interfaces contract, and routing user requests to the correct implementations.|AerRegistry|interfaces
+components/aereo/repository|Repository component for data persistence and retrieval.|ChannelType, Instrument, Satellite, AerLocalSpectralRepository, AerSpectralRepository|spectral
+components/aereo/schemas|aer.schemas - Pandera schema component.  Public API for pandera schemas used for validating dataframes.|AssetSchema, ArtifactSchema, GridSchema|
+components/aereo/spatial|Spatial component for storing geometry features, AOI types, and other spatial abstractions.|get_utm_epsg_from_geometry, get_utm_zone_from_latlng, reproject_geom|
+components/aereo/spectral|spectral defines the canonical, instrument-agnostic data model for spectral measurements used across the system. It provides the structural types, typestate markers, and taxonomy primitives required to represent Earth observation bands in a consistent and type-safe way.  This component contains no IO, no satellite-specific logic, and no transformation algorithms. It encodes structure and invariants only.|ChannelType, Instrument, Satellite, create_channel, BaseChannel, OpticalChannel, MicrowaveChannel, SARChannel, SpectrometerChannel|
+bases/aereo/client|client component|AerClient, FailureMode|interfaces, registry, schemas
+components/aereo/asset_downloader/core.py|||interfaces
+components/aereo/data/core.py|Core data storage utilities for CSV and YAML datasets.||
+components/aereo/data/normalize_instruments.py|Normalize WMO OSCAR instrument data from scraped JSON files.  Parses raw instrument channel data, classifies instruments by type (optical, microwave, SAR, spectrometer), normalizes field names, assigns canonical channel names from explicit mappings, and outputs cleaned JSON files ready for repository consumption.||
+components/aereo/data/oscar_fetcher.py|OSCAR API Data Fetcher  This module provides functions to fetch satellite and instrument data from the WMO OSCAR (Observing Systems Capability Analysis and Review) API.  API Documentation: https://space.oscar.wmo.int/apidoc/ Base URL: https://space.oscar.wmo.int/api/v1  Example usage:     from components.data.oscar_fetcher import (         fetch_oscar_satellites,         fetch_oscar_instruments,         satellites_to_dataframe,         extract_instruments_from_satellites,     )      # Fetch all satellites     satellites = fetch_oscar_satellites()     df_satellites = satellites_to_dataframe(satellites)      # Extract instruments from satellite data     df_instruments = extract_instruments_from_satellites(satellites)||
+components/aereo/data/scrape_missing_instruments.py|Scrape missing instrument data from WMO OSCAR website.  Fetches instrument channel tables from the WMO OSCAR space website for operational satellites, parses the HTML to extract channel characteristics, and saves them as JSON files for use by the normalize_instruments script.||
+components/aereo/eoids/core.py|||
+components/aereo/grid/core.py|||schemas, spatial
+components/aereo/interfaces/core.py|||grid, schemas
+components/aereo/registry/core.py|||interfaces
+components/aereo/repository/core.py|Abstract repository interfaces for spectral and spatial data access.  Defines AerSpectralRepository for satellite/instrument/channel retrieval and AerSpatialRepository for grid cell queries with spatial filtering.||spectral
+components/aereo/repository/spectral.py|Local file-based implementation of AerSpectralRepository.  Reads satellite, instrument, and channel data from CSV and JSON files extracted from the WMO OSCAR database, providing cached retrieval by acronym with disambiguation support.||repository, spectral
+components/aereo/schemas/core.py|Pandera schemas for validating aer dataframes.  Contains schema definitions for search results and grid dataframes used across the aereo plugin system.||
+components/aereo/spatial/core.py|||
+components/aereo/spatial/utils.py|Reproject a polygon to a different coordinate system.     Args:         polygon (Polygon): Shapely Polygon in source coordinate system         src_epsg (str): Source EPSG code         dst_epsg (str): Destination EPSG code     Returns:         Polygon: Reprojected Shapely Polygon in destination coordinate system||
+components/aereo/spectral/core.py|Core spectral data models and channel factory.  Defines typed channel classes (OpticalChannel, MicrowaveChannel, SARChannel, SpectrometerChannel), Instrument and Satellite models, and the create_channel() factory for constructing channels from normalized WMO OSCAR data.||
+bases/aereo/client/core.py|||interfaces, registry, schemas
 development/local/benchmark_reproject.py|Benchmark: GOES ABI L1b reprojection methods ============================================= Compares multiple approaches to reproject a full-disk GOES .nc file to EPSG:4326 (a 1000x1000 subset for fair comparison).  Methods tested:   1. rioxarray + h5netcdf (eager load)   2. rioxarray + h5netcdf + dask (chunked lazy)   3. rasterio WarpedVRT (no xarray overhead)   4. rasterio.warp.reproject (manual, memoryfile)   5. VirtualiZarr + Icechunk → rioxarray   6. rasterio warp no-IO (preloaded)   7. GDAL Python bindings (osgeo.gdal.Warp)||
 development/local/scratch_odc_geo.py|||client, extract_aws_goes
 development/local/plugin_script.py|Functional test script for plugin_type and collection-based dispatch. Copy/paste into a Jupyter notebook or run directly.||plugin
@@ -42,14 +42,14 @@ development/local/compare_grids.py|||grid
 ../majortom/src/majortom_eg/__about__.py|||
 ../majortom/check_overlaps.py|||
 ../majortom/tests/test_major_tom_grid.py|||
-test/bases/aer/client/test_core.py|||client, interfaces, registry, schemas
-test/components/aer/registry/test_core.py|||interfaces, registry, schemas
-test/components/aer/spatial/test_utils.py|||spatial
-test/components/aer/asset_downloader/test_core.py|||asset_downloader
-test/components/aer/interfaces/test_core.py|Module-level extractor so ProcessPoolExecutor can pickle it.||interfaces, schemas
-test/components/aer/grid/test_core.py|||grid
-test/components/aer/spectral/test_core.py|Tests for the spectral component models.  Verifies channel type creation, immutability, Instrument and Satellite models, and the create_channel factory for all schema types.||spectral
-test/components/aer/spectral/test_plugin_usage.py|Test demonstrating how a 3rd party plugin registers instruments and products.  Shows creating Instruments with channels using the create_channel factory and Satellite models with payload instruments.||spectral
-test/components/aer/eoids/test_core.py|||eoids
-test/components/aer/data/test_core.py|Tests for the data component.||data
-test/components/aer/data/test_normalize_instruments.py|Tests for the data component normalize_instruments module.  Covers parse_value, classify_instrument, normalize_keys, assign_channel_names, flatten_parsed_value, and finalize_channel.||data
+test/bases/aereo/client/test_core.py|||client, interfaces, registry, schemas
+test/components/aereo/registry/test_core.py|||interfaces, registry, schemas
+test/components/aereo/spatial/test_utils.py|||spatial
+test/components/aereo/asset_downloader/test_core.py|||asset_downloader
+test/components/aereo/interfaces/test_core.py|Module-level extractor so ProcessPoolExecutor can pickle it.||interfaces, schemas
+test/components/aereo/grid/test_core.py|||grid
+test/components/aereo/spectral/test_core.py|Tests for the spectral component models.  Verifies channel type creation, immutability, Instrument and Satellite models, and the create_channel factory for all schema types.||spectral
+test/components/aereo/spectral/test_plugin_usage.py|Test demonstrating how a 3rd party plugin registers instruments and products.  Shows creating Instruments with channels using the create_channel factory and Satellite models with payload instruments.||spectral
+test/components/aereo/eoids/test_core.py|||eoids
+test/components/aereo/data/test_core.py|Tests for the data component.||data
+test/components/aereo/data/test_normalize_instruments.py|Tests for the data component normalize_instruments module.  Covers parse_value, classify_instrument, normalize_keys, assign_channel_names, flatten_parsed_value, and finalize_channel.||data

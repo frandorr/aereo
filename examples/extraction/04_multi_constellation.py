@@ -1,5 +1,5 @@
 # %%
-# 03_multi_constellation.py
+# 04_multi_constellation.py
 # Multi-sensor comparison: search VIIRS + GOES + Sentinel-3 over a broad window,
 # filter to one asset per sensor, extract all into the same EOIDS directory,
 # then mosaic side-by-side.
@@ -20,16 +20,17 @@ from pathlib import Path
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
-from aer.client import AerClient
-from aer.eoids import mosaic_eoids_tiles, scan_eoids_dir
-from aer.interfaces import AerProfile, GridConfig
+from aereo.client import AerClient
+from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir
+from aereo.execution import LocalProcessBackend
+from aereo.interfaces import AerProfile, GridConfig
 from pyproj import Transformer
 from shapely.ops import transform as shapely_transform
 
 # --- Configuration ---
 DATE_START = datetime(2026, 4, 2, 0, 0, tzinfo=timezone.utc)
 DATE_END = datetime(2026, 4, 3, 0, 0, tzinfo=timezone.utc)
-URI = "/tmp/03_multi_constellation_extraction"
+URI = "/tmp/04_multi_constellation_extraction"
 
 # Shared AOI — path relative to this script so it works regardless of CWD
 try:
@@ -100,10 +101,8 @@ tasks = client.prepare_for_extraction(
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)
 print("Extracting...", flush=True)
 
-results_df = client.extract_batches(
-    tasks,
-    max_batch_workers=8,
-)
+backend = LocalProcessBackend(max_workers=8)
+results_df = client.execute_tasks(tasks, backend=backend)
 print(f"Extracted {len(results_df)} artifacts")
 
 # %%
@@ -193,6 +192,6 @@ for ax in axes.flat[n:]:
     ax.axis("off")
 
 plt.tight_layout()
-plt.savefig("/tmp/03_multi_constellation.png", dpi=150)
-print("Saved mosaic to /tmp/03_multi_constellation.png")
+plt.savefig("/tmp/04_multi_constellation.png", dpi=150)
+print("Saved mosaic to /tmp/04_multi_constellation.png")
 # %%

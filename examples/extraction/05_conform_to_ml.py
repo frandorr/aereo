@@ -1,5 +1,5 @@
 # %%
-# 04_conform_to_ml.py
+# 05_conform_to_ml.py
 # ML-ready extraction with fixed tensor shapes.  Derive ``conform_to`` from a
 # geographic patch size, add padding for CNN receptive fields, and visualise as
 # a montage.
@@ -16,14 +16,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import geopandas as gpd
-from aer.client import AerClient
-from aer.interfaces import AerProfile, GridConfig
+from aereo.client import AerClient
+from aereo.execution import LocalProcessBackend
+from aereo.interfaces import AerProfile, GridConfig
 
 # --- Configuration ---
 # Use a historical date known to have Sentinel-2 coverage over Chocon AOI.
 DATE_START = datetime(2024, 4, 9, 14, 0, tzinfo=timezone.utc)
 DATE_END = datetime(2024, 4, 9, 15, 0, tzinfo=timezone.utc)
-URI = "/tmp/04_conform_to_ml_extraction"
+URI = "/tmp/05_conform_to_ml_extraction"
 
 PATCH_KM = 2_560  # meters — at 10 m resolution this gives 256 px per side
 RESOLUTION = 10  # Sentinel-2 10 m bands
@@ -96,10 +97,8 @@ print(f"Prepared {len(tasks)} extraction tasks", flush=True)
 tasks = tasks[:1]
 print(f"Extracting {len(tasks)} task(s)...", flush=True)
 
-results_df = client.extract_batches(
-    tasks,
-    max_batch_workers=None,
-)
+backend = LocalProcessBackend(max_workers=None)
+results_df = client.execute_tasks(tasks, backend=backend)
 print(f"Extracted {len(results_df)} artifacts")
 
 # %%
@@ -166,5 +165,5 @@ for idx in range(n, rows * cols):
     axes.flat[idx].axis("off")
 
 plt.tight_layout()
-plt.savefig("/tmp/04_conform_to_montage.png", dpi=150)
-print("Saved montage to /tmp/04_conform_to_montage.png")
+plt.savefig("/tmp/05_conform_to_montage.png", dpi=150)
+print("Saved montage to /tmp/05_conform_to_montage.png")
