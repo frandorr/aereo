@@ -4,6 +4,8 @@
 
 ---
 
+Satellite data lives in a dozen different catalogs, each with its own API, authentication, and file format. **AER** unifies them into a single pipeline: **search** across catalogs, **extract** assets, and receive everything reprojected to the same **Major TOM grid** — ready for multi-sensor model training.
+
 ## Install
 
 Pick your sensor and copy-paste:
@@ -20,6 +22,8 @@ pip install aer-eo aer-search-earthaccess aer-extract-satpy
 ```
 
 > **Note:** The PyPI package is `aer-eo` because `aer` is already taken.
+
+> These plugins ship ready to use. AER's architecture makes adding new sensors trivial — a **search plugin** connects the catalog, an **extract plugin** handles the assets, and reprojection to the **Major TOM grid** happens automatically.
 
 ---
 
