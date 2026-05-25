@@ -229,12 +229,16 @@ grid = GridConfig(
     min_coverage=0.5,
 )
 
+client = AerClient(
+    profiles=profiles,
+    grid_config=grid,
+    aoi=aoi,
+    cells_per_task=10,
+)
+
 client.prepare_for_extraction(
     search_results=results,
-    grid_config=grid,
-    profiles=profiles,
     uri="output/extraction",
-    cells_per_chunk=10,
 )
 ```
 

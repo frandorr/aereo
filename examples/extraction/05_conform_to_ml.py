@@ -57,14 +57,26 @@ profiles = [
     )
 ]
 
+# Derive grid config from patch size.
+grid = GridConfig(
+    target_grid_dist=PATCH_KM,
+    target_grid_overlap=False,
+)
+
 # --- Client Setup ---
-client = AerClient()
+# cells_per_task=1 keeps the example fast and lightweight.
+client = AerClient(
+    profiles=profiles,
+    grid_config=grid,
+    aoi=aoi,
+    backend=LocalProcessBackend(max_workers=None),
+    cells_per_task=1,
+)
+
 print("Searching...", flush=True)
 results = client.search(
-    profiles=profiles,
     start_datetime=DATE_START,
     end_datetime=DATE_END,
-    intersects=aoi,
 )
 print(results[["collection", "start_time", "end_time"]].to_string())
 
@@ -76,18 +88,10 @@ print(f"Kept {len(results)} representative result(s)")
 # Prepare extraction tasks with conform_to and padding.
 # padding=16 means each side gets 16 extra pixels, so the total raster
 # dimensions are conform_shape + 2*padding = (288, 288).
-grid = GridConfig(
-    target_grid_dist=PATCH_KM,
-    target_grid_overlap=False,
-)
 
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
-    grid_config=grid,
-    target_aoi=aoi,
     uri=URI,
-    profiles=profiles,
-    cells_per_chunk=1,
 )
 
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)
@@ -97,8 +101,7 @@ print(f"Prepared {len(tasks)} extraction tasks", flush=True)
 tasks = tasks[:1]
 print(f"Extracting {len(tasks)} task(s)...", flush=True)
 
-backend = LocalProcessBackend(max_workers=None)
-results_df = client.execute_tasks(tasks, backend=backend)
+results_df = client.execute_tasks(tasks)
 print(f"Extracted {len(results_df)} artifacts")
 
 # %%

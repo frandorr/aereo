@@ -106,7 +106,7 @@ tasks = client.prepare_for_extraction(
     target_aoi=aoi,
     uri=URI,
     profiles=profiles,
-    cells_per_chunk=10,
+    cells_per_task=10,
 )
 
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)

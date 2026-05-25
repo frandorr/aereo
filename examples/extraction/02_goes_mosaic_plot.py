@@ -43,34 +43,34 @@ grid = GridConfig.from_yaml(data_dir / "grid_config.yaml")
 profiles = [all_profiles["goes_c02"]]
 
 # --- Client Setup ---
-client = AerClient()
+# cells_per_task=1 keeps the example fast and lightweight.
+client = AerClient(
+    profiles=profiles,
+    grid_config=grid,
+    aoi=aoi,
+    backend=LocalProcessBackend(max_workers=4),
+    cells_per_task=1,
+)
+
 print("Searching...", flush=True)
 results = client.search(
-    profiles=profiles,
     start_datetime=DATE_START,
     end_datetime=DATE_END,
-    intersects=aoi,
 )
 print(results[["collection", "start_time", "end_time"]].to_string())
 
 # %%
 # Prepare extraction tasks using the same profiles.
-# cells_per_chunk=1 keeps the example fast and lightweight.
 
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
-    grid_config=grid,
-    target_aoi=aoi,
     uri=URI,
-    profiles=profiles,
-    cells_per_chunk=1,
 )
 
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)
 print("Extracting...", flush=True)
 
-backend = LocalProcessBackend(max_workers=4)
-results_df = client.execute_tasks(tasks, backend=backend)
+results_df = client.execute_tasks(tasks)
 print(f"Extracted {len(results_df)} artifacts")
 
 # %%

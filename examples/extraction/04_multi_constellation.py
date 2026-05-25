@@ -54,13 +54,18 @@ profiles = [
 ]
 
 # --- Client Setup ---
-client = AerClient()
+client = AerClient(
+    profiles=profiles,
+    grid_config=grid,
+    aoi=aoi,
+    backend=LocalProcessBackend(max_workers=8),
+    cells_per_task=2,
+)
+
 print("Searching...", flush=True)
 results = client.search(
-    profiles=profiles,
     start_datetime=DATE_START,
     end_datetime=DATE_END,
-    intersects=aoi,
 )
 
 # Keep one representative asset per collection and ensure full AOI coverage.
@@ -91,18 +96,13 @@ print(f"Kept {len(results)} representative result(s) containing AOI")
 
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
-    grid_config=grid,
-    target_aoi=aoi,
     uri=URI,
-    profiles=profiles,
-    cells_per_chunk=2,
 )
 
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)
 print("Extracting...", flush=True)
 
-backend = LocalProcessBackend(max_workers=8)
-results_df = client.execute_tasks(tasks, backend=backend)
+results_df = client.execute_tasks(tasks)
 print(f"Extracted {len(results_df)} artifacts")
 
 # %%

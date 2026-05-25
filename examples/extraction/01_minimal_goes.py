@@ -8,8 +8,6 @@ from aer.client import AerClient
 from aer.interfaces import AerProfile, GridConfig
 from shapely.geometry import box
 
-client = AerClient()
-aoi = box(-70, -40, -68, -39)
 profile = AerProfile(
     name="goes",
     resolution=1000,
@@ -22,18 +20,22 @@ profile = AerProfile(
         "delay_writes": True,
     },
 )
-results = client.search(
+
+client = AerClient(
     profiles=[profile],
+    grid_config=GridConfig(target_grid_dist=256_000),
+    aoi=box(-70, -40, -68, -39),
+)
+
+results = client.search(
     start_datetime=datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc),
     end_datetime=datetime(2026, 4, 2, 14, 10, tzinfo=timezone.utc),
-    intersects=aoi,
 )
+
 tasks = client.prepare_for_extraction(
     results,
-    profiles=[profile],
     uri="/tmp/01_minimal_goes_out",
-    grid_config=GridConfig(target_grid_dist=256000),
-    target_aoi=aoi,
 )
+
 client.execute_tasks(tasks)
 print("GeoTIFFs written to /tmp/01_minimal_goes_out")
