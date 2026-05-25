@@ -279,7 +279,10 @@ tasks = client.prepare_for_extraction(
 )
 
 # 3. Extract
-artifacts = client.extract_batches(tasks)
+from aer.execution import LocalProcessBackend
+
+backend = LocalProcessBackend()
+artifacts = client.execute_tasks(tasks, backend=backend)
 print(artifacts[["id", "uri"]])
 ```
 

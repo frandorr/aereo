@@ -51,7 +51,7 @@ The `--all-extras` flag installs optional dependencies for all plugins so you ca
 
 AER is organized as a Polylith workspace:
 
-- `components/` — reusable bricks (e.g., `aer/data`, `aer/grid`)
+- `components/` — reusable bricks (e.g., `aer/grid`, `aer/eoids`)
 - `bases/` — entry points (e.g., `aer/client`)
 - `projects/` — publishable packages (e.g., `projects/aer-core`)
 - `test/` — mirrors the `components/` and `bases/` structure

@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Sequence, cast
 
 import geopandas as gpd
@@ -16,17 +17,9 @@ from pydantic import ValidationError
 from shapely.geometry import Polygon
 
 
-class _PicklableExtractor(Extractor):
-    """Module-level extractor so ProcessPoolExecutor can pickle it."""
-
-    supported_collections = ["GOES"]
-
-    def extract(
-        self,
-        extraction_task: ExtractionTask,
-        extract_params: dict[str, Any] | None,
-    ) -> GeoDataFrame[ArtifactSchema]:
-        return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
+def _module_level_downloader(url: str, path: Path) -> None:
+    """Module-level callable used for pickling tests."""
+    pass
 
 
 def test_plugin_missing_supported_collections():
@@ -136,81 +129,6 @@ def test_extractor_no_longer_requires_target_grid_d():
     assert hasattr(extractor, "extract")
 
 
-def test_extractor_extract_batches(monkeypatch):
-    extractor = _PicklableExtractor()
-    monkeypatch.setattr("aer.schemas.ArtifactSchema.validate", lambda x: x)
-
-    df1 = gpd.GeoDataFrame(
-        {"id": [1]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
-    )
-    df2 = gpd.GeoDataFrame(
-        {"id": [2]}, geometry=[Polygon([[1, 1], [2, 1], [2, 2], [1, 2]])]
-    )
-
-    from aer.interfaces.core import AerProfile
-
-    profile = AerProfile(name="default", resolution=10.0)
-    grid_config = GridConfig(target_grid_dist=10_000)
-
-    task1 = ExtractionTask(
-        assets=cast(Any, df1),
-        grid_cells=[],
-        profile=profile,
-        uri="test1",
-        grid_config=grid_config,
-    )
-    task2 = ExtractionTask(
-        assets=cast(Any, df2),
-        grid_cells=[],
-        profile=profile,
-        uri="test2",
-        grid_config=grid_config,
-    )
-
-    result = extractor.extract_batches([task1, task2])
-
-    assert len(result) == 2
-    assert list(result["id"]) == [1, 2]
-
-
-def test_extractor_extract_batches_parallel(monkeypatch):
-    """Parallel path uses forkserver/spawn and succeeds with picklable objects."""
-    extractor = _PicklableExtractor()
-    monkeypatch.setattr("aer.schemas.ArtifactSchema.validate", lambda x: x)
-
-    df1 = gpd.GeoDataFrame(
-        {"id": [1]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
-    )
-    df2 = gpd.GeoDataFrame(
-        {"id": [2]}, geometry=[Polygon([[1, 1], [2, 1], [2, 2], [1, 2]])]
-    )
-
-    from aer.interfaces.core import AerProfile
-
-    profile = AerProfile(name="default", resolution=10.0)
-    grid_config = GridConfig(target_grid_dist=10_000)
-
-    task1 = ExtractionTask(
-        assets=cast(Any, df1),
-        grid_cells=[],
-        profile=profile,
-        uri="test1",
-        grid_config=grid_config,
-    )
-    task2 = ExtractionTask(
-        assets=cast(Any, df2),
-        grid_cells=[],
-        profile=profile,
-        uri="test2",
-        grid_config=grid_config,
-    )
-
-    result = extractor.extract_batches([task1, task2], max_batch_workers=2)
-
-    assert len(result) == 2
-    assert sorted(result["id"].tolist()) == [1, 2]
-
-
 def test_extractor_prepare_for_extraction():
     class LargeGridExtractor(Extractor):
         supported_collections = ["GOES"]
@@ -275,6 +193,8 @@ def test_extractor_prepare_for_extraction():
     assert tasks[0].aoi is None
     assert len(tasks[0].assets) == 2  # Both assets have same start_time and collection
     assert "start_time" in tasks[0].task_context
+    assert "extractor_hint" in tasks[0].task_context
+    assert tasks[0].task_context["extractor_hint"] is None
 
 
 def test_aer_profile_has_all_fields():
@@ -389,6 +309,75 @@ def test_aer_profile_invalid_import_string():
         )
 
 
+# ---------------------------------------------------------------------------
+# Pickling
+# ---------------------------------------------------------------------------
+
+
+def test_aer_profile_pickle_module_level_callable_downloader():
+    """A module-level callable downloader round-trips through pickle."""
+    import os
+    import pickle
+
+    from aer.interfaces.core import AerProfile
+
+    profile = AerProfile(
+        name="test",
+        resolution=100.0,
+        downloader="os.path.join",  # pyright: ignore[reportArgumentType]
+    )
+    roundtripped = pickle.loads(pickle.dumps(profile))
+    assert roundtripped.downloader is os.path.join
+
+
+def test_aer_profile_pickle_lambda_downloader_becomes_none():
+    """A lambda downloader pickles without crashing and becomes None."""
+    import pickle
+
+    from aer.interfaces.core import AerProfile
+
+    profile = AerProfile(
+        name="test",
+        resolution=100.0,
+        downloader=lambda url, path: None,  # pyright: ignore[reportArgumentType]
+    )
+    roundtripped = pickle.loads(pickle.dumps(profile))
+    assert roundtripped.downloader is None
+
+
+def test_extraction_task_pickle_with_callable_downloader():
+    """An ExtractionTask containing a live callable downloader pickles correctly."""
+    import pickle
+
+    import geopandas as gpd
+    from shapely.geometry import Polygon
+
+    from aer.interfaces.core import AerProfile, ExtractionTask
+    from pandera.typing.geopandas import GeoDataFrame
+
+    df = gpd.GeoDataFrame(
+        {"collection": ["GOES"], "start_time": ["2023-01-01"]},
+        geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
+    )
+    profile = AerProfile(
+        name="test",
+        resolution=10.0,
+        collections={"GOES": ["var1"]},
+        downloader=_module_level_downloader,  # pyright: ignore[reportArgumentType]
+    )
+    grid_config = GridConfig(target_grid_dist=10_000)
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, df),
+        profile=profile,
+        uri="test",
+        grid_cells=[],
+        grid_config=grid_config,
+    )
+    roundtripped = pickle.loads(pickle.dumps(task))
+    assert roundtripped.profile.name == "test"
+    assert roundtripped.profile.downloader is _module_level_downloader
+
+
 def test_aer_profile_has_search_and_extract_params():
     from aer.interfaces.core import AerProfile
 
@@ -407,53 +396,6 @@ def test_aer_profile_rejects_extra_params():
 
     with pytest.raises(ValidationError):
         AerProfile(name="test", resolution=100.0, extra_params={"foo": "bar"})  # pyright: ignore[reportCallIssue]
-
-
-_captured_extract_params: list[dict[str, Any] | None] = []
-
-
-def test_extract_batches_merges_profile_extract_params(monkeypatch):
-    """Profile extract_params should override batch extract_params."""
-    _captured_extract_params.clear()
-
-    class _CapturingExtractor(Extractor):
-        supported_collections = ["GOES"]
-
-        def extract(
-            self,
-            extraction_task: ExtractionTask,
-            extract_params: dict[str, Any] | None,
-        ) -> GeoDataFrame[ArtifactSchema]:
-            _captured_extract_params.append(extract_params)
-            return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
-
-    extractor = _CapturingExtractor()
-    monkeypatch.setattr("aer.schemas.ArtifactSchema.validate", lambda x: x)
-
-    df = gpd.GeoDataFrame(
-        {"id": [1]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
-    )
-
-    from aer.interfaces.core import AerProfile
-
-    profile = AerProfile(
-        name="test",
-        resolution=10.0,
-        extract_params={"calibration": "reflectance"},
-    )
-    grid_config = GridConfig(target_grid_dist=10_000)
-    task = ExtractionTask(
-        assets=cast(Any, df),
-        grid_cells=[],
-        profile=profile,
-        uri="test1",
-        grid_config=grid_config,
-    )
-
-    extractor.extract_batches([task], extract_params={"calibration": "radiance"})
-
-    assert len(_captured_extract_params) == 1
-    assert _captured_extract_params[0] == {"calibration": "reflectance"}
 
 
 def test_merge_params_batch_only():
@@ -568,6 +510,48 @@ def test_prepare_does_not_compute_common_shape_when_conform_disabled():
     assert tasks[0].profile.conform_to is None
 
 
+def test_prepare_for_extraction_includes_extractor_hint():
+    class HintExtractor(Extractor):
+        supported_collections = ["C1"]
+
+        def extract(
+            self,
+            extraction_task: ExtractionTask,
+            extract_params: dict[str, Any] | None,
+        ) -> GeoDataFrame[ArtifactSchema]:
+            return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
+
+    extractor = HintExtractor()
+
+    from datetime import datetime
+    from aer.interfaces.core import AerProfile
+
+    df = gpd.GeoDataFrame(
+        {
+            "id": [1],
+            "collection": ["C1"],
+            "start_time": [datetime(2023, 1, 1, 12, 0)],
+        },
+        geometry=[
+            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
+        ],
+    )
+
+    grid_config = GridConfig(target_grid_dist=1_000_000)
+    profile = AerProfile(name="test_profile", resolution=10.0)
+
+    tasks = extractor.prepare_for_extraction(
+        cast(Any, df),
+        grid_config=grid_config,
+        profiles=[profile],
+        uri="test_uri",
+        extractor_hint="aer-extract-dummy",
+    )
+
+    assert len(tasks) > 0
+    assert tasks[0].task_context["extractor_hint"] == "aer-extract-dummy"
+
+
 def test_grid_config_defaults_require_explicit_dist():
     gc = GridConfig(target_grid_dist=50_000)
     assert gc.target_grid_dist == 50_000
@@ -647,3 +631,53 @@ def test_example_grid_configs_load(config_file):
     gc = GridConfig.from_json(path)
     assert gc.target_grid_dist is not None
     assert isinstance(gc.target_grid_overlap, bool)
+
+
+def test_prepare_for_extraction_spatial_filtering():
+    """Verify that prepare_for_extraction filters assets to only those intersecting chunk grid cells."""
+    from datetime import datetime
+    from aer.interfaces.core import AerProfile
+    from shapely.geometry import Polygon
+
+    class DummyExtractor(Extractor):
+        supported_collections = ["C1"]
+
+        def extract(self, extraction_task, extract_params):
+            return cast(Any, extraction_task.assets)
+
+    # Asset 1 at coordinates (0, 0)
+    # Asset 2 at coordinates (10, 10) - very far away
+    df = gpd.GeoDataFrame(
+        {
+            "id": ["asset_1", "asset_2"],
+            "collection": ["C1", "C1"],
+            "start_time": [datetime(2023, 1, 1, 12, 0), datetime(2023, 1, 1, 12, 0)],
+        },
+        geometry=[
+            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
+            Polygon([[10, 10], [11, 10], [11, 11], [10, 11]]),
+        ],
+    )
+
+    profile = AerProfile(name="test", resolution=1000.0, collections={"C1": ["var1"]})
+    grid_config = GridConfig(target_grid_dist=100_000)
+    extractor = DummyExtractor()
+
+    tasks = extractor.prepare_for_extraction(
+        cast(Any, df),
+        grid_config=grid_config,
+        profiles=[profile],
+        uri="test_uri",
+        cells_per_chunk=1,
+    )
+
+    # Check that every task only contains 1 asset (either asset_1 or asset_2) because
+    # the cells in each chunk only intersect one of the two far-apart assets.
+    for task in tasks:
+        assert len(task.assets) == 1
+
+    # Check that both assets are represented across all tasks
+    all_assigned = set()
+    for task in tasks:
+        all_assigned.update(task.assets["id"])
+    assert all_assigned == {"asset_1", "asset_2"}

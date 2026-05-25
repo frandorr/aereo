@@ -5,6 +5,7 @@ from typing import Any, Mapping, Optional, Sequence, cast
 
 import pandas as pd
 import json
+from aer.execution.core import ExecutionBackend, LocalProcessBackend, TaskRunner
 from aer.interfaces import AerProfile, ExtractionTask, GridConfig, merge_params
 from aer.registry import AerRegistry
 from aer.schemas import ArtifactSchema, AssetSchema
@@ -408,106 +409,76 @@ class AerClient:
             uri=uri,
             profiles=resolved_profiles,
             cells_per_chunk=cells_per_chunk,
+            extractor_hint=target_plugin,
         )
 
         all_tasks.extend(batches)
 
         return all_tasks
 
-    def extract_batches(
+    def execute_tasks(
         self,
-        extraction_task_batch: Sequence[ExtractionTask],
-        extract_params: Optional[Mapping[str, Any]] = None,
-        init_params: Optional[Mapping[str, Any]] = None,
+        tasks: Sequence[ExtractionTask],
+        backend: ExecutionBackend | None = None,
         failure_mode: FailureMode = FailureMode.STRICT,
-        max_batch_workers: Optional[int] = None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """
-        Executes the extraction phase by delegating all ExtractionTasks to the appropriate Extractor plugin.
+        Execute a sequence of ExtractionTasks through a configurable backend.
+
+        The client resolves the correct plugin for each task and delegates
+        execution to the backend, which controls parallelism, memory, and
+        remote dispatch.
 
         Args:
-            extraction_task_batch: A sequence of ExtractionTasks, usually from prepare_for_extraction.
-            extract_params: Meta-level or tool-level parameters for the extraction
-                (e.g. ``max_retries``, ``credentials``, ``downloader`` callables).
-                Domain-specific configuration such as ``padding``, ``calibration``,
-                ``reader``, etc. should be defined on each task's ``profile``.
-            init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for extractor instantiation.
-                Supports global and per-collection overrides, matching the ``extract_params`` pattern::
-
-                    # Override target_grid_d globally
-                    init_params={"target_grid_d": 50_000}
-
-                    # Or per-collection
-                    init_params={"ABI-L1b-RadC": {"target_grid_d": 50_000, "target_grid_overlap": True}}
-
-            failure_mode: STRICT raises errors; BEST_EFFORT continues with successful plugins.
+            tasks: A sequence of ExtractionTasks, usually from prepare_for_extraction.
+            backend: An ExecutionBackend implementation. Defaults to
+                LocalProcessBackend() (sequential execution).
+            failure_mode: STRICT raises on the first failure; BEST_EFFORT
+                processes tasks individually and returns partial results,
+                skipping only the tasks that fail.
 
         Returns:
             A unified GeoDataFrame containing all extracted Artifacts.
         """
-        all_artifacts = []
-        errors = []
-
-        if not extraction_task_batch:
-            logger.warning("extract_empty_result", reason="No tasks provided")
+        if not tasks:
+            logger.warning("execute_tasks_empty", reason="No tasks provided")
             return cast(GeoDataFrame, ArtifactSchema.empty())
 
-        # Resolve extractor for each task's profile
-        plugin_set: set[str] = set()
-        for task in extraction_task_batch:
-            target_plugin = self._resolve_plugin_for_profile("extractor", task.profile)
-            if not target_plugin:
-                raise RuntimeError(f"No plugin found for profile: {task.profile.name}")
-            plugin_set.add(target_plugin)
-
-        if len(plugin_set) > 1:
-            raise ValueError(
-                "Multiple extractor plugins found for tasks. "
-                "Ensure all tasks use the same extractor."
-            )
-
-        target_plugin = plugin_set.pop()
-        first_collection = (
-            next(iter(extraction_task_batch[0].profile.collections))
-            if extraction_task_batch and extraction_task_batch[0].profile.collections
-            else ""
-        )
-
-        # Resolve init params and instantiate extractor
-        c_init = self._resolve_params(init_params, first_collection)
-        extractor = self.registry.get_extractor(target_plugin, **c_init)
-
-        # Resolve extract params
-        c_params = self._resolve_params(extract_params, first_collection)
+        backend = backend or LocalProcessBackend()
+        runner = TaskRunner(registry=self.registry)
 
         logger.info(
-            "extract_batches_start",
-            plugin=target_plugin,
-            batch_count=len(extraction_task_batch),
+            "execute_tasks_start",
+            task_count=len(tasks),
+            backend=backend.__class__.__name__,
+            failure_mode=failure_mode.value,
         )
 
-        try:
-            df = extractor.extract_batches(
-                extraction_task_batch,
-                extract_params=c_params,
-                max_batch_workers=max_batch_workers,
-            )
-            all_artifacts.append(df)
-        except Exception as e:
-            logger.error(
-                "extract_failed",
-                plugin=target_plugin,
-                exc_info=True,
-            )
-            errors.append(e)
+        if failure_mode == FailureMode.BEST_EFFORT:
+            results: list[GeoDataFrame[ArtifactSchema]] = []
+            for task in tasks:
+                try:
+                    task_results = list(backend.run_tasks([task], runner))
+                    if task_results:
+                        results.append(task_results[0])
+                except Exception:
+                    logger.warning("task_failed_best_effort", exc_info=True)
+            if not results:
+                logger.warning("execute_tasks_empty_result")
+                return cast(GeoDataFrame, ArtifactSchema.empty())
+            concatenated = pd.concat(results, ignore_index=True)
+            return cast(GeoDataFrame, ArtifactSchema.validate(concatenated))
 
-        if not all_artifacts:
-            if failure_mode == FailureMode.STRICT and errors:
-                raise RuntimeError(
-                    f"Extraction failed strictly. {len(errors)} errors captured."
-                )
-            logger.warning("extract_empty_result", reason="No artifacts retrieved")
+        # STRICT mode — batch for efficiency, raise on first failure
+        try:
+            results = list(backend.run_tasks(tasks, runner))
+        except Exception:
+            logger.error("execute_tasks_failed", exc_info=True)
+            raise
+
+        if not results:
+            logger.warning("execute_tasks_empty_result")
             return cast(GeoDataFrame, ArtifactSchema.empty())
 
-        final_df = pd.concat(all_artifacts, ignore_index=True)
-        return cast(GeoDataFrame, ArtifactSchema.validate(final_df))
+        concatenated = pd.concat(results, ignore_index=True)
+        return cast(GeoDataFrame, ArtifactSchema.validate(concatenated))

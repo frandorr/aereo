@@ -38,11 +38,13 @@ dependencies = [
   "python-geotiepoints>=1.9",
   "pyyaml>=6.0.3",
   "returns[compatible-mypy]>=0.26",
+  "rich>=13",
   "rtree>=1.4.1",
   "s3fs>=2025.2",
   "scikit-learn>=1.8",
   "shapely>=2.1.2",
   "structlog>=25.5",
+  "typer>=0.12",
   "utm>=0.8.1",
 ]
 optional-dependencies.aws-goes = [ "aer-search-aws-goes>=2" ]
@@ -57,10 +59,13 @@ urls.Repository = "https://github.com/frandorr/aer"
 dev = [
   "aer-extract-aws-goes",
   "aer-extract-odc-stac",
+  "aer-extract-remote",
   "aer-extract-satpy",
+  "aer-extract-tessera",
   "aer-search-aws-goes>=2",
   "aer-search-earthaccess>=2.0.3,<3",
   "aer-search-planetary-computer",
+  "aer-search-tessera",
   "basedpyright>=1.38",
   "cartopy>=0.25",
   "graphviz>=0.21",
@@ -73,6 +78,7 @@ dev = [
   "obstore>=0.9.3",
   "polylith-cli>=1.42.5,<2",
   "pytest>=9.0.2,<10",
+  "pytest-cov>=6",
   "python-semantic-release>=10.5.3,<11",
   "rasterio>=1.5",
   "rioxarray>=0.22",
@@ -90,18 +96,59 @@ metadata.allow-direct-references = true
 sources.aer-eo = { path = "projects/aer-core", editable = true }
 sources.aer-extract-aws-goes = { path = "../aer-extract-aws-goes/projects/aer-extract-aws-goes", editable = true }
 sources.aer-extract-odc-stac = { path = "../aer-extract-odc-stac/projects/aer-extract-odc-stac", editable = true }
+sources.aer-extract-remote = { path = "../aer-extract-remote", editable = true }
 sources.aer-extract-satpy = { path = "../aer-extract-satpy/projects/aer-extract-satpy", editable = true }
+sources.aer-extract-tessera = { path = "../aer-extract-tessera/projects/aer-extract-tessera", editable = true }
 sources.aer-search-aws-goes = { path = "../aer-search-aws-goes/projects/aer-search-aws-goes", editable = true }
 sources.aer-search-earthaccess = { path = "../aer-search-earthaccess/projects/aer-search-earthaccess", editable = true }
 sources.aer-search-planetary-computer = { path = "../aer-search-planetary-computer/projects/aer-search-planetary-computer", editable = true }
+sources.aer-search-tessera = { path = "../aer-search-tessera/projects/aer-search-tessera", editable = true }
 managed = true
 workspace.members = [ "projects/*" ]
 
 [tool.pytest]
+ini_options.testpaths = [ "test" ]
+ini_options.norecursedirs = [
+  ".git",
+  ".venv",
+  ".local_ci_env",
+  "site",
+  "dist",
+  "build",
+  "*.egg-info",
+  "__pycache__",
+  ".pytest_cache",
+  ".mypy_cache",
+  ".ruff_cache",
+]
 ini_options.markers = [
   "slow: marks tests as slow (deselect with '-m \"not slow\"')",
   "integration: marks tests as integration tests",
 ]
+
+[tool.coverage]
+run.branch = true
+run.omit = [
+  "*/.venv/*",
+  "*/__pycache__/*",
+  "*/build/*",
+  "*/development/*",
+  "*/dist/*",
+  "*/site/*",
+  "*/test*",
+]
+run.source = [ "bases", "components" ]
+report.exclude_also = [
+  "def __repr__",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "raise AssertionError",
+  "raise NotImplementedError",
+]
+report.fail_under = 0
+report.show_missing = true
+report.skip_covered = false
+html.directory = "htmlcov"
 
 [tool.basedpyright]
 typeCheckingMode = "basic"
@@ -116,14 +163,13 @@ reportMissingImports = false
 extraPaths = [ "components", "bases", "development" ]
 
 [tool.polylith]
-bricks."components/aer/data" = "aer/data"
 bricks."components/aer/eoids" = "aer/eoids"
 bricks."components/aer/grid" = "aer/grid"
 bricks."components/aer/interfaces" = "aer/interfaces"
 bricks."components/aer/registry" = "aer/registry"
-bricks."components/aer/repository" = "aer/repository"
 bricks."components/aer/schemas" = "aer/schemas"
 bricks."components/aer/spatial" = "aer/spatial"
-bricks."components/aer/spectral" = "aer/spectral"
 bricks."components/aer/asset_downloader" = "aer/asset_downloader"
+bricks."bases/aer/cli" = "aer/cli"
 bricks."bases/aer/client" = "aer/client"
+bricks."bases/aer/lambda_handler" = "aer/lambda_handler"

@@ -2,16 +2,12 @@ from __future__ import annotations
 
 import json
 import logging
-import sys
 from abc import ABC, abstractmethod
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
-from multiprocessing import get_context
 from pathlib import Path
 from typing import Any, Callable, Literal, Mapping, Protocol, Self, Sequence, cast
 
 import attrs
-import pandas as pd
 from aer.grid import GridCell
 from aer.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -215,6 +211,27 @@ class AerProfile(BaseModel):
     search_params: Mapping[str, Any] = Field(default_factory=dict)
     extract_params: Mapping[str, Any] = Field(default_factory=dict)
 
+    def __getstate__(self) -> dict[str, Any]:
+        """Serialize to a dict, converting live callables to dotted paths.
+
+        Non-importable callables (lambdas, nested functions, bound methods)
+        are replaced with ``None`` so that pickling never crashes.
+        """
+        state = self.model_dump(mode="json")
+        downloader_path = state.get("downloader")
+        if downloader_path is not None:
+            try:
+                ta = TypeAdapter(ImportString[Callable[[str, Path], None]] | None)
+                ta.validate_python(downloader_path)
+            except Exception:
+                state["downloader"] = None
+        return state
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        """Reconstruct from a validated dict."""
+        obj = self.__class__.model_validate(state)
+        object.__setattr__(self, "__dict__", obj.__dict__)
+
     @classmethod
     def from_yaml(cls, path: str | Path) -> list[Self]:
         """Load profiles from a YAML file.
@@ -361,15 +378,6 @@ class ExtractionTask:
         )
 
 
-def _extract_wrapper(
-    extractor: "Extractor",
-    task: "ExtractionTask",
-    extract_params: Mapping[str, Any] | None,
-) -> "GeoDataFrame[ArtifactSchema]":
-    """Module-level wrapper so ProcessPoolExecutor can pickle the call."""
-    return extractor.extract(task, extract_params)
-
-
 class Extractor(AerPlugin, plugin_abstract=True):
     """Base class for AER extraction plugins.
 
@@ -386,6 +394,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
         uri: str | None = None,
         profiles: Sequence[AerProfile] | None = None,
         cells_per_chunk: int = 50,
+        extractor_hint: str | None = None,
     ) -> Sequence[ExtractionTask]:
         """Prepare extraction tasks by grouping assets by profile and start time, then chunking grid cells."""
         if uri is None:
@@ -416,6 +425,9 @@ class Extractor(AerPlugin, plugin_abstract=True):
 
         # 1. Iterate over each profile
         for profile in profiles:
+            resolution = int(profile.resolution)
+            padding = profile.padding or 0
+
             # Filter assets by profile collections if specified
             if profile.collections:
                 profile_assets = search_results[
@@ -493,8 +505,6 @@ class Extractor(AerPlugin, plugin_abstract=True):
             conform_to_shape: tuple[int, int] | None = None
             if profile.conform_to is not None:
                 conform_to_shape = profile.conform_to
-                resolution = int(profile.resolution)
-                padding = profile.padding or 0
                 # Pre-warm area_def cache with conformed shape for all cells
                 for _, _, cells in profile_cell_groups:
                     for cell in cells:
@@ -514,14 +524,42 @@ class Extractor(AerPlugin, plugin_abstract=True):
                 ]
 
                 for chunk_idx, cells in enumerate(cell_chunks):
+                    # Filter assets to only those that spatially intersect these grid cells' footprints,
+                    # accounting for resolution, padding, and margin.
+                    import geopandas as gpd
+
+                    cell_geoms = []
+                    for cell in cells:
+                        geobox = cell.area_def(
+                            resolution,
+                            padding=padding,
+                            margin=target_grid_margin,
+                            conform_to=conform_to_shape,
+                        )
+                        cell_geoms.append(geobox.extent.to_crs("epsg:4326").geom)
+
+                    if hasattr(gpd.GeoSeries(cell_geoms), "union_all"):
+                        cells_union = gpd.GeoSeries(cell_geoms).union_all()
+                    else:
+                        cells_union = gpd.GeoSeries(cell_geoms).unary_union
+
+                    intersecting_mask = (
+                        time_group.intersects(cells_union) | time_group.geometry.isna()
+                    )
+                    chunk_assets = cast(
+                        GeoDataFrame[AssetSchema],
+                        time_group[intersecting_mask].copy(),
+                    )
+
                     task_context: dict[str, Any] = {
                         "chunk_id": chunk_idx,
                         "total_chunks": len(cell_chunks),
                         "start_time": str(start_time),
+                        "extractor_hint": extractor_hint,
                     }
 
                     task = ExtractionTask(
-                        assets=time_group,
+                        assets=chunk_assets,
                         profile=profile,
                         uri=uri,
                         grid_cells=cells,
@@ -562,85 +600,3 @@ class Extractor(AerPlugin, plugin_abstract=True):
             time range, and any other relevant attributes.
         """
         ...
-
-    def extract_batches(
-        self,
-        extraction_task_batch: Sequence[ExtractionTask],
-        extract_params: Mapping[str, Any] | None = None,
-        max_batch_workers: int | None = None,
-    ) -> GeoDataFrame[ArtifactSchema]:
-        """
-        Execute extraction over multiple batches, optionally in parallel.
-
-        When ``max_batch_workers`` is set, batches are processed in parallel
-        using ``ProcessPoolExecutor`` with a ``forkserver`` context (Unix) or
-        ``spawn`` context (Windows).  This avoids thread-safety issues that can
-        occur with the default ``fork`` start method when threaded libraries
-        such as dask or rasterio have already been imported in the parent
-        process.  Failed batches are logged and collected; if *all* batches fail
-        a ``RuntimeError`` is raised.
-
-        When ``max_batch_workers`` is ``None`` (default), falls back to
-        sequential execution.
-
-        Args:
-            extraction_task_batch: A sequence of ExtractionTask, where each one contains a batch
-                of assets to extract. This is the output of the `prepare_for_extraction` method.
-            extract_params: Meta-level or tool-level parameters for the extraction
-                (e.g. ``max_retries``, ``credentials``, ``downloader`` callables).
-                Domain-specific configuration should live on each task's ``profile``.
-            max_batch_workers: Maximum number of worker processes for parallel execution.
-                ``None`` (default) disables parallelism and runs sequentially.
-        Returns:
-            A GeoDataFrame of extracted artifacts, where each row corresponds to an extracted asset
-            and its corresponding grid_cell, and includes metadata such as collection, geometry,
-            time range, and any other relevant attributes.
-        """
-        if max_batch_workers is None:
-            # Sequential path (original behaviour)
-            results = []
-            for batch in extraction_task_batch:
-                effective_params = merge_params(
-                    extract_params, batch.profile.extract_params
-                )
-                results.append(self.extract(batch, effective_params))
-            concatenated = pd.concat(results, ignore_index=True)
-            validated = ArtifactSchema.validate(concatenated)
-            return cast(GeoDataFrame[ArtifactSchema], validated)
-
-        # Parallel path
-        results: list[GeoDataFrame[ArtifactSchema]] = []
-        errors: list[str] = []
-
-        tasks = [
-            (self, batch, merge_params(extract_params, batch.profile.extract_params))
-            for batch in extraction_task_batch
-        ]
-
-        mp_context = get_context("spawn" if sys.platform == "win32" else "forkserver")
-        with ProcessPoolExecutor(
-            max_workers=max_batch_workers, mp_context=mp_context
-        ) as executor:
-            futures = {
-                executor.submit(_extract_wrapper, *t): i for i, t in enumerate(tasks)
-            }
-
-            for future in as_completed(futures):
-                batch_idx = futures[future]
-                try:
-                    results.append(future.result())
-                except Exception as exc:  # noqa: BLE001
-                    logger.error(
-                        "batch_extract_failed",
-                        extra={"batch": batch_idx, "error": str(exc)},
-                    )
-                    errors.append(str(exc))
-
-        if not results:
-            raise RuntimeError(
-                f"All {len(extraction_task_batch)} batches failed. Errors: {errors}"
-            )
-
-        concatenated = pd.concat(results, ignore_index=True)
-        validated = ArtifactSchema.validate(concatenated)
-        return cast(GeoDataFrame[ArtifactSchema], validated)
