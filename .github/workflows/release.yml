@@ -3,7 +3,7 @@ name: Publish package
 on:
   push:
     tags:
-      - "aer-*-v*"
+      - "aer*-v*"
 
 jobs:
   publish:
