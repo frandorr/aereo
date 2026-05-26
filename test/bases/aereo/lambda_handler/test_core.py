@@ -1,6 +1,10 @@
 from typing import Any
 from unittest.mock import MagicMock, patch
 
+import pytest
+
+pytest.importorskip("aereo_extract_remote")
+
 from aereo.lambda_handler.core import handler
 
 

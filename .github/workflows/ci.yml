@@ -17,7 +17,8 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: uv sync --group ci
-      - run: uv run pytest
-      - run: uv run ruff check .
-      - run: uv run basedpyright components/
+      - run: uv sync --project projects/aereo
+      - run: uv pip install pytest pytest-cov ruff basedpyright
+      - run: uv run --no-sync pytest
+      - run: uv run --no-sync ruff check .
+      - run: uv run --no-sync basedpyright components/
