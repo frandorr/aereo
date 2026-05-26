@@ -316,7 +316,7 @@ tasks = client.prepare_for_extraction(
 )
 
 # 3. Extract
-from aereo.execution import LocalProcessBackend
+from aereo.backends import LocalProcessBackend
 
 backend = LocalProcessBackend()
 artifacts = client.execute_tasks(tasks, backend=backend)

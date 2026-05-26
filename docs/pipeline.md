@@ -171,7 +171,7 @@ Run the extraction. Each `ExtractionTask` is handed to the registered **Extracto
 ### Minimal example
 
 ```python
-from aereo.execution import LocalProcessBackend
+from aereo.backends import LocalProcessBackend
 
 backend = LocalProcessBackend(max_workers=4)
 artifacts = client.execute_tasks(tasks, backend=backend)

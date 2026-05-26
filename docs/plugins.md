@@ -182,7 +182,7 @@ tasks = client.prepare_for_extraction(
     uri="output/goes",
 )
 
-from aereo.execution import LocalProcessBackend
+from aereo.backends import LocalProcessBackend
 
 # 3. Extract
 backend = LocalProcessBackend(max_workers=4)

@@ -10,7 +10,7 @@ The default is sequential local execution, but you can swap in process pools, th
 
 ```python
 from aereo.client import AereoClient
-from aereo.execution import LocalProcessBackend, ThreadBackend
+from aereo.backends import LocalProcessBackend, ThreadBackend
 
 client = AereoClient()
 
@@ -37,7 +37,7 @@ Executes tasks locally using `ProcessPoolExecutor` when `max_workers` is set, or
 **Best for:** CPU-heavy extractors that release the GIL (satpy, GDAL/rasterio).
 
 ```python
-from aereo.execution import LocalProcessBackend
+from aereo.backends import LocalProcessBackend
 
 backend = LocalProcessBackend(max_workers=4)
 artifacts = client.execute_tasks(tasks, backend=backend)
@@ -54,7 +54,7 @@ Executes tasks locally using `ThreadPoolExecutor` when `max_workers` is set.
 **Best for:** I/O-bound extractors that spend most of their time waiting on HTTP or S3 (lightweight COG readers, metadata fetching).
 
 ```python
-from aereo.execution import ThreadBackend
+from aereo.backends import ThreadBackend
 
 backend = ThreadBackend(max_workers=8)
 artifacts = client.execute_tasks(tasks, backend=backend)
@@ -123,7 +123,7 @@ Any class implementing the `ExecutionBackend` Protocol can be used:
 
 ```python
 from typing import Iterable, Sequence
-from aereo.execution import ExecutionBackend, TaskRunner
+from aereo.backends import ExecutionBackend, TaskRunner
 from aereo.interfaces import ExtractionTask
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame

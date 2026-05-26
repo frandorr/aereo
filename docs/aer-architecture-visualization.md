@@ -135,7 +135,7 @@ flowchart TB
 | **Data** | `aereo.schemas` | Pandera validation — `AssetSchema`, `ArtifactSchema`, `GridSchema` |
 | **Data** | `aereo.grid` | MajorTOM tiling — `GridDefinition`, `GridCell` |
 | **Data** | `aereo.spatial` | CRS helpers — UTM EPSG lookup, reprojection |
-| **Run** | `aereo.execution` | Backends — `LocalProcessBackend`, `ThreadBackend`, `TaskRunner` |
+| **Run** | `aereo.backends` | Backends — `LocalProcessBackend`, `ThreadBackend`, `TaskRunner` |
 | **Run** | `aereo.serialization` | Task serialization for remote transport |
 | **Run** | `aereo.asset_downloader` | Safe multi-process downloading (S3/HTTP/local) |
 | **Output** | `aereo.eoids` | File naming & folder conventions |
