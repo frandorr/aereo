@@ -31,13 +31,13 @@ pip install aereo aereo-search-earthaccess aereo-extract-satpy
 
 ```python
 from datetime import datetime, timezone
-from aereo.client import AerClient
-from aereo.interfaces import AerProfile, GridConfig
+from aereo.client import AereoClient
+from aereo.interfaces import AereoProfile, GridConfig
 from shapely.geometry import box
 
-client = AerClient()
+client = AereoClient()
 aoi = box(-70, -40, -68, -39)
-profile = AerProfile(name="goes", resolution=1000, collections={"ABI-L1b-RadF": ["C01"]}, plugin_hints={"search": "search_aws_goes", "extract": "extract_satpy"}, search_params={"satellite": "GOES-19"}, extract_params={"reader": "abi_l1b"})
+profile = AereoProfile(name="goes", resolution=1000, collections={"ABI-L1b-RadF": ["C01"]}, plugin_hints={"search": "search_aws_goes", "extract": "extract_satpy"}, search_params={"satellite": "GOES-19"}, extract_params={"reader": "abi_l1b"})
 results = client.search(profiles=[profile], start_datetime=datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc), end_datetime=datetime(2026, 4, 2, 14, 10, tzinfo=timezone.utc), intersects=aoi)
 tasks = client.prepare_for_extraction(results, profiles=[profile], uri="./out", grid_config=GridConfig(target_grid_dist=256000), target_aoi=aoi)
 client.execute_tasks(tasks)
