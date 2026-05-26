@@ -17,7 +17,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: uv pip install -e ./projects/aereo
+      - run: uv pip install -e .
       - run: uv pip install pytest pytest-cov ruff basedpyright
       - run: uv run --no-sync pytest
       - run: uv run --no-sync ruff check .
