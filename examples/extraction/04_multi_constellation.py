@@ -8,7 +8,7 @@
 #   1. Missing geolocation collection VJ203IMG for VIIRS → satpy raises KeyError
 #      for missing geolocation arrays. Always pair VJ202IMG with VJ203IMG.
 #   2. Forgetting downloader for earthaccess-based sensors → assets cannot be
-#      downloaded. Use aer.search_earthaccess.earthaccess_download_wrapper.
+#      downloaded. Use aereo.search_earthaccess.earthaccess_download_wrapper.
 #   3. Missing extract_params["reader"] → satpy raises ReaderNotAvailable.
 #
 # NASA sensors (VIIRS, Sentinel-3) require Earthdata auth.

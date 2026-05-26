@@ -90,8 +90,8 @@ After running your first example, here are the key abstractions:
 
 | Concept | What it does |
 |---------|--------------|
-| **`AerClient`** | Central orchestrator. Auto-discovers plugins, routes searches, delegates extraction. |
-| **`AerProfile`** | Blueprint: which bands to extract, target resolution, plugin-specific params. |
+| **`AereoClient`** | Central orchestrator. Auto-discovers plugins, routes searches, delegates extraction. |
+| **`AereoProfile`** | Blueprint: which bands to extract, target resolution, plugin-specific params. |
 | **`prepare_for_extraction`** | Groups results by profile and time, generates grid cells, chunks into tasks. |
 | **`execute_tasks`** | Executes tasks through a configurable `ExecutionBackend` (sequential, process pool, or remote). |
 | **`conform_to`** | When set to `(W, H)`, every cell in the batch is padded to the same `(width, height)` for fixed tensor shapes. |
@@ -99,9 +99,9 @@ After running your first example, here are the key abstractions:
 
 ---
 
-## Common `AerProfile` Errors and Fixes
+## Common `AereoProfile` Errors and Fixes
 
-The most common failures when running AER examples are incorrect `AerProfile` definitions. Here is a single reference for the pitfalls each example documents inline.
+The most common failures when running AER examples are incorrect `AereoProfile` definitions. Here is a single reference for the pitfalls each example documents inline.
 
 ### GOES (examples 02, 04)
 
@@ -123,14 +123,14 @@ The most common failures when running AER examples are incorrect `AerProfile` de
 | Error | Cause | Fix |
 |-------|-------|-----|
 | `KeyError` for missing geolocation arrays | `VJ203IMG` (geolocation) omitted from `collections` | Always pair `VJ202IMG` with `VJ203IMG` even if no variables are extracted from it |
-| Assets cannot be downloaded | Missing `downloader` | Set `downloader="aer.search_earthaccess.earthaccess_download_wrapper"` |
+| Assets cannot be downloaded | Missing `downloader` | Set `downloader="aereo.search_earthaccess.earthaccess_download_wrapper"` |
 | `ReaderNotAvailable` from satpy | Missing `extract_params["reader"]` | Add `extract_params={"reader": "viirs_l1b", ...}` |
 
 ### Sentinel-3 OLCI (example 04)
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| Assets cannot be downloaded | Missing `downloader` | Set `downloader="aer.search_earthaccess.earthaccess_download_wrapper"` |
+| Assets cannot be downloaded | Missing `downloader` | Set `downloader="aereo.search_earthaccess.earthaccess_download_wrapper"` |
 | `ReaderNotAvailable` from satpy | Missing `extract_params["reader"]` | Add `extract_params={"reader": "olci_l1b", ...}` |
 
 ---
@@ -151,7 +151,7 @@ conform_shape = (PATCH_KM // RESOLUTION, PATCH_KM // RESOLUTION)  # (256, 256)
 Then set it on the profile:
 
 ```python
-AerProfile(
+AereoProfile(
     name="s2_ml",
     resolution=10,
     collections={"sentinel-2-l2a": ["B04", "B03", "B02", "B08"]},
