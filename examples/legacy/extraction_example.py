@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 # %%
 # --- Plot AOI on a map ---
 import shutil
@@ -133,7 +134,11 @@ print(results_df)
 # --- Mosaic & plot extracted artifacts ---
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir  # noqa: E402
+import sys
+
+_helpers = Path(__file__).resolve().parents[1] / "helpers"
+sys.path.insert(0, str(_helpers))
+from eoids import mosaic_eoids_tiles, scan_eoids_dir  # noqa: E402
 
 
 def _mask_invalid(data, is_viirs=False):

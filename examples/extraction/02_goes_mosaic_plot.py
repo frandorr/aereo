@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 # %%
 # 02_goes_mosaic_plot.py
 # GOES-19 ABI workflow: search, extract, mosaic and plot.
@@ -16,7 +17,11 @@ from pyproj import Transformer
 from shapely.ops import transform as shapely_transform
 
 from aereo.client import AereoClient
-from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir
+import sys
+
+_helpers = Path(__file__).resolve().parents[1] / "helpers"
+sys.path.insert(0, str(_helpers))
+from eoids import mosaic_eoids_tiles, scan_eoids_dir
 from aereo.execution import LocalProcessBackend
 from aereo.interfaces import AereoProfile, GridConfig
 

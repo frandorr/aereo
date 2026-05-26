@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 # %%
 # 04_multi_constellation.py
 # Multi-sensor comparison: search VIIRS + GOES + Sentinel-3 over a broad window,
@@ -21,7 +22,11 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
 from aereo.client import AereoClient
-from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir
+import sys
+
+_helpers = Path(__file__).resolve().parents[1] / "helpers"
+sys.path.insert(0, str(_helpers))
+from eoids import mosaic_eoids_tiles, scan_eoids_dir
 from aereo.execution import LocalProcessBackend
 from aereo.interfaces import AereoProfile, GridConfig
 from pyproj import Transformer

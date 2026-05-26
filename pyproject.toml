@@ -40,7 +40,6 @@ dependencies = [
   "pyresample>=1.35",
   "python-geotiepoints>=1.9",
   "pyyaml>=6.0.3",
-  "rasterio>=1.5",
   "requests>=2.32",
   "returns[compatible-mypy]>=0.26",
   "rich>=13",
@@ -162,6 +161,12 @@ report.skip_covered = false
 html.directory = "htmlcov"
 
 [tool.basedpyright]
+exclude = [
+  "examples/",
+  "site/",
+  ".venv/",
+  "test/",
+]
 typeCheckingMode = "basic"
 reportMissingTypeStubs = false
 pythonVersion = "3.12"
@@ -174,7 +179,6 @@ reportMissingImports = false
 extraPaths = [ "components", "bases", "development" ]
 
 [tool.polylith]
-bricks."components/aereo/eoids" = "aereo/eoids"
 bricks."components/aereo/grid" = "aereo/grid"
 bricks."components/aereo/interfaces" = "aereo/interfaces"
 bricks."components/aereo/registry" = "aereo/registry"

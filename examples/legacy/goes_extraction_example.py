@@ -1,6 +1,8 @@
+# ruff: noqa: E402
 # %%
 # --- Plot AOI on a map ---
 from datetime import datetime, timezone
+from pathlib import Path
 
 from aereo.client import AereoClient
 from aereo.execution import LocalProcessBackend
@@ -68,7 +70,11 @@ print(f"Extracted {len(results_df)} artifacts")
 # --- Mosaic & plot extracted artifacts ---
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir  # noqa: E402
+import sys
+
+_helpers = Path(__file__).resolve().parents[1] / "helpers"
+sys.path.insert(0, str(_helpers))
+from eoids import mosaic_eoids_tiles, scan_eoids_dir  # noqa: E402
 from pyproj import Transformer  # noqa: E402
 from shapely.ops import transform as shapely_transform  # noqa: E402
 

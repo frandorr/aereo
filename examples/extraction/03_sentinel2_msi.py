@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 # %%
 # 03_sentinel2_msi.py
 # Sentinel-2 MSI via Planetary Computer: search → extract → true-color RGB composite.
@@ -15,7 +16,11 @@ import rasterio
 from shapely.ops import transform as shapely_transform
 
 from aereo.client import AereoClient
-from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir
+import sys
+
+_helpers = Path(__file__).resolve().parents[1] / "helpers"
+sys.path.insert(0, str(_helpers))
+from eoids import mosaic_eoids_tiles, scan_eoids_dir
 from aereo.execution import LocalProcessBackend
 from aereo.interfaces import AereoProfile, GridConfig
 
