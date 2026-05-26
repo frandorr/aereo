@@ -23,7 +23,7 @@ jobs:
       - uses: astral-sh/setup-uv@v3
         with:
           python-version: "3.12"
-      - run: uv sync --extra docs
+      - run: uv sync --no-dev --extra docs
       - run: uv run mkdocs build
       - uses: actions/upload-pages-artifact@v3
         with:
