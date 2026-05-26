@@ -97,7 +97,7 @@ def test_client_search_all_fail_strict():
         name="modis", resolution=1000.0, collections={"MODIS": ["var1"]}
     )
 
-    with pytest.raises(RuntimeError, match="All search plugins failed strictly"):
+    with pytest.raises(RuntimeError, match="Search failed strictly"):
         client.search(profiles=[profile], failure_mode=FailureMode.STRICT)
 
 

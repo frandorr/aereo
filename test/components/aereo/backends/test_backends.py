@@ -13,7 +13,7 @@ import geopandas as gpd
 import pytest
 from shapely.geometry import Polygon
 
-from aereo.execution.backends import LambdaBackend, RetryableLambdaError
+from aereo.backends.lambda_backend import LambdaBackend, RetryableLambdaError
 from aereo.interfaces.core import AereoProfile, ExtractionTask, GridConfig
 from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -75,6 +75,13 @@ class _FakeStaging:
 
     def result_prefix(self, job_id: str, task_idx: int) -> str:
         return f"s3://{self.bucket}/results/{job_id}/{task_idx}/"
+
+    def upload_artifacts(
+        self,
+        artifacts: GeoDataFrame[ArtifactSchema],
+        output_prefix: str,
+    ) -> dict[str, str]:
+        return {"manifest_uri": f"{output_prefix}manifest.json"}
 
 
 def _make_empty_artifacts() -> GeoDataFrame[ArtifactSchema]:
@@ -446,7 +453,7 @@ def test_lambda_backend_structured_error_not_retryable_raises_runtime_error():
 
 def test_safe_truncate_redacts_credentials():
     """_safe_truncate redacts AWS credentials and presigned URLs."""
-    from aereo.execution.backends import _safe_truncate
+    from aereo.backends.lambda_backend import _safe_truncate
 
     text = (
         "Error accessing https://bucket.s3.amazonaws.com/key?X-Amz-Credential=abc123 "
@@ -490,7 +497,7 @@ def test_lambda_backend_run_tasks_with_no_runner():
 
 def test_safe_truncate_truncates_long_text():
     """_safe_truncate truncates text exceeding max_len."""
-    from aereo.execution.backends import _safe_truncate
+    from aereo.backends.lambda_backend import _safe_truncate
 
     text = "x" * 3000
     result = _safe_truncate(text, max_len=2048)

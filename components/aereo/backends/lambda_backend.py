@@ -10,8 +10,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Iterable, Sequence
 
-from aereo.execution.core import TaskRunner, TaskStaging
-from aereo.interfaces import ExtractionTask
+from aereo.backends.core import TaskRunner
+from aereo.interfaces import ExecutionBackend, ExtractionTask, TaskStaging
 from aereo.schemas import ArtifactSchema
 from aereo.serialization import TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
@@ -32,7 +32,7 @@ def _safe_truncate(text: str, max_len: int = 2048) -> str:
     return text
 
 
-class LambdaBackend:
+class LambdaBackend(ExecutionBackend):
     """Execute tasks remotely via AWS Lambda container functions.
 
     Each :class:`ExtractionTask` is serialized, staged to remote object storage,
@@ -144,10 +144,14 @@ class LambdaBackend:
         payload_dict = {
             "task_uri": task_uri,
             "output_prefix": output_prefix,
+            "job_id": job_id,
+            "chunk_id": task_idx,
+            "init_params": task.task_context.get("init_params"),
+            "bucket": getattr(self.staging, "bucket", None),
         }
         response = self._lambda_client.invoke(
             FunctionName=self.function_name,
-            Payload=json.dumps(payload_dict).encode("utf-8"),
+            Payload=json.dumps(payload_dict, default=str).encode("utf-8"),
         )
 
         payload_stream = response["Payload"]

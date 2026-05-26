@@ -63,7 +63,9 @@ class TaskSerializer:
             "aoi_wkt": task.aoi.wkt if task.aoi is not None else None,
             "task_context": dict(task.task_context),
         }
-        (dest_dir / self.META_NAME).write_text(json.dumps(meta), encoding="utf-8")
+        (dest_dir / self.META_NAME).write_text(
+            json.dumps(meta, default=str), encoding="utf-8"
+        )
 
         logger.debug(
             f"task_serialized dest_dir={dest_dir} n_assets={len(task.assets)} n_cells={len(task.grid_cells)}"

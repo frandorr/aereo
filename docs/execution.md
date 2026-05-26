@@ -71,12 +71,11 @@ Dispatches tasks to an AWS Lambda function for serverless extraction.
 **Best for:** Burst workloads, large-scale parallel extraction, or offloading heavy processing from local machines.
 
 ```python
-from aereo.execution import LambdaBackend
-from aereo_extract_remote import S3TaskStaging
+from aereo.backends import CloudTaskStaging, LambdaBackend
 
 backend = LambdaBackend(
     function_name="aereo-extract",
-    task_staging=S3TaskStaging(bucket="my-staging-bucket"),
+    staging=CloudTaskStaging(bucket="my-staging-bucket"),
 )
 artifacts = client.execute_tasks(tasks, backend=backend)
 ```
@@ -96,7 +95,7 @@ Point `LambdaBackend` at a local Lambda emulator (e.g. Floci):
 ```python
 backend = LambdaBackend(
     function_name="aereo-extract",
-    task_staging=S3TaskStaging(bucket="local-bucket"),
+    staging=CloudTaskStaging(bucket="local-bucket"),
     endpoint_url="http://localhost:9001",
 )
 ```

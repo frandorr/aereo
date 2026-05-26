@@ -10,12 +10,14 @@ from aereo.interfaces.core import (
     AereoPlugin,
     AereoProfile,
     Downloader,
+    ExecutionBackend,
     ExtractionProfile,
     ExtractionTask,
     Extractor,
     GridConfig,
     PluginParam,
     SearchProvider,
+    TaskStaging,
     merge_params,
 )
 
@@ -23,11 +25,13 @@ __all__ = [
     "AereoPlugin",
     "AereoProfile",
     "Downloader",
+    "ExecutionBackend",
     "ExtractionProfile",
     "ExtractionTask",
     "Extractor",
     "GridConfig",
     "PluginParam",
     "SearchProvider",
+    "TaskStaging",
     "merge_params",
 ]

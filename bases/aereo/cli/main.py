@@ -15,7 +15,7 @@ from rich.console import Console
 from rich.table import Table
 
 from aereo.client import AereoClient
-from aereo.execution import LocalProcessBackend
+from aereo.backends import LocalProcessBackend
 from aereo.interfaces import AereoProfile, GridConfig
 from aereo.schemas import AssetSchema
 

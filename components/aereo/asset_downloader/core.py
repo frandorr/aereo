@@ -35,7 +35,7 @@ def download_asset_safely(
     local_path.parent.mkdir(parents=True, exist_ok=True)
     lock_path = local_path.with_suffix(".lock")
 
-    with filelock.FileLock(str(lock_path)):
+    with filelock.FileLock(str(lock_path), timeout=600):
         if not local_path.exists():
             if downloader is not None:
                 downloader(href, local_path)
@@ -46,7 +46,7 @@ def download_asset_safely(
                 fs.get(href.replace("s3://", ""), str(local_path))
             elif href.startswith("http://") or href.startswith("https://"):
                 http = http_session if http_session is not None else requests
-                response = http.get(href, stream=True)
+                response = http.get(href, stream=True, timeout=(30, 300))
                 response.raise_for_status()
                 with open(local_path, "wb") as f:
                     for chunk in response.iter_content(chunk_size=8192):
