@@ -17,6 +17,23 @@ from shapely.geometry.base import BaseGeometry
 logger = logging.getLogger(__name__)
 
 
+class PluginParam(BaseModel):
+    """Schema for a single plugin parameter.
+
+    Used by both search and extract plugins to declare what parameters
+    they accept. Enables auto-generated docs, CLI validation, and UI forms.
+    """
+
+    model_config = {"extra": "forbid", "frozen": True}
+
+    name: str
+    type: Literal["str", "int", "float", "bool", "choice", "path", "list[str]"]
+    description: str
+    default: Any | None = None
+    choices: Sequence[str] | None = None
+    required: bool = False
+
+
 def merge_params(
     batch_params: Mapping[str, Any] | None,
     profile_params: Mapping[str, Any],
@@ -120,6 +137,10 @@ class AereoPlugin(ABC):
     # 1. Define the type hint, but remove the `= None` default.
     supported_collections: Sequence[str]
 
+    # --- NEW: params metadata ---
+    required_params: Sequence[PluginParam] = ()
+    optional_params: Sequence[PluginParam] = ()
+
     def __init_subclass__(cls, plugin_abstract: bool = False, **kwargs):
         super().__init_subclass__(**kwargs)
 
@@ -147,7 +168,21 @@ class AereoPlugin(ABC):
                 f"(list, tuple, or set), got {type(cls.supported_collections).__name__}."
             )
 
-        # 5. Empty sequences are allowed (used by plugins that only support plugin_hints)
+        # 5. Validate params metadata
+        for p in cls.required_params:
+            if not isinstance(p, PluginParam):
+                raise TypeError(
+                    f"{cls.__name__}.required_params must contain PluginParam instances, "
+                    f"got {type(p).__name__}"
+                )
+        for p in cls.optional_params:
+            if not isinstance(p, PluginParam):
+                raise TypeError(
+                    f"{cls.__name__}.optional_params must contain PluginParam instances, "
+                    f"got {type(p).__name__}"
+                )
+
+        # 6. Empty sequences are allowed (used by plugins that only support plugin_hints)
 
 
 class SearchProvider(AereoPlugin, plugin_abstract=True):

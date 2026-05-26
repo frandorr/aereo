@@ -242,3 +242,37 @@ class AereoRegistry:
             )
 
         return self._extractors[plugin_name](**kwargs)
+
+    def get_plugin_params(self, plugin_name: str) -> dict[str, list[dict]]:
+        """Return params metadata for any plugin (search or extract).
+
+        Args:
+            plugin_name: Entry-point name of the plugin.
+
+        Returns:
+            {"required": [...], "optional": [...]} where each item is a
+            JSON-serializable dict representing a PluginParam.
+        """
+        cls = self._searchers.get(plugin_name) or self._extractors.get(plugin_name)
+        if cls is None:
+            raise KeyError(f"Unknown plugin: {plugin_name}")
+        return {
+            "required": [p.model_dump() for p in cls.required_params],
+            "optional": [p.model_dump() for p in cls.optional_params],
+        }
+
+    def list_all_params(self) -> dict[str, dict]:
+        """JSON-serializable params catalog for all discovered plugins."""
+        from aereo.interfaces import PluginParam
+
+        def _dump(params: tuple[PluginParam, ...]) -> list[dict]:
+            return [p.model_dump() for p in params]
+
+        return {
+            name: {
+                "type": "search" if name in self._searchers else "extract",
+                "required": _dump(cls.required_params),
+                "optional": _dump(cls.optional_params),
+            }
+            for name, cls in {**self._searchers, **self._extractors}.items()
+        }

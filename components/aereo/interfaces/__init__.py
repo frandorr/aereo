@@ -14,6 +14,7 @@ from aereo.interfaces.core import (
     ExtractionTask,
     Extractor,
     GridConfig,
+    PluginParam,
     SearchProvider,
     merge_params,
 )
@@ -26,6 +27,7 @@ __all__ = [
     "ExtractionTask",
     "Extractor",
     "GridConfig",
+    "PluginParam",
     "SearchProvider",
     "merge_params",
 ]
