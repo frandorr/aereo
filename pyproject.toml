@@ -84,7 +84,6 @@ dev = [
   "pytest>=9.0.2,<10",
   "pytest-cov>=6",
   "python-semantic-release>=10.5.3,<11",
-  "rasterio>=1.5",
   "rioxarray>=0.22",
   "satpy>=0.59",
   "types-requests>=2.32.4.20260107,<3",
@@ -179,6 +178,7 @@ reportMissingImports = false
 extraPaths = [ "components", "bases", "development" ]
 
 [tool.polylith]
+bricks."components/aereo/eoids" = "aereo/eoids"
 bricks."components/aereo/grid" = "aereo/grid"
 bricks."components/aereo/interfaces" = "aereo/interfaces"
 bricks."components/aereo/registry" = "aereo/registry"
