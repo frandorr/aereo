@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from shapely.geometry import box
 from aereo.client import AereoClient
 from aereo.interfaces import AereoProfile
-from aereo.execution import LocalProcessBackend
+from aereo.backends import LocalProcessBackend
 
 client = AereoClient()
 
