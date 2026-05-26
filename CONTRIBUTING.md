@@ -38,8 +38,8 @@ AER uses [uv](https://docs.astral.sh/uv/) for dependency management and [Polylit
 ### Clone and Install
 
 ```bash
-git clone https://github.com/<org>/aer.git
-cd aer
+git clone https://github.com/frandorr/aereo.git
+cd aereo
 uv sync --all-extras
 ```
 
@@ -49,9 +49,9 @@ The `--all-extras` flag installs optional dependencies for all plugins so you ca
 
 AER is organized as a Polylith workspace:
 
-- `components/` — reusable bricks (e.g., `aer/data`, `aer/grid`)
-- `bases/` — entry points (e.g., `aer/client`)
-- `projects/` — publishable packages (e.g., `projects/aer-core`)
+- `components/` — reusable bricks (e.g., `aereo/data`, `aereo/grid`)
+- `bases/` — entry points (e.g., `aereo/client`)
+- `projects/` — publishable packages (e.g., `projects/aereo-core`)
 - `test/` — mirrors the `components/` and `bases/` structure
 
 When adding new functionality, prefer creating or extending a component in `components/` over adding code directly to a base.
@@ -160,4 +160,4 @@ Configuration is in `pyproject.toml`.
 
 ## Questions?
 
-Feel free to open a [Discussion](https://github.com/<org>/aer/discussions) or reach out in an existing issue.
+Feel free to open a [Discussion](https://github.com/frandorr/aereo/discussions) or reach out in an existing issue.
