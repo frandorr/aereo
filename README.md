@@ -21,7 +21,7 @@ pip install aereo aereo-search-planetary-computer aereo-extract-odc-stac
 pip install aereo aereo-search-earthaccess aereo-extract-satpy
 ```
 
-> **Note:** The PyPI package is `aereo` because `aereo` is already taken.
+> **Note:** Install the core framework with `pip install aereo`. Plugins are separate packages (e.g. `aereo-search-aws-goes`).
 
 > These plugins ship ready to use. AER's architecture makes adding new sensors trivial — a **search plugin** connects the catalog, an **extract plugin** handles the assets, and reprojection to the **Major TOM grid** happens automatically.
 
