@@ -57,7 +57,9 @@ profiles:
     - name: geotessera
       resolution: 10
       collections:
-          geotessera: []
+          geotessera: ["0", "1", "2"]
+      extract_params:
+          max_download_workers: 4
       plugin_hints:
           search: search_tessera
           extract: extract_tessera

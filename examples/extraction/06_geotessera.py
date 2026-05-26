@@ -34,7 +34,7 @@ from aereo.interfaces import AereoProfile, GridConfig
 # GeoTessera covers 2017–2025. We use 2024 which has coverage for the Chocon AOI.
 DATE_START = datetime(2024, 1, 1, tzinfo=timezone.utc)
 DATE_END = datetime(2024, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
-URI = "/root/repos/aereo/examples/extraction/09_geotessera_extraction_output"
+URI = "/root/repos/aereo/examples/extraction/06_geotessera_extraction_output"
 
 # Shared AOI — path relative to this script so it works regardless of CWD
 try:
@@ -106,7 +106,7 @@ artifact_paths = [e["path"] for e in entries if e.get("profile") == "geotessera"
 if artifact_paths:
     with rasterio.open(artifact_paths[0]) as src:
         print(f"Verified artifact: {artifact_paths[0].name}")
-        print(f"  Bands: {src.count} (expected 128 for full embedding tensor)")
+        print(f"  Bands: {src.count} (extracting dims 0,1,2 for demo speed)")
         print(f"  Shape: {src.shape}")
         print(f"  CRS:   {src.crs}")
 
@@ -161,11 +161,11 @@ if mosaic.shape[0] >= 3:
     ax.set_ylabel("Latitude")
     plt.tight_layout()
     plt.savefig(
-        "/root/repos/aereo/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png",
+        "/root/repos/aereo/examples/extraction/06_geotessera_extraction_output/06_geotessera_rgb.png",
         dpi=150,
     )
     print(
-        "Saved RGB mosaic to /root/repos/aereo/examples/extraction/09_geotessera_extraction_output/09_geotessera_rgb.png"
+        "Saved RGB mosaic to /root/repos/aereo/examples/extraction/06_geotessera_extraction_output/06_geotessera_rgb.png"
     )
 
 # %%
@@ -196,11 +196,11 @@ if valid.size > 0:
     ax.set_ylabel("Latitude")
     plt.tight_layout()
     plt.savefig(
-        "/root/repos/aereo/examples/extraction/09_geotessera_extraction_output/09_geotessera_single_band.png",
+        "/root/repos/aereo/examples/extraction/06_geotessera_extraction_output/06_geotessera_single_band.png",
         dpi=150,
     )
     print(
-        "Saved single-band mosaic to /root/repos/aereo/examples/extraction/09_geotessera_extraction_output/09_geotessera_single_band.png"
+        "Saved single-band mosaic to /root/repos/aereo/examples/extraction/06_geotessera_extraction_output/06_geotessera_single_band.png"
     )
 else:
     print("Warning: no valid pixels found for single-band visualization")

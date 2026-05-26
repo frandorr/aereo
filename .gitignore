@@ -231,6 +231,7 @@ single_cell_comparison.png
 areas/
 data/
 !test/components/aer/data/
+!examples/data/
 satpy_cache/
 
 # Examples: keep notebooks, scripts, README; remove PNGs & non-BA geojsons
@@ -250,6 +251,6 @@ examples/test_aoi.geojson
 
 # Generated example outputs & dev artifacts
 /*.png
-examples/extraction/09_geotessera_extraction_output/
+examples/extraction/*_output/
 .ralph-tui/
 site/
