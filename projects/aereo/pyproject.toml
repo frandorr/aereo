@@ -5,7 +5,10 @@ requires = [ "hatch-polylith-bricks", "hatchling" ]
 [project]
 name = "aereo"
 version = "1.1.0"
-description = "A modular, high-performance capability-graph framework for processing Earth Observation sensor data."
+description = """\
+  Plugin-based satellite data extraction — search across catalogs, extract assets, and reproject to analysis-ready \
+  Major TOM grids.\
+  """
 readme = "README.md"
 keywords = [
   "earth-observation",

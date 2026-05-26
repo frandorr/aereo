@@ -1,6 +1,6 @@
-# Contributing to AER
+# Contributing to AEREO
 
-Thank you for your interest in contributing to AER! This document provides guidelines for reporting issues, setting up your development environment, and submitting changes.
+Thank you for your interest in contributing to AEREO! This document provides guidelines for reporting issues, setting up your development environment, and submitting changes.
 
 ## Table of Contents
 
@@ -27,7 +27,7 @@ For feature requests, describe the use case and the problem you're trying to sol
 
 ## Development Setup
 
-AER uses [uv](https://docs.astral.sh/uv/) for dependency management and [Polylith](https://polylith.gitbook.io/polylith) for code organization.
+AEREO uses [uv](https://docs.astral.sh/uv/) for dependency management and [Polylith](https://polylith.gitbook.io/polylith) for code organization.
 
 ### Prerequisites
 
@@ -47,7 +47,7 @@ The `--all-extras` flag installs optional dependencies for all plugins so you ca
 
 ### Polylith Workspace
 
-AER is organized as a Polylith workspace:
+AEREO is organized as a Polylith workspace:
 
 - `components/` — reusable bricks (e.g., `aereo/data`, `aereo/grid`)
 - `bases/` — entry points (e.g., `aereo/client`)

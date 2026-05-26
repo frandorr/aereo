@@ -1,14 +1,22 @@
-# aereoeo
+# aereo
 
-`aereo` is a modular, high-performance capability-graph framework for downloading, parsing, and transforming Earth Observation sensor data.
+> Plugin-based satellite data extraction — from search to analysis-ready Major TOM grid in minutes.
 
-This `aereo` package includes the base registries, spatial transforms, dependency grids, and foundational typing rules meant to be extended by third-party Python plugin components.
+`aereo` is the core framework. Install it together with search and extract plugins for the sensors you need:
 
-## Features
+```bash
+# GOES ABI (public S3, no auth)
+pip install aereo aereo-search-aws-goes aereo-extract-satpy
 
-- **Strict Validations:** Uses `pandera` and `geopandas` for 100% rigorous parsing of geo-features.
-- **Capability Graph Engine:** Automatically infers plugin IO shapes dynamically.
-- **Lazy Discovery Engine:** Finds and eagerly caches dynamic instrument components.
-- **SatPy/PyResample Wrappers:** Seamless grid abstractions across `utm`, `proj`.
+# Sentinel-2 (Planetary Computer)
+pip install aereo aereo-search-planetary-computer aereo-extract-odc-stac
 
-For building capabilities and plugins on top of `aereo`, see our official Plugin Developer Guide on the repository docs!
+# MODIS / VIIRS / Sentinel-3 (NASA Earthdata)
+pip install aereo aereo-search-earthaccess aereo-extract-satpy
+```
+
+- **Search** across multiple satellite catalogs through a unified API.
+- **Extract** assets and reproject them automatically to the same **Major TOM grid**.
+- **Plugin-based** — add new sensors by installing pip packages; no code changes required.
+
+For docs, examples, and plugin development guides, see [https://frandorr.github.io/aereo](https://frandorr.github.io/aereo).

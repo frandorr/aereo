@@ -4,7 +4,7 @@ Get from zero to your first extracted satellite image in under 5 minutes.
 
 ## 1. Install
 
-Install AER and the GOES plugins (public S3, no authentication required):
+Install AEREO and the GOES plugins (public S3, no authentication required):
 
 ```bash
 pip install aereo aereo-search-aws-goes aereo-extract-satpy
@@ -50,7 +50,7 @@ print(f"Found {len(results)} assets")
 
 ## 4. Prepare
 
-Turn search results into extraction tasks. AER builds a grid over your AOI and chunks everything into parallelizable tasks.
+Turn search results into extraction tasks. AEREO builds a grid over your AOI and chunks everything into parallelizable tasks.
 
 ```python
 from aereo.interfaces import GridConfig

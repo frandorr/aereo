@@ -1,6 +1,6 @@
 # %%
 # 01_minimal_goes.py
-# Minimal AER workflow: search GOES-19 ABI C02, extract to GeoTIFF.
+# Minimal AEREO workflow: search GOES-19 ABI C02, extract to GeoTIFF.
 
 from datetime import datetime, timezone
 

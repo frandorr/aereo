@@ -1,12 +1,12 @@
-# AER Architecture — Simplified Visual Guide
+# AEREO Architecture — Simplified Visual Guide
 
-> A clean, high-level map of the AER system. For deep implementation details, see [`pipeline-architecture.md`](./pipeline-architecture.md).
+> A clean, high-level map of the AEREO system. For deep implementation details, see [`pipeline-architecture.md`](./pipeline-architecture.md).
 >
 > Rendered SVGs are available alongside this file: `aer-architecture-visualization-1.svg` through `aer-architecture-visualization-7.svg`.
 
 ---
 
-## 1. AER at a Glance
+## 1. AEREO at a Glance
 
 Three entry points. One pipeline. GeoTIFF output.
 
@@ -80,7 +80,7 @@ flowchart LR
 
 ## 4. Plugin Discovery
 
-Install a pip package. AER finds it automatically.
+Install a pip package. AEREO finds it automatically.
 
 ```mermaid
 flowchart LR
@@ -164,7 +164,7 @@ flowchart LR
 
 ## 8. Project Layout
 
-AER is a Polylith monorepo.
+AEREO is a Polylith monorepo.
 
 ```mermaid
 flowchart LR

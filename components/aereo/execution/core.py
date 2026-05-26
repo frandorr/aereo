@@ -1,4 +1,4 @@
-"""Execution backends and task runner for AER extraction tasks."""
+"""Execution backends and task runner for AEREO extraction tasks."""
 
 from __future__ import annotations
 

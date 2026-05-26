@@ -20,7 +20,7 @@ pip install aereo
 
 ### Missing plugins
 
-AER is a plugin-based framework. Installing only `aereo` gives you the core client and interfaces, but you cannot search or extract anything without at least one search plugin and one extract plugin.
+AEREO is a plugin-based framework. Installing only `aereo` gives you the core client and interfaces, but you cannot search or extract anything without at least one search plugin and one extract plugin.
 
 **Symptom:**
 ```
@@ -169,7 +169,7 @@ GridConfig(target_grid_dist=50_000)  # 50 km cells
 
 ### CRS mismatch
 
-Each grid cell is naturally projected to its local UTM zone. Adjacent cells may have different CRSs. When you mosaic them, AER reprojects everything to a common CRS, but if you open individual cells manually, expect varying CRS values.
+Each grid cell is naturally projected to its local UTM zone. Adjacent cells may have different CRSs. When you mosaic them, AEREO reprojects everything to a common CRS, but if you open individual cells manually, expect varying CRS values.
 
 ### `conform_to` vs natural shapes
 

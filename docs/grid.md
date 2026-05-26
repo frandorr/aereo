@@ -1,6 +1,6 @@
 # Grid System
 
-AER partitions the Earth into analysis-ready cells using the ESA Major TOM grid conventions. Every extraction task is tied to a `GridCell`, and the set of cells that cover an AOI is produced by a `GridDefinition`.
+AEREO partitions the Earth into analysis-ready cells using the ESA Major TOM grid conventions. Every extraction task is tied to a `GridCell`, and the set of cells that cover an AOI is produced by a `GridDefinition`.
 
 ---
 
@@ -92,7 +92,7 @@ When `conform_to=(w, h)` is provided, `tight=True` is enforced internally so eve
 
 ## Grid Filtering Modes
 
-During `prepare_for_extraction`, AER intersects the generated grid with the **asset geometry** (the actual satellite swath footprint, not the AOI). You can control how strict that intersection is via `prepare_params`:
+During `prepare_for_extraction`, AEREO intersects the generated grid with the **asset geometry** (the actual satellite swath footprint, not the AOI). You can control how strict that intersection is via `prepare_params`:
 
 | Mode | Parameter | Behaviour | Use case |
 |------|-----------|-----------|----------|

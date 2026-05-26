@@ -1,4 +1,4 @@
-"""AER CLI — command-line interface for the AER satellite data framework."""
+"""AEREO CLI — command-line interface for the AEREO satellite data framework."""
 
 # ruff: noqa: E402
 from __future__ import annotations
@@ -21,7 +21,7 @@ from aereo.schemas import AssetSchema
 
 app = typer.Typer(
     name="aereo",
-    help="AER — Modular satellite data discovery, extraction, and processing",
+    help="AEREO — Modular satellite data discovery, extraction, and processing",
     no_args_is_help=True,
 )
 console = Console()
@@ -431,7 +431,7 @@ def validate(
         typer.Option("--profile", "-p", help="Path to profile YAML to validate"),
     ] = None,
 ) -> None:
-    """Validate a config or profile YAML against AER schemas."""
+    """Validate a config or profile YAML against AEREO schemas."""
     if config:
         if not config.exists():
             console.print(f"[red]Config not found:[/red] {config}")
@@ -461,12 +461,12 @@ def validate(
 
 @app.command()
 def plugins() -> None:
-    """List installed AER plugins."""
+    """List installed AEREO plugins."""
     from aereo.registry import AereoRegistry
 
     registry = AereoRegistry()
 
-    table = Table(title="Installed AER Plugins")
+    table = Table(title="Installed AEREO Plugins")
     table.add_column("Type", style="cyan")
     table.add_column("Name", style="magenta")
     table.add_column("Collections", style="green")

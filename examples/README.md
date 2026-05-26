@@ -1,6 +1,6 @@
-# AER Examples
+# AEREO Examples
 
-Runnable `.py` examples (with `# %%` cell markers for Jupyter compatibility) demonstrating the AER (Asset Extraction and Retrieval) framework for satellite data processing.
+Runnable `.py` examples (with `# %%` cell markers for Jupyter compatibility) demonstrating the AEREO (Asset Extraction and Retrieval) framework for satellite data processing.
 
 ---
 
@@ -57,7 +57,7 @@ Every example follows the same 4-step pattern:
 3. **Extract** — Download and process raw data into GeoTIFFs
 4. **Output** — Files organized by `location/date/profile/collection/variable/resolution`
 
-> 📖 New to AER? Read the [root README](../index.md) for the full quickstart and API overview.
+> 📖 New to AEREO? Read the [root README](../index.md) for the full quickstart and API overview.
 
 ---
 
@@ -101,7 +101,7 @@ After running your first example, here are the key abstractions:
 
 ## Common `AereoProfile` Errors and Fixes
 
-The most common failures when running AER examples are incorrect `AereoProfile` definitions. Here is a single reference for the pitfalls each example documents inline.
+The most common failures when running AEREO examples are incorrect `AereoProfile` definitions. Here is a single reference for the pitfalls each example documents inline.
 
 ### GOES (examples 02, 04)
 

@@ -1,6 +1,6 @@
 # Examples
 
-AER comes with a collection of runnable `.py` examples and a Jupyter notebook covering every supported sensor and workflow.
+AEREO comes with a collection of runnable `.py` examples and a Jupyter notebook covering every supported sensor and workflow.
 
 ## Tutorial Sequence (`.py` examples)
 
@@ -29,4 +29,4 @@ For run commands, disk-space estimates, common `AereoProfile` errors and fixes, 
 
 ## Quick start
 
-If you are new to AER, start with the [Quick Start](quickstart.md) guide for a complete copy-paste example.
+If you are new to AEREO, start with the [Quick Start](quickstart.md) guide for a complete copy-paste example.

@@ -1,4 +1,4 @@
-"""Tests for the AER CLI."""
+"""Tests for the AEREO CLI."""
 
 import json
 from pathlib import Path
@@ -67,7 +67,7 @@ class TestPlugins:
     def test_plugins_list(self):
         result = runner.invoke(app, ["plugins"])
         assert result.exit_code == 0
-        assert "Installed AER Plugins" in result.output
+        assert "Installed AEREO Plugins" in result.output
 
 
 class TestSearch:

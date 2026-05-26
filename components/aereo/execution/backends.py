@@ -1,4 +1,4 @@
-"""Remote execution backends for AER extraction tasks."""
+"""Remote execution backends for AEREO extraction tasks."""
 
 from __future__ import annotations
 

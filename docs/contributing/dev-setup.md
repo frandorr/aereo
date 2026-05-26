@@ -1,6 +1,6 @@
 # Developer Setup
 
-AER uses [uv](https://docs.astral.sh/uv/) for dependency management and [Polylith](https://polylith.gitbook.io/polylith) for code organization. This guide covers cloning, syncing, and understanding the workspace layout.
+AEREO uses [uv](https://docs.astral.sh/uv/) for dependency management and [Polylith](https://polylith.gitbook.io/polylith) for code organization. This guide covers cloning, syncing, and understanding the workspace layout.
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ uv run python -c "from aereo.registry import AereoRegistry; r = AereoRegistry();
 
 ## Polylith Workspace
 
-AER is organized as a Polylith workspace:
+AEREO is organized as a Polylith workspace:
 
 | Directory | Purpose |
 |-----------|---------|
@@ -51,7 +51,7 @@ To learn how to implement the code for a search provider or extractor, read [Bui
 
 ## hatch-polylith-bricks Dev Mode
 
-AER uses `hatch-polylith-bricks` to bundle bricks during an editable install. The `projects/aereo-core/pyproject.toml` already configures `build.dev-mode-dirs` so that local source edits in `components/` and `bases/` are reflected immediately without reinstalling:
+AEREO uses `hatch-polylith-bricks` to bundle bricks during an editable install. The `projects/aereo-core/pyproject.toml` already configures `build.dev-mode-dirs` so that local source edits in `components/` and `bases/` are reflected immediately without reinstalling:
 
 ```toml
 [tool.hatch]

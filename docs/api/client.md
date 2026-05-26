@@ -1,6 +1,6 @@
 # Client API
 
-`AereoClient` is the single entry point for almost all AER workflows. Create one instance and call `search()`, `prepare_for_extraction()`, and `execute_tasks()` in sequence. The sections below document every parameter and return type.
+`AereoClient` is the single entry point for almost all AEREO workflows. Create one instance and call `search()`, `prepare_for_extraction()`, and `execute_tasks()` in sequence. The sections below document every parameter and return type.
 
 ```python
 from datetime import datetime, timezone

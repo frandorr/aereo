@@ -1,6 +1,6 @@
-# aereoeo-lambda
+# aereo-lambda
 
-AER Lambda container image — a Polylith project that packages the AWS Lambda handler and a minimal subset of AER core bricks for serverless extraction tasks.
+AEREO Lambda container image — a Polylith project that packages the AWS Lambda handler and a minimal subset of AEREO core bricks for serverless extraction tasks.
 
 ## Build
 

@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="aer.png" alt="AER logo" style="max-width: 500px; width: 100%;">
+    <img src="aer.png" alt="AEREO logo" style="max-width: 500px; width: 100%;">
 </p>
 
 <h1 align="center">
@@ -8,7 +8,7 @@
 
 ---
 
-Satellite data lives in a dozen different catalogs, each with its own API, authentication, and file format. **AER** unifies them into a single pipeline: **search** across catalogs, **extract** assets, and receive everything reprojected to the same **Major TOM grid** — ready for multi-sensor model training.
+Satellite data lives in a dozen different catalogs, each with its own API, authentication, and file format. **AEREO** unifies them into a single pipeline: **search** across catalogs, **extract** assets, and receive everything reprojected to the same **Major TOM grid** — ready for multi-sensor model training.
 
 ## Install
 
@@ -34,7 +34,7 @@ Pick your sensor and copy-paste:
 
 > **Note:** The PyPI package is `aereo` because `aereo` is already taken.
 
-> These plugins ship ready to use. AER's architecture makes adding new sensors trivial — a **search plugin** connects the catalog, an **extract plugin** handles the assets, and reprojection to the **Major TOM grid** happens automatically.
+> These plugins ship ready to use. AEREO's architecture makes adding new sensors trivial — a **search plugin** connects the catalog, an **extract plugin** handles the assets, and reprojection to the **Major TOM grid** happens automatically.
 
 ---
 
@@ -74,7 +74,7 @@ Open `./out/` — you have GeoTIFFs.
 
 ---
 
-## New to AER?
+## New to AEREO?
 
 - [Quick Start](quickstart.md) — first extraction in 3 minutes
 - [CLI](cli.md) — zero-code `aereo run`

@@ -1,6 +1,6 @@
-# AER Pipeline Architecture
+# AEREO Pipeline Architecture
 
-This document describes the three-phase AER pipeline — **Search**, **Prepare**, and **Extract** — with UML-like diagrams, input/output schemas, and the exact parameters each phase accepts and produces.
+This document describes the three-phase AEREO pipeline — **Search**, **Prepare**, and **Extract** — with UML-like diagrams, input/output schemas, and the exact parameters each phase accepts and produces.
 
 ---
 
@@ -24,7 +24,7 @@ This document describes the three-phase AER pipeline — **Search**, **Prepare**
 ## Phase 1: Search
 
 ### Purpose
-Find satellite granules across one or more collections that intersect a given AOI and time range. AER fans out the query to registered **SearchProvider** plugins in parallel.
+Find satellite granules across one or more collections that intersect a given AOI and time range. AEREO fans out the query to registered **SearchProvider** plugins in parallel.
 
 ### Sequence Diagram
 

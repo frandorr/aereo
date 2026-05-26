@@ -1,10 +1,18 @@
 # aereo 🪐
 
+[![PyPI](https://img.shields.io/pypi/v/aereo.svg)](https://pypi.org/project/aereo)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/aereo.svg)](https://pypi.org/project/aereo)
+[![Python Versions](https://img.shields.io/pypi/pyversions/aereo.svg)](https://pypi.org/project/aereo)
+[![CI](https://github.com/frandorr/aereo/actions/workflows/ci.yml/badge.svg)](https://github.com/frandorr/aereo/actions/workflows/ci.yml)
+[![GitHub Issues](https://img.shields.io/github/issues/frandorr/aereo.svg)](https://github.com/frandorr/aereo/issues)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/frandorr/aereo/blob/main/LICENSE)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://frandorr.github.io/aereo)
+
 > Plugin-based satellite data extraction — from search to analysis-ready Major TOM grid in minutes.
 
 ---
 
-Satellite data lives in a dozen different catalogs, each with its own API, authentication, and file format. **AER** unifies them into a single pipeline: **search** across catalogs, **extract** assets, and receive everything reprojected to the same **Major TOM grid** — ready for multi-sensor model training.
+Satellite data lives in a dozen different catalogs, each with its own API, authentication, and file format. **AEREO** unifies them into a single pipeline: **search** across catalogs, **extract** assets, and receive everything reprojected to the same **Major TOM grid** — ready for multi-sensor model training.
 
 ## Install
 
@@ -23,7 +31,7 @@ pip install aereo aereo-search-earthaccess aereo-extract-satpy
 
 > **Note:** Install the core framework with `pip install aereo`. Plugins are separate packages (e.g. `aereo-search-aws-goes`).
 
-> These plugins ship ready to use. AER's architecture makes adding new sensors trivial — a **search plugin** connects the catalog, an **extract plugin** handles the assets, and reprojection to the **Major TOM grid** happens automatically.
+> These plugins ship ready to use. AEREO's architecture makes adding new sensors trivial — a **search plugin** connects the catalog, an **extract plugin** handles the assets, and reprojection to the **Major TOM grid** happens automatically.
 
 ---
 
@@ -52,7 +60,7 @@ Open `./out/` — you have GeoTIFFs.
 - [Quick Start](https://frandorr.github.io/aereo/quickstart/) — first extraction in 3 minutes
 - [Examples](https://frandorr.github.io/aereo/examples/) — GOES, Sentinel-2, multi-sensor, ML-ready
 - [CLI](https://frandorr.github.io/aereo/cli/) — zero-code `aereo run`
-- [Build a Plugin](https://frandorr.github.io/aereo/build-your-own-plugin/) — extend AER
+- [Build a Plugin](https://frandorr.github.io/aereo/build-your-own-plugin/) — extend AEREO
 
 ---
 

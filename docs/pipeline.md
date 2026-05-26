@@ -1,6 +1,6 @@
 # Running the Pipeline
 
-AER's entire user experience is built around three `AereoClient` methods: `search()`, `prepare_for_extraction()`, and `execute_tasks()`. This page shows you how to use each one with practical examples, common patterns, and the gotchas that matter in production.
+AEREO's entire user experience is built around three `AereoClient` methods: `search()`, `prepare_for_extraction()`, and `execute_tasks()`. This page shows you how to use each one with practical examples, common patterns, and the gotchas that matter in production.
 
 For deep technical internals — UML diagrams, exact schema tables, and sequence diagrams — see [Pipeline Architecture](pipeline-architecture.md).
 
@@ -8,7 +8,7 @@ For deep technical internals — UML diagrams, exact schema tables, and sequence
 
 ## Search
 
-Find satellite granules that match your time range, area of interest, and sensor profile. AER fans the query out to registered **search plugins** in parallel and returns a single validated GeoDataFrame.
+Find satellite granules that match your time range, area of interest, and sensor profile. AEREO fans the query out to registered **search plugins** in parallel and returns a single validated GeoDataFrame.
 
 ### Minimal example
 
@@ -54,7 +54,7 @@ print(results[["id", "collection", "start_time"]].head())
 
 ### Common pattern: searching multiple collections
 
-Pass several profiles at once. AER will dispatch them to the right plugins automatically.
+Pass several profiles at once. AEREO will dispatch them to the right plugins automatically.
 
 ```python
 from datetime import datetime, timezone
@@ -102,7 +102,7 @@ With `BEST_EFFORT` (the default), a failing plugin is logged and skipped — you
 
 ## Prepare
 
-Turn search results into a list of `ExtractionTask` objects. AER builds a grid over your AOI, groups assets by profile and start time, filters grid cells by swath coverage, and chunks everything into parallelizable units.
+Turn search results into a list of `ExtractionTask` objects. AEREO builds a grid over your AOI, groups assets by profile and start time, filters grid cells by swath coverage, and chunks everything into parallelizable units.
 
 ### Minimal example
 

@@ -1,4 +1,4 @@
-"""AER Lambda handler entrypoint."""
+"""AEREO Lambda handler entrypoint."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
-    """AER Lambda handler entrypoint.
+    """AEREO Lambda handler entrypoint.
 
     Delegates to :func:`aereo_extract_remote.lambda_handler.handle` for
     deserialization, execution, and result upload.

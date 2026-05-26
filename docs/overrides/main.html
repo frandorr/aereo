@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{# Custom site title in header — shows AER branding instead of plain text #}
+{# Custom site title in header — shows AEREO branding instead of plain text #}
 {% block site_name %}
   <span class="md-header__title">
-    <a href="{{ nav.homepage.url | url }}" title="{{ config.site_name or 'AER Documentation' }}" class="md-header__button md-logo" aria-label="{{ config.site_name or 'AER Documentation' }}">
+    <a href="{{ nav.homepage.url | url }}" title="{{ config.site_name or 'AEREO Documentation' }}" class="md-header__button md-logo" aria-label="{{ config.site_name or 'AEREO Documentation' }}">
       {% include "partials/logo.html" ignore missing %}
     </a>
     <div class="md-header__ellipsis">
       <div class="md-header__topic">
         <span class="md-ellipsis">
-          🪐 AER
+          🪐 AEREO
         </span>
       </div>
       <div class="md-header__topic" data-md-component="header-topic">

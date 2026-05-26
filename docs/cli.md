@@ -1,6 +1,6 @@
-# AER CLI
+# AEREO CLI
 
-AER ships with a command-line interface for users who prefer YAML configuration over Python notebooks. Every CLI command uses `LocalProcessBackend` under the hood.
+AEREO ships with a command-line interface for users who prefer YAML configuration over Python notebooks. Every CLI command uses `LocalProcessBackend` under the hood.
 
 ---
 
@@ -16,7 +16,7 @@ pip install aereo aereo-search-aws-goes aereo-extract-satpy
 
 ## Verify plugins
 
-List every search and extract plugin AER can discover:
+List every search and extract plugin AEREO can discover:
 
 ```bash
 aereo plugins
@@ -163,5 +163,5 @@ Validation exits with code `0` on success and code `1` on failure, printing the 
   aereo run -p goes.yaml -p s2.yaml -g aoi.geojson --start 2026-04-02T14:00 --end 2026-04-02T14:10
   ```
 - **Date formats** — any ISO 8601 string works (`2026-04-02`, `2026-04-02T14:00`, `2026-04-02T14:00:00Z`).
-- **AOI from GeoJSON** — the file can be a `Feature`, `FeatureCollection`, or raw `Geometry`. AER uses the first feature found.
+- **AOI from GeoJSON** — the file can be a `Feature`, `FeatureCollection`, or raw `Geometry`. AEREO uses the first feature found.
 - **No results?** — narrow your date range, check your `search_params` (e.g., `satellite: GOES-19`), or verify the collection name exists for that sensor.

@@ -1,6 +1,6 @@
 # Execution Backends
 
-AER decouples *what* to extract from *how* to execute. Once you have a list of `ExtractionTask` objects, you choose an **ExecutionBackend** to control parallelism, memory, and remote dispatch.
+AEREO decouples *what* to extract from *how* to execute. Once you have a list of `ExtractionTask` objects, you choose an **ExecutionBackend** to control parallelism, memory, and remote dispatch.
 
 The default is sequential local execution, but you can swap in process pools, thread pools, or cloud Lambda backends without changing your pipeline code.
 

@@ -1,4 +1,4 @@
-# aereoeo Plugin System
+# aereo Plugin System
 
 `aereo` uses a modular, object-oriented plugin architecture built around standard Python `entry_points`. This allows developers to seamlessly register new search providers and extractors for satellite data collections without needing complex third-party hook libraries like `pluggy`.
 

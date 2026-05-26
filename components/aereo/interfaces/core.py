@@ -132,7 +132,7 @@ class Downloader(Protocol):
 
 
 class AereoPlugin(ABC):
-    """Base class for AER plugins"""
+    """Base class for AEREO plugins"""
 
     # 1. Define the type hint, but remove the `= None` default.
     supported_collections: Sequence[str]
@@ -414,7 +414,7 @@ class ExtractionTask:
 
 
 class Extractor(AereoPlugin, plugin_abstract=True):
-    """Base class for AER extraction plugins.
+    """Base class for AEREO extraction plugins.
 
     Subclasses must implement ``extract()``. Grid parameters are no longer
     declared as plugin properties; they are supplied at preparation time via
