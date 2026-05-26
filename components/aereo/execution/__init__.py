@@ -8,7 +8,6 @@ from aereo.execution.core import (
     TaskStaging,
     ThreadBackend,
 )
-from aereo.gdal_env import configure_gdal, setup_gdal_worker
 
 __all__ = [
     "ExecutionBackend",
@@ -18,6 +17,4 @@ __all__ = [
     "TaskRunner",
     "TaskStaging",
     "ThreadBackend",
-    "configure_gdal",
-    "setup_gdal_worker",
 ]

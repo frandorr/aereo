@@ -1,7 +1,6 @@
-import os
 from pathlib import Path
 from typing import Any, cast
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import geopandas as gpd
 import pandas as pd
@@ -13,7 +12,6 @@ from aereo.execution.core import (
     TaskRunner,
     ThreadBackend,
 )
-from aereo.gdal_env import configure_gdal, setup_gdal_worker
 from aereo.interfaces.core import AereoProfile, ExtractionTask, GridConfig
 from aereo.registry.core import AereoRegistry
 from aereo.schemas.core import AssetSchema
@@ -326,69 +324,6 @@ def test_local_backend_exception_propagates():
 
 
 # ---------------------------------------------------------------------------
-# configure_gdal / setup_gdal_worker
-# ---------------------------------------------------------------------------
-
-
-def test_configure_gdal_sets_env_vars():
-    """GDAL environment variables are configured for remote COG access."""
-    with patch.dict("os.environ", {}, clear=True):
-        configure_gdal()
-        assert os.environ["GDAL_DISABLE_READDIR_ON_OPEN"] == "EMPTY_DIR"
-        assert os.environ["GDAL_HTTP_MERGE_CONSECUTIVE_RANGES"] == "YES"
-        assert os.environ["GDAL_HTTP_MULTIPLEX"] == "YES"
-        assert (
-            os.environ["CPL_VSIL_CURL_ALLOWED_EXTENSIONS"]
-            == ".tif,.tiff,.vrt,.xml,.json"
-        )
-
-
-def test_configure_gdal_does_not_override_existing_values():
-    """Existing GDAL env vars are preserved by configure_gdal."""
-    with patch.dict(
-        "os.environ",
-        {"GDAL_DISABLE_READDIR_ON_OPEN": "TRUE"},
-        clear=True,
-    ):
-        configure_gdal()
-        assert os.environ["GDAL_DISABLE_READDIR_ON_OPEN"] == "TRUE"
-        assert os.environ["GDAL_HTTP_MULTIPLEX"] == "YES"
-
-
-def test_setup_gdal_worker_emits_deprecation_warning():
-    """setup_gdal_worker is deprecated but still functional."""
-    with patch.dict("os.environ", {}, clear=True):
-        with pytest.warns(DeprecationWarning, match="deprecated"):
-            setup_gdal_worker()
-        assert os.environ["GDAL_DISABLE_READDIR_ON_OPEN"] == "EMPTY_DIR"
-
-
-def test_configure_gdal_before_rasterio_import():
-    """configure_gdal() env vars are visible inside rasterio after import."""
-    import subprocess
-    import sys
-
-    code = (
-        "from aereo.gdal_env import configure_gdal\n"
-        "configure_gdal()\n"
-        "import rasterio\n"
-        "from rasterio.env import get_gdal_config\n"
-        "val = get_gdal_config('GDAL_DISABLE_READDIR_ON_OPEN')\n"
-        "assert val == 'EMPTY_DIR', f'expected EMPTY_DIR, got {val}'\n"
-        "val2 = get_gdal_config('GDAL_HTTP_MERGE_CONSECUTIVE_RANGES')\n"
-        "assert val2 == 'YES', f'expected YES, got {val2}'\n"
-        "print('OK')\n"
-    )
-    result = subprocess.run(
-        [sys.executable, "-c", code],
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 0, f"stdout: {result.stdout}\nstderr: {result.stderr}"
-    assert "OK" in result.stdout
-
-
-# ---------------------------------------------------------------------------
 # ThreadBackend
 # ---------------------------------------------------------------------------
 
@@ -474,8 +409,3 @@ def test_thread_backend_exception_propagates():
     tasks = [_make_task()]
     with pytest.raises(RuntimeError, match="task failed"):
         list(backend.run_tasks(tasks, mock_runner))
-
-
-# ---------------------------------------------------------------------------
-# setup_gdal_worker
-# ---------------------------------------------------------------------------

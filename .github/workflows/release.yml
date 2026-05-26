@@ -39,6 +39,7 @@ jobs:
           echo "Project files:"
           ls -la
 
+          rm -rf ../../dist
           uv build
 
           echo "Dist contents in root:"
