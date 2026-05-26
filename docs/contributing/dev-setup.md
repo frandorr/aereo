@@ -12,7 +12,7 @@ AER uses [uv](https://docs.astral.sh/uv/) for dependency management and [Polylit
 
 ```bash
 git clone https://github.com/frandorr/aereo.git
-cd aer
+cd aereo
 uv sync --all-extras
 ```
 
@@ -21,7 +21,7 @@ The `--all-extras` flag installs optional dependencies for all plugins so you ca
 Verify everything is wired correctly:
 
 ```bash
-uv run python -c "from aereo.registry import AerRegistry; r = AerRegistry(); print(r.list_supported_collections())"
+uv run python -c "from aereo.registry import AereoRegistry; r = AereoRegistry(); print(r.list_supported_collections())"
 ```
 
 ## Polylith Workspace
@@ -30,9 +30,9 @@ AER is organized as a Polylith workspace:
 
 | Directory | Purpose |
 |-----------|---------|
-| `components/` | Reusable bricks (e.g., `aer/grid`, `aer/eoids`) |
-| `bases/` | Entry points (e.g., `aer/client`) |
-| `projects/` | Publishable packages (e.g., `projects/aer-core`) |
+| `components/` | Reusable bricks (e.g., `aereo/grid`, `aereo/eoids`) |
+| `bases/` | Entry points (e.g., `aereo/client`) |
+| `projects/` | Publishable packages (e.g., `projects/aereo-core`) |
 | `test/` | Mirrors the `components/` and `bases/` structure |
 
 When adding new functionality, prefer creating or extending a component in `components/` over adding code directly to a base.
@@ -42,7 +42,7 @@ When adding new functionality, prefer creating or extending a component in `comp
 `aereo` discovers plugins automatically using Python's standard `importlib.metadata` entry points mechanism:
 
 1. Plugins declare their classes in `pyproject.toml` under `[project.entry-points."aereo.plugins"]`.
-2. The `AerRegistry` scans installed packages for these hooks dynamically upon instantiation.
+2. The `AereoRegistry` scans installed packages for these hooks dynamically upon instantiation.
 3. Classes listed in entry points are stored, matching their declared `supported_collections` for fast lookup.
 
 Collection name matching is **case-insensitive** — `"abi-l1b-radf"` and `"ABI-L1b-RadF"` both resolve to the same plugin.
@@ -51,7 +51,7 @@ To learn how to implement the code for a search provider or extractor, read [Bui
 
 ## hatch-polylith-bricks Dev Mode
 
-AER uses `hatch-polylith-bricks` to bundle bricks during an editable install. The `projects/aer-core/pyproject.toml` already configures `build.dev-mode-dirs` so that local source edits in `components/` and `bases/` are reflected immediately without reinstalling:
+AER uses `hatch-polylith-bricks` to bundle bricks during an editable install. The `projects/aereo-core/pyproject.toml` already configures `build.dev-mode-dirs` so that local source edits in `components/` and `bases/` are reflected immediately without reinstalling:
 
 ```toml
 [tool.hatch]

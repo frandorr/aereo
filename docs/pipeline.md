@@ -1,6 +1,6 @@
 # Running the Pipeline
 
-AER's entire user experience is built around three `AerClient` methods: `search()`, `prepare_for_extraction()`, and `execute_tasks()`. This page shows you how to use each one with practical examples, common patterns, and the gotchas that matter in production.
+AER's entire user experience is built around three `AereoClient` methods: `search()`, `prepare_for_extraction()`, and `execute_tasks()`. This page shows you how to use each one with practical examples, common patterns, and the gotchas that matter in production.
 
 For deep technical internals — UML diagrams, exact schema tables, and sequence diagrams — see [Pipeline Architecture](pipeline-architecture.md).
 
@@ -15,13 +15,13 @@ Find satellite granules that match your time range, area of interest, and sensor
 ```python
 from datetime import datetime, timezone
 from shapely.geometry import box
-from aereo.client import AerClient
-from aereo.interfaces import AerProfile
+from aereo.client import AereoClient
+from aereo.interfaces import AereoProfile
 
 aoi = box(-69.76, -39.98, -68.24, -39.05)
 
 profiles = [
-    AerProfile(
+    AereoProfile(
         name="goes_c02",
         resolution=500,
         collections={"ABI-L1b-RadF": ["C02"]},
@@ -30,7 +30,7 @@ profiles = [
     )
 ]
 
-client = AerClient()
+client = AereoClient()
 
 results = client.search(
     profiles=profiles,
@@ -46,7 +46,7 @@ print(results[["id", "collection", "start_time"]].head())
 
 | Parameter | What it does |
 |-----------|--------------|
-| `profiles` | **Required.** List of `AerProfile` objects. Each profile carries its own `collections`, `search_params`, and `plugin_hints`. The client groups profiles by target plugin to avoid redundant API calls. |
+| `profiles` | **Required.** List of `AereoProfile` objects. Each profile carries its own `collections`, `search_params`, and `plugin_hints`. The client groups profiles by target plugin to avoid redundant API calls. |
 | `intersects` | Spatial filter. Accepts a Shapely `BaseGeometry` or a GeoJSON `dict`. |
 | `start_datetime` / `end_datetime` | UTC `datetime` objects for temporal filtering. |
 | `search_params` | Meta-level dict forwarded to search plugins. Supports **per-collection overrides** using collection names as top-level keys (case-insensitive). Profile-level `search_params` always wins over batch-level. |
@@ -60,14 +60,14 @@ Pass several profiles at once. AER will dispatch them to the right plugins autom
 from datetime import datetime, timezone
 
 profiles = [
-    AerProfile(
+    AereoProfile(
         name="goes_c02",
         resolution=500,
         collections={"ABI-L1b-RadF": ["C02"]},
         plugin_hints={"search": "search_aws_goes"},
         search_params={"satellite": "GOES-19"},
     ),
-    AerProfile(
+    AereoProfile(
         name="s2_ndvi",
         resolution=10,
         collections={"Sentinel-2-L2A": ["B04", "B08"]},
@@ -153,7 +153,7 @@ tasks = client.prepare_for_extraction(
 | Attribute | Description |
 |-----------|-------------|
 | `assets` | GeoDataFrame of granules this task will process |
-| `profile` | The `AerProfile` with bands, resolution, and params |
+| `profile` | The `AereoProfile` with bands, resolution, and params |
 | `grid_cells` | Spatial cells this task covers |
 | `uri` | Destination path for artifacts |
 | `task_context` | Metadata such as `chunk_id`, `total_chunks`, `start_time`. Contains `conform_to_shape` when the profile enables fixed-shape batching. |

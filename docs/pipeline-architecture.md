@@ -9,7 +9,7 @@ This document describes the three-phase AER pipeline — **Search**, **Prepare**
 ```
 ┌─────────────┐     ┌─────────────────────────┐     ┌─────────────────┐     ┌──────────────┐
 │   User      │────▶│   1. search()           │────▶│ 2. prepare_for_ │────▶│ 3. extract_  │
-│  Query      │     │   (AerClient)           │     │    extraction() │     │   batches()  │
+│  Query      │     │   (AereoClient)           │     │    extraction() │     │   batches()  │
 └─────────────┘     └─────────────────────────┘     └─────────────────┘     └──────────────┘
                               │                              │                       │
                               ▼                              ▼                       ▼
@@ -30,7 +30,7 @@ Find satellite granules across one or more collections that intersect a given AO
 
 ```
 ┌─────────┐          ┌─────────────┐              ┌─────────────────────┐
-│  User   │          │  AerClient  │              │  SearchProvider     │
+│  User   │          │  AereoClient  │              │  SearchProvider     │
 │         │          │             │              │  (plugin)           │
 └────┬────┘          └──────┬──────┘              └──────────┬──────────┘
      │                      │                                │
@@ -93,7 +93,7 @@ Transform search results into a batch of `ExtractionTask` objects. Groups assets
 
 ```
 ┌─────────────────┐          ┌─────────────┐              ┌─────────────────────┐
-│  GeoDataFrame   │          │  AerClient  │              │  Extractor          │
+│  GeoDataFrame   │          │  AereoClient  │              │  Extractor          │
 │ [AssetSchema]   │          │             │              │  (plugin)           │
 └────────┬────────┘          └──────┬──────┘              └──────────┬──────────┘
          │                          │                                │
@@ -132,7 +132,7 @@ Transform search results into a batch of `ExtractionTask` objects. Groups assets
 |-----------|------|----------|-------------|
 | `search_results` | `GeoDataFrame[AssetSchema]` | Yes | Output from `search()`. |
 | `target_aoi` | `BaseGeometry \| dict \| None` | No | AOI to clip grid generation. If `None`, uses the union of all asset geometries. |
-| `profiles` | `Sequence[AerProfile]` | Yes** | Blueprints for extraction. **Required** if `resolution` is not provided. |
+| `profiles` | `Sequence[AereoProfile]` | Yes** | Blueprints for extraction. **Required** if `resolution` is not provided. |
 | `resolution` | `float \| None` | Yes** | Fallback target resolution (creates a default profile). **Required** if `profiles` is not provided. |
 | `uri` | `str \| None` | No | Base output directory or URI prefix for artifacts. |
 | `prepare_params` | `Mapping[str, Any] \| None` | No | Params forwarded to the extractor's `prepare_for_extraction`. Common keys: `cells_per_chunk`, `grid_filter_mode`, `min_coverage`. |
@@ -148,7 +148,7 @@ Each `ExtractionTask` (from `aereo.interfaces.core`) contains:
 | Attribute | Type | Description |
 |-----------|------|-------------|
 | `assets` | `GeoDataFrame[AssetSchema]` | The granule batch this task will extract. |
-| `profile` | `AerProfile` | Target bands, resolution, search_params, and extract_params. |
+| `profile` | `AereoProfile` | Target bands, resolution, search_params, and extract_params. |
 | `uri` | `str` | Destination path for artifacts. |
 | `grid_cells` | `Sequence[GridCell]` | Spatial cells this task covers. |
 | `aoi` | `BaseGeometry \| None` | Clipping geometry used during preparation. |
@@ -188,7 +188,7 @@ Execute all `ExtractionTask` objects. Can run sequentially or in parallel via `P
 
 ```
 ┌─────────────────────┐          ┌─────────────┐              ┌─────────────────────┐
-│  Sequence[          │          │  AerClient  │              │  Extractor          │
+│  Sequence[          │          │  AereoClient  │              │  Extractor          │
 │   ExtractionTask]   │          │             │              │  (plugin)           │
 └──────────┬──────────┘          └──────┬──────┘              └──────────┬──────────┘
            │                            │                                │
@@ -311,7 +311,7 @@ User Query
 │    Output: Sequence[ExtractionTask]                                         │
 │    ──────────────────────────────────────────────────────────────────────── │
 │    task.assets  → GeoDataFrame[AssetSchema]                                 │
-│    task.profile → AerProfile (bands, resolution, search_params, extract_params) │
+│    task.profile → AereoProfile (bands, resolution, search_params, extract_params) │
 │    task.grid_cells → Sequence[GridCell] (with UTM CRS & area_def)           │
 │    task.uri     → output path                                               │
 │    task.task_context → {chunk_id, total_chunks, start_time}                 │

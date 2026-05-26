@@ -9,10 +9,10 @@ The default is sequential local execution, but you can swap in process pools, th
 ## Overview
 
 ```python
-from aereo.client import AerClient
+from aereo.client import AereoClient
 from aereo.execution import LocalProcessBackend, ThreadBackend
 
-client = AerClient()
+client = AereoClient()
 
 # Assuming 'tasks' was created by client.prepare_for_extraction()
 
@@ -75,7 +75,7 @@ from aereo.execution import LambdaBackend
 from aereo_extract_remote import S3TaskStaging
 
 backend = LambdaBackend(
-    function_name="aer-extract",
+    function_name="aereo-extract",
     task_staging=S3TaskStaging(bucket="my-staging-bucket"),
 )
 artifacts = client.execute_tasks(tasks, backend=backend)
@@ -95,7 +95,7 @@ Point `LambdaBackend` at a local Lambda emulator (e.g. Floci):
 
 ```python
 backend = LambdaBackend(
-    function_name="aer-extract",
+    function_name="aereo-extract",
     task_staging=S3TaskStaging(bucket="local-bucket"),
     endpoint_url="http://localhost:9001",
 )
@@ -105,7 +105,7 @@ backend = LambdaBackend(
 
 ## `TaskRunner`
 
-`TaskRunner` is the bridge between backends and plugins. You rarely instantiate it directly — `AerClient.execute_tasks()` creates one automatically — but it is the unit that:
+`TaskRunner` is the bridge between backends and plugins. You rarely instantiate it directly — `AereoClient.execute_tasks()` creates one automatically — but it is the unit that:
 
 1. Resolves the correct extractor plugin for each task
 2. Merges per-task parameters from the profile

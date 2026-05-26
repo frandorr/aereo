@@ -43,15 +43,15 @@ Pick your sensor and copy-paste:
 ## Verify installation
 
 ```python
-from aereo.registry import AerRegistry
+from aereo.registry import AereoRegistry
 
-registry = AerRegistry()
+registry = AereoRegistry()
 print("Supported collections:", registry.list_supported_collections())
 # e.g. ['ABI-L1b-RadF', 'ABI-L2-AODF', 'MOD021KM', 'VJ202IMG', ...]
 ```
 
 > [!NOTE]
-> Not all plugins declare their supported collections in the registry. If your expected collection is missing, check the plugin's own documentation — it may still work when passed directly to `AerClient.search()`.
+> Not all plugins declare their supported collections in the registry. If your expected collection is missing, check the plugin's own documentation — it may still work when passed directly to `AereoClient.search()`.
 
 ---
 

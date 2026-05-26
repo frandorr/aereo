@@ -12,7 +12,7 @@ We recommend using the [`aereo-plugin-template`](https://github.com/frandorr/aer
 
 1. Go to [https://github.com/frandorr/aereo-plugin-template](https://github.com/frandorr/aereo-plugin-template).
 2. Click **Use this template** -> **Create a new repository**.
-3. Name your repository (e.g., `aer-plugin-acme`) and clone it locally.
+3. Name your repository (e.g., `aereo-plugin-acme`) and clone it locally.
 
 ## Step 2: Add Dependencies
 
@@ -22,7 +22,7 @@ Update your `pyproject.toml` dependencies to include `aereo`:
 
 ```toml
 [project]
-name = "aer-plugin-acme"
+name = "aereo-plugin-acme"
 version = "0.1.0"
 dependencies = [
     "aereo",
@@ -54,7 +54,7 @@ import pandas as pd
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
 
-from aereo.interfaces import SearchProvider
+from aereo.interfaces import PluginParam, SearchProvider
 from aereo.schemas import AssetSchema
 
 
@@ -63,6 +63,14 @@ class AcmeSearchProvider(SearchProvider):
 
     # REQUIRED: sequence of collections this plugin supports
     supported_collections = ["acme-l1", "acme-l2"]
+
+    # OPTIONAL: declare parameters for introspection and validation
+    required_params = [
+        PluginParam(name="api_key", type="str", description="ACME API key", required=True),
+    ]
+    optional_params = [
+        PluginParam(name="max_results", type="int", description="Max results per page", default=100),
+    ]
 
     def search(
         self,
@@ -104,7 +112,7 @@ Create your extractor (e.g., in `acme_plugin/extract.py`). Extract plugins MUST 
 from typing import Any
 
 from pandera.typing.geopandas import GeoDataFrame
-from aereo.interfaces import Extractor
+from aereo.interfaces import PluginParam, Extractor
 from aereo.schemas import AssetSchema, ArtifactSchema
 
 
@@ -113,6 +121,14 @@ class AcmeExtractor(Extractor):
 
     # REQUIRED: sequence of collections this plugin supports
     supported_collections = ["acme-l1"]
+
+    # OPTIONAL: declare extraction parameters
+    required_params = [
+        PluginParam(name="output_format", type="choice", description="Output raster format", choices=["geotiff", "netcdf"], required=True),
+    ]
+    optional_params = [
+        PluginParam(name="compression", type="str", description="GeoTIFF compression", default="deflate"),
+    ]
 
     def prepare_for_extraction(
         self,
@@ -175,18 +191,39 @@ acme_search = "acme_plugin.search:AcmeSearchProvider"
 acme_extract = "acme_plugin.extract:AcmeExtractor"
 ```
 
-## Step 5: Configure Your Profiles
+## Step 5: Document Your Parameters
 
-`AerProfile` (also available as the backward-compat alias `ExtractionProfile`) is a **Pydantic `BaseModel`**. This means you get declarative validation, frozen immutability, and native JSON/YAML deserialization out of the box.
+If you declared `required_params` and `optional_params` on your plugin classes, users can introspect them at runtime via the `AereoRegistry`:
+
+```python
+from aereo.registry import AereoRegistry
+
+registry = AereoRegistry()
+
+# Get params for a single plugin
+params = registry.get_plugin_params("acme_search")
+print(params["required"])   # [PluginParam(name="api_key", ...)]
+print(params["optional"])   # [PluginParam(name="max_results", ...)]
+
+# Export a JSON catalog of every plugin's params
+import json
+print(json.dumps(registry.list_all_params(), indent=2))
+```
+
+This powers CLI help text, config validation, and plugin marketplace listings.
+
+## Step 6: Configure Your Profiles
+
+`AereoProfile` (also available as the backward-compat alias `ExtractionProfile`) is a **Pydantic `BaseModel`**. This means you get declarative validation, frozen immutability, and native JSON/YAML deserialization out of the box.
 
 ### Constructing profiles in code
 
 Pydantic models accept keyword arguments just like the old attrs class:
 
 ```python
-from aereo.interfaces import AerProfile
+from aereo.interfaces import AereoProfile
 
-profile = AerProfile(
+profile = AereoProfile(
     name="acme_l1",
     resolution=250,
     collections={"acme-l1": ["B01"]},
@@ -194,7 +231,7 @@ profile = AerProfile(
 )
 ```
 
-`AerProfile` is frozen (`model_config = {"frozen": True}`) and forbids unknown fields (`"extra": "forbid"`), so typos raise a clear `ValidationError` immediately.
+`AereoProfile` is frozen (`model_config = {"frozen": True}`) and forbids unknown fields (`"extra": "forbid"`), so typos raise a clear `ValidationError` immediately.
 
 ### Loading profiles from YAML or JSON
 
@@ -212,23 +249,23 @@ profiles:
       extract: acme_extract
 ```
 
-Load them with the class methods provided on `AerProfile`:
+Load them with the class methods provided on `AereoProfile`:
 
 ```python
 from pathlib import Path
-from aereo.interfaces import AerProfile
+from aereo.interfaces import AereoProfile
 
 # From a YAML file
-profiles = AerProfile.from_yaml(Path("profiles.yaml"))
+profiles = AereoProfile.from_yaml(Path("profiles.yaml"))
 
 # From a YAML string
-profiles = AerProfile.from_yaml_string(yaml_text)
+profiles = AereoProfile.from_yaml_string(yaml_text)
 
 # From a JSON file
-profiles = AerProfile.from_json(Path("profiles.json"))
+profiles = AereoProfile.from_json(Path("profiles.json"))
 
 # From a directory containing *.yaml / *.yml / *.json
-profiles = AerProfile.from_config_dir(Path("configs/"))
+profiles = AereoProfile.from_config_dir(Path("configs/"))
 ```
 
 ### Referencing a downloader by import path
@@ -248,21 +285,21 @@ The resolved callable must match the `Downloader` signature: `Callable[[str, Pat
 
 If the module or attribute does not exist, Pydantic raises a clear `ValidationError` pointing to the exact import path.
 
-## Step 6: Test Your Plugin
+## Step 7: Test Your Plugin
 
-Test your plugin using the high-level `AerClient` API:
+Test your plugin using the high-level `AereoClient` API:
 
 ```python
-from aereo.client import AerClient
-from aereo.interfaces import AerProfile
+from aereo.client import AereoClient
+from aereo.interfaces import AereoProfile
 from datetime import datetime
 from pathlib import Path
 
 # The client automatically discovers your entry points!
-client = AerClient()
+client = AereoClient()
 
 # Load profiles from config (or build them in code)
-profiles = AerProfile.from_yaml(Path("profiles.yaml"))
+profiles = AereoProfile.from_yaml(Path("profiles.yaml"))
 
 # 1. Search
 results = client.search(
@@ -286,7 +323,7 @@ artifacts = client.execute_tasks(tasks, backend=backend)
 print(artifacts[["id", "uri"]])
 ```
 
-## Step 7: Distribute
+## Step 8: Distribute
 
 Your plugin is just a standard Python package. Publish it to PyPI:
 
@@ -328,7 +365,7 @@ build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", 
 
 Then clear the cached packages and reinstall:
 ```bash
-rm -rf .venv/lib/python*/site-packages/aer
-uv sync --reinstall-package aereo --reinstall-package aer-plugin-acme
+rm -rf .venv/lib/python*/site-packages/aereo
+uv sync --reinstall-package aereo --reinstall-package aereo-plugin-acme
 ```
 Your local imports will now properly resolve directly to your hot-reloading `components/` directory.

@@ -25,7 +25,7 @@ Each file uses `# %%` cell markers, so you can open them directly in VS Code, Ju
 
 ## Full details
 
-For run commands, disk-space estimates, common `AerProfile` errors and fixes, ML-ready `conform_to` formulas, and the complete directory structure, see [`examples/README.md`](examples/README.md).
+For run commands, disk-space estimates, common `AereoProfile` errors and fixes, ML-ready `conform_to` formulas, and the complete directory structure, see [`examples/README.md`](examples/README.md).
 
 ## Quick start
 

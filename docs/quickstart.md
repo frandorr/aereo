@@ -12,12 +12,12 @@ pip install aereo aereo-search-aws-goes aereo-extract-satpy
 
 ## 2. Define a profile
 
-An `AerProfile` describes *what* you want to extract, *from which sensor*, and *how*.
+An `AereoProfile` describes *what* you want to extract, *from which sensor*, and *how*.
 
 ```python
-from aereo.interfaces import AerProfile
+from aereo.interfaces import AereoProfile
 
-profile = AerProfile(
+profile = AereoProfile(
     name="goes_c02",
     resolution=1000,
     collections={"ABI-L1b-RadF": ["C02"]},
@@ -34,10 +34,10 @@ Find granules matching your time range and area of interest:
 ```python
 from datetime import datetime, timezone
 from shapely.geometry import box
-from aereo.client import AerClient
+from aereo.client import AereoClient
 
 aoi = box(-70, -40, -68, -39)
-client = AerClient()
+client = AereoClient()
 
 results = client.search(
     profiles=[profile],

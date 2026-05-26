@@ -1,17 +1,17 @@
 # Client API
 
-`AerClient` is the single entry point for almost all AER workflows. Create one instance and call `search()`, `prepare_for_extraction()`, and `execute_tasks()` in sequence. The sections below document every parameter and return type.
+`AereoClient` is the single entry point for almost all AER workflows. Create one instance and call `search()`, `prepare_for_extraction()`, and `execute_tasks()` in sequence. The sections below document every parameter and return type.
 
 ```python
 from datetime import datetime, timezone
 from shapely.geometry import box
-from aereo.client import AerClient
-from aereo.interfaces import AerProfile
+from aereo.client import AereoClient
+from aereo.interfaces import AereoProfile
 from aereo.execution import LocalProcessBackend
 
-client = AerClient()
+client = AereoClient()
 
-profile = AerProfile(
+profile = AereoProfile(
     name="goes",
     resolution=1000,
     collections={"ABI-L1b-RadF": ["C01"]},

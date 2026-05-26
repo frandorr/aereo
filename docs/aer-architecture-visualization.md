@@ -22,7 +22,7 @@ flowchart TB
         LAM["Lambda"]:::entry
     end
 
-    CORE["AerClient"]:::core
+    CORE["AereoClient"]:::core
     OUT["GeoTIFFs"]:::output
 
     CLI --> CORE
@@ -67,7 +67,7 @@ flowchart LR
     classDef data fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
 
     A["Entry"]:::entry
-    B["AerClient"]:::core
+    B["AereoClient"]:::core
     C["Plugins"]:::plugin
     D["Building Blocks"]:::data
 
@@ -91,7 +91,7 @@ flowchart LR
     PIP["pip install"]:::entry
     EP["entry-points"]:::data
     REG["Registry"]:::core
-    USE["AerClient"]:::core
+    USE["AereoClient"]:::core
 
     PIP --> EP
     EP --> REG
@@ -127,19 +127,19 @@ flowchart TB
 
 | Layer | Component | What it does |
 |-------|-----------|--------------|
-| **Entry** | `aer.cli` | Terminal commands (`search`, `run`, `plugins`) |
-| **Entry** | `aereo.client` | Python API — `AerClient` class |
-| **Entry** | `aer.lambda_handler` | AWS Lambda entrypoint |
-| **Core** | `aer.interfaces` | Contracts — `SearchProvider`, `Extractor`, `AerProfile`, `GridConfig` |
-| **Core** | `aer.registry` | Plugin discovery via `entry_points` |
-| **Data** | `aer.schemas` | Pandera validation — `AssetSchema`, `ArtifactSchema`, `GridSchema` |
-| **Data** | `aer.grid` | MajorTOM tiling — `GridDefinition`, `GridCell` |
-| **Data** | `aer.spatial` | CRS helpers — UTM EPSG lookup, reprojection |
-| **Run** | `aer.execution` | Backends — `LocalProcessBackend`, `ThreadBackend`, `TaskRunner` |
-| **Run** | `aer.serialization` | Task serialization for remote transport |
-| **Run** | `aer.asset_downloader` | Safe multi-process downloading (S3/HTTP/local) |
-| **Output** | `aer.eoids` | File naming & folder conventions |
-| **Output** | `aer.viz` | Quick plotting helpers |
+| **Entry** | `aereo.cli` | Terminal commands (`search`, `run`, `plugins`) |
+| **Entry** | `aereo.client` | Python API — `AereoClient` class |
+| **Entry** | `aereo.lambda_handler` | AWS Lambda entrypoint |
+| **Core** | `aereo.interfaces` | Contracts — `SearchProvider`, `Extractor`, `AereoProfile`, `GridConfig` |
+| **Core** | `aereo.registry` | Plugin discovery via `entry_points` |
+| **Data** | `aereo.schemas` | Pandera validation — `AssetSchema`, `ArtifactSchema`, `GridSchema` |
+| **Data** | `aereo.grid` | MajorTOM tiling — `GridDefinition`, `GridCell` |
+| **Data** | `aereo.spatial` | CRS helpers — UTM EPSG lookup, reprojection |
+| **Run** | `aereo.execution` | Backends — `LocalProcessBackend`, `ThreadBackend`, `TaskRunner` |
+| **Run** | `aereo.serialization` | Task serialization for remote transport |
+| **Run** | `aereo.asset_downloader` | Safe multi-process downloading (S3/HTTP/local) |
+| **Output** | `aereo.eoids` | File naming & folder conventions |
+| **Output** | `aereo.viz` | Quick plotting helpers |
 
 ---
 

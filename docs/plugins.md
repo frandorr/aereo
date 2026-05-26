@@ -6,11 +6,11 @@
 
 The plugin system relies on clear, strongly-typed interfaces defined in `aereo.interfaces`. Plugins subclass these base classes, and an internal `AereoRegistry` discovers them at runtime.
 
-### The Pipeline (`AerClient`)
+### The Pipeline (`AereoClient`)
 
-The data orchestration lifecycle consists of three core stages, managed cohesively by the `AerClient`:
+The data orchestration lifecycle consists of three core stages, managed cohesively by the `AereoClient`:
 
-1.  **Search**: `SearchProvider` plugins query satellite data collections and return standardized `AssetSchema` GeoDataFrames. The `AerClient` concurrently dispatches searches across multiple plugins.
+1.  **Search**: `SearchProvider` plugins query satellite data collections and return standardized `AssetSchema` GeoDataFrames. The `AereoClient` concurrently dispatches searches across multiple plugins.
 2.  **Prepare**: `Extractor` plugins break down the search results into discrete execution batches (e.g., grouping by time, location, or file).
 3.  **Extract**: `Extractor` plugins download, reproject, and format the data into unified `ArtifactSchema` GeoDataFrames.
 
@@ -75,21 +75,91 @@ class MyExtractor(Extractor):
         ...
 ```
 
+## Plugin Parameter Metadata
+
+Plugins can declare typed parameter schemas using `PluginParam`. This enables runtime introspection, CLI help generation, and validation before execution.
+
+### `PluginParam`
+
+A frozen Pydantic model that describes a single configuration parameter:
+
+```python
+from aereo.interfaces import PluginParam
+
+param = PluginParam(
+    name="reader",
+    type="choice",
+    description="Rasterio reader driver to use",
+    choices=["abi_l1b", "netcdf", "geotiff"],
+    required=True,
+)
+```
+
+**Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | `str` | Parameter key used in `search_params` / `extract_params` |
+| `type` | `Literal["str", "int", "float", "bool", "choice", "path", "list[str]"]` | Expected value type |
+| `description` | `str` | Human-readable help text |
+| `default` | `Any \| None` | Default value when omitted |
+| `choices` | `Sequence[str] \| None` | Allowed values for `"choice"` type |
+| `required` | `bool` | Whether the parameter must be provided |
+
+### Declaring params on a plugin
+
+Set `required_params` and `optional_params` as class attributes on your plugin subclass:
+
+```python
+from aereo.interfaces import SearchProvider, PluginParam
+
+class MySearchProvider(SearchProvider):
+    supported_collections = ["my-satellite-data"]
+
+    required_params = [
+        PluginParam(name="api_key", type="str", description="API authentication key", required=True),
+    ]
+
+    optional_params = [
+        PluginParam(name="max_cloud_cover", type="float", description="Max cloud cover %", default=20.0),
+    ]
+```
+
+### Introspecting params at runtime
+
+The `AereoRegistry` provides methods to query parameter metadata:
+
+```python
+from aereo.registry import AereoRegistry
+
+registry = AereoRegistry()
+
+# Get params for a specific plugin
+params = registry.get_plugin_params("my_searcher")
+# {"required": [...], "optional": [...]}
+
+# Get a JSON-serializable catalog of all plugins and their params
+catalog = registry.list_all_params()
+```
+
+> [!NOTE]
+> Parameter metadata is optional. Existing plugins that do not declare `required_params` / `optional_params` continue to work unchanged.
+
 ## Using the High-Level API (Recommended)
 
-The `AerClient` provides a simple, robust interface that handles plugin discovery, collection routing, parallel search, and configurable error handling.
+The `AereoClient` provides a simple, robust interface that handles plugin discovery, collection routing, parallel search, and configurable error handling.
 
 ### Usage
 
 ```python
 from datetime import datetime, timezone
-from aereo.client import AerClient
-from aereo.interfaces import AerProfile
+from aereo.client import AereoClient
+from aereo.interfaces import AereoProfile
 
-client = AerClient()
+client = AereoClient()
 
 profiles = [
-    AerProfile(
+    AereoProfile(
         name="goes_c07",
         resolution=2000,
         collections={"ABI-L1b-RadF": ["C07"]},
@@ -125,9 +195,9 @@ print(f"Extracted {len(artifacts_df)} artifacts.")
 If you need fine-grained control, use the `AereoRegistry` directly. It parses `entry_points` and provides instantiated plugin objects.
 
 ```python
-from aereo.registry import AerRegistry
+from aereo.registry import AereoRegistry
 
-registry = AerRegistry()
+registry = AereoRegistry()
 
 # See what collections are supported overall
 print(registry.list_supported_collections())

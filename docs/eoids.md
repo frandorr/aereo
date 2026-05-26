@@ -30,7 +30,7 @@ dataset/
 │   ├── date-20260102/
 ```
 
-Because `collection` and `variable` are declared inside the `AerProfile`, they are encoded directly in the filename rather than as extra subdirectories. This keeps the hierarchy flat and avoids redundant nesting.
+Because `collection` and `variable` are declared inside the `AereoProfile`, they are encoded directly in the filename rather than as extra subdirectories. This keeps the hierarchy flat and avoids redundant nesting.
 
 ### Derivatives
 Just like BIDS, if the data is processed or derived from the raw source (e.g., a cloud mask, a machine learning prediction, or a composite), it should be placed in a `derivatives/` folder at the root:
@@ -47,7 +47,7 @@ dataset/
 
 ### `profile.json` sidecar
 
-Every profile directory may contain a `profile.json` file that stores the full serialized `AerProfile` metadata (resolution, padding, plugin hints, search parameters, etc.). It is written automatically on the first call to `build_eoids_path` and enables external inspection or BIDS-style inheritance:
+Every profile directory may contain a `profile.json` file that stores the full serialized `AereoProfile` metadata (resolution, padding, plugin hints, search parameters, etc.). It is written automatically on the first call to `build_eoids_path` and enables external inspection or BIDS-style inheritance:
 
 ```json
 {
@@ -63,7 +63,7 @@ The `downloader` callable is intentionally excluded from serialization because i
 
 ### One Profile = One Artifact File
 
-An `AerProfile` produces **exactly one artifact file per grid cell**.  All
+An `AereoProfile` produces **exactly one artifact file per grid cell**.  All
 variables declared in `profile.collections` are stored as separate **bands**
 inside that single file — they are never split into multiple files.
 
@@ -76,7 +76,7 @@ This means:
   file**, not a request to write separate files.
 
 If an extractor truly needs one file per variable, it must define a
-separate `AerProfile` for each.
+separate `AereoProfile` for each.
 
 ---
 
@@ -129,15 +129,15 @@ To ensure strict compliance across all plugins, use the `build_eoids_path` funct
 ```python
 import datetime
 from aereo.eoids import build_eoids_path
-from aereo.interfaces import AerProfile
+from aereo.interfaces import AereoProfile
 
-profile = AerProfile(
+profile = AereoProfile(
     name="goes_c01",
     collections={"ABI-L1b-RadF": ["C01"]},
 )
 
 # collection, variable, and resolution are derived automatically from the
-# AerProfile. All other parameters (except local_dir and profile) are optional.
+# AereoProfile. All other parameters (except local_dir and profile) are optional.
 # If omitted, they simply won't appear in the directory path or filename.
 path = build_eoids_path(
     local_dir="/my/dataset",

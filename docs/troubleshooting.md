@@ -64,7 +64,7 @@ Collection names are case-sensitive and vary by data provider.
 GOES ABI requires `search_params={"satellite": "GOES-19"}` (or `GOES-18`, `GOES-16`). Without it, the search plugin may return results for the wrong satellite or nothing at all.
 
 ```python
-AerProfile(
+AereoProfile(
     name="goes_c02",
     resolution=1000,
     collections={"ABI-L1b-RadF": ["C02"]},
@@ -122,7 +122,7 @@ ReaderNotAvailable: No reader found for ...
 | Sentinel-3 OLCI | `olci_l1b` |
 
 ```python
-AerProfile(
+AereoProfile(
     ...,
     extract_params={"reader": "abi_l1b", "calibration": "reflectance"},
 )
@@ -137,7 +137,7 @@ NASA Earthdata assets require a downloader because the URLs are behind URS authe
 **Fix:** Add the Earthdata downloader to the profile:
 
 ```python
-AerProfile(
+AereoProfile(
     ...,
     downloader="aereo.search_earthaccess.earthaccess_download_wrapper",
 )
