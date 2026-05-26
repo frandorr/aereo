@@ -69,7 +69,7 @@ tasks = client.prepare_for_extraction(
 print(f"Prepared {len(tasks)} extraction tasks", flush=True)
 print("Extracting...", flush=True)
 
-backend = LocalProcessBackend(max_workers=4)
+backend = LocalProcessBackend(max_workers=2)
 results_df = client.execute_tasks(tasks, backend=backend)
 print(f"Extracted {len(results_df)} artifacts")
 

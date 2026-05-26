@@ -83,7 +83,7 @@ print(f"Prepared {len(tasks)} extraction tasks", flush=True)
 # tasks = tasks[:1]
 print(f"Extracting {len(tasks)} task(s)...", flush=True)
 start_time = time.time()
-backend = LocalProcessBackend(max_workers=8)
+backend = LocalProcessBackend(max_workers=2)
 results_df = client.execute_tasks(tasks, backend=backend)
 print(f"Extraction completed in {time.time() - start_time:.2f} seconds")
 print(f"Extracted {len(results_df)} artifacts")
