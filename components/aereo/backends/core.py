@@ -1,13 +1,12 @@
-"""Execution backends and task runner for AEREO extraction tasks."""
+"""Local process-based and thread-based execution backends and task runner."""
 
 from __future__ import annotations
 
 import logging
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
-from pathlib import Path
-from typing import Iterable, Protocol, Sequence
+from typing import Any, Iterable, Mapping, Sequence
 
-from aereo.interfaces import ExtractionTask, merge_params
+from aereo.interfaces import ExecutionBackend, ExtractionTask, merge_params
 from aereo.registry import AereoRegistry
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -15,87 +14,16 @@ from pandera.typing.geopandas import GeoDataFrame
 logger = logging.getLogger(__name__)
 
 
-class TaskStaging(Protocol):
-    """Protocol for staging serialized tasks to remote storage and loading results.
-
-    Concrete implementations handle upload/download for a specific object-store
-    backend (e.g. S3, GCS, Azure Blob).
-    """
-
-    bucket: str
-
-    def stage(self, src_dir: Path, job_id: str, task_idx: int) -> str:
-        """Upload a serialized task directory and return its URI.
-
-        Args:
-            src_dir: Directory containing ``task_assets.parquet`` and
-                ``task_meta.json`` produced by :class:`aereo.serialization.TaskSerializer`.
-            job_id: Logical job identifier for grouping staged tasks.
-            task_idx: Index of the task within the job.
-
-        Returns:
-            A URI (e.g. ``s3://bucket/aer-tasks/{job_id}/{task_idx}/``) that the
-            remote worker can use to retrieve the task.
-        """
-        ...
-
-    def load_artifacts(self, manifest_uri: str) -> GeoDataFrame[ArtifactSchema]:
-        """Load artifact results from a manifest URI.
-
-        Args:
-            manifest_uri: URI pointing to a manifest produced by the remote worker
-                (e.g. ``s3://bucket/results/{job_id}/{task_idx}/manifest.json``).
-
-        Returns:
-            A validated ``GeoDataFrame[ArtifactSchema]`` with the extracted artifacts.
-        """
-        ...
-
-    def result_prefix(self, job_id: str, task_idx: int) -> str:
-        """Return the URI prefix where the remote worker should write results.
-
-        Args:
-            job_id: Logical job identifier.
-            task_idx: Index of the task within the job.
-
-        Returns:
-            A URI prefix (e.g. ``s3://bucket/results/{job_id}/{task_idx}/``).
-        """
-        ...
-
-
-class ExecutionBackend(Protocol):
-    """Protocol for pluggable task execution backends.
-
-    Backends decide **where** and **how** a batch of :class:`ExtractionTask`
-    objects are executed.  Local backends use the supplied *runner* directly;
-    remote backends may serialize tasks and dispatch to external workers.
-    """
-
-    def run_tasks(
-        self,
-        tasks: Sequence[ExtractionTask],
-        runner: TaskRunner | None = None,
-    ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
-        """Execute *tasks* and yield or return their results.
-
-        Because the return type is :class:`Iterable`, implementations are free
-        to process tasks asynchronously and yield results as they arrive,
-        enabling streaming consumption by the caller.
-
-        Args:
-            tasks: The extraction tasks to run.
-            runner: A client-side :class:`TaskRunner` that knows how to execute
-                a single task using the correct local plugin.
-        """
-        ...
-
-
 class TaskRunner:
     """Executes a single :class:`ExtractionTask` using the correct plugin."""
 
-    def __init__(self, registry: AereoRegistry):
+    def __init__(
+        self,
+        registry: AereoRegistry,
+        init_params: Mapping[str, Any] | None = None,
+    ):
         self.registry = registry
+        self._init_params = dict(init_params or {})
 
     def run(self, task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
         """Resolve the extractor for *task* and run it.
@@ -105,15 +33,19 @@ class TaskRunner:
           2. ``task.profile.plugin_hints["extract"]``
           3. Auto-discover from ``task.profile.collections``
         """
+        # Merge task-level init params (from deserialization) over constructor params
+        task_init = dict(self._init_params)
+        task_init.update(task.task_context.get("init_params", {}))
+
         # 1. Hint from task context (highest priority)
         hint = task.task_context.get("extractor_hint")
         if hint and self.registry.has_extractor(hint):
-            extractor = self.registry.get_extractor(hint)
+            extractor = self.registry.get_extractor(hint, **task_init)
         else:
             # 2. Fallback to profile hint
             profile_hint = task.profile.plugin_hints.get("extract")
             if profile_hint and self.registry.has_extractor(profile_hint):
-                extractor = self.registry.get_extractor(profile_hint)
+                extractor = self.registry.get_extractor(profile_hint, **task_init)
             else:
                 # 3. Auto-discover from collections
                 plugin_name: str | None = None
@@ -126,7 +58,7 @@ class TaskRunner:
                     raise ValueError(
                         f"No extractor plugin found for profile: {task.profile.name}"
                     )
-                extractor = self.registry.get_extractor(plugin_name)
+                extractor = self.registry.get_extractor(plugin_name, **task_init)
 
         # 4. Merge params (profile wins)
         effective_params = merge_params(None, task.profile.extract_params)
@@ -135,7 +67,7 @@ class TaskRunner:
         return extractor.extract(task, effective_params)
 
 
-class LocalProcessBackend:
+class LocalProcessBackend(ExecutionBackend):
     """Execute tasks locally using sequential or process-based parallelism.
 
     When *max_workers* is ``None`` or there is only one task, execution is
@@ -179,7 +111,7 @@ class LocalProcessBackend:
         return [r for r in results if r is not None]
 
 
-class ThreadBackend:
+class ThreadBackend(ExecutionBackend):
     """Execute tasks locally using thread-based parallelism.
 
     This backend is ideal for **I/O-bound** extractors (e.g. those that spend

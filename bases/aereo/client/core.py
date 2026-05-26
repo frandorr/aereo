@@ -5,8 +5,14 @@ from typing import Any, Mapping, Optional, Sequence, cast
 
 import pandas as pd
 import json
-from aereo.execution.core import ExecutionBackend, LocalProcessBackend, TaskRunner
-from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig, merge_params
+from aereo.backends import LocalProcessBackend, TaskRunner
+from aereo.interfaces import (
+    AereoProfile,
+    ExecutionBackend,
+    ExtractionTask,
+    GridConfig,
+    merge_params,
+)
 from aereo.registry import AereoRegistry
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -209,7 +215,16 @@ class AereoClient:
 
         def get_params_key(p: Mapping[str, Any]) -> str:
             # Simple stable key for grouping; default=str handles non-JSON-serializable objects
-            return json.dumps(p, sort_keys=True, default=str)
+            # Use a custom JSON encoder that recursively stringifies non-string dict keys
+            def _json_default(obj: Any) -> Any:
+                if isinstance(obj, dict):
+                    return {str(k): _json_default(v) for k, v in obj.items()}
+                try:
+                    return json.JSONEncoder.default(json.JSONEncoder(), obj)
+                except TypeError:
+                    return str(obj)
+
+            return json.dumps(p, sort_keys=True, default=_json_default)
 
         # Map (plugin_name, params_key) -> (list_of_profiles, resolved_params_dict)
         execution_groups: dict[
@@ -293,12 +308,13 @@ class AereoClient:
                     errors.append(e)
 
         # 3. Handle Resilience & Failure Profiles
-        if not all_results:
-            if failure_mode == FailureMode.STRICT and errors:
-                raise RuntimeError(
-                    f"All search plugins failed strictly. {len(errors)} errors."
-                )
+        if failure_mode == FailureMode.STRICT and errors:
+            raise RuntimeError(
+                f"Search failed strictly. {len(errors)} plugin(s) failed: "
+                + "; ".join(f"{type(e).__name__}: {e}" for e in errors)
+            )
 
+        if not all_results:
             logger.warning(
                 "search_empty",
                 reason="All searches returned empty or failed gracefully.",
@@ -410,6 +426,7 @@ class AereoClient:
             profiles=resolved_profiles,
             cells_per_chunk=cells_per_chunk,
             extractor_hint=target_plugin,
+            init_params=c_init,
         )
 
         all_tasks.extend(batches)
@@ -421,6 +438,7 @@ class AereoClient:
         tasks: Sequence[ExtractionTask],
         backend: ExecutionBackend | None = None,
         failure_mode: FailureMode = FailureMode.STRICT,
+        init_params: Optional[Mapping[str, Any]] = None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """
         Execute a sequence of ExtractionTasks through a configurable backend.
@@ -445,7 +463,7 @@ class AereoClient:
             return cast(GeoDataFrame, ArtifactSchema.empty())
 
         backend = backend or LocalProcessBackend()
-        runner = TaskRunner(registry=self.registry)
+        runner = TaskRunner(registry=self.registry, init_params=init_params)
 
         logger.info(
             "execute_tasks_start",

@@ -5,7 +5,22 @@ import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Literal, Mapping, Protocol, Self, Sequence, cast
+from typing import (
+    Any,
+    Callable,
+    Iterable,
+    Literal,
+    Mapping,
+    Protocol,
+    Self,
+    Sequence,
+    TYPE_CHECKING,
+    cast,
+)
+
+if TYPE_CHECKING:
+    from aereo.backends import TaskRunner
+
 
 import attrs
 from aereo.grid import GridCell
@@ -252,7 +267,19 @@ class AereoProfile(BaseModel):
         Non-importable callables (lambdas, nested functions, bound methods)
         are replaced with ``None`` so that pickling never crashes.
         """
-        state = self.model_dump(mode="json")
+        try:
+            state = self.model_dump(mode="json")
+        except Exception:
+            # Fallback: dump field-by-field, stringifying anything non-JSON
+            state = {}
+            for name in self.__class__.model_fields:
+                try:
+                    val = getattr(self, name)
+                    # ImportString callables serialize to their dotted path
+                    state[name] = json.loads(json.dumps(val, default=str))
+                except Exception:
+                    state[name] = None
+
         downloader_path = state.get("downloader")
         if downloader_path is not None:
             try:
@@ -430,6 +457,7 @@ class Extractor(AereoPlugin, plugin_abstract=True):
         profiles: Sequence[AereoProfile] | None = None,
         cells_per_chunk: int = 50,
         extractor_hint: str | None = None,
+        init_params: Mapping[str, Any] | None = None,
     ) -> Sequence[ExtractionTask]:
         """Prepare extraction tasks by grouping assets by profile and start time, then chunking grid cells."""
         if uri is None:
@@ -591,6 +619,7 @@ class Extractor(AereoPlugin, plugin_abstract=True):
                         "total_chunks": len(cell_chunks),
                         "start_time": str(start_time),
                         "extractor_hint": extractor_hint,
+                        "init_params": dict(init_params) if init_params else {},
                     }
 
                     task = ExtractionTask(
@@ -633,5 +662,97 @@ class Extractor(AereoPlugin, plugin_abstract=True):
             A GeoDataFrame of extracted artifacts, where each row corresponds to an extracted asset
             and its corresponding grid_cell, and includes metadata such as collection, geometry,
             time range, and any other relevant attributes.
+        """
+        ...
+
+
+class TaskStaging(Protocol):
+    """Protocol for staging serialized tasks to remote storage and loading results.
+
+    Concrete implementations handle upload/download for a specific object-store
+    backend (e.g. S3, GCS, Azure Blob).
+    """
+
+    bucket: str
+
+    def stage(self, src_dir: Path, job_id: str, task_idx: int) -> str:
+        """Upload a serialized task directory and return its URI.
+
+        Args:
+            src_dir: Directory containing ``task_assets.parquet`` and
+                ``task_meta.json`` produced by :class:`aereo.serialization.TaskSerializer`.
+            job_id: Logical job identifier for grouping staged tasks.
+            task_idx: Index of the task within the job.
+
+        Returns:
+            A URI (e.g. ``s3://bucket/aer-tasks/{job_id}/{task_idx}/``) that the
+            remote worker can use to retrieve the task.
+        """
+        ...
+
+    def load_artifacts(self, manifest_uri: str) -> GeoDataFrame[ArtifactSchema]:
+        """Load artifact results from a manifest URI.
+
+        Args:
+            manifest_uri: URI pointing to a manifest produced by the remote worker
+                (e.g. ``s3://bucket/results/{job_id}/{task_idx}/manifest.json``).
+
+        Returns:
+            A validated ``GeoDataFrame[ArtifactSchema]`` with the extracted artifacts.
+        """
+        ...
+
+    def upload_artifacts(
+        self,
+        artifacts: GeoDataFrame[ArtifactSchema],
+        output_prefix: str,
+    ) -> dict[str, str]:
+        """Upload artifacts and a manifest.
+
+        Args:
+            artifacts: GeoDataFrame of extracted artifacts.
+            output_prefix: URI prefix where the results should be written.
+
+        Returns:
+            A dictionary containing the ``manifest_uri`` of the uploaded manifest.
+        """
+        ...
+
+    def result_prefix(self, job_id: str, task_idx: int) -> str:
+        """Return the URI prefix where the remote worker should write results.
+
+        Args:
+            job_id: Logical job identifier.
+            task_idx: Index of the task within the job.
+
+        Returns:
+            A URI prefix (e.g. ``s3://bucket/results/{job_id}/{task_idx}/``).
+        """
+        ...
+
+
+class ExecutionBackend(Protocol):
+    """Protocol for pluggable task execution backends.
+
+    Backends decide **where** and **how** a batch of :class:`ExtractionTask`
+    objects are executed.  Local backends use the supplied *runner* directly;
+    remote backends may serialize tasks and dispatch to external workers.
+    """
+
+    def run_tasks(
+        self,
+        tasks: Sequence[ExtractionTask],
+        runner: TaskRunner | None = None,
+    ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
+        """Execute *tasks* and yield or return their results.
+
+        Because the return type is :class:`Iterable`, implementations are free
+        to process tasks asynchronously and yield results as they arrive,
+        enabling streaming consumption by the caller.
+
+        Args:
+            tasks: The extraction tasks to run.
+            runner: A client-side :class:`TaskRunner` that knows how to execute
+                a single task using the correct local plugin.
         """
         ...

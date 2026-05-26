@@ -54,6 +54,7 @@ dependencies = [
 optional-dependencies.aws-goes = [ "aereo-search-aws-goes>=2" ]
 optional-dependencies.docs = [ "mkdocs-material>=9", "mkdocs-minify-plugin>=0.8", "mkdocstrings[python]>=0.24" ]
 optional-dependencies.earthaccess = [ "aereo-search-earthaccess>=1.1.1" ]
+optional-dependencies.serverless = [ "boto3>=1.34" ]
 urls.Documentation = "https://frandorr.github.io/aereo"
 urls.Homepage = "https://github.com/frandorr/aereo"
 urls.Issues = "https://github.com/frandorr/aereo/issues"
@@ -63,7 +64,6 @@ urls.Repository = "https://github.com/frandorr/aereo"
 dev = [
   "aereo-extract-aws-goes",
   "aereo-extract-odc-stac",
-  "aereo-extract-remote",
   "aereo-extract-satpy",
   "aereo-extract-tessera",
   "aereo-search-aws-goes>=2",
@@ -105,7 +105,6 @@ metadata.allow-direct-references = true
 sources.aereo = { path = "projects/aereo", editable = true }
 sources.aereo-extract-aws-goes = { path = "../aereo-extract-aws-goes/projects/aereo-extract-aws-goes", editable = true }
 sources.aereo-extract-odc-stac = { path = "../aereo-extract-odc-stac/projects/aereo-extract-odc-stac", editable = true }
-sources.aereo-extract-remote = { path = "../aereo-extract-remote", editable = true }
 sources.aereo-extract-satpy = { path = "../aereo-extract-satpy/projects/aereo-extract-satpy", editable = true }
 sources.aereo-extract-tessera = { path = "../aereo-extract-tessera/projects/aereo-extract-tessera", editable = true }
 sources.aereo-search-aws-goes = { path = "../aereo-search-aws-goes/projects/aereo-search-aws-goes", editable = true }
@@ -185,6 +184,9 @@ bricks."components/aereo/registry" = "aereo/registry"
 bricks."components/aereo/schemas" = "aereo/schemas"
 bricks."components/aereo/spatial" = "aereo/spatial"
 bricks."components/aereo/asset_downloader" = "aereo/asset_downloader"
+bricks."components/aereo/backends" = "aereo/backends"
+bricks."components/aereo/serialization" = "aereo/serialization"
+bricks."components/aereo/viz" = "aereo/viz"
 bricks."bases/aereo/cli" = "aereo/cli"
 bricks."bases/aereo/client" = "aereo/client"
 bricks."bases/aereo/lambda_handler" = "aereo/lambda_handler"

@@ -17,7 +17,6 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-  "aereo-extract-remote>=1",
   "attrs>=25.4",
   "boto3>=1.34",
   "cattrs>=26.1",
@@ -57,7 +56,7 @@ build.targets.wheel.force-include."../../components/aereo/gdal_env.py" = "aereo/
 bricks."../../bases/aereo/lambda_handler" = "aereo/lambda_handler"
 bricks."../../components/aereo/interfaces" = "aereo/interfaces"
 bricks."../../components/aereo/schemas" = "aereo/schemas"
-bricks."../../components/aereo/execution" = "aereo/execution"
+bricks."../../components/aereo/backends" = "aereo/backends"
 bricks."../../components/aereo/serialization" = "aereo/serialization"
 bricks."../../components/aereo/registry" = "aereo/registry"
 bricks."../../components/aereo/grid" = "aereo/grid"

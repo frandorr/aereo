@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 from shapely.geometry import Polygon
 
-from aereo.execution.core import (
+from aereo.backends import (
     LocalProcessBackend,
     TaskRunner,
     ThreadBackend,

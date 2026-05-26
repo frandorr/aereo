@@ -66,7 +66,10 @@ class AereoRegistry:
                         f"Plugin '{ep.name}' does not inherit from SearchProvider or Extractor. Skipping."
                     )
             except Exception as e:
-                logger.error(f"Failed to load plugin '{ep.name}': {e}")
+                logger.error(
+                    f"Failed to load plugin '{ep.name}': {e}",
+                    exc_info=True,
+                )
 
     def _map_products(
         self,
