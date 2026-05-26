@@ -13,7 +13,7 @@ from aereo.eoids import (
     scan_eoids_dir,
 )
 from aereo.eoids.core import _matches_filter
-from aereo.interfaces import AerProfile
+from aereo.interfaces import AereoProfile
 from rasterio.crs import CRS
 from rasterio.transform import from_bounds
 
@@ -24,7 +24,7 @@ from rasterio.transform import from_bounds
 
 @pytest.fixture()
 def dummy_profile():
-    return AerProfile(
+    return AereoProfile(
         name="goes_c01",
         resolution=1000.0,
         collections={"ABI-L1b-RadF": ["C01"]},
@@ -100,7 +100,7 @@ def test_build_eoids_path_no_time(dummy_profile):
 
 
 def test_build_eoids_path_with_profile_only():
-    profile = AerProfile(name="test_prof", resolution=500.0, collections={})
+    profile = AereoProfile(name="test_prof", resolution=500.0, collections={})
     path = build_eoids_path("/tmp/ds", profile=profile)
 
     assert path.parent == Path("/tmp/ds/profile-test_prof")
@@ -108,7 +108,7 @@ def test_build_eoids_path_with_profile_only():
 
 
 def test_build_eoids_path_uses_profile_resolution():
-    profile = AerProfile(name="test_prof", resolution=250.0, collections={})
+    profile = AereoProfile(name="test_prof", resolution=250.0, collections={})
     path = build_eoids_path(
         "/tmp/ds",
         profile=profile,
@@ -118,7 +118,7 @@ def test_build_eoids_path_uses_profile_resolution():
 
 
 def test_build_eoids_path_multiple_collections_and_variables():
-    profile = AerProfile(
+    profile = AereoProfile(
         name="viirs_geo",
         resolution=375.0,
         collections={"IMG202": ["I04"], "IMG203": ["I05"]},
@@ -136,7 +136,7 @@ def test_build_eoids_path_multiple_collections_and_variables():
 
 
 def test_build_eoids_path_empty_collections():
-    profile = AerProfile(name="mask", resolution=500.0, collections={})
+    profile = AereoProfile(name="mask", resolution=500.0, collections={})
     path = build_eoids_path("/tmp/ds", profile=profile, cell_id="1U_10L")
 
     assert "collection-" not in path.name
@@ -145,7 +145,7 @@ def test_build_eoids_path_empty_collections():
 
 
 def test_build_eoids_path_writes_profile_json(tmp_path):
-    profile = AerProfile(
+    profile = AereoProfile(
         name="goes_c01", resolution=1000.0, collections={"ABI-L1b-RadF": ["C01"]}
     )
     path = build_eoids_path(tmp_path, profile=profile, cell_id="36D61L")
@@ -159,7 +159,7 @@ def test_build_eoids_path_writes_profile_json(tmp_path):
 
 
 def test_build_eoids_path_skips_existing_profile_json(tmp_path):
-    profile = AerProfile(
+    profile = AereoProfile(
         name="goes_c01", resolution=1000.0, collections={"ABI-L1b-RadF": ["C01"]}
     )
     profile_json = tmp_path / "profile-goes_c01" / "profile.json"
@@ -389,7 +389,7 @@ class TestScanEoidsDir:
             assert entry["date"] is not None
 
     def test_scan_eoids_dir_filter_with_plus_concatenation(self, tmp_path):
-        profile = AerProfile(
+        profile = AereoProfile(
             name="rgb",
             resolution=1000.0,
             collections={"ABI-L1b-RadF": ["C01", "C02", "C03"]},
@@ -472,7 +472,7 @@ class TestMosaicEoidsTiles:
         root = tmp_path / "roundtrip"
         st = datetime.datetime(2026, 6, 15, 12, 0, 0)
         et = datetime.datetime(2026, 6, 15, 12, 10, 0)
-        profile = AerProfile(
+        profile = AereoProfile(
             name="goes_c01",
             resolution=1000.0,
             collections={"ABI-L1b-RadF": ["C01"]},

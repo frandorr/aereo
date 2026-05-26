@@ -4,7 +4,7 @@
 # geographic patch size, add padding for CNN receptive fields, and visualise as
 # a montage.
 #
-# Common AerProfile pitfalls (documented inline):
+# Common AereoProfile pitfalls (documented inline):
 #   1. Forgetting ``conform_to`` is ``(width, height)`` not ``(height, width)`` —
 #      it matches rasterio ``(bands, height, width)`` convention.
 #   2. ``padding`` increases extracted size beyond ``conform_to`` — the valid
@@ -16,9 +16,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import geopandas as gpd
-from aereo.client import AerClient
+from aereo.client import AereoClient
 from aereo.execution import LocalProcessBackend
-from aereo.interfaces import AerProfile, GridConfig
+from aereo.interfaces import AereoProfile, GridConfig
 
 # --- Configuration ---
 # Use a historical date known to have Sentinel-2 coverage over Chocon AOI.
@@ -43,7 +43,7 @@ aoi = gdf.geometry.iloc[0]
 
 # %%
 profiles = [
-    AerProfile(
+    AereoProfile(
         name="s2_ml",
         resolution=10,
         collections={"sentinel-2-l2a": ["B04", "B03", "B02", "B08"]},
@@ -58,7 +58,7 @@ profiles = [
 ]
 
 # --- Client Setup ---
-client = AerClient()
+client = AereoClient()
 print("Searching...", flush=True)
 results = client.search(
     profiles=profiles,

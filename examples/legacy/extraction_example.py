@@ -6,9 +6,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import geopandas as gpd
-from aereo.client import AerClient
+from aereo.client import AereoClient
 from aereo.execution import LocalProcessBackend
-from aereo.interfaces import AerProfile, GridConfig
+from aereo.interfaces import AereoProfile, GridConfig
 from aereo.viz import plot_aoi
 
 # --- Configuration ---
@@ -33,12 +33,12 @@ aoi = gdf.geometry.iloc[0]
 # The *downloader* field accepts a dotted import path string
 # (e.g. ``aer.search_earthaccess.earthaccess_download_wrapper``) which
 # Pydantic resolves to a live callable at load time.
-profiles = AerProfile.from_yaml(profiles_path)
+profiles = AereoProfile.from_yaml(profiles_path)
 # Verify the downloader was resolved from a string to a callable
 assert profiles[0].downloader is not None
 
 # --- Client Setup ---
-client = AerClient()
+client = AereoClient()
 print("Searching...", flush=True)
 results = client.search(
     profiles=profiles,

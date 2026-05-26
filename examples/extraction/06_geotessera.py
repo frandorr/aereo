@@ -25,10 +25,10 @@ from pyproj import Transformer
 import rasterio
 from shapely.ops import transform as shapely_transform
 
-from aereo.client import AerClient
+from aereo.client import AereoClient
 from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir
 from aereo.execution import LocalProcessBackend
-from aereo.interfaces import AerProfile, GridConfig
+from aereo.interfaces import AereoProfile, GridConfig
 
 # --- Configuration ---
 # GeoTessera covers 2017–2025. We use 2024 which has coverage for the Chocon AOI.
@@ -48,13 +48,13 @@ aoi = gdf.geometry.iloc[0]
 
 # %%
 # Load shared profiles and grid config from YAML.
-all_profiles = {p.name: p for p in AerProfile.from_yaml(data_dir / "profiles.yaml")}
+all_profiles = {p.name: p for p in AereoProfile.from_yaml(data_dir / "profiles.yaml")}
 grid = GridConfig.from_yaml(data_dir / "grid_config.yaml")
 
 profiles = [all_profiles["geotessera"]]
 
 # --- Client Setup ---
-client = AerClient()
+client = AereoClient()
 print("Searching GeoTessera tiles...", flush=True)
 t0 = time.time()
 results = client.search(

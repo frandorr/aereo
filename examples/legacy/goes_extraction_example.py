@@ -2,9 +2,9 @@
 # --- Plot AOI on a map ---
 from datetime import datetime, timezone
 
-from aereo.client import AerClient
+from aereo.client import AereoClient
 from aereo.execution import LocalProcessBackend
-from aereo.interfaces import AerProfile, GridConfig
+from aereo.interfaces import AereoProfile, GridConfig
 from shapely.geometry import box
 
 # --- Configuration ---
@@ -17,11 +17,11 @@ aoi = box(
 )
 
 # %%
-# Profiles are usually loaded from a YAML or JSON config file (AerProfile.from_yaml or AerProfile.from_json).
+# Profiles are usually loaded from a YAML or JSON config file (AereoProfile.from_yaml or AereoProfile.from_json).
 # Each profile declares its collections, variables, and which plugins to use (via
-# plugin_hints). This time we just create the AerProfile directly from a dict.
+# plugin_hints). This time we just create the AereoProfile directly from a dict.
 profiles = [
-    AerProfile(
+    AereoProfile(
         name="goes_c01",
         resolution=500,
         collections={"ABI-L1b-RadF": ["C02"]},
@@ -32,7 +32,7 @@ profiles = [
 ]
 
 # --- Client Setup ---
-client = AerClient()
+client = AereoClient()
 print("Searching...", flush=True)
 results = client.search(
     profiles=profiles,

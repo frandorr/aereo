@@ -7,8 +7,8 @@ By defining these interfaces, we ensure that all implementations adhere to a con
 """
 
 from aereo.interfaces.core import (
-    AerPlugin,
-    AerProfile,
+    AereoPlugin,
+    AereoProfile,
     Downloader,
     ExtractionProfile,
     ExtractionTask,
@@ -19,8 +19,8 @@ from aereo.interfaces.core import (
 )
 
 __all__ = [
-    "AerPlugin",
-    "AerProfile",
+    "AereoPlugin",
+    "AereoProfile",
     "Downloader",
     "ExtractionProfile",
     "ExtractionTask",

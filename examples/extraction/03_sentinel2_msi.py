@@ -14,10 +14,10 @@ from pyproj import Transformer
 import rasterio
 from shapely.ops import transform as shapely_transform
 
-from aereo.client import AerClient
+from aereo.client import AereoClient
 from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir
 from aereo.execution import LocalProcessBackend
-from aereo.interfaces import AerProfile, GridConfig
+from aereo.interfaces import AereoProfile, GridConfig
 
 # --- Configuration ---
 # Use a historical date known to have Sentinel-2 coverage over AOI.
@@ -37,14 +37,14 @@ aoi = gdf.geometry.iloc[0]
 
 # %%
 # Load profiles and grid config from YAML.
-all_profiles = {p.name: p for p in AerProfile.from_yaml(data_dir / "profiles.yaml")}
+all_profiles = {p.name: p for p in AereoProfile.from_yaml(data_dir / "profiles.yaml")}
 grid = GridConfig.from_yaml(data_dir / "grid_config.yaml")
 
 # Select the profile to use for extraction.
 profiles = [all_profiles["s2_rgb"]]
 
 # --- Client Setup ---
-client = AerClient()
+client = AereoClient()
 print("Searching...", flush=True)
 results = client.search(
     profiles=profiles,
@@ -105,9 +105,9 @@ if artifact_paths:
         print(f"  Bands: {src.count} (expected 3 for B04+B03+B02)")
         print(f"  Shape: {src.shape}")
 
-# One AerProfile produces exactly one multi-band artifact.
+# One AereoProfile produces exactly one multi-band artifact.
 # Load it once via ``profile=profiles[0].name`` (which derives collection
-# and variable from the AerProfile) and index the bands directly.
+# and variable from the AereoProfile) and index the bands directly.
 # We set ``sort_by_coverage=False`` because Sentinel-2 tiles are dense
 # rectangles — the coverage sort would read every tile into memory just
 # to count pixels, which is very slow when mosaicking many tiles.

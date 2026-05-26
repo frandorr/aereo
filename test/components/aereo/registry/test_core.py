@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from aereo.interfaces import ExtractionTask, Extractor, SearchProvider
-from aereo.registry import AerRegistry
+from aereo.registry import AereoRegistry
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
@@ -71,7 +71,7 @@ def mock_entry_points(monkeypatch):
 
 
 def test_registry_discovery(mock_entry_points):
-    registry = AerRegistry()
+    registry = AereoRegistry()
     assert "dummy_searcher" in registry._searchers
     assert "dummy_extractor" in registry._extractors
 
@@ -81,20 +81,20 @@ def test_registry_discovery(mock_entry_points):
 
 
 def test_list_supported_collections(mock_entry_points):
-    registry = AerRegistry()
+    registry = AereoRegistry()
     collections = registry.list_supported_collections()
     assert collections == ["DummyCollection1", "DummyCollection2", "SharedCollection"]
 
 
 def test_find_searchers_for(mock_entry_points):
-    registry = AerRegistry()
+    registry = AereoRegistry()
     assert registry.find_searchers_for("DummyCollection1") == ["dummy_searcher"]
     assert registry.find_searchers_for("SharedCollection") == ["dummy_searcher"]
     assert registry.find_searchers_for("Unknown") == []
 
 
 def test_find_extractors_for(mock_entry_points):
-    registry = AerRegistry()
+    registry = AereoRegistry()
     assert registry.find_extractors_for("DummyCollection2") == ["dummy_extractor"]
     assert registry.find_extractors_for("SharedCollection") == ["dummy_extractor"]
     assert registry.find_extractors_for("Unknown") == []
@@ -102,7 +102,7 @@ def test_find_extractors_for(mock_entry_points):
 
 def test_case_insensitive_searcher_lookup(mock_entry_points):
     """Test that find_searchers_for matches collections case-insensitively."""
-    registry = AerRegistry()
+    registry = AereoRegistry()
     # Exact match
     assert registry.find_searchers_for("DummyCollection1") == ["dummy_searcher"]
     # Lowercase
@@ -115,7 +115,7 @@ def test_case_insensitive_searcher_lookup(mock_entry_points):
 
 def test_case_insensitive_extractor_lookup(mock_entry_points):
     """Test that find_extractors_for matches collections case-insensitively."""
-    registry = AerRegistry()
+    registry = AereoRegistry()
     # Exact match
     assert registry.find_extractors_for("DummyCollection2") == ["dummy_extractor"]
     # Lowercase
@@ -127,7 +127,7 @@ def test_case_insensitive_extractor_lookup(mock_entry_points):
 
 
 def test_get_searcher(mock_entry_points):
-    registry = AerRegistry()
+    registry = AereoRegistry()
 
     searcher = registry.get_searcher("dummy_searcher")
     assert isinstance(searcher, DummySearchProvider)
@@ -137,7 +137,7 @@ def test_get_searcher(mock_entry_points):
 
 
 def test_get_extractor(mock_entry_points):
-    registry = AerRegistry()
+    registry = AereoRegistry()
 
     extractor = registry.get_extractor("dummy_extractor")
     assert isinstance(extractor, DummyExtractor)
@@ -148,7 +148,7 @@ def test_get_extractor(mock_entry_points):
 
 def test_get_collection_mapping_for_searcher(mock_entry_points):
     """Test that collection names are mapped to plugin's declared format."""
-    registry = AerRegistry()
+    registry = AereoRegistry()
 
     # Plugin declares supported_collections = ["DummyCollection1", "SharedCollection"]
     # Should map user input (any case) to plugin's original case
@@ -174,7 +174,7 @@ def test_get_collection_mapping_for_searcher(mock_entry_points):
 
 def test_get_collection_mapping_for_searcher_unknown_plugin(mock_entry_points):
     """Test fallback when plugin is not found in mapping."""
-    registry = AerRegistry()
+    registry = AereoRegistry()
 
     # Unknown plugin falls back to lowercase
     result = registry.get_collection_mapping_for_searcher(
@@ -185,7 +185,7 @@ def test_get_collection_mapping_for_searcher_unknown_plugin(mock_entry_points):
 
 def test_get_collection_mapping_for_extractor(mock_entry_points):
     """Test collection mapping for extractors."""
-    registry = AerRegistry()
+    registry = AereoRegistry()
 
     # Plugin declares supported_collections = ["SharedCollection", "DummyCollection2"]
     # Should map user input to plugin's original case

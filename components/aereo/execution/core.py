@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Iterable, Protocol, Sequence
 
 from aereo.interfaces import ExtractionTask, merge_params
-from aereo.registry import AerRegistry
+from aereo.registry import AereoRegistry
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -94,7 +94,7 @@ class ExecutionBackend(Protocol):
 class TaskRunner:
     """Executes a single :class:`ExtractionTask` using the correct plugin."""
 
-    def __init__(self, registry: AerRegistry):
+    def __init__(self, registry: AereoRegistry):
         self.registry = registry
 
     def run(self, task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:

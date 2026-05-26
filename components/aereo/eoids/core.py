@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 import rasterio
-from aereo.interfaces import AerProfile
+from aereo.interfaces import AereoProfile
 from numpy.typing import NDArray
 from rasterio.crs import CRS
 from rasterio.merge import merge
@@ -34,7 +34,7 @@ _EOIDS_PATTERN = re.compile(
 
 def build_eoids_path(
     local_dir: str | Path,
-    profile: AerProfile,
+    profile: AereoProfile,
     *,
     cell_id: str | None = None,
     start_time: datetime.datetime | None = None,
@@ -60,7 +60,7 @@ def build_eoids_path(
 
     Args:
         local_dir: Root directory for the dataset.
-        profile: The AerProfile used for extraction. Provides the profile name,
+        profile: The AereoProfile used for extraction. Provides the profile name,
             default resolution, and collection/variable mapping.
         cell_id: Geographic cell identifier (e.g., '36D61L').
         start_time: Start time of the observation.
@@ -69,7 +69,7 @@ def build_eoids_path(
         desc: Custom descriptor for the file (e.g., 'cloudmask').
         suffix: File extension (default: 'tif').
         write_profile_meta: When *True* (the default), serialize the full
-            ``AerProfile`` to ``profile.json`` in the profile directory on the
+            ``AereoProfile`` to ``profile.json`` in the profile directory on the
             first call.
     """
     parts: list[str] = []

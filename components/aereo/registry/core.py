@@ -8,7 +8,7 @@ from structlog import get_logger
 logger = get_logger()
 
 
-class AerRegistry:
+class AereoRegistry:
     """
     Dynamically discovers and manages aereo plugins via Python entry_points.
     """

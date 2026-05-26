@@ -4,7 +4,7 @@
 # filter to one asset per sensor, extract all into the same EOIDS directory,
 # then mosaic side-by-side.
 #
-# Common AerProfile pitfalls (documented inline):
+# Common AereoProfile pitfalls (documented inline):
 #   1. Missing geolocation collection VJ203IMG for VIIRS → satpy raises KeyError
 #      for missing geolocation arrays. Always pair VJ202IMG with VJ203IMG.
 #   2. Forgetting downloader for earthaccess-based sensors → assets cannot be
@@ -20,10 +20,10 @@ from pathlib import Path
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
-from aereo.client import AerClient
+from aereo.client import AereoClient
 from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir
 from aereo.execution import LocalProcessBackend
-from aereo.interfaces import AerProfile, GridConfig
+from aereo.interfaces import AereoProfile, GridConfig
 from pyproj import Transformer
 from shapely.ops import transform as shapely_transform
 
@@ -44,7 +44,7 @@ aoi = gdf.geometry.iloc[0]
 
 # %%
 # Load shared profiles and grid config from YAML.
-all_profiles = {p.name: p for p in AerProfile.from_yaml(data_dir / "profiles.yaml")}
+all_profiles = {p.name: p for p in AereoProfile.from_yaml(data_dir / "profiles.yaml")}
 grid = GridConfig.from_yaml(data_dir / "grid_config.yaml")
 
 profiles = [
@@ -54,7 +54,7 @@ profiles = [
 ]
 
 # --- Client Setup ---
-client = AerClient()
+client = AereoClient()
 print("Searching...", flush=True)
 results = client.search(
     profiles=profiles,

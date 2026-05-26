@@ -114,7 +114,7 @@ class Downloader(Protocol):
         ...
 
 
-class AerPlugin(ABC):
+class AereoPlugin(ABC):
     """Base class for AER plugins"""
 
     # 1. Define the type hint, but remove the `= None` default.
@@ -150,11 +150,11 @@ class AerPlugin(ABC):
         # 5. Empty sequences are allowed (used by plugins that only support plugin_hints)
 
 
-class SearchProvider(AerPlugin, plugin_abstract=True):
+class SearchProvider(AereoPlugin, plugin_abstract=True):
     @abstractmethod
     def search(
         self,
-        profiles: Sequence[AerProfile],
+        profiles: Sequence[AereoProfile],
         intersects: BaseGeometry | None,
         start_datetime: datetime | None,
         end_datetime: datetime | None,
@@ -163,14 +163,14 @@ class SearchProvider(AerPlugin, plugin_abstract=True):
         """Search for collections data matching the query.
 
         Args:
-            profiles: Sequence of AerProfile objects defining what to search for.
+            profiles: Sequence of AereoProfile objects defining what to search for.
                 Collections and other domain-specific config are read from each
                 profile (via ``collections``, ``search_params``, etc.).
             intersects: Optional shapely BaseGeometry to filter results by spatial intersection.
             start_datetime: Optional start datetime to filter results by temporal range.
             end_datetime: Optional end datetime to filter results by temporal range.
             search_params: Additional meta-level parameters for the search (credentials,
-                timeouts, etc.). Domain-specific config lives on each AerProfile.
+                timeouts, etc.). Domain-specific config lives on each AereoProfile.
 
         Returns:
             A GeoDataFrame of search results, where each row represents a dataset
@@ -180,7 +180,7 @@ class SearchProvider(AerPlugin, plugin_abstract=True):
         ...
 
 
-class AerProfile(BaseModel):
+class AereoProfile(BaseModel):
     """Ground-truth configuration for a single search + extraction unit.
 
     Can be constructed in code or loaded from JSON/YAML. The *downloader*
@@ -314,7 +314,7 @@ class AerProfile(BaseModel):
 
 
 # Backward-compat alias — will be removed in a later task.
-ExtractionProfile = AerProfile
+ExtractionProfile = AereoProfile
 
 
 @attrs.frozen
@@ -325,7 +325,7 @@ class ExtractionTask:
     Attributes:
         assets: GeoDataFrame of assets to extract. It can group multiple collections
             (for example Imagery + Geolocation). Schema is defined in `aereo.schemas.AssetSchema`.
-        profile: The AerProfile containing target variables and resolution.
+        profile: The AereoProfile containing target variables and resolution.
         uri: Destination URI for extracted artifacts.
         grid_cells: Spatial grid cells this task covers.
         grid_config: Tiling specification shared by all tasks in this run.
@@ -335,7 +335,7 @@ class ExtractionTask:
     """
 
     assets: GeoDataFrame[AssetSchema]
-    profile: AerProfile
+    profile: AereoProfile
     uri: str
     grid_cells: Sequence[GridCell]
     grid_config: GridConfig
@@ -378,7 +378,7 @@ class ExtractionTask:
         )
 
 
-class Extractor(AerPlugin, plugin_abstract=True):
+class Extractor(AereoPlugin, plugin_abstract=True):
     """Base class for AER extraction plugins.
 
     Subclasses must implement ``extract()``. Grid parameters are no longer
@@ -392,7 +392,7 @@ class Extractor(AerPlugin, plugin_abstract=True):
         grid_config: GridConfig,
         target_aoi: BaseGeometry | None = None,
         uri: str | None = None,
-        profiles: Sequence[AerProfile] | None = None,
+        profiles: Sequence[AereoProfile] | None = None,
         cells_per_chunk: int = 50,
         extractor_hint: str | None = None,
     ) -> Sequence[ExtractionTask]:

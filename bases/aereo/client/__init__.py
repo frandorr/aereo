@@ -1,9 +1,9 @@
 from aereo.client.core import (
-    AerClient,
+    AereoClient,
     FailureMode,
 )
 
 __all__ = [
-    "AerClient",
+    "AereoClient",
     "FailureMode",
 ]

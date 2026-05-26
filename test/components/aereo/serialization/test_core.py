@@ -3,7 +3,7 @@ from typing import Any, cast
 
 import geopandas as gpd
 from aereo.grid import GridCell
-from aereo.interfaces import AerProfile, ExtractionTask, GridConfig
+from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig
 from aereo.schemas import AssetSchema
 from aereo.serialization import TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
@@ -30,7 +30,7 @@ def _make_task(
         crs="EPSG:4326",
     )
 
-    profile = AerProfile(name="test_profile", resolution=100.0)
+    profile = AereoProfile(name="test_profile", resolution=100.0)
     grid_config = GridConfig(target_grid_dist=50_000)
     grid_cell = GridCell(
         d=50_000,
@@ -154,7 +154,7 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
 
     original = ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
-        profile=AerProfile(name="multi", resolution=10.0),
+        profile=AereoProfile(name="multi", resolution=10.0),
         uri="out",
         grid_cells=cells,
         grid_config=GridConfig(target_grid_dist=10_000),
@@ -188,7 +188,7 @@ def test_assets_crs_preserved(tmp_path: Any) -> None:
 def test_profile_reconstruction_matches_original(tmp_path: Any) -> None:
     """Complex profiles with collections and params reconstruct identically."""
     serializer = TaskSerializer()
-    profile = AerProfile(
+    profile = AereoProfile(
         name="complex",
         resolution=500.0,
         collections={"ABI-L1b-RadC": ["C01", "C02"]},

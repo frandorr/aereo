@@ -4,13 +4,13 @@
 
 from datetime import datetime, timezone
 
-from aereo.client import AerClient
-from aereo.interfaces import AerProfile, GridConfig
+from aereo.client import AereoClient
+from aereo.interfaces import AereoProfile, GridConfig
 from shapely.geometry import box
 
-client = AerClient()
+client = AereoClient()
 aoi = box(-70, -40, -68, -39)
-profile = AerProfile(
+profile = AereoProfile(
     name="goes",
     resolution=1000,
     collections={"ABI-L1b-RadF": ["C02"]},

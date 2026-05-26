@@ -4,7 +4,7 @@ from typing import Any, Sequence, cast
 import geopandas as gpd
 import pytest
 from aereo.interfaces import (
-    AerPlugin,
+    AereoPlugin,
     ExtractionTask,
     Extractor,
     GridConfig,
@@ -27,7 +27,7 @@ def test_plugin_missing_supported_collections():
         TypeError, match="must define the 'supported_collections' attribute"
     ):
 
-        class InvalidPlugin(AerPlugin):
+        class InvalidPlugin(AereoPlugin):
             pass
 
 
@@ -36,26 +36,26 @@ def test_plugin_supported_collections_is_string():
         TypeError, match="must be a Sequence of strings .* got a single string"
     ):
 
-        class InvalidPlugin(AerPlugin):
+        class InvalidPlugin(AereoPlugin):
             supported_collections = "GOES-16"
 
 
 def test_plugin_supported_collections_is_not_sequence():
     with pytest.raises(TypeError, match="must be a Sequence .* got int"):
 
-        class InvalidPlugin(AerPlugin):
+        class InvalidPlugin(AereoPlugin):
             supported_collections = 123  # pyright: ignore[reportAssignmentType]
 
 
 def test_plugin_supported_collections_is_empty():
-    class InvalidPlugin(AerPlugin):
+    class InvalidPlugin(AereoPlugin):
         supported_collections = []
 
     assert InvalidPlugin.supported_collections == []
 
 
 def test_plugin_valid_supported_collections():
-    class ValidPlugin(AerPlugin):
+    class ValidPlugin(AereoPlugin):
         supported_collections = ["GOES-16", "GOES-17"]
 
     assert ValidPlugin.supported_collections == ["GOES-16", "GOES-17"]
@@ -82,14 +82,14 @@ def test_search_provider_signature_has_profiles():
 
 def test_search_provider_accepts_profiles_signature():
     """A concrete searcher using the new profiles signature can be instantiated."""
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
     class GoodSearcher(SearchProvider):
         supported_collections = ["X"]
 
         def search(
             self,
-            profiles: Sequence[AerProfile],
+            profiles: Sequence[AereoProfile],
             intersects: Any,
             start_datetime: Any,
             end_datetime: Any,
@@ -144,7 +144,7 @@ def test_extractor_prepare_for_extraction():
 
     from datetime import datetime
 
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
     # Needs a GeoDataFrame with collection and start_time
     df = gpd.GeoDataFrame(
@@ -160,7 +160,7 @@ def test_extractor_prepare_for_extraction():
     )
 
     grid_config = GridConfig(target_grid_dist=1_000_000)
-    profile = AerProfile(name="test_profile", resolution=10.0)
+    profile = AereoProfile(name="test_profile", resolution=10.0)
 
     # Should raise error if uri not provided
     with pytest.raises(
@@ -198,9 +198,9 @@ def test_extractor_prepare_for_extraction():
 
 
 def test_aer_profile_has_all_fields():
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
-    profile = AerProfile(
+    profile = AereoProfile(
         name="goes_16_abi",
         resolution=1000.0,
         collections={"ABI-L1b-RadC": ["C01", "C02"]},
@@ -216,35 +216,35 @@ def test_aer_profile_has_all_fields():
 def test_aer_profile_accepts_downloader():
     from pathlib import Path
 
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
     def my_dl(url: str, local_path: Path) -> None:
         pass
 
-    profile = AerProfile(name="test", resolution=100.0, downloader=my_dl)
+    profile = AereoProfile(name="test", resolution=100.0, downloader=my_dl)
     assert profile.downloader is my_dl
 
 
 def test_aer_profile_downloader_defaults_to_none():
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
-    profile = AerProfile(name="test", resolution=100.0)
+    profile = AereoProfile(name="test", resolution=100.0)
     assert profile.downloader is None
 
 
 def test_aer_profile_defaults():
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
-    profile = AerProfile(name="minimal", resolution=100.0)
+    profile = AereoProfile(name="minimal", resolution=100.0)
     assert profile.collections == {}
     assert profile.plugin_hints == {}
     assert profile.conform_to is None
 
 
 def test_aer_profile_accepts_conform_to():
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
-    profile = AerProfile(name="test", resolution=100.0, conform_to=(256, 256))
+    profile = AereoProfile(name="test", resolution=100.0, conform_to=(256, 256))
     assert profile.conform_to == (256, 256)
 
 
@@ -252,14 +252,14 @@ def test_extraction_task_accepts_aer_profile():
     import geopandas as gpd
     from shapely.geometry import Polygon
 
-    from aereo.interfaces.core import AerProfile, ExtractionTask
+    from aereo.interfaces.core import AereoProfile, ExtractionTask
     from pandera.typing.geopandas import GeoDataFrame
 
     df = gpd.GeoDataFrame(
         {"collection": ["GOES"], "start_time": ["2023-01-01"]},
         geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
     )
-    profile = AerProfile(name="test", resolution=10.0, collections={"GOES": ["var1"]})
+    profile = AereoProfile(name="test", resolution=10.0, collections={"GOES": ["var1"]})
     grid_config = GridConfig(target_grid_dist=10_000)
     task = ExtractionTask(
         assets=cast(GeoDataFrame, df),
@@ -272,25 +272,25 @@ def test_extraction_task_accepts_aer_profile():
 
 
 def test_aer_profile_is_frozen():
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
-    profile = AerProfile(name="test", resolution=100.0)
+    profile = AereoProfile(name="test", resolution=100.0)
     with pytest.raises(ValidationError):
         profile.resolution = 200.0
 
 
 def test_aer_profile_forbids_extra_fields():
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
     with pytest.raises(ValidationError):
-        AerProfile(name="test", resolution=100.0, unknown_field=42)  # pyright: ignore[reportCallIssue]
+        AereoProfile(name="test", resolution=100.0, unknown_field=42)  # pyright: ignore[reportCallIssue]
 
 
 def test_aer_profile_import_string_downloader():
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
     # Use a stdlib callable as a stand-in for a real downloader
-    profile = AerProfile(
+    profile = AereoProfile(
         name="test",
         resolution=100.0,
         downloader="os.path.join",  # pyright: ignore[reportArgumentType]
@@ -299,10 +299,10 @@ def test_aer_profile_import_string_downloader():
 
 
 def test_aer_profile_invalid_import_string():
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
     with pytest.raises(ValidationError):
-        AerProfile(
+        AereoProfile(
             name="test",
             resolution=100.0,
             downloader="this.does.not.exist",  # pyright: ignore[reportArgumentType]
@@ -319,9 +319,9 @@ def test_aer_profile_pickle_module_level_callable_downloader():
     import os
     import pickle
 
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
-    profile = AerProfile(
+    profile = AereoProfile(
         name="test",
         resolution=100.0,
         downloader="os.path.join",  # pyright: ignore[reportArgumentType]
@@ -334,9 +334,9 @@ def test_aer_profile_pickle_lambda_downloader_becomes_none():
     """A lambda downloader pickles without crashing and becomes None."""
     import pickle
 
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
-    profile = AerProfile(
+    profile = AereoProfile(
         name="test",
         resolution=100.0,
         downloader=lambda url, path: None,  # pyright: ignore[reportArgumentType]
@@ -352,14 +352,14 @@ def test_extraction_task_pickle_with_callable_downloader():
     import geopandas as gpd
     from shapely.geometry import Polygon
 
-    from aereo.interfaces.core import AerProfile, ExtractionTask
+    from aereo.interfaces.core import AereoProfile, ExtractionTask
     from pandera.typing.geopandas import GeoDataFrame
 
     df = gpd.GeoDataFrame(
         {"collection": ["GOES"], "start_time": ["2023-01-01"]},
         geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
     )
-    profile = AerProfile(
+    profile = AereoProfile(
         name="test",
         resolution=10.0,
         collections={"GOES": ["var1"]},
@@ -379,9 +379,9 @@ def test_extraction_task_pickle_with_callable_downloader():
 
 
 def test_aer_profile_has_search_and_extract_params():
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
-    profile = AerProfile(
+    profile = AereoProfile(
         name="test",
         resolution=100.0,
         search_params={"version": "061"},
@@ -392,10 +392,10 @@ def test_aer_profile_has_search_and_extract_params():
 
 
 def test_aer_profile_rejects_extra_params():
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
     with pytest.raises(ValidationError):
-        AerProfile(name="test", resolution=100.0, extra_params={"foo": "bar"})  # pyright: ignore[reportCallIssue]
+        AereoProfile(name="test", resolution=100.0, extra_params={"foo": "bar"})  # pyright: ignore[reportCallIssue]
 
 
 def test_merge_params_batch_only():
@@ -418,7 +418,7 @@ def test_prepare_computes_common_shape_when_conform_enabled():
     """When profile has conform_to set, conform_to is read from profile, not task_context."""
     from datetime import datetime
 
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
     class ConformExtractor(Extractor):
         supported_collections = ["C1"]
@@ -443,7 +443,7 @@ def test_prepare_computes_common_shape_when_conform_enabled():
         ],
     )
 
-    profile = AerProfile(
+    profile = AereoProfile(
         name="test",
         resolution=100.0,
         collections={"C1": ["var1"]},
@@ -466,7 +466,7 @@ def test_prepare_does_not_compute_common_shape_when_conform_disabled():
     """When profile has conform_to=None, profile.conform_to is None."""
     from datetime import datetime
 
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
     class NoConformExtractor(Extractor):
         supported_collections = ["C1"]
@@ -491,7 +491,7 @@ def test_prepare_does_not_compute_common_shape_when_conform_disabled():
         ],
     )
 
-    profile = AerProfile(
+    profile = AereoProfile(
         name="test",
         resolution=100.0,
         collections={"C1": ["var1"]},
@@ -524,7 +524,7 @@ def test_prepare_for_extraction_includes_extractor_hint():
     extractor = HintExtractor()
 
     from datetime import datetime
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
     df = gpd.GeoDataFrame(
         {
@@ -538,7 +538,7 @@ def test_prepare_for_extraction_includes_extractor_hint():
     )
 
     grid_config = GridConfig(target_grid_dist=1_000_000)
-    profile = AerProfile(name="test_profile", resolution=10.0)
+    profile = AereoProfile(name="test_profile", resolution=10.0)
 
     tasks = extractor.prepare_for_extraction(
         cast(Any, df),
@@ -636,7 +636,7 @@ def test_example_grid_configs_load(config_file):
 def test_prepare_for_extraction_spatial_filtering():
     """Verify that prepare_for_extraction filters assets to only those intersecting chunk grid cells."""
     from datetime import datetime
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
     from shapely.geometry import Polygon
 
     class DummyExtractor(Extractor):
@@ -659,7 +659,7 @@ def test_prepare_for_extraction_spatial_filtering():
         ],
     )
 
-    profile = AerProfile(name="test", resolution=1000.0, collections={"C1": ["var1"]})
+    profile = AereoProfile(name="test", resolution=1000.0, collections={"C1": ["var1"]})
     grid_config = GridConfig(target_grid_dist=100_000)
     extractor = DummyExtractor()
 

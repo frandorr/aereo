@@ -19,9 +19,9 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from aereo.client import AerClient
+from aereo.client import AereoClient
 from aereo.execution import LocalProcessBackend
-from aereo.interfaces import AerProfile, GridConfig
+from aereo.interfaces import AereoProfile, GridConfig
 from aereo.schemas import AssetSchema
 
 app = typer.Typer(
@@ -159,12 +159,12 @@ def search(
         structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(10))
 
     # Load profiles
-    profiles: list[AerProfile] = []
+    profiles: list[AereoProfile] = []
     for p in profile:
         if not p.exists():
             console.print(f"[red]Profile not found:[/red] {p}")
             raise typer.Exit(code=1)
-        profiles.extend(AerProfile.from_yaml(p))
+        profiles.extend(AereoProfile.from_yaml(p))
 
     # Load geometry
     intersects = _load_geometry(geojson) if geojson and geojson.exists() else None
@@ -173,7 +173,7 @@ def search(
     start_dt = datetime.fromisoformat(start) if start else None
     end_dt = datetime.fromisoformat(end) if end else None
 
-    client = AerClient()
+    client = AereoClient()
     try:
         results = client.search(
             profiles=profiles,
@@ -242,12 +242,12 @@ def prepare(
     records = json.loads(search_results.read_text())
     df = _search_results_from_json(records)
 
-    profiles: list[AerProfile] = []
+    profiles: list[AereoProfile] = []
     for p in profile:
         if not p.exists():
             console.print(f"[red]Profile not found:[/red] {p}")
             raise typer.Exit(code=1)
-        profiles.extend(AerProfile.from_yaml(p))
+        profiles.extend(AereoProfile.from_yaml(p))
 
     grid_config = (
         GridConfig.from_yaml(config) if config and config.exists() else GridConfig()
@@ -255,7 +255,7 @@ def prepare(
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    client = AerClient()
+    client = AereoClient()
     try:
         tasks = client.prepare_for_extraction(
             search_results=df,  # type: ignore[arg-type]
@@ -302,7 +302,7 @@ def extract(
     task_list = pickle.loads(tasks.read_bytes())
 
     backend = LocalProcessBackend(max_workers=workers)
-    client = AerClient()
+    client = AereoClient()
     try:
         artifacts = client.execute_tasks(task_list, backend=backend)
     except Exception as exc:
@@ -356,12 +356,12 @@ def run(
         structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(10))
 
     # Load profiles
-    profiles: list[AerProfile] = []
+    profiles: list[AereoProfile] = []
     for p in profile:
         if not p.exists():
             console.print(f"[red]Profile not found:[/red] {p}")
             raise typer.Exit(code=1)
-        profiles.extend(AerProfile.from_yaml(p))
+        profiles.extend(AereoProfile.from_yaml(p))
 
     grid_config = (
         GridConfig.from_yaml(config) if config and config.exists() else GridConfig()
@@ -371,7 +371,7 @@ def run(
     end_dt = datetime.fromisoformat(end) if end else None
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    client = AerClient()
+    client = AereoClient()
 
     # Search
     console.print("[bold blue]🔍 Searching...[/bold blue]")
@@ -453,7 +453,7 @@ def validate(
             console.print(f"[red]Profile not found:[/red] {profile}")
             raise typer.Exit(code=1)
         try:
-            AerProfile.from_yaml(profile)
+            AereoProfile.from_yaml(profile)
             console.print(f"[green]✓ Profile valid:[/green] {profile}")
         except Exception as exc:
             console.print(f"[red]✗ Profile invalid:[/red] {profile}\n{exc}")
@@ -467,9 +467,9 @@ def validate(
 @app.command()
 def plugins() -> None:
     """List installed AER plugins."""
-    from aereo.registry import AerRegistry
+    from aereo.registry import AereoRegistry
 
-    registry = AerRegistry()
+    registry = AereoRegistry()
 
     table = Table(title="Installed AER Plugins")
     table.add_column("Type", style="cyan")

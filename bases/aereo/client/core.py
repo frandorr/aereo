@@ -6,8 +6,8 @@ from typing import Any, Mapping, Optional, Sequence, cast
 import pandas as pd
 import json
 from aereo.execution.core import ExecutionBackend, LocalProcessBackend, TaskRunner
-from aereo.interfaces import AerProfile, ExtractionTask, GridConfig, merge_params
-from aereo.registry import AerRegistry
+from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig, merge_params
+from aereo.registry import AereoRegistry
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import shape
@@ -37,7 +37,7 @@ def normalize_geometry(geom: Any) -> Optional[BaseGeometry]:
     )
 
 
-class AerClient:
+class AereoClient:
     """Core external entrypoint orchestrating the Geospatial pipeline.
 
     Responsibilities:
@@ -49,16 +49,16 @@ class AerClient:
     - Implements configurable failure modes for robust real-world operation.
     """
 
-    def __init__(self, registry: Optional[AerRegistry] = None):
+    def __init__(self, registry: Optional[AereoRegistry] = None):
         """
-        Initializes the AerClient with an optional AerRegistry instance.
+        Initializes the AereoClient with an optional AereoRegistry instance.
          - If no registry is provided, a default one is instantiated.
 
         Args:
-            registry (Optional[AerRegistry]): An instance of AerRegistry to manage plugin discovery and instantiation.
-                If None, a default AerRegistry is created.
+            registry (Optional[AereoRegistry]): An instance of AereoRegistry to manage plugin discovery and instantiation.
+                If None, a default AereoRegistry is created.
         """
-        self.registry = registry or AerRegistry()
+        self.registry = registry or AereoRegistry()
 
     def _resolve_params(
         self, params: Optional[Mapping[str, Any]], collection: str
@@ -110,7 +110,7 @@ class AerClient:
         return resolved
 
     def _resolve_plugin_for_profile(
-        self, plugin_type: str, profile: AerProfile
+        self, plugin_type: str, profile: AereoProfile
     ) -> Optional[str]:
         """Resolves the appropriate plugin name for a profile.
 
@@ -123,7 +123,7 @@ class AerClient:
 
         Args:
             plugin_type: "searcher" or "extractor".
-            profile: The AerProfile to resolve a plugin for.
+            profile: The AereoProfile to resolve a plugin for.
 
         Returns:
             The resolved target plugin name, or None if no plugin is found.
@@ -160,7 +160,7 @@ class AerClient:
 
     def search(
         self,
-        profiles: Sequence[AerProfile],
+        profiles: Sequence[AereoProfile],
         intersects: Optional[BaseGeometry | dict] = None,
         start_datetime: Optional[datetime] = None,
         end_datetime: Optional[datetime] = None,
@@ -171,13 +171,13 @@ class AerClient:
         """Find data across massive sensor networks utilizing parallel Fan-Out search dispatch.
 
         Args:
-            profiles (Sequence[AerProfile]): Sequence of AerProfile objects defining what to search for.
+            profiles (Sequence[AereoProfile]): Sequence of AereoProfile objects defining what to search for.
                 Each profile carries its collections, channels, satellite, and plugin hints.
             intersects (Optional[BaseGeometry | dict]): Optional geometry to spatially filter search results.
             start_datetime (Optional[datetime]): Optional start datetime for temporal filtering.
             end_datetime (Optional[datetime]): Optional end datetime for temporal filtering.
             search_params (Optional[Mapping[str, Any]]): Meta-level parameters to pass to search plugins
-                (credentials, timeouts, etc.). Domain-specific config lives on each AerProfile.
+                (credentials, timeouts, etc.). Domain-specific config lives on each AereoProfile.
                 Per-profile ``search_params`` overrides batch-level values (profile wins).
             init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for plugin instantiation.
                 Can be a flat dict (applied to every searcher) or use collection names as top-level keys
@@ -213,7 +213,7 @@ class AerClient:
 
         # Map (plugin_name, params_key) -> (list_of_profiles, resolved_params_dict)
         execution_groups: dict[
-            tuple[str, str], tuple[list[AerProfile], Mapping[str, Any]]
+            tuple[str, str], tuple[list[AereoProfile], Mapping[str, Any]]
         ] = {}
 
         for profile in profiles:
@@ -319,7 +319,7 @@ class AerClient:
         target_aoi: Optional[BaseGeometry | dict] = None,
         resolution: Optional[float] = None,
         uri: Optional[str] = None,
-        profiles: Optional[Sequence[AerProfile]] = None,
+        profiles: Optional[Sequence[AereoProfile]] = None,
         cells_per_chunk: int = 50,
         init_params: Optional[Mapping[str, Any]] = None,
     ) -> Sequence[ExtractionTask]:
@@ -331,7 +331,7 @@ class AerClient:
             target_aoi: Optional area of interest as a shapely geometry.
             resolution: The desired resolution for extraction. If provided, a default profile is created.
             uri: An optional URI defining output path or identifier.
-            profiles: A sequence of AerProfile objects. If provided, they take precedence over resolution.
+            profiles: A sequence of AereoProfile objects. If provided, they take precedence over resolution.
             cells_per_chunk: Max grid cells per ExtractionTask (default 50).
             init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for extractor instantiation.
                 Passed as a flat dict to the extractor constructor.
@@ -351,7 +351,7 @@ class AerClient:
         if profiles:
             resolved_profiles = list(profiles)
         elif resolution is not None:
-            resolved_profiles = [AerProfile(name="default", resolution=resolution)]
+            resolved_profiles = [AereoProfile(name="default", resolution=resolution)]
         else:
             raise ValueError(
                 "Either 'profiles' or 'resolution' must be provided for extraction."
@@ -364,7 +364,7 @@ class AerClient:
             if not target_plugin:
                 # Fallback to search result collections for default/empty profiles
                 for collection in unique_collections:
-                    fallback_profile = AerProfile(
+                    fallback_profile = AereoProfile(
                         name="fallback", resolution=0, collections={str(collection): []}
                     )
                     target_plugin = self._resolve_plugin_for_profile(

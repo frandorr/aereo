@@ -5,9 +5,9 @@ import pytest
 import pandas as pd
 from shapely.geometry import Point
 
-from aereo.interfaces.core import AerProfile, ExtractionTask, GridConfig
-from aereo.registry.core import AerRegistry
-from aereo.client.core import AerClient, FailureMode, normalize_geometry
+from aereo.interfaces.core import AereoProfile, ExtractionTask, GridConfig
+from aereo.registry.core import AereoRegistry
+from aereo.client.core import AereoClient, FailureMode, normalize_geometry
 from aereo.schemas.core import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -26,7 +26,7 @@ def test_normalize_geometry_invalid():
 
 
 def test_client_search_success(monkeypatch):
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
 
     # Setup mock registry to return valid dummy data
     mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
@@ -43,9 +43,9 @@ def test_client_search_success(monkeypatch):
 
     mock_registry.get_searcher.return_value = mock_searcher
 
-    client = AerClient(registry=mock_registry)
+    client = AereoClient(registry=mock_registry)
 
-    profile = AerProfile(
+    profile = AereoProfile(
         name="modis", resolution=1000.0, collections={"MODIS": ["var1"]}
     )
 
@@ -64,7 +64,7 @@ def test_client_search_success(monkeypatch):
 
 def test_client_search_accepts_profiles(monkeypatch):
     """search() must pass profiles (not collections) to the plugin."""
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
 
     mock_searcher = MagicMock()
@@ -75,8 +75,8 @@ def test_client_search_accepts_profiles(monkeypatch):
     mock_searcher.search.return_value = valid_df
     mock_registry.get_searcher.return_value = mock_searcher
 
-    client = AerClient(registry=mock_registry)
-    profile = AerProfile(name="p1", resolution=10.0, collections={"MODIS": ["var1"]})
+    client = AereoClient(registry=mock_registry)
+    profile = AereoProfile(name="p1", resolution=10.0, collections={"MODIS": ["var1"]})
     client.search(profiles=[profile])
 
     call_kwargs = mock_searcher.search.call_args.kwargs
@@ -85,15 +85,15 @@ def test_client_search_accepts_profiles(monkeypatch):
 
 
 def test_client_search_all_fail_strict():
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
 
     mock_searcher = MagicMock()
     mock_searcher.search.side_effect = Exception("API Down")
     mock_registry.get_searcher.return_value = mock_searcher
 
-    client = AerClient(registry=mock_registry)
-    profile = AerProfile(
+    client = AereoClient(registry=mock_registry)
+    profile = AereoProfile(
         name="modis", resolution=1000.0, collections={"MODIS": ["var1"]}
     )
 
@@ -102,15 +102,15 @@ def test_client_search_all_fail_strict():
 
 
 def test_client_search_all_fail_best_effort():
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
 
     mock_searcher = MagicMock()
     mock_searcher.search.side_effect = Exception("API Down")
     mock_registry.get_searcher.return_value = mock_searcher
 
-    client = AerClient(registry=mock_registry)
-    profile = AerProfile(
+    client = AereoClient(registry=mock_registry)
+    profile = AereoProfile(
         name="modis", resolution=1000.0, collections={"MODIS": ["var1"]}
     )
 
@@ -126,11 +126,11 @@ def test_client_search_all_fail_best_effort():
 # ---------------------------------------------------------------------------
 
 
-def _make_client_with_collections(*collections: str) -> AerClient:
-    """Return an AerClient whose registry reports the given known collections."""
-    mock_registry = MagicMock(spec=AerRegistry)
+def _make_client_with_collections(*collections: str) -> AereoClient:
+    """Return an AereoClient whose registry reports the given known collections."""
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.list_supported_collections.return_value = list(collections)
-    return AerClient(registry=mock_registry)
+    return AereoClient(registry=mock_registry)
 
 
 def test_resolve_params_none_returns_empty():
@@ -209,19 +209,19 @@ def test_resolve_params_strips_other_collection_keys_case_insensitive():
 # ---------------------------------------------------------------------------
 
 
-def _make_client_for_profile_resolution() -> tuple[AerClient, MagicMock]:
-    mock_registry = MagicMock(spec=AerRegistry)
+def _make_client_for_profile_resolution() -> tuple[AereoClient, MagicMock]:
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.has_searcher.return_value = True
     mock_registry.has_extractor.return_value = True
     mock_registry.find_searchers_for.return_value = ["auto_searcher"]
     mock_registry.find_extractors_for.return_value = ["auto_extractor"]
-    client = AerClient(registry=mock_registry)
+    client = AereoClient(registry=mock_registry)
     return client, mock_registry
 
 
 def test_resolve_plugin_for_profile_uses_hint():
     client, mock_registry = _make_client_for_profile_resolution()
-    profile = AerProfile(
+    profile = AereoProfile(
         name="p1",
         resolution=10.0,
         collections={"X": ["var1"]},
@@ -234,7 +234,7 @@ def test_resolve_plugin_for_profile_uses_hint():
 
 def test_resolve_plugin_for_profile_auto_discovers():
     client, mock_registry = _make_client_for_profile_resolution()
-    profile = AerProfile(name="p1", resolution=10.0, collections={"MODIS": ["var1"]})
+    profile = AereoProfile(name="p1", resolution=10.0, collections={"MODIS": ["var1"]})
     result = client._resolve_plugin_for_profile("searcher", profile)
     assert result == "auto_searcher"
     mock_registry.find_searchers_for.assert_called_with("MODIS")
@@ -243,7 +243,7 @@ def test_resolve_plugin_for_profile_auto_discovers():
 def test_resolve_plugin_for_profile_hinted_not_registered():
     client, mock_registry = _make_client_for_profile_resolution()
     mock_registry.has_searcher.return_value = False
-    profile = AerProfile(
+    profile = AereoProfile(
         name="p1",
         resolution=10.0,
         collections={"X": ["var1"]},
@@ -256,14 +256,14 @@ def test_resolve_plugin_for_profile_hinted_not_registered():
 def test_resolve_plugin_for_profile_no_collections_returns_none():
     client, mock_registry = _make_client_for_profile_resolution()
     mock_registry.find_searchers_for.return_value = []
-    profile = AerProfile(name="p1", resolution=10.0, collections={})
+    profile = AereoProfile(name="p1", resolution=10.0, collections={})
     result = client._resolve_plugin_for_profile("searcher", profile)
     assert result is None
 
 
 def test_resolve_plugin_for_profile_extract_hint():
     client, mock_registry = _make_client_for_profile_resolution()
-    profile = AerProfile(
+    profile = AereoProfile(
         name="p1",
         resolution=10.0,
         collections={"X": ["var1"]},
@@ -281,7 +281,7 @@ def test_resolve_plugin_for_profile_extract_hint():
 
 def test_search_with_profile_plugin_hint(monkeypatch):
     """Profile-level plugin_hints['search'] should drive plugin selection."""
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.has_searcher.return_value = True
     mock_registry.find_searchers_for.return_value = []
 
@@ -293,8 +293,8 @@ def test_search_with_profile_plugin_hint(monkeypatch):
     mock_searcher.search.return_value = valid_df
     mock_registry.get_searcher.return_value = mock_searcher
 
-    client = AerClient(registry=mock_registry)
-    profile = AerProfile(
+    client = AereoClient(registry=mock_registry)
+    profile = AereoProfile(
         name="goes",
         resolution=1000.0,
         collections={"ABI-L1b-RadC": ["C01"]},
@@ -306,7 +306,7 @@ def test_search_with_profile_plugin_hint(monkeypatch):
 
 def test_search_merges_profile_search_params(monkeypatch):
     """Profile search_params should override batch search_params passed to the searcher."""
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
 
     mock_searcher = MagicMock()
@@ -317,8 +317,8 @@ def test_search_merges_profile_search_params(monkeypatch):
     mock_searcher.search.return_value = valid_df
     mock_registry.get_searcher.return_value = mock_searcher
 
-    client = AerClient(registry=mock_registry)
-    profile = AerProfile(
+    client = AereoClient(registry=mock_registry)
+    profile = AereoProfile(
         name="modis_thermal",
         resolution=1000.0,
         collections={"MOD021KM": ["var1"]},
@@ -341,7 +341,7 @@ def test_search_merges_profile_search_params(monkeypatch):
 
 def _make_prepare_client(monkeypatch, valid_search_df):
     """Return a client whose extractor mock captures prepare_for_extraction calls."""
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     monkeypatch.setattr("aereo.schemas.core.AssetSchema.validate", lambda x: x)
 
     mock_registry.has_extractor.return_value = True
@@ -351,7 +351,9 @@ def _make_prepare_client(monkeypatch, valid_search_df):
     grid_config = GridConfig(target_grid_dist=10_000)
     task = ExtractionTask(
         assets=cast(GeoDataFrame, valid_search_df),
-        profile=AerProfile(name="test", resolution=10, collections={"MODIS": ["var1"]}),
+        profile=AereoProfile(
+            name="test", resolution=10, collections={"MODIS": ["var1"]}
+        ),
         uri="test-uri",
         grid_cells=[],
         grid_config=grid_config,
@@ -359,7 +361,7 @@ def _make_prepare_client(monkeypatch, valid_search_df):
     mock_extractor.prepare_for_extraction.return_value = [task]
     mock_registry.get_extractor.return_value = mock_extractor
 
-    client = AerClient(registry=mock_registry)
+    client = AereoClient(registry=mock_registry)
     return client, mock_extractor
 
 
@@ -421,7 +423,7 @@ def test_prepare_for_extraction_requires_grid_config(monkeypatch):
 
 def test_prepare_uses_profile_extract_hint(monkeypatch):
     """prepare_for_extraction must resolve extractor from profile.plugin_hints['extract']."""
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.has_extractor.return_value = True
     mock_registry.find_extractors_for.return_value = []
     mock_extractor = MagicMock()
@@ -434,8 +436,8 @@ def test_prepare_uses_profile_extract_hint(monkeypatch):
     valid_df["geometry"] = Point(0, 0)
     valid_df["collection"] = "MODIS"
 
-    client = AerClient(registry=mock_registry)
-    profile = AerProfile(
+    client = AereoClient(registry=mock_registry)
+    profile = AereoProfile(
         name="p1",
         resolution=10.0,
         collections={"MODIS": ["var1"]},
@@ -453,7 +455,7 @@ def test_prepare_uses_profile_extract_hint(monkeypatch):
 
 def test_prepare_for_extraction_passes_extractor_hint(monkeypatch):
     """prepare_for_extraction must pass the resolved plugin name as extractor_hint."""
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.has_extractor.return_value = True
     mock_registry.find_extractors_for.return_value = ["resolved_extractor"]
     mock_extractor = MagicMock()
@@ -466,8 +468,8 @@ def test_prepare_for_extraction_passes_extractor_hint(monkeypatch):
     valid_df["geometry"] = Point(0, 0)
     valid_df["collection"] = "MODIS"
 
-    client = AerClient(registry=mock_registry)
-    profile = AerProfile(
+    client = AereoClient(registry=mock_registry)
+    profile = AereoProfile(
         name="p1",
         resolution=10.0,
         collections={"MODIS": ["var1"]},
@@ -490,15 +492,15 @@ def test_prepare_for_extraction_passes_extractor_hint(monkeypatch):
 
 def test_execute_tasks_empty():
     """execute_tasks with no tasks returns an empty GeoDataFrame."""
-    mock_registry = MagicMock(spec=AerRegistry)
-    client = AerClient(registry=mock_registry)
+    mock_registry = MagicMock(spec=AereoRegistry)
+    client = AereoClient(registry=mock_registry)
     result = client.execute_tasks([])
     assert len(result) == 0
 
 
 def test_execute_tasks_with_profile_hint(monkeypatch):
     """execute_tasks must resolve extractor from each task's profile hint."""
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.has_extractor.return_value = True
     mock_registry.find_extractors_for.return_value = []
     mock_extractor = MagicMock()
@@ -507,8 +509,8 @@ def test_execute_tasks_with_profile_hint(monkeypatch):
     mock_extractor.extract.return_value = empty_artifact_df
     mock_registry.get_extractor.return_value = mock_extractor
 
-    client = AerClient(registry=mock_registry)
-    profile = AerProfile(
+    client = AereoClient(registry=mock_registry)
+    profile = AereoProfile(
         name="goes",
         resolution=1000.0,
         collections={"ABI-L1b-RadC": ["C01"]},
@@ -532,7 +534,7 @@ def test_execute_tasks_with_profile_hint(monkeypatch):
 
 def test_execute_tasks_uses_profile_specific_downloaders(monkeypatch):
     """Tasks with different profile downloaders must be passed to extractor intact."""
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.has_extractor.return_value = True
     mock_registry.find_extractors_for.return_value = []
     mock_extractor = MagicMock()
@@ -541,19 +543,19 @@ def test_execute_tasks_uses_profile_specific_downloaders(monkeypatch):
     mock_extractor.extract.return_value = empty_artifact_df
     mock_registry.get_extractor.return_value = mock_extractor
 
-    client = AerClient(registry=mock_registry)
+    client = AereoClient(registry=mock_registry)
 
     dl_a = MagicMock()
     dl_b = MagicMock()
 
-    profile_a = AerProfile(
+    profile_a = AereoProfile(
         name="a",
         resolution=100.0,
         collections={"C1": ["var1"]},
         plugin_hints={"extract": "dummy_extractor"},
         downloader=dl_a,
     )
-    profile_b = AerProfile(
+    profile_b = AereoProfile(
         name="b",
         resolution=100.0,
         collections={"C1": ["var1"]},
@@ -591,14 +593,14 @@ def test_execute_tasks_uses_profile_specific_downloaders(monkeypatch):
 
 def test_execute_tasks_failure_mode_strict(monkeypatch):
     """STRICT failure mode raises when a task fails."""
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.has_extractor.return_value = True
     mock_extractor = MagicMock()
     mock_extractor.extract.side_effect = RuntimeError("extract failed")
     mock_registry.get_extractor.return_value = mock_extractor
 
-    client = AerClient(registry=mock_registry)
-    profile = AerProfile(
+    client = AereoClient(registry=mock_registry)
+    profile = AereoProfile(
         name="test",
         resolution=100.0,
         collections={"C1": ["var1"]},
@@ -623,14 +625,14 @@ def test_execute_tasks_failure_mode_strict(monkeypatch):
 
 def test_execute_tasks_failure_mode_best_effort(monkeypatch):
     """BEST_EFFORT failure mode returns empty GeoDataFrame when all tasks fail."""
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.has_extractor.return_value = True
     mock_extractor = MagicMock()
     mock_extractor.extract.side_effect = RuntimeError("extract failed")
     mock_registry.get_extractor.return_value = mock_extractor
 
-    client = AerClient(registry=mock_registry)
-    profile = AerProfile(
+    client = AereoClient(registry=mock_registry)
+    profile = AereoProfile(
         name="test",
         resolution=100.0,
         collections={"C1": ["var1"]},
@@ -655,7 +657,7 @@ def test_execute_tasks_failure_mode_best_effort(monkeypatch):
 
 def test_execute_tasks_best_effort_partial_results(monkeypatch):
     """BEST_EFFORT returns partial results when only some tasks fail."""
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.has_extractor.return_value = True
     mock_extractor = MagicMock()
     monkeypatch.setattr("aereo.schemas.core.ArtifactSchema.validate", lambda x: x)
@@ -669,7 +671,7 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
     mock_extractor.extract.side_effect = _extract
     mock_registry.get_extractor.return_value = mock_extractor
 
-    client = AerClient(registry=mock_registry)
+    client = AereoClient(registry=mock_registry)
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
     valid_df["geometry"] = Point(0, 0)
@@ -678,7 +680,7 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
 
     task_ok_1 = ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
-        profile=AerProfile(
+        profile=AereoProfile(
             name="ok_1",
             resolution=100.0,
             collections={"C1": ["var1"]},
@@ -690,7 +692,7 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
     )
     task_fail = ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
-        profile=AerProfile(
+        profile=AereoProfile(
             name="fail",
             resolution=100.0,
             collections={"C1": ["var1"]},
@@ -702,7 +704,7 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
     )
     task_ok_2 = ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
-        profile=AerProfile(
+        profile=AereoProfile(
             name="ok_2",
             resolution=100.0,
             collections={"C1": ["var1"]},
@@ -723,7 +725,7 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
 
 def test_execute_tasks_strict_mode_raises_on_first_failure(monkeypatch):
     """STRICT mode still raises immediately on the first failing task."""
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.has_extractor.return_value = True
     mock_extractor = MagicMock()
     monkeypatch.setattr("aereo.schemas.core.ArtifactSchema.validate", lambda x: x)
@@ -740,7 +742,7 @@ def test_execute_tasks_strict_mode_raises_on_first_failure(monkeypatch):
     mock_extractor.extract.side_effect = _extract
     mock_registry.get_extractor.return_value = mock_extractor
 
-    client = AerClient(registry=mock_registry)
+    client = AereoClient(registry=mock_registry)
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
     valid_df["geometry"] = Point(0, 0)
@@ -749,7 +751,7 @@ def test_execute_tasks_strict_mode_raises_on_first_failure(monkeypatch):
 
     task_ok = ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
-        profile=AerProfile(
+        profile=AereoProfile(
             name="ok",
             resolution=100.0,
             collections={"C1": ["var1"]},
@@ -761,7 +763,7 @@ def test_execute_tasks_strict_mode_raises_on_first_failure(monkeypatch):
     )
     task_fail = ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
-        profile=AerProfile(
+        profile=AereoProfile(
             name="fail",
             resolution=100.0,
             collections={"C1": ["var1"]},
@@ -785,7 +787,7 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
     """Profile search_params and extract_params are passed through correctly."""
     from aereo.interfaces.core import Extractor
 
-    mock_registry = MagicMock(spec=AerRegistry)
+    mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.has_searcher.return_value = True
     mock_registry.has_extractor.return_value = True
     mock_registry.find_searchers_for.return_value = ["dummy_searcher"]
@@ -802,14 +804,14 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
     mock_registry.get_searcher.return_value = mock_searcher
 
     # -- Profiles with divergent params --------------------------------------
-    profile_a = AerProfile(
+    profile_a = AereoProfile(
         name="profile_a",
         resolution=100.0,
         collections={"C1": ["var1"]},
         search_params={"version": "061", "cloud_cover": 10},
         extract_params={"calibration": "reflectance", "padding": 2},
     )
-    profile_b = AerProfile(
+    profile_b = AereoProfile(
         name="profile_b",
         resolution=100.0,
         collections={"C1": ["var1"]},
@@ -817,7 +819,7 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
         extract_params={"calibration": "radiance", "padding": 4},
     )
 
-    client = AerClient(registry=mock_registry)
+    client = AereoClient(registry=mock_registry)
 
     # -- Search phase --------------------------------------------------------
     client.search(

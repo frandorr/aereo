@@ -14,8 +14,8 @@ from aereo.execution.core import (
     ThreadBackend,
 )
 from aereo.gdal_env import configure_gdal, setup_gdal_worker
-from aereo.interfaces.core import AerProfile, ExtractionTask, GridConfig
-from aereo.registry.core import AerRegistry
+from aereo.interfaces.core import AereoProfile, ExtractionTask, GridConfig
+from aereo.registry.core import AereoRegistry
 from aereo.schemas.core import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -26,7 +26,7 @@ from pandera.typing.geopandas import GeoDataFrame
 
 
 def _make_task(
-    profile: AerProfile | None = None,
+    profile: AereoProfile | None = None,
     task_context: dict[str, Any] | None = None,
 ) -> ExtractionTask:
     """Return a minimal ExtractionTask for testing."""
@@ -38,7 +38,7 @@ def _make_task(
     grid_config = GridConfig(target_grid_dist=50_000)
     return ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
-        profile=profile or AerProfile(name="test", resolution=100.0),
+        profile=profile or AereoProfile(name="test", resolution=100.0),
         uri="test-uri",
         grid_cells=[],
         grid_config=grid_config,
@@ -47,8 +47,8 @@ def _make_task(
 
 
 def _make_mock_registry() -> MagicMock:
-    """Return a MagicMock configured like an AerRegistry."""
-    mock = MagicMock(spec=AerRegistry)
+    """Return a MagicMock configured like an AereoRegistry."""
+    mock = MagicMock(spec=AereoRegistry)
     mock.has_extractor.return_value = True
     mock.find_extractors_for.return_value = []
     return mock
@@ -83,7 +83,7 @@ def test_task_runner_falls_back_to_profile_hint():
     mock_registry.get_extractor.return_value = mock_extractor
 
     runner = TaskRunner(registry=mock_registry)
-    profile = AerProfile(
+    profile = AereoProfile(
         name="test",
         resolution=100.0,
         plugin_hints={"extract": "profile_hinted"},
@@ -105,7 +105,7 @@ def test_task_runner_auto_discovers_from_collections():
     mock_registry.get_extractor.return_value = mock_extractor
 
     runner = TaskRunner(registry=mock_registry)
-    profile = AerProfile(
+    profile = AereoProfile(
         name="test",
         resolution=100.0,
         collections={"C1": ["var1"]},
@@ -125,7 +125,7 @@ def test_task_runner_raises_when_no_extractor_found():
     mock_registry.find_extractors_for.return_value = []
 
     runner = TaskRunner(registry=mock_registry)
-    profile = AerProfile(
+    profile = AereoProfile(
         name="orphan",
         resolution=100.0,
         collections={"C1": ["var1"]},
@@ -144,7 +144,7 @@ def test_task_runner_merges_profile_extract_params():
     mock_registry.get_extractor.return_value = mock_extractor
 
     runner = TaskRunner(registry=mock_registry)
-    profile = AerProfile(
+    profile = AereoProfile(
         name="test",
         resolution=100.0,
         plugin_hints={"extract": "dummy"},
@@ -258,7 +258,7 @@ def test_local_backend_parallel_with_multiple_tasks():
 
 def test_local_backend_parallel_with_callable_downloader():
     """ProcessPoolExecutor works when tasks contain live callable downloaders."""
-    from aereo.interfaces.core import AerProfile
+    from aereo.interfaces.core import AereoProfile
 
     def my_dl(url: str, path: Path) -> None:
         pass
@@ -273,7 +273,7 @@ def test_local_backend_parallel_with_callable_downloader():
 
     tasks = [
         _make_task(
-            profile=AerProfile(
+            profile=AereoProfile(
                 name="p1",
                 resolution=100.0,
                 downloader=my_dl,  # pyright: ignore[reportArgumentType]
@@ -281,7 +281,7 @@ def test_local_backend_parallel_with_callable_downloader():
             task_context={"test_idx": 0},
         ),
         _make_task(
-            profile=AerProfile(
+            profile=AereoProfile(
                 name="p2",
                 resolution=100.0,
                 downloader=lambda url, path: None,  # pyright: ignore[reportArgumentType]

@@ -14,7 +14,7 @@ import pytest
 from shapely.geometry import Polygon
 
 from aereo.execution.backends import LambdaBackend, RetryableLambdaError
-from aereo.interfaces.core import AerProfile, ExtractionTask, GridConfig
+from aereo.interfaces.core import AereoProfile, ExtractionTask, GridConfig
 from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -25,7 +25,7 @@ from pandera.typing.geopandas import GeoDataFrame
 
 
 def _make_task(
-    profile: AerProfile | None = None,
+    profile: AereoProfile | None = None,
     task_context: dict[str, Any] | None = None,
 ) -> ExtractionTask:
     """Return a minimal ExtractionTask for testing."""
@@ -46,7 +46,7 @@ def _make_task(
     grid_config = GridConfig(target_grid_dist=50_000)
     return ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
-        profile=profile or AerProfile(name="test", resolution=100.0),
+        profile=profile or AereoProfile(name="test", resolution=100.0),
         uri="test-uri",
         grid_cells=[],
         grid_config=grid_config,

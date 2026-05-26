@@ -2,7 +2,7 @@
 # 02_goes_mosaic_plot.py
 # GOES-19 ABI workflow: search, extract, mosaic and plot.
 #
-# Common AerProfile pitfalls (documented inline):
+# Common AereoProfile pitfalls (documented inline):
 #   1. Forgetting search_params={"satellite": "GOES-19"} → search returns empty or wrong satellite.
 #   2. Forgetting extract_params["reader"] → satpy raises ReaderNotAvailable.
 
@@ -15,10 +15,10 @@ import numpy as np
 from pyproj import Transformer
 from shapely.ops import transform as shapely_transform
 
-from aereo.client import AerClient
+from aereo.client import AereoClient
 from aereo.eoids import mosaic_eoids_tiles, scan_eoids_dir
 from aereo.execution import LocalProcessBackend
-from aereo.interfaces import AerProfile, GridConfig
+from aereo.interfaces import AereoProfile, GridConfig
 
 # --- Configuration ---
 DATE_START = datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc)
@@ -37,13 +37,13 @@ aoi = gdf.geometry.iloc[0]
 
 # %%
 # Load shared profiles and grid config from YAML.
-all_profiles = {p.name: p for p in AerProfile.from_yaml(data_dir / "profiles.yaml")}
+all_profiles = {p.name: p for p in AereoProfile.from_yaml(data_dir / "profiles.yaml")}
 grid = GridConfig.from_yaml(data_dir / "grid_config.yaml")
 
 profiles = [all_profiles["goes_c02"]]
 
 # --- Client Setup ---
-client = AerClient()
+client = AereoClient()
 print("Searching...", flush=True)
 results = client.search(
     profiles=profiles,
