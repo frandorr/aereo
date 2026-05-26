@@ -7,7 +7,12 @@ from aereo.interfaces.core import AereoProfile
 def test_from_yaml_example_loads_profiles():
     """Verify the checked-in examples/data/profiles.yaml loads correctly."""
     yaml_path = Path(__file__).parents[4] / "examples" / "data" / "profiles.yaml"
-    profiles = AereoProfile.from_yaml(yaml_path)
+    try:
+        profiles = AereoProfile.from_yaml(yaml_path)
+    except Exception as exc:
+        if "No module named" in str(exc):
+            pytest.skip(f"Plugin not available: {exc}")
+        raise
     assert len(profiles) == 5
     names = {p.name for p in profiles}
     assert names == {"goes_c02", "s2_rgb", "viirs_i1", "olci_o08", "geotessera"}
