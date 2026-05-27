@@ -37,5 +37,8 @@ tasks = client.prepare_for_extraction(
     uri="/tmp/01_minimal_goes_out",
 )
 
-client.execute_tasks(tasks)
+results_df = client.execute_tasks(tasks)
 print("GeoTIFFs written to /tmp/01_minimal_goes_out")
+# %%
+# import rioxarray
+# rioxarray.open_rasterio(results_df.iloc[0].uri).plot()

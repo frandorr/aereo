@@ -1,28 +1,14 @@
 # ruff: noqa: E402
 # %%
-# 02_goes_mosaic_plot.py
-# GOES-19 ABI workflow: search, extract, mosaic and plot.
-#
-# Common AereoProfile pitfalls (documented inline):
-#   1. Forgetting search_params={"satellite": "GOES-19"} → search returns empty or wrong satellite.
-#   2. Forgetting extract_params["reader"] → satpy raises ReaderNotAvailable.
 
 from datetime import datetime, timezone
 from pathlib import Path
 
 import geopandas as gpd
-import matplotlib.pyplot as plt
-import numpy as np
-from pyproj import Transformer
-from shapely.ops import transform as shapely_transform
-
+from aereo.backends import (
+    LocalProcessBackend,  # we are going to use an explicit backend this time
+)
 from aereo.client import AereoClient
-import sys
-
-_helpers = Path(__file__).resolve().parents[1] / "helpers"
-sys.path.insert(0, str(_helpers))
-from eoids import mosaic_eoids_tiles, scan_eoids_dir
-from aereo.execution import LocalProcessBackend
 from aereo.interfaces import AereoProfile, GridConfig
 
 # --- Configuration ---
@@ -40,7 +26,6 @@ geojson_path = data_dir / "chocon.geojson"
 gdf = gpd.read_file(geojson_path)
 aoi = gdf.geometry.iloc[0]
 
-# %%
 # Load shared profiles and grid config from YAML.
 all_profiles = {p.name: p for p in AereoProfile.from_yaml(data_dir / "profiles.yaml")}
 grid = GridConfig.from_yaml(data_dir / "grid_config.yaml")
@@ -48,13 +33,11 @@ grid = GridConfig.from_yaml(data_dir / "grid_config.yaml")
 profiles = [all_profiles["goes_c02"]]
 
 # --- Client Setup ---
-# cells_per_task=1 keeps the example fast and lightweight.
 client = AereoClient(
     profiles=profiles,
     grid_config=grid,
     aoi=aoi,
     backend=LocalProcessBackend(max_workers=4),
-    cells_per_task=1,
 )
 
 print("Searching...", flush=True)
@@ -64,58 +47,17 @@ results = client.search(
 )
 print(results[["collection", "start_time", "end_time"]].to_string())
 
-# %%
-# Prepare extraction tasks using the same profiles.
 
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
     uri=URI,
+    cells_per_task=4,
 )
 
-print(f"Prepared {len(tasks)} extraction tasks", flush=True)
-print("Extracting...", flush=True)
 
 results_df = client.execute_tasks(tasks)
 print(f"Extracted {len(results_df)} artifacts")
-
 # %%
-# --- Mosaic & plot extracted artifacts ---
-# Discover unique collections that were actually extracted
-entries = scan_eoids_dir(URI)
-collections = sorted({e["collection"] for e in entries})
-print(f"Collections to mosaic: {collections}")
+# import rioxarray
 
-mosaic, transform, crs = mosaic_eoids_tiles(URI, collection=collections[0])
-
-fig, ax = plt.subplots(figsize=(8, 6))
-band = mosaic[0]
-valid = band[(band != 0) & np.isfinite(band)]
-vmin, vmax = valid.min(), valid.max()
-
-im = ax.imshow(
-    band,
-    extent=(
-        transform.c,
-        transform.c + transform.a * mosaic.shape[2],
-        transform.f + transform.e * mosaic.shape[1],
-        transform.f,
-    ),
-    vmin=vmin,
-    vmax=vmax,
-    cmap="Greys_r",
-)
-
-# Reproject AOI boundary to mosaic CRS and overlay it
-transformer = Transformer.from_crs("EPSG:4326", crs, always_xy=True)
-aoi_projected = shapely_transform(transformer.transform, aoi)
-xs, ys = aoi_projected.exterior.xy
-ax.plot(xs, ys, color="red", linewidth=2, label="AOI boundary")
-
-ax.legend(loc="upper right")
-fig.colorbar(im, ax=ax, shrink=0.6, label="Reflectance")
-ax.set_title(f"GOES-19 C02 @ 1000 m – {collections[0]}")
-ax.set_xlabel("Longitude")
-ax.set_ylabel("Latitude")
-plt.tight_layout()
-plt.savefig("/tmp/02_goes_mosaic_plot.png", dpi=150)
-print("Saved mosaic to /tmp/02_goes_mosaic_plot.png")
+# rioxarray.open_rasterio(results_df.iloc[0].uri).plot()

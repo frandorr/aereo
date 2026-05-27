@@ -24,6 +24,7 @@ dependencies = [
   "majortom-eg",
   "netcdf4>=1.7.4",
   "numpy",
+  "obstore>=0.9.3",
   "odc-geo>=0.5.1",
   "odc-stac>=0.5.2",
   "pandas>=3.0.1",
