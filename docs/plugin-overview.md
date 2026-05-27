@@ -222,4 +222,4 @@ my_extractor = "my_package.extraction:MyExtractor"
 > [!IMPORTANT]
 > **Workspace Discovery Root**: In a Polylith development environment, `importlib.metadata` reads discovery metadata from the package currently installed in the environment. If you add a new plugin to a `projects/` sub-package but **do not** add it to the root `pyproject.toml`, it will be missing during development. Always mirror your plugin entry points in the root configuration during active development.
 
-To learn how to build and expose your own custom search providers and extractors natively, see [Build Your Own Plugin](./build-your-own-plugin.md).
+To learn how to build and expose your own custom search providers and extractors natively, see [Build Your First Plugin](build-first-plugin.md).

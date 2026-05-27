@@ -47,7 +47,7 @@ When adding new functionality, prefer creating or extending a component in `comp
 
 Collection name matching is **case-insensitive** — `"abi-l1b-radf"` and `"ABI-L1b-RadF"` both resolve to the same plugin.
 
-To learn how to implement the code for a search provider or extractor, read [Build Your Own Plugin](../build-your-own-plugin.md).
+To learn how to implement the code for a search provider or extractor, read [Build Your First Plugin](../build-first-plugin.md).
 
 ## hatch-polylith-bricks Dev Mode
 
@@ -58,7 +58,7 @@ AEREO uses `hatch-polylith-bricks` to bundle bricks during an editable install. 
 build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", "." ]
 ```
 
-If you are developing a plugin simultaneously with the `aereo` core framework on the same machine and notice that `uv sync` masks your local source edits, see the [Troubleshooting section in Build Your Own Plugin](../build-your-own-plugin.md#troubleshooting-local-development-alongside-aereo) for how to align `build.dev-mode-dirs` across both packages.
+If you are developing a plugin simultaneously with the `aereo` core framework on the same machine and notice that `uv sync` masks your local source edits, see the [Local Development section in Advanced Plugin Patterns](../plugin-advanced.md#local-development-alongside-aereo) for how to align `build.dev-mode-dirs` across both packages.
 
 ## Running Tests
 
@@ -79,4 +79,4 @@ uv run ruff check .
 ## Next Steps
 
 - Read the [Contributing Guidelines](../contributing.md) for issue reporting, conventional commits, and the pull-request process.
-- Explore [Build Your Own Plugin](../build-your-own-plugin.md) to create a new plugin.
+- Explore [Build Your First Plugin](../build-first-plugin.md) to create a new plugin.
