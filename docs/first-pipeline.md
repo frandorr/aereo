@@ -55,6 +55,12 @@ results = client.search(
 print(f"Found {len(results)} assets")
 ```
 
+> [!TIP]
+> **Search returns empty?** Check these three things:
+> 1. **Collection name** — Collection names are case-sensitive. `ABI-L1B-RADF` is wrong; `ABI-L1b-RadF` is correct. `sentinel-2-l1c` is wrong; `sentinel-2-l2a` is correct.
+> 2. **`search_params`** — GOES ABI requires `search_params={"satellite": "GOES-19"}` (or `GOES-18`, `GOES-16`). Without it, the search plugin may return results for the wrong satellite or nothing at all.
+> 3. **Date range** — Some sensors have infrequent revisit times. A 10-minute window may contain zero granules. Try widening to a few hours or a full day.
+
 ## 4. Prepare
 
 Turn search results into extraction tasks. AEREO builds a grid over your AOI and chunks everything into parallelizable tasks.

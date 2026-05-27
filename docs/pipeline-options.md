@@ -220,3 +220,34 @@ See [Output Formats](output-formats.md) for the full directory layout and mosaic
 ### Gotcha: plugin-specific errors surface here
 
 If a granule is missing, a band is unsupported, or a download times out, the error usually appears during `execute_tasks()`, not `search()` or `prepare_for_extraction()`. Use `failure_mode=BEST_EFFORT` to skip bad granules and keep the rest, or wrap the call in your own retry logic. The `LocalProcessBackend` uses `ProcessPoolExecutor` — exceptions in worker processes are captured and re-raised (or logged) by the client.
+
+> [!TIP]
+> **Extraction fails with `ReaderNotAvailable`?** Satpy-based extractors need a `reader` in `extract_params`:
+> | Sensor | Reader |
+> |--------|--------|
+> | GOES ABI | `abi_l1b` |
+> | VIIRS | `viirs_l1b` |
+> | Sentinel-3 OLCI | `olci_l1b` |
+>
+> ```python
+> AereoProfile(
+>     ...,
+>     extract_params={"reader": "abi_l1b", "calibration": "reflectance"},
+> )
+> ```
+
+> [!TIP]
+> **NASA Earthdata assets fail with HTTP 401?** NASA Earthdata URLs are behind URS authentication. Add the Earthdata downloader to your profile:
+> ```python
+> AereoProfile(
+>     ...,
+>     downloader="aereo.search_earthaccess.earthaccess_download_wrapper",
+> )
+> ```
+
+> [!TIP]
+> **Out of memory during extraction?** Large mosaics or high-resolution extractions can exhaust RAM. Try:
+> - Reduce `cells_per_chunk` (e.g., `1` instead of `50`).
+> - Reduce `max_workers` (e.g., `1` instead of `8`).
+> - Use a smaller AOI or coarser `target_grid_dist`.
+> - Process one profile at a time instead of multiple sensors in parallel.
