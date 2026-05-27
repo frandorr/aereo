@@ -1,9 +1,8 @@
-"""Concrete TaskStaging implementation for S3 and Cloud backends."""
+"""Concrete TaskStaging implementation for S3 and cloud object storage."""
 
 from __future__ import annotations
 
 import json
-import logging
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -12,12 +11,23 @@ import geopandas as gpd
 from aereo.interfaces import TaskStaging
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
+from structlog import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
 
 
 def _parse_s3_uri(uri: str) -> tuple[str, str]:
-    """Split an s3:// URI into (bucket, key)."""
+    """Split an s3:// URI into (bucket, key).
+
+    Args:
+        uri: A valid S3 URI starting with ``s3://``.
+
+    Returns:
+        A 2-tuple of ``(bucket, key)``.
+
+    Raises:
+        ValueError: If *uri* does not start with ``s3://``.
+    """
     if not uri.startswith("s3://"):
         raise ValueError(f"Invalid S3 URI: {uri}")
     parts = uri[5:].split("/", 1)
@@ -27,11 +37,26 @@ def _parse_s3_uri(uri: str) -> tuple[str, str]:
 
 
 class CloudTaskStaging(TaskStaging):
-    """Staging helper that uploads/downloads tasks and artifacts to AWS S3 (and GCS in the future)."""
+    """Staging helper that uploads and downloads tasks and artifacts to AWS S3.
+
+    GCS support is planned but not yet implemented.
+    """
 
     def __init__(
         self, bucket: str, provider: str = "s3", endpoint_url: str | None = None
     ) -> None:
+        """Create a new CloudTaskStaging instance.
+
+        Args:
+            bucket: Name of the S3 bucket to use.
+            provider: Cloud provider. Only ``"s3"`` is supported; ``"gcs"`` raises
+                :class:`NotImplementedError`.
+            endpoint_url: Optional custom endpoint URL (e.g. for LocalStack).
+
+        Raises:
+            ValueError: If *provider* is not ``"s3"`` or ``"gcs"``.
+            NotImplementedError: If *provider* is ``"gcs"``.
+        """
         if provider not in ("s3", "gcs"):
             raise ValueError(f"Unsupported provider: {provider}")
         if provider == "gcs":
@@ -43,7 +68,16 @@ class CloudTaskStaging(TaskStaging):
         self._s3: Any | None = None
 
     def _client(self) -> Any:
-        """Lazy boto3 S3 client (refreshed every call to avoid expired creds)."""
+        """Return a lazily-initialised boto3 S3 client.
+
+        The client is recreated on every call to avoid expired credentials.
+
+        Returns:
+            A boto3 S3 client object.
+
+        Raises:
+            ImportError: If ``boto3`` is not installed.
+        """
         try:
             import boto3  # pyright: ignore[reportMissingImports]
         except ImportError as exc:
@@ -55,24 +89,53 @@ class CloudTaskStaging(TaskStaging):
         return self._s3
 
     def stage(self, src_dir: Path, job_id: str, task_idx: int) -> str:
-        """Upload serialized task files to S3 and return the task URI."""
+        """Upload serialized task files to S3.
+
+        Args:
+            src_dir: Local directory containing the serialized task files.
+            job_id: Identifier for the parent job.
+            task_idx: Index of the task within the job.
+
+        Returns:
+            The S3 URI prefix where the files were uploaded.
+        """
         s3 = self._client()
         prefix = f"aereo-tasks/{job_id}/{task_idx}/"
         for file in Path(src_dir).iterdir():
             if file.is_file():
                 key = f"{prefix}{file.name}"
                 logger.debug(
-                    "staging_upload", extra={"bucket": self.bucket, "key": key}
+                    "staging_upload",
+                    bucket=self.bucket,
+                    key=key,
                 )
                 s3.upload_file(str(file), self.bucket, key)
         return f"s3://{self.bucket}/{prefix}"
 
     def result_prefix(self, job_id: str, task_idx: int) -> str:
-        """Return the S3 URI prefix where the remote worker should write results."""
+        """Return the S3 URI prefix where the remote worker should write results.
+
+        Args:
+            job_id: Identifier for the parent job.
+            task_idx: Index of the task within the job.
+
+        Returns:
+            An S3 URI prefix ending with ``/``.
+        """
         return f"s3://{self.bucket}/results/{job_id}/{task_idx}/"
 
     def load_artifacts(self, manifest_uri: str) -> GeoDataFrame[ArtifactSchema]:
-        """Download a manifest and its referenced artifacts from S3."""
+        """Download a manifest and its referenced artifacts from S3.
+
+        Args:
+            manifest_uri: S3 URI of the manifest JSON file.
+
+        Returns:
+            A ``GeoDataFrame[ArtifactSchema]`` containing the downloaded artifacts.
+
+        Raises:
+            ValueError: If the manifest is missing the ``artifacts_uri`` key.
+        """
         s3 = self._client()
         bucket, key = _parse_s3_uri(manifest_uri)
 
@@ -100,7 +163,12 @@ class CloudTaskStaging(TaskStaging):
     ) -> dict[str, str]:
         """Upload artifacts and a manifest to S3.
 
-        Returns a dict with ``manifest_uri`` pointing at the uploaded manifest.
+        Args:
+            artifacts: GeoDataFrame containing the artifacts to upload.
+            output_prefix: S3 URI prefix where files should be written.
+
+        Returns:
+            A dict with ``manifest_uri`` pointing at the uploaded manifest.
         """
         s3 = self._client()
         bucket, prefix = _parse_s3_uri(output_prefix)
