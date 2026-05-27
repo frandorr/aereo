@@ -3,7 +3,7 @@ from typing import Any, Mapping, Sequence, cast
 from unittest.mock import MagicMock
 
 import pytest
-from aereo.interfaces import ExtractionTask, Extractor, SearchProvider
+from aereo.interfaces import ExtractionTask, Extractor, PluginParam, SearchProvider
 from aereo.registry import AereoRegistry
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -13,6 +13,12 @@ from shapely.geometry.base import BaseGeometry
 # Dummy plugins
 class DummySearchProvider(SearchProvider):
     supported_collections = ["DummyCollection1", "SharedCollection"]
+    required_params = (
+        PluginParam(name="bbox", type="str", description="Bounding box"),
+    )
+    optional_params = (
+        PluginParam(name="limit", type="int", description="Result limit", default=10),
+    )
 
     def search(
         self,
@@ -27,6 +33,14 @@ class DummySearchProvider(SearchProvider):
 
 class DummyExtractor(Extractor):
     supported_collections = ["SharedCollection", "DummyCollection2"]
+    required_params = (
+        PluginParam(name="output_dir", type="path", description="Output directory"),
+    )
+    optional_params = (
+        PluginParam(
+            name="compress", type="bool", description="Compress output", default=False
+        ),
+    )
 
     @property
     def target_grid_d(self) -> int:
@@ -194,3 +208,77 @@ def test_get_collection_mapping_for_extractor(mock_entry_points):
         "dummy_extractor", ["DUMMYCOLLECTION2"]
     )
     assert result == ["DummyCollection2"]
+
+
+def test_get_plugin_params_detailed(mock_entry_points):
+    """Test get_plugin_params returns full metadata when detailed=True."""
+    registry = AereoRegistry()
+
+    params = registry.get_plugin_params("dummy_searcher", detailed=True)
+    assert len(params["required"]) == 1
+    assert params["required"][0]["name"] == "bbox"
+    assert "type" in params["required"][0]
+    assert "description" in params["required"][0]
+
+    assert len(params["optional"]) == 1
+    assert params["optional"][0]["name"] == "limit"
+    assert params["optional"][0]["default"] == 10
+    assert "type" in params["optional"][0]
+
+
+def test_get_plugin_params_not_detailed(mock_entry_points):
+    """Test get_plugin_params returns only name and default when detailed=False."""
+    registry = AereoRegistry()
+
+    params = registry.get_plugin_params("dummy_searcher", detailed=False)
+    assert len(params["required"]) == 1
+    assert params["required"][0] == {"name": "bbox", "default": None}
+
+    assert len(params["optional"]) == 1
+    assert params["optional"][0] == {"name": "limit", "default": 10}
+
+    # Ensure no extra keys are present
+    assert set(params["required"][0].keys()) == {"name", "default"}
+    assert set(params["optional"][0].keys()) == {"name", "default"}
+
+
+def test_list_all_params_detailed(mock_entry_points):
+    """Test list_all_params returns full metadata when detailed=True."""
+    registry = AereoRegistry()
+
+    all_params = registry.list_all_params(detailed=True)
+    assert "dummy_searcher" in all_params
+    assert "dummy_extractor" in all_params
+
+    searcher = all_params["dummy_searcher"]
+    assert searcher["type"] == "search"
+    assert len(searcher["required"]) == 1
+    assert searcher["required"][0]["name"] == "bbox"
+    assert "description" in searcher["required"][0]
+
+
+def test_list_all_params_not_detailed(mock_entry_points):
+    """Test list_all_params returns only name and default when detailed=False."""
+    registry = AereoRegistry()
+
+    all_params = registry.list_all_params(detailed=False)
+    assert "dummy_searcher" in all_params
+    assert "dummy_extractor" in all_params
+
+    extractor = all_params["dummy_extractor"]
+    assert extractor["type"] == "extract"
+    assert len(extractor["required"]) == 1
+    assert extractor["required"][0] == {"name": "output_dir", "default": None}
+    assert set(extractor["required"][0].keys()) == {"name", "default"}
+
+    assert len(extractor["optional"]) == 1
+    assert extractor["optional"][0] == {"name": "compress", "default": False}
+    assert set(extractor["optional"][0].keys()) == {"name", "default"}
+
+
+def test_get_plugin_params_unknown_plugin(mock_entry_points):
+    """Test get_plugin_params raises for unknown plugin."""
+    registry = AereoRegistry()
+
+    with pytest.raises(KeyError, match="Unknown plugin"):
+        registry.get_plugin_params("nonexistent_plugin")
