@@ -28,21 +28,21 @@ In the `aereo` ecosystem, a plugin is typically composed of:
 ## When to Use This Skill
 
 - When a user asks to "create a new plugin", "scaffold a plugin", or "generate a new search plugin".
-- When a user wants to extend the capabilities of `aereo` with a new instrument, transformation, or integration.
+- When a user wants to extend the capabilities of `aereo` with a Search or Extraction plugin.
 
 ## Core Workflow
 
 ### 1. Determine Plugin Type
 
-Ask the user (or infer from context) what type of plugin they need:
+Ask the user (or infer from context) what type of plugin they need, interfaces located at aereo/components/aereo/interfaces/core.py, schemas in aereo/components/aereo/schemas/core.py:
 
 | Type | Base Class | Method(s) to implement | Typical use case |
 |------|-----------|------------------------|------------------|
 | **Search** | `SearchProvider` | `search()` | Discovering datasets/assets (STAC, CMR, API, etc.) |
 | **Extract** | `Extractor` | `extract()` | Processing/searching assets into raster artifacts (GeoTIFF, netCDF, etc.) |
 
-- Search plugins return a `GeoDataFrame[AssetSchema]` with `id`, `collection`, `geometry`, `start_time`, `end_time`, `href`.
-- Extract plugins receive an `ExtractionTask` and return a `GeoDataFrame[ArtifactSchema]` with raster output paths and grid metadata.
+- Search plugins implements "search" method and return a `GeoDataFrame[AssetSchema]`
+- Extract plugins implements extract (and optionally prepare_for_extraction) and return a `GeoDataFrame[ArtifactSchema]` with raster output paths and grid metadata.
 
 ### 2. Gather Reference Plugins as Context
 
@@ -71,16 +71,16 @@ Before writing any code, **read existing plugins** to learn patterns, convention
   - Component: `components/aereo/extract_satpy/core.py`
 
 Also read the base classes to understand the exact signatures:
-- `aer/components/aereo/interfaces/core.py` — `SearchProvider`, `Extractor`, `AerProfile`, `ExtractionTask`, `GridConfig`
-- `aer/components/aereo/schemas/core.py` — `AssetSchema`, `ArtifactSchema`
+- `aereo/components/aereo/interfaces/core.py` — `SearchProvider`, `Extractor`, `AereoProfile`, `ExtractionTask`, `GridConfig`
+- `aereo/components/aereo/schemas/core.py` — `AssetSchema`, `ArtifactSchema`
 
 ### 3. Bootstrap from the Template
 
 **Do NOT create files manually.** Instead, create a new repository from the template:
 
 ```bash
-git clone https://github.com/frandorr/aereo-plugin-template.git aer-<type>-<name>
-cd aer-<type>-<name>
+git clone https://github.com/frandorr/aereo-plugin-template.git aereo-<type>-<name>
+cd aereo-<type>-<name>
 rm -rf .git
 ```
 
@@ -92,7 +92,7 @@ chmod +x setup.sh
 ```
 
 The script will:
-1. Validate the project name starts with `aer-`.
+1. Validate the project name starts with `aereo-`.
 2. Install `uv` (if missing) and sync dependencies.
 3. Create the Polylith **component** and **project**.
 4. Generate `core.py` with the correct base class (`SearchProvider` or `Extractor`).
@@ -103,7 +103,7 @@ The script will:
 Open the generated `components/aereo/<component_name>/core.py` and implement the required methods using the reference plugins as inspiration.
 
 **Key conventions:**
-- Always set `supported_collections: Sequence[str] = ["*"]` (or a specific list).
+- For every plugins, always set `supported_collections: Sequence[str] = ["*"]` (or a specific list) and recommend adding params metadata with `required_params` and `optional_params`. Those will be used by the plugin manager to validate and document the plugin's parameters and give helpful hints to the user.
 - For search: return an empty-but-valid GeoDataFrame via `self._empty_result()` when there are no matches.
 - For extract: read tiling params from `extraction_task.grid_config` and `extraction_task.profile`. Do not hard-code defaults.
 - Use `structlog.get_logger()` for logging.
@@ -132,11 +132,10 @@ uv add <package-name>
 ### MUST DO
 - Always start from `aereo-plugin-template` and run `setup.sh`.
 - Always read at least one reference plugin before implementing.
-- Always read `aer/components/aereo/interfaces/core.py` to confirm current base-class signatures.
+- Always read `aereo/components/aereo/interfaces/core.py` and `aereo/components/aereo/schemas/core.py` to confirm current base-class and schema signatures.
 - Request clarification if the plugin type (search vs extract) or name is ambiguous.
 - Ensure the user runs `uv sync` after scaffolding.
 
 ### MUST NOT DO
 - Do NOT manually create components with raw `mkdir` or `cat`.
 - Do NOT manually edit `pyproject.toml` entry points; let `setup.sh` handle it.
-- Do NOT use the old `@hookimpl` / pluggy patterns (deprecated).
