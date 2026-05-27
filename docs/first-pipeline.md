@@ -7,6 +7,8 @@ redirect_from: quickstart.md
 
 Get from zero to your first extracted satellite image in under 5 minutes.
 
+AEREO's entire user experience is built around three `AereoClient` methods: `search()`, `prepare_for_extraction()`, and `execute_tasks()`. This tutorial walks you through each one with a single sensor. For the full parameter reference and advanced patterns, see [Pipeline Options](pipeline-options.md).
+
 ## 1. Install
 
 Install AEREO and the GOES plugins (public S3, no authentication required):
@@ -74,7 +76,11 @@ print(f"Prepared {len(tasks)} extraction tasks")
 Run the extraction. Each task is handed to the extractor plugin, which downloads granules, resamples to the target grid, and writes GeoTIFFs.
 
 ```python
-client.execute_tasks(tasks)
+from aereo.execution import LocalProcessBackend
+
+backend = LocalProcessBackend(max_workers=4)
+artifacts = client.execute_tasks(tasks, backend=backend)
+print(f"Extracted {len(artifacts)} artifacts")
 ```
 
 ## 6. Verify
@@ -85,7 +91,7 @@ Open your output directory (`./out/`) and look for `.tif` files. You now have an
 
 ## Next Steps
 
-- Explore more sensors in [Examples Gallery](examples-gallery.md) and [Install](install.md)
+- Explore more sensors in [Examples Gallery](examples-gallery.md) and [How Plugins Work](plugin-overview.md)
 - Understand grid options in [Working with Grids](grids.md)
 - Prefer the command line? See the [CLI Recipes](cli-recipes.md)
 - Learn advanced pipeline options in [Pipeline Options](pipeline-options.md)

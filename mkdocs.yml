@@ -181,6 +181,7 @@ nav:
     - Search and Extract:
           - Install: install.md
           - Your First Pipeline: first-pipeline.md
+          - Pipeline Options: pipeline-options.md
           - Working with Grids: grids.md
           - Output Formats: output-formats.md
           - CLI Recipes: cli-recipes.md
