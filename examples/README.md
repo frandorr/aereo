@@ -258,7 +258,7 @@ All sample AOIs are in the `data/` directory and shared across examples:
 
 ## EOIDS Output Structure
 
-Extracted data follows the [Earth Observation Imaging Data Structure](../eoids.md) convention:
+Extracted data follows the [Earth Observation Imaging Data Structure](../output-formats.md) convention:
 
 ```
 extract_buenos_aires_viirs/

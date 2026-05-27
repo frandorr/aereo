@@ -29,4 +29,4 @@ For run commands, disk-space estimates, common `AereoProfile` errors and fixes, 
 
 ## Quick start
 
-If you are new to AEREO, start with the [Quick Start](quickstart.md) guide for a complete copy-paste example.
+If you are new to AEREO, start with [Your First Pipeline](first-pipeline.md) for a complete copy-paste example.

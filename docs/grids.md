@@ -126,3 +126,36 @@ The coverage heatmap below shows the exact overlap fraction for every cell. Gree
 ![Cell coverage percentages](assets/grid_filter_coverage_detail.png)
 
 For an interactive demonstration with real satellite data, see the [Grid Filtering Modes notebook](https://github.com/frandorr/aereo/blob/main/examples/grid/grid_filter_modes_demo.ipynb).
+
+---
+
+## Troubleshooting
+
+### Grid cell size looks wrong
+
+The default `target_grid_dist` is 256 km. If your AOI is a small city, a 256 km cell will include a lot of surrounding area.
+
+**Fix:** Use a smaller cell size:
+
+```python
+GridConfig(target_grid_dist=50_000)  # 50 km cells
+```
+
+Remember: `target_grid_dist` controls the **cell** size in metres, while `profile.resolution` controls the **pixel** size in metres. A 256 km cell at 500 m resolution is roughly a 512 × 512 pixel tile.
+
+### CRS mismatch between adjacent cells
+
+Each grid cell is naturally projected to its local UTM zone. Adjacent cells may have different CRSs. When you mosaic them, AEREO reprojects everything to a common CRS, but if you open individual cells manually, expect varying CRS values.
+
+### `conform_to` vs natural shapes
+
+By default, each cell's output matches its natural UTM footprint, so adjacent cells tile edge-to-edge with no gaps.
+
+When you set `conform_to=(W, H)`, every cell is padded to the same pixel dimensions with `NaN` fill. This is essential for ML pipelines but creates padding borders that do not exist in natural-shape mode.
+
+| Mode | Use case | Edge behaviour |
+|------|----------|----------------|
+| Natural (default) | Visualization, mosaics | Seamless tiling |
+| `conform_to` | ML training, fixed tensors | `NaN` padding where data is missing |
+
+Remember: `conform_to` is `(width, height)`, matching rasterio's `(bands, height, width)` convention.
