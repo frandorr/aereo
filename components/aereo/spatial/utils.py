@@ -4,16 +4,20 @@ from shapely.geometry import LineString, MultiPolygon, Point, Polygon
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import transform
 
+_NORTH_EPSG_BASE = 326
+_SOUTH_EPSG_BASE = 327
+
 
 def reproject_geom(geom: BaseGeometry, src_epsg: str, dst_epsg: str) -> BaseGeometry:
-    """
-    Reproject a polygon to a different coordinate system.
+    """Reproject a geometry to a different coordinate system.
+
     Args:
-        polygon (Polygon): Shapely Polygon in source coordinate system
-        src_epsg (str): Source EPSG code
-        dst_epsg (str): Destination EPSG code
+        geom: Shapely geometry in the source coordinate system.
+        src_epsg: Source EPSG code.
+        dst_epsg: Destination EPSG code.
+
     Returns:
-        Polygon: Reprojected Shapely Polygon in destination coordinate system
+        The reprojected Shapely geometry.
     """
     transformer = Transformer.from_crs(src_epsg, dst_epsg, always_xy=True)
     projected_geom = transform(transformer.transform, geom)
@@ -23,6 +27,7 @@ def reproject_geom(geom: BaseGeometry, src_epsg: str, dst_epsg: str) -> BaseGeom
 def get_utm_epsg_from_geometry(geometry: BaseGeometry) -> str:
     """
     Get the UTM EPSG code from a Shapely geometry.
+
     Args:
         geometry (BaseGeometry): A Shapely geometry object.
     Returns:
@@ -37,12 +42,12 @@ def get_utm_epsg_from_geometry(geometry: BaseGeometry) -> str:
         lonlat = (geometry.x, geometry.y)
     else:
         # raise an error if the geometry is not supported
-        raise ValueError("Unsupported geometry type")
+        raise ValueError(f"Unsupported geometry type: {type(geometry).__name__}")
 
     _, _, zone_number, zone_letter = utm.from_latlon(lonlat[1], lonlat[0])  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
 
     if zone_number and zone_letter:
-        epsg = f"{326 if zone_letter >= 'N' else 327}{zone_number:02d}"
+        epsg = f"{_NORTH_EPSG_BASE if zone_letter >= 'N' else _SOUTH_EPSG_BASE}{zone_number:02d}"
     else:
         raise ValueError("Could not determine UTM zone from geometry")
 
@@ -50,22 +55,20 @@ def get_utm_epsg_from_geometry(geometry: BaseGeometry) -> str:
 
 
 def get_utm_zone_from_latlng(latlng: list[float] | tuple[float, float]) -> str:
-    """
-    Get the UTM zone from a latlng list and return the corresponding EPSG code.
+    """Get the UTM zone from a latlng and return the corresponding EPSG code.
 
-    Parameters
-    ----------
-    latlng : List[Union[int, float]]
-        The latlng list to get the UTM zone from.
+    Args:
+        latlng: A sequence of (latitude, longitude).
 
-    Returns
-    -------
-    str
+    Returns:
         The EPSG code for the UTM zone.
+
+    Raises:
+        TypeError: If latlng is not a list or tuple.
+        ValueError: If the UTM zone cannot be determined.
     """
-    assert isinstance(latlng, (list, tuple)), (
-        "latlng must be in the form of a list or tuple."
-    )
+    if not isinstance(latlng, (list, tuple)):
+        raise TypeError("latlng must be in the form of a list or tuple.")
 
     longitude = float(latlng[1])
     latitude = float(latlng[0])
