@@ -1,10 +1,10 @@
 <p align="center">
-    <img src="aer.png" alt="AEREO logo" style="max-width: 500px; width: 100%;">
+    <img src="banner.svg" alt="AEREO logo" style="max-width: 300px; width: 100%;">
 </p>
 
-<h1 align="center">
+<!--<h1 align="center">
   Plugin-based satellite data extraction — from search to analysis-ready Major TOM grid in minutes.
-</h1>
+</h1>-->
 
 ---
 

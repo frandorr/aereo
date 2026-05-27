@@ -1,198 +1,136 @@
-site_name: ""
+site_name: AEREO
+site_description: AEREO — Plugin-based satellite data extraction framework. From search to analysis-ready GeoTIFF in minutes.
+site_author: Francisco Dorr
+copyright: Copyright &copy; 2026 Francisco Dorr
 site_url: https://frandorr.github.io/aereo
+repo_name: frandorr/aereo
 repo_url: https://github.com/frandorr/aereo
 edit_uri: edit/main/docs/
 
-# SEO & Social
-site_description: >-
-    AER.EO — Plugin-based satellite data extraction framework.
-    From search to analysis-ready GeoTIFF in minutes.
-site_author: Francisco Dorr
-copyright: Copyright &copy; 2026 Francisco Dorr
-
-# Theme — Material with deep UX polish
 theme:
-    name: material
+  name: material
+  variant: classic
+  custom_dir: docs/overrides
 
-    # Typography
-    font:
-        text: Roboto
-        code: Roboto Mono
+  palette:
+    - media: (prefers-color-scheme)
+      toggle:
+        icon: material/lightbulb-auto
+        name: Switch to light mode
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to system preference
 
-    # Iconography
-    icon:
-        logo: material/satellite-variant
-        repo: fontawesome/brands/github
-        edit: material/pencil
-        view: material/eye
+  features:
+    - content.code.annotate
+    - content.code.copy
+    - content.footnote.tooltips
+    - content.tabs.link
+    - content.tooltips
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.path
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
 
-    # Color system — day/night with accessible contrast
-    palette:
-        - media: "(prefers-color-scheme: light)"
-          scheme: default
-          primary: cyan
-          toggle:
-              icon: material/weather-night
-              name: Switch to dark mode
-        - media: "(prefers-color-scheme: dark)"
-          scheme: slate
-          primary: custom
-          toggle:
-              icon: material/weather-sunny
-              name: Switch to light mode
+  icon:
+    repo: octicons/mark-github-24
 
-    # UX Features
-    features:
-        # Navigation
-        - navigation.instant
-        - navigation.instant.progress
-        - navigation.tracking
-        - navigation.tabs
-        - navigation.tabs.sticky
-        - navigation.sections
-        - navigation.expand
-        - navigation.path
-        - navigation.top
-        - toc.follow
-        - toc.integrate
-
-        # Content actions
-        - content.action.edit
-        - content.action.view
-        - content.code.copy
-        - content.code.annotate
-        - content.code.select
-        - content.tooltips
-
-        # Search
-        - search.suggest
-        - search.highlight
-        - search.share
-
-        # Header
-        - header.autohide
-
-# Plugins
 plugins:
-    - search:
-          separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?=\w)'
-          lang: en
-    - minify:
-          minify_html: true
-    - redirects:
-          redirect_maps:
-              quickstart.md: first-pipeline.md
-              pipeline.md: pipeline-options.md
-              grid.md: grids.md
-              eoids.md: output-formats.md
-              cli.md: cli-recipes.md
-              examples.md: examples-gallery.md
-              plugins.md: plugin-overview.md
-              build-your-own-plugin.md: build-first-plugin.md
-              architecture.md: architecture-overview.md
-              execution.md: execution-backends.md
-              aer-architecture-visualization.md: architecture-visual.md
-    - mkdocstrings:
-          handlers:
-              python:
-                  paths: [components, bases]
-                  options:
-                      docstring_style: google
-                      show_source: true
-                      show_root_heading: true
-                      show_root_full_path: true
-                      show_category_heading: true
-                      show_symbol_type_heading: true
-                      show_symbol_type_toc: true
-                      show_signature: true
-                      show_signature_annotations: true
-                      separate_signature: true
-                      line_length: 80
-                      merge_init_into_class: true
-                      members_order: source
-                      filters: ["!^_"]
+  - search:
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?=\w)'
+      lang: en
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [components, bases]
+          options:
+            show_root_heading: true
+            show_if_no_docstring: true
+            inherited_members: true
+            members_order: source
+            separate_signature: true
+            unwrap_annotated: true
+            filters:
+              - '!^_'
+            merge_init_into_class: true
+            docstring_section_style: spacy
+            signature_crossrefs: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
 
-                  import:
-                      - https://docs.python.org/3/objects.inv
-
-# Markdown processing
 markdown_extensions:
-    # Python-Markdown core
-    - abbr
-    - admonition
-    - attr_list
-    - def_list
-    - footnotes
-    - md_in_html
-    - tables
-    - toc:
-          permalink: true
-          permalink_title: Anchor link to this section
-          toc_depth: 3
+  - zensical.extensions.macros
+  - abbr
+  - attr_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.highlight:
+      line_spans: __span
+      linenums_style: pymdownx-inline
+  - pymdownx.inlinehilite
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format ''
+  - pymdownx.tilde
+  - pymdownx.blocks.admonition:
+      types:
+        - note
+        - attention
+        - caution
+        - danger
+        - error
+        - tip
+        - hint
+        - warning
+        - info
+        - check
+  - pymdownx.blocks.details
+  - pymdownx.blocks.tab:
+      alternate_style: true
 
-    # PyMdownX extensions — rich content
-    - pymdownx.arithmatex:
-          generic: true
-    - pymdownx.betterem:
-          smart_enable: all
-    - pymdownx.caret
-    - pymdownx.details
-    - pymdownx.emoji:
-          emoji_index: !!python/name:material.extensions.emoji.twemoji
-          emoji_generator: !!python/name:material.extensions.emoji.to_svg
-    - pymdownx.highlight:
-          anchor_linenums: true
-          line_spans: __span
-          pygments_lang_class: true
-          use_pygments: true
-    - pymdownx.inlinehilite
-    - pymdownx.keys
-    - pymdownx.mark
-    - pymdownx.smartsymbols
-    - pymdownx.snippets:
-          auto_append:
-              - docs/includes/abbreviations.md
-    - pymdownx.superfences:
-          custom_fences:
-              - name: mermaid
-                class: mermaid
-                format: !!python/name:pymdownx.superfences.fence_code_format
-    - pymdownx.tabbed:
-          alternate_style: true
-    - pymdownx.tasklist:
-          custom_checkbox: true
-    - pymdownx.tilde
-
-extra_css:
-    - stylesheets/extra.css
-
-extra_javascript:
-    - javascripts/mathjax.js
-    - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
-    - https://unpkg.com/mermaid@10/dist/mermaid.min.js
-
-# Files not in navigation (auto-included snippets)
-not_in_nav: |
-    includes/abbreviations.md
-    examples/README.md
-    examples/grid_configs/README.md
-
-# Extra site variables
 extra:
-    social:
-        - icon: fontawesome/brands/github
-          link: https://github.com/frandorr/aereo
-          name: AEREO on GitHub
-        - icon: fontawesome/brands/python
-          link: https://pypi.org/project/aereo/
-          name: AEREO on PyPI
-        - icon: fontawesome/solid/handshake-angle
-          link: https://github.com/frandorr/aereo/blob/main/CONTRIBUTING.md
-          name: Contributing
-    version:
-        provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/frandorr/aereo
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/aereo/
 
-# Navigation structure
+validation:
+  unresolved_references: false
+
 nav:
     - Home: index.md
     - Search and Extract:
