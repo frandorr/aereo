@@ -455,7 +455,7 @@ class Extractor(AereoPlugin, plugin_abstract=True):
         target_aoi: BaseGeometry | None = None,
         uri: str | None = None,
         profiles: Sequence[AereoProfile] | None = None,
-        cells_per_chunk: int = 50,
+        cells_per_task: int = 50,
         extractor_hint: str | None = None,
         init_params: Mapping[str, Any] | None = None,
     ) -> Sequence[ExtractionTask]:
@@ -582,8 +582,8 @@ class Extractor(AereoPlugin, plugin_abstract=True):
             for start_time, time_group, all_cells in profile_cell_groups:
                 # 6. Chunk cells and create tasks
                 cell_chunks = [
-                    all_cells[i : i + cells_per_chunk]
-                    for i in range(0, len(all_cells), cells_per_chunk)
+                    all_cells[i : i + cells_per_task]
+                    for i in range(0, len(all_cells), cells_per_task)
                 ]
 
                 for chunk_idx, cells in enumerate(cell_chunks):
