@@ -79,6 +79,19 @@ plugins:
           lang: en
     - minify:
           minify_html: true
+    - redirects:
+          redirect_maps:
+              quickstart.md: first-pipeline.md
+              pipeline.md: pipeline-options.md
+              grid.md: grids.md
+              eoids.md: output-formats.md
+              cli.md: cli-recipes.md
+              examples.md: examples-gallery.md
+              plugins.md: plugin-overview.md
+              build-your-own-plugin.md: build-first-plugin.md
+              architecture.md: architecture-overview.md
+              execution.md: execution-backends.md
+              aer-architecture-visualization.md: architecture-visual.md
     - mkdocstrings:
           handlers:
               python:
@@ -170,7 +183,7 @@ extra:
           link: https://pypi.org/project/aereo/
           name: AEREO on PyPI
         - icon: fontawesome/solid/handshake-angle
-          link: https://github.com/frandorr/aereo/blob/main/docs/contributing.md
+          link: https://github.com/frandorr/aereo/blob/main/CONTRIBUTING.md
           name: Contributing
     version:
         provider: mike
