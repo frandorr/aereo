@@ -22,6 +22,8 @@ from structlog import get_logger
 
 logger = get_logger()
 
+DEFAULT_CELLS_PER_TASK = 50
+
 
 class FailureMode(str, Enum):
     """Determines pipeline behavior when partial or total plugin failures occur."""
@@ -55,7 +57,15 @@ class AereoClient:
     - Implements configurable failure modes for robust real-world operation.
     """
 
-    def __init__(self, registry: Optional[AereoRegistry] = None):
+    def __init__(
+        self,
+        registry: Optional[AereoRegistry] = None,
+        profiles: Optional[Sequence[AereoProfile]] = None,
+        grid_config: Optional[GridConfig] = None,
+        aoi: Optional[BaseGeometry | dict] = None,
+        backend: Optional[Any] = None,
+        cells_per_task: Optional[int] = None,
+    ):
         """
         Initializes the AereoClient with an optional AereoRegistry instance.
          - If no registry is provided, a default one is instantiated.
@@ -63,8 +73,18 @@ class AereoClient:
         Args:
             registry (Optional[AereoRegistry]): An instance of AereoRegistry to manage plugin discovery and instantiation.
                 If None, a default AereoRegistry is created.
+            profiles (Optional[Sequence[AereoProfile]]): Default profiles to use for search and extraction.
+            grid_config (Optional[GridConfig]): Default grid configuration for extraction.
+            aoi (Optional[BaseGeometry | dict]): Default area of interest geometry.
+            backend (Optional[ExecutionBackend]): Default execution backend.
+            cells_per_task (Optional[int]): Default number of grid cells per extraction task.
         """
         self.registry = registry or AereoRegistry()
+        self._profiles = profiles
+        self._grid_config = grid_config
+        self._aoi = normalize_geometry(aoi)
+        self._backend = backend
+        self._cells_per_task = cells_per_task
 
     def _resolve_params(
         self, params: Optional[Mapping[str, Any]], collection: str
@@ -166,7 +186,7 @@ class AereoClient:
 
     def search(
         self,
-        profiles: Sequence[AereoProfile],
+        profiles: Optional[Sequence[AereoProfile]] = None,
         intersects: Optional[BaseGeometry | dict] = None,
         start_datetime: Optional[datetime] = None,
         end_datetime: Optional[datetime] = None,
@@ -177,9 +197,11 @@ class AereoClient:
         """Find data across massive sensor networks utilizing parallel Fan-Out search dispatch.
 
         Args:
-            profiles (Sequence[AereoProfile]): Sequence of AereoProfile objects defining what to search for.
+            profiles (Optional[Sequence[AereoProfile]]): Sequence of AereoProfile objects defining what to search for.
                 Each profile carries its collections, channels, satellite, and plugin hints.
+                Falls back to client-level profiles if not provided.
             intersects (Optional[BaseGeometry | dict]): Optional geometry to spatially filter search results.
+                Falls back to client-level aoi if not provided.
             start_datetime (Optional[datetime]): Optional start datetime for temporal filtering.
             end_datetime (Optional[datetime]): Optional end datetime for temporal filtering.
             search_params (Optional[Mapping[str, Any]]): Meta-level parameters to pass to search plugins
@@ -202,7 +224,15 @@ class AereoClient:
             GeoDataFrame[AssetSchema]: A verified GeoDataFrame of combined search results.
         """
 
-        norm_intersects = normalize_geometry(intersects)
+        profiles = self._profiles if profiles is None else profiles
+        if profiles is None:
+            raise ValueError(
+                "profiles must be provided either as a method argument or as a client default."
+            )
+
+        norm_intersects = (
+            normalize_geometry(intersects) if intersects is not None else self._aoi
+        )
 
         logger.info(
             "search_called",
@@ -331,12 +361,12 @@ class AereoClient:
     def prepare_for_extraction(
         self,
         search_results: GeoDataFrame[AssetSchema],
-        grid_config: GridConfig,
+        grid_config: Optional[GridConfig] = None,
         target_aoi: Optional[BaseGeometry | dict] = None,
         resolution: Optional[float] = None,
         uri: Optional[str] = None,
         profiles: Optional[Sequence[AereoProfile]] = None,
-        cells_per_chunk: int = 50,
+        cells_per_task: Optional[int] = None,
         init_params: Optional[Mapping[str, Any]] = None,
     ) -> Sequence[ExtractionTask]:
         """Groups search results by collection and distributes batches to appropriate Extractors.
@@ -344,11 +374,14 @@ class AereoClient:
         Args:
             search_results: The merged GeoDataFrame of search results to prepare.
             grid_config: Explicit tiling specification. All profiles share this grid.
+                Falls back to client-level grid_config if not provided.
             target_aoi: Optional area of interest as a shapely geometry.
+                Falls back to client-level aoi if not provided.
             resolution: The desired resolution for extraction. If provided, a default profile is created.
             uri: An optional URI defining output path or identifier.
             profiles: A sequence of AereoProfile objects. If provided, they take precedence over resolution.
-            cells_per_chunk: Max grid cells per ExtractionTask (default 50).
+                Falls back to client-level profiles if not provided.
+            cells_per_task: Max grid cells per ExtractionTask. Falls back to client default, then 50.
             init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for extractor instantiation.
                 Passed as a flat dict to the extractor constructor.
 
@@ -358,7 +391,17 @@ class AereoClient:
         if search_results.empty:
             return []
 
-        norm_intersects = normalize_geometry(target_aoi)
+        grid_config = self._grid_config if grid_config is None else grid_config
+        if grid_config is None:
+            raise ValueError(
+                "grid_config must be provided either as a method argument or as a client default."
+            )
+
+        profiles = self._profiles if profiles is None else profiles
+
+        norm_intersects = (
+            normalize_geometry(target_aoi) if target_aoi is not None else self._aoi
+        )
         all_tasks = []
 
         unique_collections = search_results["collection"].unique()
@@ -417,6 +460,16 @@ class AereoClient:
             profiles=[p.name for p in resolved_profiles],
         )
 
+        effective_cells_per_task = (
+            cells_per_task
+            if cells_per_task is not None
+            else (
+                self._cells_per_task
+                if self._cells_per_task is not None
+                else DEFAULT_CELLS_PER_TASK
+            )
+        )
+
         # Pass full search results to extractor (profile filtering happens there)
         batches = extractor.prepare_for_extraction(
             cast(GeoDataFrame, search_results),
@@ -424,7 +477,7 @@ class AereoClient:
             target_aoi=norm_intersects,
             uri=uri,
             profiles=resolved_profiles,
-            cells_per_chunk=cells_per_chunk,
+            cells_per_task=effective_cells_per_task,
             extractor_hint=target_plugin,
             init_params=c_init,
         )
@@ -462,6 +515,7 @@ class AereoClient:
             logger.warning("execute_tasks_empty", reason="No tasks provided")
             return cast(GeoDataFrame, ArtifactSchema.empty())
 
+        backend = self._backend if backend is None else backend
         backend = backend or LocalProcessBackend()
         runner = TaskRunner(registry=self.registry, init_params=init_params)
 
