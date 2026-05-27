@@ -370,11 +370,17 @@ class AereoRegistry:
         """
         return self._extractor_registry.get(plugin_name, "Extractor", **kwargs)
 
-    def get_plugin_params(self, plugin_name: str) -> dict[str, list[dict]]:
+    def get_plugin_params(
+        self, plugin_name: str, *, detailed: bool = True
+    ) -> dict[str, list[dict]]:
         """Return params metadata for any plugin (search or extract).
 
         Args:
             plugin_name: Entry-point name of the plugin.
+            detailed: When ``True`` (default), each param includes all
+                attributes (name, type, description, default, choices,
+                required). When ``False``, only ``name`` and ``default``
+                are returned.
 
         Returns:
             {"required": [...], "optional": [...]} where each item is a
@@ -383,23 +389,35 @@ class AereoRegistry:
         cls = self._searchers.get(plugin_name) or self._extractors.get(plugin_name)
         if cls is None:
             raise KeyError(f"Unknown plugin: {plugin_name}")
+
+        def _dump(params: Sequence[Any]) -> list[dict]:
+            if detailed:
+                return [p.model_dump() for p in params]
+            return [{"name": p.name, "default": p.default} for p in params]
+
         return {
-            "required": [p.model_dump() for p in cls.required_params],
-            "optional": [p.model_dump() for p in cls.optional_params],
+            "required": _dump(cls.required_params),
+            "optional": _dump(cls.optional_params),
         }
 
-    def list_all_params(self) -> dict[str, dict]:
+    def list_all_params(self, *, detailed: bool = True) -> dict[str, dict]:
         """JSON-serializable params catalog for all discovered plugins.
+
+        Args:
+            detailed: When ``True`` (default), each param includes all
+                attributes. When ``False``, only ``name`` and ``default``
+                are returned.
 
         Returns:
             Mapping of plugin name to a dict with keys ``type`` ("search" or
             "extract"), ``required``, and ``optional``. Each param list contains
             JSON-serializable dicts representing a PluginParam.
         """
-        from aereo.interfaces import PluginParam
 
-        def _dump(params: tuple[PluginParam, ...]) -> list[dict]:
-            return [p.model_dump() for p in params]
+        def _dump(params: Sequence[Any]) -> list[dict]:
+            if detailed:
+                return [p.model_dump() for p in params]
+            return [{"name": p.name, "default": p.default} for p in params]
 
         return {
             name: {
