@@ -520,3 +520,13 @@ button:focus-visible,
   max-width: 600px;
   margin: 0 auto 1.5rem;
 }
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .md-typeset .mdx-hero h1 {
+    font-size: 1.8rem;
+  }
+  .md-typeset .mdx-hero {
+    padding: 2rem 0.75rem;
+  }
+}
