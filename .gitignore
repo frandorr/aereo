@@ -13,11 +13,9 @@ output/
 *.SEN3/
 codemap.csv
 local
-.planning
 .local_ci_env
 .vscode
 development/local
-skills-lock.json
 .agent
 uv.lock
 ### Python ###
@@ -252,5 +250,4 @@ examples/test_aoi.geojson
 # Generated example outputs & dev artifacts
 /*.png
 examples/extraction/*_output/
-.ralph-tui/
 site/
