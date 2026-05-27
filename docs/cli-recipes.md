@@ -50,7 +50,7 @@ aereo run \
 | `--end` | `-e` | — | End datetime (ISO 8601) |
 | `--output-dir` | `-d` | — | Output directory (default: `out`) |
 | `--workers` | `-w` | — | Max batch workers (default: `1`) |
-| `--cells-per-chunk` | — | — | Max grid cells per task (default: `50`) |
+| `--cells-per-task` | — | — | Max grid cells per task (default: `50`) |
 | `--verbose` | `-v` | — | Enable verbose logging |
 
 **Exit codes:**

@@ -20,6 +20,7 @@ Find satellite granules that match your time range, area of interest, and sensor
 from datetime import datetime, timezone
 from shapely.geometry import box
 from aereo.client import AereoClient
+from aereo.grid import GridConfig
 from aereo.interfaces import AereoProfile
 
 aoi = box(-69.76, -39.98, -68.24, -39.05)
@@ -34,13 +35,14 @@ profiles = [
     )
 ]
 
-client = AereoClient()
+client = AereoClient(
+    profiles=profiles,
+    aoi=aoi,
+)
 
 results = client.search(
-    profiles=profiles,
     start_datetime=datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc),
     end_datetime=datetime(2026, 4, 2, 14, 9, tzinfo=timezone.utc),
-    intersects=aoi,
 )
 print(f"Found {len(results)} assets")
 print(results[["id", "collection", "start_time"]].head())
@@ -78,9 +80,12 @@ profiles = [
     ),
 ]
 
-results = client.search(
+client = AereoClient(
     profiles=profiles,
-    intersects=aoi,
+    aoi=aoi,
+)
+
+results = client.search(
     start_datetime=datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc),
     end_datetime=datetime(2026, 4, 2, 14, 9, tzinfo=timezone.utc),
 )
@@ -111,14 +116,16 @@ Turn search results into a list of `ExtractionTask` objects. AEREO builds a grid
 ### Minimal example
 
 ```python
+client = AereoClient(
+    profiles=profiles,
+    aoi=aoi,
+    grid_config=GridConfig(target_grid_dist=256_000, target_grid_overlap=False),
+    cells_per_task=10,
+)
+
 tasks = client.prepare_for_extraction(
     search_results=results,
-    target_aoi=aoi,
     uri="/tmp/goes_extraction",
-    profiles=profiles,
-    target_grid_dist=256000,      # cell size in metres
-    target_grid_overlap=False,
-    prepare_params={"cells_per_chunk": 10},
 )
 print(f"Prepared {len(tasks)} extraction tasks")
 print(f"Task 0 covers {len(tasks[0].grid_cells)} cells")
@@ -132,7 +139,7 @@ print(f"Task 0 covers {len(tasks[0].grid_cells)} cells")
 | `profiles` / `resolution` | **At least one is required.** If `profiles` is omitted, a default profile named `"default"` is created with the given `resolution`. |
 | `target_aoi` | Clipping geometry. If `None`, the extractor uses the union of all asset geometries. |
 | `uri` | Base output directory for extracted artifacts. |
-| `prepare_params` | Forwarded to the extractor. Common keys: `cells_per_chunk` (default 50), `grid_filter_mode` (`"intersection"`, `"within"`, `"coverage"`), `min_coverage` (float 0.0–1.0). |
+| `prepare_params` | Forwarded to the extractor. Common keys: `cells_per_task` (default 50), `grid_filter_mode` (`"intersection"`, `"within"`, `"coverage"`), `min_coverage` (float 0.0–1.0). |
 | `target_grid_dist` | Override grid cell size in metres (e.g. `256000` for 256 km cells). |
 | `target_grid_overlap` | Override whether grid cells are allowed to overlap. |
 
@@ -141,12 +148,15 @@ print(f"Task 0 covers {len(tasks[0].grid_cells)} cells")
 Pass the same `profiles` list you used in `search()`. `prepare_for_extraction()` uses `profile.resolution`, `profile.extract_params`, and `profile.conform_to` to build tasks.
 
 ```python
-# profiles was used for both search() and prepare_for_extraction()
+# profiles and grid_config were used for both search() and prepare_for_extraction()
+client = AereoClient(
+    profiles=profiles,
+    grid_config=GridConfig(target_grid_dist=128_000),
+)
+
 tasks = client.prepare_for_extraction(
     results,
-    profiles=profiles,
     uri="/tmp/output",
-    target_grid_dist=128000,
 )
 ```
 
@@ -247,7 +257,7 @@ If a granule is missing, a band is unsupported, or a download times out, the err
 
 > [!TIP]
 > **Out of memory during extraction?** Large mosaics or high-resolution extractions can exhaust RAM. Try:
-> - Reduce `cells_per_chunk` (e.g., `1` instead of `50`).
+> - Reduce `cells_per_task` (e.g., `1` instead of `50`).
 > - Reduce `max_workers` (e.g., `1` instead of `8`).
 > - Use a smaller AOI or coarser `target_grid_dist`.
 > - Process one profile at a time instead of multiple sensors in parallel.

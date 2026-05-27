@@ -120,7 +120,7 @@ Transform search results into a batch of `ExtractionTask` objects. Groups assets
          │                          │     coverage)                  │
          │                          │                                │
          │                          │─── 6. Chunk into tasks ───────▶│
-         │                          │    (cells_per_chunk)           │
+         │                          │    (cells_per_task)            │
          │                          │                                │
          │◀─────────────────────────│  Sequence[ExtractionTask]      │
          │                          │                                │
@@ -135,7 +135,7 @@ Transform search results into a batch of `ExtractionTask` objects. Groups assets
 | `profiles` | `Sequence[AereoProfile]` | Yes** | Blueprints for extraction. **Required** if `resolution` is not provided. |
 | `resolution` | `float \| None` | Yes** | Fallback target resolution (creates a default profile). **Required** if `profiles` is not provided. |
 | `uri` | `str \| None` | No | Base output directory or URI prefix for artifacts. |
-| `prepare_params` | `Mapping[str, Any] \| None` | No | Params forwarded to the extractor's `prepare_for_extraction`. Common keys: `cells_per_chunk`, `grid_filter_mode`, `min_coverage`. |
+| `prepare_params` | `Mapping[str, Any] \| None` | No | Params forwarded to the extractor's `prepare_for_extraction`. Common keys: `cells_per_task`, `grid_filter_mode`, `min_coverage`. |
 | `init_params` | `Mapping[str, Any] \| None` | No | Constructor kwargs for extractor instantiation. Same override rules as in `search`. |
 | `plugin_hints` | `Mapping[str, str \| Sequence[str]] \| None` | No | Force extractor plugin. Same format as search hints. |
 | `target_grid_dist` | `int \| None` | No | Override grid cell size in metres (default: extractor's `target_grid_d`). |
@@ -152,7 +152,7 @@ Each `ExtractionTask` (from `aereo.interfaces.core`) contains:
 | `uri` | `str` | Destination path for artifacts. |
 | `grid_cells` | `Sequence[GridCell]` | Spatial cells this task covers. |
 | `aoi` | `BaseGeometry \| None` | Clipping geometry used during preparation. |
-| `prepare_params` | `Mapping[str, Any]` | Params that drove task construction (e.g. `chunk_id`, `cells_per_chunk`). |
+| `prepare_params` | `Mapping[str, Any]` | Params that drove task construction (e.g. `chunk_id`, `cells_per_task`). |
 | `task_context` | `Mapping[str, Any]` | Observability metadata: `chunk_id`, `total_chunks`, `start_time`. May also contain `conform_to_shape` when the profile enables fixed-shape batching. |
 
 ### `ExtractionProfile` Fields
