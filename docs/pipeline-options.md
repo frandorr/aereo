@@ -1,8 +1,12 @@
-# Running the Pipeline
+---
+title: Advanced Pipeline Options
+---
 
-AEREO's entire user experience is built around three `AereoClient` methods: `search()`, `prepare_for_extraction()`, and `execute_tasks()`. This page shows you how to use each one with practical examples, common patterns, and the gotchas that matter in production.
+# Advanced Pipeline Options
 
-For deep technical internals — UML diagrams, exact schema tables, and sequence diagrams — see [Pipeline Architecture](pipeline-architecture.md).
+This page covers the full API for `AereoClient.search()`, `prepare_for_extraction()`, and `execute_tasks()` — parameters, backends, edge cases, and production patterns.
+
+For a gentle introduction, see [Your First Pipeline](first-pipeline.md).
 
 ---
 
@@ -186,7 +190,6 @@ print(artifacts[["id", "grid_cell", "uri"]].head())
 | `tasks` | **Required.** Output from `prepare_for_extraction()`. |
 | `backend` | `ExecutionBackend` implementation. Defaults to `LocalProcessBackend()` (sequential). Use `LocalProcessBackend(max_workers=4)` for process parallelism, `ThreadBackend(max_workers=8)` for thread parallelism, or `LambdaBackend(...)` for remote execution. |
 | `failure_mode` | `STRICT` (default) raises on any failure. `BEST_EFFORT` returns an empty GeoDataFrame on failure. |
-| `failure_mode` | **Defaults to `STRICT`** (unlike `search()`). `BEST_EFFORT` logs and continues. |
 
 ### Return value: `ArtifactSchema` GeoDataFrame
 
@@ -212,8 +215,39 @@ from aereo.eoids import mosaic_eoids_tiles
 mosaic, transform, crs = mosaic_eoids_tiles("/tmp/goes_extraction", target_crs="EPSG:4326")
 ```
 
-See [EOIDS](eoids.md) for the full directory layout and mosaic options.
+See [Output Formats](output-formats.md) for the full directory layout and mosaic options.
 
 ### Gotcha: plugin-specific errors surface here
 
 If a granule is missing, a band is unsupported, or a download times out, the error usually appears during `execute_tasks()`, not `search()` or `prepare_for_extraction()`. Use `failure_mode=BEST_EFFORT` to skip bad granules and keep the rest, or wrap the call in your own retry logic. The `LocalProcessBackend` uses `ProcessPoolExecutor` — exceptions in worker processes are captured and re-raised (or logged) by the client.
+
+> [!TIP]
+> **Extraction fails with `ReaderNotAvailable`?** Satpy-based extractors need a `reader` in `extract_params`:
+> | Sensor | Reader |
+> |--------|--------|
+> | GOES ABI | `abi_l1b` |
+> | VIIRS | `viirs_l1b` |
+> | Sentinel-3 OLCI | `olci_l1b` |
+>
+> ```python
+> AereoProfile(
+>     ...,
+>     extract_params={"reader": "abi_l1b", "calibration": "reflectance"},
+> )
+> ```
+
+> [!TIP]
+> **NASA Earthdata assets fail with HTTP 401?** NASA Earthdata URLs are behind URS authentication. Add the Earthdata downloader to your profile:
+> ```python
+> AereoProfile(
+>     ...,
+>     downloader="aereo.search_earthaccess.earthaccess_download_wrapper",
+> )
+> ```
+
+> [!TIP]
+> **Out of memory during extraction?** Large mosaics or high-resolution extractions can exhaust RAM. Try:
+> - Reduce `cells_per_chunk` (e.g., `1` instead of `50`).
+> - Reduce `max_workers` (e.g., `1` instead of `8`).
+> - Use a smaller AOI or coarser `target_grid_dist`.
+> - Process one profile at a time instead of multiple sensors in parallel.

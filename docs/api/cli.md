@@ -1,0 +1,3 @@
+# CLI
+
+::: aereo.cli
