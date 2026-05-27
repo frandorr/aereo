@@ -28,6 +28,18 @@ class TaskSerializer:
     ASSETS_NAME = "task_assets.parquet"
     META_NAME = "task_meta.json"
 
+    # JSON field keys for serialize / deserialize parity
+    CELL_ID_KEY = "cell_id"
+    D_KEY = "d"
+    IS_PRIMARY_KEY = "is_primary"
+    GEOM_WKT_KEY = "geom_wkt"
+    PROFILE_KEY = "profile"
+    GRID_CONFIG_KEY = "grid_config"
+    GRID_CELLS_KEY = "grid_cells"
+    URI_KEY = "uri"
+    AOI_WKT_KEY = "aoi_wkt"
+    TASK_CONTEXT_KEY = "task_context"
+
     def serialize(self, task: ExtractionTask, dest_dir: Path) -> None:
         """Write *task* into *dest_dir* as GeoParquet + JSON.
 
@@ -35,6 +47,12 @@ class TaskSerializer:
             task: The extraction task to persist.
             dest_dir: Directory that will hold ``task_assets.parquet`` and
                 ``task_meta.json``.  Created automatically if it does not exist.
+
+        Returns:
+            None
+
+        Raises:
+            OSError: If the destination directory cannot be created.
         """
         dest_dir = Path(dest_dir)
         dest_dir.mkdir(parents=True, exist_ok=True)
@@ -47,21 +65,21 @@ class TaskSerializer:
         for cell in task.grid_cells:
             grid_cells_meta.append(
                 {
-                    "cell_id": cell.id(),
-                    "d": cell.D,
-                    "is_primary": cell.is_primary,
-                    "geom_wkt": cell.geom.wkt,
+                    self.CELL_ID_KEY: cell.id(),
+                    self.D_KEY: cell.D,
+                    self.IS_PRIMARY_KEY: cell.is_primary,
+                    self.GEOM_WKT_KEY: cell.geom.wkt,
                 }
             )
 
         # Metadata → JSON
         meta: dict[str, Any] = {
-            "profile": task.profile.model_dump(mode="json"),
-            "grid_config": task.grid_config.model_dump(mode="json"),
-            "grid_cells": grid_cells_meta,
-            "uri": task.uri,
-            "aoi_wkt": task.aoi.wkt if task.aoi is not None else None,
-            "task_context": dict(task.task_context),
+            self.PROFILE_KEY: task.profile.model_dump(mode="json"),
+            self.GRID_CONFIG_KEY: task.grid_config.model_dump(mode="json"),
+            self.GRID_CELLS_KEY: grid_cells_meta,
+            self.URI_KEY: task.uri,
+            self.AOI_WKT_KEY: task.aoi.wkt if task.aoi is not None else None,
+            self.TASK_CONTEXT_KEY: dict(task.task_context),
         }
         (dest_dir / self.META_NAME).write_text(
             json.dumps(meta, default=str), encoding="utf-8"
@@ -79,6 +97,11 @@ class TaskSerializer:
 
         Returns:
             A fully reconstructed ``ExtractionTask``.
+
+        Raises:
+            FileNotFoundError: If the source directory or required files are missing.
+            json.JSONDecodeError: If ``task_meta.json`` is malformed.
+            ValidationError: If the stored metadata fails Pydantic validation.
         """
         src_dir = Path(src_dir)
 
@@ -87,33 +110,35 @@ class TaskSerializer:
         meta = json.loads((src_dir / self.META_NAME).read_text(encoding="utf-8"))
 
         # Reconstruct Pydantic models
-        profile = AereoProfile.model_validate(meta["profile"])
-        grid_config = GridConfig.model_validate(meta["grid_config"])
+        profile = AereoProfile.model_validate(meta[self.PROFILE_KEY])
+        grid_config = GridConfig.model_validate(meta[self.GRID_CONFIG_KEY])
 
         # Reconstruct GridCell instances
         grid_cells: list[GridCell] = []
-        for cell_meta in meta["grid_cells"]:
-            geom = shapely.wkt.loads(cell_meta["geom_wkt"])
+        for cell_meta in meta[self.GRID_CELLS_KEY]:
+            geom = shapely.wkt.loads(cell_meta[self.GEOM_WKT_KEY])
             grid_cells.append(
                 GridCell(
-                    d=cell_meta["d"],
+                    d=cell_meta[self.D_KEY],
                     geom=geom,  # type: ignore[arg-type]
-                    is_primary=cell_meta["is_primary"],
-                    cell_id=cell_meta["cell_id"],
+                    is_primary=cell_meta[self.IS_PRIMARY_KEY],
+                    cell_id=cell_meta[self.CELL_ID_KEY],
                 )
             )
 
         # Reconstruct optional AOI
         aoi = (
-            shapely.wkt.loads(meta["aoi_wkt"]) if meta["aoi_wkt"] is not None else None
+            shapely.wkt.loads(meta[self.AOI_WKT_KEY])
+            if meta[self.AOI_WKT_KEY] is not None
+            else None
         )
 
         return ExtractionTask(
             assets=assets,  # type: ignore[arg-type]
             profile=profile,
-            uri=meta["uri"],
+            uri=meta[self.URI_KEY],
             grid_cells=grid_cells,
             grid_config=grid_config,
             aoi=aoi,
-            task_context=meta["task_context"],
+            task_context=meta[self.TASK_CONTEXT_KEY],
         )
