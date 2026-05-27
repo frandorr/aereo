@@ -166,6 +166,7 @@ markdown_extensions:
 extra_javascript:
     - javascripts/mathjax.js
     - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+    - https://unpkg.com/mermaid@10/dist/mermaid.min.js
 
 # Files not in navigation (auto-included snippets)
 not_in_nav: |
