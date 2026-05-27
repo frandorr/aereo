@@ -1,4 +1,9 @@
-# Quick Start
+---
+title: Your First Pipeline
+redirect_from: quickstart.md
+---
+
+# Your First Pipeline
 
 Get from zero to your first extracted satellite image in under 5 minutes.
 
@@ -80,6 +85,7 @@ Open your output directory (`./out/`) and look for `.tif` files. You now have an
 
 ## Next Steps
 
-- Explore more sensors in [Examples Gallery](examples-gallery.md) and [Using Plugins](using-plugins.md)
+- Explore more sensors in [Examples Gallery](examples-gallery.md) and [Install](install.md)
 - Understand grid options in [Working with Grids](grids.md)
 - Prefer the command line? See the [CLI Recipes](cli-recipes.md)
+- Learn advanced pipeline options in [Pipeline Options](pipeline-options.md)

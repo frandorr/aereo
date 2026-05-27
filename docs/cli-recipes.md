@@ -136,7 +136,7 @@ aereo extract \
   tasks.pkl
 ```
 
-Extracted GeoTIFFs are written to `--output-dir` in [EOIDS](eoids.md) format.
+Extracted GeoTIFFs are written to `--output-dir` in [EOIDS](output-formats.md) format.
 
 ---
 

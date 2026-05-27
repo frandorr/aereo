@@ -73,6 +73,6 @@ export EARTHDATA_PASSWORD=YOUR_PASS
 
 ## Next steps
 
-- Follow the [Quick Start](quickstart.md) for a complete Search → Prepare → Extract walkthrough.
-- Read the [Plugin System](plugins.md) overview to understand how discovery and routing work.
-- Learn how to [Build Your Own Plugin](build-your-own-plugin.md).
+- Follow [Your First Pipeline](first-pipeline.md) for a complete Search → Prepare → Extract walkthrough.
+- Read the [How Plugins Work](plugin-overview.md) overview to understand how discovery and routing work.
+- Learn how to [Build Your First Plugin](build-first-plugin.md).

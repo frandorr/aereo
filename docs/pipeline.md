@@ -212,7 +212,7 @@ from aereo.eoids import mosaic_eoids_tiles
 mosaic, transform, crs = mosaic_eoids_tiles("/tmp/goes_extraction", target_crs="EPSG:4326")
 ```
 
-See [EOIDS](eoids.md) for the full directory layout and mosaic options.
+See [Output Formats](output-formats.md) for the full directory layout and mosaic options.
 
 ### Gotcha: plugin-specific errors surface here
 
