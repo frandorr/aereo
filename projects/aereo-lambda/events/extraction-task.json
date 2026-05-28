@@ -1,0 +1,7 @@
+{
+  "task_uri": "s3://aereo-tasks/test-job/0/",
+  "output_prefix": "s3://aereo-tasks/results/test-job/0/",
+  "job_id": "test-job",
+  "chunk_id": 0,
+  "bucket": "aereo-tasks"
+}

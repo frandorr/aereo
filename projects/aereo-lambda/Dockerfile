@@ -35,7 +35,6 @@ COPY projects/aereo/ projects/aereo/
 # ------------------------------------------------------------------
 RUN cd projects/aereo && hatch build -t wheel
 RUN cd projects/aereo-lambda && hatch build -t wheel
-
 # ---------------------------------------------------------------------------
 # Stage 2 — Lambda Runtime
 # ---------------------------------------------------------------------------
@@ -48,7 +47,11 @@ COPY --from=builder /build/projects/aereo/dist/*.whl /tmp/
 COPY --from=builder /build/projects/aereo-lambda/dist/*.whl /tmp/
 RUN pip install --no-cache-dir /tmp/*.whl && rm -rf /tmp/*.whl
 
-# Install extractor plugins from PyPI (uncomment/modify as needed):
+# Install test extractor plugin for local testing
+COPY --from=builder /build/projects/aereo-lambda/test_extractor /tmp/test_extractor
+RUN pip install --no-cache-dir /tmp/test_extractor && rm -rf /tmp/test_extractor
+
+# Install real extractor plugins from PyPI (uncomment/modify as needed):
 # RUN pip install aereo-extract-odc-stac aereo-extract-satpy
 
 # AWS Lambda handler entrypoint
