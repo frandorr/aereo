@@ -7,7 +7,7 @@ description: |
 license: MIT
 metadata:
   author: AI
-  version: "2.0.0"
+  version: "2.2.0"
   domain: scaffolding
   triggers: create plugin, scaffolding plugin, new plugin, generate plugin, build aereo plugin
   role: scaffolding
@@ -98,6 +98,20 @@ The script will:
 4. Generate `core.py` with the correct base class (`SearchProvider` or `Extractor`).
 5. Register the `[project.entry-points."aereo.plugins"]` entry point.
 
+#### Important: Fix namespace and naming bugs in the template
+
+The template may still contain outdated `aer` references. After `setup.sh` finishes, verify and fix these:
+
+1. **Workspace namespace**: Check `workspace.toml` — if it says `namespace = "aer"`, change it to `namespace = "aereo"`.
+2. **Root pyproject.toml keywords**: If the keywords list contains `"aer"`, change it to `"aereo"`.
+3. **Project directory name**: The `setup.sh` may create `projects/aer-<name>/` instead of `projects/aereo-<name>/`. Rename it if needed:
+   ```bash
+   mv projects/aer-<name> projects/aereo-<name>
+   ```
+4. **Project pyproject.toml name**: Update `projects/aereo-<name>/pyproject.toml` to have `name = "aereo-<name>"` (not `aer-<name>`).
+5. **Wheel packages**: In the project `pyproject.toml`, ensure `build.targets.wheel.packages = ["aereo"]` (not `["aer"]`).
+6. **Polylith bricks**: In the project `pyproject.toml`, ensure bricks map to `aereo/<component>` not `aer/<component>`.
+
 ### 4. Implement the Plugin Logic
 
 Open the generated `components/aereo/<component_name>/core.py` and implement the required methods using the reference plugins as inspiration.
@@ -109,7 +123,32 @@ Open the generated `components/aereo/<component_name>/core.py` and implement the
 - Use `structlog.get_logger()` for logging.
 - Use `pandera` schemas (`AssetSchema.validate()`, `ArtifactSchema.validate()`) for DataFrame validation.
 
-### 5. Verify the Scaffolding
+### 5. Ensure Entry Points Are Registered
+
+The project package (not just the workspace root) must be installed as an editable package for the `aereo.plugins` entry points to be discoverable by the `PluginRegistry`.
+
+1. Create a `README.md` inside the project directory if it doesn't exist (hatchling requires it):
+   ```bash
+   touch projects/aereo-<name>/README.md
+   ```
+
+2. Install the project package:
+   ```bash
+   uv pip install -e projects/aereo-<name> --no-deps
+   ```
+
+3. Verify the entry point is registered:
+   ```bash
+   uv run python -c "
+   import importlib.metadata
+   for ep in importlib.metadata.entry_points().select(group='aereo.plugins'):
+       print(f'{ep.name} = {ep.value}')
+   "
+   ```
+
+You should see your plugin listed (e.g., `extract_lazycogs = aereo.extract_lazycogs.core:ExtractLazycogs`). If it's missing, the `PluginRegistry` will raise `ValueError: Hinted plugin '...' is not a registered Extractor/SearchProvider`.
+
+### 6. Verify the Scaffolding
 
 Run these commands to ensure everything is wired correctly:
 
@@ -119,7 +158,7 @@ uv run pytest                       # Run tests (should pass with the placeholde
 python -c "from aereo.<component_name>.core import <ClassName>; print('OK')"
 ```
 
-### 6. Add Dependencies
+### 7. Add Dependencies
 
 If the plugin needs extra libraries (e.g., `requests`, `pystac-client`, `geoai-py`), add them:
 
@@ -127,15 +166,70 @@ If the plugin needs extra libraries (e.g., `requests`, `pystac-client`, `geoai-p
 uv add <package-name>
 ```
 
+**Important:** The plugin's *project* `pyproject.toml` (`projects/aereo-<name>/pyproject.toml`) must declare its runtime dependencies, not just `"aereo"`. When the aereo workspace installs your plugin as an editable package, `uv` resolves dependencies from the project's `pyproject.toml`. If you import `rustac` in `core.py` but don't list it in the project dependencies, you'll get `ModuleNotFoundError` at runtime.
+
+For example, a search plugin that uses `rustac` should have:
+```toml
+[project]
+dependencies = [
+    "aereo",
+    "rustac>=0.9.11,<0.10.0",
+]
+```
+
+### 8. Register the Plugin in the Aereo Workspace
+
+This is the **most common cause** of `ValueError: Hinted plugin '...' is not a registered ...`. The plugin project must be declared as a workspace dependency so `uv` installs it and exposes its entry points.
+
+In the **aereo workspace** `pyproject.toml` (the main repo, not the plugin repo), add two things:
+
+1. **Add to `[tool.uv.sources]`** (pointing at the plugin's *project* directory, not the workspace root):
+   ```toml
+   [tool.uv.sources]
+   aereo-<name> = { path = "../aereo-<name>/projects/aereo-<name>", editable = true }
+   ```
+   - The path must end in `projects/aereo-<name>` — that's the directory with the entry points.
+   - If the plugin is a sibling of the aereo repo, the path is `../aereo-<name>/projects/aereo-<name>`.
+
+2. **Add to `[dependency-groups] dev`** so it gets installed when you `uv sync`:
+   ```toml
+   [dependency-groups]
+   dev = [
+     "...",
+     "aereo-<name>",
+   ]
+   ```
+
+3. **Match `requires-python`** between the plugin and the aereo workspace. If aereo says `requires-python = ">=3.12"`, the plugin project `pyproject.toml` must not say `">=3.13"` or `uv` will fail to resolve.
+
+4. **Run `uv sync` in the aereo workspace**:
+   ```bash
+   cd /path/to/aereo
+   uv sync
+   ```
+
+5. **Verify** — from inside the aereo workspace, check all registered entry points:
+   ```bash
+   uv run python -c "
+   import importlib.metadata
+   for ep in importlib.metadata.entry_points().select(group='aereo.plugins'):
+       print(f'{ep.name} = {ep.value}')
+   "
+   ```
+   You should see your plugin listed.
+
 ## Constraints
 
 ### MUST DO
 - Always start from `aereo-plugin-template` and run `setup.sh`.
 - Always read at least one reference plugin before implementing.
 - Always read `aereo/components/aereo/interfaces/core.py` and `aereo/components/aereo/schemas/core.py` to confirm current base-class and schema signatures.
+- Always fix `aer` → `aereo` namespace issues after running `setup.sh`.
+- Always install the project package with `uv pip install -e projects/aereo-<name> --no-deps` and verify entry points are registered.
+- Always register the plugin in the **aereo workspace** `pyproject.toml` (`[tool.uv.sources]` + `[dependency-groups] dev`) and run `uv sync` there.
 - Request clarification if the plugin type (search vs extract) or name is ambiguous.
 - Ensure the user runs `uv sync` after scaffolding.
 
 ### MUST NOT DO
 - Do NOT manually create components with raw `mkdir` or `cat`.
-- Do NOT manually edit `pyproject.toml` entry points; let `setup.sh` handle it.
+- Do NOT manually edit `pyproject.toml` entry points; let `setup.sh` handle it (then fix the `aer`/`aereo` naming bugs).
