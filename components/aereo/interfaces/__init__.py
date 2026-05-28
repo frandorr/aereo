@@ -20,6 +20,12 @@ from aereo.interfaces.core import (
     TaskStaging,
     merge_params,
 )
+from aereo.interfaces.core import (
+    DEFAULT_RASTER_COMPRESS as DEFAULT_RASTER_COMPRESS,
+    DEFAULT_RASTER_DRIVER as DEFAULT_RASTER_DRIVER,
+    DEFAULT_RASTER_PREDICTOR as DEFAULT_RASTER_PREDICTOR,
+    DEFAULT_RASTER_ZLEVEL as DEFAULT_RASTER_ZLEVEL,
+)
 
 __all__ = [
     "AereoPlugin",
@@ -34,4 +40,8 @@ __all__ = [
     "SearchProvider",
     "TaskStaging",
     "merge_params",
+    "DEFAULT_RASTER_COMPRESS",
+    "DEFAULT_RASTER_DRIVER",
+    "DEFAULT_RASTER_PREDICTOR",
+    "DEFAULT_RASTER_ZLEVEL",
 ]

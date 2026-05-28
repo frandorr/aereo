@@ -6,7 +6,7 @@ used across the aereo plugin system.
 
 import pandera.pandas as pa
 from pandera.typing import Series
-from pandera.typing.geopandas import GeoSeries
+from pandera.typing.geopandas import GeoDataFrame, GeoSeries
 
 
 class GridSchema(pa.DataFrameModel):
@@ -88,3 +88,20 @@ class ArtifactSchema(GridSchema):
     uri: Series[pa.String] = pa.Field(nullable=False)
     geometry: GeoSeries = pa.Field(nullable=False)
     collection: Series[pa.String] = pa.Field(nullable=True)
+
+    @classmethod
+    def empty_geodataframe(cls) -> GeoDataFrame["ArtifactSchema"]:
+        """Return an empty GeoDataFrame with ArtifactSchema columns.
+
+        Returns:
+            An empty validated GeoDataFrame with the correct schema columns,
+            including a geometry column.
+        """
+        import geopandas as gpd
+        from typing import cast
+
+        columns = list(cls.to_schema().columns.keys())
+        if "geometry" not in columns:
+            columns.append("geometry")
+        gdf = gpd.GeoDataFrame(columns=columns, geometry="geometry")
+        return cast(GeoDataFrame["ArtifactSchema"], cls.validate(gdf))
