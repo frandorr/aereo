@@ -33,6 +33,12 @@ GridFilterMode = Literal["intersection", "within", "coverage"]
 DEFAULT_CELLS_PER_TASK: int = 50
 WGS84_CRS: str = "epsg:4326"
 
+# Default raster write parameters used by extract plugins.
+DEFAULT_RASTER_DRIVER: str = "GTiff"
+DEFAULT_RASTER_COMPRESS: str = "deflate"
+DEFAULT_RASTER_ZLEVEL: int = 1
+DEFAULT_RASTER_PREDICTOR: int | None = None
+
 _YAML_INSTALL_MSG = (
     "YAML support requires PyYAML. Install it with: pip install 'aer[yaml]'"
 )
@@ -254,6 +260,22 @@ class AereoPlugin(ABC):
 
 
 class SearchProvider(AereoPlugin, plugin_abstract=True):
+    @staticmethod
+    def empty_result() -> GeoDataFrame[AssetSchema]:
+        """Return an empty GeoDataFrame with AssetSchema columns.
+
+        Returns:
+            An empty validated GeoDataFrame with the correct schema columns,
+            including a geometry column.
+        """
+        import geopandas as gpd
+
+        columns = list(AssetSchema.to_schema().columns.keys())
+        if "geometry" not in columns:
+            columns.append("geometry")
+        gdf = gpd.GeoDataFrame(columns=columns, geometry="geometry")
+        return cast(GeoDataFrame[AssetSchema], AssetSchema.validate(gdf))
+
     @abstractmethod
     def search(
         self,
@@ -516,6 +538,103 @@ class Extractor(AereoPlugin, plugin_abstract=True):
     declared as plugin properties; they are supplied at preparation time via
     ``GridConfig``.
     """
+
+    @staticmethod
+    def resolve_variables(
+        task: ExtractionTask,
+        collection: str | None = None,
+        extract_params: Mapping[str, Any] | None = None,
+    ) -> list[str]:
+        """Resolve target variables from profile collections with fallback chain.
+
+        Resolution order:
+        1. ``task.profile.collections[collection]``
+        2. ``extract_params["dataset_name"]``
+        3. ``task.task_context["dataset_name"]``
+
+        Args:
+            task: The extraction task containing profile and assets.
+            collection: Collection name to look up in profile.collections.
+                If None, uses the first collection found in task assets.
+            extract_params: Additional parameters that may contain a
+                ``dataset_name`` fallback.
+
+        Returns:
+            List of resolved variable names.
+
+        Raises:
+            ValueError: If no variables can be resolved.
+        """
+        variables: list[str] = []
+        extract_params = dict(extract_params or {})
+
+        if task.profile.collections:
+            if collection is not None:
+                variables = list(task.profile.collections.get(collection, []))
+            else:
+                # Use first collection's variables
+                for col_vars in task.profile.collections.values():
+                    variables.extend(col_vars)
+                variables = list(dict.fromkeys(variables))
+
+        if not variables:
+            dataset_name = extract_params.get("dataset_name") or task.task_context.get(
+                "dataset_name"
+            )
+            if dataset_name:
+                variables = [dataset_name]
+
+        if not variables:
+            coll_str = collection or "unknown"
+            raise ValueError(
+                f"No variables found in profile or params for collection {coll_str}"
+            )
+
+        return variables
+
+    @staticmethod
+    def resolve_downloader(
+        task: ExtractionTask,
+        extract_params: Mapping[str, Any] | None = None,
+    ) -> Any | None:
+        """Resolve the downloader callable using the standard priority order.
+
+        Resolution order:
+        1. ``task.profile.downloader`` (per-profile, highest priority)
+        2. ``extract_params["downloader"]`` (batch-level fallback)
+        3. ``None`` (use built-in default)
+
+        Args:
+            task: The extraction task containing profile.
+            extract_params: Additional parameters that may contain a downloader.
+
+        Returns:
+            The resolved downloader callable, or None.
+        """
+        if task.profile.downloader is not None:
+            return task.profile.downloader
+        if extract_params and "downloader" in extract_params:
+            return extract_params["downloader"]
+        return None
+
+    @staticmethod
+    def get_grid_cells(task: ExtractionTask) -> Sequence[Any]:
+        """Return the grid cells for a task.
+
+        Prefers ``task.grid_cells`` (set by :meth:`prepare_for_extraction`)
+        so that engines use the exact, pre-computed subset of cells.
+        Falls back to ``task.task_context["grid_cells"]`` if the task was
+        created without the standard preparation flow.
+
+        Args:
+            task: The extraction task whose grid cells should be retrieved.
+
+        Returns:
+            Sequence of grid-cell objects.
+        """
+        if hasattr(task, "grid_cells") and task.grid_cells:
+            return task.grid_cells
+        return task.task_context.get("grid_cells", [])
 
     def prepare_for_extraction(
         self,
