@@ -82,7 +82,7 @@ print(f"Prepared {len(tasks)} extraction tasks")
 Run the extraction. Each task is handed to the extractor plugin, which downloads granules, resamples to the target grid, and writes GeoTIFFs.
 
 ```python
-from aereo.execution import LocalProcessBackend
+from aereo.backends import LocalProcessBackend
 
 backend = LocalProcessBackend(max_workers=4)
 artifacts = client.execute_tasks(tasks, backend=backend)

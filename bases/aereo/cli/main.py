@@ -470,18 +470,67 @@ def plugins() -> None:
     table.add_column("Type", style="cyan")
     table.add_column("Name", style="magenta")
     table.add_column("Collections", style="green")
+    table.add_column("Required", style="yellow")
+    table.add_column("Optional", style="blue")
 
     for name, cls in registry._searchers.items():
         cols = ", ".join(cls.supported_collections[:3])
         if len(cls.supported_collections) > 3:
             cols += " ..."
-        table.add_row("Searcher", name, cols)
+        req = str(len(getattr(cls, "required_params", [])))
+        opt = str(len(getattr(cls, "optional_params", [])))
+        table.add_row("Searcher", name, cols, req, opt)
 
     for name, cls in registry._extractors.items():
         cols = ", ".join(cls.supported_collections[:3])
         if len(cls.supported_collections) > 3:
             cols += " ..."
-        table.add_row("Extractor", name, cols)
+        req = str(len(getattr(cls, "required_params", [])))
+        opt = str(len(getattr(cls, "optional_params", [])))
+        table.add_row("Extractor", name, cols, req, opt)
+
+    console.print(table)
+
+
+@app.command()
+def plugin_params(name: str) -> None:
+    """Show parameters for a specific AEREO plugin."""
+    from aereo.registry import AereoRegistry
+
+    registry = AereoRegistry()
+    try:
+        params = registry.get_plugin_params(name)
+    except KeyError:
+        console.print(f"[red]Plugin '{name}' not found.[/red]")
+        raise typer.Exit(code=1)
+
+    table = Table(title=f"Parameters for {name}")
+    table.add_column("Type", style="cyan")
+    table.add_column("Name", style="magenta")
+    table.add_column("Data Type", style="green")
+    table.add_column("Description", style="yellow")
+    table.add_column("Required", style="blue")
+    table.add_column("Default", style="dim")
+
+    for param in params.get("required", []):
+        table.add_row(
+            "Required",
+            param["name"],
+            param["type"],
+            param["description"],
+            "Yes",
+            str(param["default"]) if param.get("default") is not None else "—",
+        )
+
+    for param in params.get("optional", []):
+        table.add_row(
+            "Optional",
+            param["name"],
+            param["type"],
+            param["description"],
+            "No",
+            str(param["default"]) if param.get("default") is not None else "—",
+        )
 
     console.print(table)
 

@@ -20,7 +20,7 @@ Find satellite granules that match your time range, area of interest, and sensor
 from datetime import datetime, timezone
 from shapely.geometry import box
 from aereo.client import AereoClient
-from aereo.grid import GridConfig
+from aereo.interfaces import GridConfig
 from aereo.interfaces import AereoProfile
 
 aoi = box(-69.76, -39.98, -68.24, -39.05)

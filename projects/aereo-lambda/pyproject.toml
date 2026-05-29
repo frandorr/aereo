@@ -7,7 +7,7 @@ name = "aereo-lambda"
 version = "1.0.0"
 description = "AER Lambda container image — polylith project"
 readme = "README.md"
-keywords = [ "aer", "earth-observation", "lambda", "remote-sensing", "satellite" ]
+keywords = [ "aereo", "earth-observation", "lambda", "remote-sensing", "satellite" ]
 license = "Apache-2.0"
 requires-python = ">=3.12"
 classifiers = [

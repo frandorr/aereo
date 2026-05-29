@@ -102,7 +102,7 @@ Here is a complete, copy-pasteable implementation using `boto3`:
 ```python
 import boto3
 from pathlib import Path
-from aereo.execution.core import TaskStaging
+from aereo.interfaces import TaskStaging
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -118,7 +118,7 @@ class S3TaskStaging(TaskStaging):
 
     def stage(self, src_dir: Path, job_id: str, task_idx: int) -> str:
         """Upload serialized task files and return an S3 URI."""
-        prefix = f"aer-tasks/{job_id}/{task_idx}/"
+        prefix = f"aereo-tasks/{job_id}/{task_idx}/"
         for file_path in src_dir.iterdir():
             if file_path.is_file():
                 key = f"{prefix}{file_path.name}"
@@ -127,7 +127,7 @@ class S3TaskStaging(TaskStaging):
 
     def result_prefix(self, job_id: str, task_idx: int) -> str:
         """Return the S3 prefix where the remote worker should write results."""
-        return f"s3://{self.bucket}/aer-results/{job_id}/{task_idx}/"
+        return f"s3://{self.bucket}/aereo-results/{job_id}/{task_idx}/"
 
     def load_artifacts(self, manifest_uri: str) -> GeoDataFrame[ArtifactSchema]:
         """Download the result manifest and load the artifact GeoDataFrame.
@@ -144,10 +144,10 @@ class S3TaskStaging(TaskStaging):
 You can now pass this staging object to `LambdaBackend`:
 
 ```python
-from aereo.execution import LambdaBackend
+from aereo.backends.lambda_backend import LambdaBackend
 
 backend = LambdaBackend(
-    function_name="aer-extract",
+    function_name="aereo-extract",
     staging=S3TaskStaging(bucket="my-staging-bucket"),
 )
 ```
@@ -159,10 +159,10 @@ Dispatches tasks to an AWS Lambda function for serverless extraction.
 **Best for:** Burst workloads, large-scale parallel extraction, or offloading heavy processing from local machines.
 
 ```python
-from aereo.execution import LambdaBackend
+from aereo.backends.lambda_backend import LambdaBackend
 
 backend = LambdaBackend(
-    function_name="aer-extract",
+    function_name="aereo-extract",
     staging=S3TaskStaging(bucket="my-staging-bucket"),
 )
 artifacts = client.execute_tasks(tasks)
@@ -182,7 +182,7 @@ Point `LambdaBackend` at a local Lambda emulator (e.g. Floci):
 
 ```python
 backend = LambdaBackend(
-    function_name="aer-extract",
+    function_name="aereo-extract",
     staging=S3TaskStaging(bucket="local-bucket"),
     endpoint_url="http://localhost:9001",
 )
