@@ -40,7 +40,7 @@ DEFAULT_RASTER_ZLEVEL: int = 1
 DEFAULT_RASTER_PREDICTOR: int | None = None
 
 _YAML_INSTALL_MSG = (
-    "YAML support requires PyYAML. Install it with: pip install 'aer[yaml]'"
+    "YAML support requires PyYAML. Install it with: pip install 'aereo[yaml]'"
 )
 
 
@@ -885,7 +885,7 @@ class TaskStaging(Protocol):
             task_idx: Index of the task within the job.
 
         Returns:
-            A URI (e.g. ``s3://bucket/aer-tasks/{job_id}/{task_idx}/``) that the
+            A URI (e.g. ``s3://bucket/aereo-tasks/{job_id}/{task_idx}/``) that the
             remote worker can use to retrieve the task.
         """
         ...

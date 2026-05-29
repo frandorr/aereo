@@ -59,7 +59,7 @@ import pandas as pd
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
 
-from aereo.interfaces import PluginParam, SearchProvider
+from aereo.interfaces import AereoProfile, PluginParam, SearchProvider
 from aereo.schemas import AssetSchema
 
 
@@ -79,7 +79,7 @@ class AcmeSearchProvider(SearchProvider):
 
     def search(
         self,
-        collections: Sequence[str],
+        profiles: Sequence[AereoProfile],
         intersects: BaseGeometry | None,
         start_datetime: datetime | None,
         end_datetime: datetime | None,
@@ -114,10 +114,11 @@ Create an extractor (e.g., in `acme_plugin/extract.py`). Extract plugins **must*
 ```python
 """ACME extract plugin for aereo."""
 
-from typing import Any
+from typing import Any, Mapping, Sequence
 
 from pandera.typing.geopandas import GeoDataFrame
-from aereo.interfaces import PluginParam, Extractor
+from shapely.geometry.base import BaseGeometry
+from aereo.interfaces import AereoProfile, Extractor, ExtractionTask, GridConfig, PluginParam
 from aereo.schemas import AssetSchema, ArtifactSchema
 
 
@@ -138,8 +139,14 @@ class AcmeExtractor(Extractor):
     def prepare_for_extraction(
         self,
         search_results: GeoDataFrame[AssetSchema],
-        prepare_params: dict[str, Any] | None,
-    ) -> list[GeoDataFrame[AssetSchema]]:
+        grid_config: GridConfig,
+        target_aoi: BaseGeometry | None = None,
+        uri: str | None = None,
+        profiles: Sequence[AereoProfile] | None = None,
+        cells_per_task: int = 50,
+        extractor_hint: str | None = None,
+        init_params: Mapping[str, Any] | None = None,
+    ) -> Sequence[ExtractionTask]:
         """Group search results into extraction batches."""
 
         # By default, split into single-row batches for individual download
@@ -151,13 +158,13 @@ class AcmeExtractor(Extractor):
 
     def extract(
         self,
-        assets_batch: GeoDataFrame[AssetSchema],
-        extract_params: dict[str, Any] | None,
+        extraction_task: ExtractionTask,
+        extract_params: Mapping[str, Any] | None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """Download and extract ACME data for a batch."""
         extracted_artifacts = []
 
-        for _, asset_row in assets_batch.iterrows():
+        for _, asset_row in extraction_task.assets.iterrows():
             item_id = asset_row["id"]
 
             try:
@@ -308,7 +315,7 @@ profiles = AereoProfile.from_yaml(Path("profiles.yaml"))
 
 # 1. Search
 results = client.search(
-    collections=["acme-l1"],
+    profiles=profiles,
     start_datetime=datetime(2023, 1, 1),
     end_datetime=datetime(2023, 1, 31),
 )

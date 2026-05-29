@@ -55,13 +55,13 @@ ExtendedAssetSchema = AssetSchema.add_columns(
 The `AereoClient` abstracts backend selection, but you can also invoke backends directly in custom workflows:
 
 ```python
-from aereo.execution import LocalProcessBackend, DaskBackend
+from aereo.backends import LocalProcessBackend, ThreadBackend
 
-# Single-machine parallel extraction
+# Single-machine parallel extraction (CPU-bound)
 local = LocalProcessBackend(max_workers=4)
 
-# Distributed Dask extraction
-dask = DaskBackend(cluster_address="scheduler:8786")
+# Single-machine parallel extraction (I/O-bound)
+threads = ThreadBackend(max_workers=8)
 ```
 
 When designing an `Extractor`, keep the `extract` method stateless and idempotent. The backend handles scheduling and retry logic; your plugin should focus on the per-batch data transformation.
@@ -97,8 +97,8 @@ from aereo.registry import AereoRegistry
 
 def test_plugin_discovery():
     registry = AereoRegistry()
-    assert "acme_search" in registry.list_search_providers()
-    assert "acme_extract" in registry.list_extractors()
+    assert "acme_search" in registry._searchers
+    assert "acme_extract" in registry._extractors
 ```
 
 ---
