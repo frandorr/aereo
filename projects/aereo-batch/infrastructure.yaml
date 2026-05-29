@@ -1,0 +1,343 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  AEREO Batch infrastructure — Managed EC2 Spot compute environment,
+  job queue, and job definition for satellite data extraction.
+
+Parameters:
+  ImageUri:
+    Type: String
+    Description: Full ECR image URI for the Batch container.
+
+  S3BucketName:
+    Type: String
+    Description: S3 bucket for task staging and results.
+
+  JobQueueName:
+    Type: String
+    Default: aereo-queue
+    Description: Name of the AWS Batch job queue.
+
+  JobDefinitionName:
+    Type: String
+    Default: aereo-extractor
+    Description: Name of the AWS Batch job definition.
+
+  ComputeEnvironmentName:
+    Type: String
+    Default: aereo-compute-env
+    Description: Name of the AWS Batch compute environment.
+
+  SpotBidPercentage:
+    Type: Number
+    Default: 60
+    Description: Spot bid percentage of On-Demand price (0-100).
+
+  MinvCpus:
+    Type: Number
+    Default: 0
+    Description: Minimum vCPUs for the compute environment.
+
+  MaxvCpus:
+    Type: Number
+    Default: 256
+    Description: Maximum vCPUs for the compute environment.
+
+  DesiredvCpus:
+    Type: Number
+    Default: 0
+    Description: Desired vCPUs for the compute environment.
+
+  InstanceTypes:
+    Type: CommaDelimitedList
+    Default: optimal
+    Description: EC2 instance types. Use 'optimal' for AWS to choose.
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID for Batch compute resources. Use default VPC if empty.
+
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs for Batch compute resources.
+
+  SecurityGroupIds:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: Security group IDs for Batch compute resources.
+
+Conditions:
+  UseDefaultVpc: !Equals
+    - !Ref VpcId
+    - ""
+
+Resources:
+  # ---------------------------------------------------------------------------
+  # VPC Resources (if not provided)
+  # ---------------------------------------------------------------------------
+  AereoBatchVpc:
+    Type: AWS::EC2::VPC
+    Condition: UseDefaultVpc
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: aereo-batch-vpc
+
+  AereoBatchSubnet:
+    Type: AWS::EC2::Subnet
+    Condition: UseDefaultVpc
+    Properties:
+      VpcId: !Ref AereoBatchVpc
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select
+        - 0
+        - !GetAZs
+          Ref: AWS::Region
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: aereo-batch-subnet
+
+  AereoBatchInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Condition: UseDefaultVpc
+    Properties:
+      Tags:
+        - Key: Name
+          Value: aereo-batch-igw
+
+  AereoBatchVpcGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Condition: UseDefaultVpc
+    Properties:
+      VpcId: !Ref AereoBatchVpc
+      InternetGatewayId: !Ref AereoBatchInternetGateway
+
+  AereoBatchRouteTable:
+    Type: AWS::EC2::RouteTable
+    Condition: UseDefaultVpc
+    Properties:
+      VpcId: !Ref AereoBatchVpc
+      Tags:
+        - Key: Name
+          Value: aereo-batch-rt
+
+  AereoBatchRoute:
+    Type: AWS::EC2::Route
+    Condition: UseDefaultVpc
+    DependsOn: AereoBatchVpcGatewayAttachment
+    Properties:
+      RouteTableId: !Ref AereoBatchRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref AereoBatchInternetGateway
+
+  AereoBatchSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: UseDefaultVpc
+    Properties:
+      SubnetId: !Ref AereoBatchSubnet
+      RouteTableId: !Ref AereoBatchRouteTable
+
+  AereoBatchSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: UseDefaultVpc
+    Properties:
+      GroupDescription: Security group for AEREO Batch compute resources
+      VpcId: !Ref AereoBatchVpc
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: aereo-batch-sg
+
+  # ---------------------------------------------------------------------------
+  # IAM Roles
+  # ---------------------------------------------------------------------------
+  BatchServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-batch-service-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: batch.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole
+
+  BatchInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-batch-instance-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+
+  BatchInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub "${AWS::StackName}-batch-instance-profile"
+      Roles:
+        - !Ref BatchInstanceRole
+
+  BatchJobRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-batch-job-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3TaskAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowS3StagingAndResults
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub "arn:aws:s3:::${S3BucketName}"
+                  - !Sub "arn:aws:s3:::${S3BucketName}/*"
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowCloudWatchLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+  # ---------------------------------------------------------------------------
+  # Compute Environment
+  # ---------------------------------------------------------------------------
+  AereoComputeEnvironment:
+    Type: AWS::Batch::ComputeEnvironment
+    Properties:
+      ComputeEnvironmentName: !Ref ComputeEnvironmentName
+      Type: MANAGED
+      State: ENABLED
+      ComputeResources:
+        Type: EC2
+        AllocationStrategy: SPOT_CAPACITY_OPTIMIZED
+        MinvCpus: !Ref MinvCpus
+        MaxvCpus: !Ref MaxvCpus
+        DesiredvCpus: !Ref DesiredvCpus
+        InstanceTypes: !Ref InstanceTypes
+        Subnets:
+          - !If
+            - UseDefaultVpc
+            - !Ref AereoBatchSubnet
+            - !Select
+              - 0
+              - !Ref SubnetIds
+        SecurityGroupIds:
+          - !If
+            - UseDefaultVpc
+            - !Ref AereoBatchSecurityGroup
+            - !Select
+              - 0
+              - !Ref SecurityGroupIds
+        InstanceRole: !Ref BatchInstanceProfile
+        SpotIamFleetRole: !GetAtt BatchServiceRole.Arn
+        BidPercentage: !Ref SpotBidPercentage
+        Ec2Configuration:
+          - ImageType: ECS_AL2
+        Tags:
+          Name: aereo-batch-compute
+
+  # ---------------------------------------------------------------------------
+  # Job Queue
+  # ---------------------------------------------------------------------------
+  AereoJobQueue:
+    Type: AWS::Batch::JobQueue
+    Properties:
+      JobQueueName: !Ref JobQueueName
+      State: ENABLED
+      Priority: 1
+      ComputeEnvironmentOrder:
+        - Order: 1
+          ComputeEnvironment: !Ref AereoComputeEnvironment
+
+  # ---------------------------------------------------------------------------
+  # Job Definition
+  # ---------------------------------------------------------------------------
+  AereoJobDefinition:
+    Type: AWS::Batch::JobDefinition
+    Properties:
+      JobDefinitionName: !Ref JobDefinitionName
+      Type: container
+      ContainerProperties:
+        Image: !Ref ImageUri
+        Vcpus: 4
+        Memory: 16384
+        JobRoleArn: !GetAtt BatchJobRole.Arn
+        ExecutionRoleArn: !GetAtt BatchJobRole.Arn
+        Environment: []
+        MountPoints: []
+        Volumes: []
+        Ulimits: []
+      RetryStrategy:
+        Attempts: 2
+        EvaluateOnExit:
+          - OnStatusReason: Host EC2*
+            Action: RETRY
+          - OnReason: "*"
+            Action: EXIT
+      Timeout:
+        AttemptDurationSeconds: 7200
+
+Outputs:
+  JobQueueArn:
+    Description: ARN of the AEREO Batch job queue
+    Value: !GetAtt AereoJobQueue.JobQueueArn
+    Export:
+      Name: !Sub "${AWS::StackName}-JobQueueArn"
+
+  JobQueueName:
+    Description: Name of the AEREO Batch job queue
+    Value: !Ref AereoJobQueue
+    Export:
+      Name: !Sub "${AWS::StackName}-JobQueueName"
+
+  JobDefinitionArn:
+    Description: ARN of the AEREO Batch job definition
+    Value: !Ref AereoJobDefinition
+    Export:
+      Name: !Sub "${AWS::StackName}-JobDefinitionArn"
+
+  JobDefinitionName:
+    Description: Name of the AEREO Batch job definition
+    Value: !Ref JobDefinitionName
+    Export:
+      Name: !Sub "${AWS::StackName}-JobDefinitionName"
+
+  ComputeEnvironmentName:
+    Description: Name of the AEREO compute environment
+    Value: !Ref AereoComputeEnvironment
+    Export:
+      Name: !Sub "${AWS::StackName}-ComputeEnvName"
+
+  S3BucketName:
+    Description: S3 bucket for tasks and results
+    Value: !Ref S3BucketName
+    Export:
+      Name: !Sub "${AWS::StackName}-S3Bucket"
