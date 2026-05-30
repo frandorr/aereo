@@ -49,8 +49,8 @@ Parameters:
 
   InstanceTypes:
     Type: CommaDelimitedList
-    Default: optimal
-    Description: EC2 instance types. Use 'optimal' for AWS to choose.
+    Default: t3.medium,t3.large,m5.large,m5.xlarge
+    Description: EC2 instance types for Batch compute. Avoid 'optimal' which can pick oversized instances.
 
   VpcId:
     Type: AWS::EC2::VPC::Id
@@ -237,7 +237,7 @@ Resources:
       State: ENABLED
       ComputeResources:
         Type: EC2
-        AllocationStrategy: SPOT_CAPACITY_OPTIMIZED
+        AllocationStrategy: BEST_FIT_PROGRESSIVE
         MinvCpus: !Ref MinvCpus
         MaxvCpus: !Ref MaxvCpus
         DesiredvCpus: !Ref DesiredvCpus
@@ -257,8 +257,6 @@ Resources:
               - 0
               - !Ref SecurityGroupIds
         InstanceRole: !Ref BatchInstanceProfile
-        SpotIamFleetRole: !GetAtt BatchServiceRole.Arn
-        BidPercentage: !Ref SpotBidPercentage
         Ec2Configuration:
           - ImageType: ECS_AL2
         Tags:
@@ -291,7 +289,19 @@ Resources:
         Memory: 16384
         JobRoleArn: !GetAtt BatchJobRole.Arn
         ExecutionRoleArn: !GetAtt BatchJobRole.Arn
-        Environment: []
+        Environment:
+          - Name: TASK_URI
+            Value: Ref::TASK_URI
+          - Name: OUTPUT_PREFIX
+            Value: Ref::OUTPUT_PREFIX
+          - Name: JOB_ID
+            Value: Ref::JOB_ID
+          - Name: CHUNK_ID
+            Value: Ref::CHUNK_ID
+          - Name: BUCKET
+            Value: Ref::BUCKET
+          - Name: INIT_PARAMS
+            Value: Ref::INIT_PARAMS
         MountPoints: []
         Volumes: []
         Ulimits: []

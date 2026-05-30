@@ -44,7 +44,7 @@ profile = AereoProfile(
 # 2. Configure Batch backend with S3 staging
 # ---------------------------------------------------------------------------
 # NOTE: Update these values if you deployed with different names
-BUCKET = "aereo-batch-tasks"
+BUCKET = "frandorr-lambda-tests"
 JOB_QUEUE = "aereo-queue"
 JOB_DEFINITION = "aereo-extractor"
 REGION = "us-west-2"
@@ -103,7 +103,7 @@ print(results_df.head())
 if len(results_df) > 0:
     print(f"\nArtifacts stored in S3 bucket: {BUCKET}")
     print("Result columns:", list(results_df.columns))
-    
+
     # Save result metadata locally
     results_df.to_parquet("/tmp/batch_goes_results.parquet")
     print("Saved result metadata to /tmp/batch_goes_results.parquet")

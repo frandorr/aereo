@@ -8,6 +8,12 @@ version = "1.0.0"
 description = "AEREO Batch execution backend for AWS Batch on EC2 Spot"
 readme = "README.md"
 requires-python = ">=3.12"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
 dependencies = [
   "boto3>=1.34",
 ]

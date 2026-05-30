@@ -75,8 +75,7 @@ class BatchBackend(ExecutionBackend):
             import boto3  # pyright: ignore[reportMissingImports]
         except ImportError as exc:
             raise ImportError(
-                "boto3 is required for BatchBackend. "
-                "Install it with: pip install boto3"
+                "boto3 is required for BatchBackend. Install it with: pip install boto3"
             ) from exc
 
         self.job_queue = job_queue
@@ -134,20 +133,28 @@ class BatchBackend(ExecutionBackend):
                 job_queue=self.job_queue,
             )
 
-            # Submit array job
+            # Submit job (array for multi-task, single for single-task)
             job_name = f"aereo-{job_id}-{batch_idx}"
-            array_job_id = self._submit_array_job(
-                job_name=job_name,
-                array_size=batch_size,
-                staged_tasks=batch_tasks,
-            )
-
-            # Wait for completion and collect results
-            batch_results = self._wait_and_collect(
-                array_job_id=array_job_id,
-                batch_size=batch_size,
-                staged_tasks=batch_tasks,
-            )
+            if batch_size == 1:
+                job_id = self._submit_single_job(
+                    job_name=job_name,
+                    staged_task=batch_tasks[0],
+                )
+                batch_results = self._wait_single_job(
+                    job_id=job_id,
+                    staged_task=batch_tasks[0],
+                )
+            else:
+                array_job_id = self._submit_array_job(
+                    job_name=job_name,
+                    array_size=batch_size,
+                    staged_tasks=batch_tasks,
+                )
+                batch_results = self._wait_and_collect(
+                    array_job_id=array_job_id,
+                    batch_size=batch_size,
+                    staged_tasks=batch_tasks,
+                )
 
             # Map batch results back to original task indices
             for i, result in enumerate(batch_results):
@@ -170,12 +177,14 @@ class BatchBackend(ExecutionBackend):
                 task_uri = self.staging.stage(Path(tmpdir), job_id, task_idx)
 
             output_prefix = self.staging.result_prefix(job_id, task_idx)
-            staged.append({
-                "task_uri": task_uri,
-                "output_prefix": output_prefix,
-                "chunk_id": task_idx,
-                "task": task,
-            })
+            staged.append(
+                {
+                    "task_uri": task_uri,
+                    "output_prefix": output_prefix,
+                    "chunk_id": task_idx,
+                    "task": task,
+                }
+            )
 
             logger.debug(
                 "task_staged",
@@ -227,10 +236,12 @@ class BatchBackend(ExecutionBackend):
         first_task = staged_tasks[0]["task"]
         init_params = first_task.task_context.get("init_params")
         if init_params:
-            container_overrides["environment"].append({
-                "name": "INIT_PARAMS",
-                "value": json.dumps(init_params),
-            })
+            container_overrides["environment"].append(
+                {
+                    "name": "INIT_PARAMS",
+                    "value": json.dumps(init_params),
+                }
+            )
 
         response = self._batch_client.submit_job(
             jobName=job_name,
@@ -338,3 +349,123 @@ class BatchBackend(ExecutionBackend):
             )
 
         return results
+
+    def _submit_single_job(
+        self,
+        job_name: str,
+        staged_task: dict[str, Any],
+    ) -> str:
+        """Submit a single (non-array) AWS Batch job.
+
+        Args:
+            job_name: Name for the job.
+            staged_task: Staged task metadata dict.
+
+        Returns:
+            The AWS Batch job ID.
+        """
+        container_overrides = {
+            "environment": [
+                {"name": "TASK_URI", "value": staged_task["task_uri"]},
+                {"name": "OUTPUT_PREFIX", "value": staged_task["output_prefix"]},
+                {"name": "JOB_ID", "value": job_name},
+                {"name": "CHUNK_ID", "value": str(staged_task["chunk_id"])},
+                {
+                    "name": "BUCKET",
+                    "value": getattr(self.staging, "bucket", ""),
+                },
+            ]
+        }
+
+        # Add init_params if present
+        init_params = staged_task["task"].task_context.get("init_params")
+        if init_params:
+            container_overrides["environment"].append(
+                {
+                    "name": "INIT_PARAMS",
+                    "value": json.dumps(init_params),
+                }
+            )
+
+        response = self._batch_client.submit_job(
+            jobName=job_name,
+            jobQueue=self.job_queue,
+            jobDefinition=self.job_definition,
+            containerOverrides=container_overrides,
+            retryStrategy={
+                "attempts": 2,
+                "evaluateOnExit": [
+                    {
+                        "onStatusReason": "Host EC2*",
+                        "action": "RETRY",
+                    },
+                    {
+                        "onReason": "*",
+                        "action": "EXIT",
+                    },
+                ],
+            },
+        )
+
+        job_id = response["jobId"]
+        logger.info(
+            "batch_single_job_submitted",
+            job_name=job_name,
+            job_id=job_id,
+        )
+        return job_id
+
+    def _wait_single_job(
+        self,
+        job_id: str,
+        staged_task: dict[str, Any],
+    ) -> list[GeoDataFrame[ArtifactSchema] | None]:
+        """Poll a single job until complete, then load artifacts.
+
+        Args:
+            job_id: The AWS Batch job ID.
+            staged_task: Staged task metadata.
+
+        Returns:
+            List with single result (GeoDataFrame) or None.
+        """
+        start_time = time.time()
+
+        while (time.time() - start_time) < self.max_wait_seconds:
+            response = self._batch_client.describe_jobs(jobs=[job_id])
+            job = response["jobs"][0]
+            status = job["status"]
+
+            if status == "SUCCEEDED":
+                try:
+                    output_prefix = staged_task["output_prefix"]
+                    manifest_uri = f"{output_prefix}manifest.json"
+                    result = self.staging.load_artifacts(manifest_uri)
+                    logger.info(
+                        "batch_single_job_completed",
+                        job_id=job_id,
+                    )
+                    return [result]
+                except Exception as exc:
+                    logger.error(
+                        "batch_single_load_artifacts_failed",
+                        job_id=job_id,
+                        error=str(exc),
+                    )
+                    return [None]
+            elif status == "FAILED":
+                reason = job.get("statusReason", "Unknown")
+                logger.error(
+                    "batch_single_job_failed",
+                    job_id=job_id,
+                    reason=reason,
+                )
+                return [None]
+
+            time.sleep(self.poll_interval)
+
+        logger.warning(
+            "batch_single_timeout",
+            job_id=job_id,
+        )
+        return [None]

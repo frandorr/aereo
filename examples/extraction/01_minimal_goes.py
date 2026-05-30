@@ -40,5 +40,13 @@ tasks = client.prepare_for_extraction(
 results_df = client.execute_tasks(tasks)
 print("GeoTIFFs written to /tmp/01_minimal_goes_out")
 # %%
-# import rioxarray
-# rioxarray.open_rasterio(results_df.iloc[0].uri).plot()
+import matplotlib.pyplot as plt  # noqa: E402
+import rioxarray  # noqa: E402, F401
+import xarray as xr  # noqa: E402
+
+da = xr.open_dataarray(results_df.iloc[0].uri, engine="rasterio")
+da.plot()
+plt.title("GOES")
+plt.tight_layout()
+plt.savefig("/root/repos/aereo/docs/assets/01_minimal_goes.png", dpi=150)
+print("Saved plot to docs/assets/01_minimal_goes.png")

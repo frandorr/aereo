@@ -60,6 +60,7 @@ profiles:
           geotessera: ["0", "1", "2"]
       extract_params:
           max_download_workers: 4
+          tmp_dir: /root/repos/aereo/examples
       plugin_hints:
           search: search_tessera
           extract: extract_tessera

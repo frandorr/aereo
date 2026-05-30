@@ -58,6 +58,13 @@ tasks = client.prepare_for_extraction(
 results_df = client.execute_tasks(tasks)
 print(f"Extracted {len(results_df)} artifacts")
 # %%
-# import rioxarray
+import matplotlib.pyplot as plt
+import rioxarray  # noqa: F401
+import xarray as xr
 
-# rioxarray.open_rasterio(results_df.iloc[0].uri).plot()
+da = xr.open_dataarray(results_df.iloc[0].uri, engine="rasterio")
+da.plot()
+plt.title("GOES")
+plt.tight_layout()
+plt.savefig("/root/repos/aereo/docs/assets/02_goes_mosaic_plot.png", dpi=150)
+print("Saved plot to docs/assets/02_goes_mosaic_plot.png")

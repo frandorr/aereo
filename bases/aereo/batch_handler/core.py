@@ -59,7 +59,11 @@ _extract_plugins = [
 _search_plugins = [
     ("search_aws_goes", "aereo.search_aws_goes.core", "AwsGoesSearcher"),
     ("search_earthaccess", "aereo.search_earthaccess.core", "EarthAccessSearcher"),
-    ("search_planetary_computer", "aereo.search_planetary_computer.core", "PlanetaryComputerSearcher"),
+    (
+        "search_planetary_computer",
+        "aereo.search_planetary_computer.core",
+        "PlanetaryComputerSearcher",
+    ),
     ("search_rustac", "aereo.search_rustac.core", "RustacSearcher"),
     ("search_tessera", "aereo.search_tessera.core", "TesseraSearcher"),
 ]

@@ -1,0 +1,2 @@
+FROM 789196964947.dkr.ecr.us-west-2.amazonaws.com/aereo-batch:latest
+RUN pip install --no-cache-dir pandera
