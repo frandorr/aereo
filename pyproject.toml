@@ -167,6 +167,10 @@ exclude = [
   "site/",
   ".venv/",
   "test/",
+  "build/",
+  "docs/examples/",
+  "docs/examples/legacy/",
+  "development/local/",
 ]
 typeCheckingMode = "basic"
 reportMissingTypeStubs = false

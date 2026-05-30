@@ -12,7 +12,7 @@ repos:
     rev: v1.13.0
     hooks:
       - id: basedpyright
-        exclude: ^examples/
+        exclude: ^(examples/|docs/examples/|build/|development/local/)
 
   # --- pyproject formatting ---
   - repo: https://github.com/tox-dev/pyproject-fmt
