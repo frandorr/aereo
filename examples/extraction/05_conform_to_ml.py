@@ -16,8 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import geopandas as gpd
+from aereo.backends import LocalProcessBackend
 from aereo.client import AereoClient
-from aereo.execution import LocalProcessBackend
 from aereo.interfaces import AereoProfile, GridConfig
 
 # --- Configuration ---
@@ -69,8 +69,8 @@ client = AereoClient(
     profiles=profiles,
     grid_config=grid,
     aoi=aoi,
-    backend=LocalProcessBackend(max_workers=None),
-    cells_per_task=1,
+    backend=LocalProcessBackend(max_workers=8),
+    cells_per_task=2,
 )
 
 print("Searching...", flush=True)
@@ -116,6 +116,7 @@ if not tifs:
     raise RuntimeError("No GeoTIFF outputs found — extraction may have failed.")
 
 arrays = []
+uri_to_collection = dict(zip(results_df["uri"], results_df["collection"]))
 for tif in tifs:
     with rasterio.open(tif) as src:
         arr = src.read()  # (C, H, W)
@@ -152,7 +153,7 @@ fig.suptitle(
     fontweight="bold",
 )
 
-for idx, arr in enumerate(arrays):
+for idx, (arr, tif) in enumerate(zip(arrays, tifs)):
     ax = axes.flat[idx]
     band = arr[0]  # (C, H, W) -> (H, W)
     valid = band[(band != 0) & np.isfinite(band)]
@@ -161,7 +162,8 @@ for idx, arr in enumerate(arrays):
     else:
         vmin, vmax = 0, 1
     ax.imshow(band, vmin=vmin, vmax=vmax, cmap="viridis")
-    ax.set_title(f"Cell {idx + 1}\n{band.shape}", fontsize=9)
+    collection = uri_to_collection.get(str(tif), "Unknown")
+    ax.set_title(f"{collection}\nCell {idx + 1}  {band.shape}", fontsize=9)
     ax.axis("off")
 
 for idx in range(n, rows * cols):

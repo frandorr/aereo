@@ -93,28 +93,39 @@ results_df = client.execute_tasks(tasks)
 print(f"Extracted {len(results_df)} artifacts")
 
 # %%
-# import rioxarray  # noqa: F401
-# import xarray as xr
+import matplotlib.pyplot as plt
+import rioxarray  # noqa: F401
+import xarray as xr
 
-# # plot in 3 cols (one per row uri) — each at its native pixel size
-# uris = results_df[results_df.grid_cell == "90D_119L"].uri.tolist()
-# n = len(uris)
-# cols = 3
-# rows = (n + cols - 1) // cols
+# plot in 3 cols (one per row uri) — each at its native pixel size
+subset = results_df[results_df.grid_cell == "90D_119L"]
+uris = subset.uri.tolist()
+n = len(uris)
+cols = 3
+rows = (n + cols - 1) // cols
 
-# fig, axes = plt.subplots(rows, cols, figsize=(4 * cols, 4 * rows))
-# if n == 1:
-#     axes = [axes]
-# else:
-#     axes = axes.flatten()
+COLLECTION_TO_CONSTELLATION = {
+    "ABI-L1b-RadF": "GOES",
+    "VJ202IMG": "VIIRS",
+    "VJ203IMG": "VIIRS",
+    "S3A_OL_1_EFR": "Sentinel-3",
+}
 
-# for ax, uri in zip(axes, uris):
-#     da = xr.open_dataarray(uri, engine="rasterio")
-#     da.plot(ax=ax, add_colorbar=False)
-#     ax.set_title(uri.split("/")[-1])
+fig, axes = plt.subplots(rows, cols, figsize=(4 * cols, 4 * rows))
+if n == 1:
+    axes = [axes]
+else:
+    axes = axes.flatten()
 
-# # hide unused subplots
-# for ax in axes[n:]:
-#     ax.axis("off")
+for ax, (_, row) in zip(axes, subset.iterrows()):
+    da = xr.open_dataarray(row.uri, engine="rasterio")
+    da.plot(ax=ax, add_colorbar=False)
+    ax.set_title(COLLECTION_TO_CONSTELLATION.get(row.collection, row.collection))
 
-# plt.tight_layout()
+# hide unused subplots
+for ax in axes[n:]:
+    ax.axis("off")
+
+plt.tight_layout()
+plt.savefig("/root/repos/aereo/docs/assets/04_multi_constellation.png", dpi=150)
+print("Saved plot to docs/assets/04_multi_constellation.png")

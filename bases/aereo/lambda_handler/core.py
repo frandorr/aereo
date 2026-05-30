@@ -36,7 +36,11 @@ _extract_plugins = [
 _search_plugins = [
     ("search_aws_goes", "aereo.search_aws_goes.core", "AwsGoesSearcher"),
     ("search_earthaccess", "aereo.search_earthaccess.core", "EarthAccessSearcher"),
-    ("search_planetary_computer", "aereo.search_planetary_computer.core", "PlanetaryComputerSearcher"),
+    (
+        "search_planetary_computer",
+        "aereo.search_planetary_computer.core",
+        "PlanetaryComputerSearcher",
+    ),
     ("search_rustac", "aereo.search_rustac.core", "RustacSearcher"),
     ("search_tessera", "aereo.search_tessera.core", "TesseraSearcher"),
 ]
@@ -143,14 +147,14 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
         # Timing instrumentation
         timings = {}
         t0 = time.time()
-        
+
         # 1. Download staged task
         with tempfile.TemporaryDirectory() as tmpdir:
             task_dir = Path(tmpdir)
             t1 = time.time()
             _download_prefix(s3, bucket, prefix, task_dir)
             timings["download_task"] = time.time() - t1
-            
+
             t2 = time.time()
             task = _serializer.deserialize(task_dir)
             timings["deserialize_task"] = time.time() - t2
@@ -187,7 +191,10 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             extra={
                 "job_id": job_id,
                 "chunk_id": chunk_id,
-                "timings_ms": {k: round(v * 1000, 2) if isinstance(v, float) else v for k, v in timings.items()},
+                "timings_ms": {
+                    k: round(v * 1000, 2) if isinstance(v, float) else v
+                    for k, v in timings.items()
+                },
             },
         )
 
@@ -196,7 +203,10 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             "manifest_uri": manifest_uri,
             "job_id": job_id,
             "chunk_id": chunk_id,
-            "timings_ms": {k: round(v * 1000, 2) if isinstance(v, float) else v for k, v in timings.items()},
+            "timings_ms": {
+                k: round(v * 1000, 2) if isinstance(v, float) else v
+                for k, v in timings.items()
+            },
         }
 
     except MemoryError:

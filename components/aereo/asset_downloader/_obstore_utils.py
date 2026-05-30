@@ -40,6 +40,10 @@ def _resolve_store(
         # Default to anonymous access unless the caller overrides it.
         if "skip_signature" not in opts:
             opts["skip_signature"] = True
+        # Public NOAA GOES buckets are in us-east-1; avoid cross-region
+        # redirect errors by setting the correct region.
+        if bucket.startswith("noaa-goes") and "region" not in opts:
+            opts["region"] = "us-east-1"
         return S3Store(bucket, **opts), path  # type: ignore[reportCallIssue]
 
     if parsed.scheme == "gs":

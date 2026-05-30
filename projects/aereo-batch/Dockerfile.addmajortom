@@ -1,0 +1,3 @@
+FROM 789196964947.dkr.ecr.us-west-2.amazonaws.com/aereo-batch:latest
+COPY majortom/ /app/majortom/
+ENV PYTHONPATH=/app/components:/app/bases:/app/plugins/aereo-extract-satpy/components:/app/plugins/aereo-extract-odc-stac/components:/app/plugins/aereo-extract-aws-goes/components:/app/plugins/aereo-extract-lazycogs/components:/app/plugins/aereo-extract-tessera/components:/app/majortom/src

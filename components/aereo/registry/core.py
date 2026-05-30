@@ -146,8 +146,15 @@ class AereoRegistry:
     ENTRY_POINT_GROUP: str = "aereo.plugins"
     WILDCARD: str = "*"
 
-    def __init__(self) -> None:
-        """Initialize the registry and discover all installed plugins."""
+    def __init__(self, auto_discover: bool = True) -> None:
+        """Initialize the registry and optionally discover all installed plugins.
+
+        Args:
+            auto_discover: When ``True`` (default), scan entry points immediately.
+                Set to ``False`` and call :meth:`discover_plugins` later if you
+                want lazy loading, or pass pre-discovered plugins via
+                :meth:`register_plugins`.
+        """
         self._searcher_registry = _TypedRegistry()
         self._extractor_registry = _TypedRegistry()
         # Expose the internal dicts directly so existing tests and consumers
@@ -160,8 +167,28 @@ class AereoRegistry:
         # Track original case for display in list_supported_collections
         self._original_collections: Dict[str, str] = {}
 
-        # Automatically load on instantiation
-        self.discover_plugins()
+        if auto_discover:
+            self.discover_plugins()
+
+    def register_plugins(self, plugins: Dict[str, Type]) -> None:
+        """Register pre-discovered plugins without scanning entry points.
+
+        This is useful in environments like AWS Lambda where entry point
+        scanning is slow (~20-30s with many packages). Instead, import the
+        plugin classes directly and register them explicitly.
+
+        Args:
+            plugins: Mapping of plugin name to plugin class.
+        """
+        for name, plugin_class in plugins.items():
+            if issubclass(plugin_class, SearchProvider):
+                self._searcher_registry.register(
+                    name, plugin_class, self._original_collections
+                )
+            elif issubclass(plugin_class, Extractor):
+                self._extractor_registry.register(
+                    name, plugin_class, self._original_collections
+                )
 
     def discover_plugins(self) -> None:
         """Finds all installed packages declaring aereo entry_points.

@@ -33,14 +33,16 @@ grid = GridConfig.from_yaml(data_dir / "grid_config.yaml")
 
 # Select the profile to use for extraction.
 profiles = [all_profiles["s2_rgb"]]
-
+# %%
+profiles
+# %%
 # --- Client Setup ---
 # cells_per_task=3 keeps the example fast and lightweight.
 client = AereoClient(
     profiles=profiles,
     grid_config=grid,
     aoi=aoi,
-    backend=LocalProcessBackend(max_workers=8),
+    backend=LocalProcessBackend(max_workers=4),
 )
 
 print("Searching...", flush=True)
@@ -69,6 +71,13 @@ results_df = client.execute_tasks(tasks)
 print(f"Extraction completed in {time.time() - start_time:.2f} seconds")
 print(f"Extracted {len(results_df)} artifacts")
 # %%
-import rioxarray
+import matplotlib.pyplot as plt
+import rioxarray  # noqa: F401
+import xarray as xr
 
-rioxarray.open_rasterio(results_df.iloc[0].uri)[0].plot()
+da = xr.open_dataarray(results_df.iloc[0].uri, engine="rasterio")
+da[0].plot()
+plt.title("Sentinel-2")
+plt.tight_layout()
+plt.savefig("/root/repos/aereo/docs/assets/03_sentinel2_msi.png", dpi=150)
+print("Saved plot to docs/assets/03_sentinel2_msi.png")

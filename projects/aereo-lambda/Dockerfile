@@ -52,7 +52,7 @@ COPY --from=builder /build/projects/aereo-lambda/test_extractor /tmp/test_extrac
 RUN pip install --no-cache-dir /tmp/test_extractor && rm -rf /tmp/test_extractor
 
 # Install real extractor plugins from PyPI (uncomment/modify as needed):
-# RUN pip install aereo-extract-odc-stac aereo-extract-satpy
+RUN pip install aereo-extract-satpy
 
 # AWS Lambda handler entrypoint
 CMD ["aereo.lambda_handler.core.handler"]
