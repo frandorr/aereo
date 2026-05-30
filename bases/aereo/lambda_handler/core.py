@@ -16,6 +16,8 @@ from aereo.serialization import TaskSerializer
 
 logger = logging.getLogger(__name__)
 
+_S3_PREFIX = "s3://"
+
 # Initialize once per cold start — eagerly import plugins to avoid
 # the ~20-30s entry-point scanning overhead in Lambda.
 _registry = AereoRegistry(auto_discover=False)
@@ -59,16 +61,34 @@ _serializer = TaskSerializer()
 
 
 def _parse_s3_uri(uri: str) -> tuple[str, str]:
-    if not uri.startswith("s3://"):
+    """Parse an S3 URI into bucket and key components.
+
+    Args:
+        uri: S3 URI (e.g., "s3://bucket/prefix/key").
+
+    Returns:
+        Tuple of (bucket, key).
+
+    Raises:
+        ValueError: If the URI is not a valid S3 URI.
+    """
+    if not uri.startswith(_S3_PREFIX):
         raise ValueError(f"Invalid S3 URI: {uri}")
-    parts = uri[5:].split("/", 1)
+    parts = uri[len(_S3_PREFIX) :].split("/", 1)
     bucket = parts[0]
     key = parts[1] if len(parts) > 1 else ""
     return bucket, key
 
 
 def _download_prefix(s3: Any, bucket: str, prefix: str, dest_dir: Path) -> None:
-    """Download all objects under *prefix* into *dest_dir*, preserving structure."""
+    """Download all objects under *prefix* into *dest_dir*, preserving structure.
+
+    Args:
+        s3: Boto3 S3 client.
+        bucket: S3 bucket name.
+        prefix: S3 key prefix to download from.
+        dest_dir: Local directory to download files into.
+    """
     paginator = s3.get_paginator("list_objects_v2")
     for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
         for obj in page.get("Contents", []):
@@ -82,7 +102,14 @@ def _download_prefix(s3: Any, bucket: str, prefix: str, dest_dir: Path) -> None:
 
 
 def _is_retryable(exc: Exception) -> bool:
-    """Return True if *exc* is a retryable error."""
+    """Return True if *exc* is a retryable error.
+
+    Args:
+        exc: The exception to check.
+
+    Returns:
+        True if the exception is retryable, False otherwise.
+    """
     if isinstance(exc, (TimeoutError, ConnectionError)):
         return True
     # botocore is imported lazily; handle gracefully when missing
@@ -94,6 +121,84 @@ def _is_retryable(exc: Exception) -> bool:
     except Exception:
         pass
     return False
+
+
+def _build_error_response(
+    job_id: str,
+    chunk_id: int,
+    exc: Exception,
+    status_code: int = 500,
+) -> dict[str, Any]:
+    """Build a standardized error response dict.
+
+    Args:
+        job_id: Job identifier.
+        chunk_id: Chunk identifier.
+        exc: The exception that occurred.
+        status_code: HTTP status code for the response.
+
+    Returns:
+        Error response dictionary.
+    """
+    error_msg = _safe_truncate(str(exc))
+    logger.error(
+        "lambda_handler_error",
+        extra={
+            "job_id": job_id,
+            "chunk_id": chunk_id,
+            "error_type": type(exc).__name__,
+            "error": error_msg,
+        },
+        exc_info=True,
+    )
+    return {
+        "statusCode": status_code,
+        "error": error_msg,
+        "error_type": type(exc).__name__,
+        "retryable": _is_retryable(exc) if status_code == 500 else False,
+        "manifest_uri": None,
+        "job_id": job_id,
+        "chunk_id": chunk_id,
+    }
+
+
+def _upload_artifacts_to_s3(
+    s3: Any,
+    artifacts: Any,
+    output_prefix: str,
+    timings: dict[str, Any],
+) -> str:
+    """Upload GeoTIFF artifacts to S3 and update their URIs.
+
+    Args:
+        s3: Boto3 S3 client.
+        artifacts: DataFrame containing artifact metadata.
+        output_prefix: S3 prefix for output files.
+        timings: Mutable timing dictionary to update.
+
+    Returns:
+        The manifest URI from CloudTaskStaging.
+    """
+    t4 = time.time()
+    out_bucket, out_prefix = _parse_s3_uri(output_prefix)
+    geotiff_count = 0
+    for idx, row in artifacts.iterrows():
+        local_path = Path(str(row["uri"]))
+        if local_path.exists():
+            rel_key = f"{out_prefix}{local_path.name}"
+            s3.upload_file(str(local_path), out_bucket, rel_key)
+            artifacts.at[idx, "uri"] = f"{_S3_PREFIX}{out_bucket}/{rel_key}"
+            geotiff_count += 1
+    timings["upload_geotiffs"] = time.time() - t4
+    timings["geotiff_count"] = geotiff_count
+
+    t5 = time.time()
+    endpoint_url = os.environ.get("AWS_ENDPOINT_URL")
+    staging = CloudTaskStaging(bucket=out_bucket, endpoint_url=endpoint_url)
+    upload_result = staging.upload_artifacts(artifacts, output_prefix)
+    timings["upload_metadata"] = time.time() - t5
+
+    return upload_result["manifest_uri"]
 
 
 def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
@@ -125,8 +230,6 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
 
     try:
         endpoint_url = os.environ.get("AWS_ENDPOINT_URL")
-
-        # S3 bucket name is read from the event payload if present, otherwise parsed from task_uri
         bucket = event.get("bucket")
         if not bucket:
             bucket, prefix = _parse_s3_uri(task_uri)
@@ -137,20 +240,19 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
 
         s3 = boto3.client("s3", endpoint_url=endpoint_url)
 
-        # Rebuild runner with any init_params passed in the event
         init_params = event.get("init_params")
-        if init_params:
-            runner = TaskRunner(registry=_registry, init_params=init_params)
-        else:
-            runner = _runner
+        runner = (
+            TaskRunner(registry=_registry, init_params=init_params)
+            if init_params
+            else _runner
+        )
 
-        # Timing instrumentation
-        timings = {}
+        timings: dict[str, Any] = {}
         t0 = time.time()
 
-        # 1. Download staged task
         with tempfile.TemporaryDirectory() as tmpdir:
             task_dir = Path(tmpdir)
+
             t1 = time.time()
             _download_prefix(s3, bucket, prefix, task_dir)
             timings["download_task"] = time.time() - t1
@@ -159,31 +261,13 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             task = _serializer.deserialize(task_dir)
             timings["deserialize_task"] = time.time() - t2
 
-            # 2. Execute using the local plugin registry
             t3 = time.time()
             artifacts = runner.run(task)
             timings["extractor_run"] = time.time() - t3
 
-            # 3. Upload actual GeoTIFF files and update URIs
-            t4 = time.time()
-            out_bucket, out_prefix = _parse_s3_uri(output_prefix)
-            geotiff_count = 0
-            for idx, row in artifacts.iterrows():
-                local_path = Path(str(row["uri"]))
-                if local_path.exists():
-                    rel_key = f"{out_prefix}{local_path.name}"
-                    s3.upload_file(str(local_path), out_bucket, rel_key)
-                    artifacts.at[idx, "uri"] = f"s3://{out_bucket}/{rel_key}"
-                    geotiff_count += 1
-            timings["upload_geotiffs"] = time.time() - t4
-            timings["geotiff_count"] = geotiff_count
-
-            # 4. Upload metadata using CloudTaskStaging
-            t5 = time.time()
-            staging = CloudTaskStaging(bucket=bucket, endpoint_url=endpoint_url)
-            upload_result = staging.upload_artifacts(artifacts, output_prefix)
-            manifest_uri = upload_result["manifest_uri"]
-            timings["upload_metadata"] = time.time() - t5
+            manifest_uri = _upload_artifacts_to_s3(
+                s3, artifacts, output_prefix, timings
+            )
 
         timings["total"] = time.time() - t0
         logger.info(
@@ -210,28 +294,7 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
         }
 
     except MemoryError:
-        # Re-raise memory errors so the Lambda runtime can handle them
         raise
 
     except Exception as exc:
-        error_msg = _safe_truncate(str(exc))
-        logger.error(
-            "lambda_handler_error",
-            extra={
-                "job_id": job_id,
-                "chunk_id": chunk_id,
-                "error_type": type(exc).__name__,
-                "error": error_msg,
-            },
-            exc_info=True,
-        )
-
-        return {
-            "statusCode": 500,
-            "error": error_msg,
-            "error_type": type(exc).__name__,
-            "retryable": _is_retryable(exc),
-            "manifest_uri": None,
-            "job_id": job_id,
-            "chunk_id": chunk_id,
-        }
+        return _build_error_response(job_id, chunk_id, exc)

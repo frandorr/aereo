@@ -31,8 +31,18 @@ console = Console()
 # ---------------------------------------------------------------------------
 
 
-def _load_geometry(geojson_path: Path) -> Optional[dict[str, Any]]:
-    """Load a GeoJSON file and return the geometry dict."""
+def _load_geometry(geojson_path: Path) -> dict[str, Any] | None:
+    """Load a GeoJSON file and return the geometry dict.
+
+    Args:
+        geojson_path: Path to the GeoJSON file.
+
+    Returns:
+        The geometry dictionary, or None if the path is missing.
+
+    Raises:
+        ValueError: If the GeoJSON has no extractable geometry.
+    """
     data = json.loads(geojson_path.read_text())
     if data.get("type") == "FeatureCollection":
         if not data.get("features"):
@@ -54,7 +64,14 @@ def _load_geometry(geojson_path: Path) -> Optional[dict[str, Any]]:
 
 
 def _search_results_to_json(df: gpd.GeoDataFrame) -> list[dict[str, Any]]:
-    """Convert search results GeoDataFrame to JSON-serializable records."""
+    """Convert search results GeoDataFrame to JSON-serializable records.
+
+    Args:
+        df: GeoDataFrame containing search results.
+
+    Returns:
+        List of JSON-serializable record dictionaries.
+    """
     # Convert to GeoJSON feature collection then to simple records
     df = df.copy()
     df["geometry"] = df.geometry.apply(
@@ -64,15 +81,21 @@ def _search_results_to_json(df: gpd.GeoDataFrame) -> list[dict[str, Any]]:
     # Convert datetime to ISO strings
     for rec in records:
         for key in ("start_time", "end_time"):
-            if key in rec and rec[key] is not None:
-                rec[key] = (
-                    rec[key].isoformat() if hasattr(rec[key], "isoformat") else rec[key]
-                )
+            val = rec.get(key)
+            if val is not None and hasattr(val, "isoformat"):
+                rec[key] = val.isoformat()
     return records
 
 
-def _search_results_from_json(records: list[dict[str, Any]]) -> Any:
-    """Reconstruct a GeoDataFrame from JSON records."""
+def _search_results_from_json(records: list[dict[str, Any]]) -> gpd.GeoDataFrame:
+    """Reconstruct a GeoDataFrame from JSON records.
+
+    Args:
+        records: List of JSON record dictionaries.
+
+    Returns:
+        A validated GeoDataFrame.
+    """
     df = gpd.GeoDataFrame.from_records(records)
     if "geometry" in df.columns:
         from shapely.geometry import shape
@@ -92,7 +115,11 @@ def _search_results_from_json(records: list[dict[str, Any]]) -> Any:
 
 
 def _print_search_table(df: gpd.GeoDataFrame) -> None:
-    """Pretty-print search results as a Rich table."""
+    """Pretty-print search results as a Rich table.
+
+    Args:
+        df: GeoDataFrame containing search results.
+    """
     table = Table(title=f"Search Results ({len(df)} scenes)")
     table.add_column("ID", style="cyan", no_wrap=True)
     table.add_column("Collection", style="magenta")
@@ -100,17 +127,50 @@ def _print_search_table(df: gpd.GeoDataFrame) -> None:
     table.add_column("End Time", style="green")
     table.add_column("Href", style="blue", overflow="fold")
 
-    for _, row in df.head(50).iterrows():
+    for row in df.head(50).itertuples(index=False):
         table.add_row(
-            str(row.get("id", "")),
-            str(row.get("collection", "")),
-            str(row.get("start_time", "")),
-            str(row.get("end_time", "")),
-            str(row.get("href", ""))[:60] + "...",
+            str(getattr(row, "id", "")),
+            str(getattr(row, "collection", "")),
+            str(getattr(row, "start_time", "")),
+            str(getattr(row, "end_time", "")),
+            str(getattr(row, "href", ""))[:60] + "...",
         )
     if len(df) > 50:
         table.add_row("...", f"... and {len(df) - 50} more rows", "", "", "")
     console.print(table)
+
+
+def _configure_verbose_logging(verbose: bool) -> None:
+    """Configure structlog for verbose output if requested.
+
+    Args:
+        verbose: Whether to enable verbose (DEBUG) logging.
+    """
+    if verbose:
+        import structlog
+
+        structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(10))
+
+
+def _load_profiles(paths: list[Path]) -> list[AereoProfile]:
+    """Load AereoProfile instances from YAML file paths.
+
+    Args:
+        paths: List of paths to profile YAML files.
+
+    Returns:
+        List of loaded AereoProfile instances.
+
+    Raises:
+        typer.Exit: If a profile file is not found.
+    """
+    profiles: list[AereoProfile] = []
+    for p in paths:
+        if not p.exists():
+            console.print(f"[red]Profile not found:[/red] {p}")
+            raise typer.Exit(code=1)
+        profiles.extend(AereoProfile.from_yaml(p))
+    return profiles
 
 
 # ---------------------------------------------------------------------------
@@ -147,19 +207,23 @@ def search(
         bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
     ] = False,
 ) -> None:
-    """Search for satellite data across configured profiles."""
-    if verbose:
-        import structlog
+    """Search for satellite data across configured profiles.
 
-        structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(10))
+    Args:
+        profile: Paths to profile YAML files.
+        config: Optional path to grid config YAML.
+        geojson: Optional path to AOI GeoJSON file.
+        start: Optional start datetime (ISO 8601).
+        end: Optional end datetime (ISO 8601).
+        output: Optional output JSON file path.
+        fmt: Output format ("table" or "json").
+        verbose: Enable verbose logging.
 
-    # Load profiles
-    profiles: list[AereoProfile] = []
-    for p in profile:
-        if not p.exists():
-            console.print(f"[red]Profile not found:[/red] {p}")
-            raise typer.Exit(code=1)
-        profiles.extend(AereoProfile.from_yaml(p))
+    Returns:
+        None. Prints results or writes to output file.
+    """
+    _configure_verbose_logging(verbose)
+    profiles = _load_profiles(profile)
 
     # Load geometry
     intersects = _load_geometry(geojson) if geojson and geojson.exists() else None
@@ -224,11 +288,21 @@ def prepare(
         bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
     ] = False,
 ) -> None:
-    """Prepare search results for extraction."""
-    if verbose:
-        import structlog
+    """Prepare search results for extraction.
 
-        structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(10))
+    Args:
+        search_results: Path to search results JSON.
+        profile: Paths to profile YAML files.
+        config: Optional path to grid config YAML.
+        output_dir: Output directory for extraction tasks.
+        output: Optional pickle file path for tasks.
+        cells_per_task: Max grid cells per task.
+        verbose: Enable verbose logging.
+
+    Returns:
+        None. Writes prepared tasks to a pickle file.
+    """
+    _configure_verbose_logging(verbose)
 
     if not search_results.exists():
         console.print(f"[red]Search results not found:[/red] {search_results}")
@@ -237,12 +311,7 @@ def prepare(
     records = json.loads(search_results.read_text())
     df = _search_results_from_json(records)
 
-    profiles: list[AereoProfile] = []
-    for p in profile:
-        if not p.exists():
-            console.print(f"[red]Profile not found:[/red] {p}")
-            raise typer.Exit(code=1)
-        profiles.extend(AereoProfile.from_yaml(p))
+    profiles = _load_profiles(profile)
 
     grid_config = (
         GridConfig.from_yaml(config) if config and config.exists() else GridConfig()
@@ -284,11 +353,18 @@ def extract(
         bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
     ] = False,
 ) -> None:
-    """Run extraction on prepared tasks."""
-    if verbose:
-        import structlog
+    """Run extraction on prepared tasks.
 
-        structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(10))
+    Args:
+        tasks: Path to prepared tasks pickle file.
+        output_dir: Output directory for artifacts.
+        workers: Max batch workers.
+        verbose: Enable verbose logging.
+
+    Returns:
+        None. Writes extracted artifacts to parquet.
+    """
+    _configure_verbose_logging(verbose)
 
     if not tasks.exists():
         console.print(f"[red]Tasks file not found:[/red] {tasks}")
@@ -344,19 +420,24 @@ def run(
         bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
     ] = False,
 ) -> None:
-    """One-shot: search → prepare → extract."""
-    if verbose:
-        import structlog
+    """One-shot: search → prepare → extract.
 
-        structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(10))
+    Args:
+        profile: Paths to profile YAML files.
+        config: Optional path to grid config YAML.
+        geojson: Optional path to AOI GeoJSON file.
+        start: Optional start datetime (ISO 8601).
+        end: Optional end datetime (ISO 8601).
+        output_dir: Output directory for artifacts.
+        workers: Max batch workers.
+        cells_per_task: Max grid cells per task.
+        verbose: Enable verbose logging.
 
-    # Load profiles
-    profiles: list[AereoProfile] = []
-    for p in profile:
-        if not p.exists():
-            console.print(f"[red]Profile not found:[/red] {p}")
-            raise typer.Exit(code=1)
-        profiles.extend(AereoProfile.from_yaml(p))
+    Returns:
+        None. Writes extracted artifacts to parquet.
+    """
+    _configure_verbose_logging(verbose)
+    profiles = _load_profiles(profile)
 
     grid_config = (
         GridConfig.from_yaml(config) if config and config.exists() else GridConfig()
@@ -431,7 +512,15 @@ def validate(
         typer.Option("--profile", "-p", help="Path to profile YAML to validate"),
     ] = None,
 ) -> None:
-    """Validate a config or profile YAML against AEREO schemas."""
+    """Validate a config or profile YAML against AEREO schemas.
+
+    Args:
+        config: Optional path to config YAML to validate.
+        profile: Optional path to profile YAML to validate.
+
+    Returns:
+        None. Prints validation result.
+    """
     if config:
         if not config.exists():
             console.print(f"[red]Config not found:[/red] {config}")
@@ -461,7 +550,11 @@ def validate(
 
 @app.command()
 def plugins() -> None:
-    """List installed AEREO plugins."""
+    """List installed AEREO plugins.
+
+    Returns:
+        None. Prints a table of installed plugins.
+    """
     from aereo.registry import AereoRegistry
 
     registry = AereoRegistry()
@@ -494,7 +587,14 @@ def plugins() -> None:
 
 @app.command()
 def plugin_params(name: str) -> None:
-    """Show parameters for a specific AEREO plugin."""
+    """Show parameters for a specific AEREO plugin.
+
+    Args:
+        name: Name of the plugin to inspect.
+
+    Returns:
+        None. Prints a table of plugin parameters.
+    """
     from aereo.registry import AereoRegistry
 
     registry = AereoRegistry()
