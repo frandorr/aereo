@@ -35,6 +35,7 @@ dependencies = [
   "cattrs>=24.1",
   "geopandas>=1.1.2",
   "majortom-eg",
+  "obstore>=0.9.3",
   "pandas>=3.0.1",
   "pandera[geopandas]>=0.24",
   "pyproj>=3.7.1",

@@ -15,7 +15,7 @@ tasks = client.prepare_for_extraction(
     results,
     grid_config=grid,
     profiles=profiles,
-    cells_per_chunk=5,
+    cells_per_task=5,
 )
 ```
 

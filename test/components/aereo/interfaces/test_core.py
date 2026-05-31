@@ -182,7 +182,7 @@ def test_extractor_prepare_for_extraction():
         grid_config=grid_config,
         profiles=[profile],
         uri="test_uri",
-        cells_per_chunk=1,
+        cells_per_task=1,
     )
 
     assert len(tasks) > 0
@@ -197,7 +197,7 @@ def test_extractor_prepare_for_extraction():
     assert tasks[0].task_context["extractor_hint"] is None
 
 
-def test_aer_profile_has_all_fields():
+def test_aereo_profile_has_all_fields():
     from aereo.interfaces.core import AereoProfile
 
     profile = AereoProfile(
@@ -213,7 +213,7 @@ def test_aer_profile_has_all_fields():
     assert profile.plugin_hints["search"] == "aereo-search-aws-goes"
 
 
-def test_aer_profile_accepts_downloader():
+def test_aereo_profile_accepts_downloader():
     from pathlib import Path
 
     from aereo.interfaces.core import AereoProfile
@@ -225,14 +225,14 @@ def test_aer_profile_accepts_downloader():
     assert profile.downloader is my_dl
 
 
-def test_aer_profile_downloader_defaults_to_none():
+def test_aereo_profile_downloader_defaults_to_none():
     from aereo.interfaces.core import AereoProfile
 
     profile = AereoProfile(name="test", resolution=100.0)
     assert profile.downloader is None
 
 
-def test_aer_profile_defaults():
+def test_aereo_profile_defaults():
     from aereo.interfaces.core import AereoProfile
 
     profile = AereoProfile(name="minimal", resolution=100.0)
@@ -241,14 +241,14 @@ def test_aer_profile_defaults():
     assert profile.conform_to is None
 
 
-def test_aer_profile_accepts_conform_to():
+def test_aereo_profile_accepts_conform_to():
     from aereo.interfaces.core import AereoProfile
 
     profile = AereoProfile(name="test", resolution=100.0, conform_to=(256, 256))
     assert profile.conform_to == (256, 256)
 
 
-def test_extraction_task_accepts_aer_profile():
+def test_extraction_task_accepts_aereo_profile():
     import geopandas as gpd
     from shapely.geometry import Polygon
 
@@ -271,7 +271,7 @@ def test_extraction_task_accepts_aer_profile():
     assert task.profile.name == "test"
 
 
-def test_aer_profile_is_frozen():
+def test_aereo_profile_is_frozen():
     from aereo.interfaces.core import AereoProfile
 
     profile = AereoProfile(name="test", resolution=100.0)
@@ -279,14 +279,14 @@ def test_aer_profile_is_frozen():
         profile.resolution = 200.0
 
 
-def test_aer_profile_forbids_extra_fields():
+def test_aereo_profile_forbids_extra_fields():
     from aereo.interfaces.core import AereoProfile
 
     with pytest.raises(ValidationError):
         AereoProfile(name="test", resolution=100.0, unknown_field=42)  # pyright: ignore[reportCallIssue]
 
 
-def test_aer_profile_import_string_downloader():
+def test_aereo_profile_import_string_downloader():
     from aereo.interfaces.core import AereoProfile
 
     # Use a stdlib callable as a stand-in for a real downloader
@@ -298,7 +298,7 @@ def test_aer_profile_import_string_downloader():
     assert callable(profile.downloader)
 
 
-def test_aer_profile_invalid_import_string():
+def test_aereo_profile_invalid_import_string():
     from aereo.interfaces.core import AereoProfile
 
     with pytest.raises(ValidationError):
@@ -314,7 +314,7 @@ def test_aer_profile_invalid_import_string():
 # ---------------------------------------------------------------------------
 
 
-def test_aer_profile_pickle_module_level_callable_downloader():
+def test_aereo_profile_pickle_module_level_callable_downloader():
     """A module-level callable downloader round-trips through pickle."""
     import os
     import pickle
@@ -330,7 +330,7 @@ def test_aer_profile_pickle_module_level_callable_downloader():
     assert roundtripped.downloader is os.path.join
 
 
-def test_aer_profile_pickle_lambda_downloader_becomes_none():
+def test_aereo_profile_pickle_lambda_downloader_becomes_none():
     """A lambda downloader pickles without crashing and becomes None."""
     import pickle
 
@@ -378,7 +378,7 @@ def test_extraction_task_pickle_with_callable_downloader():
     assert roundtripped.profile.downloader is _module_level_downloader
 
 
-def test_aer_profile_has_search_and_extract_params():
+def test_aereo_profile_has_search_and_extract_params():
     from aereo.interfaces.core import AereoProfile
 
     profile = AereoProfile(
@@ -391,7 +391,7 @@ def test_aer_profile_has_search_and_extract_params():
     assert profile.extract_params["calibration"] == "reflectance"
 
 
-def test_aer_profile_rejects_extra_params():
+def test_aereo_profile_rejects_extra_params():
     from aereo.interfaces.core import AereoProfile
 
     with pytest.raises(ValidationError):
@@ -668,7 +668,7 @@ def test_prepare_for_extraction_spatial_filtering():
         grid_config=grid_config,
         profiles=[profile],
         uri="test_uri",
-        cells_per_chunk=1,
+        cells_per_task=1,
     )
 
     # Check that every task only contains 1 asset (either asset_1 or asset_2) because

@@ -14,9 +14,64 @@ from shapely.geometry import Point, Polygon
 from shapely.geometry.base import BaseGeometry
 
 
-class GridCell(BaseGridCell):
+_WGS84_CRS = "epsg:4326"
+_GEOM_TOLERANCE = 1e-10
+_OVERLAP_SUFFIX = "_OV"
+
+
+def _parse_directional_value(value: str, positive: str, negative: str) -> int:
+    """Parse a directional numeric string like ``"922U"`` into a signed integer.
+
+    Args:
+        value: The string to parse (e.g. ``"922U"`` or ``"249R"``).
+        positive: The character indicating a positive direction (e.g. ``"U"``).
+        negative: The character indicating a negative direction (e.g. ``"D"``).
+
+    Returns:
+        Signed integer magnitude.
     """
-    A grid cell that represents a polygon and whether it is a primary or overlapping cell.
+    magnitude = int(value[:-1])
+    return magnitude if value[-1].upper() == positive else -magnitude
+
+
+def _n_cols_for_spacing(lon_spacing: float) -> int:
+    """Calculate number of columns for a given longitude spacing.
+
+    Args:
+        lon_spacing: Longitude spacing in degrees.
+
+    Returns:
+        Number of columns around the globe.
+    """
+    return round(360 / lon_spacing) if lon_spacing > 0 else 0
+
+
+def _make_cell_polygon(
+    lon: float, lat: float, lon_spacing: float, lat_spacing: float
+) -> Polygon:
+    """Construct a cell polygon from bottom-left corner and spacings.
+
+    Args:
+        lon: Bottom-left longitude.
+        lat: Bottom-left latitude.
+        lon_spacing: Longitude extent in degrees.
+        lat_spacing: Latitude extent in degrees.
+
+    Returns:
+        A Polygon representing the cell.
+    """
+    return Polygon(
+        [
+            [lon, lat],
+            [lon + lon_spacing, lat],
+            [lon + lon_spacing, lat + lat_spacing],
+            [lon, lat + lat_spacing],
+        ]
+    )
+
+
+class GridCell(BaseGridCell):
+    """A grid cell that represents a polygon and whether it is a primary or overlapping cell.
 
     ``area_def()`` returns an :class:`odc.geo.geobox.GeoBox` centred on the
     cell's grid point with a fixed size of ``D * (1 + margin/100)`` metres.
@@ -31,8 +86,13 @@ class GridCell(BaseGridCell):
         is_primary: bool = True,
         cell_id: str | None = None,
     ):
-        """
-        Initializes a GridCell with the given geometry and primary status.
+        """Initialise a GridCell.
+
+        Args:
+            d: Nominal cell size in metres.
+            geom: Cell polygon in WGS84.
+            is_primary: Whether this is a primary (non-overlapping) cell.
+            cell_id: Optional Major TOM cell ID; falls back to geohash if omitted.
         """
         super().__init__(geom=geom, is_primary=is_primary)
         self.D = d
@@ -42,10 +102,11 @@ class GridCell(BaseGridCell):
             self._id = cell_id
 
     def to_geodataframe(self) -> GeoDataFrame[GridSchema]:
-        """
-        Converts the GridCell to a GeoDataFrame for easier spatial analysis and visualization.
-        """
+        """Convert the GridCell to a GeoDataFrame.
 
+        Returns:
+            A GeoDataFrame with grid cell metadata.
+        """
         return cast(
             GeoDataFrame,
             gpd.GeoDataFrame(
@@ -61,21 +122,31 @@ class GridCell(BaseGridCell):
         )
 
     @cached_property
-    def utm_crs(self):
+    def utm_crs(self) -> str:
+        """UTM EPSG code for the cell's geometry.
+
+        Returns:
+            EPSG string (e.g. ``"EPSG:32701"``).
+        """
         return get_utm_epsg_from_geometry(self.geom)
 
     @cached_property
-    def utm_footprint(self):
-        return reproject_geom(self.geom, src_epsg="epsg:4326", dst_epsg=self.utm_crs)
+    def utm_footprint(self) -> BaseGeometry:
+        """Cell geometry reprojected to its native UTM CRS.
+
+        Returns:
+            The cell polygon in UTM coordinates.
+        """
+        return reproject_geom(self.geom, src_epsg=_WGS84_CRS, dst_epsg=self.utm_crs)
 
     def area_name(self, resolution: int) -> str:
-        """
-        Get the area name based on grid cell and a resolution in meters.
-        Args:
-            resolution (int): Resolution in meters
-        Returns:
-            str: Area name
+        """Get the area name based on grid cell and a resolution in meters.
 
+        Args:
+            resolution: Resolution in meters.
+
+        Returns:
+            Area name string.
         """
         return f"{self.id()}_dist-{self.D}m_res-{resolution}m"
 
@@ -94,31 +165,28 @@ class GridCell(BaseGridCell):
         extractions of the same cell from different scenes align pixel-wise,
         and that neighbouring cells overlap slightly when ``margin > 0``.
 
-        Parameters
-        ----------
-        resolution:
-            Pixel size in metres.
-        padding:
-            Extra pixels to add on all sides (uses ``GeoBox.pad``).
-        margin:
-            Percentage margin added to the nominal cell size ``self.D``
-            when computing the extraction extent.  For example,
-            ``margin=6.8`` produces a 10.68 km × 10.68 km box for a
-            D=10 km cell (the MajorTOM Core standard).  Adjacent cells
-            then overlap by design, eliminating gaps at cell edges.
-        conform_to:
-            Force a uniform ``(width, height)`` across a batch. When provided,
-            ``tight=True`` is enforced internally so that every cell has the
-            exact same pixel dimensions (``anchor`` is ignored in tight mode).
-        **geobox_kwargs:
-            Forwarded to ``GeoBox.from_bbox``. The default ``anchor`` is
-            ``'edge'`` (top-left pixel-grid alignment).
+        Args:
+            resolution: Pixel size in metres.
+            padding: Extra pixels to add on all sides (uses ``GeoBox.pad``).
+            margin: Percentage margin added to the nominal cell size ``self.D``
+                when computing the extraction extent.  For example,
+                ``margin=6.8`` produces a 10.68 km × 10.68 km box for a
+                D=10 km cell (the MajorTOM Core standard).  Adjacent cells
+                then overlap by design, eliminating gaps at cell edges.
+            conform_to: Force a uniform ``(width, height)`` across a batch. When provided,
+                ``tight=True`` is enforced internally so that every cell has the
+                exact same pixel dimensions (``anchor`` is ignored in tight mode).
+            **geobox_kwargs: Forwarded to ``GeoBox.from_bbox``. The default ``anchor`` is
+                ``'edge'`` (top-left pixel-grid alignment).
+
+        Returns:
+            A GeoBox centred on the cell's UTM grid point.
         """
         # MajorTOM grid point in UTM — the deterministic anchor for this cell
         utm_centroid = cast(
             Point,
             reproject_geom(
-                self.geom.centroid, src_epsg="epsg:4326", dst_epsg=self.utm_crs
+                self.geom.centroid, src_epsg=_WGS84_CRS, dst_epsg=self.utm_crs
             ),
         )
         # Snap centre to the resolution grid so that pixel edges are
@@ -151,28 +219,71 @@ class GridCell(BaseGridCell):
 
 
 class GridDefinition(MajorTomGrid):
-    """
-    A grid definition that generates grid cells intersecting a given polygon.
-    It uses shapely for efficient geometry operations and supports both primary and overlapping grid cells.
+    """A grid definition that generates grid cells intersecting a given polygon.
+
+    It uses shapely for efficient geometry operations and supports both primary
+    and overlapping grid cells.
     """
 
     def __init__(self, d: int = 10000, overlap=False):
-        """
-        Initializes the GridDefinition with the specified grid distance and overlap option.
+        """Initialise the GridDefinition.
+
         Args:
-            d (int): The grid distance in meters (default is 10,000).
-            overlap (bool): Whether to generate overlapping grid cells (default is False).
+            d: The grid distance in meters (default is 10,000).
+            overlap: Whether to generate overlapping grid cells.
         """
         super().__init__(d=d, overlap=overlap)
 
-    def cell_from_id(self, cell_id: str) -> GridCell:
-        """
-        Overrides the base class method to support both old geohash IDs and new ESA Major TOM naming convention.
+    def _cell_from_indices(
+        self,
+        row_idx: int,
+        col_idx: int,
+        lon_spacing: float,
+        is_primary: bool,
+        cell_id: str,
+    ) -> "GridCell":
+        """Reconstruct a GridCell from absolute row/col indices.
 
         Args:
-            cell_id (str): The cell ID, which can be either an old geohash or a new ESA Major TOM name (e.g., "922U_249R" or "922U_249R_OV").
+            row_idx: Absolute row index.
+            col_idx: Absolute column index.
+            lon_spacing: Longitude spacing in degrees.
+            is_primary: Whether this is a primary cell.
+            cell_id: The cell ID string.
+
         Returns:
-            GridCell: A GridCell object corresponding to the given cell ID.
+            A reconstructed GridCell.
+        """
+        row_lat = self.get_row_lat(row_idx)
+        lon_offset = self.get_lon_offset(lon_spacing)
+        cell_lon = self.get_col_lon(col_idx, lon_spacing, lon_offset)
+
+        if is_primary:
+            primary = _make_cell_polygon(
+                cell_lon, row_lat, lon_spacing, self.lat_spacing
+            )
+            return GridCell(self.D, primary, is_primary=True, cell_id=cell_id)
+
+        half_lat = self.lat_spacing / 2
+        half_lon = lon_spacing / 2
+        overlap_lon = cell_lon + half_lon
+        overlap_lat = row_lat + half_lat
+        overlap_poly = _make_cell_polygon(
+            overlap_lon, overlap_lat, lon_spacing, self.lat_spacing
+        )
+        return GridCell(self.D, overlap_poly, is_primary=False, cell_id=cell_id)
+
+    def cell_from_id(self, cell_id: str) -> "GridCell":
+        """Return a GridCell for the given cell ID.
+
+        Supports both old geohash IDs and new ESA Major TOM naming convention.
+
+        Args:
+            cell_id: The cell ID, which can be either an old geohash or a new
+                ESA Major TOM name (e.g., ``"922U_249R"`` or ``"922U_249R_OV"``).
+
+        Returns:
+            A GridCell object corresponding to the given cell ID.
         """
         # Fallback: If no underscore, route to old geohash lookup logic
         if "_" not in cell_id:
@@ -185,73 +296,47 @@ class GridDefinition(MajorTomGrid):
         # --- NEW O(1) LOOKUP ---
         parts = cell_id.split("_")
         y_str, x_str = parts[0], parts[1]
-        is_primary = "OV" not in parts
+        is_primary = _OVERLAP_SUFFIX not in parts
 
         # Reverse-engineer relative Y (Row)
-        y_val = int(y_str[:-1])
-        rel_y = y_val if y_str[-1].upper() == "U" else -y_val
+        rel_y = _parse_directional_value(y_str, "U", "D")
 
         # Reverse-engineer relative X (Col)
-        x_val = int(x_str[:-1])
-        rel_x = x_val if x_str[-1].upper() == "R" else -x_val
+        rel_x = _parse_directional_value(x_str, "R", "L")
 
         # Map back to absolute indices
         row_idx = rel_y + int(self.row_count) // 2
         row_lat = self.get_row_lat(row_idx)
 
         lon_spacing = self.get_lon_spacing(row_lat)
-        lon_offset = self.get_lon_offset(lon_spacing)
+        n_cols = _n_cols_for_spacing(lon_spacing)
 
-        n_cols = round(360 / lon_spacing) if lon_spacing > 0 else 0
         col_idx = rel_x + n_cols // 2
 
-        cell_lon = self.get_col_lon(col_idx, lon_spacing, lon_offset)
-
-        # Reconstruct exactly one Polygon instantly
-        if is_primary:
-            primary = Polygon(
-                [
-                    [cell_lon, row_lat],
-                    [cell_lon + lon_spacing, row_lat],
-                    [cell_lon + lon_spacing, row_lat + self.lat_spacing],
-                    [cell_lon, row_lat + self.lat_spacing],
-                ]
-            )
-            return GridCell(self.D, primary, is_primary=True, cell_id=cell_id)
-        else:
-            half_lat = self.lat_spacing / 2
-            half_lon = lon_spacing / 2
-            overlap_lon = cell_lon + half_lon
-            overlap_lat = row_lat + half_lat
-            overlap_poly = Polygon(
-                [
-                    [overlap_lon, overlap_lat],
-                    [overlap_lon + lon_spacing, overlap_lat],
-                    [overlap_lon + lon_spacing, overlap_lat + self.lat_spacing],
-                    [overlap_lon, overlap_lat + self.lat_spacing],
-                ]
-            )
-            return GridCell(self.D, overlap_poly, is_primary=False, cell_id=cell_id)
+        return self._cell_from_indices(
+            row_idx, col_idx, lon_spacing, is_primary, cell_id
+        )
 
     def get_cell_name(
         self, row_idx: int, col_idx: int, lon_spacing: float, is_primary=True
     ) -> str:
-        """Generates the ESA Major TOM naming convention (e.g., 922D_249L).
+        """Generate the ESA Major TOM naming convention (e.g., 922U_249R).
 
         Args:
-            row_idx (int): The row index of the cell.
-            col_idx (int): The column index of the cell.
-            lon_spacing (float): The longitude spacing for the current latitude.
-            is_primary (bool): Whether this is a primary cell or an overlapping cell.
+            row_idx: The row index of the cell.
+            col_idx: The column index of the cell.
+            lon_spacing: The longitude spacing for the current latitude.
+            is_primary: Whether this is a primary cell or an overlapping cell.
+
         Returns:
-            str: The generated cell name following the ESA Major TOM convention.
+            The generated cell name following the ESA Major TOM convention.
         """
         # 1. Calculate row relative to the Equator
         rel_y = row_idx - int(self.row_count) // 2
         y_dir = "U" if rel_y >= 0 else "D"
 
         # 2. Calculate col relative to the Prime Meridian
-        n_cols = round(360 / lon_spacing) if lon_spacing > 0 else 0
+        n_cols = _n_cols_for_spacing(lon_spacing)
         rel_x = col_idx - n_cols // 2
         x_dir = "R" if rel_x >= 0 else "L"
 
@@ -259,21 +344,57 @@ class GridDefinition(MajorTomGrid):
 
         # Append an indicator for overlapping grids
         if not is_primary:
-            name += "_OV"
+            name += f"_{_OVERLAP_SUFFIX}"
 
         return name
 
-    def generate_grid_cells(self, polygon: BaseGeometry) -> Sequence[GridCell]:
-        """
-        Generates grid cells that intersect with the given polygon. It processes the grid row by row,
-        calculating the appropriate longitude spacing and offsets for each latitude, and uses shapely's vectorized
-        geometry operations to efficiently determine which cells intersect the polygon.
+    def _add_overlap_cells(
+        self,
+        lons: np.ndarray,
+        lat: float,
+        lon_spacing: float,
+        cols: np.ndarray,
+        row_idx: int,
+        polygon: BaseGeometry,
+        cells: list[GridCell],
+    ) -> None:
+        """Append overlapping cells that intersect *polygon* to *cells*.
 
         Args:
-            polygon (BaseGeometry): The input polygon to intersect with the grid cells.
-        Returns:
-            Sequence[GridCell]: A list of GridCell objects that intersect with the input polygon.
+            lons: Array of longitude values for each column.
+            lat: Latitude of the current row.
+            lon_spacing: Longitude spacing in degrees.
+            cols: Array of column indices.
+            row_idx: Current row index.
+            polygon: The intersection polygon.
+            cells: Mutable list of GridCell objects to append to.
+        """
+        over_xmin = lons + lon_spacing / 2
+        over_ymin = lat + self.lat_spacing / 2
+        over_xmax = over_xmin + lon_spacing
+        over_ymax = over_ymin + self.lat_spacing
 
+        overlap_polys = shapely.box(over_xmin, over_ymin, over_xmax, over_ymax)  # pyright: ignore[reportCallIssue, reportArgumentType]
+        overlap_mask = shapely.intersects(overlap_polys, polygon)
+
+        matched_over_cols = cols[overlap_mask]
+
+        for poly, c_idx in zip(overlap_polys[overlap_mask], matched_over_cols):
+            c_id = self.get_cell_name(row_idx, c_idx, lon_spacing, is_primary=False)
+            cells.append(GridCell(self.D, poly, is_primary=False, cell_id=c_id))
+
+    def generate_grid_cells(self, polygon: BaseGeometry) -> Sequence[GridCell]:
+        """Generate grid cells that intersect with the given polygon.
+
+        Processes the grid row by row, calculating the appropriate longitude
+        spacing and offsets for each latitude, and uses shapely's vectorized
+        geometry operations to efficiently determine which cells intersect.
+
+        Args:
+            polygon: The input polygon to intersect with the grid cells.
+
+        Returns:
+            A list of GridCell objects that intersect with the input polygon.
         """
         shapely.prepare(polygon)
         min_lon, min_lat, max_lon, max_lat = polygon.bounds
@@ -283,12 +404,12 @@ class GridDefinition(MajorTomGrid):
         start_row = int(np.floor((min_lat + 90 - self._lat_offset) / self.lat_spacing))
         end_row = int(np.ceil((max_lat + 90 - self._lat_offset) / self.lat_spacing))
 
-        while self.get_row_lat(start_row) > min_lat + 1e-10:
+        while self.get_row_lat(start_row) > min_lat + _GEOM_TOLERANCE:
             start_row -= 1
-        while self.get_row_lat(end_row) < max_lat - 1e-10:
+        while self.get_row_lat(end_row) < max_lat - _GEOM_TOLERANCE:
             end_row += 1
 
-        cells = []
+        cells: list[GridCell] = []
 
         # Process row by row
         for row_idx in range(start_row, end_row + 1):
@@ -300,10 +421,14 @@ class GridDefinition(MajorTomGrid):
             end_col = int(np.ceil((max_lon + 180 - lon_offset) / lon_spacing))
 
             while (
-                self.get_col_lon(start_col, lon_spacing, lon_offset) > min_lon + 1e-10
+                self.get_col_lon(start_col, lon_spacing, lon_offset)
+                > min_lon + _GEOM_TOLERANCE
             ):
                 start_col -= 1
-            while self.get_col_lon(end_col, lon_spacing, lon_offset) < max_lon - 1e-10:
+            while (
+                self.get_col_lon(end_col, lon_spacing, lon_offset)
+                < max_lon - _GEOM_TOLERANCE
+            ):
                 end_col += 1
 
             # --- VECTORIZATION ---
@@ -327,21 +452,9 @@ class GridDefinition(MajorTomGrid):
                 cells.append(GridCell(self.D, poly, is_primary=True, cell_id=c_id))
 
             if self.overlap:
-                over_xmin = lons + lon_spacing / 2
-                over_ymin = lat + self.lat_spacing / 2
-                over_xmax = over_xmin + lon_spacing
-                over_ymax = over_ymin + self.lat_spacing
-
-                overlap_polys = shapely.box(over_xmin, over_ymin, over_xmax, over_ymax)  # pyright: ignore[reportCallIssue, reportArgumentType]
-                overlap_mask = shapely.intersects(overlap_polys, polygon)
-
-                matched_over_cols = cols[overlap_mask]
-
-                for poly, c_idx in zip(overlap_polys[overlap_mask], matched_over_cols):
-                    c_id = self.get_cell_name(
-                        row_idx, c_idx, lon_spacing, is_primary=False
-                    )
-                    cells.append(GridCell(self.D, poly, is_primary=False, cell_id=c_id))
+                self._add_overlap_cells(
+                    lons, lat, lon_spacing, cols, row_idx, polygon, cells
+                )
 
         return cells
 
@@ -381,18 +494,58 @@ class GridDefinition(MajorTomGrid):
             max_h += 2 * padding
         return max_w, max_h
 
-    def to_esa_compatible_dataframe(self, cells: Sequence[GridCell]) -> GeoDataFrame:
-        """
-        Converts a sequence of GridCells into a GeoDataFrame that perfectly
-        matches the schema and formatting of the original ESA `Grid.points` dataframe.
+    def _cell_to_esa_record(self, cell: GridCell) -> tuple[dict[str, Any], Point]:
+        """Build ESA-compatible metadata for a single primary GridCell.
 
         Args:
-            cells (Sequence[GridCell]): A list of GridCell objects to convert.
-        Returns:
-            GeoDataFrame: A GeoDataFrame with columns and formatting identical to the ESA grid points.
-        """
+            cell: A primary GridCell.
 
-        data = {
+        Returns:
+            Tuple of (data dict, geometry Point).
+        """
+        parts = cell.id().split("_")
+        r_str, c_str = parts[0], parts[1]
+
+        # ESA grid points are defined as the bottom-left corner of the cell
+        bottom_left = cell.geom.exterior.coords[0]
+        lon, lat = bottom_left[0], bottom_left[1]
+
+        # Reconstruct original ESA row_idx and col_idx
+        rel_y = _parse_directional_value(r_str, "U", "D")
+        row_idx = rel_y + int(self.row_count) // 2
+
+        lon_spacing = self.get_lon_spacing(lat)
+        n_cols = _n_cols_for_spacing(lon_spacing)
+        rel_x = _parse_directional_value(c_str, "R", "L")
+        col_idx = rel_x + n_cols // 2
+
+        # Format the CRS to match ESA exactly (e.g., 'EPSG:32701' and '32701')
+        raw_crs = str(cell.utm_crs).upper()
+        epsg_str = raw_crs if "EPSG:" in raw_crs else f"EPSG:{raw_crs}"
+        utm_zone = epsg_str.split(":")[-1]
+
+        data: dict[str, Any] = {
+            "name": cell.id(),
+            "row": r_str,
+            "col": c_str,
+            "row_idx": row_idx,
+            "col_idx": col_idx,
+            "utm_zone": utm_zone,
+            "epsg": epsg_str,
+        }
+
+        return data, Point(lon, lat)
+
+    def to_esa_compatible_dataframe(self, cells: Sequence[GridCell]) -> GeoDataFrame:
+        """Convert a sequence of GridCells into a GeoDataFrame matching ESA format.
+
+        Args:
+            cells: A list of GridCell objects to convert.
+
+        Returns:
+            A GeoDataFrame with columns and formatting identical to the ESA grid points.
+        """
+        data: dict[str, list[Any]] = {
             "name": [],
             "row": [],
             "col": [],
@@ -401,45 +554,17 @@ class GridDefinition(MajorTomGrid):
             "utm_zone": [],
             "epsg": [],
         }
-        geometries = []
+        geometries: list[Point] = []
 
         for cell in cells:
             # ESA's base grid dataframe only stored primary grid points, not overlaps
             if not cell.is_primary:
                 continue
 
-            parts = cell.id().split("_")
-            r_str, c_str = parts[0], parts[1]
-
-            # ESA grid points are defined as the bottom-left corner of the cell
-            bottom_left = cell.geom.exterior.coords[0]
-            lon, lat = bottom_left[0], bottom_left[1]
-
-            # Reconstruct original ESA row_idx and col_idx
-            y_val = int(r_str[:-1])
-            rel_y = y_val if r_str[-1].upper() == "U" else -y_val
-            row_idx = rel_y + int(self.row_count) // 2
-
-            lon_spacing = self.get_lon_spacing(lat)
-            n_cols = round(360 / lon_spacing) if lon_spacing > 0 else 0
-            x_val = int(c_str[:-1])
-            rel_x = x_val if c_str[-1].upper() == "R" else -x_val
-            col_idx = rel_x + n_cols // 2
-
-            # Format the CRS to match ESA exactly (e.g., 'EPSG:32701' and '32701')
-            raw_crs = str(cell.utm_crs).upper()
-            epsg_str = raw_crs if "EPSG:" in raw_crs else f"EPSG:{raw_crs}"
-            utm_zone = epsg_str.split(":")[-1]
-
-            data["name"].append(cell.id())
-            data["row"].append(r_str)
-            data["col"].append(c_str)
-            data["row_idx"].append(row_idx)
-            data["col_idx"].append(col_idx)
-            data["utm_zone"].append(utm_zone)
-            data["epsg"].append(epsg_str)
-
-            geometries.append(Point(lon, lat))
+            cell_data, point = self._cell_to_esa_record(cell)
+            for key in data:
+                data[key].append(cell_data[key])
+            geometries.append(point)
 
         # Return a GeoDataFrame with the exact same structure as the ESA one
         return cast(

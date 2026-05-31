@@ -229,12 +229,16 @@ grid = GridConfig(
     min_coverage=0.5,
 )
 
+client = AereoClient(
+    profiles=profiles,
+    grid_config=grid,
+    aoi=aoi,
+    cells_per_task=10,
+)
+
 client.prepare_for_extraction(
     search_results=results,
-    grid_config=grid,
-    profiles=profiles,
     uri="output/extraction",
-    cells_per_chunk=10,
 )
 ```
 
@@ -258,7 +262,7 @@ All sample AOIs are in the `data/` directory and shared across examples:
 
 ## EOIDS Output Structure
 
-Extracted data follows the [Earth Observation Imaging Data Structure](../eoids.md) convention:
+Extracted data follows the [Earth Observation Imaging Data Structure](../output-formats.md) convention:
 
 ```
 extract_buenos_aires_viirs/

@@ -1,40 +1,42 @@
 <p align="center">
-    <img src="aer.png" alt="AEREO logo" style="max-width: 500px; width: 100%;">
+    <img src="banner.svg" alt="AEREO logo" style="max-width: 300px; width: 100%;">
 </p>
 
-<h1 align="center">
+<!--<h1 align="center">
   Plugin-based satellite data extraction — from search to analysis-ready Major TOM grid in minutes.
-</h1>
+</h1>-->
 
 ---
 
 Satellite data lives in a dozen different catalogs, each with its own API, authentication, and file format. **AEREO** unifies them into a single pipeline: **search** across catalogs, **extract** assets, and receive everything reprojected to the same **Major TOM grid** — ready for multi-sensor model training.
 
-## Install
+<div class="grid cards" markdown>
 
-Pick your sensor and copy-paste:
+-   ## Search and Extract
 
-=== "GOES ABI (public S3, no auth)"
+    ---
 
-    ```bash
-    pip install aereo aereo-search-aws-goes aereo-extract-satpy
-    ```
+    Process satellite data with AEREO's unified pipeline.
 
-=== "Sentinel-2 (Planetary Computer)"
+    [:octicons-arrow-right-24: Get Started](first-pipeline.md)
 
-    ```bash
-    pip install aereo aereo-search-planetary-computer aereo-extract-odc-stac
-    ```
+-   ## Build a Plugin
 
-=== "MODIS / VIIRS / Sentinel-3 (NASA Earthdata)"
+    ---
 
-    ```bash
-    pip install aereo aereo-search-earthaccess aereo-extract-satpy
-    ```
+    Extend AEREO with custom search and extract plugins.
 
-> **Note:** The PyPI package is `aereo` because `aereo` is already taken.
+    [:octicons-arrow-right-24: Learn How](plugin-overview.md)
 
-> These plugins ship ready to use. AEREO's architecture makes adding new sensors trivial — a **search plugin** connects the catalog, an **extract plugin** handles the assets, and reprojection to the **Major TOM grid** happens automatically.
+-   ## API Reference
+
+    ---
+
+    Explore the complete API for power users and plugin developers.
+
+    [:octicons-arrow-right-24: View API](api/client.md)
+
+</div>
 
 ---
 
@@ -71,18 +73,6 @@ client.execute_tasks(tasks)
 ```
 
 Open `./out/` — you have GeoTIFFs.
-
----
-
-## New to AEREO?
-
-- [Quick Start](quickstart.md) — first extraction in 3 minutes
-- [CLI](cli.md) — zero-code `aereo run`
-
-## Going deeper
-
-- [Examples](examples.md) — GOES, Sentinel-2, multi-sensor, ML-ready
-- [Grid System](grid.md) — how the Major TOM grid works
 
 ---
 

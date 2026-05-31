@@ -15,25 +15,21 @@
 # tiles in parallel, lazily reprojects them to the target grid, mosaics
 # overlapping coverage, and writes multi-band GeoTIFFs.
 
+import time
 from datetime import datetime, timezone
 from pathlib import Path
-import time
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
-from pyproj import Transformer
 import rasterio
-from shapely.ops import transform as shapely_transform
-
+from aereo.backends import LocalProcessBackend
 from aereo.client import AereoClient
-import sys
-
-_helpers = Path(__file__).resolve().parents[1] / "helpers"
-sys.path.insert(0, str(_helpers))
-from eoids import mosaic_eoids_tiles, scan_eoids_dir
-from aereo.execution import LocalProcessBackend
+from aereo.eoids import scan_eoids_dir
 from aereo.interfaces import AereoProfile, GridConfig
+from examples.helpers.eoids_mosaic import mosaic_eoids_tiles
+from pyproj import Transformer
+from shapely.ops import transform as shapely_transform
 
 # --- Configuration ---
 # GeoTessera covers 2017–2025. We use 2024 which has coverage for the Chocon AOI.
@@ -59,14 +55,20 @@ grid = GridConfig.from_yaml(data_dir / "grid_config.yaml")
 profiles = [all_profiles["geotessera"]]
 
 # --- Client Setup ---
-client = AereoClient()
+# cells_per_task=4 keeps the example fast and memory-light.
+client = AereoClient(
+    profiles=profiles,
+    grid_config=grid,
+    aoi=aoi,
+    backend=LocalProcessBackend(max_workers=8),
+    cells_per_task=2,
+)
+
 print("Searching GeoTessera tiles...", flush=True)
 t0 = time.time()
 results = client.search(
-    profiles=profiles,
     start_datetime=DATE_START,
     end_datetime=DATE_END,
-    intersects=aoi,
 )
 print(f"Search completed in {time.time() - t0:.2f}s")
 print(
@@ -77,14 +79,9 @@ print(
 
 # %%
 # Prepare extraction tasks using the same profiles.
-# cells_per_chunk=1 keeps the example fast and memory-light.
 tasks = client.prepare_for_extraction(
     results,  # type: ignore[arg-type]
-    grid_config=grid,
-    target_aoi=aoi,
     uri=URI,
-    profiles=profiles,
-    cells_per_chunk=4,
 )
 
 print(f"Prepared {len(tasks)} extraction task(s)", flush=True)
@@ -94,8 +91,7 @@ print(f"Prepared {len(tasks)} extraction task(s)", flush=True)
 # max_download_workers controls the ThreadPoolExecutor for .npy downloads.
 print(f"Extracting {len(tasks)} task(s)...", flush=True)
 start_time = time.time()
-backend = LocalProcessBackend(max_workers=None)
-results_df = client.execute_tasks(tasks, backend=backend)
+results_df = client.execute_tasks(tasks)
 print(f"Extraction completed in {time.time() - start_time:.2f}s")
 print(f"Extracted {len(results_df)} artifacts")
 

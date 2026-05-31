@@ -1,26 +1,34 @@
-"""Remote execution backends for AEREO extraction tasks."""
+"""Remote execution backend for AWS Lambda."""
 
 from __future__ import annotations
 
 import json
-import logging
 import re
 import tempfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Iterable, Sequence
+from typing import Iterable, Optional, Sequence
 
 from aereo.backends.core import TaskRunner
 from aereo.interfaces import ExecutionBackend, ExtractionTask, TaskStaging
 from aereo.schemas import ArtifactSchema
 from aereo.serialization import TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
+from structlog import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
 
 
 def _safe_truncate(text: str, max_len: int = 2048) -> str:
-    """Truncate error text and redact potential credentials."""
+    """Truncate error text and redact potential credentials.
+
+    Args:
+        text: Raw error text that may contain sensitive URLs or keys.
+        max_len: Maximum length before truncation.
+
+    Returns:
+        Sanitised text with credentials redacted and length capped.
+    """
     text = re.sub(
         r"https?://[^\s]+\?[^\s]*X-Amz-Credential[^\s]*",
         "[REDACTED-PRESIGNED-URL]",
@@ -36,12 +44,12 @@ class LambdaBackend(ExecutionBackend):
     """Execute tasks remotely via AWS Lambda container functions.
 
     Each :class:`ExtractionTask` is serialized, staged to remote object storage,
-    and dispatched as a separate Lambda invocation.  The Lambda handler is
+    and dispatched as a separate Lambda invocation. The Lambda handler is
     expected to deserialize the task, run the appropriate extractor, upload the
     results, and return a JSON payload with a ``manifest_uri`` key.
 
     Because ``boto3`` is an optional dependency, it is imported lazily inside
-    :meth:`__init__`.  Install it with ``pip install boto3`` before using this
+    :meth:`__init__`. Install it with ``pip install boto3`` before using this
     backend.
     """
 
@@ -53,19 +61,22 @@ class LambdaBackend(ExecutionBackend):
         endpoint_url: str | None = None,
         max_concurrent_invokes: int = 10,
         invoke_timeout: int = 900,
-    ):
+    ) -> None:
         """Create a new Lambda backend.
 
         Args:
             function_name: AWS Lambda function name or ARN.
             staging: A :class:`TaskStaging` implementation that knows how to upload
                 serialized tasks and download result manifests.
-            serializer: Optional :class:`TaskSerializer` instance.  A default one
+            serializer: Optional :class:`TaskSerializer` instance. A default one
                 is created when ``None``.
             endpoint_url: Optional boto3 endpoint URL (e.g. ``http://localhost:4566``
-                for Floci/local emulation).
+                for LocalStack emulation).
             max_concurrent_invokes: Maximum number of concurrent Lambda invocations.
             invoke_timeout: Read timeout in seconds for the boto3 Lambda client.
+
+        Raises:
+            ImportError: If ``boto3`` is not installed.
         """
         try:
             import boto3  # pyright: ignore[reportMissingImports]
@@ -92,7 +103,7 @@ class LambdaBackend(ExecutionBackend):
     def run_tasks(
         self,
         tasks: Sequence[ExtractionTask],
-        runner: TaskRunner | None = None,
+        runner: Optional[TaskRunner] = None,
     ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
         """Execute *tasks* via AWS Lambda.
 
@@ -125,14 +136,28 @@ class LambdaBackend(ExecutionBackend):
                 except Exception as exc:
                     logger.error(
                         "lambda_task_failed",
-                        extra={"task_index": idx, "error": str(exc)},
+                        task_index=idx,
+                        error=str(exc),
                     )
                     raise
 
         return [r for r in results if r is not None]
 
     def _invoke_single(self, task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
-        """Serialize, stage, invoke Lambda, and load artifacts for one task."""
+        """Serialize, stage, invoke Lambda, and load artifacts for one task.
+
+        Args:
+            task: The extraction task to process.
+
+        Returns:
+            The extracted artifacts as a ``GeoDataFrame[ArtifactSchema]``.
+
+        Raises:
+            RuntimeError: If the Lambda invocation fails or returns a non-2xx
+                status code.
+            RetryableLambdaError: If the Lambda returns a retryable error.
+            ValueError: If the response is missing ``manifest_uri``.
+        """
         job_id = task.task_context.get("job_id", "default")
         task_idx = task.task_context.get("chunk_id", 0)
 
@@ -163,12 +188,10 @@ class LambdaBackend(ExecutionBackend):
             )
             logger.error(
                 "lambda_invocation_failed",
-                extra={
-                    "function_name": self.function_name,
-                    "job_id": job_id,
-                    "task_idx": task_idx,
-                    "error": error_msg,
-                },
+                function_name=self.function_name,
+                job_id=job_id,
+                task_idx=task_idx,
+                error=error_msg,
             )
             raise RuntimeError(
                 f"Lambda function '{self.function_name}' returned error "
@@ -177,7 +200,6 @@ class LambdaBackend(ExecutionBackend):
 
         payload = json.loads(payload_bytes)
 
-        # Handle structured error responses from the Lambda handler
         status_code = payload.get("statusCode", 200)
         if status_code >= 400:
             error = payload.get("error", "Unknown Lambda error")
