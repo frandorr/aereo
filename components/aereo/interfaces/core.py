@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
@@ -29,7 +28,47 @@ from pandera.typing.geopandas import GeoDataFrame
 from pydantic import BaseModel, Field, ImportString, TypeAdapter
 from shapely.geometry.base import BaseGeometry
 
-logger = logging.getLogger(__name__)
+GridFilterMode = Literal["intersection", "within", "coverage"]
+
+DEFAULT_CELLS_PER_TASK: int = 50
+WGS84_CRS: str = "epsg:4326"
+
+# Default raster write parameters used by extract plugins.
+DEFAULT_RASTER_DRIVER: str = "GTiff"
+DEFAULT_RASTER_COMPRESS: str = "deflate"
+DEFAULT_RASTER_ZLEVEL: int = 1
+DEFAULT_RASTER_PREDICTOR: int | None = None
+
+_YAML_INSTALL_MSG = (
+    "YAML support requires PyYAML. Install it with: pip install 'aereo[yaml]'"
+)
+
+
+def _skip_empty(geom: BaseGeometry | None) -> bool:
+    """Return True if *geom* is None or empty."""
+    return geom is None or geom.is_empty
+
+
+def _load_json_file(path: str | Path) -> dict[str, Any]:
+    """Load and parse a JSON file."""
+    path = Path(path)
+    return json.loads(path.read_text())
+
+
+def _union_all(geom_series) -> BaseGeometry:
+    """Return the union of a geometry series, handling API differences."""
+    if hasattr(geom_series, "union_all"):
+        return geom_series.union_all()
+    return geom_series.unary_union
+
+
+def _import_yaml() -> Any:
+    """Import yaml with a clear error message if PyYAML is missing."""
+    try:
+        import yaml
+    except ImportError as exc:
+        raise ImportError(_YAML_INSTALL_MSG) from exc
+    return yaml
 
 
 class PluginParam(BaseModel):
@@ -56,6 +95,14 @@ def merge_params(
     """Merge profile-level params over batch-level params.
 
     Profile wins on key collision.
+
+    Args:
+        batch_params: Base parameters, typically from a batch config.
+        profile_params: Override parameters, typically from a profile.
+            These take precedence on key collision.
+
+    Returns:
+        A new dict containing the merged parameters.
     """
     merged = dict(batch_params or {})
     merged.update(profile_params)
@@ -84,7 +131,7 @@ class GridConfig(BaseModel):
         default=0.0,
         description="Percentage margin added to each cell's nominal size (e.g. 6.8 for 6.8 %).",
     )
-    grid_filter_mode: Literal["intersection", "within", "coverage"] = Field(
+    grid_filter_mode: GridFilterMode = Field(
         default="intersection",
         description="How to filter grid cells against the AOI.",
     )
@@ -100,12 +147,7 @@ class GridConfig(BaseModel):
         The file may contain either a top-level ``grid_config`` key mapping
         to a grid config dictionary, or the grid config fields directly.
         """
-        try:
-            import yaml
-        except ImportError as exc:
-            raise ImportError(
-                "YAML support requires PyYAML. Install it with: pip install 'aer[yaml]'"
-            ) from exc
+        yaml = _import_yaml()
         path = Path(path)
         data = yaml.safe_load(path.read_text())
         return cls._from_raw(data)
@@ -113,24 +155,31 @@ class GridConfig(BaseModel):
     @classmethod
     def from_yaml_string(cls, text: str) -> "GridConfig":
         """Load a GridConfig from a YAML string."""
-        try:
-            import yaml
-        except ImportError as exc:
-            raise ImportError(
-                "YAML support requires PyYAML. Install it with: pip install 'aer[yaml]'"
-            ) from exc
+        yaml = _import_yaml()
         data = yaml.safe_load(text)
         return cls._from_raw(data)
 
     @classmethod
     def from_json(cls, path: str | Path) -> "GridConfig":
         """Load a GridConfig from a JSON file."""
-        path = Path(path)
-        data = json.loads(path.read_text())
+        data = _load_json_file(path)
         return cls._from_raw(data)
 
     @classmethod
     def _from_raw(cls, data: dict[str, Any]) -> "GridConfig":
+        """Validate and construct a GridConfig from a raw dict.
+
+        Supports the ``grid_config`` nested-key convention used by YAML files.
+
+        Args:
+            data: Raw dictionary, possibly containing a ``grid_config`` key.
+
+        Returns:
+            A validated GridConfig instance.
+
+        Raises:
+            ValueError: If data is not a dict.
+        """
         if not isinstance(data, dict):
             raise ValueError("GridConfig data must be a dict.")
         if "grid_config" in data:
@@ -157,6 +206,16 @@ class AereoPlugin(ABC):
     optional_params: Sequence[PluginParam] = ()
 
     def __init_subclass__(cls, plugin_abstract: bool = False, **kwargs):
+        """Validate plugin subclasses on definition.
+
+        Enforces that subclasses define ``supported_collections`` as a
+        non-empty sequence of strings and that ``required_params`` and
+        ``optional_params`` contain only PluginParam instances.
+
+        Args:
+            plugin_abstract: If True, skip validation (for intermediate ABCs).
+            **kwargs: Passed to ``ABC.__init_subclass__``.
+        """
         super().__init_subclass__(**kwargs)
 
         if plugin_abstract:
@@ -201,6 +260,22 @@ class AereoPlugin(ABC):
 
 
 class SearchProvider(AereoPlugin, plugin_abstract=True):
+    @staticmethod
+    def empty_result() -> GeoDataFrame[AssetSchema]:
+        """Return an empty GeoDataFrame with AssetSchema columns.
+
+        Returns:
+            An empty validated GeoDataFrame with the correct schema columns,
+            including a geometry column.
+        """
+        import geopandas as gpd
+
+        columns = list(AssetSchema.to_schema().columns.keys())
+        if "geometry" not in columns:
+            columns.append("geometry")
+        gdf = gpd.GeoDataFrame(columns=columns, geometry="geometry")
+        return cast(GeoDataFrame[AssetSchema], AssetSchema.validate(gdf))
+
     @abstractmethod
     def search(
         self,
@@ -301,12 +376,7 @@ class AereoProfile(BaseModel):
         The file must contain a top-level ``profiles`` key mapping to a list
         of profile dictionaries.
         """
-        try:
-            import yaml
-        except ImportError as exc:
-            raise ImportError(
-                "YAML support requires PyYAML. Install it with: pip install 'aer[yaml]'"
-            ) from exc
+        yaml = _import_yaml()
         path = Path(path)
         data = yaml.safe_load(path.read_text())
         return cls._from_raw(data)
@@ -314,20 +384,14 @@ class AereoProfile(BaseModel):
     @classmethod
     def from_yaml_string(cls, text: str) -> list[Self]:
         """Load profiles from a YAML string."""
-        try:
-            import yaml
-        except ImportError as exc:
-            raise ImportError(
-                "YAML support requires PyYAML. Install it with: pip install 'aer[yaml]'"
-            ) from exc
+        yaml = _import_yaml()
         data = yaml.safe_load(text)
         return cls._from_raw(data)
 
     @classmethod
     def from_json(cls, path: str | Path) -> list[Self]:
         """Load profiles from a JSON file."""
-        path = Path(path)
-        data = json.loads(path.read_text())
+        data = _load_json_file(path)
         return cls._from_raw(data)
 
     @classmethod
@@ -352,6 +416,18 @@ class AereoProfile(BaseModel):
 
     @classmethod
     def _from_raw(cls, data: dict[str, Any]) -> list[Self]:
+        """Validate and construct AereoProfile instances from a raw dict.
+
+        Args:
+            data: Raw dictionary containing a ``profiles`` key mapping to a
+                list of profile dictionaries.
+
+        Returns:
+            A list of validated AereoProfile instances.
+
+        Raises:
+            ValueError: If data is not a dict or lacks a ``profiles`` key.
+        """
         if not isinstance(data, dict) or "profiles" not in data:
             raise ValueError("Config must be a dict with a 'profiles' key.")
         raw_profiles = data["profiles"]
@@ -366,6 +442,15 @@ class AereoProfile(BaseModel):
         profiles: list[Self],
         allow_duplicate_names: bool = False,
     ) -> None:
+        """Check that profile names are unique.
+
+        Args:
+            profiles: List of profiles to validate.
+            allow_duplicate_names: If True, skip the uniqueness check.
+
+        Raises:
+            ValueError: If duplicate names are found.
+        """
         if allow_duplicate_names:
             return
         seen = set()
@@ -405,6 +490,12 @@ class ExtractionTask:
     task_context: Mapping[str, Any] = attrs.field(factory=dict)
 
     def __attrs_post_init__(self) -> None:
+        """Validate task invariants after construction.
+
+        Raises:
+            ValueError: If assets is empty or if a profile collection is
+                missing from the assets DataFrame.
+        """
         if self.assets is None or len(self.assets) == 0:
             raise ValueError("assets cannot be empty")
 
@@ -448,6 +539,103 @@ class Extractor(AereoPlugin, plugin_abstract=True):
     ``GridConfig``.
     """
 
+    @staticmethod
+    def resolve_variables(
+        task: ExtractionTask,
+        collection: str | None = None,
+        extract_params: Mapping[str, Any] | None = None,
+    ) -> list[str]:
+        """Resolve target variables from profile collections with fallback chain.
+
+        Resolution order:
+        1. ``task.profile.collections[collection]``
+        2. ``extract_params["dataset_name"]``
+        3. ``task.task_context["dataset_name"]``
+
+        Args:
+            task: The extraction task containing profile and assets.
+            collection: Collection name to look up in profile.collections.
+                If None, uses the first collection found in task assets.
+            extract_params: Additional parameters that may contain a
+                ``dataset_name`` fallback.
+
+        Returns:
+            List of resolved variable names.
+
+        Raises:
+            ValueError: If no variables can be resolved.
+        """
+        variables: list[str] = []
+        extract_params = dict(extract_params or {})
+
+        if task.profile.collections:
+            if collection is not None:
+                variables = list(task.profile.collections.get(collection, []))
+            else:
+                # Use first collection's variables
+                for col_vars in task.profile.collections.values():
+                    variables.extend(col_vars)
+                variables = list(dict.fromkeys(variables))
+
+        if not variables:
+            dataset_name = extract_params.get("dataset_name") or task.task_context.get(
+                "dataset_name"
+            )
+            if dataset_name:
+                variables = [dataset_name]
+
+        if not variables:
+            coll_str = collection or "unknown"
+            raise ValueError(
+                f"No variables found in profile or params for collection {coll_str}"
+            )
+
+        return variables
+
+    @staticmethod
+    def resolve_downloader(
+        task: ExtractionTask,
+        extract_params: Mapping[str, Any] | None = None,
+    ) -> Any | None:
+        """Resolve the downloader callable using the standard priority order.
+
+        Resolution order:
+        1. ``task.profile.downloader`` (per-profile, highest priority)
+        2. ``extract_params["downloader"]`` (batch-level fallback)
+        3. ``None`` (use built-in default)
+
+        Args:
+            task: The extraction task containing profile.
+            extract_params: Additional parameters that may contain a downloader.
+
+        Returns:
+            The resolved downloader callable, or None.
+        """
+        if task.profile.downloader is not None:
+            return task.profile.downloader
+        if extract_params and "downloader" in extract_params:
+            return extract_params["downloader"]
+        return None
+
+    @staticmethod
+    def get_grid_cells(task: ExtractionTask) -> Sequence[Any]:
+        """Return the grid cells for a task.
+
+        Prefers ``task.grid_cells`` (set by :meth:`prepare_for_extraction`)
+        so that engines use the exact, pre-computed subset of cells.
+        Falls back to ``task.task_context["grid_cells"]`` if the task was
+        created without the standard preparation flow.
+
+        Args:
+            task: The extraction task whose grid cells should be retrieved.
+
+        Returns:
+            Sequence of grid-cell objects.
+        """
+        if hasattr(task, "grid_cells") and task.grid_cells:
+            return task.grid_cells
+        return task.task_context.get("grid_cells", [])
+
     def prepare_for_extraction(
         self,
         search_results: GeoDataFrame[AssetSchema],
@@ -455,11 +643,32 @@ class Extractor(AereoPlugin, plugin_abstract=True):
         target_aoi: BaseGeometry | None = None,
         uri: str | None = None,
         profiles: Sequence[AereoProfile] | None = None,
-        cells_per_chunk: int = 50,
+        cells_per_task: int = DEFAULT_CELLS_PER_TASK,
         extractor_hint: str | None = None,
         init_params: Mapping[str, Any] | None = None,
     ) -> Sequence[ExtractionTask]:
-        """Prepare extraction tasks by grouping assets by profile and start time, then chunking grid cells."""
+        """Prepare extraction tasks by grouping assets and chunking grid cells.
+
+        Groups search results by profile and start time, generates grid cells,
+        optionally filters them by AOI coverage, then chunks into tasks.
+
+        Args:
+            search_results: GeoDataFrame of assets from the search phase.
+            grid_config: Tiling specification shared by all tasks.
+            target_aoi: Optional geometry to clip the extraction region.
+            uri: Destination URI prefix for extracted artifacts.
+            profiles: Profiles defining what to extract. Must contain at least one.
+            cells_per_task: Maximum number of grid cells per task chunk.
+            extractor_hint: Optional hint string forwarded to task context.
+            init_params: Optional parameters added to each task's context.
+
+        Returns:
+            A sequence of ExtractionTask objects ready for execution.
+
+        Raises:
+            ValueError: If uri is None, no profiles are provided, or
+                grid_dist is not set in grid_config.
+        """
         if uri is None:
             raise ValueError(
                 "Default prepare_for_extraction requires uri to be defined."
@@ -480,6 +689,7 @@ class Extractor(AereoPlugin, plugin_abstract=True):
         grid_filter_mode = grid_config.grid_filter_mode
         min_coverage = grid_config.min_coverage
 
+        import geopandas as gpd
         from aereo.grid import GridDefinition
 
         grid_def = GridDefinition(d=grid_dist, overlap=grid_overlap)
@@ -508,12 +718,9 @@ class Extractor(AereoPlugin, plugin_abstract=True):
             # 2. Group by exact start_time
             for start_time, time_group in profile_assets.groupby("start_time"):
                 # 3. Determine base geometry union of the group
-                if hasattr(time_group, "union_all"):
-                    group_geom = time_group.union_all()
-                else:
-                    group_geom = time_group.geometry.unary_union
+                group_geom = _union_all(time_group.geometry)
 
-                if group_geom is None or group_geom.is_empty:
+                if _skip_empty(group_geom):
                     continue
 
                 # 4. Intersect with target_aoi if provided
@@ -522,7 +729,7 @@ class Extractor(AereoPlugin, plugin_abstract=True):
                 else:
                     aoi_geom = group_geom
 
-                if aoi_geom is None or aoi_geom.is_empty:
+                if _skip_empty(aoi_geom):
                     continue
 
                 # 5. Generate grid cells specifically for the intersected geometry
@@ -568,43 +775,36 @@ class Extractor(AereoPlugin, plugin_abstract=True):
             conform_to_shape: tuple[int, int] | None = None
             if profile.conform_to is not None:
                 conform_to_shape = profile.conform_to
-                # Pre-warm area_def cache with conformed shape for all cells
-                for _, _, cells in profile_cell_groups:
-                    for cell in cells:
-                        cell.area_def(
-                            resolution,
-                            padding,
-                            margin=target_grid_margin,
-                            conform_to=conform_to_shape,
-                        )
+
+            # Pre-warm and cache area_def results for all cells to avoid
+            # redundant computation in the second pass.
+            area_def_cache: dict[GridCell, Any] = {}
+            for _, _, cells in profile_cell_groups:
+                for cell in cells:
+                    area_def_cache[cell] = cell.area_def(
+                        resolution,
+                        padding,
+                        margin=target_grid_margin,
+                        conform_to=conform_to_shape,
+                    )
 
             # Second pass: chunk cells and create tasks
             for start_time, time_group, all_cells in profile_cell_groups:
                 # 6. Chunk cells and create tasks
                 cell_chunks = [
-                    all_cells[i : i + cells_per_chunk]
-                    for i in range(0, len(all_cells), cells_per_chunk)
+                    all_cells[i : i + cells_per_task]
+                    for i in range(0, len(all_cells), cells_per_task)
                 ]
 
                 for chunk_idx, cells in enumerate(cell_chunks):
                     # Filter assets to only those that spatially intersect these grid cells' footprints,
                     # accounting for resolution, padding, and margin.
-                    import geopandas as gpd
-
                     cell_geoms = []
                     for cell in cells:
-                        geobox = cell.area_def(
-                            resolution,
-                            padding=padding,
-                            margin=target_grid_margin,
-                            conform_to=conform_to_shape,
-                        )
-                        cell_geoms.append(geobox.extent.to_crs("epsg:4326").geom)
+                        geobox = area_def_cache[cell]
+                        cell_geoms.append(geobox.extent.to_crs(WGS84_CRS).geom)
 
-                    if hasattr(gpd.GeoSeries(cell_geoms), "union_all"):
-                        cells_union = gpd.GeoSeries(cell_geoms).union_all()
-                    else:
-                        cells_union = gpd.GeoSeries(cell_geoms).unary_union
+                    cells_union = _union_all(gpd.GeoSeries(cell_geoms))
 
                     intersecting_mask = (
                         time_group.intersects(cells_union) | time_group.geometry.isna()
@@ -685,7 +885,7 @@ class TaskStaging(Protocol):
             task_idx: Index of the task within the job.
 
         Returns:
-            A URI (e.g. ``s3://bucket/aer-tasks/{job_id}/{task_idx}/``) that the
+            A URI (e.g. ``s3://bucket/aereo-tasks/{job_id}/{task_idx}/``) that the
             remote worker can use to retrieve the task.
         """
         ...

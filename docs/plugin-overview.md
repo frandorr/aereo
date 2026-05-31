@@ -29,7 +29,7 @@ from datetime import datetime
 from shapely.geometry.base import BaseGeometry
 from pandera.typing.geopandas import GeoDataFrame
 
-from aereo.interfaces import SearchProvider
+from aereo.interfaces import AereoProfile, SearchProvider
 from aereo.schemas import AssetSchema
 
 class MySearchProvider(SearchProvider):
@@ -37,7 +37,7 @@ class MySearchProvider(SearchProvider):
 
     def search(
         self,
-        collections: Sequence[str],
+        profiles: Sequence[AereoProfile],
         intersects: BaseGeometry | None,
         start_datetime: datetime | None,
         end_datetime: datetime | None,
@@ -52,9 +52,10 @@ Responsible for generating task batches and running data extraction.
 Plugins must declare `supported_collections` as a sequence of strings.
 
 ```python
-from typing import Any
+from typing import Any, Mapping, Sequence
+from shapely.geometry.base import BaseGeometry
 from pandera.typing.geopandas import GeoDataFrame
-from aereo.interfaces import Extractor
+from aereo.interfaces import AereoProfile, Extractor, ExtractionTask, GridConfig
 from aereo.schemas import AssetSchema, ArtifactSchema
 
 class MyExtractor(Extractor):
@@ -63,14 +64,20 @@ class MyExtractor(Extractor):
     def prepare_for_extraction(
         self,
         search_results: GeoDataFrame[AssetSchema],
-        prepare_params: dict[str, Any] | None,
-    ) -> list[GeoDataFrame[AssetSchema]]:
+        grid_config: GridConfig,
+        target_aoi: BaseGeometry | None = None,
+        uri: str | None = None,
+        profiles: Sequence[AereoProfile] | None = None,
+        cells_per_task: int = 50,
+        extractor_hint: str | None = None,
+        init_params: Mapping[str, Any] | None = None,
+    ) -> Sequence[ExtractionTask]:
         ...
 
     def extract(
         self,
-        assets_batch: GeoDataFrame[AssetSchema],
-        extract_params: dict[str, Any] | None,
+        extraction_task: ExtractionTask,
+        extract_params: Mapping[str, Any] | None,
     ) -> GeoDataFrame[ArtifactSchema]:
         ...
 ```
@@ -222,4 +229,4 @@ my_extractor = "my_package.extraction:MyExtractor"
 > [!IMPORTANT]
 > **Workspace Discovery Root**: In a Polylith development environment, `importlib.metadata` reads discovery metadata from the package currently installed in the environment. If you add a new plugin to a `projects/` sub-package but **do not** add it to the root `pyproject.toml`, it will be missing during development. Always mirror your plugin entry points in the root configuration during active development.
 
-To learn how to build and expose your own custom search providers and extractors natively, see [Build Your Own Plugin](./build-your-own-plugin.md).
+To learn how to build and expose your own custom search providers and extractors natively, see [Build Your First Plugin](build-first-plugin.md).

@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from enum import Enum
-from typing import Any, Mapping, Optional, Sequence, cast
+from typing import Any, Mapping, Sequence, cast
 
 import pandas as pd
 import json
@@ -22,6 +22,18 @@ from structlog import get_logger
 
 logger = get_logger()
 
+DEFAULT_CELLS_PER_TASK = 50
+
+
+def _json_default(obj: Any) -> Any:
+    """Custom JSON encoder that recursively stringifies non-string dict keys."""
+    if isinstance(obj, dict):
+        return {str(k): _json_default(v) for k, v in obj.items()}
+    try:
+        return json.JSONEncoder.default(json.JSONEncoder(), obj)
+    except TypeError:
+        return str(obj)
+
 
 class FailureMode(str, Enum):
     """Determines pipeline behavior when partial or total plugin failures occur."""
@@ -30,8 +42,18 @@ class FailureMode(str, Enum):
     BEST_EFFORT = "best_effort"
 
 
-def normalize_geometry(geom: Any) -> Optional[BaseGeometry]:
-    """Ensures input geometries are Shapely objects before passing to Plugins."""
+def normalize_geometry(geom: Any) -> BaseGeometry | None:
+    """Ensures input geometries are Shapely objects before passing to Plugins.
+
+    Args:
+        geom: Geometry input (dict, BaseGeometry, or None).
+
+    Returns:
+        A Shapely BaseGeometry, or None if input was None.
+
+    Raises:
+        ValueError: If the geometry format is unsupported.
+    """
     if geom is None:
         return None
     if isinstance(geom, dict):
@@ -55,7 +77,15 @@ class AereoClient:
     - Implements configurable failure modes for robust real-world operation.
     """
 
-    def __init__(self, registry: Optional[AereoRegistry] = None):
+    def __init__(
+        self,
+        registry: AereoRegistry | None = None,
+        profiles: Sequence[AereoProfile] | None = None,
+        grid_config: GridConfig | None = None,
+        aoi: BaseGeometry | dict | None = None,
+        backend: Any | None = None,
+        cells_per_task: int | None = None,
+    ):
         """
         Initializes the AereoClient with an optional AereoRegistry instance.
          - If no registry is provided, a default one is instantiated.
@@ -63,11 +93,37 @@ class AereoClient:
         Args:
             registry (Optional[AereoRegistry]): An instance of AereoRegistry to manage plugin discovery and instantiation.
                 If None, a default AereoRegistry is created.
+            profiles (Optional[Sequence[AereoProfile]]): Default profiles to use for search and extraction.
+            grid_config (Optional[GridConfig]): Default grid configuration for extraction.
+            aoi (Optional[BaseGeometry | dict]): Default area of interest geometry.
+            backend (Optional[ExecutionBackend]): Default execution backend.
+            cells_per_task (Optional[int]): Default number of grid cells per extraction task.
         """
         self.registry = registry or AereoRegistry()
+        self._profiles = profiles
+        self._grid_config = grid_config
+        self._aoi = normalize_geometry(aoi)
+        self._backend = backend
+        self._cells_per_task = cells_per_task
+
+    def _resolve_aoi(self, intersects: Any | None) -> BaseGeometry | None:
+        """Resolve an AOI geometry, falling back to the client default.
+
+        Args:
+            intersects: Explicit geometry (dict or BaseGeometry), or None.
+
+        Returns:
+            Normalized geometry, or the client's default AOI.
+        """
+        return normalize_geometry(intersects) if intersects is not None else self._aoi
+
+    @staticmethod
+    def _empty_asset_df() -> GeoDataFrame:
+        """Return an empty validated AssetSchema GeoDataFrame."""
+        return cast(GeoDataFrame, AssetSchema.empty())
 
     def _resolve_params(
-        self, params: Optional[Mapping[str, Any]], collection: str
+        self, params: Mapping[str, Any] | None, collection: str
     ) -> Mapping[str, Any]:
         """Resolves parameters for a specific collection by merging global and per-collection overrides.
 
@@ -79,6 +135,13 @@ class AereoClient:
           1. Build a lowercase-key index of ``params`` for case-insensitive matching.
           2. Start with non-collection-name params (global params).
           3. Merge the per-collection override block (if present) on top.
+
+        Args:
+            params: Raw parameter mapping.
+            collection: Target collection name.
+
+        Returns:
+            Resolved parameter mapping with per-collection overrides applied.
         """
         if params is None:
             return {}
@@ -117,7 +180,7 @@ class AereoClient:
 
     def _resolve_plugin_for_profile(
         self, plugin_type: str, profile: AereoProfile
-    ) -> Optional[str]:
+    ) -> str | None:
         """Resolves the appropriate plugin name for a profile.
 
         Resolution order:
@@ -164,69 +227,20 @@ class AereoClient:
                 return plugin_names[0]
         return None
 
-    def search(
+    def _build_search_execution_groups(
         self,
         profiles: Sequence[AereoProfile],
-        intersects: Optional[BaseGeometry | dict] = None,
-        start_datetime: Optional[datetime] = None,
-        end_datetime: Optional[datetime] = None,
-        search_params: Optional[Mapping[str, Any]] = None,
-        init_params: Optional[Mapping[str, Any]] = None,
-        failure_mode: FailureMode = FailureMode.BEST_EFFORT,
-    ) -> GeoDataFrame[AssetSchema]:
-        """Find data across massive sensor networks utilizing parallel Fan-Out search dispatch.
+        search_params: Mapping[str, Any] | None,
+    ) -> dict[tuple[str, str], tuple[list[AereoProfile], Mapping[str, Any]]]:
+        """Group profiles by (target_plugin, resolved_params) to minimize redundant calls.
 
         Args:
-            profiles (Sequence[AereoProfile]): Sequence of AereoProfile objects defining what to search for.
-                Each profile carries its collections, channels, satellite, and plugin hints.
-            intersects (Optional[BaseGeometry | dict]): Optional geometry to spatially filter search results.
-            start_datetime (Optional[datetime]): Optional start datetime for temporal filtering.
-            end_datetime (Optional[datetime]): Optional end datetime for temporal filtering.
-            search_params (Optional[Mapping[str, Any]]): Meta-level parameters to pass to search plugins
-                (credentials, timeouts, etc.). Domain-specific config lives on each AereoProfile.
-                Per-profile ``search_params`` overrides batch-level values (profile wins).
-            init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for plugin instantiation.
-                Can be a flat dict (applied to every searcher) or use collection names as top-level keys
-                for per-collection overrides, following the same pattern as ``search_params``::
+            profiles: Sequence of profiles to search for.
+            search_params: Raw search parameters.
 
-                    # Global kwargs — applied to every searcher
-                    init_params={"timeout": 30}
-
-                    # Per-collection kwargs
-                    init_params={"GOES-16": {"timeout": 60}, "Sentinel-2-L2A": {"timeout": 10}}
-
-            failure_mode (FailureMode): Determines pipeline behavior when partial or total plugin failures occur. Defaults to BEST_EFFORT.
-                - STRICT: Any plugin failure raises an exception and halts the pipeline.
-                - BEST_EFFORT: Logs failures but continues processing with successful plugins.
         Returns:
-            GeoDataFrame[AssetSchema]: A verified GeoDataFrame of combined search results.
+            Mapping from (plugin_name, params_key) to (profile_list, resolved_params).
         """
-
-        norm_intersects = normalize_geometry(intersects)
-
-        logger.info(
-            "search_called",
-            profiles=[p.name for p in profiles],
-        )
-
-        # 1. Resolution & Grouping Phase
-        # We group by (target_plugin, resolved_search_params) to minimize redundant plugin calls
-        # while ensuring each profile gets its targeted parameters.
-
-        def get_params_key(p: Mapping[str, Any]) -> str:
-            # Simple stable key for grouping; default=str handles non-JSON-serializable objects
-            # Use a custom JSON encoder that recursively stringifies non-string dict keys
-            def _json_default(obj: Any) -> Any:
-                if isinstance(obj, dict):
-                    return {str(k): _json_default(v) for k, v in obj.items()}
-                try:
-                    return json.JSONEncoder.default(json.JSONEncoder(), obj)
-                except TypeError:
-                    return str(obj)
-
-            return json.dumps(p, sort_keys=True, default=_json_default)
-
-        # Map (plugin_name, params_key) -> (list_of_profiles, resolved_params_dict)
         execution_groups: dict[
             tuple[str, str], tuple[list[AereoProfile], Mapping[str, Any]]
         ] = {}
@@ -241,13 +255,12 @@ class AereoClient:
                 )
                 continue
 
-            # Resolve targeted parameters using the first collection for per-collection overrides
             first_collection = (
                 next(iter(profile.collections)) if profile.collections else ""
             )
             batch_resolved = self._resolve_params(search_params, first_collection)
             c_params = merge_params(batch_resolved, profile.search_params)
-            p_key = get_params_key(c_params)
+            p_key = json.dumps(c_params, sort_keys=True, default=_json_default)
 
             group_key = (target_plugin, p_key)
             if group_key not in execution_groups:
@@ -255,17 +268,33 @@ class AereoClient:
             else:
                 execution_groups[group_key][0].append(profile)
 
-        all_results = []
-        errors = []
+        return execution_groups
 
-        if not execution_groups:
-            if failure_mode == FailureMode.STRICT:
-                raise RuntimeError(
-                    "No eligible search plugins found for the requested profiles."
-                )
-            return cast(GeoDataFrame, AssetSchema.empty())
+    def _execute_search_groups(
+        self,
+        execution_groups: dict[
+            tuple[str, str], tuple[list[AereoProfile], Mapping[str, Any]]
+        ],
+        norm_intersects: BaseGeometry | None,
+        start_datetime: datetime | None,
+        end_datetime: datetime | None,
+        init_params: Mapping[str, Any] | None,
+    ) -> tuple[list[GeoDataFrame], list[Exception]]:
+        """Dispatch search calls in parallel and collect results.
 
-        # 2. Parallel fan-out dispatch to remote plugin APIs
+        Args:
+            execution_groups: Grouped profiles and parameters.
+            norm_intersects: Normalized AOI geometry.
+            start_datetime: Optional start filter.
+            end_datetime: Optional end filter.
+            init_params: Optional plugin init params.
+
+        Returns:
+            Tuple of (list_of_result_dataframes, list_of_exceptions).
+        """
+        all_results: list[GeoDataFrame] = []
+        errors: list[Exception] = []
+
         with ThreadPoolExecutor(max_workers=max(1, len(execution_groups))) as executor:
             futures = {
                 executor.submit(
@@ -307,7 +336,73 @@ class AereoClient:
                     )
                     errors.append(e)
 
-        # 3. Handle Resilience & Failure Profiles
+        return all_results, errors
+
+    def search(
+        self,
+        profiles: Sequence[AereoProfile] | None = None,
+        intersects: BaseGeometry | dict | None = None,
+        start_datetime: datetime | None = None,
+        end_datetime: datetime | None = None,
+        search_params: Mapping[str, Any] | None = None,
+        init_params: Mapping[str, Any] | None = None,
+        failure_mode: FailureMode = FailureMode.BEST_EFFORT,
+    ) -> GeoDataFrame[AssetSchema]:
+        """Find data across massive sensor networks utilizing parallel Fan-Out search dispatch.
+
+        Args:
+            profiles: Sequence of AereoProfile objects defining what to search for.
+                Each profile carries its collections, channels, satellite, and plugin hints.
+                Falls back to client-level profiles if not provided.
+            intersects: Optional geometry to spatially filter search results.
+                Falls back to client-level aoi if not provided.
+            start_datetime: Optional start datetime for temporal filtering.
+            end_datetime: Optional end datetime for temporal filtering.
+            search_params: Meta-level parameters to pass to search plugins
+                (credentials, timeouts, etc.). Domain-specific config lives on each AereoProfile.
+                Per-profile ``search_params`` overrides batch-level values (profile wins).
+            init_params: Optional constructor kwargs for plugin instantiation.
+                Can be a flat dict (applied to every searcher) or use collection names as top-level keys
+                for per-collection overrides, following the same pattern as ``search_params``::
+
+                    # Global kwargs — applied to every searcher
+                    init_params={"timeout": 30}
+
+                    # Per-collection kwargs
+                    init_params={"GOES-16": {"timeout": 60}, "Sentinel-2-L2A": {"timeout": 10}}
+
+            failure_mode: Determines pipeline behavior when partial or total plugin failures occur. Defaults to BEST_EFFORT.
+                - STRICT: Any plugin failure raises an exception and halts the pipeline.
+                - BEST_EFFORT: Logs failures but continues processing with successful plugins.
+
+        Returns:
+            A verified GeoDataFrame of combined search results.
+        """
+        profiles = self._profiles if profiles is None else profiles
+        if profiles is None:
+            raise ValueError(
+                "profiles must be provided either as a method argument or as a client default."
+            )
+
+        norm_intersects = self._resolve_aoi(intersects)
+        logger.info("search_called", profiles=[p.name for p in profiles])
+
+        execution_groups = self._build_search_execution_groups(profiles, search_params)
+        if not execution_groups:
+            if failure_mode == FailureMode.STRICT:
+                raise RuntimeError(
+                    "No eligible search plugins found for the requested profiles."
+                )
+            return self._empty_asset_df()
+
+        all_results, errors = self._execute_search_groups(
+            execution_groups,
+            norm_intersects,
+            start_datetime,
+            end_datetime,
+            init_params,
+        )
+
         if failure_mode == FailureMode.STRICT and errors:
             raise RuntimeError(
                 f"Search failed strictly. {len(errors)} plugin(s) failed: "
@@ -319,66 +414,34 @@ class AereoClient:
                 "search_empty",
                 reason="All searches returned empty or failed gracefully.",
             )
-            return cast(GeoDataFrame, AssetSchema.empty())
+            return self._empty_asset_df()
 
-        # 4. Collapse results safely
-        merged_results = cast(
+        return cast(
             GeoDataFrame,
             AssetSchema.validate(pd.concat(all_results, ignore_index=True)),
         )
-        return merged_results
 
-    def prepare_for_extraction(
+    def _resolve_extractor_plugin(
         self,
-        search_results: GeoDataFrame[AssetSchema],
-        grid_config: GridConfig,
-        target_aoi: Optional[BaseGeometry | dict] = None,
-        resolution: Optional[float] = None,
-        uri: Optional[str] = None,
-        profiles: Optional[Sequence[AereoProfile]] = None,
-        cells_per_chunk: int = 50,
-        init_params: Optional[Mapping[str, Any]] = None,
-    ) -> Sequence[ExtractionTask]:
-        """Groups search results by collection and distributes batches to appropriate Extractors.
+        profiles: Sequence[AereoProfile],
+        unique_collections: Sequence[str],
+    ) -> str:
+        """Resolve a single extractor plugin for the given profiles.
 
         Args:
-            search_results: The merged GeoDataFrame of search results to prepare.
-            grid_config: Explicit tiling specification. All profiles share this grid.
-            target_aoi: Optional area of interest as a shapely geometry.
-            resolution: The desired resolution for extraction. If provided, a default profile is created.
-            uri: An optional URI defining output path or identifier.
-            profiles: A sequence of AereoProfile objects. If provided, they take precedence over resolution.
-            cells_per_chunk: Max grid cells per ExtractionTask (default 50).
-            init_params (Optional[Mapping[str, Any]]): Optional constructor kwargs for extractor instantiation.
-                Passed as a flat dict to the extractor constructor.
+            profiles: Profiles to resolve an extractor for.
+            unique_collections: Fallback collection names if profile resolution fails.
 
         Returns:
-            A Sequence of prepared ExtractionTasks.
+            Name of the resolved extractor plugin.
+
+        Raises:
+            ValueError: If no extractor is found or multiple extractors are needed.
         """
-        if search_results.empty:
-            return []
-
-        norm_intersects = normalize_geometry(target_aoi)
-        all_tasks = []
-
-        unique_collections = search_results["collection"].unique()
-
-        # Determine profiles for extraction
-        if profiles:
-            resolved_profiles = list(profiles)
-        elif resolution is not None:
-            resolved_profiles = [AereoProfile(name="default", resolution=resolution)]
-        else:
-            raise ValueError(
-                "Either 'profiles' or 'resolution' must be provided for extraction."
-            )
-
-        # Resolve extractor for all profiles
-        plugin_set = set()
-        for profile in resolved_profiles:
+        plugin_set: set[str] = set()
+        for profile in profiles:
             target_plugin = self._resolve_plugin_for_profile("extractor", profile)
             if not target_plugin:
-                # Fallback to search result collections for default/empty profiles
                 for collection in unique_collections:
                     fallback_profile = AereoProfile(
                         name="fallback", resolution=0, collections={str(collection): []}
@@ -396,18 +459,88 @@ class AereoClient:
 
         if len(plugin_set) > 1:
             raise ValueError(
-                f"Multiple extractor plugins found for profiles: {[p.name for p in resolved_profiles]}. "
+                f"Multiple extractor plugins found for profiles: {[p.name for p in profiles]}. "
                 "Ensure all profiles use the same extractor."
             )
 
-        target_plugin = plugin_set.pop()
+        return plugin_set.pop()
+
+    def _resolve_cells_per_task(self, cells_per_task: int | None) -> int:
+        """Resolve the effective cells-per-task value.
+
+        Args:
+            cells_per_task: Explicit value, or None to fall back to defaults.
+
+        Returns:
+            Effective cells per task (argument > client default > 50).
+        """
+        if cells_per_task is not None:
+            return cells_per_task
+        if self._cells_per_task is not None:
+            return self._cells_per_task
+        return DEFAULT_CELLS_PER_TASK
+
+    def prepare_for_extraction(
+        self,
+        search_results: GeoDataFrame[AssetSchema],
+        grid_config: GridConfig | None = None,
+        target_aoi: BaseGeometry | dict | None = None,
+        resolution: float | None = None,
+        uri: str | None = None,
+        profiles: Sequence[AereoProfile] | None = None,
+        cells_per_task: int | None = None,
+        init_params: Mapping[str, Any] | None = None,
+    ) -> Sequence[ExtractionTask]:
+        """Groups search results by collection and distributes batches to appropriate Extractors.
+
+        Args:
+            search_results: The merged GeoDataFrame of search results to prepare.
+            grid_config: Explicit tiling specification. All profiles share this grid.
+                Falls back to client-level grid_config if not provided.
+            target_aoi: Optional area of interest as a shapely geometry.
+                Falls back to client-level aoi if not provided.
+            resolution: The desired resolution for extraction. If provided, a default profile is created.
+            uri: An optional URI defining output path or identifier.
+            profiles: A sequence of AereoProfile objects. If provided, they take precedence over resolution.
+                Falls back to client-level profiles if not provided.
+            cells_per_task: Max grid cells per ExtractionTask. Falls back to client default, then 50.
+            init_params: Optional constructor kwargs for extractor instantiation.
+                Passed as a flat dict to the extractor constructor.
+
+        Returns:
+            A Sequence of prepared ExtractionTasks.
+        """
+        if search_results.empty:
+            return []
+
+        grid_config = self._grid_config if grid_config is None else grid_config
+        if grid_config is None:
+            raise ValueError(
+                "grid_config must be provided either as a method argument or as a client default."
+            )
+
+        profiles = self._profiles if profiles is None else profiles
+
+        norm_intersects = self._resolve_aoi(target_aoi)
+
+        if profiles:
+            resolved_profiles = list(profiles)
+        elif resolution is not None:
+            resolved_profiles = [AereoProfile(name="default", resolution=resolution)]
+        else:
+            raise ValueError(
+                "Either 'profiles' or 'resolution' must be provided for extraction."
+            )
+
+        target_plugin = self._resolve_extractor_plugin(
+            resolved_profiles, list(search_results["collection"].unique())
+        )
         first_collection = (
             next(iter(resolved_profiles[0].collections))
             if resolved_profiles and resolved_profiles[0].collections
             else ""
         )
 
-        # Resolve init params and instantiate extractor
         c_init = self._resolve_params(init_params, first_collection)
         extractor = self.registry.get_extractor(target_plugin, **c_init)
 
@@ -417,28 +550,27 @@ class AereoClient:
             profiles=[p.name for p in resolved_profiles],
         )
 
-        # Pass full search results to extractor (profile filtering happens there)
+        effective_cells_per_task = self._resolve_cells_per_task(cells_per_task)
+
         batches = extractor.prepare_for_extraction(
             cast(GeoDataFrame, search_results),
             grid_config=grid_config,
             target_aoi=norm_intersects,
             uri=uri,
             profiles=resolved_profiles,
-            cells_per_chunk=cells_per_chunk,
+            cells_per_task=effective_cells_per_task,
             extractor_hint=target_plugin,
             init_params=c_init,
         )
 
-        all_tasks.extend(batches)
-
-        return all_tasks
+        return list(batches)
 
     def execute_tasks(
         self,
         tasks: Sequence[ExtractionTask],
         backend: ExecutionBackend | None = None,
         failure_mode: FailureMode = FailureMode.STRICT,
-        init_params: Optional[Mapping[str, Any]] = None,
+        init_params: Mapping[str, Any] | None = None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """
         Execute a sequence of ExtractionTasks through a configurable backend.
@@ -462,6 +594,7 @@ class AereoClient:
             logger.warning("execute_tasks_empty", reason="No tasks provided")
             return cast(GeoDataFrame, ArtifactSchema.empty())
 
+        backend = self._backend if backend is None else backend
         backend = backend or LocalProcessBackend()
         runner = TaskRunner(registry=self.registry, init_params=init_params)
 

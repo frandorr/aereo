@@ -32,6 +32,6 @@ backend = LocalProcessBackend()
 artifacts = client.execute_tasks(tasks, backend=backend)
 ```
 
-For a hands-on introduction, see [Quick Start](../quickstart.md) or [Running the Pipeline](../pipeline.md).
+For a hands-on introduction, see [Your First Pipeline](../first-pipeline.md).
 
 ::: aereo.client

@@ -1,6 +1,6 @@
 import pytest
 from typing import cast
-from aereo.spatial.utils import (
+from aereo.spatial import (
     get_utm_epsg_from_geometry,
     get_utm_zone_from_latlng,
     reproject_geom,

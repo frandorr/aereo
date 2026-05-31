@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  AEREO Lambda infrastructure — ECR-ready container Lambda with S3 access and CloudWatch logging.
+
+Parameters:
+  ImageUri:
+    Type: String
+    Description: Full ECR image URI (e.g. 123456789.dkr.ecr.us-east-1.amazonaws.com/aereo-lambda:latest)
+
+  S3BucketName:
+    Type: String
+    Description: S3 bucket for task staging and results.
+
+  LambdaFunctionName:
+    Type: String
+    Default: aereo-extractor
+    Description: Name of the Lambda function.
+
+  LambdaTimeout:
+    Type: Number
+    Default: 900
+    Description: Lambda timeout in seconds (max 900).
+
+  LambdaMemory:
+    Type: Number
+    Default: 3008
+    Description: Lambda memory in MB.
+
+Resources:
+  # ---------------------------------------------------------------------------
+  # Lambda Execution Role
+  # ---------------------------------------------------------------------------
+  AereoLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${LambdaFunctionName}-execution-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: S3TaskAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowS3StagingAndResults
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub "arn:aws:s3:::${S3BucketName}"
+                  - !Sub "arn:aws:s3:::${S3BucketName}/*"
+
+  # ---------------------------------------------------------------------------
+  # Lambda Function (Container Image)
+  # ---------------------------------------------------------------------------
+  AereoLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref LambdaFunctionName
+      PackageType: Image
+      Code:
+        ImageUri: !Ref ImageUri
+      Role: !GetAtt AereoLambdaExecutionRole.Arn
+      Timeout: !Ref LambdaTimeout
+      MemorySize: !Ref LambdaMemory
+
+
+Outputs:
+  LambdaFunctionArn:
+    Description: ARN of the AEREO Lambda function
+    Value: !GetAtt AereoLambdaFunction.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-LambdaArn"
+
+  LambdaFunctionName:
+    Description: Name of the AEREO Lambda function
+    Value: !Ref AereoLambdaFunction
+    Export:
+      Name: !Sub "${AWS::StackName}-LambdaName"
+
+  S3BucketName:
+    Description: S3 bucket for tasks and results
+    Value: !Ref S3BucketName
+    Export:
+      Name: !Sub "${AWS::StackName}-S3Bucket"

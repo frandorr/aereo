@@ -6,7 +6,7 @@ used across the aereo plugin system.
 
 import pandera.pandas as pa
 from pandera.typing import Series
-from pandera.typing.geopandas import GeoSeries
+from pandera.typing.geopandas import GeoDataFrame, GeoSeries
 
 
 class GridSchema(pa.DataFrameModel):
@@ -17,12 +17,12 @@ class GridSchema(pa.DataFrameModel):
     includes fields for grid cell identifiers, spatial geometry, and any
     additional metadata needed for task preparation and artifact management.
 
-    Fields:
-        grid_cell (str): Unique identifier for the grid cell (e.g., "0U_0R").
-        grid_dist (int): Distance in meters that defines the size of the grid cell.
-        grid_geometry (geometry): Spatial geometry of the grid cell (e.g., footprint).
-        grid_utm_crs (str): EPSG code for the UTM coordinate reference system corresponding to the grid_cell.
-        grid_utm_footprint (geometry): Spatial geometry of the grid_cell footprint in the UTM coordinate reference system.
+    Attributes:
+        grid_cell: Unique identifier for the grid cell (e.g., "0U_0R").
+        grid_dist: Distance in meters that defines the size of the grid cell.
+        cell_geometry: Spatial geometry of the grid cell (e.g., footprint).
+        cell_utm_crs: EPSG code for the UTM coordinate reference system corresponding to the grid_cell.
+        cell_utm_footprint: Spatial geometry of the grid_cell footprint in the UTM coordinate reference system.
     """
 
     grid_cell: Series[pa.String] = pa.Field(nullable=False)
@@ -44,13 +44,13 @@ class AssetSchema(pa.DataFrameModel):
     spatial geometry, temporal information, and any additional metadata needed
     for task preparation and extraction.
 
-    Fields:
-        id (str): Unique identifier for the search result (e.g., a product ID).
-        collection (str): Identifier for the collection this result belongs to.
-        geometry (geometry): Spatial geometry of the result (e.g., footprint).
-        start_time (datetime): Start time of the data acquisition.
-        end_time (datetime): End time of the data acquisition.
-        href (str): URL or reference to the data source for extraction.
+    Attributes:
+        id: Unique identifier for the search result (e.g., a product ID).
+        collection: Identifier for the collection this result belongs to.
+        geometry: Spatial geometry of the result (e.g., footprint).
+        start_time: Start time of the data acquisition.
+        end_time: End time of the data acquisition.
+        href: URL or reference to the data source for extraction.
     """
 
     id: Series[pa.String] = pa.Field(nullable=False)
@@ -66,26 +66,19 @@ class AssetSchema(pa.DataFrameModel):
 
 
 class ArtifactSchema(GridSchema):
-    """
-    Schema for artifacts created during extraction.
+    """Schema for artifacts created during extraction.
+
+    Inherits all fields from :class:`GridSchema`.
 
     Attributes:
-    - id (str): Unique identifier for the artifact.
-    - source_ids (str): Comma-separated list of source identifiers that contributed to the artifact.
-    - start_time (datetime): Start time of the data acquisition for the artifact.
-    - end_time (datetime): End time of the data acquisition for the artifact.
-    - uri (str): URI or reference to the artifact's location (e.g., file path, cloud storage URL).
-    - geometry (geometry): Spatial geometry of the artifact (e.g., footprint).
-    - collection (str, optional): Identifier for the collection this artifact belongs to,
-        which can be used for organizational and metadata purposes.
-
-    GridSchema fields are inherited, so the artifact will also include:
-    - grid_cell (str): Unique identifier for the grid cell (e.g., "0U_0R").
-    - grid_dist (int): Distance in meters that defines the size of the grid cell.
-    - cell_geometry (geometry): Spatial geometry of the grid cell (e.g., footprint).
-    - cell_utm_crs (str): EPSG code for the UTM coordinate reference system corresponding to the grid_cell.
-    - cell_utm_footprint (geometry): Spatial geometry of the grid_cell footprint in the UTM coordinate reference system.
-
+        id: Unique identifier for the artifact.
+        source_ids: Comma-separated list of source identifiers that contributed to the artifact.
+        start_time: Start time of the data acquisition for the artifact.
+        end_time: End time of the data acquisition for the artifact.
+        uri: URI or reference to the artifact's location (e.g., file path, cloud storage URL).
+        geometry: Spatial geometry of the artifact (e.g., footprint).
+        collection: Identifier for the collection this artifact belongs to,
+            which can be used for organizational and metadata purposes.
     """
 
     id: Series[pa.String] = pa.Field(unique=True, nullable=False)
@@ -96,6 +89,19 @@ class ArtifactSchema(GridSchema):
     geometry: GeoSeries = pa.Field(nullable=False)
     collection: Series[pa.String] = pa.Field(nullable=True)
 
-    class Config:
-        coerce = True
-        strict = False
+    @classmethod
+    def empty_geodataframe(cls) -> GeoDataFrame["ArtifactSchema"]:
+        """Return an empty GeoDataFrame with ArtifactSchema columns.
+
+        Returns:
+            An empty validated GeoDataFrame with the correct schema columns,
+            including a geometry column.
+        """
+        import geopandas as gpd
+        from typing import cast
+
+        columns = list(cls.to_schema().columns.keys())
+        if "geometry" not in columns:
+            columns.append("geometry")
+        gdf = gpd.GeoDataFrame(columns=columns, geometry="geometry")
+        return cast(GeoDataFrame["ArtifactSchema"], cls.validate(gdf))

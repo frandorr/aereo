@@ -3,6 +3,11 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
+from aereo.asset_downloader._obstore_utils import (
+    _resolve_store,
+    _stream_obstore_to_disk,
+)
+
 if TYPE_CHECKING:
     from aereo.interfaces import Downloader
 
@@ -10,27 +15,32 @@ if TYPE_CHECKING:
 def download_asset_safely(
     href: str,
     local_path: Path,
-    s3_client: Optional[Any] = None,
-    http_session: Optional[Any] = None,
     downloader: Optional["Downloader"] = None,
+    store_options: Optional[dict[str, Any]] = None,
 ) -> None:
     """Download asset with a filelock to avoid corruption in multi-processing.
 
     Args:
-        href: URL or local path to the asset.
+        href: URL or local path to the asset. Supported schemes:
+            ``s3://``, ``gs://``, ``az://``, ``http(s)://``, ``file://``,
+            or a bare local filesystem path.
         local_path: Destination path for the downloaded file.
-        s3_client: Optional authenticated S3FileSystem for S3 access.
-            Note: Only works when running in AWS us-west-2 region.
-        http_session: Optional authenticated requests.Session for HTTPS downloads.
-            Use earthaccess.get_requests_https_session() to create.
-            Works from anywhere (no AWS region requirement).
         downloader: Optional callable that handles the download itself.
             If provided, it is called unconditionally inside the file lock
-            and all built-in logic is skipped.
+            and all built-in logic is skipped. This is the escape hatch used
+            by plugins such as *aereo-search-earthaccess* that need custom
+            authentication or region-fallback logic.
+        store_options: Optional dict of keyword arguments forwarded to the
+            obstore store constructor.  For ``s3://`` URLs this is passed as
+            ``S3Store(bucket, **store_options)``.  Common keys:
+
+            - ``skip_signature=False`` — disable anonymous access.
+            - ``access_key_id`` / ``secret_access_key`` / ``token`` —
+              explicit AWS credentials.
+            - ``credential_provider`` — a callable that returns credentials
+              (enables automatic refresh).
     """
     import filelock
-    import s3fs
-    import requests
 
     local_path.parent.mkdir(parents=True, exist_ok=True)
     lock_path = local_path.with_suffix(".lock")
@@ -39,31 +49,16 @@ def download_asset_safely(
         if not local_path.exists():
             if downloader is not None:
                 downloader(href, local_path)
-            elif href.startswith("s3://"):
-                fs = (
-                    s3_client if s3_client is not None else s3fs.S3FileSystem(anon=True)
-                )
-                fs.get(href.replace("s3://", ""), str(local_path))
-            elif href.startswith("http://") or href.startswith("https://"):
-                http = http_session if http_session is not None else requests
-                response = http.get(href, stream=True, timeout=(30, 300))
-                response.raise_for_status()
-                with open(local_path, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        f.write(chunk)
-            elif Path(href).exists():
-                if Path(href).absolute() != local_path.absolute():
-                    shutil.copy(href, local_path)
             else:
-                raise FileNotFoundError(f"Source file not found at {href}")
+                store, path = _resolve_store(href, store_options)
+                _stream_obstore_to_disk(store, path, local_path)
 
 
 def download_assets_safely(
     hrefs: list[str],
     local_paths: list[Path],
-    s3_client: Optional[Any] = None,
-    http_session: Optional[Any] = None,
     downloader: Optional["Downloader"] = None,
+    store_options: Optional[dict[str, Any]] = None,
     max_workers: Optional[int] = None,
 ) -> None:
     """Download multiple assets concurrently using a thread pool.
@@ -71,9 +66,9 @@ def download_assets_safely(
     Args:
         hrefs: List of URLs or local paths to the assets.
         local_paths: List of destination paths for the downloaded files.
-        s3_client: Optional authenticated S3FileSystem for S3 access.
-        http_session: Optional authenticated requests.Session for HTTPS downloads.
         downloader: Optional callable that handles the download itself.
+        store_options: Optional dict forwarded to the obstore store constructor
+            for every asset.  See :func:`download_asset_safely` for details.
         max_workers: The maximum number of threads to use. Defaults to None.
     """
     if len(hrefs) != len(local_paths):
@@ -85,9 +80,8 @@ def download_assets_safely(
                 download_asset_safely,
                 href=href,
                 local_path=local_path,
-                s3_client=s3_client,
-                http_session=http_session,
                 downloader=downloader,
+                store_options=store_options,
             )
             for href, local_path in zip(hrefs, local_paths, strict=True)
         ]
@@ -115,7 +109,6 @@ def extract_asset_safely(
             ``extract_dir.with_suffix(".lock")``.
     """
     import filelock
-    import shutil
     import tempfile
     import zipfile
 

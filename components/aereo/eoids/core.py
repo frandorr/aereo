@@ -22,6 +22,26 @@ _EOIDS_PATTERN = re.compile(
     r"(?=_(?:" + "|".join(_EOIDS_KEYS) + r")-|$)"
 )
 
+_EOIDS_DT_FMT = "%Y%m%dT%H%M%S"
+_EOIDS_DATE_FMT = "%Y%m%d"
+
+
+def _sanitize_cell(cell_id: str) -> str:
+    return str(cell_id).replace("_", "")
+
+
+def _normalize_suffix(suffix: str) -> str:
+    return suffix.lstrip(".")
+
+
+def _write_profile_meta(base_dir: Path, profile: AereoProfile) -> None:
+    profile_path = base_dir / "profile.json"
+    if not profile_path.exists():
+        profile_path.write_text(
+            profile.model_dump_json(exclude={"downloader"}, indent=2),
+            encoding="utf-8",
+        )
+
 
 def build_eoids_path(
     local_dir: str | Path,
@@ -65,16 +85,14 @@ def build_eoids_path(
     """
     parts: list[str] = []
 
-    if cell_id:
-        safe_cell = str(cell_id).replace("_", "")
+    safe_cell = _sanitize_cell(cell_id) if cell_id else None
+    if safe_cell:
         parts.append(f"loc-{safe_cell}")
-    else:
-        safe_cell = None
 
     if start_time:
-        parts.append(f"start-{start_time.strftime('%Y%m%dT%H%M%S')}")
+        parts.append(f"start-{start_time.strftime(_EOIDS_DT_FMT)}")
     if end_time:
-        parts.append(f"end-{end_time.strftime('%Y%m%dT%H%M%S')}")
+        parts.append(f"end-{end_time.strftime(_EOIDS_DT_FMT)}")
     parts.append(f"profile-{profile.name}")
 
     # Derive collection and variable from profile.collections
@@ -91,7 +109,7 @@ def build_eoids_path(
     if desc:
         parts.append(f"desc-{desc}")
 
-    safe_suffix = suffix.lstrip(".")
+    safe_suffix = _normalize_suffix(suffix)
     if not parts:
         filename = f"unnamed.{safe_suffix}"
     else:
@@ -106,19 +124,14 @@ def build_eoids_path(
         base_dir = base_dir / f"loc-{safe_cell}"
 
     if start_time:
-        base_dir = base_dir / f"date-{start_time.strftime('%Y%m%d')}"
+        base_dir = base_dir / f"date-{start_time.strftime(_EOIDS_DATE_FMT)}"
 
     base_dir = base_dir / f"profile-{profile.name}"
 
     base_dir.mkdir(parents=True, exist_ok=True)
 
     if write_profile_meta:
-        profile_path = base_dir / "profile.json"
-        if not profile_path.exists():
-            profile_path.write_text(
-                profile.model_dump_json(exclude={"downloader"}, indent=2),
-                encoding="utf-8",
-            )
+        _write_profile_meta(base_dir, profile)
 
     return base_dir / filename
 
@@ -167,6 +180,14 @@ def _matches_filter(filter_value: str | None, file_value: str | None) -> bool:
 
     Both sides may use ``+`` concatenation (e.g. ``"C01+C02"``).  The filter
     matches when at least one component appears on both sides.
+
+    Args:
+        filter_value: The filter pattern, or *None* to match all.
+        file_value: The file's value to test, or *None*.
+
+    Returns:
+        *True* when at least one ``+``-separated component exists in both
+        strings, or when *filter_value* is *None*.
     """
     if filter_value is None:
         return True
@@ -209,7 +230,7 @@ def scan_eoids_dir(
         ``"date"`` (extracted from the directory hierarchy).
     """
     root = Path(root_dir)
-    safe_suffix = suffix.lstrip(".")
+    safe_suffix = _normalize_suffix(suffix)
     results: list[dict[str, Any]] = []
 
     for filepath in root.rglob(f"*.{safe_suffix}"):
@@ -235,7 +256,7 @@ def scan_eoids_dir(
             continue
         if not _matches_filter(variable, meta.get("variable")):
             continue
-        if cell_id is not None and meta.get("loc") != cell_id.replace("_", ""):
+        if cell_id is not None and meta.get("loc") != _sanitize_cell(cell_id):
             continue
 
         results.append(entry)
