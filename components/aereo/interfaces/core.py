@@ -698,6 +698,121 @@ class AereoProfile(BaseModel):
             seen.add(p.name)
 
 
+class PipelineProfile(BaseModel):
+    """Declarative pipeline configuration for search + extraction.
+
+    One PipelineProfile = one complete DAG configuration. It replaces the
+    extraction-time half of :class:`AereoProfile` and is consumed by
+    :class:`aereo.driver.core.AereoDriver`.
+    """
+
+    model_config = {"extra": "forbid", "frozen": True}
+
+    name: str
+    resolution: float
+    collections: Mapping[str, Sequence[str]] = Field(default_factory=dict)
+    plugin_hints: Mapping[str, str] = Field(default_factory=dict)
+
+    # Stage-specific parameters
+    search_params: Mapping[str, Any] = Field(default_factory=dict)
+    download_params: Mapping[str, Any] = Field(default_factory=dict)
+    read_params: Mapping[str, Any] = Field(default_factory=dict)
+    reproject_params: Mapping[str, Any] = Field(default_factory=dict)
+    write_params: Mapping[str, Any] = Field(default_factory=dict)
+
+    # Processor configuration
+    pre_processors: Sequence[str | dict[str, Any]] = Field(default_factory=list)
+    post_processors: Sequence[str | dict[str, Any]] = Field(default_factory=list)
+
+    @classmethod
+    def from_yaml(cls, path: str | Path) -> list[Self]:
+        """Load profiles from a YAML file.
+
+        The file must contain a top-level ``profiles`` key mapping to a list
+        of profile dictionaries.
+        """
+        yaml = _import_yaml()
+        path = Path(path)
+        data = yaml.safe_load(path.read_text())
+        return cls._from_raw(data)
+
+    @classmethod
+    def from_yaml_string(cls, text: str) -> list[Self]:
+        """Load profiles from a YAML string."""
+        yaml = _import_yaml()
+        data = yaml.safe_load(text)
+        return cls._from_raw(data)
+
+    @classmethod
+    def from_json(cls, path: str | Path) -> list[Self]:
+        """Load profiles from a JSON file."""
+        data = _load_json_file(path)
+        return cls._from_raw(data)
+
+    @classmethod
+    def from_config_dir(
+        cls,
+        directory: str | Path,
+        *,
+        allow_duplicate_names: bool = False,
+    ) -> list[Self]:
+        """Load all ``*.yaml`` / ``*.yml`` / ``*.json`` files in *directory*."""
+        directory = Path(directory)
+        profiles: list[Self] = []
+        for ext in ("*.yaml", "*.yml", "*.json"):
+            for fp in directory.glob(ext):
+                profiles.extend(
+                    cls.from_yaml(fp) if fp.suffix != ".json" else cls.from_json(fp)
+                )
+        cls._validate_names(profiles, allow_duplicate_names=allow_duplicate_names)
+        return profiles
+
+    @classmethod
+    def _from_raw(cls, data: dict[str, Any]) -> list[Self]:
+        """Validate and construct PipelineProfile instances from a raw dict.
+
+        Args:
+            data: Raw dictionary containing a ``profiles`` key mapping to a
+                list of profile dictionaries.
+
+        Returns:
+            A list of validated PipelineProfile instances.
+
+        Raises:
+            ValueError: If data is not a dict or lacks a ``profiles`` key.
+        """
+        if not isinstance(data, dict) or "profiles" not in data:
+            raise ValueError("Config must be a dict with a 'profiles' key.")
+        raw_profiles = data["profiles"]
+        adapter = TypeAdapter(list[cls])
+        profiles = adapter.validate_python(raw_profiles)
+        cls._validate_names(profiles)
+        return profiles
+
+    @classmethod
+    def _validate_names(
+        cls,
+        profiles: list[Self],
+        allow_duplicate_names: bool = False,
+    ) -> None:
+        """Check that profile names are unique.
+
+        Args:
+            profiles: List of profiles to validate.
+            allow_duplicate_names: If True, skip the uniqueness check.
+
+        Raises:
+            ValueError: If duplicate names are found.
+        """
+        if allow_duplicate_names:
+            return
+        seen = set()
+        for p in profiles:
+            if p.name in seen:
+                raise ValueError(f"Duplicate profile name: {p.name!r}")
+            seen.add(p.name)
+
+
 # Backward-compat alias — will be removed in a later task.
 ExtractionProfile = AereoProfile
 
