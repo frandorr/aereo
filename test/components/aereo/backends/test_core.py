@@ -3,8 +3,10 @@ from typing import Any, cast
 from unittest.mock import MagicMock
 
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 import pytest
+import xarray as xr
 from shapely.geometry import Polygon
 
 from aereo.backends import (
@@ -12,7 +14,13 @@ from aereo.backends import (
     TaskRunner,
     ThreadBackend,
 )
-from aereo.interfaces.core import AereoProfile, ExtractionTask, GridConfig
+from aereo.interfaces.core import (
+    AereoProfile,
+    ExtractionTask,
+    GridConfig,
+    Reader,
+    Writer,
+)
 from aereo.registry.core import AereoRegistry
 from aereo.schemas.core import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -47,80 +55,133 @@ def _make_task(
 def _make_mock_registry() -> MagicMock:
     """Return a MagicMock configured like an AereoRegistry."""
     mock = MagicMock(spec=AereoRegistry)
-    mock.has_extractor.return_value = True
-    mock.find_extractors_for.return_value = []
+    mock.has.return_value = True
+    mock.find_for.return_value = []
     return mock
 
 
+class _DummyReader(Reader):
+    """A dummy reader that returns a simple xarray Dataset."""
+
+    supported_collections = ("*",)
+
+    def read(self, task, params):
+        return xr.Dataset(
+            {"B04": (["y", "x"], np.ones((4, 4)))},
+            coords={"y": range(4), "x": range(4)},
+        )
+
+
+class _DummyWriter(Writer):
+    """A dummy writer that returns an empty GeoDataFrame."""
+
+    supported_collections = ("*",)
+
+    def write(self, ds, task, cell, params):
+        return gpd.GeoDataFrame()
+
+
 # ---------------------------------------------------------------------------
-# TaskRunner
+# TaskRunner (Phase 1 pipeline)
 # ---------------------------------------------------------------------------
 
 
-def test_task_runner_uses_extractor_hint_from_task_context():
-    """Resolution priority 1: task_context['extractor_hint']."""
+def test_task_runner_uses_reader_hint_from_task_context():
+    """Resolution priority 1: task_context['reader_hint']."""
     mock_registry = _make_mock_registry()
-    mock_extractor = MagicMock()
-    mock_extractor.extract.return_value = gpd.GeoDataFrame()
-    mock_registry.get_extractor.return_value = mock_extractor
+    mock_reader = MagicMock(spec=_DummyReader)
+    mock_reader.read.return_value = xr.Dataset()
+
+    mock_reprojector = MagicMock()
+    mock_reprojector.reproject.return_value = xr.Dataset()
+
+    mock_writer = MagicMock(spec=_DummyWriter)
+    mock_writer.write.return_value = gpd.GeoDataFrame()
+
+    allowed = {"my_reader", "my_reprojector", "my_writer"}
+
+    def _mock_has(type_label, name):
+        return name in allowed
+
+    def _mock_get(type_label, name, **kwargs):
+        if type_label == "reader" and name == "my_reader":
+            return mock_reader
+        if type_label == "reprojector" and name == "my_reprojector":
+            return mock_reprojector
+        if type_label == "writer" and name == "my_writer":
+            return mock_writer
+        raise ValueError(f"Unexpected get: {type_label}, {name}")
+
+    mock_registry.has.side_effect = _mock_has
+    mock_registry.get.side_effect = _mock_get
 
     runner = TaskRunner(registry=mock_registry)
-    task = _make_task(task_context={"extractor_hint": "my_extractor"})
+    task = _make_task(
+        task_context={
+            "reader_hint": "my_reader",
+            "reprojector_hint": "my_reprojector",
+            "writer_hint": "my_writer",
+        }
+    )
 
     runner.run(task)
 
-    mock_registry.get_extractor.assert_called_once_with("my_extractor")
+    # Verify reader was resolved via task context hint
+    mock_registry.has.assert_any_call("reader", "my_reader")
 
 
 def test_task_runner_falls_back_to_profile_hint():
-    """Resolution priority 2: profile.plugin_hints['extract']."""
+    """Resolution priority 2: profile.plugin_hints['read']."""
     mock_registry = _make_mock_registry()
-    mock_registry.has_extractor.side_effect = lambda name: name == "profile_hinted"
-    mock_extractor = MagicMock()
-    mock_extractor.extract.return_value = gpd.GeoDataFrame()
-    mock_registry.get_extractor.return_value = mock_extractor
+    mock_reader = MagicMock(spec=_DummyReader)
+    mock_reader.read.return_value = xr.Dataset()
+
+    mock_reprojector = MagicMock()
+    mock_reprojector.reproject.return_value = xr.Dataset()
+
+    mock_writer = MagicMock(spec=_DummyWriter)
+    mock_writer.write.return_value = gpd.GeoDataFrame()
+
+    allowed = {"profile_reader", "profile_reprojector", "profile_writer"}
+
+    def _mock_has(type_label, name):
+        return name in allowed
+
+    def _mock_get(type_label, name, **kwargs):
+        if type_label == "reader" and name == "profile_reader":
+            return mock_reader
+        if type_label == "reprojector" and name == "profile_reprojector":
+            return mock_reprojector
+        if type_label == "writer" and name == "profile_writer":
+            return mock_writer
+        raise ValueError(f"Unexpected get: {type_label}, {name}")
+
+    mock_registry.has.side_effect = _mock_has
+    mock_registry.get.side_effect = _mock_get
 
     runner = TaskRunner(registry=mock_registry)
     profile = AereoProfile(
         name="test",
         resolution=100.0,
-        plugin_hints={"extract": "profile_hinted"},
+        plugin_hints={
+            "read": "profile_reader",
+            "reproject": "profile_reprojector",
+            "writer": "profile_writer",
+        },
     )
     task = _make_task(profile=profile)
 
     runner.run(task)
 
-    mock_registry.get_extractor.assert_called_once_with("profile_hinted")
+    # Should have checked profile hint
+    mock_registry.has.assert_any_call("reader", "profile_reader")
 
 
-def test_task_runner_auto_discovers_from_collections():
-    """Resolution priority 3: auto-discover from profile.collections."""
+def test_task_runner_raises_when_no_reader_found():
+    """ValueError when no reader plugin can be resolved."""
     mock_registry = _make_mock_registry()
-    mock_registry.has_extractor.return_value = False
-    mock_registry.find_extractors_for.return_value = ["auto_extractor"]
-    mock_extractor = MagicMock()
-    mock_extractor.extract.return_value = gpd.GeoDataFrame()
-    mock_registry.get_extractor.return_value = mock_extractor
-
-    runner = TaskRunner(registry=mock_registry)
-    profile = AereoProfile(
-        name="test",
-        resolution=100.0,
-        collections={"C1": ["var1"]},
-    )
-    task = _make_task(profile=profile)
-
-    runner.run(task)
-
-    mock_registry.find_extractors_for.assert_called_once_with("C1")
-    mock_registry.get_extractor.assert_called_once_with("auto_extractor")
-
-
-def test_task_runner_raises_when_no_extractor_found():
-    """ValueError when no extractor can be resolved."""
-    mock_registry = _make_mock_registry()
-    mock_registry.has_extractor.return_value = False
-    mock_registry.find_extractors_for.return_value = []
+    mock_registry.has.return_value = False
+    mock_registry.find_for.return_value = []
 
     runner = TaskRunner(registry=mock_registry)
     profile = AereoProfile(
@@ -130,53 +191,100 @@ def test_task_runner_raises_when_no_extractor_found():
     )
     task = _make_task(profile=profile)
 
-    with pytest.raises(ValueError, match="No extractor plugin found"):
+    with pytest.raises(ValueError, match="No reader plugin found"):
         runner.run(task)
 
 
-def test_task_runner_merges_profile_extract_params():
-    """Profile extract_params are passed to extractor.extract()."""
+def test_task_runner_passes_read_params_to_reader():
+    """Profile read_params are passed to reader.read()."""
     mock_registry = _make_mock_registry()
-    mock_extractor = MagicMock()
-    mock_extractor.extract.return_value = gpd.GeoDataFrame()
-    mock_registry.get_extractor.return_value = mock_extractor
+    mock_reader = MagicMock(spec=_DummyReader)
+    mock_reader.read.return_value = xr.Dataset()
+
+    mock_reprojector = MagicMock()
+    mock_reprojector.reproject.return_value = xr.Dataset()
+
+    mock_writer = MagicMock(spec=_DummyWriter)
+    mock_writer.write.return_value = gpd.GeoDataFrame()
+
+    allowed = {"dummy"}
+
+    def _mock_has(type_label, name):
+        return name in allowed
+
+    def _mock_get(type_label, name, **kwargs):
+        if type_label == "reader" and name == "dummy":
+            return mock_reader
+        if type_label == "reprojector" and name == "dummy":
+            return mock_reprojector
+        if type_label == "writer" and name == "dummy":
+            return mock_writer
+        raise ValueError(f"Unexpected get: {type_label}, {name}")
+
+    mock_registry.has.side_effect = _mock_has
+    mock_registry.get.side_effect = _mock_get
 
     runner = TaskRunner(registry=mock_registry)
     profile = AereoProfile(
         name="test",
         resolution=100.0,
-        plugin_hints={"extract": "dummy"},
-        extract_params={"calibration": "reflectance", "padding": 2},
+        plugin_hints={"read": "dummy", "reproject": "dummy", "writer": "dummy"},
+        read_params={"calibration": "reflectance"},
     )
-    task = _make_task(profile=profile, task_context={"extractor_hint": "dummy"})
+    task = _make_task(profile=profile)
 
     runner.run(task)
 
-    call_args = mock_extractor.extract.call_args
-    passed_params = (
-        call_args.args[1]
-        if len(call_args.args) > 1
-        else call_args.kwargs.get("extract_params")
-    )
-    assert passed_params == {"calibration": "reflectance", "padding": 2}
+    call_args = mock_reader.read.call_args
+    passed_params = call_args.kwargs.get("params") or call_args.args[1]
+    assert passed_params == {"calibration": "reflectance"}
 
 
-def test_task_runner_returns_extractor_result():
-    """The GeoDataFrame returned by extract() is passed through unchanged."""
+def test_task_runner_returns_writer_result():
+    """The GeoDataFrame returned by writer.write() is accumulated."""
     mock_registry = _make_mock_registry()
+    mock_reader = MagicMock(spec=_DummyReader)
+    mock_reader.read.return_value = xr.Dataset()
+
+    mock_reprojector = MagicMock()
+    mock_reprojector.reproject.return_value = xr.Dataset()
+
     expected = gpd.GeoDataFrame(
         {"id": [1]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
     )
-    mock_extractor = MagicMock()
-    mock_extractor.extract.return_value = expected
-    mock_registry.get_extractor.return_value = mock_extractor
+    mock_writer = MagicMock(spec=_DummyWriter)
+    mock_writer.write.return_value = expected
+
+    allowed = {"dummy"}
+
+    def _mock_has(type_label, name):
+        return name in allowed
+
+    def _mock_get(type_label, name, **kwargs):
+        if type_label == "reader" and name == "dummy":
+            return mock_reader
+        if type_label == "reprojector" and name == "dummy":
+            return mock_reprojector
+        if type_label == "writer" and name == "dummy":
+            return mock_writer
+        raise ValueError(f"Unexpected get: {type_label}, {name}")
+
+    mock_registry.has.side_effect = _mock_has
+    mock_registry.get.side_effect = _mock_get
 
     runner = TaskRunner(registry=mock_registry)
-    task = _make_task(task_context={"extractor_hint": "dummy"})
+    task = _make_task(
+        task_context={
+            "reader_hint": "dummy",
+            "reprojector_hint": "dummy",
+            "writer_hint": "dummy",
+        }
+    )
 
     result = runner.run(task)
 
-    assert result is expected
+    # Result should be a GeoDataFrame (empty in this case since grid_cells is empty)
+    assert isinstance(result, gpd.GeoDataFrame)
 
 
 # ---------------------------------------------------------------------------

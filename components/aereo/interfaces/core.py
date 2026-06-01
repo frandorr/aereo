@@ -14,6 +14,7 @@ from typing import (
     Self,
     Sequence,
     TYPE_CHECKING,
+    TypeAlias,
     cast,
 )
 
@@ -42,6 +43,116 @@ DEFAULT_RASTER_PREDICTOR: int | None = None
 _YAML_INSTALL_MSG = (
     "YAML support requires PyYAML. Install it with: pip install 'aereo[yaml]'"
 )
+
+_XARRAY_INSTALL_MSG = (
+    "xarray support requires xarray. Install it with: pip install 'aereo[xarray]'"
+)
+
+_RIOXARRAY_INSTALL_MSG = "rioxarray support requires rioxarray. Install it with: pip install 'aereo[rioxarray]'"
+
+
+def _import_xarray() -> Any:
+    """Import xarray with a clear error message if missing."""
+    try:
+        import xarray as xr
+    except ImportError as exc:
+        raise ImportError(_XARRAY_INSTALL_MSG) from exc
+    return xr
+
+
+def _import_rioxarray() -> Any:
+    """Import rioxarray with a clear error message if missing."""
+    try:
+        import rioxarray  # noqa: F401
+    except ImportError as exc:
+        raise ImportError(_RIOXARRAY_INSTALL_MSG) from exc
+    return rioxarray
+
+
+# ---------------------------------------------------------------------------
+# AereoDataset — canonical in-memory intermediate representation
+# ---------------------------------------------------------------------------
+#
+# ``AereoDataset`` is an ``xarray.Dataset`` that carries the following
+# conventions so that every pipeline stage (Reader, Processor, Reprojector,
+# Writer) can rely on a consistent contract:
+#
+# 1. CRS metadata is attached via ``rioxarray``::
+#
+#        ds.rio.crs  # -> rasterio.crs.CRS (or None if unset)
+#
+# 2. Spatial dimensions are named ``y`` and ``x``.
+# 3. Optional band dimension is named ``band``.
+# 4. Optional temporal dimension is named ``time``.
+# 5. Data variables are typically named after the physical quantity
+#    (e.g. ``"ndvi"``, ``"B04"``, ``"C01"``).
+#
+# Whether the underlying data is dask-backed (lazy) or numpy-backed
+# (eager) is an implementation detail of each stage.
+# ---------------------------------------------------------------------------
+
+#: Canonical in-memory intermediate representation.
+#:
+#: ``AereoDataset`` is an ``xarray.Dataset`` that carries the following
+#: conventions so that every pipeline stage (Reader, Processor, Reprojector,
+#: Writer) can rely on a consistent contract:
+#:
+#: 1. CRS metadata is attached via ``rioxarray``::
+#:
+#:        ds.rio.crs  # -> rasterio.crs.CRS (or None if unset)
+#:
+#: 2. Spatial dimensions are named ``y`` and ``x``.
+#: 3. Optional band dimension is named ``band``.
+#: 4. Optional temporal dimension is named ``time``.
+#: 5. Data variables are typically named after the physical quantity
+#:    (e.g. ``"ndvi"``, ``"B04"``, ``"C01"``).
+#:
+#: Whether the underlying data is dask-backed (lazy) or numpy-backed
+#: (eager) is an implementation detail of each stage.
+try:
+    import xarray as _xr
+
+    AereoDataset: TypeAlias = _xr.Dataset
+except ImportError:
+    # Graceful fallback when xarray is not installed — the alias becomes
+    # ``Any`` so that type-checking and runtime imports still work.
+    AereoDataset = Any  # type: ignore[misc,assignment]
+
+
+def validate_aereo_dataset(
+    ds: Any,
+    *,
+    require_crs: bool = True,
+    require_dims: Sequence[str] | None = None,
+) -> None:
+    """Validate that *ds* conforms to the AereoDataset conventions.
+
+    Args:
+        ds: The dataset to validate.
+        require_crs: If True, ensure ``ds.rio.crs`` is set.
+        require_dims: If given, ensure all listed dimensions exist.
+
+    Raises:
+        ValueError: If any convention is violated.
+        ImportError: If ``rioxarray`` is not installed and *require_crs* is True.
+    """
+    import xarray as xr
+
+    if not isinstance(ds, xr.Dataset):
+        raise ValueError(f"Expected xarray.Dataset, got {type(ds).__name__}")
+
+    if require_crs:
+        _import_rioxarray()
+        # Access the rio accessor to trigger its import side-effects
+        if ds.rio.crs is None:
+            raise ValueError(
+                "AereoDataset must have a CRS set via rioxarray (ds.rio.crs)"
+            )
+
+    if require_dims:
+        missing = [d for d in require_dims if d not in ds.dims]
+        if missing:
+            raise ValueError(f"AereoDataset missing required dimensions: {missing}")
 
 
 def _skip_empty(geom: BaseGeometry | None) -> bool:
@@ -259,6 +370,128 @@ class AereoPlugin(ABC):
         # 6. Empty sequences are allowed (used by plugins that only support plugin_hints)
 
 
+# ---------------------------------------------------------------------------
+# New pipeline base classes (Phase 1)
+# ---------------------------------------------------------------------------
+
+
+class Reader(AereoPlugin, plugin_abstract=True):
+    """Reads raw satellite data and returns it in native CRS as an AereoDataset."""
+
+    @abstractmethod
+    def read(
+        self,
+        task: ExtractionTask,
+        params: Mapping[str, Any],
+    ) -> AereoDataset:
+        """Read data for the given task.
+
+        Implementations should:
+        1. Use ``task.grid_cells`` to spatially subset where possible.
+        2. Return dask-backed (lazy) datasets by default for memory efficiency.
+        3. Only load data that intersects the task's AOI.
+        """
+        ...
+
+
+class Reprojector(AereoPlugin, plugin_abstract=True):
+    """Reprojects/resamples an AereoDataset to a target GeoBox."""
+
+    @abstractmethod
+    def reproject(
+        self,
+        ds: AereoDataset,
+        geobox: Any,
+        params: Mapping[str, Any],
+    ) -> AereoDataset:
+        """Reproject *ds* to the target *geobox*.
+
+        Args:
+            ds: Source dataset in native CRS.
+            geobox: Target grid definition (typically ``odc_geo.geobox.GeoBox``).
+            params: Reprojection parameters (e.g. resampling method).
+
+        Returns:
+            Reprojected dataset aligned to *geobox*.
+        """
+        ...
+
+
+class Processor(AereoPlugin, plugin_abstract=True):
+    """Pure ``AereoDataset -> AereoDataset`` transform.
+
+    Runs either **pre-reproject** (once on native-CRS data) or
+    **post-reproject** (per cell on co-registered data).
+    """
+
+    stage: Literal["pre_reproject", "post_reproject"] = "post_reproject"
+
+    @abstractmethod
+    def process(
+        self,
+        ds: AereoDataset,
+        params: Mapping[str, Any],
+    ) -> AereoDataset:
+        """Transform *ds* and return a new dataset."""
+        ...
+
+
+class Writer(AereoPlugin, plugin_abstract=True):
+    """Serialises an AereoDataset to disk."""
+
+    @abstractmethod
+    def write(
+        self,
+        ds: AereoDataset,
+        task: ExtractionTask,
+        cell: GridCell,
+        params: Mapping[str, Any],
+    ) -> GeoDataFrame[ArtifactSchema]:
+        """Write *ds* for a single grid cell.
+
+        Returns:
+            GeoDataFrame of written artifacts with ``ArtifactSchema``.
+        """
+        ...
+
+
+class PipelineCallback:
+    """Lifecycle hooks for pipeline execution.
+
+    Similar to PyTorch Lightning callbacks, these allow external code to
+    observe and react to pipeline stages without modifying the TaskRunner.
+    """
+
+    def on_task_start(self, task: ExtractionTask) -> None:
+        """Called before any processing begins."""
+        pass
+
+    def on_read_complete(
+        self,
+        task: ExtractionTask,
+        ds: AereoDataset,
+    ) -> None:
+        """Called after the Reader finishes."""
+        pass
+
+    def on_cell_write_complete(
+        self,
+        task: ExtractionTask,
+        cell: GridCell,
+        artifacts: GeoDataFrame[ArtifactSchema],
+    ) -> None:
+        """Called after each cell is written."""
+        pass
+
+    def on_task_complete(
+        self,
+        task: ExtractionTask,
+        artifacts_gdf: GeoDataFrame[ArtifactSchema],
+    ) -> None:
+        """Called after all cells are processed."""
+        pass
+
+
 class SearchProvider(AereoPlugin, plugin_abstract=True):
     @staticmethod
     def empty_result() -> GeoDataFrame[AssetSchema]:
@@ -334,6 +567,11 @@ class AereoProfile(BaseModel):
     plugin_hints: Mapping[str, str] = Field(default_factory=dict)
     downloader: ImportString[Callable[[str, Path], None]] | None = None
     search_params: Mapping[str, Any] = Field(default_factory=dict)
+    read_params: Mapping[str, Any] = Field(default_factory=dict)
+    process_params: Mapping[str, Any] = Field(default_factory=dict)
+    write_params: Mapping[str, Any] = Field(default_factory=dict)
+    # Backward-compat alias — ``extract_params`` is merged into read/process/write
+    # params at runtime by the TaskRunner.
     extract_params: Mapping[str, Any] = Field(default_factory=dict)
 
     def __getstate__(self) -> dict[str, Any]:

@@ -1,8 +1,15 @@
 import importlib.metadata
-from typing import Any, Dict, List, Sequence, Type
+from typing import Any, Dict, List, Sequence, Tuple, Type
 
 # Importing the contracts we defined earlier
-from aereo.interfaces import Extractor, SearchProvider
+from aereo.interfaces import (
+    Extractor,
+    Processor,
+    Reader,
+    Reprojector,
+    SearchProvider,
+    Writer,
+)
 from structlog import get_logger
 
 logger = get_logger()
@@ -12,8 +19,7 @@ class _TypedRegistry:
     """Internal helper that manages plugins of a single type.
 
     Encapsulates the collections, mappings, and lookup logic so that
-    ``AereoRegistry`` does not have to duplicate state for searchers and
-    extractors.
+    ``AereoRegistry`` does not have to duplicate state for every plugin type.
     """
 
     def __init__(self) -> None:
@@ -139,12 +145,25 @@ class _TypedRegistry:
 
 
 class AereoRegistry:
-    """
-    Dynamically discovers and manages aereo plugins via Python entry_points.
+    """Dynamically discovers and manages aereo plugins via Python entry_points.
+
+    The registry is data-driven: adding a new plugin type requires one line in
+    ``PLUGIN_TYPES`` and one new base class (see FR-5.1 / FR-5.2).
     """
 
     ENTRY_POINT_GROUP: str = "aereo.plugins"
     WILDCARD: str = "*"
+
+    # prefix -> (type_label, base_class)
+    PLUGIN_TYPES: Dict[str, Tuple[str, Type]] = {
+        "search_": ("searcher", SearchProvider),
+        "read_": ("reader", Reader),
+        "reproject_": ("reprojector", Reprojector),
+        "process_": ("processor", Processor),
+        "write_": ("writer", Writer),
+        # Backward-compat: extractors are still supported during migration
+        "extract_": ("extractor", Extractor),
+    }
 
     def __init__(self, auto_discover: bool = True) -> None:
         """Initialize the registry and optionally discover all installed plugins.
@@ -155,20 +174,32 @@ class AereoRegistry:
                 want lazy loading, or pass pre-discovered plugins via
                 :meth:`register_plugins`.
         """
-        self._searcher_registry = _TypedRegistry()
-        self._extractor_registry = _TypedRegistry()
+        # One _TypedRegistry per plugin type
+        self._registries: Dict[str, _TypedRegistry] = {
+            label: _TypedRegistry() for label, _ in self.PLUGIN_TYPES.values()
+        }
+
         # Expose the internal dicts directly so existing tests and consumers
         # that access ``_searchers`` / ``_extractors`` continue to work.
-        self._searchers: Dict[str, Type[SearchProvider]] = (
-            self._searcher_registry.plugins  # type: ignore[assignment]
-        )
-        self._extractors: Dict[str, Type[Extractor]] = self._extractor_registry.plugins  # type: ignore[assignment]
+        self._searchers: Dict[str, Type[SearchProvider]] = self._registries[
+            "searcher"
+        ].plugins  # type: ignore[assignment]
+        self._extractors: Dict[str, Type[Extractor]] = self._registries[
+            "extractor"
+        ].plugins  # type: ignore[assignment]
 
         # Track original case for display in list_supported_collections
         self._original_collections: Dict[str, str] = {}
 
         if auto_discover:
             self.discover_plugins()
+
+    def _label_for(self, plugin_class: Type) -> str | None:
+        """Return the registry label for a plugin class based on PLUGIN_TYPES."""
+        for label, base_class in self.PLUGIN_TYPES.values():
+            if issubclass(plugin_class, base_class):
+                return label
+        return None
 
     def register_plugins(self, plugins: Dict[str, Type]) -> None:
         """Register pre-discovered plugins without scanning entry points.
@@ -181,12 +212,9 @@ class AereoRegistry:
             plugins: Mapping of plugin name to plugin class.
         """
         for name, plugin_class in plugins.items():
-            if issubclass(plugin_class, SearchProvider):
-                self._searcher_registry.register(
-                    name, plugin_class, self._original_collections
-                )
-            elif issubclass(plugin_class, Extractor):
-                self._extractor_registry.register(
+            label = self._label_for(plugin_class)
+            if label is not None:
+                self._registries[label].register(
                     name, plugin_class, self._original_collections
                 )
 
@@ -207,20 +235,16 @@ class AereoRegistry:
         for ep in eps:
             try:
                 plugin_class = ep.load()
+                label = self._label_for(plugin_class)
 
-                if issubclass(plugin_class, SearchProvider):
-                    self._searcher_registry.register(
+                if label is not None:
+                    self._registries[label].register(
                         ep.name, plugin_class, self._original_collections
                     )
-                    logger.debug(f"Loaded searcher: {ep.name}")
-                elif issubclass(plugin_class, Extractor):
-                    self._extractor_registry.register(
-                        ep.name, plugin_class, self._original_collections
-                    )
-                    logger.debug(f"Loaded extractor: {ep.name}")
+                    logger.debug(f"Loaded {label}: {ep.name}")
                 else:
                     logger.warning(
-                        f"Plugin '{ep.name}' does not inherit from SearchProvider or Extractor. Skipping."
+                        f"Plugin '{ep.name}' does not inherit from any known base class. Skipping."
                     )
             except Exception as e:
                 logger.error(
@@ -228,7 +252,58 @@ class AereoRegistry:
                     exc_info=True,
                 )
 
-    # --- Public API for the CLI / Orchestrator ---
+    # --- Generic API (FR-5.3) ---
+
+    def find_for(self, type_label: str, collection_name: str) -> List[str]:
+        """Return plugin names of *type_label* supporting *collection_name*.
+
+        Args:
+            type_label: Plugin type label (e.g. "searcher", "reader", "writer").
+            collection_name: Name of the collection to query.
+
+        Returns:
+            Sorted list of plugin names that support the collection.
+        """
+        registry = self._registries.get(type_label)
+        if registry is None:
+            return []
+        return registry.find_for(collection_name, self.WILDCARD)
+
+    def get(self, type_label: str, plugin_name: str, **kwargs) -> Any:
+        """Instantiate a plugin of *type_label* by *plugin_name*.
+
+        Args:
+            type_label: Plugin type label (e.g. "searcher", "reader").
+            plugin_name: Entry-point name of the plugin.
+            **kwargs: Configuration values passed to the plugin constructor.
+
+        Returns:
+            An instantiated plugin.
+
+        Raises:
+            ValueError: If the plugin type or name is not known.
+        """
+        registry = self._registries.get(type_label)
+        if registry is None:
+            raise ValueError(f"Unknown plugin type: {type_label}")
+        return registry.get(plugin_name, type_label.capitalize(), **kwargs)
+
+    def has(self, type_label: str, plugin_name: str) -> bool:
+        """Check whether a plugin of *type_label* with *plugin_name* is registered.
+
+        Args:
+            type_label: Plugin type label.
+            plugin_name: Entry-point name of the plugin.
+
+        Returns:
+            True if registered, False otherwise.
+        """
+        registry = self._registries.get(type_label)
+        if registry is None:
+            return False
+        return registry.has(plugin_name)
+
+    # --- Backward-compatible API ---
 
     def list_supported_collections(self) -> List[str]:
         """Returns a list of all products supported by currently installed plugins.
@@ -237,165 +312,59 @@ class AereoRegistry:
             Sorted list of collection names in their original case as defined
             by plugins.
         """
-        # Combine keys from both maps and return unique values in original case
-        all_products = set(self._searcher_registry.collection_to_plugins.keys()).union(
-            set(self._extractor_registry.collection_to_plugins.keys())
-        )
-        # Map back to original case for display
+        all_products: set[str] = set()
+        for registry in self._registries.values():
+            all_products.update(registry.collection_to_plugins.keys())
         display_names = [self._original_collections.get(p, p) for p in all_products]
         return sorted(display_names)
 
     def find_searchers_for(self, collection_name: str) -> List[str]:
-        """Returns names of search plugins that support the requested collection.
-
-        Case-insensitive lookup. Wildcard plugins (supported_collections=["*"])
-        are returned for any collection.
-
-        Args:
-            collection_name: Name of the collection to query.
-
-        Returns:
-            Sorted list of plugin names that support the collection.
-        """
-        return self._searcher_registry.find_for(collection_name, self.WILDCARD)
+        """Returns names of search plugins that support the requested collection."""
+        return self._registries["searcher"].find_for(collection_name, self.WILDCARD)
 
     def find_extractors_for(self, collection_name: str) -> List[str]:
-        """Returns names of extraction plugins that support the requested collection.
-
-        Case-insensitive lookup. Wildcard plugins (supported_collections=["*"])
-        are returned for any collection.
-
-        Args:
-            collection_name: Name of the collection to query.
-
-        Returns:
-            Sorted list of plugin names that support the collection.
-        """
-        return self._extractor_registry.find_for(collection_name, self.WILDCARD)
+        """Returns names of extraction plugins that support the requested collection."""
+        return self._registries["extractor"].find_for(collection_name, self.WILDCARD)
 
     def get_searcher_collections(self, plugin_name: str) -> List[str]:
-        """Return the supported collections for a named search plugin.
-
-        Args:
-            plugin_name: Entry-point name of the search plugin.
-
-        Returns:
-            List of collection strings supported by the plugin, or an empty list
-            if the plugin is not known.
-        """
-        return self._searcher_registry.get_collections(plugin_name)
+        """Return the supported collections for a named search plugin."""
+        return self._registries["searcher"].get_collections(plugin_name)
 
     def get_extractor_collections(self, plugin_name: str) -> List[str]:
-        """Return the supported collections for a named extractor plugin.
-
-        Args:
-            plugin_name: Entry-point name of the extractor plugin.
-
-        Returns:
-            List of collection strings supported by the plugin, or an empty list
-            if the plugin is not known.
-        """
-        return self._extractor_registry.get_collections(plugin_name)
+        """Return the supported collections for a named extractor plugin."""
+        return self._registries["extractor"].get_collections(plugin_name)
 
     def has_searcher(self, plugin_name: str) -> bool:
-        """Check whether a search plugin with the given name is registered.
-
-        Args:
-            plugin_name: Entry-point name of the plugin.
-
-        Returns:
-            True if the plugin is registered, False otherwise.
-        """
-        return self._searcher_registry.has(plugin_name)
+        """Check whether a search plugin with the given name is registered."""
+        return self._registries["searcher"].has(plugin_name)
 
     def has_extractor(self, plugin_name: str) -> bool:
-        """Check whether an extractor plugin with the given name is registered.
-
-        Args:
-            plugin_name: Entry-point name of the plugin.
-
-        Returns:
-            True if the plugin is registered, False otherwise.
-        """
-        return self._extractor_registry.has(plugin_name)
+        """Check whether an extractor plugin with the given name is registered."""
+        return self._registries["extractor"].has(plugin_name)
 
     def get_collection_mapping_for_searcher(
         self, plugin_name: str, collection_names: Sequence[str]
     ) -> List[str]:
-        """Maps user-provided collection names to a specific search plugin's declared format.
-
-        Takes user-provided collection names (in any case) and maps them to the exact case
-        that the specified plugin declared in its supported_collections.
-
-        Args:
-            plugin_name: Name of the search plugin
-            collection_names: Collection names provided by user (any case)
-
-        Returns:
-            List of collection names mapped to the plugin's declared format
-
-        Example:
-            # Plugin declares supported_collections=["abi-l1b-radc"]
-            # User searches with "ABI-L1b-RadC"
-            # This method returns ["abi-l1b-radc"]
-        """
-        return self._searcher_registry.get_collection_mapping(
+        """Maps user-provided collection names to a specific search plugin's declared format."""
+        return self._registries["searcher"].get_collection_mapping(
             plugin_name, collection_names, self.WILDCARD
         )
 
     def get_collection_mapping_for_extractor(
         self, plugin_name: str, collection_names: Sequence[str]
     ) -> List[str]:
-        """Maps user-provided collection names to a specific extractor plugin's declared format.
-
-        Takes user-provided collection names (in any case) and maps them to the exact case
-        that the specified plugin declared in its supported_collections.
-
-        Args:
-            plugin_name: Name of the extractor plugin
-            collection_names: Collection names provided by user (any case)
-
-        Returns:
-            List of collection names mapped to the plugin's declared format
-
-        Example:
-            # Plugin declares supported_collections=["goes-16"]
-            # User searches with "GOES-16"
-            # This method returns ["goes-16"]
-        """
-        return self._extractor_registry.get_collection_mapping(
+        """Maps user-provided collection names to a specific extractor plugin's declared format."""
+        return self._registries["extractor"].get_collection_mapping(
             plugin_name, collection_names, self.WILDCARD
         )
 
     def get_searcher(self, plugin_name: str, **kwargs) -> SearchProvider:
-        """Instantiates and returns a SearchProvider by name.
-
-        Args:
-            plugin_name: Entry-point name of the search plugin.
-            **kwargs: Configuration values passed to the plugin constructor.
-
-        Returns:
-            An instantiated SearchProvider.
-
-        Raises:
-            ValueError: If the plugin name is not registered.
-        """
-        return self._searcher_registry.get(plugin_name, "Search", **kwargs)
+        """Instantiates and returns a SearchProvider by name."""
+        return self._registries["searcher"].get(plugin_name, "Search", **kwargs)
 
     def get_extractor(self, plugin_name: str, **kwargs) -> Extractor:
-        """Instantiates and returns an Extractor by name.
-
-        Args:
-            plugin_name: Entry-point name of the extractor plugin.
-            **kwargs: Configuration values passed to the plugin constructor.
-
-        Returns:
-            An instantiated Extractor.
-
-        Raises:
-            ValueError: If the plugin name is not registered.
-        """
-        return self._extractor_registry.get(plugin_name, "Extractor", **kwargs)
+        """Instantiates and returns an Extractor by name."""
+        return self._registries["extractor"].get(plugin_name, "Extractor", **kwargs)
 
     def get_plugin_params(
         self, plugin_name: str, *, detailed: bool = True
@@ -413,7 +382,12 @@ class AereoRegistry:
             {"required": [...], "optional": [...]} where each item is a
             JSON-serializable dict representing a PluginParam.
         """
-        cls = self._searchers.get(plugin_name) or self._extractors.get(plugin_name)
+        cls: Type | None = None
+        for registry in self._registries.values():
+            cls = registry.plugins.get(plugin_name)
+            if cls is not None:
+                break
+
         if cls is None:
             raise KeyError(f"Unknown plugin: {plugin_name}")
 
@@ -436,9 +410,9 @@ class AereoRegistry:
                 are returned.
 
         Returns:
-            Mapping of plugin name to a dict with keys ``type`` ("search" or
-            "extract"), ``required``, and ``optional``. Each param list contains
-            JSON-serializable dicts representing a PluginParam.
+            Mapping of plugin name to a dict with keys ``type``, ``required``,
+            and ``optional``. Each param list contains JSON-serializable dicts
+            representing a PluginParam.
         """
 
         def _dump(params: Sequence[Any]) -> list[dict]:
@@ -446,11 +420,12 @@ class AereoRegistry:
                 return [p.model_dump() for p in params]
             return [{"name": p.name, "default": p.default} for p in params]
 
-        return {
-            name: {
-                "type": "search" if name in self._searchers else "extract",
-                "required": _dump(cls.required_params),
-                "optional": _dump(cls.optional_params),
-            }
-            for name, cls in {**self._searchers, **self._extractors}.items()
-        }
+        result: dict[str, dict] = {}
+        for label, registry in self._registries.items():
+            for name, cls in registry.plugins.items():
+                result[name] = {
+                    "type": label,
+                    "required": _dump(cls.required_params),
+                    "optional": _dump(cls.optional_params),
+                }
+        return result

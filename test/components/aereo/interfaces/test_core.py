@@ -4,12 +4,14 @@ from typing import Any, Sequence, cast
 import geopandas as gpd
 import pytest
 from aereo.interfaces import (
+    AereoDataset,
     AereoPlugin,
     ExtractionTask,
     Extractor,
     GridConfig,
     SearchProvider,
     merge_params,
+    validate_aereo_dataset,
 )
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -681,3 +683,59 @@ def test_prepare_for_extraction_spatial_filtering():
     for task in tasks:
         all_assigned.update(task.assets["id"])
     assert all_assigned == {"asset_1", "asset_2"}
+
+
+# ---------------------------------------------------------------------------
+# AereoDataset (Phase 0)
+# ---------------------------------------------------------------------------
+
+
+def test_aereo_dataset_is_xarray_dataset():
+    """AereoDataset must be an xarray.Dataset at runtime."""
+    import xarray as xr
+
+    assert AereoDataset is xr.Dataset
+
+
+def test_validate_aereo_dataset_accepts_valid():
+    import numpy as np
+    import xarray as xr
+
+    ds = xr.Dataset(
+        {"B04": (["y", "x"], np.ones((4, 4)))},
+        coords={"y": range(4), "x": range(4)},
+    )
+    # rioxarray crs is None by default, so we set require_crs=False
+    validate_aereo_dataset(ds, require_crs=False)
+
+
+def test_validate_aereo_dataset_rejects_non_dataset():
+    with pytest.raises(ValueError, match="Expected xarray.Dataset"):
+        validate_aereo_dataset("not a dataset", require_crs=False)
+
+
+def test_validate_aereo_dataset_checks_required_dims():
+    import numpy as np
+    import xarray as xr
+
+    ds = xr.Dataset(
+        {"B04": (["y", "x"], np.ones((4, 4)))},
+        coords={"y": range(4), "x": range(4)},
+    )
+    validate_aereo_dataset(ds, require_crs=False, require_dims=["y", "x"])
+
+    with pytest.raises(ValueError, match="missing required dimensions"):
+        validate_aereo_dataset(ds, require_crs=False, require_dims=["time"])
+
+
+def test_validate_aereo_dataset_checks_crs_when_required():
+    import numpy as np
+    import xarray as xr
+
+    ds = xr.Dataset(
+        {"B04": (["y", "x"], np.ones((4, 4)))},
+        coords={"y": range(4), "x": range(4)},
+    )
+    # Without rioxarray crs, require_crs=True should fail
+    with pytest.raises(ValueError, match="must have a CRS"):
+        validate_aereo_dataset(ds, require_crs=True)
