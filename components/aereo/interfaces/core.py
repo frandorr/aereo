@@ -835,7 +835,7 @@ class ExtractionTask:
     """
 
     assets: GeoDataFrame[AssetSchema]
-    profile: AereoProfile
+    profile: AereoProfile | PipelineProfile
     uri: str
     grid_cells: Sequence[GridCell]
     grid_config: GridConfig
@@ -964,8 +964,9 @@ class Extractor(AereoPlugin, plugin_abstract=True):
         Returns:
             The resolved downloader callable, or None.
         """
-        if task.profile.downloader is not None:
-            return task.profile.downloader
+        downloader = getattr(task.profile, "downloader", None)
+        if downloader is not None:
+            return downloader
         if extract_params and "downloader" in extract_params:
             return extract_params["downloader"]
         return None
