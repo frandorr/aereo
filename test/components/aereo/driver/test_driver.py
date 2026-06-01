@@ -184,10 +184,15 @@ def test_driver_prepare_not_implemented() -> None:
         )
 
 
-def test_driver_extract_not_implemented() -> None:
-    """extract() raises NotImplementedError until Task 1.5."""
+def test_driver_extract_compiler_import_succeeds() -> None:
+    """extract() no longer raises NotImplementedError for Task 1.5.
+
+    The compiler module now exists, so the method proceeds to plugin
+    resolution. With no download plugin available it falls through to
+    ValueError, proving the compiler import succeeded.
+    """
     driver = AereoDriver()
     mock_task = MagicMock()
     mock_task.profile = PipelineProfile(name="test", resolution=100.0)
-    with pytest.raises(NotImplementedError, match="Task 1.5"):
+    with pytest.raises(ValueError, match="No plugin found"):
         driver.extract(mock_task)
