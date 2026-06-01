@@ -43,11 +43,13 @@ uv sync
 
 ## Step 3: Write Your Plugin Logic
 
-Plugins are standard Python classes that inherit from `SearchProvider` or `Extractor` base classes defined in `aereo.interfaces`.
+Plugins are **plain Python functions** that AEREO wires together into a [Hamilton](https://github.com/dagworks-inc/hamilton) DAG at runtime. There are no base classes to inherit from and no decorators to apply — just functions with descriptive names and type hints.
+
+Every plugin module **must** declare `supported_collections` as a module-level variable so the discovery machinery knows which collections it can handle.
 
 ### Search Plugin
 
-Create a search provider (e.g., in `acme_plugin/search.py`). Search plugins **must** declare `supported_collections`.
+Create a search plugin (e.g., in `acme_plugin/nodes.py`). Search plugins export functions that return a `GeoDataFrame` of assets.
 
 ```python
 """ACME search plugin for aereo."""
@@ -59,195 +61,150 @@ import pandas as pd
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
 
-from aereo.interfaces import AereoProfile, PluginParam, SearchProvider
 from aereo.schemas import AssetSchema
 
+# REQUIRED: sequence of collections this plugin supports
+supported_collections = ("acme-l1", "acme-l2")
 
-class AcmeSearchProvider(SearchProvider):
-    """Search plugin for ACME satellite data."""
 
-    # REQUIRED: sequence of collections this plugin supports
-    supported_collections = ["acme-l1", "acme-l2"]
+def search_assets(
+    aoi: BaseGeometry | None,
+    start_datetime: datetime | None,
+    end_datetime: datetime | None,
+    collections: Sequence[str],
+    search_params: Mapping[str, Any] | None = None,
+) -> GeoDataFrame[AssetSchema]:
+    """Search ACME API for satellite data."""
+    # Your ACME API search logic here
 
-    # OPTIONAL: declare parameters for introspection and validation
-    required_params = [
-        PluginParam(name="api_key", type="str", description="ACME API key", required=True),
-    ]
-    optional_params = [
-        PluginParam(name="max_results", type="int", description="Max results per page", default=100),
-    ]
+    # Example: Mocking a search request
+    # results = acme_api.search(...)
 
-    def search(
-        self,
-        profiles: Sequence[AereoProfile],
-        intersects: BaseGeometry | None,
-        start_datetime: datetime | None,
-        end_datetime: datetime | None,
-        search_params: Mapping[str, Any] | None,
-    ) -> GeoDataFrame[AssetSchema]:
-        """Search ACME API for satellite data."""
-        # Your ACME API search logic here
+    # Format the response as a GeoDataFrame that aligns with AssetSchema
+    df = pd.DataFrame([
+        {
+            "id": "acme_item_001",
+            "collection": collections[0],
+            "datetime": datetime.utcnow(),
+            "geometry": aoi if aoi else None,
+            "assets": {"data": {"href": "https://acme.org/data.tif"}}
+        }
+    ])
 
-        # Example: Mocking a search request
-        # results = acme_api.search(...)
+    # Ensure it matches AssetSchema
+    gdf = GeoDataFrame(df, geometry="geometry")
+    return AssetSchema.validate(gdf)
 
-        # Format the response as a GeoDataFrame that aligns with AssetSchema
-        df = pd.DataFrame([
-            {
-                "id": "acme_item_001",
-                "collection": collections[0],
-                "datetime": datetime.utcnow(),
-                "geometry": intersects if intersects else None,
-                "assets": {"data": {"href": "https://acme.org/data.tif"}}
-            }
-        ])
 
-        # Ensure it matches AssetSchema
-        gdf = GeoDataFrame(df, geometry="geometry")
-        return AssetSchema.validate(gdf)
+def search_results(search_assets: GeoDataFrame[AssetSchema]) -> GeoDataFrame[AssetSchema]:
+    """Output boundary for the search stage.
+
+    This function simply forwards the results from ``search_assets`` so
+    that the Hamilton driver has a single well-known output node.
+    """
+    return search_assets
 ```
 
-### Extract Plugin
+### Read Plugin
 
-Create an extractor (e.g., in `acme_plugin/extract.py`). Extract plugins **must** declare `supported_collections` and implement both `prepare_for_extraction` and `extract`.
+Create a read plugin (e.g., in `acme_plugin/nodes.py`). Read plugins turn downloaded assets into an `xarray.Dataset`.
 
 ```python
-"""ACME extract plugin for aereo."""
+"""ACME read plugin for aereo."""
 
-from typing import Any, Mapping, Sequence
+from pathlib import Path
+from typing import Any, Mapping
 
-from pandera.typing.geopandas import GeoDataFrame
-from shapely.geometry.base import BaseGeometry
-from aereo.interfaces import AereoProfile, Extractor, ExtractionTask, GridConfig, PluginParam
-from aereo.schemas import AssetSchema, ArtifactSchema
+import xarray as xr
+from aereo.interfaces import ExtractionTask
+
+supported_collections = ("acme-l1",)
 
 
-class AcmeExtractor(Extractor):
-    """Extract plugin for ACME data."""
+def read_scenes(
+    extracted_assets: Mapping[str, Path],
+    task: ExtractionTask,
+    collection: str | None = None,
+) -> xr.Dataset:
+    """Load ACME data into an xarray Dataset."""
+    # Open files, stack bands, attach CRS metadata via rioxarray, etc.
+    ds = xr.Dataset()
+    # ... your loading logic ...
+    return ds
+```
 
-    # REQUIRED: sequence of collections this plugin supports
-    supported_collections = ["acme-l1"]
+### Processor Plugin
 
-    # OPTIONAL: declare extraction parameters
-    required_params = [
-        PluginParam(name="output_format", type="choice", description="Output raster format", choices=["geotiff", "netcdf"], required=True),
-    ]
-    optional_params = [
-        PluginParam(name="compression", type="str", description="GeoTIFF compression", default="deflate"),
-    ]
+Create a processor plugin (e.g., in `acme_plugin/processors.py`). Processors are pure functions that take an `xr.Dataset` and return a modified `xr.Dataset`.
 
-    def prepare_for_extraction(
-        self,
-        search_results: GeoDataFrame[AssetSchema],
-        grid_config: GridConfig,
-        target_aoi: BaseGeometry | None = None,
-        uri: str | None = None,
-        profiles: Sequence[AereoProfile] | None = None,
-        cells_per_task: int = 50,
-        extractor_hint: str | None = None,
-        init_params: Mapping[str, Any] | None = None,
-    ) -> Sequence[ExtractionTask]:
-        """Group search results into extraction batches."""
+```python
+"""ACME processor plugin for aereo."""
 
-        # By default, split into single-row batches for individual download
-        batches = []
-        for i in range(len(search_results)):
-            batches.append(search_results.iloc[[i]].copy())
+import numpy as np
+import xarray as xr
 
-        return batches
+supported_collections = ("*",)  # wildcard — applies to any collection
 
-    def extract(
-        self,
-        extraction_task: ExtractionTask,
-        extract_params: Mapping[str, Any] | None,
-    ) -> GeoDataFrame[ArtifactSchema]:
-        """Download and extract ACME data for a batch."""
-        extracted_artifacts = []
 
-        for _, asset_row in extraction_task.assets.iterrows():
-            item_id = asset_row["id"]
-
-            try:
-                # 1. Download
-                # file_path = download_file(asset_row["assets"]["data"]["href"])
-                file_path = f"/tmp/extracted_{item_id}.tif"
-
-                # 2. Append success artifact
-                payload = asset_row.to_dict()
-                payload["file_path"] = file_path
-                payload["status"] = "SUCCESS"
-                extracted_artifacts.append(payload)
-
-            except Exception as e:
-                # Append failed artifact
-                payload = asset_row.to_dict()
-                payload["status"] = "FAILED"
-                payload["error"] = str(e)
-                extracted_artifacts.append(payload)
-
-        # Ensure return type matches ArtifactSchema rules
-        from geopandas import GeoDataFrame as gpd_GeoDataFrame
-        return ArtifactSchema.validate(gpd_GeoDataFrame(extracted_artifacts, geometry="geometry"))
+def apply_acme_calibration(ds: xr.Dataset, gain: float = 1.0) -> xr.Dataset:
+    """Apply ACME-specific calibration scaling."""
+    for var in ds.data_vars:
+        ds[var] = ds[var] * gain
+    return ds
 ```
 
 ---
 
 ## Step 4: Register the Entry Point
 
-`aereo` discovers third-party plugins automatically using **Python Entry Points**.
+`aereo` discovers third-party plugins automatically using **Python Entry Points**. Each pipeline stage has its own entry-point group:
 
-Add the plugin class paths to `pyproject.toml` under the unified `aereo.plugins` group:
+| Stage | Entry-point group | Typical function |
+|-------|-------------------|------------------|
+| Search | `aereo.search` | `search_assets` |
+| Download | `aereo.download` | `download_assets` |
+| Read | `aereo.read` | `read_scenes` |
+| Reproject | `aereo.reproject` | `reproject_to_grid` |
+| Write | `aereo.write` | `write_cogs` |
+| Process | `aereo.process` | `compute_ndvi`, `mask_clouds`, etc. |
+
+Add the plugin module paths to `pyproject.toml` under the relevant stage group:
 
 ```toml
-[project.entry-points."aereo.plugins"]
-# alias = "module.path:ClassName"
-acme_search = "acme_plugin.search:AcmeSearchProvider"
-acme_extract = "acme_plugin.extract:AcmeExtractor"
+[project.entry-points."aereo.search"]
+acme = "acme_plugin.search"
+
+[project.entry-points."aereo.read"]
+acme = "acme_plugin.read"
+
+[project.entry-points."aereo.process"]
+acme = "acme_plugin.processors"
 ```
+
+> [!IMPORTANT]
+> The value must be a **module path** (e.g., `acme_plugin.search`), **not** a `module:ClassName` reference. Hamilton imports the module and inspects its functions.
 
 ---
 
-## Step 5: Document Your Parameters
+## Step 5: Configure Your Profiles
 
-If you declared `required_params` and `optional_params`, users can introspect them at runtime via the `AereoRegistry`:
-
-```python
-from aereo.registry import AereoRegistry
-
-registry = AereoRegistry()
-
-# Get params for a single plugin
-params = registry.get_plugin_params("acme_search")
-print(params["required"])   # [PluginParam(name="api_key", ...)]
-print(params["optional"])   # [PluginParam(name="max_results", ...)]
-
-# Export a JSON catalog of every plugin's params
-import json
-print(json.dumps(registry.list_all_params(), indent=2))
-```
-
-This powers CLI help text, config validation, and plugin marketplace listings.
-
----
-
-## Step 6: Configure Your Profiles
-
-`AereoProfile` (also available as the backward-compat alias `ExtractionProfile`) is a **Pydantic `BaseModel`**. You get declarative validation, frozen immutability, and native JSON/YAML deserialization.
+`PipelineProfile` (also available as the backward-compat alias `AereoProfile`) is a **Pydantic `BaseModel`** that declaratively configures a complete pipeline. You get validation, frozen immutability, and native JSON/YAML deserialization.
 
 ### Construct profiles in code
 
 ```python
-from aereo.interfaces import AereoProfile
+from aereo.interfaces import PipelineProfile
 
-profile = AereoProfile(
+profile = PipelineProfile(
     name="acme_l1",
     resolution=250,
     collections={"acme-l1": ["B01"]},
-    plugin_hints={"search": "acme_search", "extract": "acme_extract"},
+    plugin_hints={"search": "acme", "read": "acme"},
+    search_params={"api_key": "secret"},
 )
 ```
 
-`AereoProfile` is frozen (`model_config = {"frozen": True}`) and forbids unknown fields (`"extra": "forbid"`), so typos raise a clear `ValidationError` immediately.
+`PipelineProfile` is frozen (`model_config = {"frozen": True}`) and forbids unknown fields (`"extra": "forbid"`), so typos raise a clear `ValidationError` immediately.
 
 ### Load profiles from YAML or JSON
 
@@ -259,41 +216,96 @@ profiles:
     collections:
       acme-l1: ["B01"]
     plugin_hints:
-      search: acme_search
-      extract: acme_extract
+      search: acme
+      read: acme
+    search_params:
+      api_key: secret
 ```
 
 ```python
 from pathlib import Path
-from aereo.interfaces import AereoProfile
+from aereo.interfaces import PipelineProfile
 
 # From a YAML file
-profiles = AereoProfile.from_yaml(Path("profiles.yaml"))
+profiles = PipelineProfile.from_yaml(Path("profiles.yaml"))
 
 # From a YAML string
-profiles = AereoProfile.from_yaml_string(yaml_text)
+profiles = PipelineProfile.from_yaml_string(yaml_text)
 
 # From a JSON file
-profiles = AereoProfile.from_json(Path("profiles.json"))
+profiles = PipelineProfile.from_json(Path("profiles.json"))
 
 # From a directory containing *.yaml / *.yml / *.json
-profiles = AereoProfile.from_config_dir(Path("configs/"))
+profiles = PipelineProfile.from_config_dir(Path("configs/"))
 ```
 
-### Referencing a downloader by import path
+---
 
-The `downloader` field accepts a live callable or a dotted import path string. When loading from config, write the string and Pydantic's `ImportString` resolves it at validation time:
+## Step 6: Processor Configuration
 
-```yaml
-profiles:
-  - name: acme_l1
-    resolution: 250
-    collections:
-      acme-l1: ["B01"]
-    downloader: my_package.downloaders.custom_downloader
+One of the most powerful features of the Hamilton pipeline is **configurable processors**. You declare which processors run — and in what order — directly in the profile.
+
+### Sequential processors
+
+```python
+profile = PipelineProfile(
+    name="acme_l1",
+    resolution=250,
+    collections={"acme-l1": ["B01", "B02"]},
+    pre_processors=["select_bands"],
+    post_processors=["normalize"],
+)
 ```
 
-The resolved callable must match the `Downloader` signature: `Callable[[str, Path], None]`. If the module or attribute does not exist, Pydantic raises a clear `ValidationError`.
+Each processor name maps to a function discovered via the `aereo.process` entry-point group. The pipeline wires them in order:
+
+```
+read_scenes → select_bands → reproject_to_grid → normalize → write_cogs
+```
+
+### Passing parameters to a processor
+
+Use a dict when a processor needs arguments:
+
+```python
+profile = PipelineProfile(
+    name="acme_l1",
+    resolution=250,
+    collections={"acme-l1": ["B01", "B02"]},
+    pre_processors=[
+        {"select_bands": {"bands": ["B01", "B02"]}},
+        {"mask_clouds": {"qa_band": "qa", "qa_mask_bits": [3, 4]}},
+    ],
+)
+```
+
+### Parallel processors
+
+Independent processors can run in parallel by wrapping them in a `parallel` dict:
+
+```python
+profile = PipelineProfile(
+    name="s2_ndvi_ndwi",
+    resolution=100,
+    collections={"sentinel-2-l2a": ["B04", "B08", "B11"]},
+    plugin_hints={"search": "planetary_computer", "read": "odc_stac"},
+    post_processors=[
+        {"parallel": ["compute_ndvi", "compute_ndwi"]},
+        "normalize",
+    ],
+)
+```
+
+The pipeline builds a DAG where `compute_ndvi` and `compute_ndwi` both receive the same input (the output of `reproject_to_grid`), run concurrently, and their results are merged before passing to `normalize`:
+
+```
+                    ┌─→ compute_ndvi ─┐
+reproject_to_grid ──┤                 ├──→ merge ─→ normalize ─→ write_cogs
+                    └─→ compute_ndwi ─┘
+```
+
+> [!TIP]
+> Parallel branches are merged by concatenating their output datasets. Make sure each branch produces **different variable names** (e.g., `ndvi` and `ndwi`) so they don't collide.
 
 ---
 
@@ -303,7 +315,7 @@ Test your plugin using the high-level `AereoClient` API:
 
 ```python
 from aereo.client import AereoClient
-from aereo.interfaces import AereoProfile
+from aereo.interfaces import PipelineProfile
 from datetime import datetime
 from pathlib import Path
 
@@ -311,7 +323,7 @@ from pathlib import Path
 client = AereoClient()
 
 # Load profiles from config (or build them in code)
-profiles = AereoProfile.from_yaml(Path("profiles.yaml"))
+profiles = PipelineProfile.from_yaml(Path("profiles.yaml"))
 
 # 1. Search
 results = client.search(
@@ -321,10 +333,13 @@ results = client.search(
 )
 
 # 2. Prepare
+from aereo.interfaces import GridConfig
+
 tasks = client.prepare_for_extraction(
     results,
     profiles=profiles,
     uri="output/acme",
+    grid_config=GridConfig(target_grid_dist=256000),
 )
 
 # 3. Extract
@@ -354,18 +369,44 @@ pip install aereo-plugin-acme
 
 ---
 
+## Plugin Hint Resolution
+
+When multiple plugins can handle the same collection, AEREO resolves which one to use with the following priority:
+
+1. **`plugin_hints`** — Explicit user choice in the profile always wins.
+2. **Collection match** — Auto-discovery finds a plugin whose `supported_collections` includes the target collection.
+3. **Wildcard fallback** — If no specific match is found, a plugin declaring `supported_collections = ("*",)` is used.
+
+```python
+# Explicit hint — always uses "acme" for search
+profile = PipelineProfile(
+    name="acme_l1",
+    resolution=250,
+    collections={"acme-l1": ["B01"]},
+    plugin_hints={"search": "acme"},
+)
+```
+
+If no plugin can be resolved, `AereoDriver` raises a clear `ValueError`.
+
+---
+
 ## Interface Reference
 
-| Interface | Purpose | Key Methods |
-|-----------|---------|-------------|
-| `SearchProvider` | Query satellite data | `search` |
-| `Extractor` | Configure and run extractions | `prepare_for_extraction`, `extract` |
+| Stage | Entry-point group | Key functions | Output type |
+|-------|-------------------|---------------|-------------|
+| Search | `aereo.search` | `search_assets` | `GeoDataFrame[AssetSchema]` |
+| Download | `aereo.download` | `download_assets` | `Mapping[str, Path]` |
+| Read | `aereo.read` | `read_scenes` | `xr.Dataset` |
+| Reproject | `aereo.reproject` | `reproject_to_grid` | `xr.Dataset` |
+| Write | `aereo.write` | `write_cogs` | `GeoDataFrame[ArtifactSchema]` |
+| Process | `aereo.process` | `compute_ndvi`, `mask_clouds`, etc. | `xr.Dataset` |
 
-See the `aereo.interfaces` module for detailed documentation.
+See the `aereo.interfaces` module for detailed documentation on `PipelineProfile`, `ExtractionTask`, and `GridConfig`.
 
 ---
 
 ## Next Steps
 
-- Read [How Plugins Work](plugin-overview.md) for a deeper dive into the plugin system and discovery mechanics.
+- Read [How Plugins Work](plugin-overview.md) for a deeper dive into the Hamilton DAG, plugin discovery, and the process compiler.
 - Explore [Advanced Plugin Patterns](plugin-advanced.md) for local development tips, custom schemas, and multi-backend strategies.
