@@ -17,7 +17,7 @@ from typing import Any
 import geopandas as gpd
 import shapely.wkt
 from aereo.grid import GridCell
-from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig
+from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig, PipelineProfile
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +34,7 @@ class TaskSerializer:
     IS_PRIMARY_KEY = "is_primary"
     GEOM_WKT_KEY = "geom_wkt"
     PROFILE_KEY = "profile"
+    PROFILE_TYPE_KEY = "profile_type"
     GRID_CONFIG_KEY = "grid_config"
     GRID_CELLS_KEY = "grid_cells"
     URI_KEY = "uri"
@@ -75,6 +76,7 @@ class TaskSerializer:
         # Metadata → JSON
         meta: dict[str, Any] = {
             self.PROFILE_KEY: task.profile.model_dump(mode="json"),
+            self.PROFILE_TYPE_KEY: type(task.profile).__name__,
             self.GRID_CONFIG_KEY: task.grid_config.model_dump(mode="json"),
             self.GRID_CELLS_KEY: grid_cells_meta,
             self.URI_KEY: task.uri,
@@ -110,7 +112,12 @@ class TaskSerializer:
         meta = json.loads((src_dir / self.META_NAME).read_text(encoding="utf-8"))
 
         # Reconstruct Pydantic models
-        profile = AereoProfile.model_validate(meta[self.PROFILE_KEY])
+        profile_data = meta[self.PROFILE_KEY]
+        profile_type = meta.get(self.PROFILE_TYPE_KEY)
+        if profile_type == "PipelineProfile":
+            profile = PipelineProfile.model_validate(profile_data)
+        else:
+            profile = AereoProfile.model_validate(profile_data)
         grid_config = GridConfig.model_validate(meta[self.GRID_CONFIG_KEY])
 
         # Reconstruct GridCell instances
