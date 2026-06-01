@@ -60,6 +60,7 @@ entry-points."aereo.plugins".process_select_bands = "aereo.builtins:SelectBands"
 entry-points."aereo.plugins".reproject_odc = "aereo.builtins:ReprojectODC"
 entry-points."aereo.plugins".write_geotiff = "aereo.builtins:WriteGeoTIFF"
 entry-points."aereo.reproject".odc_geo = "aereo.reproject.core"
+entry-points."aereo.write".cog_eoids = "aereo.write.core"
 
 [tool.hatch]
 build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", "." ]
@@ -78,4 +79,5 @@ bricks."../../components/aereo/registry" = "aereo/registry"
 bricks."../../components/aereo/schemas" = "aereo/schemas"
 bricks."../../components/aereo/serialization" = "aereo/serialization"
 bricks."../../components/aereo/spatial" = "aereo/spatial"
+bricks."../../components/aereo/write" = "aereo/write"
 bricks."../../components/aereo/viz" = "aereo/viz"

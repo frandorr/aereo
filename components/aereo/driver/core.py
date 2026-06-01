@@ -187,9 +187,18 @@ class AereoDriver:
             self._gather_process_functions(),
         )
 
+        try:
+            from aereo.pipeline import extract as extract_module  # type: ignore[import-not-found]
+        except ImportError as exc:
+            raise NotImplementedError(
+                "extract() requires aereo.pipeline.extract (Task 1.6)."
+            ) from exc
+
         dr = (
             driver.Builder()
-            .with_modules(download_mod, read_mod, reproject_mod, write_mod)
+            .with_modules(
+                download_mod, read_mod, reproject_mod, write_mod, extract_module
+            )
             .build()
         )
 
