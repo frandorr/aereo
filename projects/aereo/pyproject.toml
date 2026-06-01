@@ -59,6 +59,7 @@ entry-points."aereo.plugins".process_qa_mask = "aereo.builtins:QAMask"
 entry-points."aereo.plugins".process_select_bands = "aereo.builtins:SelectBands"
 entry-points."aereo.plugins".reproject_odc = "aereo.builtins:ReprojectODC"
 entry-points."aereo.plugins".write_geotiff = "aereo.builtins:WriteGeoTIFF"
+entry-points."aereo.reproject".odc_geo = "aereo.reproject.core"
 
 [tool.hatch]
 build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", "." ]
