@@ -90,6 +90,8 @@ class AereoDriver:
         profile: PipelineProfile,
         grid_config: GridConfig,
         aoi: BaseGeometry | None,
+        uri: str | None = None,
+        cells_per_task: int | None = None,
     ) -> Sequence[Any]:
         """Build a Hamilton prepare driver and execute the prepare DAG.
 
@@ -98,6 +100,8 @@ class AereoDriver:
             profile: Pipeline profile.
             grid_config: Grid configuration.
             aoi: Area of interest geometry.
+            uri: Destination URI prefix for extracted artifacts.
+            cells_per_task: Maximum grid cells per task chunk.
 
         Returns:
             Sequence of extraction tasks.
@@ -119,6 +123,10 @@ class AereoDriver:
             "aoi": aoi,
             "profile": profile,
         }
+        if uri is not None:
+            inputs["uri"] = uri
+        if cells_per_task is not None:
+            inputs["cells_per_task"] = cells_per_task
         result = dr.execute(["extraction_tasks"], inputs=inputs)
         return result["extraction_tasks"]
 
