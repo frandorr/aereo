@@ -7,6 +7,7 @@ By defining these interfaces, we ensure that all implementations adhere to a con
 """
 
 from aereo.interfaces.core import (
+    AereoDataset,
     AereoPlugin,
     AereoProfile,
     Downloader,
@@ -15,10 +16,16 @@ from aereo.interfaces.core import (
     ExtractionTask,
     Extractor,
     GridConfig,
+    PipelineCallback,
     PluginParam,
+    Processor,
+    Reader,
+    Reprojector,
     SearchProvider,
     TaskStaging,
+    Writer,
     merge_params,
+    validate_aereo_dataset,
 )
 from aereo.interfaces.core import (
     DEFAULT_RASTER_COMPRESS as DEFAULT_RASTER_COMPRESS,
@@ -28,6 +35,7 @@ from aereo.interfaces.core import (
 )
 
 __all__ = [
+    "AereoDataset",
     "AereoPlugin",
     "AereoProfile",
     "Downloader",
@@ -36,10 +44,16 @@ __all__ = [
     "ExtractionTask",
     "Extractor",
     "GridConfig",
+    "PipelineCallback",
     "PluginParam",
+    "Processor",
+    "Reader",
+    "Reprojector",
     "SearchProvider",
     "TaskStaging",
+    "Writer",
     "merge_params",
+    "validate_aereo_dataset",
     "DEFAULT_RASTER_COMPRESS",
     "DEFAULT_RASTER_DRIVER",
     "DEFAULT_RASTER_PREDICTOR",

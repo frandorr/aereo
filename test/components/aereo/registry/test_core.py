@@ -251,7 +251,7 @@ def test_list_all_params_detailed(mock_entry_points):
     assert "dummy_extractor" in all_params
 
     searcher = all_params["dummy_searcher"]
-    assert searcher["type"] == "search"
+    assert searcher["type"] == "searcher"
     assert len(searcher["required"]) == 1
     assert searcher["required"][0]["name"] == "bbox"
     assert "description" in searcher["required"][0]
@@ -266,7 +266,7 @@ def test_list_all_params_not_detailed(mock_entry_points):
     assert "dummy_extractor" in all_params
 
     extractor = all_params["dummy_extractor"]
-    assert extractor["type"] == "extract"
+    assert extractor["type"] == "extractor"
     assert len(extractor["required"]) == 1
     assert extractor["required"][0] == {"name": "output_dir", "default": None}
     assert set(extractor["required"][0].keys()) == {"name", "default"}
@@ -282,3 +282,41 @@ def test_get_plugin_params_unknown_plugin(mock_entry_points):
 
     with pytest.raises(KeyError, match="Unknown plugin"):
         registry.get_plugin_params("nonexistent_plugin")
+
+
+# ---------------------------------------------------------------------------
+# Generic API (Phase 1)
+# ---------------------------------------------------------------------------
+
+
+def test_generic_find_for(mock_entry_points):
+    """Test generic find_for works for all plugin types."""
+    registry = AereoRegistry()
+    assert registry.find_for("searcher", "DummyCollection1") == ["dummy_searcher"]
+    assert registry.find_for("extractor", "DummyCollection2") == ["dummy_extractor"]
+    assert registry.find_for("reader", "Anything") == []
+
+
+def test_generic_has(mock_entry_points):
+    """Test generic has works for all plugin types."""
+    registry = AereoRegistry()
+    assert registry.has("searcher", "dummy_searcher") is True
+    assert registry.has("extractor", "dummy_extractor") is True
+    assert registry.has("reader", "dummy_searcher") is False
+    assert registry.has("unknown_type", "dummy_searcher") is False
+
+
+def test_generic_get(mock_entry_points):
+    """Test generic get instantiates plugins by type label."""
+    registry = AereoRegistry()
+    searcher = registry.get("searcher", "dummy_searcher")
+    assert isinstance(searcher, DummySearchProvider)
+
+    extractor = registry.get("extractor", "dummy_extractor")
+    assert isinstance(extractor, DummyExtractor)
+
+    with pytest.raises(ValueError, match="Unknown plugin type"):
+        registry.get("unknown_type", "dummy_searcher")
+
+    with pytest.raises(ValueError, match="not found or failed to load"):
+        registry.get("searcher", "missing")

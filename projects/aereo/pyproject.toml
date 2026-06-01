@@ -50,6 +50,13 @@ urls.Homepage = "https://github.com/frandorr/aereo"
 urls.Issues = "https://github.com/frandorr/aereo/issues"
 urls.Repository = "https://github.com/frandorr/aereo"
 scripts.aereo = "aereo.cli.main:app"
+entry-points."aereo.plugins".process_composite = "aereo.builtins:Composite"
+entry-points."aereo.plugins".process_ndvi = "aereo.builtins:NDVI"
+entry-points."aereo.plugins".process_normalize = "aereo.builtins:Normalize"
+entry-points."aereo.plugins".process_qa_mask = "aereo.builtins:QAMask"
+entry-points."aereo.plugins".process_select_bands = "aereo.builtins:SelectBands"
+entry-points."aereo.plugins".reproject_odc = "aereo.builtins:ReprojectODC"
+entry-points."aereo.plugins".write_geotiff = "aereo.builtins:WriteGeoTIFF"
 
 [tool.hatch]
 build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", "." ]
