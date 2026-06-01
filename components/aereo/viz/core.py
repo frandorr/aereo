@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import geopandas as gpd
+    from matplotlib.figure import Figure
 
 _BASE_ZORDER = 0
 _OVERLAY_ZORDER = 1
@@ -154,3 +155,162 @@ def plot_aoi(
     ax.set_title("Selected Area of Interest")
 
     plt.show()
+
+
+def plot_coverage(
+    search_results: gpd.GeoDataFrame,
+    aoi: gpd.GeoDataFrame | None = None,
+    *,
+    group_by: str = "collection",
+    temporal_bins: str = "1D",
+    width: float = 14,
+    height: float = 6,
+) -> Figure:
+    """Visualise spatial-temporal coverage of search results.
+
+    Produces a two-panel figure:
+
+    1. **Map** — semi-transparent asset footprints coloured by *group_by* column
+       (default ``collection``), with the AOI outlined in red.
+    2. **Temporal heatmap** — acquisition density per (*group_by*, time-bin).
+
+    All heavy dependencies (matplotlib, cartopy, seaborn) are imported lazily
+    so callers only pay the import cost when this function is actually used.
+
+    Args:
+        search_results: GeoDataFrame of search assets (must contain a
+            ``geometry`` column and the column named by *group_by*).
+        aoi: Optional GeoDataFrame with the AOI boundary. If provided, the
+            map extent is centred on the AOI and uncovered regions are
+            highlighted.
+        group_by: Column name to group footprints and temporal bins by.
+            Default is ``"collection"``.
+        temporal_bins: Pandas frequency string for temporal binning
+            (e.g. ``"1D"``, ``"1H"``). Default is ``"1D"``.
+        width: Figure width in inches.
+        height: Figure height in inches.
+
+    Returns:
+        A :class:`matplotlib.figure.Figure` with two subplots.
+    """
+    import cartopy.crs as ccrs
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    fig = plt.figure(figsize=(width, height))
+    gs = fig.add_gridspec(1, 2, width_ratios=[2, 1])
+    ax_map = fig.add_subplot(gs[0, 0], projection=ccrs.PlateCarree())
+    ax_temporal = fig.add_subplot(gs[0, 1])
+
+    # ------------------------------------------------------------------
+    # 1. Map panel
+    # ------------------------------------------------------------------
+    _add_base_layer(ax_map, tiles=False, zoom=12)
+
+    # Plot asset footprints coloured by group_by
+    if group_by in search_results.columns and not search_results.empty:
+        groups = search_results[group_by].unique()
+        cmap = plt.get_cmap("tab10")
+        for idx, group in enumerate(groups):
+            subset = search_results[search_results[group_by] == group]
+            color = cmap(idx % 10)
+            subset.plot(
+                ax=ax_map,
+                facecolor=color,
+                edgecolor="none",
+                alpha=0.4,
+                label=str(group),
+                transform=ccrs.PlateCarree(),
+            )
+
+    # Plot AOI outline
+    if aoi is not None and not aoi.empty:
+        aoi.plot(
+            ax=ax_map,
+            facecolor="none",
+            edgecolor="red",
+            linewidth=2.0,
+            label="AOI",
+            transform=ccrs.PlateCarree(),
+        )
+        bounds = aoi.total_bounds
+        buffer = 0.02
+        ax_map.set_extent(  # type: ignore[reportAttributeAccessIssue]
+            [
+                bounds[0] - buffer,
+                bounds[2] + buffer,
+                bounds[1] - buffer,
+                bounds[3] + buffer,
+            ],
+            crs=ccrs.PlateCarree(),
+        )
+    elif not search_results.empty:
+        bounds = search_results.total_bounds
+        buffer = 0.02
+        ax_map.set_extent(  # type: ignore[reportAttributeAccessIssue]
+            [
+                bounds[0] - buffer,
+                bounds[2] + buffer,
+                bounds[1] - buffer,
+                bounds[3] + buffer,
+            ],
+            crs=ccrs.PlateCarree(),
+        )
+
+    ax_map.gridlines(  # type: ignore[reportAttributeAccessIssue]
+        draw_labels=True, linestyle="--", alpha=0.5
+    )
+    ax_map.set_title("Spatial Coverage")
+    ax_map.legend(loc="upper left")
+
+    # ------------------------------------------------------------------
+    # 2. Temporal heatmap panel
+    # ------------------------------------------------------------------
+    if (
+        "start_time" in search_results.columns
+        and group_by in search_results.columns
+        and not search_results.empty
+    ):
+        df = search_results.copy()
+        df["time_bin"] = pd.to_datetime(df["start_time"]).dt.floor(temporal_bins)
+        heatmap_data = df.groupby([group_by, "time_bin"]).size().unstack(fill_value=0)
+
+        if not heatmap_data.empty:
+            im = ax_temporal.imshow(
+                heatmap_data.to_numpy(),
+                aspect="auto",
+                cmap="YlOrRd",
+            )
+            ax_temporal.set_xticks(range(len(heatmap_data.columns)))
+            ax_temporal.set_xticklabels(
+                [str(c) for c in heatmap_data.columns], rotation=45, ha="right"
+            )
+            ax_temporal.set_yticks(range(len(heatmap_data.index)))
+            ax_temporal.set_yticklabels([str(i) for i in heatmap_data.index])
+            ax_temporal.set_title("Acquisition Density")
+            ax_temporal.set_xlabel("Time bin")
+            ax_temporal.set_ylabel(group_by)
+            plt.colorbar(im, ax=ax_temporal, label="Asset count")
+        else:
+            ax_temporal.text(
+                0.5,
+                0.5,
+                "No temporal data",
+                ha="center",
+                va="center",
+                transform=ax_temporal.transAxes,
+            )
+            ax_temporal.set_title("Acquisition Density")
+    else:
+        ax_temporal.text(
+            0.5,
+            0.5,
+            "No temporal data",
+            ha="center",
+            va="center",
+            transform=ax_temporal.transAxes,
+        )
+        ax_temporal.set_title("Acquisition Density")
+
+    plt.tight_layout()
+    return fig

@@ -3,6 +3,9 @@ import re
 from pathlib import Path
 from typing import Any
 
+import geopandas as gpd
+import pandas as pd
+
 from aereo.interfaces import AereoProfile
 
 # Known EOIDS key tokens — order matters for greedy matching
@@ -265,3 +268,66 @@ def scan_eoids_dir(
 
 
 # ---------------------------------------------------------------------------
+# EOIDSLoader — Major TOM dataset integration
+# ---------------------------------------------------------------------------
+
+
+class EOIDSLoader:
+    """Load and manage Major TOM-format EOIDS datasets from parquet files."""
+
+    def __init__(self, dataset_path: str | Path) -> None:
+        """Initialise loader with a path to a Major TOM parquet dataset.
+
+        Args:
+            dataset_path: Path to the parquet file or directory containing
+                the Major TOM dataset.
+        """
+        self.dataset_path = Path(dataset_path)
+
+    @classmethod
+    def from_parquet(cls, path: str | Path) -> "EOIDSLoader":
+        """Create an EOIDSLoader from a parquet file.
+
+        Args:
+            path: Path to the parquet file.
+
+        Returns:
+            An EOIDSLoader instance.
+        """
+        return cls(path)
+
+    def load(self) -> gpd.GeoDataFrame:
+        """Load the dataset as a GeoDataFrame.
+
+        Returns:
+            GeoDataFrame containing the Major TOM dataset.
+        """
+        return gpd.read_parquet(self.dataset_path)
+
+    def merge_with_extraction(
+        self,
+        existing_dataset: gpd.GeoDataFrame,
+        new_artifacts: gpd.GeoDataFrame,
+        dedup_by: tuple[str, ...] = ("grid_cell", "collection", "start_time"),
+    ) -> gpd.GeoDataFrame:
+        """Merge new extraction artifacts into an existing Major TOM dataset.
+
+        Duplicates are identified by the *dedup_by* columns. When a conflict
+        is found, the new artifact takes precedence.
+
+        Args:
+            existing_dataset: Existing Major TOM dataset loaded from parquet.
+            new_artifacts: New artifacts produced by an extraction run.
+            dedup_by: Columns used to identify duplicate rows.
+
+        Returns:
+            Merged GeoDataFrame with duplicates removed.
+        """
+        combined = pd.concat([existing_dataset, new_artifacts], ignore_index=True)
+
+        # Determine which columns are available for deduplication
+        available_cols = [c for c in dedup_by if c in combined.columns]
+        if available_cols:
+            combined = combined.drop_duplicates(subset=available_cols, keep="last")
+
+        return gpd.GeoDataFrame(combined, crs=existing_dataset.crs)

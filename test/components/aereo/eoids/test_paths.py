@@ -83,3 +83,70 @@ def test_matches_filter():
     assert _matches_filter("goes_c01", "goes_c01") is True
     assert _matches_filter(None, "goes_c01") is True
     assert _matches_filter("goes_c01", "s2_rgb") is False
+
+
+def test_eoids_loader_merge_with_extraction():
+    """Test EOIDSLoader.merge_with_extraction deduplicates correctly."""
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    from aereo.eoids import EOIDSLoader
+
+    existing = gpd.GeoDataFrame(
+        {
+            "grid_cell": ["cell1", "cell2"],
+            "collection": ["s2", "s2"],
+            "start_time": ["2024-01-01", "2024-01-02"],
+            "value": [1, 2],
+        },
+        geometry=[Point(0, 0), Point(1, 1)],
+        crs="EPSG:4326",
+    )
+
+    new_artifacts = gpd.GeoDataFrame(
+        {
+            "grid_cell": ["cell1", "cell3"],
+            "collection": ["s2", "s2"],
+            "start_time": ["2024-01-01", "2024-01-03"],
+            "value": [10, 30],
+        },
+        geometry=[Point(0, 0), Point(2, 2)],
+        crs="EPSG:4326",
+    )
+
+    loader = EOIDSLoader("/tmp/dummy.parquet")
+    merged = loader.merge_with_extraction(existing, new_artifacts)
+
+    # Should have 3 rows (cell1, cell2, cell3)
+    assert len(merged) == 3
+
+    # cell1 should have the new value (10) because keep="last"
+    cell1_rows = merged[merged["grid_cell"] == "cell1"]
+    assert len(cell1_rows) == 1
+    assert cell1_rows.iloc[0]["value"] == 10
+
+
+def test_eoids_loader_merge_no_dedup_cols():
+    """Test merge when dedup columns don't exist."""
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    from aereo.eoids import EOIDSLoader
+
+    existing = gpd.GeoDataFrame(
+        {"value": [1]},
+        geometry=[Point(0, 0)],
+        crs="EPSG:4326",
+    )
+
+    new_artifacts = gpd.GeoDataFrame(
+        {"value": [2]},
+        geometry=[Point(1, 1)],
+        crs="EPSG:4326",
+    )
+
+    loader = EOIDSLoader("/tmp/dummy.parquet")
+    merged = loader.merge_with_extraction(existing, new_artifacts)
+
+    # No dedup columns available, so both rows should be kept
+    assert len(merged) == 2
