@@ -171,17 +171,20 @@ def test_driver_search_builds_hamilton_driver(monkeypatch) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_driver_prepare_not_implemented() -> None:
-    """prepare() raises NotImplementedError until Task 1.6."""
+def test_driver_prepare_empty_assets() -> None:
+    """prepare() builds a Hamilton driver and returns an empty list for empty assets."""
+    from aereo.interfaces import GridConfig
+
     driver = AereoDriver()
     profile = PipelineProfile(name="test", resolution=100.0)
-    with pytest.raises(NotImplementedError, match="Task 1.6"):
-        driver.prepare(
-            assets=gpd.GeoDataFrame(),  # type: ignore[arg-type]
-            profile=profile,
-            grid_config=MagicMock(),
-            aoi=None,
-        )
+    grid_config = GridConfig(target_grid_dist=10000)
+    result = driver.prepare(
+        assets=gpd.GeoDataFrame(),  # type: ignore[arg-type]
+        profile=profile,
+        grid_config=grid_config,
+        aoi=None,
+    )
+    assert result == []
 
 
 def test_driver_extract_compiler_import_succeeds() -> None:
