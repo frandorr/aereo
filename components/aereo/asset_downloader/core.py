@@ -9,13 +9,13 @@ from aereo.asset_downloader._obstore_utils import (
 )
 
 if TYPE_CHECKING:
-    from aereo.interfaces import Downloader
+    from aereo.interfaces import DownloaderCallable
 
 
 def download_asset_safely(
     href: str,
     local_path: Path,
-    downloader: Optional["Downloader"] = None,
+    downloader: Optional["DownloaderCallable"] = None,
     store_options: Optional[dict[str, Any]] = None,
 ) -> None:
     """Download asset with a filelock to avoid corruption in multi-processing.
@@ -57,7 +57,7 @@ def download_asset_safely(
 def download_assets_safely(
     hrefs: list[str],
     local_paths: list[Path],
-    downloader: Optional["Downloader"] = None,
+    downloader: Optional["DownloaderCallable"] = None,
     store_options: Optional[dict[str, Any]] = None,
     max_workers: Optional[int] = None,
 ) -> None:

@@ -298,7 +298,7 @@ class GridConfig(BaseModel):
         return cls.model_validate(data)
 
 
-class Downloader(Protocol):
+class DownloaderCallable(Protocol):
     """Callable that downloads a URL to a local path."""
 
     def __call__(self, url: str, local_path: Path) -> None:
@@ -373,6 +373,37 @@ class AereoPlugin(ABC):
 # ---------------------------------------------------------------------------
 # New pipeline base classes (Phase 1)
 # ---------------------------------------------------------------------------
+
+
+class Downloader(AereoPlugin, plugin_abstract=True):
+    """Downloads assets for a task before reading.
+
+    Implementations should store downloaded paths in
+    ``task.task_context["downloaded_assets"]`` as a ``dict[str, Path]``
+    mapping asset IDs to local file paths. The :class:`Reader` can then
+    access them via ``task.task_context["downloaded_assets"]`` without
+    re-downloading.
+
+    Example::
+
+        task.task_context["downloaded_assets"] = {
+            "asset-1": Path("/tmp/data/asset-1.tif"),
+        }
+    """
+
+    @abstractmethod
+    def download(
+        self,
+        task: ExtractionTask,
+        params: Mapping[str, Any],
+    ) -> None:
+        """Download assets for the given task.
+
+        Args:
+            task: The extraction task containing asset URIs.
+            params: Download parameters (e.g. credentials, concurrency).
+        """
+        ...
 
 
 class Reader(AereoPlugin, plugin_abstract=True):
@@ -466,12 +497,30 @@ class PipelineCallback:
         """Called before any processing begins."""
         pass
 
+    def on_download_complete(self, task: ExtractionTask) -> None:
+        """Called after assets have been fetched to local storage.
+
+        In AEREO's stage-based pipeline the download step is typically
+        handled inside :meth:`Reader.read`, so this hook fires
+        immediately after the reader returns.
+        """
+        pass
+
     def on_read_complete(
         self,
         task: ExtractionTask,
         ds: AereoDataset,
     ) -> None:
         """Called after the Reader finishes."""
+        pass
+
+    def on_reproject_complete(
+        self,
+        task: ExtractionTask,
+        cell: GridCell,
+        ds: AereoDataset,
+    ) -> None:
+        """Called after a single grid cell has been reprojected."""
         pass
 
     def on_cell_write_complete(
@@ -489,6 +538,10 @@ class PipelineCallback:
         artifacts_gdf: GeoDataFrame[ArtifactSchema],
     ) -> None:
         """Called after all cells are processed."""
+        pass
+
+    def on_task_failed(self, task: ExtractionTask, error: Exception) -> None:
+        """Called when a task fails at any stage."""
         pass
 
 
@@ -538,7 +591,104 @@ class SearchProvider(AereoPlugin, plugin_abstract=True):
         ...
 
 
-class AereoProfile(BaseModel):
+class _ProfileLoaderMixin:
+    """Mixin providing YAML/JSON loading and name validation for profile classes.
+
+    Both :class:`AereoProfile` and :class:`PipelineProfile` share the same
+    serialization format (a top-level ``profiles`` list), so this mixin
+    eliminates the duplication.
+    """
+
+    @classmethod
+    def from_yaml(cls, path: str | Path) -> list[Self]:
+        """Load profiles from a YAML file.
+
+        The file must contain a top-level ``profiles`` key mapping to a list
+        of profile dictionaries.
+        """
+        yaml = _import_yaml()
+        path = Path(path)
+        data = yaml.safe_load(path.read_text())
+        return cls._from_raw(data)
+
+    @classmethod
+    def from_yaml_string(cls, text: str) -> list[Self]:
+        """Load profiles from a YAML string."""
+        yaml = _import_yaml()
+        data = yaml.safe_load(text)
+        return cls._from_raw(data)
+
+    @classmethod
+    def from_json(cls, path: str | Path) -> list[Self]:
+        """Load profiles from a JSON file."""
+        data = _load_json_file(path)
+        return cls._from_raw(data)
+
+    @classmethod
+    def from_config_dir(
+        cls,
+        directory: str | Path,
+        *,
+        allow_duplicate_names: bool = False,
+    ) -> list[Self]:
+        """Load all ``*.yaml`` / ``*.yml`` / ``*.json`` files in *directory*."""
+        directory = Path(directory)
+        profiles: list[Self] = []
+        for ext in ("*.yaml", "*.yml", "*.json"):
+            for fp in directory.glob(ext):
+                profiles.extend(
+                    cls.from_yaml(fp) if fp.suffix != ".json" else cls.from_json(fp)
+                )
+        cls._validate_names(profiles, allow_duplicate_names=allow_duplicate_names)
+        return profiles
+
+    @classmethod
+    def _from_raw(cls, data: dict[str, Any]) -> list[Self]:
+        """Validate and construct profile instances from a raw dict.
+
+        Args:
+            data: Raw dictionary containing a ``profiles`` key mapping to a
+                list of profile dictionaries.
+
+        Returns:
+            A list of validated profile instances.
+
+        Raises:
+            ValueError: If data is not a dict or lacks a ``profiles`` key.
+        """
+        if not isinstance(data, dict) or "profiles" not in data:
+            raise ValueError("Config must be a dict with a 'profiles' key.")
+        raw_profiles = data["profiles"]
+        adapter = TypeAdapter(list[cls])
+        profiles = adapter.validate_python(raw_profiles)
+        cls._validate_names(profiles)
+        return profiles
+
+    @classmethod
+    def _validate_names(
+        cls,
+        profiles: list[Self],
+        allow_duplicate_names: bool = False,
+    ) -> None:
+        """Check that profile names are unique.
+
+        Args:
+            profiles: List of profiles to validate.
+            allow_duplicate_names: If True, skip the uniqueness check.
+
+        Raises:
+            ValueError: If duplicate names are found.
+        """
+        if allow_duplicate_names:
+            return
+        seen = set()
+        for p in profiles:
+            if p.name in seen:
+                raise ValueError(f"Duplicate profile name: {p.name!r}")
+            seen.add(p.name)
+
+
+class AereoProfile(_ProfileLoaderMixin, BaseModel):
     """Ground-truth configuration for a single search + extraction unit.
 
     Can be constructed in code or loaded from JSON/YAML. The *downloader*
@@ -607,98 +757,8 @@ class AereoProfile(BaseModel):
         obj = self.__class__.model_validate(state)
         object.__setattr__(self, "__dict__", obj.__dict__)
 
-    @classmethod
-    def from_yaml(cls, path: str | Path) -> list[Self]:
-        """Load profiles from a YAML file.
 
-        The file must contain a top-level ``profiles`` key mapping to a list
-        of profile dictionaries.
-        """
-        yaml = _import_yaml()
-        path = Path(path)
-        data = yaml.safe_load(path.read_text())
-        return cls._from_raw(data)
-
-    @classmethod
-    def from_yaml_string(cls, text: str) -> list[Self]:
-        """Load profiles from a YAML string."""
-        yaml = _import_yaml()
-        data = yaml.safe_load(text)
-        return cls._from_raw(data)
-
-    @classmethod
-    def from_json(cls, path: str | Path) -> list[Self]:
-        """Load profiles from a JSON file."""
-        data = _load_json_file(path)
-        return cls._from_raw(data)
-
-    @classmethod
-    def from_config_dir(
-        cls,
-        directory: str | Path,
-        *,
-        allow_duplicate_names: bool = False,
-    ) -> list[Self]:
-        """Load all ``*.yaml`` / ``*.yml`` / ``*.json`` files in *directory*."""
-        directory = Path(directory)
-        profiles: list[Self] = []
-        for ext in ("*.yaml", "*.yml", "*.json"):
-            for fp in directory.glob(ext):
-                profiles.extend(
-                    cls.from_yaml(fp) if fp.suffix != ".json" else cls.from_json(fp)
-                )
-        cls._validate_names(profiles, allow_duplicate_names=allow_duplicate_names)
-        return profiles
-
-    # --- helpers ---
-
-    @classmethod
-    def _from_raw(cls, data: dict[str, Any]) -> list[Self]:
-        """Validate and construct AereoProfile instances from a raw dict.
-
-        Args:
-            data: Raw dictionary containing a ``profiles`` key mapping to a
-                list of profile dictionaries.
-
-        Returns:
-            A list of validated AereoProfile instances.
-
-        Raises:
-            ValueError: If data is not a dict or lacks a ``profiles`` key.
-        """
-        if not isinstance(data, dict) or "profiles" not in data:
-            raise ValueError("Config must be a dict with a 'profiles' key.")
-        raw_profiles = data["profiles"]
-        adapter = TypeAdapter(list[cls])
-        profiles = adapter.validate_python(raw_profiles)
-        cls._validate_names(profiles)
-        return profiles
-
-    @classmethod
-    def _validate_names(
-        cls,
-        profiles: list[Self],
-        allow_duplicate_names: bool = False,
-    ) -> None:
-        """Check that profile names are unique.
-
-        Args:
-            profiles: List of profiles to validate.
-            allow_duplicate_names: If True, skip the uniqueness check.
-
-        Raises:
-            ValueError: If duplicate names are found.
-        """
-        if allow_duplicate_names:
-            return
-        seen = set()
-        for p in profiles:
-            if p.name in seen:
-                raise ValueError(f"Duplicate profile name: {p.name!r}")
-            seen.add(p.name)
-
-
-class PipelineProfile(BaseModel):
+class PipelineProfile(_ProfileLoaderMixin, BaseModel):
     """Declarative pipeline configuration for search + extraction.
 
     One PipelineProfile = one complete DAG configuration. It replaces the
@@ -723,94 +783,6 @@ class PipelineProfile(BaseModel):
     # Processor configuration
     pre_processors: Sequence[str | dict[str, Any]] = Field(default_factory=list)
     post_processors: Sequence[str | dict[str, Any]] = Field(default_factory=list)
-
-    @classmethod
-    def from_yaml(cls, path: str | Path) -> list[Self]:
-        """Load profiles from a YAML file.
-
-        The file must contain a top-level ``profiles`` key mapping to a list
-        of profile dictionaries.
-        """
-        yaml = _import_yaml()
-        path = Path(path)
-        data = yaml.safe_load(path.read_text())
-        return cls._from_raw(data)
-
-    @classmethod
-    def from_yaml_string(cls, text: str) -> list[Self]:
-        """Load profiles from a YAML string."""
-        yaml = _import_yaml()
-        data = yaml.safe_load(text)
-        return cls._from_raw(data)
-
-    @classmethod
-    def from_json(cls, path: str | Path) -> list[Self]:
-        """Load profiles from a JSON file."""
-        data = _load_json_file(path)
-        return cls._from_raw(data)
-
-    @classmethod
-    def from_config_dir(
-        cls,
-        directory: str | Path,
-        *,
-        allow_duplicate_names: bool = False,
-    ) -> list[Self]:
-        """Load all ``*.yaml`` / ``*.yml`` / ``*.json`` files in *directory*."""
-        directory = Path(directory)
-        profiles: list[Self] = []
-        for ext in ("*.yaml", "*.yml", "*.json"):
-            for fp in directory.glob(ext):
-                profiles.extend(
-                    cls.from_yaml(fp) if fp.suffix != ".json" else cls.from_json(fp)
-                )
-        cls._validate_names(profiles, allow_duplicate_names=allow_duplicate_names)
-        return profiles
-
-    @classmethod
-    def _from_raw(cls, data: dict[str, Any]) -> list[Self]:
-        """Validate and construct PipelineProfile instances from a raw dict.
-
-        Args:
-            data: Raw dictionary containing a ``profiles`` key mapping to a
-                list of profile dictionaries.
-
-        Returns:
-            A list of validated PipelineProfile instances.
-
-        Raises:
-            ValueError: If data is not a dict or lacks a ``profiles`` key.
-        """
-        if not isinstance(data, dict) or "profiles" not in data:
-            raise ValueError("Config must be a dict with a 'profiles' key.")
-        raw_profiles = data["profiles"]
-        adapter = TypeAdapter(list[cls])
-        profiles = adapter.validate_python(raw_profiles)
-        cls._validate_names(profiles)
-        return profiles
-
-    @classmethod
-    def _validate_names(
-        cls,
-        profiles: list[Self],
-        allow_duplicate_names: bool = False,
-    ) -> None:
-        """Check that profile names are unique.
-
-        Args:
-            profiles: List of profiles to validate.
-            allow_duplicate_names: If True, skip the uniqueness check.
-
-        Raises:
-            ValueError: If duplicate names are found.
-        """
-        if allow_duplicate_names:
-            return
-        seen = set()
-        for p in profiles:
-            if p.name in seen:
-                raise ValueError(f"Duplicate profile name: {p.name!r}")
-            seen.add(p.name)
 
 
 # Backward-compat alias — will be removed in a later task.
@@ -1038,156 +1010,217 @@ class Extractor(AereoPlugin, plugin_abstract=True):
             raise ValueError(
                 "GridConfig.target_grid_dist must be an explicit integer (e.g. 50_000)."
             )
-        grid_overlap = grid_config.target_grid_overlap
-        target_grid_margin = grid_config.target_grid_margin
-        grid_filter_mode = grid_config.grid_filter_mode
-        min_coverage = grid_config.min_coverage
 
-        import geopandas as gpd
         from aereo.grid import GridDefinition
 
-        grid_def = GridDefinition(d=grid_dist, overlap=grid_overlap)
+        grid_def = GridDefinition(d=grid_dist, overlap=grid_config.target_grid_overlap)
 
-        tasks = []
-
-        # 1. Iterate over each profile
+        tasks: list[ExtractionTask] = []
         for profile in profiles:
-            resolution = int(profile.resolution)
-            padding = profile.padding or 0
+            profile_tasks = self._prepare_profile_tasks(
+                search_results=search_results,
+                profile=profile,
+                grid_def=grid_def,
+                grid_config=grid_config,
+                target_aoi=target_aoi,
+                uri=uri,
+                cells_per_task=cells_per_task,
+                extractor_hint=extractor_hint,
+                init_params=init_params,
+            )
+            tasks.extend(profile_tasks)
 
-            # Filter assets by profile collections if specified
-            if profile.collections:
-                profile_assets = search_results[
-                    search_results["collection"].isin(list(profile.collections.keys()))
-                ].copy()
-            else:
-                profile_assets = search_results.copy()
+        return tasks
 
-            if profile_assets.empty:
+    def _prepare_profile_tasks(
+        self,
+        search_results: GeoDataFrame[AssetSchema],
+        profile: AereoProfile,
+        grid_def: Any,
+        grid_config: GridConfig,
+        target_aoi: BaseGeometry | None,
+        uri: str,
+        cells_per_task: int,
+        extractor_hint: str | None,
+        init_params: Mapping[str, Any] | None,
+    ) -> list[ExtractionTask]:
+        """Prepare tasks for a single profile."""
+        import geopandas as gpd
+
+        profile_assets = self._filter_assets_by_profile(search_results, profile)
+        if profile_assets.empty:
+            return []
+
+        cell_groups = self._generate_cell_groups(
+            profile_assets=profile_assets,
+            target_aoi=target_aoi,
+            grid_def=grid_def,
+            grid_config=grid_config,
+        )
+        if not cell_groups:
+            return []
+
+        area_def_cache, wgs84_geom_cache = self._cache_cell_geometries(
+            cell_groups=cell_groups,
+            profile=profile,
+            grid_config=grid_config,
+        )
+
+        tasks: list[ExtractionTask] = []
+        for start_time, time_group, all_cells in cell_groups:
+            cell_chunks = [
+                all_cells[i : i + cells_per_task]
+                for i in range(0, len(all_cells), cells_per_task)
+            ]
+
+            for chunk_idx, cells in enumerate(cell_chunks):
+                cell_geoms = [wgs84_geom_cache[cell] for cell in cells]
+                cells_union = _union_all(gpd.GeoSeries(cell_geoms))
+
+                intersecting_mask = (
+                    time_group.intersects(cells_union) | time_group.geometry.isna()
+                )
+                chunk_assets = cast(
+                    GeoDataFrame[AssetSchema],
+                    time_group[intersecting_mask].copy(),
+                )
+
+                task_context: dict[str, Any] = {
+                    "chunk_id": chunk_idx,
+                    "total_chunks": len(cell_chunks),
+                    "start_time": str(start_time),
+                    "extractor_hint": extractor_hint,
+                    "init_params": dict(init_params) if init_params else {},
+                }
+
+                task = ExtractionTask(
+                    assets=chunk_assets,
+                    profile=profile,
+                    uri=uri,
+                    grid_cells=cells,
+                    grid_config=grid_config,
+                    aoi=target_aoi,
+                    task_context=task_context,
+                )
+                tasks.append(task)
+
+        return tasks
+
+    @staticmethod
+    def _filter_assets_by_profile(
+        search_results: GeoDataFrame[AssetSchema],
+        profile: AereoProfile,
+    ) -> GeoDataFrame[AssetSchema]:
+        """Filter search results to assets matching *profile.collections*."""
+        if profile.collections:
+            filtered = search_results[
+                search_results["collection"].isin(list(profile.collections.keys()))
+            ].copy()
+        else:
+            filtered = search_results.copy()
+        return cast(GeoDataFrame[AssetSchema], filtered)
+
+    @staticmethod
+    def _generate_cell_groups(
+        profile_assets: GeoDataFrame[AssetSchema],
+        target_aoi: BaseGeometry | None,
+        grid_def: Any,
+        grid_config: GridConfig,
+    ) -> list[tuple[Any, GeoDataFrame, list[GridCell]]]:
+        """Group assets by start_time and generate/filter grid cells."""
+        profile_cell_groups: list[tuple[Any, GeoDataFrame, list[GridCell]]] = []
+        grid_filter_mode = str(grid_config.grid_filter_mode).lower()
+        min_coverage = grid_config.min_coverage
+
+        for start_time, time_group in profile_assets.groupby("start_time"):
+            group_geom = _union_all(time_group.geometry)
+            if _skip_empty(group_geom):
                 continue
 
-            # First pass: collect all cells across time groups for this profile
-            profile_cell_groups: list[tuple[Any, GeoDataFrame, list[GridCell]]] = []
+            aoi_geom = (
+                target_aoi.intersection(group_geom)
+                if target_aoi is not None
+                else group_geom
+            )
+            if _skip_empty(aoi_geom):
+                continue
 
-            # 2. Group by exact start_time
-            for start_time, time_group in profile_assets.groupby("start_time"):
-                # 3. Determine base geometry union of the group
-                group_geom = _union_all(time_group.geometry)
+            all_cells = list(grid_def.generate_grid_cells(aoi_geom))
+            if not all_cells:
+                continue
 
-                if _skip_empty(group_geom):
-                    continue
-
-                # 4. Intersect with target_aoi if provided
-                if target_aoi is not None:
-                    aoi_geom = target_aoi.intersection(group_geom)
-                else:
-                    aoi_geom = group_geom
-
-                if _skip_empty(aoi_geom):
-                    continue
-
-                # 5. Generate grid cells specifically for the intersected geometry
-                all_cells = list(grid_def.generate_grid_cells(aoi_geom))
+            if grid_filter_mode != "intersection":
+                all_cells = Extractor._filter_cells_by_mode(
+                    all_cells, aoi_geom, grid_filter_mode, min_coverage
+                )
                 if not all_cells:
                     continue
 
-                # 5b. Optional grid cell filtering by asset coverage
-                _grid_filter_mode = str(grid_filter_mode).lower()
-                if _grid_filter_mode != "intersection":
-                    filtered_cells = []
-                    for cell in all_cells:
-                        cell_geom = cell.geom
-                        if _grid_filter_mode == "within":
-                            if aoi_geom.contains(cell_geom):
-                                filtered_cells.append(cell)
-                        elif _grid_filter_mode == "coverage":
-                            intersection = cell_geom.intersection(aoi_geom)
-                            coverage = (
-                                intersection.area / cell_geom.area
-                                if cell_geom.area > 0
-                                else 0.0
-                            )
-                            if coverage >= min_coverage:
-                                filtered_cells.append(cell)
-                        else:
-                            raise ValueError(
-                                f"Unknown grid_filter_mode: {_grid_filter_mode}. "
-                                f"Use 'intersection', 'within', or 'coverage'."
-                            )
-                    all_cells = filtered_cells
-                    if not all_cells:
-                        continue
+            profile_cell_groups.append(
+                (start_time, cast(GeoDataFrame, time_group), all_cells)
+            )
 
-                profile_cell_groups.append(
-                    (start_time, cast(GeoDataFrame, time_group), all_cells)
+        return profile_cell_groups
+
+    @staticmethod
+    def _filter_cells_by_mode(
+        cells: list[GridCell],
+        aoi_geom: BaseGeometry,
+        mode: str,
+        min_coverage: float,
+    ) -> list[GridCell]:
+        """Filter cells by coverage mode ('within' or 'coverage')."""
+        filtered: list[GridCell] = []
+        for cell in cells:
+            cell_geom = cell.geom
+            if mode == "within":
+                if aoi_geom.contains(cell_geom):
+                    filtered.append(cell)
+            elif mode == "coverage":
+                intersection = cell_geom.intersection(aoi_geom)
+                coverage = (
+                    intersection.area / cell_geom.area if cell_geom.area > 0 else 0.0
                 )
+                if coverage >= min_coverage:
+                    filtered.append(cell)
+            else:
+                raise ValueError(
+                    f"Unknown grid_filter_mode: {mode}. "
+                    f"Use 'intersection', 'within', or 'coverage'."
+                )
+        return filtered
 
-            if not profile_cell_groups:
-                continue
+    @staticmethod
+    def _cache_cell_geometries(
+        cell_groups: list[tuple[Any, GeoDataFrame, list[GridCell]]],
+        profile: AereoProfile,
+        grid_config: GridConfig,
+    ) -> tuple[dict[GridCell, Any], dict[GridCell, BaseGeometry]]:
+        """Pre-compute area_def and WGS84 geometries for all cells.
 
-            # Compute common shape if conforming is enabled for this profile
-            conform_to_shape: tuple[int, int] | None = None
-            if profile.conform_to is not None:
-                conform_to_shape = profile.conform_to
+        Returns:
+            Tuple of (area_def_cache, wgs84_geom_cache).
+        """
+        resolution = int(profile.resolution)
+        padding = profile.padding or 0
+        conform_to_shape = profile.conform_to
+        target_grid_margin = grid_config.target_grid_margin
 
-            # Pre-warm and cache area_def results for all cells to avoid
-            # redundant computation in the second pass.
-            area_def_cache: dict[GridCell, Any] = {}
-            for _, _, cells in profile_cell_groups:
-                for cell in cells:
-                    area_def_cache[cell] = cell.area_def(
-                        resolution,
-                        padding,
-                        margin=target_grid_margin,
-                        conform_to=conform_to_shape,
-                    )
+        area_def_cache: dict[GridCell, Any] = {}
+        wgs84_geom_cache: dict[GridCell, BaseGeometry] = {}
 
-            # Second pass: chunk cells and create tasks
-            for start_time, time_group, all_cells in profile_cell_groups:
-                # 6. Chunk cells and create tasks
-                cell_chunks = [
-                    all_cells[i : i + cells_per_task]
-                    for i in range(0, len(all_cells), cells_per_task)
-                ]
+        for _, _, cells in cell_groups:
+            for cell in cells:
+                geobox = cell.area_def(
+                    resolution,
+                    padding,
+                    margin=target_grid_margin,
+                    conform_to=conform_to_shape,
+                )
+                area_def_cache[cell] = geobox
+                wgs84_geom_cache[cell] = geobox.extent.to_crs(WGS84_CRS).geom
 
-                for chunk_idx, cells in enumerate(cell_chunks):
-                    # Filter assets to only those that spatially intersect these grid cells' footprints,
-                    # accounting for resolution, padding, and margin.
-                    cell_geoms = []
-                    for cell in cells:
-                        geobox = area_def_cache[cell]
-                        cell_geoms.append(geobox.extent.to_crs(WGS84_CRS).geom)
-
-                    cells_union = _union_all(gpd.GeoSeries(cell_geoms))
-
-                    intersecting_mask = (
-                        time_group.intersects(cells_union) | time_group.geometry.isna()
-                    )
-                    chunk_assets = cast(
-                        GeoDataFrame[AssetSchema],
-                        time_group[intersecting_mask].copy(),
-                    )
-
-                    task_context: dict[str, Any] = {
-                        "chunk_id": chunk_idx,
-                        "total_chunks": len(cell_chunks),
-                        "start_time": str(start_time),
-                        "extractor_hint": extractor_hint,
-                        "init_params": dict(init_params) if init_params else {},
-                    }
-
-                    task = ExtractionTask(
-                        assets=chunk_assets,
-                        profile=profile,
-                        uri=uri,
-                        grid_cells=cells,
-                        grid_config=grid_config,
-                        aoi=target_aoi,
-                        task_context=task_context,
-                    )
-                    tasks.append(task)
-
-        return tasks
+        return area_def_cache, wgs84_geom_cache
 
     @abstractmethod
     def extract(
