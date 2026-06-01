@@ -1,0 +1,97 @@
+# pipeline.yaml
+# Declarative pipeline profiles for the AEREO Hamilton dataflow engine.
+#
+# Each profile defines a complete search → prepare → extract configuration.
+# Load via PipelineProfile.from_yaml() or PipelineProfile.from_config_dir().
+
+profiles:
+  # ---------------------------------------------------------------------------
+  # Sentinel-2 — parallel NDVI + NDWI computation
+  # ---------------------------------------------------------------------------
+  - name: s2_ndvi_ndwi
+    resolution: 100
+    collections:
+      sentinel-2-l2a:
+        - B04   # red
+        - B08   # NIR
+        - B11   # SWIR
+    plugin_hints:
+      search: planetary_computer
+      read: odc_stac
+    search_params:
+      cloud_cover: 20
+    pre_processors:
+      - select_bands:
+          bands: [B04, B08, B11]
+    post_processors:
+      - parallel:
+          - compute_ndvi
+          - compute_ndwi
+      - normalize:
+          method: minmax
+
+  # ---------------------------------------------------------------------------
+  # GOES-19 ABI — single-channel quicklook
+  # ---------------------------------------------------------------------------
+  - name: goes19_c02
+    resolution: 1000
+    collections:
+      ABI-L1b-RadF:
+        - C02
+    plugin_hints:
+      search: aws_goes
+      read: satpy
+    search_params:
+      satellite: GOES-19
+      channels: [C02]
+
+  # ---------------------------------------------------------------------------
+  # NASA VIIRS — EarthAccess search, Satpy read
+  # ---------------------------------------------------------------------------
+  - name: viirs_rgb
+    resolution: 375
+    collections:
+      VJ202IMG:
+        - I01
+        - I02
+        - I03
+    plugin_hints:
+      search: earthaccess
+      read: satpy
+    read_params:
+      reader: viirs_l1b
+      calibration: reflectance
+    pre_processors:
+      - select_bands:
+          bands: [I01, I02, I03]
+
+  # ---------------------------------------------------------------------------
+  # Sentinel-3 OLCI — EarthAccess search, Satpy read
+  # ---------------------------------------------------------------------------
+  - name: olci_o01
+    resolution: 300
+    collections:
+      S3A_OL_1_EFR:
+        - Oa01
+    plugin_hints:
+      search: earthaccess
+      read: satpy
+    read_params:
+      reader: olci_l1b
+      calibration: radiance
+
+  # ---------------------------------------------------------------------------
+  # GeoTessera — local tile extraction
+  # ---------------------------------------------------------------------------
+  - name: geotessera_rgb
+    resolution: 10
+    collections:
+      geotessera:
+        - "0"
+        - "1"
+        - "2"
+    plugin_hints:
+      search: tessera
+      read: tessera
+    download_params:
+      max_download_workers: 4
