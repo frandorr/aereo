@@ -80,7 +80,7 @@ class AereoClient:
     def __init__(
         self,
         registry: Any | None = None,
-        profiles: Sequence[AereoProfile] | None = None,
+        profiles: Sequence[AereoProfile | PipelineProfile] | None = None,
         grid_config: GridConfig | None = None,
         aoi: BaseGeometry | dict | None = None,
         backend: Any | None = None,
@@ -179,7 +179,7 @@ class AereoClient:
 
     def search(
         self,
-        profiles: Sequence[AereoProfile] | None = None,
+        profiles: Sequence[AereoProfile | PipelineProfile] | None = None,
         intersects: BaseGeometry | dict | None = None,
         start_datetime: datetime | None = None,
         end_datetime: datetime | None = None,
@@ -284,7 +284,7 @@ class AereoClient:
         target_aoi: BaseGeometry | dict | None = None,
         resolution: float | None = None,
         uri: str | None = None,
-        profiles: Sequence[AereoProfile] | None = None,
+        profiles: Sequence[AereoProfile | PipelineProfile] | None = None,
         cells_per_task: int | None = None,
         init_params: Mapping[str, Any] | None = None,
     ) -> Sequence[ExtractionTask]:
