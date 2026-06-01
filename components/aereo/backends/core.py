@@ -8,7 +8,11 @@ from __future__ import annotations
 
 from typing import Any, Literal, Mapping, Sequence, cast
 
+import geopandas as gpd
+import pandas as pd
+
 from aereo.interfaces import (
+    Downloader,
     ExtractionTask,
     PipelineCallback,
     Processor,
@@ -29,7 +33,8 @@ class TaskRunner:
     """Orchestrates the refactored extraction pipeline for a single task.
 
     Execution order:
-        read -> pre-process -> reproject (per cell) -> post-process (per cell) -> write (per cell)
+        download (optional) -> read -> pre-process -> reproject (per cell)
+        -> post-process (per cell) -> write (per cell)
 
     Resolution follows a three-tier priority for each stage:
         1. ``task.task_context["{stage}_hint"]``
@@ -60,6 +65,11 @@ class TaskRunner:
         self.callbacks = list(callbacks or [])
         self.per_cell_failure_mode = per_cell_failure_mode
 
+    def _fire_callbacks(self, event: str, *args: Any) -> None:
+        """Fire a lifecycle event across all registered callbacks."""
+        for cb in self.callbacks:
+            getattr(cb, event)(*args)
+
     def run(self, task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
         """Execute the full pipeline for *task*.
 
@@ -86,6 +96,10 @@ class TaskRunner:
         post = [p for p in processors if p.stage == "post_reproject"]
 
         # Build effective params for each stage
+        download_params = merge_params(
+            getattr(task.profile, "extract_params", {}),
+            getattr(task.profile, "download_params", {}),
+        )
         read_params = merge_params(
             task.profile.extract_params, task.profile.read_params
         )
@@ -96,67 +110,91 @@ class TaskRunner:
             task.profile.extract_params, task.profile.write_params
         )
 
-        # Lifecycle: task start
-        for cb in self.callbacks:
-            cb.on_task_start(task)
+        self._fire_callbacks("on_task_start", task)
 
-        # Stage 1: Read
-        ds = reader.read(task, read_params)
-        for cb in self.callbacks:
-            cb.on_read_complete(task, ds)
+        try:
+            # Stage 0: Download (optional)
+            downloader = self._resolve_downloader(task, task_init)
+            if downloader is not None:
+                downloader.download(task, download_params)
+                self._fire_callbacks("on_download_complete", task)
 
-        # Stage 2: Pre-reproject processing (once, outside cell loop)
-        for proc in pre:
-            ds = proc.process(ds, process_params)
+            # Stage 1: Read
+            ds = reader.read(task, read_params)
+            if downloader is None:
+                self._fire_callbacks("on_download_complete", task)
+            self._fire_callbacks("on_read_complete", task, ds)
 
-        # Stage 3-5: Per-cell loop
-        artifacts: list[GeoDataFrame[ArtifactSchema]] = []
-        for cell in task.grid_cells:
-            try:
-                geobox = cell.area_def(
-                    resolution=int(task.profile.resolution),
-                    padding=task.profile.padding or 0,
-                    margin=task.grid_config.target_grid_margin,
-                    conform_to=task.profile.conform_to,
+            # Stage 2: Pre-reproject processing (once, outside cell loop)
+            for proc in pre:
+                ds = proc.process(ds, process_params)
+
+            # Stage 3-5: Per-cell loop
+            artifacts: list[GeoDataFrame[ArtifactSchema]] = []
+            for cell in task.grid_cells:
+                try:
+                    geobox = cell.area_def(
+                        resolution=int(task.profile.resolution),
+                        padding=task.profile.padding or 0,
+                        margin=task.grid_config.target_grid_margin,
+                        conform_to=task.profile.conform_to,
+                    )
+                    ds_cell = reprojector.reproject(ds, geobox, read_params)
+                    self._fire_callbacks("on_reproject_complete", task, cell, ds_cell)
+
+                    for proc in post:
+                        ds_cell = proc.process(ds_cell, process_params)
+
+                    cell_artifacts = writer.write(ds_cell, task, cell, write_params)
+                    artifacts.append(cell_artifacts)
+
+                    self._fire_callbacks(
+                        "on_cell_write_complete", task, cell, cell_artifacts
+                    )
+                except Exception as exc:
+                    if self.per_cell_failure_mode == "strict":
+                        raise
+                    self._fire_callbacks("on_task_failed", task, exc)
+                    logger.warning(
+                        "Cell %s failed, skipping: %s", cell.id(), exc, exc_info=True
+                    )
+
+            if artifacts:
+                artifacts_gdf = gpd.GeoDataFrame(
+                    pd.concat(artifacts, ignore_index=True),
+                    geometry="geometry",
                 )
-                ds_cell = reprojector.reproject(ds, geobox, read_params)
-
-                for proc in post:
-                    ds_cell = proc.process(ds_cell, process_params)
-
-                cell_artifacts = writer.write(ds_cell, task, cell, write_params)
-                artifacts.append(cell_artifacts)
-
-                for cb in self.callbacks:
-                    cb.on_cell_write_complete(task, cell, cell_artifacts)
-            except Exception as exc:
-                if self.per_cell_failure_mode == "strict":
-                    raise
-                logger.warning(
-                    "Cell %s failed, skipping: %s", cell.id(), exc, exc_info=True
+            else:
+                artifacts_gdf = gpd.GeoDataFrame(
+                    columns=list(ArtifactSchema.to_schema().columns.keys()),
+                    geometry="geometry",
                 )
 
-        import geopandas as gpd
+            artifacts_gdf = cast(GeoDataFrame[ArtifactSchema], artifacts_gdf)
+            self._fire_callbacks("on_task_complete", task, artifacts_gdf)
 
-        if artifacts:
-            artifacts_gdf = gpd.GeoDataFrame(
-                gpd.pd.concat(artifacts, ignore_index=True),
-                geometry="geometry",
-            )
-        else:
-            artifacts_gdf = gpd.GeoDataFrame(
-                columns=list(ArtifactSchema.to_schema().columns.keys()),
-                geometry="geometry",
-            )
+            return artifacts_gdf
 
-        # Lifecycle: task complete
-        artifacts_gdf = cast(GeoDataFrame[ArtifactSchema], artifacts_gdf)
-        for cb in self.callbacks:
-            cb.on_task_complete(task, artifacts_gdf)
-
-        return artifacts_gdf
+        except Exception as exc:
+            self._fire_callbacks("on_task_failed", task, exc)
+            raise
 
     # --- Resolution helpers ---
+
+    def _resolve_downloader(
+        self, task: ExtractionTask, init: dict[str, Any]
+    ) -> Downloader | None:
+        """Resolve an optional downloader plugin.
+
+        Returns ``None`` when no downloader is configured, allowing the
+        reader to handle its own downloads.
+        """
+        try:
+            return self._resolve_stage(
+                task, init, stage="download", type_label="downloader"
+            )
+        except ValueError:
+            return None
 
     def _resolve_reader(self, task: ExtractionTask, init: dict[str, Any]) -> Reader:
         return self._resolve_stage(

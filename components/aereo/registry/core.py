@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Sequence, Tuple, Type
 
 # Importing the contracts we defined earlier
 from aereo.interfaces import (
+    Downloader,
     Extractor,
     Processor,
     Reader,
@@ -13,6 +14,22 @@ from aereo.interfaces import (
 from structlog import get_logger
 
 logger = get_logger()
+
+
+def _dump_params(params: Sequence[Any], detailed: bool) -> list[dict]:
+    """Serialize PluginParam instances to JSON-safe dicts.
+
+    Args:
+        params: Sequence of PluginParam objects.
+        detailed: When ``True``, each param includes all attributes.
+            When ``False``, only ``name`` and ``default`` are returned.
+
+    Returns:
+        List of JSON-serializable dicts representing PluginParam.
+    """
+    if detailed:
+        return [p.model_dump() for p in params]
+    return [{"name": p.name, "default": p.default} for p in params]
 
 
 class _TypedRegistry:
@@ -157,6 +174,7 @@ class AereoRegistry:
     # prefix -> (type_label, base_class)
     PLUGIN_TYPES: Dict[str, Tuple[str, Type]] = {
         "search_": ("searcher", SearchProvider),
+        "download_": ("downloader", Downloader),
         "read_": ("reader", Reader),
         "reproject_": ("reprojector", Reprojector),
         "process_": ("processor", Processor),
@@ -391,14 +409,9 @@ class AereoRegistry:
         if cls is None:
             raise KeyError(f"Unknown plugin: {plugin_name}")
 
-        def _dump(params: Sequence[Any]) -> list[dict]:
-            if detailed:
-                return [p.model_dump() for p in params]
-            return [{"name": p.name, "default": p.default} for p in params]
-
         return {
-            "required": _dump(cls.required_params),
-            "optional": _dump(cls.optional_params),
+            "required": _dump_params(cls.required_params, detailed),
+            "optional": _dump_params(cls.optional_params, detailed),
         }
 
     def list_all_params(self, *, detailed: bool = True) -> dict[str, dict]:
@@ -415,17 +428,12 @@ class AereoRegistry:
             representing a PluginParam.
         """
 
-        def _dump(params: Sequence[Any]) -> list[dict]:
-            if detailed:
-                return [p.model_dump() for p in params]
-            return [{"name": p.name, "default": p.default} for p in params]
-
         result: dict[str, dict] = {}
         for label, registry in self._registries.items():
             for name, cls in registry.plugins.items():
                 result[name] = {
                     "type": label,
-                    "required": _dump(cls.required_params),
-                    "optional": _dump(cls.optional_params),
+                    "required": _dump_params(cls.required_params, detailed),
+                    "optional": _dump_params(cls.optional_params, detailed),
                 }
         return result
