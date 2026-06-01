@@ -124,6 +124,8 @@ def test_driver_resolve_plugin_by_collection() -> None:
 def test_driver_resolve_plugin_by_wildcard() -> None:
     """Wildcard fallback when collection is unknown."""
     driver = AereoDriver()
+    # Clear any real discovered plugins so the mock is the only wildcard.
+    driver._search_plugins = StagePlugins()
     wildcard_mod = MagicMock(spec=ModuleType)
     wildcard_mod.supported_collections = ("*",)
     driver._search_plugins.register("generic", wildcard_mod)

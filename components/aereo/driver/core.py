@@ -75,12 +75,19 @@ class AereoDriver:
         mod = self._resolve_plugin("search", profile)
         dr = driver.Builder().with_modules(mod).build()
 
+        search_params = dict(profile.search_params)
         inputs: dict[str, Any] = {
             "aoi": aoi,
             "start_datetime": start_datetime,
             "end_datetime": end_datetime,
-            **dict(profile.search_params),
+            "collections": list(profile.collections.keys()) or None,
+            "search_params": search_params,
         }
+        # Spread individual search params for backward compatibility with
+        # plugins that expect direct parameter mapping.
+        for key, value in search_params.items():
+            if key not in inputs:
+                inputs[key] = value
         result = dr.execute(["search_results"], inputs=inputs)
         return result["search_results"]
 
