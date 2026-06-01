@@ -40,6 +40,7 @@ dependencies = [
   "pandera[geopandas]>=0.24",
   "pyproj>=3.7.1",
   "rich>=13",
+  "sf-hamilton>=1",
   "shapely>=2.1.2",
   "structlog>=25.5",
   "typer>=0.12",
