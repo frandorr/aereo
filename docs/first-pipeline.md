@@ -7,7 +7,7 @@ redirect_from: quickstart.md
 
 Get from zero to your first extracted satellite image in under 5 minutes.
 
-AEREO's entire user experience is built around three `AereoClient` methods: `search()`, `prepare_for_extraction()`, and `execute_tasks()`. This tutorial walks you through each one with a single sensor. For the full parameter reference and advanced patterns, see [Pipeline Options](pipeline-options.md).
+AEREO's entire user experience is built around three `AereoClient` methods: `search()`, `prepare_for_extraction()`, and `execute_tasks()`. Under the hood, each stage is orchestrated by an [Apache Hamilton](https://github.com/dagworks-inc/hamilton) DAG built from plain Python functions discovered via stage-specific entry points. This tutorial walks you through each method with a single sensor. For the full parameter reference and advanced patterns, see [Pipeline Options](pipeline-options.md).
 
 ## 1. Install
 
@@ -19,20 +19,23 @@ pip install aereo aereo-search-aws-goes aereo-extract-satpy
 
 ## 2. Define a profile
 
-An `AereoProfile` describes *what* you want to extract, *from which sensor*, and *how*.
+A `PipelineProfile` describes *what* you want to extract, *from which sensor*, and *how*. It replaces the legacy `AereoProfile` and adds support for declarative processor configuration.
 
 ```python
-from aereo.interfaces import AereoProfile
+from aereo.interfaces import PipelineProfile
 
-profile = AereoProfile(
+profile = PipelineProfile(
     name="goes_c02",
     resolution=1000,
     collections={"ABI-L1b-RadF": ["C02"]},
-    plugin_hints={"search": "search_aws_goes", "extract": "extract_satpy"},
+    plugin_hints={"search": "aws_goes", "read": "satpy"},
     search_params={"satellite": "GOES-19"},
-    extract_params={"reader": "abi_l1b", "calibration": "reflectance"},
+    read_params={"reader": "abi_l1b", "calibration": "reflectance"},
 )
 ```
+
+> [!NOTE]
+> Plugin hints now use **stage-specific** names. `"aws_goes"` resolves to the `aereo.search` entry point, and `"satpy"` resolves to the `aereo.read` entry point. The legacy unified `aereo.plugins` group is still supported for backward compatibility.
 
 ## 3. Search
 
@@ -79,7 +82,7 @@ print(f"Prepared {len(tasks)} extraction tasks")
 
 ## 5. Extract
 
-Run the extraction. Each task is handed to the extractor plugin, which downloads granules, resamples to the target grid, and writes GeoTIFFs.
+Run the extraction. Each task is handed to the Hamilton extract driver, which wires together download, read, reproject, processor, and write nodes into a DAG and executes them.
 
 ```python
 from aereo.backends import LocalProcessBackend
@@ -101,3 +104,4 @@ Open your output directory (`./out/`) and look for `.tif` files. You now have an
 - Understand grid options in [Working with Grids](grids.md)
 - Prefer the command line? See the [CLI Recipes](cli-recipes.md)
 - Learn advanced pipeline options in [Pipeline Options](pipeline-options.md)
+- Build your own plugin in [Build Your First Plugin](build-first-plugin.md)
