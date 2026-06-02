@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import geopandas as gpd
+    from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
 _BASE_ZORDER = 0
@@ -53,6 +54,27 @@ def _add_base_layer(ax, tiles: bool, zoom: int) -> None:
         )
 
 
+def _set_extent_with_buffer(ax, bounds: list[float], buffer: float) -> None:
+    """Set axes extent from bounds ``[minx, miny, maxx, maxy]`` plus a buffer.
+
+    Args:
+        ax: Matplotlib axes with a cartopy projection.
+        bounds: Total-bounds array ``[minx, miny, maxx, maxy]``.
+        buffer: Padding in CRS units added to each side.
+    """
+    import cartopy.crs as ccrs
+
+    ax.set_extent(  # type: ignore[reportAttributeAccessIssue]
+        [
+            bounds[0] - buffer,
+            bounds[2] + buffer,
+            bounds[1] - buffer,
+            bounds[3] + buffer,
+        ],
+        crs=ccrs.PlateCarree(),
+    )
+
+
 def _build_legend_patches(
     assets: gpd.GeoDataFrame | None,
     asset_label: str,
@@ -70,7 +92,7 @@ def _build_legend_patches(
     """
     import matplotlib.patches as mpatches
 
-    handles = []
+    handles: list = []
     if assets is not None and not assets.empty:
         asset_patch = mpatches.Patch(
             facecolor="none", edgecolor="blue", linewidth=1.5, label=asset_label
@@ -82,6 +104,77 @@ def _build_legend_patches(
     )
     handles.append(aoi_patch)
     return handles
+
+
+def _plot_temporal_heatmap(
+    ax_temporal: Axes,
+    search_results: gpd.GeoDataFrame,
+    group_by: str,
+    temporal_bins: str,
+) -> None:
+    """Render the acquisition-density heatmap on *ax_temporal*.
+
+    Falls back to a centred "No temporal data" message when the input is
+    missing required columns or contains no rows.
+
+    Args:
+        ax_temporal: Matplotlib axes for the right-hand panel.
+        search_results: GeoDataFrame of search assets.
+        group_by: Column name to group time bins by.
+        temporal_bins: Pandas frequency string (e.g. ``"1D"``).
+    """
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    has_time = (
+        "start_time" in search_results.columns
+        and group_by in search_results.columns
+        and not search_results.empty
+    )
+    if not has_time:
+        _show_no_temporal_text(ax_temporal)
+        return
+
+    df = search_results.copy()
+    df["time_bin"] = pd.to_datetime(df["start_time"]).dt.floor(temporal_bins)
+    heatmap_data = df.groupby([group_by, "time_bin"]).size().unstack(fill_value=0)
+
+    if heatmap_data.empty:
+        _show_no_temporal_text(ax_temporal)
+        return
+
+    im = ax_temporal.imshow(
+        heatmap_data.to_numpy(),
+        aspect="auto",
+        cmap="YlOrRd",
+    )
+    ax_temporal.set_xticks(range(len(heatmap_data.columns)))
+    ax_temporal.set_xticklabels(
+        [str(c) for c in heatmap_data.columns], rotation=45, ha="right"
+    )
+    ax_temporal.set_yticks(range(len(heatmap_data.index)))
+    ax_temporal.set_yticklabels([str(i) for i in heatmap_data.index])
+    ax_temporal.set_title("Acquisition Density")
+    ax_temporal.set_xlabel("Time bin")
+    ax_temporal.set_ylabel(group_by)
+    plt.colorbar(im, ax=ax_temporal, label="Asset count")
+
+
+def _show_no_temporal_text(ax: Axes) -> None:
+    """Draw a centred "No temporal data" message and set the panel title.
+
+    Args:
+        ax: Matplotlib axes to annotate.
+    """
+    ax.text(
+        0.5,
+        0.5,
+        "No temporal data",
+        ha="center",
+        va="center",
+        transform=ax.transAxes,
+    )
+    ax.set_title("Acquisition Density")
 
 
 def plot_aoi(
@@ -115,13 +208,13 @@ def plot_aoi(
             ``False`` to avoid HTTP 429 rate-limit errors.
         zoom: OSM tile zoom level when ``tiles=True``.
 
-    Returns:
-        None. Displays the plot via ``plt.show()``.
+    Side Effects:
+        Displays the plot via ``plt.show()``.
     """
     import cartopy.crs as ccrs
     import matplotlib.pyplot as plt
 
-    fig, ax = plt.subplots(
+    _, ax = plt.subplots(
         figsize=(width, height), subplot_kw={"projection": ccrs.PlateCarree()}
     )
 
@@ -137,16 +230,7 @@ def plot_aoi(
     handles = _build_legend_patches(assets, asset_label, label)
 
     # Set extent with a small buffer around the AOI
-    bounds = gdf.total_bounds
-    ax.set_extent(  # type: ignore[reportAttributeAccessIssue]
-        [
-            bounds[0] - buffer,
-            bounds[2] + buffer,
-            bounds[1] - buffer,
-            bounds[3] + buffer,
-        ],
-        crs=ccrs.PlateCarree(),
-    )
+    _set_extent_with_buffer(ax, list(gdf.total_bounds), buffer)
 
     ax.gridlines(  # type: ignore[reportAttributeAccessIssue]
         draw_labels=True, linestyle="--", alpha=0.5
@@ -195,7 +279,6 @@ def plot_coverage(
     """
     import cartopy.crs as ccrs
     import matplotlib.pyplot as plt
-    import pandas as pd
 
     fig = plt.figure(figsize=(width, height))
     gs = fig.add_gridspec(1, 2, width_ratios=[2, 1])
@@ -233,29 +316,9 @@ def plot_coverage(
             label="AOI",
             transform=ccrs.PlateCarree(),
         )
-        bounds = aoi.total_bounds
-        buffer = 0.02
-        ax_map.set_extent(  # type: ignore[reportAttributeAccessIssue]
-            [
-                bounds[0] - buffer,
-                bounds[2] + buffer,
-                bounds[1] - buffer,
-                bounds[3] + buffer,
-            ],
-            crs=ccrs.PlateCarree(),
-        )
+        _set_extent_with_buffer(ax_map, list(aoi.total_bounds), buffer=0.02)
     elif not search_results.empty:
-        bounds = search_results.total_bounds
-        buffer = 0.02
-        ax_map.set_extent(  # type: ignore[reportAttributeAccessIssue]
-            [
-                bounds[0] - buffer,
-                bounds[2] + buffer,
-                bounds[1] - buffer,
-                bounds[3] + buffer,
-            ],
-            crs=ccrs.PlateCarree(),
-        )
+        _set_extent_with_buffer(ax_map, list(search_results.total_bounds), buffer=0.02)
 
     ax_map.gridlines(  # type: ignore[reportAttributeAccessIssue]
         draw_labels=True, linestyle="--", alpha=0.5
@@ -266,51 +329,12 @@ def plot_coverage(
     # ------------------------------------------------------------------
     # 2. Temporal heatmap panel
     # ------------------------------------------------------------------
-    if (
-        "start_time" in search_results.columns
-        and group_by in search_results.columns
-        and not search_results.empty
-    ):
-        df = search_results.copy()
-        df["time_bin"] = pd.to_datetime(df["start_time"]).dt.floor(temporal_bins)
-        heatmap_data = df.groupby([group_by, "time_bin"]).size().unstack(fill_value=0)
-
-        if not heatmap_data.empty:
-            im = ax_temporal.imshow(
-                heatmap_data.to_numpy(),
-                aspect="auto",
-                cmap="YlOrRd",
-            )
-            ax_temporal.set_xticks(range(len(heatmap_data.columns)))
-            ax_temporal.set_xticklabels(
-                [str(c) for c in heatmap_data.columns], rotation=45, ha="right"
-            )
-            ax_temporal.set_yticks(range(len(heatmap_data.index)))
-            ax_temporal.set_yticklabels([str(i) for i in heatmap_data.index])
-            ax_temporal.set_title("Acquisition Density")
-            ax_temporal.set_xlabel("Time bin")
-            ax_temporal.set_ylabel(group_by)
-            plt.colorbar(im, ax=ax_temporal, label="Asset count")
-        else:
-            ax_temporal.text(
-                0.5,
-                0.5,
-                "No temporal data",
-                ha="center",
-                va="center",
-                transform=ax_temporal.transAxes,
-            )
-            ax_temporal.set_title("Acquisition Density")
-    else:
-        ax_temporal.text(
-            0.5,
-            0.5,
-            "No temporal data",
-            ha="center",
-            va="center",
-            transform=ax_temporal.transAxes,
-        )
-        ax_temporal.set_title("Acquisition Density")
+    _plot_temporal_heatmap(
+        ax_temporal=ax_temporal,
+        search_results=search_results,
+        group_by=group_by,
+        temporal_bins=temporal_bins,
+    )
 
     plt.tight_layout()
     return fig
