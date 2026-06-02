@@ -62,8 +62,10 @@ def _resolve_store(
             raise ValueError(
                 f"Azure URL must be az://account/container/path, got: {href}"
             )
-        account, container = parts[0], parts[1].split("/", 1)[0]
-        path = parts[1].split("/", 1)[1] if "/" in parts[1] else ""
+        account = parts[0]
+        container_path = parts[1].split("/", 1)
+        container = container_path[0]
+        path = container_path[1] if len(container_path) == 2 else ""
         return AzureStore(container, account_name=account, **opts), path  # type: ignore[reportCallIssue]
 
     if parsed.scheme in ("http", "https"):
@@ -81,10 +83,11 @@ def _resolve_store(
         return LocalStore(**opts), path
 
     # Bare local path (no scheme)
-    if Path(href).exists() or Path(href).is_absolute():
+    href_path = Path(href)
+    if href_path.exists() or href_path.is_absolute():
         from obstore.store import LocalStore
 
-        return LocalStore(**opts), str(Path(href))
+        return LocalStore(**opts), str(href_path)
 
     raise ValueError(
         f"Unsupported URL scheme or path: {href}. "

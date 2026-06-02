@@ -1,4 +1,7 @@
+import filelock
 import shutil
+import tempfile
+import zipfile
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -48,8 +51,6 @@ def download_asset_safely(
             - ``credential_provider`` — a callable that returns credentials
               (enables automatic refresh).
     """
-    import filelock
-
     local_path.parent.mkdir(parents=True, exist_ok=True)
     lock_path = local_path.with_suffix(".lock")
 
@@ -121,10 +122,6 @@ def extract_asset_safely(
         lock_path: Path to the lock file.  Defaults to
             ``extract_dir.with_suffix(".lock")``.
     """
-    import filelock
-    import tempfile
-    import zipfile
-
     archive_path = Path(archive_path)
     if extract_dir is None:
         extract_dir = archive_path.with_suffix("")
@@ -158,7 +155,7 @@ def extract_asset_safely(
                 zf.extractall(temp_dir)
 
             Path(temp_dir).rename(extract_dir)
-        except Exception:
+        except (OSError, zipfile.BadZipFile, zipfile.LargeZipFile):
             shutil.rmtree(temp_dir, ignore_errors=True)
             raise
 
@@ -182,8 +179,6 @@ def cleanup_asset_safely(
         total_chunks: Total number of chunks that must complete before
             the asset is removed. Defaults to 1.
     """
-    import filelock
-
     lock_path = local_path.with_suffix(".lock")
     if total_chunks > 1 and chunk_id is not None:
         done_file = local_path.with_suffix(f".chunk_{chunk_id}.done")

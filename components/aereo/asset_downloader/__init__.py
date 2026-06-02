@@ -1,6 +1,10 @@
+"""Safe asset downloading and cleanup routines.
+
+This module provides file-lock-protected helpers for downloading,
+extracting, and cleaning up assets in multi-process environments.
 """
-Safe asset downloading and cleanup routines
-"""
+
+from __future__ import annotations
 
 from aereo.asset_downloader.core import (
     cleanup_asset_safely,
