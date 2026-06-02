@@ -12,6 +12,14 @@ from aereo.asset_downloader._obstore_utils import (
 DownloaderCallable = Callable[[str, Path], None]
 
 
+def _safe_unlink(path: Path) -> None:
+    """Remove a file, ignoring errors if it does not exist or is inaccessible."""
+    try:
+        path.unlink()
+    except OSError:
+        pass
+
+
 def download_asset_safely(
     href: str,
     local_path: Path,
@@ -69,7 +77,12 @@ def download_assets_safely(
         downloader: Optional callable that handles the download itself.
         store_options: Optional dict forwarded to the obstore store constructor
             for every asset.  See :func:`download_asset_safely` for details.
-        max_workers: The maximum number of threads to use. Defaults to None.
+        max_workers: Maximum number of worker threads. If ``None``, the
+            default is ``min(32, os.cpu_count() + 4)`` as defined by
+            :class:`concurrent.futures.ThreadPoolExecutor`.
+
+    Raises:
+        ValueError: If *hrefs* and *local_paths* have different lengths.
     """
     if len(hrefs) != len(local_paths):
         raise ValueError("hrefs and local_paths must have the same length")
@@ -155,7 +168,20 @@ def extract_asset_safely(
 def cleanup_asset_safely(
     local_path: Path, chunk_id: int | None = None, total_chunks: int = 1
 ) -> None:
-    """Safely clean up the downloaded asset after all chunks are processed."""
+    """Safely clean up a downloaded asset.
+
+    When *total_chunks* is greater than 1 and *chunk_id* is provided,
+    the function tracks completion via per-chunk marker files and only
+    removes the asset once every chunk has signaled completion.  File
+    locking is used to avoid race conditions in multi-processing.
+
+    Args:
+        local_path: Path to the downloaded file to remove.
+        chunk_id: Identifier of the current chunk (0-based). Used only
+            when *total_chunks* is greater than 1.
+        total_chunks: Total number of chunks that must complete before
+            the asset is removed. Defaults to 1.
+    """
     import filelock
 
     lock_path = local_path.with_suffix(".lock")
@@ -165,23 +191,9 @@ def cleanup_asset_safely(
         with filelock.FileLock(str(lock_path)):
             done_files = list(local_path.parent.glob(f"{local_path.stem}.chunk_*.done"))
             if len(done_files) >= total_chunks:
-                if local_path.exists():
-                    try:
-                        local_path.unlink()
-                    except Exception:
-                        pass
+                _safe_unlink(local_path)
                 for df in done_files:
-                    try:
-                        df.unlink()
-                    except Exception:
-                        pass
-                try:
-                    lock_path.unlink()
-                except Exception:
-                    pass
+                    _safe_unlink(df)
+                _safe_unlink(lock_path)
     else:
-        if local_path.exists():
-            try:
-                local_path.unlink()
-            except Exception:
-                pass
+        _safe_unlink(local_path)
