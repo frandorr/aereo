@@ -64,7 +64,12 @@ class TaskRunner:
         self.per_cell_failure_mode = per_cell_failure_mode
 
     def _fire_callbacks(self, event: str, *args: Any) -> None:
-        """Fire a lifecycle event across all registered callbacks."""
+        """Fire a lifecycle event across all registered callbacks.
+
+        Args:
+            event: The callback method name to invoke.
+            *args: Positional arguments to pass to the callback.
+        """
         for cb in self.callbacks:
             getattr(cb, event)(*args)
 
@@ -163,11 +168,29 @@ class TaskRunner:
     # --- Resolution helpers ---
 
     def _resolve_reader(self, task: ExtractionTask, init: dict[str, Any]) -> Reader:
+        """Resolve the reader plugin for *task*.
+
+        Args:
+            task: The extraction task.
+            init: Constructor kwargs for the plugin.
+
+        Returns:
+            An instantiated reader plugin.
+        """
         return self._resolve_stage(task, init, stage="read", type_label="reader")
 
     def _resolve_reprojector(
         self, task: ExtractionTask, init: dict[str, Any]
     ) -> Reprojector:
+        """Resolve the reprojector plugin for *task*.
+
+        Args:
+            task: The extraction task.
+            init: Constructor kwargs for the plugin.
+
+        Returns:
+            An instantiated reprojector plugin.
+        """
         return self._resolve_stage(
             task, init, stage="reproject", type_label="reprojector"
         )
@@ -175,22 +198,16 @@ class TaskRunner:
     def _resolve_processors(
         self, task: ExtractionTask, init: dict[str, Any]
     ) -> list[Processor]:
-        """Resolve all processors declared in plugin_hints['processors']."""
-        hints: list[str] = []
+        """Resolve all processors declared in plugin hints.
 
-        # 1. Task context hint
-        task_hint = task.task_context.get("processor_hints") or task.task_context.get(
-            "processors"
-        )
-        if task_hint:
-            hints = [h.strip() for h in str(task_hint).split(",")]
+        Args:
+            task: The extraction task.
+            init: Constructor kwargs for each processor.
 
-        # 2. Profile hint
-        if not hints:
-            profile_hint = task.profile.plugin_hints.get("processors")
-            if profile_hint:
-                hints = [h.strip() for h in str(profile_hint).split(",")]
-
+        Returns:
+            A list of instantiated processor plugins, in declaration order.
+        """
+        hints = self._extract_processor_hints(task)
         if not hints:
             return []
 
@@ -199,10 +216,19 @@ class TaskRunner:
             if self.registry.has("processor", name):
                 processors.append(self.registry.get("processor", name, **init))
             else:
-                logger.warning(f"Processor '{name}' not found, skipping.")
+                logger.warning("Processor '%s' not found, skipping.", name)
         return processors
 
     def _resolve_writer(self, task: ExtractionTask, init: dict[str, Any]) -> Writer:
+        """Resolve the writer plugin for *task*.
+
+        Args:
+            task: The extraction task.
+            init: Constructor kwargs for the plugin.
+
+        Returns:
+            An instantiated writer plugin.
+        """
         return self._resolve_stage(task, init, stage="writer", type_label="writer")
 
     def _resolve_stage(
@@ -233,38 +259,97 @@ class TaskRunner:
         hint = task.task_context.get(f"{stage}_hint") or task.task_context.get(
             f"{type_label}_hint"
         )
-        if hint and self.registry.has(type_label, hint):
-            return self.registry.get(type_label, hint, **init)
-        if fallback and hint and self.registry.has(fallback, hint):
-            return self.registry.get(fallback, hint, **init)
+        plugin = self._try_resolve_from_hint(hint, type_label, fallback, init)
+        if plugin is not None:
+            return plugin
 
         # 2. Profile hint
         profile_hint = task.profile.plugin_hints.get(
             stage
         ) or task.profile.plugin_hints.get(type_label)
-        if profile_hint and self.registry.has(type_label, profile_hint):
-            return self.registry.get(type_label, profile_hint, **init)
-        if fallback and profile_hint and self.registry.has(fallback, profile_hint):
-            return self.registry.get(fallback, profile_hint, **init)
+        plugin = self._try_resolve_from_hint(profile_hint, type_label, fallback, init)
+        if plugin is not None:
+            return plugin
 
         # 3. Auto-discover from collections
-        plugin_name: str | None = None
-        for collection in task.profile.collections:
-            plugin_names = self.registry.find_for(type_label, collection)
-            if plugin_names:
-                plugin_name = plugin_names[0]
-                break
-
-        if plugin_name is None and fallback:
-            for collection in task.profile.collections:
-                plugin_names = self.registry.find_for(fallback, collection)
-                if plugin_names:
-                    plugin_name = plugin_names[0]
-                    break
-
+        plugin_name = self._auto_discover_plugin(task, type_label, fallback)
         if plugin_name is None:
             raise ValueError(
                 f"No {type_label} plugin found for profile: {task.profile.name}"
             )
 
         return self.registry.get(type_label, plugin_name, **init)
+
+    def _try_resolve_from_hint(
+        self,
+        hint: Any,
+        type_label: str,
+        fallback: str | None,
+        init: dict[str, Any],
+    ) -> Any | None:
+        """Attempt to resolve a plugin from a hint string.
+
+        Args:
+            hint: The hint value (typically a string or None).
+            type_label: Primary registry type label.
+            fallback: Optional fallback registry type label.
+            init: Constructor kwargs for the plugin.
+
+        Returns:
+            An instantiated plugin, or *None* if the hint does not resolve.
+        """
+        if not hint:
+            return None
+        hint_str = str(hint)
+        if self.registry.has(type_label, hint_str):
+            return self.registry.get(type_label, hint_str, **init)
+        if fallback and self.registry.has(fallback, hint_str):
+            return self.registry.get(fallback, hint_str, **init)
+        return None
+
+    def _auto_discover_plugin(
+        self,
+        task: ExtractionTask,
+        type_label: str,
+        fallback: str | None,
+    ) -> str | None:
+        """Auto-discover a plugin name from profile collections.
+
+        Args:
+            task: The extraction task.
+            type_label: Primary registry type label.
+            fallback: Optional fallback registry type label.
+
+        Returns:
+            The first discovered plugin name, or *None* if nothing matches.
+        """
+        for collection in task.profile.collections:
+            plugin_names = self.registry.find_for(type_label, collection)
+            if plugin_names:
+                return plugin_names[0]
+        if fallback:
+            for collection in task.profile.collections:
+                plugin_names = self.registry.find_for(fallback, collection)
+                if plugin_names:
+                    return plugin_names[0]
+        return None
+
+    def _extract_processor_hints(self, task: ExtractionTask) -> list[str]:
+        """Extract processor hint names from task context or profile.
+
+        Args:
+            task: The extraction task.
+
+        Returns:
+            A list of processor names, or an empty list if none are declared.
+        """
+        for key in ("processor_hints", "processors"):
+            task_hint = task.task_context.get(key)
+            if task_hint:
+                return [h.strip() for h in str(task_hint).split(",")]
+
+        profile_hint = task.profile.plugin_hints.get("processors")
+        if profile_hint:
+            return [h.strip() for h in str(profile_hint).split(",")]
+
+        return []
