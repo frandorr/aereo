@@ -7,18 +7,19 @@ from concurrent.futures import (
     ThreadPoolExecutor,
     as_completed,
 )
-from typing import Iterable, Sequence
+from typing import ClassVar, Iterable, Sequence
+
+from pandera.typing.geopandas import GeoDataFrame
+from structlog import get_logger
 
 from aereo.backends.core import TaskRunner
 from aereo.interfaces import ExecutionBackend, ExtractionTask
 from aereo.schemas import ArtifactSchema
-from pandera.typing.geopandas import GeoDataFrame
-from structlog import get_logger
 
 logger = get_logger()
 
 
-def _run_tasks_parallel(
+def _run_tasks(
     tasks: Sequence[ExtractionTask],
     runner: TaskRunner | None,
     max_workers: int | None,
@@ -28,6 +29,10 @@ def _run_tasks_parallel(
     failure_log_key: str,
 ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
     """Run tasks sequentially or via the supplied executor class.
+
+    When *max_workers* is ``None`` or only one task is supplied, tasks are
+    executed sequentially in the current process/thread. Otherwise they are
+    dispatched through *executor_cls*.
 
     Args:
         tasks: Extraction tasks to run.
@@ -71,18 +76,18 @@ def _run_tasks_parallel(
     return [r for r in results if r is not None]
 
 
-class LocalProcessBackend(ExecutionBackend):
-    """Execute tasks locally using sequential or process-based parallelism.
+class _LocalBackendBase(ExecutionBackend):
+    """Base for local execution backends with configurable worker count."""
 
-    When *max_workers* is ``None`` or there is only one task, execution is
-    sequential. Otherwise a :class:`ProcessPoolExecutor` is used.
-    """
+    _executor_cls: ClassVar[type[ProcessPoolExecutor] | type[ThreadPoolExecutor]]
+    _backend_name: ClassVar[str]
+    _failure_log_key: ClassVar[str]
 
     def __init__(self, max_workers: int | None = None) -> None:
-        """Create a new local process backend.
+        """Create a new local backend.
 
         Args:
-            max_workers: Maximum number of worker processes. ``None`` disables
+            max_workers: Maximum number of workers. ``None`` disables
                 parallelism and runs tasks sequentially.
         """
         self.max_workers = max_workers
@@ -92,7 +97,7 @@ class LocalProcessBackend(ExecutionBackend):
         tasks: Sequence[ExtractionTask],
         runner: TaskRunner | None = None,
     ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
-        """Execute *tasks* using local process-based parallelism.
+        """Execute *tasks* using local parallelism.
 
         Args:
             tasks: Extraction tasks to run.
@@ -105,17 +110,29 @@ class LocalProcessBackend(ExecutionBackend):
         Raises:
             ValueError: If *runner* is ``None``.
         """
-        return _run_tasks_parallel(
+        return _run_tasks(
             tasks,
             runner,
             self.max_workers,
-            ProcessPoolExecutor,
-            backend_name="LocalProcessBackend",
-            failure_log_key="local_task_failed",
+            self._executor_cls,
+            backend_name=self._backend_name,
+            failure_log_key=self._failure_log_key,
         )
 
 
-class ThreadBackend(ExecutionBackend):
+class LocalProcessBackend(_LocalBackendBase):
+    """Execute tasks locally using sequential or process-based parallelism.
+
+    When *max_workers* is ``None`` or there is only one task, execution is
+    sequential. Otherwise a :class:`ProcessPoolExecutor` is used.
+    """
+
+    _executor_cls = ProcessPoolExecutor
+    _backend_name = "LocalProcessBackend"
+    _failure_log_key = "local_task_failed"
+
+
+class ThreadBackend(_LocalBackendBase):
     """Execute tasks locally using thread-based parallelism.
 
     This backend is ideal for **I/O-bound** extractors (e.g. those that spend
@@ -127,38 +144,6 @@ class ThreadBackend(ExecutionBackend):
     sequential. Otherwise a :class:`ThreadPoolExecutor` is used.
     """
 
-    def __init__(self, max_workers: int | None = None) -> None:
-        """Create a new thread-based backend.
-
-        Args:
-            max_workers: Maximum number of worker threads. ``None`` disables
-                parallelism and runs tasks sequentially.
-        """
-        self.max_workers = max_workers
-
-    def run_tasks(
-        self,
-        tasks: Sequence[ExtractionTask],
-        runner: TaskRunner | None = None,
-    ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
-        """Execute *tasks* using local thread-based parallelism.
-
-        Args:
-            tasks: Extraction tasks to run.
-            runner: TaskRunner that resolves and executes each task.
-
-        Returns:
-            An iterable of ``GeoDataFrame[ArtifactSchema]`` results, one per task,
-            in the same order as *tasks*.
-
-        Raises:
-            ValueError: If *runner* is ``None``.
-        """
-        return _run_tasks_parallel(
-            tasks,
-            runner,
-            self.max_workers,
-            ThreadPoolExecutor,
-            backend_name="ThreadBackend",
-            failure_log_key="thread_task_failed",
-        )
+    _executor_cls = ThreadPoolExecutor
+    _backend_name = "ThreadBackend"
+    _failure_log_key = "thread_task_failed"
