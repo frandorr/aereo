@@ -57,15 +57,14 @@ def _resolve_store(
         from obstore.store import AzureStore
 
         # az://account/container/path
-        parts = parsed.path.lstrip("/").split("/", 1)
-        if len(parts) < 2:
+        path_parts = parsed.path.lstrip("/").split("/", 2)
+        if len(path_parts) < 2:
             raise ValueError(
                 f"Azure URL must be az://account/container/path, got: {href}"
             )
-        account = parts[0]
-        container_path = parts[1].split("/", 1)
-        container = container_path[0]
-        path = container_path[1] if len(container_path) == 2 else ""
+        account = path_parts[0]
+        container = path_parts[1]
+        path = path_parts[2] if len(path_parts) == 3 else ""
         return AzureStore(container, account_name=account, **opts), path  # type: ignore[reportCallIssue]
 
     if parsed.scheme in ("http", "https"):
@@ -76,17 +75,15 @@ def _resolve_store(
         store = HTTPStore.from_url(href, **opts)
         return store, ""
 
-    if parsed.scheme == "file":
-        from obstore.store import LocalStore
+    from obstore.store import LocalStore
 
+    if parsed.scheme == "file":
         path = parsed.path
         return LocalStore(**opts), path
 
     # Bare local path (no scheme)
     href_path = Path(href)
     if href_path.exists() or href_path.is_absolute():
-        from obstore.store import LocalStore
-
         return LocalStore(**opts), str(href_path)
 
     raise ValueError(
@@ -100,6 +97,11 @@ def _stream_obstore_to_disk(store: Any, path: str, local_path: Path) -> None:
 
     Uses obstore's top-level ``get()`` function and writes chunks
     without materialising the whole object in memory.
+
+    Args:
+        store: An obstore store instance.
+        path: Object path within the store.
+        local_path: Destination path on the local filesystem.
     """
     import obstore
 
