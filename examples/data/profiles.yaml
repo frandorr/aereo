@@ -7,7 +7,7 @@ profiles:
       resolution: 1000
       collections:
           ABI-L1b-RadF: ["C02"]
-      extract_params:
+      read_params:
           reader: abi_l1b
           calibration: reflectance
           delay_writes: true
@@ -30,7 +30,7 @@ profiles:
       collections:
           VJ202IMG: ["I01"]
           VJ203IMG: []
-      extract_params:
+      read_params:
           reader: viirs_l1b
           calibration: reflectance
           resampling: nearest
@@ -44,7 +44,7 @@ profiles:
       resolution: 300
       collections:
           S3A_OL_1_EFR: ["Oa08"]
-      extract_params:
+      read_params:
           reader: olci_l1b
           calibration: radiance
           resampling: nearest
@@ -58,7 +58,7 @@ profiles:
       resolution: 10
       collections:
           geotessera: ["0", "1", "2"]
-      extract_params:
+      read_params:
           max_download_workers: 4
           tmp_dir: /root/repos/aereo/examples
       plugin_hints:

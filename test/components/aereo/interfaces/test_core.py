@@ -123,7 +123,6 @@ def test_extractor_no_longer_requires_target_grid_d():
         def extract(
             self,
             extraction_task: ExtractionTask,
-            extract_params: dict[str, Any] | None,
         ) -> GeoDataFrame[ArtifactSchema]:
             return cast(GeoDataFrame[ArtifactSchema], pd.DataFrame())
 
@@ -138,7 +137,6 @@ def test_extractor_prepare_for_extraction():
         def extract(
             self,
             extraction_task: ExtractionTask,
-            extract_params: dict[str, Any] | None,
         ) -> GeoDataFrame[ArtifactSchema]:
             return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
 
@@ -380,19 +378,6 @@ def test_extraction_task_pickle_with_callable_downloader():
     assert roundtripped.profile.downloader is _module_level_downloader
 
 
-def test_aereo_profile_has_search_and_extract_params():
-    from aereo.interfaces.core import AereoProfile
-
-    profile = AereoProfile(
-        name="test",
-        resolution=100.0,
-        search_params={"version": "061"},
-        extract_params={"calibration": "reflectance"},
-    )
-    assert profile.search_params["version"] == "061"
-    assert profile.extract_params["calibration"] == "reflectance"
-
-
 def test_aereo_profile_rejects_extra_params():
     from aereo.interfaces.core import AereoProfile
 
@@ -476,7 +461,6 @@ def test_prepare_does_not_compute_common_shape_when_conform_disabled():
         def extract(
             self,
             extraction_task: ExtractionTask,
-            extract_params: dict[str, Any] | None,
         ) -> GeoDataFrame[ArtifactSchema]:
             return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
 
@@ -519,7 +503,6 @@ def test_prepare_for_extraction_includes_extractor_hint():
         def extract(
             self,
             extraction_task: ExtractionTask,
-            extract_params: dict[str, Any] | None,
         ) -> GeoDataFrame[ArtifactSchema]:
             return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
 
@@ -644,7 +627,7 @@ def test_prepare_for_extraction_spatial_filtering():
     class DummyExtractor(Extractor):
         supported_collections = ["C1"]
 
-        def extract(self, extraction_task, extract_params):
+        def extract(self, extraction_task):
             return cast(Any, extraction_task.assets)
 
     # Asset 1 at coordinates (0, 0)

@@ -96,19 +96,10 @@ class TaskRunner:
         post = [p for p in processors if p.stage == "post_reproject"]
 
         # Build effective params for each stage
-        download_params = merge_params(
-            getattr(task.profile, "extract_params", {}),
-            getattr(task.profile, "download_params", {}),
-        )
-        read_params = merge_params(
-            task.profile.extract_params, task.profile.read_params
-        )
-        process_params = merge_params(
-            task.profile.extract_params, task.profile.process_params
-        )
-        write_params = merge_params(
-            task.profile.extract_params, task.profile.write_params
-        )
+        download_params = dict(getattr(task.profile, "download_params", {}))
+        read_params = dict(task.profile.read_params)
+        process_params = dict(task.profile.process_params)
+        write_params = dict(task.profile.write_params)
 
         self._fire_callbacks("on_task_start", task)
 

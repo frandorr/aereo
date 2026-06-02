@@ -169,7 +169,7 @@ class AereoDriver:
         else:
             pre_processors = []
             post_processors = []
-            download_params = dict(getattr(profile, "extract_params", {}))
+            download_params = dict(getattr(profile, "download_params", {}))
             read_params = dict(getattr(profile, "read_params", {}))
             reproject_params = {}
             write_params = dict(getattr(profile, "write_params", {}))
