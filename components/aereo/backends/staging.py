@@ -15,6 +15,14 @@ from structlog import get_logger
 
 logger = get_logger()
 
+__all__ = ["CloudTaskStaging"]
+
+_TASK_PREFIX = "aereo-tasks/"
+_RESULTS_PREFIX = "results/"
+_ARTIFACTS_FILENAME = "artifacts.parquet"
+_MANIFEST_FILENAME = "manifest.json"
+_ARTIFACTS_URI_KEY = "artifacts_uri"
+
 
 def _parse_s3_uri(uri: str) -> tuple[str, str]:
     """Split an s3:// URI into (bucket, key).
@@ -100,8 +108,8 @@ class CloudTaskStaging(TaskStaging):
             The S3 URI prefix where the files were uploaded.
         """
         s3 = self._client()
-        prefix = f"aereo-tasks/{job_id}/{task_idx}/"
-        for file in Path(src_dir).iterdir():
+        prefix = f"{_TASK_PREFIX}{job_id}/{task_idx}/"
+        for file in src_dir.iterdir():
             if file.is_file():
                 key = f"{prefix}{file.name}"
                 logger.debug(
@@ -122,7 +130,7 @@ class CloudTaskStaging(TaskStaging):
         Returns:
             An S3 URI prefix ending with ``/``.
         """
-        return f"s3://{self.bucket}/results/{job_id}/{task_idx}/"
+        return f"s3://{self.bucket}/{_RESULTS_PREFIX}{job_id}/{task_idx}/"
 
     def load_artifacts(self, manifest_uri: str) -> GeoDataFrame[ArtifactSchema]:
         """Download a manifest and its referenced artifacts from S3.
@@ -140,17 +148,17 @@ class CloudTaskStaging(TaskStaging):
         bucket, key = _parse_s3_uri(manifest_uri)
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            manifest_path = Path(tmpdir) / "manifest.json"
+            manifest_path = Path(tmpdir) / _MANIFEST_FILENAME
             s3.download_file(bucket, key, str(manifest_path))
             manifest = json.loads(manifest_path.read_text())
 
-        artifacts_uri = manifest.get("artifacts_uri")
+        artifacts_uri = manifest.get(_ARTIFACTS_URI_KEY)
         if not artifacts_uri:
-            raise ValueError(f"Manifest missing 'artifacts_uri': {manifest}")
+            raise ValueError(f"Manifest missing '{_ARTIFACTS_URI_KEY}': {manifest}")
 
         bucket, key = _parse_s3_uri(artifacts_uri)
         with tempfile.TemporaryDirectory() as tmpdir:
-            parquet_path = Path(tmpdir) / "artifacts.parquet"
+            parquet_path = Path(tmpdir) / _ARTIFACTS_FILENAME
             s3.download_file(bucket, key, str(parquet_path))
             df = gpd.read_parquet(parquet_path)
 
@@ -174,13 +182,15 @@ class CloudTaskStaging(TaskStaging):
         bucket, prefix = _parse_s3_uri(output_prefix)
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            parquet_path = Path(tmpdir) / "artifacts.parquet"
+            parquet_path = Path(tmpdir) / _ARTIFACTS_FILENAME
             artifacts.to_parquet(parquet_path)
-            s3.upload_file(str(parquet_path), bucket, f"{prefix}artifacts.parquet")
+            s3.upload_file(str(parquet_path), bucket, f"{prefix}{_ARTIFACTS_FILENAME}")
 
-            manifest = {"artifacts_uri": f"s3://{bucket}/{prefix}artifacts.parquet"}
-            manifest_path = Path(tmpdir) / "manifest.json"
+            manifest = {
+                _ARTIFACTS_URI_KEY: f"s3://{bucket}/{prefix}{_ARTIFACTS_FILENAME}"
+            }
+            manifest_path = Path(tmpdir) / _MANIFEST_FILENAME
             manifest_path.write_text(json.dumps(manifest))
-            s3.upload_file(str(manifest_path), bucket, f"{prefix}manifest.json")
+            s3.upload_file(str(manifest_path), bucket, f"{prefix}{_MANIFEST_FILENAME}")
 
-        return {"manifest_uri": f"s3://{bucket}/{prefix}manifest.json"}
+        return {"manifest_uri": f"s3://{bucket}/{prefix}{_MANIFEST_FILENAME}"}
