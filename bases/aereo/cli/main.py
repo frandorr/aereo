@@ -109,12 +109,12 @@ def _search_results_to_json(df: gpd.GeoDataFrame) -> list[dict[str, Any]]:
     Returns:
         List of JSON-serializable record dictionaries.
     """
-    # Convert to GeoJSON feature collection then to simple records
-    df = df.copy()
-    df["geometry"] = df.geometry.apply(
+    # Convert to plain DataFrame to avoid GeoDataFrame geometry warnings
+    plain_df = pd.DataFrame(df.copy())
+    plain_df["geometry"] = plain_df["geometry"].apply(
         lambda g: g.__geo_interface__ if g is not None else None
     )
-    records = df.to_dict(orient="records")
+    records = plain_df.to_dict(orient="records")
     # Convert datetime to ISO strings
     for rec in records:
         for key in ("start_time", "end_time"):
@@ -138,6 +138,7 @@ def _search_results_from_json(records: list[dict[str, Any]]) -> gpd.GeoDataFrame
         from shapely.geometry import shape
 
         def _to_geom(g: Any) -> Any:
+            """Convert a GeoJSON dict to a Shapely geometry."""
             if isinstance(g, dict):
                 return shape(g)
             return g
@@ -145,7 +146,8 @@ def _search_results_from_json(records: list[dict[str, Any]]) -> gpd.GeoDataFrame
         df["geometry"] = gpd.GeoSeries(df["geometry"].apply(_to_geom))
         df = gpd.GeoDataFrame(df, geometry="geometry")
         df = df.set_crs(epsg=4326)
-        assert df is not None
+        if df is None:
+            raise ValueError("Failed to construct GeoDataFrame from records.")
     for key in ("start_time", "end_time"):
         if key in df.columns:
             df[key] = pd.to_datetime(df[key])
@@ -252,6 +254,44 @@ def _add_plugin_rows(table: Table, label: str, plugins: dict[str, type]) -> None
         table.add_row(label, name, cols, req, opt)
 
 
+def _run_with_exit(
+    label: str, fn: Callable[..., Any], *args: Any, **kwargs: Any
+) -> Any:
+    """Execute *fn*, printing a styled error and exiting on exception.
+
+    Args:
+        label: Human-readable name of the operation for error messages.
+        fn: Callable to execute.
+        *args: Positional arguments for *fn*.
+        **kwargs: Keyword arguments for *fn*.
+
+    Returns:
+        The return value of *fn*.
+
+    Raises:
+        typer.Exit: With code 1 if *fn* raises an exception.
+    """
+    try:
+        return fn(*args, **kwargs)
+    except Exception as exc:
+        console.print(f"[red]{label} failed:[/red] {exc}")
+        raise typer.Exit(code=1)
+
+
+def _check_results(results: gpd.GeoDataFrame | None) -> None:
+    """Exit if search results are empty or None.
+
+    Args:
+        results: GeoDataFrame from a search operation.
+
+    Raises:
+        typer.Exit: With code 2 if *results* is None or empty.
+    """
+    if results is None or len(results) == 0:
+        console.print("[yellow]No results found.[/yellow]")
+        raise typer.Exit(code=2)
+
+
 # ---------------------------------------------------------------------------
 # Commands
 # ---------------------------------------------------------------------------
@@ -312,20 +352,15 @@ def search(
     end_dt = _parse_iso_datetime(end)
 
     client = AereoClient()
-    try:
-        results = client.search(
-            profiles=profiles,
-            intersects=intersects,
-            start_datetime=start_dt,
-            end_datetime=end_dt,
-        )
-    except Exception as exc:
-        console.print(f"[red]Search failed:[/red] {exc}")
-        raise typer.Exit(code=1)
-
-    if results is None or len(results) == 0:
-        console.print("[yellow]No results found.[/yellow]")
-        raise typer.Exit(code=2)
+    results = _run_with_exit(
+        "Search",
+        client.search,
+        profiles=profiles,
+        intersects=intersects,
+        start_datetime=start_dt,
+        end_datetime=end_dt,
+    )
+    _check_results(results)
 
     if fmt == "json":
         records = _search_results_to_json(results)
@@ -397,17 +432,15 @@ def prepare(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     client = AereoClient()
-    try:
-        tasks = client.prepare_for_extraction(
-            search_results=df,  # type: ignore[arg-type]
-            grid_config=grid_config,
-            profiles=profiles,
-            uri=str(output_dir),
-            cells_per_task=cells_per_task,
-        )
-    except Exception as exc:
-        console.print(f"[red]Prepare failed:[/red] {exc}")
-        raise typer.Exit(code=1)
+    tasks = _run_with_exit(
+        "Prepare",
+        client.prepare_for_extraction,
+        search_results=df,  # type: ignore[arg-type]
+        grid_config=grid_config,
+        profiles=profiles,
+        uri=str(output_dir),
+        cells_per_task=cells_per_task,
+    )
 
     task_file = output or (output_dir / "tasks.pkl")
     task_file.write_bytes(pickle.dumps(tasks))
@@ -451,11 +484,9 @@ def extract(
 
     backend = LocalProcessBackend(max_workers=workers)
     client = AereoClient()
-    try:
-        artifacts = client.execute_tasks(task_list, backend=backend)
-    except Exception as exc:
-        console.print(f"[red]Extraction failed:[/red] {exc}")
-        raise typer.Exit(code=1)
+    artifacts = _run_with_exit(
+        "Extraction", client.execute_tasks, task_list, backend=backend
+    )
 
     # Write full GeoDataFrame to parquet
     parquet_path = output_dir / "artifacts.parquet"
@@ -526,35 +557,28 @@ def run(
 
     # Search
     console.print("[bold blue]🔍 Searching...[/bold blue]")
-    try:
-        results = client.search(
-            profiles=profiles,
-            intersects=intersects,
-            start_datetime=start_dt,
-            end_datetime=end_dt,
-        )
-    except Exception as exc:
-        console.print(f"[red]Search failed:[/red] {exc}")
-        raise typer.Exit(code=1)
-
-    if results is None or len(results) == 0:
-        console.print("[yellow]No results found.[/yellow]")
-        raise typer.Exit(code=2)
+    results = _run_with_exit(
+        "Search",
+        client.search,
+        profiles=profiles,
+        intersects=intersects,
+        start_datetime=start_dt,
+        end_datetime=end_dt,
+    )
+    _check_results(results)
     console.print(f"[green]✓ Found {len(results)} scenes.[/green]")
 
     # Prepare
     console.print("[bold blue]📦 Preparing...[/bold blue]")
-    try:
-        tasks = client.prepare_for_extraction(
-            search_results=results,
-            grid_config=grid_config,
-            profiles=profiles,
-            uri=str(output_dir),
-            cells_per_task=cells_per_task,
-        )
-    except Exception as exc:
-        console.print(f"[red]Prepare failed:[/red] {exc}")
-        raise typer.Exit(code=1)
+    tasks = _run_with_exit(
+        "Prepare",
+        client.prepare_for_extraction,
+        search_results=results,
+        grid_config=grid_config,
+        profiles=profiles,
+        uri=str(output_dir),
+        cells_per_task=cells_per_task,
+    )
     console.print(
         f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cells_per_task}).[/green]"
     )
@@ -562,11 +586,9 @@ def run(
     # Extract
     console.print("[bold blue]⛏️ Extracting...[/bold blue]")
     backend = LocalProcessBackend(max_workers=workers)
-    try:
-        artifacts = client.execute_tasks(tasks, backend=backend)
-    except Exception as exc:
-        console.print(f"[red]Extraction failed:[/red] {exc}")
-        raise typer.Exit(code=1)
+    artifacts = _run_with_exit(
+        "Extraction", client.execute_tasks, tasks, backend=backend
+    )
 
     parquet_path = output_dir / "artifacts.parquet"
     artifacts.to_parquet(parquet_path)
@@ -660,25 +682,16 @@ def plugin_params(name: str) -> None:
     table.add_column("Required", style="blue")
     table.add_column("Default", style="dim")
 
-    for param in params.get("required", []):
-        table.add_row(
-            "Required",
-            param["name"],
-            param["type"],
-            param["description"],
-            "Yes",
-            str(param["default"]) if param.get("default") is not None else "—",
-        )
-
-    for param in params.get("optional", []):
-        table.add_row(
-            "Optional",
-            param["name"],
-            param["type"],
-            param["description"],
-            "No",
-            str(param["default"]) if param.get("default") is not None else "—",
-        )
+    for section, required_flag in (("required", "Yes"), ("optional", "No")):
+        for param in params.get(section, []):
+            table.add_row(
+                section.capitalize(),
+                param["name"],
+                param["type"],
+                param["description"],
+                required_flag,
+                str(param["default"]) if param.get("default") is not None else "—",
+            )
 
     console.print(table)
 
