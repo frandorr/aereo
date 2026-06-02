@@ -1,7 +1,6 @@
-"""Per-stage plugin discovery for Hamilton-based AEREO pipelines.
+"""Per-stage plugin discovery for AEREO pipelines.
 
-Discovers function-based plugins via Python entry-point groups
-(e.g. ``aereo.search``, ``aereo.read``, ``aereo.process``).
+Discovers function-based plugins via Python entry-point groups.
 """
 
 from __future__ import annotations

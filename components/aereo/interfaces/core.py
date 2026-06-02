@@ -758,9 +758,8 @@ class AereoProfile(_ProfileLoaderMixin, BaseModel):
 class PipelineProfile(_ProfileLoaderMixin, BaseModel):
     """Declarative pipeline configuration for search + extraction.
 
-    One PipelineProfile = one complete DAG configuration. It replaces the
-    extraction-time half of :class:`AereoProfile` and is consumed by
-    :class:`aereo.driver.core.AereoDriver`.
+    One PipelineProfile = one complete configuration. It replaces the
+    extraction-time half of :class:`AereoProfile`.
     """
 
     model_config = {"extra": "forbid", "frozen": True}
