@@ -1,0 +1,2 @@
+/root/repos/aereo/bases/aereo/client/__init__.py
+/root/repos/aereo/bases/aereo/cli/__init__.py
