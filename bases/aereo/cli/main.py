@@ -574,13 +574,14 @@ def plugins() -> None:
         opt = str(len(getattr(cls, "optional_params", [])))
         table.add_row("Searcher", name, cols, req, opt)
 
-    for name, cls in registry._extractors.items():
-        cols = ", ".join(cls.supported_collections[:3])
-        if len(cls.supported_collections) > 3:
-            cols += " ..."
-        req = str(len(getattr(cls, "required_params", [])))
-        opt = str(len(getattr(cls, "optional_params", [])))
-        table.add_row("Extractor", name, cols, req, opt)
+    for label in ("reader", "reprojector", "processor", "writer"):
+        for name, cls in registry._registries[label].plugins.items():
+            cols = ", ".join(cls.supported_collections[:3])
+            if len(cls.supported_collections) > 3:
+                cols += " ..."
+            req = str(len(getattr(cls, "required_params", [])))
+            opt = str(len(getattr(cls, "optional_params", [])))
+            table.add_row(label.capitalize(), name, cols, req, opt)
 
     console.print(table)
 

@@ -13,7 +13,6 @@ def test_pipeline_profile_construction():
         collections={"S3OLCI": ["Oa01", "Oa02"]},
         plugin_hints={"search": "earthaccess", "read": "satpy"},
         search_params={"cloud_cover": 20},
-        download_params={"timeout": 30},
         read_params={"reader": "olci"},
         reproject_params={"resampling": "bilinear"},
         write_params={"driver": "COG"},
@@ -25,7 +24,6 @@ def test_pipeline_profile_construction():
     assert profile.collections == {"S3OLCI": ["Oa01", "Oa02"]}
     assert profile.plugin_hints == {"search": "earthaccess", "read": "satpy"}
     assert profile.search_params == {"cloud_cover": 20}
-    assert profile.download_params == {"timeout": 30}
     assert profile.read_params == {"reader": "olci"}
     assert profile.reproject_params == {"resampling": "bilinear"}
     assert profile.write_params == {"driver": "COG"}
@@ -42,7 +40,7 @@ def test_pipeline_profile_defaults():
     assert profile.collections == {}
     assert profile.plugin_hints == {}
     assert profile.search_params == {}
-    assert profile.download_params == {}
+    assert profile.read_params == {}
     assert profile.read_params == {}
     assert profile.reproject_params == {}
     assert profile.write_params == {}

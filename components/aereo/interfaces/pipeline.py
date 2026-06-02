@@ -8,10 +8,9 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Callable, Literal, Mapping, Self, Sequence
+from typing import Any, Mapping, Self, Sequence
 
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
-from pydantic.types import ImportString
+from pydantic import BaseModel, ConfigDict, Field
 
 
 def _import_yaml() -> Any:
@@ -37,7 +36,7 @@ class ProcessStageConfig(StageConfig):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    stage: Literal["pre_reproject", "post_reproject"] = "post_reproject"
+    stage: str = "post_reproject"
 
 
 class ExtractionPipeline(BaseModel):
@@ -54,7 +53,6 @@ class ExtractionPipeline(BaseModel):
     padding: int | None = 0
     conform_to: tuple[int, int] | None = None
     collections: Mapping[str, Sequence[str]] = Field(default_factory=dict)
-    downloader: ImportString[Callable[[str, Path], None]] | None = None
 
     read: StageConfig = Field(default_factory=StageConfig)
     process: list[ProcessStageConfig] = Field(default_factory=list)
@@ -73,13 +71,6 @@ class ExtractionPipeline(BaseModel):
                     state[name] = json.loads(json.dumps(val, default=str))
                 except Exception:
                     state[name] = None
-            downloader_path = state.get("downloader")
-            if downloader_path is not None:
-                try:
-                    ta = TypeAdapter(ImportString[Callable[[str, Path], None]] | None)
-                    ta.validate_python(downloader_path)
-                except Exception:
-                    state["downloader"] = None
             return state
 
     def __setstate__(self, state: dict[str, Any]) -> None:
@@ -131,7 +122,6 @@ class PipelineBuilder:
         self._padding = padding
         self._conform_to = conform_to
         self._collections = dict(collections) if collections else {}
-        self._downloader: Callable[[str, Path], None] | None = None
         self._read: StageConfig | None = None
         self._process: list[ProcessStageConfig] = []
         self._reproject: StageConfig | None = None
@@ -144,7 +134,7 @@ class PipelineBuilder:
     def process_with(
         self,
         plugin: str | None = None,
-        stage: Literal["pre_reproject", "post_reproject"] = "post_reproject",
+        stage: str = "post_reproject",
         **params: Any,
     ) -> "PipelineBuilder":
         self._process.append(
@@ -169,7 +159,6 @@ class PipelineBuilder:
             padding=self._padding,
             conform_to=self._conform_to,
             collections=self._collections,
-            downloader=self._downloader,
             read=self._read or StageConfig(),
             process=self._process,
             reproject=self._reproject or StageConfig(),
@@ -222,10 +211,8 @@ def profile_to_pipeline(profile: Any) -> ExtractionPipeline:
         padding=profile.padding,
         conform_to=profile.conform_to,
         collections=dict(profile.collections),
-        downloader=profile.downloader,
         read=StageConfig(plugin=read_plugin, params=read_params),
         process=process_stages,
         reproject=StageConfig(plugin=reproject_plugin, params=reproject_params),
         write=StageConfig(plugin=write_plugin, params=write_params),
     )
-

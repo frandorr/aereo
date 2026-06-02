@@ -15,6 +15,7 @@ from aereo.interfaces import (
 )
 from aereo.registry import AereoRegistry
 from aereo.schemas import ArtifactSchema, AssetSchema
+from aereo.task_builder import prepare_for_extraction
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
@@ -185,13 +186,13 @@ class AereoClient:
 
         Resolution order:
           1. ``profile.plugin_hints.get(hint_key)`` where hint_key is
-             ``"search"`` for searchers or ``"extract"`` for extractors.
+             ``"search"`` for searchers.
           2. If absent, auto-discover from ``profile.collections`` using the registry.
           3. If hinted plugin is not registered → ``ValueError``.
           4. If auto-discovery returns nothing → ``None``.
 
         Args:
-            plugin_type: "searcher" or "extractor".
+            plugin_type: "searcher".
             profile: The AereoProfile to resolve a plugin for.
 
         Returns:
@@ -200,15 +201,12 @@ class AereoClient:
         Raises:
             ValueError: If a hinted plugin is not registered.
         """
-        hint_key = "search" if plugin_type == "searcher" else "extract"
+        hint_key = "search"
         hint = profile.plugin_hints.get(hint_key)
 
         if plugin_type == "searcher":
             has_plugin = self.registry.has_searcher
             find_plugins = self.registry.find_searchers_for
-        elif plugin_type == "extractor":
-            has_plugin = self.registry.has_extractor
-            find_plugins = self.registry.find_extractors_for
         else:
             raise ValueError(f"Unknown plugin type: {plugin_type}")
 
@@ -421,50 +419,6 @@ class AereoClient:
             AssetSchema.validate(pd.concat(all_results, ignore_index=True)),
         )
 
-    def _resolve_extractor_plugin(
-        self,
-        profiles: Sequence[AereoProfile],
-        unique_collections: Sequence[str],
-    ) -> str:
-        """Resolve a single extractor plugin for the given profiles.
-
-        Args:
-            profiles: Profiles to resolve an extractor for.
-            unique_collections: Fallback collection names if profile resolution fails.
-
-        Returns:
-            Name of the resolved extractor plugin.
-
-        Raises:
-            ValueError: If no extractor is found or multiple extractors are needed.
-        """
-        plugin_set: set[str] = set()
-        for profile in profiles:
-            target_plugin = self._resolve_plugin_for_profile("extractor", profile)
-            if not target_plugin:
-                for collection in unique_collections:
-                    fallback_profile = AereoProfile(
-                        name="fallback", resolution=0, collections={str(collection): []}
-                    )
-                    target_plugin = self._resolve_plugin_for_profile(
-                        "extractor", fallback_profile
-                    )
-                    if target_plugin:
-                        break
-            if not target_plugin:
-                raise ValueError(
-                    f"No Extractor plugin found for profile: {profile.name}"
-                )
-            plugin_set.add(target_plugin)
-
-        if len(plugin_set) > 1:
-            raise ValueError(
-                f"Multiple extractor plugins found for profiles: {[p.name for p in profiles]}. "
-                "Ensure all profiles use the same extractor."
-            )
-
-        return plugin_set.pop()
-
     def _resolve_cells_per_task(self, cells_per_task: int | None) -> int:
         """Resolve the effective cells-per-task value.
 
@@ -491,7 +445,7 @@ class AereoClient:
         cells_per_task: int | None = None,
         init_params: Mapping[str, Any] | None = None,
     ) -> Sequence[ExtractionTask]:
-        """Groups search results by collection and distributes batches to appropriate Extractors.
+        """Groups search results by collection and distributes batches into tasks.
 
         Args:
             search_results: The merged GeoDataFrame of search results to prepare.
@@ -504,8 +458,7 @@ class AereoClient:
             profiles: A sequence of AereoProfile objects. If provided, they take precedence over resolution.
                 Falls back to client-level profiles if not provided.
             cells_per_task: Max grid cells per ExtractionTask. Falls back to client default, then 50.
-            init_params: Optional constructor kwargs for extractor instantiation.
-                Passed as a flat dict to the extractor constructor.
+            init_params: Optional parameters added to each task's context.
 
         Returns:
             A Sequence of prepared ExtractionTasks.
@@ -532,38 +485,19 @@ class AereoClient:
                 "Either 'profiles' or 'resolution' must be provided for extraction."
             )
 
-        target_plugin = self._resolve_extractor_plugin(
-            resolved_profiles, list(search_results["collection"].unique())
-        )
-        first_collection = (
-            next(iter(resolved_profiles[0].collections))
-            if resolved_profiles and resolved_profiles[0].collections
-            else ""
-        )
-
-        c_init = self._resolve_params(init_params, first_collection)
-        extractor = self.registry.get_extractor(target_plugin, **c_init)
-
-        logger.debug(
-            "prepare_batches_start",
-            plugin=target_plugin,
-            profiles=[p.name for p in resolved_profiles],
-        )
-
         effective_cells_per_task = self._resolve_cells_per_task(cells_per_task)
 
-        batches = extractor.prepare_for_extraction(
-            cast(GeoDataFrame, search_results),
+        tasks = prepare_for_extraction(
+            search_results=cast(GeoDataFrame, search_results),
             grid_config=grid_config,
-            target_aoi=norm_intersects,
-            uri=uri,
             profiles=resolved_profiles,
+            uri=uri or "",
+            target_aoi=norm_intersects,
             cells_per_task=effective_cells_per_task,
-            extractor_hint=target_plugin,
-            init_params=c_init,
+            init_params=dict(init_params) if init_params else None,
         )
 
-        return list(batches)
+        return list(tasks)
 
     def execute_tasks(
         self,

@@ -27,14 +27,6 @@ _registry = AereoRegistry(auto_discover=False)
 # that were actually installed in the Dockerfile get registered.
 _plugins_to_register: dict[str, Any] = {}
 
-_extract_plugins = [
-    ("extract_satpy", "aereo.extract_satpy.core", "SatpyExtractor"),
-    ("extract_aws_goes", "aereo.extract_aws_goes.core", "AwsGoesExtractor"),
-    ("extract_lazycogs", "aereo.extract_lazycogs.core", "ExtractLazycogs"),
-    ("extract_odc_stac", "aereo.extract_odc_stac.core", "ExtractOdcStac"),
-    ("extract_tessera", "aereo.extract_tessera.core", "ExtractTessera"),
-]
-
 _search_plugins = [
     ("search_aws_goes", "aereo.search_aws_goes.core", "AwsGoesSearcher"),
     ("search_earthaccess", "aereo.search_earthaccess.core", "EarthAccessSearcher"),
@@ -47,7 +39,7 @@ _search_plugins = [
     ("search_tessera", "aereo.search_tessera.core", "TesseraSearcher"),
 ]
 
-for name, module, cls_name in _extract_plugins + _search_plugins:
+for name, module, cls_name in _search_plugins:
     try:
         mod = __import__(module, fromlist=[cls_name])
         _plugins_to_register[name] = getattr(mod, cls_name)

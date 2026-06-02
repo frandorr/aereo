@@ -16,8 +16,8 @@ def test_from_yaml_example_loads_profiles():
     assert len(profiles) == 5
     names = {p.name for p in profiles}
     assert names == {"goes_c02", "s2_rgb", "viirs_i1", "olci_o08", "geotessera"}
-    # Verify ImportString resolution works from YAML too
-    assert profiles[2].downloader is not None
+    # Verify profile resolution works from YAML
+    assert profiles[2].name == "viirs_i1"
 
 
 def test_from_yaml_string_loads_profiles():

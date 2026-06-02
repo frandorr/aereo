@@ -3,9 +3,9 @@ from typing import Any, Mapping, Sequence, cast
 from unittest.mock import MagicMock
 
 import pytest
-from aereo.interfaces import ExtractionTask, Extractor, PluginParam, SearchProvider
+from aereo.interfaces import ExtractionTask, PluginParam, Reader, SearchProvider
 from aereo.registry import AereoRegistry
-from aereo.schemas import ArtifactSchema, AssetSchema
+from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
 
@@ -31,7 +31,7 @@ class DummySearchProvider(SearchProvider):
         return cast(GeoDataFrame[AssetSchema], AssetSchema.empty())
 
 
-class DummyExtractor(Extractor):
+class DummyReader(Reader):
     supported_collections = ["SharedCollection", "DummyCollection2"]
     required_params = (
         PluginParam(name="output_dir", type="path", description="Output directory"),
@@ -42,15 +42,14 @@ class DummyExtractor(Extractor):
         ),
     )
 
-    @property
-    def target_grid_d(self) -> int:
-        return 10000
-
-    def extract(
+    def read(
         self,
-        extraction_task: ExtractionTask,
-    ) -> GeoDataFrame[ArtifactSchema]:
-        return cast(GeoDataFrame[ArtifactSchema], ArtifactSchema.empty())
+        task: ExtractionTask,
+        params: Mapping[str, Any],
+    ) -> Any:
+        import xarray as xr
+
+        return xr.Dataset()
 
 
 class InvalidPlugin:
@@ -70,8 +69,8 @@ def mock_entry_points(monkeypatch):
             ep2.load.return_value = InvalidPlugin
 
             ep3 = MagicMock()
-            ep3.name = "dummy_extractor"
-            ep3.load.return_value = DummyExtractor
+            ep3.name = "dummy_reader"
+            ep3.load.return_value = DummyReader
 
             ep4 = MagicMock()
             ep4.name = "failing_plugin"
@@ -86,11 +85,11 @@ def mock_entry_points(monkeypatch):
 def test_registry_discovery(mock_entry_points):
     registry = AereoRegistry()
     assert "dummy_searcher" in registry._searchers
-    assert "dummy_extractor" in registry._extractors
+    assert "dummy_reader" in registry._registries["reader"].plugins
 
     # invalid and failing ones shouldn't be added
     assert "invalid_plugin" not in registry._searchers
-    assert "failing_plugin" not in registry._extractors
+    assert "failing_plugin" not in registry._registries["reader"].plugins
 
 
 def test_list_supported_collections(mock_entry_points):
@@ -106,11 +105,11 @@ def test_find_searchers_for(mock_entry_points):
     assert registry.find_searchers_for("Unknown") == []
 
 
-def test_find_extractors_for(mock_entry_points):
+def test_find_readers_for(mock_entry_points):
     registry = AereoRegistry()
-    assert registry.find_extractors_for("DummyCollection2") == ["dummy_extractor"]
-    assert registry.find_extractors_for("SharedCollection") == ["dummy_extractor"]
-    assert registry.find_extractors_for("Unknown") == []
+    assert registry.find_for("reader", "DummyCollection2") == ["dummy_reader"]
+    assert registry.find_for("reader", "SharedCollection") == ["dummy_reader"]
+    assert registry.find_for("reader", "Unknown") == []
 
 
 def test_case_insensitive_searcher_lookup(mock_entry_points):
@@ -126,17 +125,17 @@ def test_case_insensitive_searcher_lookup(mock_entry_points):
     assert registry.find_searchers_for("dummyCollection1") == ["dummy_searcher"]
 
 
-def test_case_insensitive_extractor_lookup(mock_entry_points):
-    """Test that find_extractors_for matches collections case-insensitively."""
+def test_case_insensitive_reader_lookup(mock_entry_points):
+    """Test that find_for matches collections case-insensitively for readers."""
     registry = AereoRegistry()
     # Exact match
-    assert registry.find_extractors_for("DummyCollection2") == ["dummy_extractor"]
+    assert registry.find_for("reader", "DummyCollection2") == ["dummy_reader"]
     # Lowercase
-    assert registry.find_extractors_for("dummycollection2") == ["dummy_extractor"]
+    assert registry.find_for("reader", "dummycollection2") == ["dummy_reader"]
     # Uppercase
-    assert registry.find_extractors_for("DUMMYCOLLECTION2") == ["dummy_extractor"]
+    assert registry.find_for("reader", "DUMMYCOLLECTION2") == ["dummy_reader"]
     # Mixed case
-    assert registry.find_extractors_for("DummyCollection2") == ["dummy_extractor"]
+    assert registry.find_for("reader", "DummyCollection2") == ["dummy_reader"]
 
 
 def test_get_searcher(mock_entry_points):
@@ -149,14 +148,14 @@ def test_get_searcher(mock_entry_points):
         registry.get_searcher("missing_searcher")
 
 
-def test_get_extractor(mock_entry_points):
+def test_get_reader(mock_entry_points):
     registry = AereoRegistry()
 
-    extractor = registry.get_extractor("dummy_extractor")
-    assert isinstance(extractor, DummyExtractor)
+    reader = registry.get("reader", "dummy_reader")
+    assert isinstance(reader, DummyReader)
 
     with pytest.raises(ValueError, match="not found or failed to load"):
-        registry.get_extractor("missing_extractor")
+        registry.get("reader", "missing_reader")
 
 
 def test_get_collection_mapping_for_searcher(mock_entry_points):
@@ -196,17 +195,15 @@ def test_get_collection_mapping_for_searcher_unknown_plugin(mock_entry_points):
     assert result == ["somecollection"]
 
 
-def test_get_collection_mapping_for_extractor(mock_entry_points):
-    """Test collection mapping for extractors."""
+def test_get_collection_mapping_for_reader(mock_entry_points):
+    """Test collection mapping for readers."""
     registry = AereoRegistry()
 
     # Plugin declares supported_collections = ["SharedCollection", "DummyCollection2"]
-    # Should map user input to plugin's original case
+    # Should map user input to plugin's declared format
 
-    result = registry.get_collection_mapping_for_extractor(
-        "dummy_extractor", ["DUMMYCOLLECTION2"]
-    )
-    assert result == ["DummyCollection2"]
+    result = registry.find_for("reader", "DUMMYCOLLECTION2")
+    assert result == ["dummy_reader"]
 
 
 def test_get_plugin_params_detailed(mock_entry_points):
@@ -247,7 +244,7 @@ def test_list_all_params_detailed(mock_entry_points):
 
     all_params = registry.list_all_params(detailed=True)
     assert "dummy_searcher" in all_params
-    assert "dummy_extractor" in all_params
+    assert "dummy_reader" in all_params
 
     searcher = all_params["dummy_searcher"]
     assert searcher["type"] == "searcher"
@@ -262,17 +259,17 @@ def test_list_all_params_not_detailed(mock_entry_points):
 
     all_params = registry.list_all_params(detailed=False)
     assert "dummy_searcher" in all_params
-    assert "dummy_extractor" in all_params
+    assert "dummy_reader" in all_params
 
-    extractor = all_params["dummy_extractor"]
-    assert extractor["type"] == "extractor"
-    assert len(extractor["required"]) == 1
-    assert extractor["required"][0] == {"name": "output_dir", "default": None}
-    assert set(extractor["required"][0].keys()) == {"name", "default"}
+    reader = all_params["dummy_reader"]
+    assert reader["type"] == "reader"
+    assert len(reader["required"]) == 1
+    assert reader["required"][0] == {"name": "output_dir", "default": None}
+    assert set(reader["required"][0].keys()) == {"name", "default"}
 
-    assert len(extractor["optional"]) == 1
-    assert extractor["optional"][0] == {"name": "compress", "default": False}
-    assert set(extractor["optional"][0].keys()) == {"name", "default"}
+    assert len(reader["optional"]) == 1
+    assert reader["optional"][0] == {"name": "compress", "default": False}
+    assert set(reader["optional"][0].keys()) == {"name", "default"}
 
 
 def test_get_plugin_params_unknown_plugin(mock_entry_points):
@@ -292,15 +289,15 @@ def test_generic_find_for(mock_entry_points):
     """Test generic find_for works for all plugin types."""
     registry = AereoRegistry()
     assert registry.find_for("searcher", "DummyCollection1") == ["dummy_searcher"]
-    assert registry.find_for("extractor", "DummyCollection2") == ["dummy_extractor"]
-    assert registry.find_for("reader", "Anything") == []
+    assert registry.find_for("reader", "DummyCollection2") == ["dummy_reader"]
+    assert registry.find_for("writer", "Anything") == []
 
 
 def test_generic_has(mock_entry_points):
     """Test generic has works for all plugin types."""
     registry = AereoRegistry()
     assert registry.has("searcher", "dummy_searcher") is True
-    assert registry.has("extractor", "dummy_extractor") is True
+    assert registry.has("reader", "dummy_reader") is True
     assert registry.has("reader", "dummy_searcher") is False
     assert registry.has("unknown_type", "dummy_searcher") is False
 
@@ -311,8 +308,8 @@ def test_generic_get(mock_entry_points):
     searcher = registry.get("searcher", "dummy_searcher")
     assert isinstance(searcher, DummySearchProvider)
 
-    extractor = registry.get("extractor", "dummy_extractor")
-    assert isinstance(extractor, DummyExtractor)
+    reader = registry.get("reader", "dummy_reader")
+    assert isinstance(reader, DummyReader)
 
     with pytest.raises(ValueError, match="Unknown plugin type"):
         registry.get("unknown_type", "dummy_searcher")

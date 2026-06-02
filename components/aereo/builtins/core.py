@@ -17,6 +17,7 @@ from aereo.grid import GridCell
 from aereo.interfaces import (
     AereoDataset,
     ExtractionTask,
+    PluginParam,
     Processor,
     Reprojector,
     Writer,
@@ -50,9 +51,93 @@ class ReprojectODC(Reprojector):
 
 
 class WriteGeoTIFF(Writer):
-    """Default writer that serialises each band as a GeoTIFF via ``rioxarray``."""
+    """Default writer that serialises each band as a GeoTIFF via ``rioxarray``.
+
+    When ``cog=True`` is passed in *params*, outputs are translated to
+    Cloud Optimized GeoTIFF (COG) with internal tiling and overviews.
+    """
 
     supported_collections = ("*",)
+
+    optional_params = (
+        PluginParam(
+            name="cog",
+            type="bool",
+            description="Enable Cloud Optimized GeoTIFF output.",
+            default=False,
+            required=False,
+        ),
+        PluginParam(
+            name="blocksize",
+            type="int",
+            description="Tile width/height in pixels when cog=True.",
+            default=512,
+            required=False,
+        ),
+        PluginParam(
+            name="overview_resampling",
+            type="choice",
+            description="Resampling method for COG overviews.",
+            default="nearest",
+            choices=["nearest", "bilinear", "cubic", "lanczos", "average", "mode"],
+            required=False,
+        ),
+        PluginParam(
+            name="overview_levels",
+            type="list[str]",
+            description="Explicit overview decimation levels. Auto-generated if omitted.",
+            default=None,
+            required=False,
+        ),
+    )
+
+    def _write_cog(
+        self,
+        da: Any,
+        fpath: Any,
+        compress: str,
+        zlevel: int,
+        blocksize: int,
+        overview_resampling: str,
+        overview_levels: list[int] | None,
+    ) -> None:
+        """Write a DataArray to a Cloud Optimized GeoTIFF.
+
+        Writes a tiled GeoTIFF with internal overviews to a temporary file,
+        then moves it to the final destination.  This preserves the requested
+        tile size, overviews, and metadata tags without relying on GDAL's
+        COG driver (which can override block sizes and strip tags).
+        """
+        import shutil
+        import tempfile
+
+        import rasterio
+        from rasterio.enums import Resampling
+
+        suffix = fpath.suffix
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+            tmp_path = tmp.name
+
+        da.rio.to_raster(
+            tmp_path,
+            compress=compress,
+            zlevel=zlevel,
+            tiled=True,
+            blockxsize=blocksize,
+            blockysize=blocksize,
+        )
+
+        with rasterio.open(tmp_path, "r+") as src:
+            if overview_levels is None:
+                overview_levels = [
+                    2**i for i in range(1, 8) if 2**i < min(src.height, src.width)
+                ]
+            if overview_levels:
+                resamp = getattr(Resampling, overview_resampling, Resampling.nearest)
+                src.build_overviews(overview_levels, resamp)
+                src.update_tags(ns="rio_overview", resampling=overview_resampling)
+
+        shutil.move(tmp_path, fpath)
 
     def write(
         self,
@@ -80,6 +165,10 @@ class WriteGeoTIFF(Writer):
 
         compress = params.get("compress", "deflate")
         zlevel = params.get("zlevel", 1)
+        cog = params.get("cog", False)
+        blocksize = params.get("blocksize", 512)
+        overview_resampling = params.get("overview_resampling", "nearest")
+        overview_levels = params.get("overview_levels")
 
         records = []
         for var_name in ds.data_vars:
@@ -90,11 +179,22 @@ class WriteGeoTIFF(Writer):
                     band_da = da.isel(band=band_idx)
                     fname = f"{var_name}_b{band_idx}_{cell_id}.tif"
                     fpath = out_dir / fname
-                    band_da.rio.to_raster(
-                        fpath,
-                        compress=compress,
-                        zlevel=zlevel,
-                    )
+                    if cog:
+                        self._write_cog(
+                            band_da,
+                            fpath,
+                            compress,
+                            zlevel,
+                            blocksize,
+                            overview_resampling,
+                            overview_levels,
+                        )
+                    else:
+                        band_da.rio.to_raster(
+                            fpath,
+                            compress=compress,
+                            zlevel=zlevel,
+                        )
                     records.append(
                         {
                             "path": str(fpath),
@@ -107,11 +207,22 @@ class WriteGeoTIFF(Writer):
             else:
                 fname = f"{var_name}_{cell_id}.tif"
                 fpath = out_dir / fname
-                da.rio.to_raster(
-                    fpath,
-                    compress=compress,
-                    zlevel=zlevel,
-                )
+                if cog:
+                    self._write_cog(
+                        da,
+                        fpath,
+                        compress,
+                        zlevel,
+                        blocksize,
+                        overview_resampling,
+                        overview_levels,
+                    )
+                else:
+                    da.rio.to_raster(
+                        fpath,
+                        compress=compress,
+                        zlevel=zlevel,
+                    )
                 records.append(
                     {
                         "path": str(fpath),
