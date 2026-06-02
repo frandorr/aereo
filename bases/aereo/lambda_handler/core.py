@@ -120,6 +120,8 @@ def _build_error_response(
     chunk_id: int,
     exc: Exception,
     status_code: int = 500,
+    *,
+    log_error: bool = True,
 ) -> dict[str, Any]:
     """Build a standardized error response dict.
 
@@ -128,21 +130,23 @@ def _build_error_response(
         chunk_id: Chunk identifier.
         exc: The exception that occurred.
         status_code: HTTP status code for the response.
+        log_error: Whether to emit a logger error record.
 
     Returns:
         Error response dictionary.
     """
     error_msg = _safe_truncate(str(exc))
-    logger.error(
-        "lambda_handler_error",
-        extra={
-            "job_id": job_id,
-            "chunk_id": chunk_id,
-            "error_type": type(exc).__name__,
-            "error": error_msg,
-        },
-        exc_info=True,
-    )
+    if log_error:
+        logger.error(
+            "lambda_handler_error",
+            extra={
+                "job_id": job_id,
+                "chunk_id": chunk_id,
+                "error_type": type(exc).__name__,
+                "error": error_msg,
+            },
+            exc_info=True,
+        )
     return {
         "statusCode": status_code,
         "error": error_msg,
@@ -193,11 +197,34 @@ def _upload_artifacts_to_s3(
     return upload_result["manifest_uri"]
 
 
+def _format_timings(timings: dict[str, Any]) -> dict[str, Any]:
+    """Convert raw timing floats to milliseconds with two-decimal rounding.
+
+    Args:
+        timings: Dictionary of timing names to float or other values.
+
+    Returns:
+        Dictionary with float values rounded to milliseconds.
+    """
+    return {
+        k: round(v * 1000, 2) if isinstance(v, float) else v for k, v in timings.items()
+    }
+
+
 def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     """AEREO Lambda handler entrypoint.
 
     Deserializes the task from S3, runs the execution backend,
     and uploads the results back to S3.
+
+    Args:
+        event: Lambda event dictionary containing task_uri, output_prefix,
+            job_id, chunk_id, and optional bucket and init_params.
+        context: Lambda runtime context.
+
+    Returns:
+        Response dictionary with statusCode, manifest_uri or error details,
+        job_id, chunk_id, and timings_ms.
     """
     task_uri = event.get("task_uri", "")
     output_prefix = event.get("output_prefix", "")
@@ -210,15 +237,13 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     )
 
     if not task_uri or not output_prefix:
-        return {
-            "statusCode": 400,
-            "error": "Missing required fields: task_uri, output_prefix",
-            "error_type": "ValueError",
-            "retryable": False,
-            "manifest_uri": None,
-            "job_id": job_id,
-            "chunk_id": chunk_id,
-        }
+        return _build_error_response(
+            job_id,
+            chunk_id,
+            ValueError("Missing required fields: task_uri, output_prefix"),
+            status_code=400,
+            log_error=False,
+        )
 
     try:
         endpoint_url = os.environ.get("AWS_ENDPOINT_URL")
@@ -267,10 +292,7 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             extra={
                 "job_id": job_id,
                 "chunk_id": chunk_id,
-                "timings_ms": {
-                    k: round(v * 1000, 2) if isinstance(v, float) else v
-                    for k, v in timings.items()
-                },
+                "timings_ms": _format_timings(timings),
             },
         )
 
@@ -279,10 +301,7 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             "manifest_uri": manifest_uri,
             "job_id": job_id,
             "chunk_id": chunk_id,
-            "timings_ms": {
-                k: round(v * 1000, 2) if isinstance(v, float) else v
-                for k, v in timings.items()
-            },
+            "timings_ms": _format_timings(timings),
         }
 
     except MemoryError:
