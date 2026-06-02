@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 import logging
 import os
 import tempfile
@@ -41,9 +42,9 @@ _search_plugins = [
 
 for name, module, cls_name in _search_plugins:
     try:
-        mod = __import__(module, fromlist=[cls_name])
+        mod = importlib.import_module(module)
         _plugins_to_register[name] = getattr(mod, cls_name)
-    except Exception:
+    except (ModuleNotFoundError, ImportError, AttributeError):
         pass  # Plugin not installed — skip
 
 _registry.register_plugins(_plugins_to_register)
@@ -110,7 +111,7 @@ def _is_retryable(exc: Exception) -> bool:
 
         if isinstance(exc, ClientError):
             return True
-    except Exception:
+    except (ModuleNotFoundError, ImportError):
         pass
     return False
 
@@ -163,14 +164,17 @@ def _upload_artifacts_to_s3(
     artifacts: Any,
     output_prefix: str,
     timings: dict[str, Any],
+    endpoint_url: str | None = None,
 ) -> str:
     """Upload GeoTIFF artifacts to S3 and update their URIs.
 
     Args:
         s3: Boto3 S3 client.
-        artifacts: DataFrame containing artifact metadata.
+        artifacts: DataFrame containing artifact metadata.  Mutated in-place
+            so that local file paths are replaced with S3 URIs.
         output_prefix: S3 prefix for output files.
         timings: Mutable timing dictionary to update.
+        endpoint_url: Optional S3 endpoint URL (e.g. for LocalStack).
 
     Returns:
         The manifest URI from CloudTaskStaging.
@@ -189,7 +193,6 @@ def _upload_artifacts_to_s3(
     timings["geotiff_count"] = geotiff_count
 
     t5 = time.time()
-    endpoint_url = os.environ.get("AWS_ENDPOINT_URL")
     staging = CloudTaskStaging(bucket=out_bucket, endpoint_url=endpoint_url)
     upload_result = staging.upload_artifacts(artifacts, output_prefix)
     timings["upload_metadata"] = time.time() - t5
@@ -283,16 +286,17 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             timings["extractor_run"] = time.time() - t3
 
             manifest_uri = _upload_artifacts_to_s3(
-                s3, artifacts, output_prefix, timings
+                s3, artifacts, output_prefix, timings, endpoint_url=endpoint_url
             )
 
         timings["total"] = time.time() - t0
+        timings_ms = _format_timings(timings)
         logger.info(
             "lambda_handler_complete",
             extra={
                 "job_id": job_id,
                 "chunk_id": chunk_id,
-                "timings_ms": _format_timings(timings),
+                "timings_ms": timings_ms,
             },
         )
 
@@ -301,7 +305,7 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             "manifest_uri": manifest_uri,
             "job_id": job_id,
             "chunk_id": chunk_id,
-            "timings_ms": _format_timings(timings),
+            "timings_ms": timings_ms,
         }
 
     except MemoryError:
