@@ -1,7 +1,15 @@
-import importlib.metadata
-from typing import Any, Dict, List, Sequence, Tuple, Type
+"""Plugin registry for aereo.
 
-# Importing the contracts we defined earlier
+Discovers aereo plugins (search, read, reproject, process, write) via Python
+entry points and exposes a uniform lookup API. See ``AereoRegistry`` for the
+public entry point and ``PLUGIN_TYPES`` for the supported plugin kinds.
+"""
+
+from __future__ import annotations
+
+import importlib.metadata
+from typing import Any, Sequence, Type
+
 from aereo.interfaces import (
     Processor,
     Reader,
@@ -23,7 +31,7 @@ def _dump_params(params: Sequence[Any], detailed: bool) -> list[dict]:
             When ``False``, only ``name`` and ``default`` are returned.
 
     Returns:
-        List of JSON-serializable dicts representing PluginParam.
+        list of JSON-serializable dicts representing PluginParam.
     """
     if detailed:
         return [p.model_dump() for p in params]
@@ -38,15 +46,15 @@ class _TypedRegistry:
     """
 
     def __init__(self) -> None:
-        self.plugins: Dict[str, Type] = {}
-        self.collection_to_plugins: Dict[str, List[str]] = {}
-        self.collection_mapping: Dict[str, Dict[str, str]] = {}
+        self.plugins: dict[str, Type] = {}
+        self.collection_to_plugins: dict[str, list[str]] = {}
+        self.collection_mapping: dict[str, dict[str, str]] = {}
 
     def register(
         self,
         plugin_name: str,
         plugin_class: Type,
-        original_collections: Dict[str, str],
+        original_collections: dict[str, str],
     ) -> None:
         """Register a plugin and index its supported collections.
 
@@ -58,7 +66,7 @@ class _TypedRegistry:
         """
         self.plugins[plugin_name] = plugin_class
 
-        plugin_canonical_map: Dict[str, str] = {}
+        plugin_canonical_map: dict[str, str] = {}
         for product in plugin_class.supported_collections:
             lower_product = product.lower()
             self.collection_to_plugins.setdefault(lower_product, []).append(plugin_name)
@@ -68,7 +76,7 @@ class _TypedRegistry:
 
         self.collection_mapping[plugin_name] = plugin_canonical_map
 
-    def find_for(self, collection_name: str, wildcard: str) -> List[str]:
+    def find_for(self, collection_name: str, wildcard: str) -> list[str]:
         """Return plugin names supporting a collection, including wildcards.
 
         Args:
@@ -83,14 +91,14 @@ class _TypedRegistry:
         results.update(self.collection_to_plugins.get(wildcard, []))
         return sorted(results)
 
-    def get_collections(self, plugin_name: str) -> List[str]:
+    def get_collections(self, plugin_name: str) -> list[str]:
         """Return the supported collections for a plugin.
 
         Args:
             plugin_name: Entry-point name of the plugin.
 
         Returns:
-            List of collection strings supported by the plugin, or an empty list
+            list of collection strings supported by the plugin, or an empty list
             if the plugin is not known.
         """
         if plugin_name in self.plugins:
@@ -113,7 +121,7 @@ class _TypedRegistry:
         plugin_name: str,
         collection_names: Sequence[str],
         wildcard: str,
-    ) -> List[str]:
+    ) -> list[str]:
         """Map user-provided collection names to the plugin's declared format.
 
         Args:
@@ -122,7 +130,7 @@ class _TypedRegistry:
             wildcard: The wildcard token (e.g. "*").
 
         Returns:
-            List of collection names mapped to the plugin's declared format.
+            list of collection names mapped to the plugin's declared format.
         """
         if plugin_name not in self.collection_mapping:
             return [c.lower() for c in collection_names]
@@ -170,7 +178,7 @@ class AereoRegistry:
     WILDCARD: str = "*"
 
     # prefix -> (type_label, base_class)
-    PLUGIN_TYPES: Dict[str, Tuple[str, Type]] = {
+    PLUGIN_TYPES: dict[str, tuple[str, Type]] = {
         "search_": ("searcher", SearchProvider),
         "read_": ("reader", Reader),
         "reproject_": ("reprojector", Reprojector),
@@ -188,18 +196,18 @@ class AereoRegistry:
                 :meth:`register_plugins`.
         """
         # One _TypedRegistry per plugin type
-        self._registries: Dict[str, _TypedRegistry] = {
+        self._registries: dict[str, _TypedRegistry] = {
             label: _TypedRegistry() for label, _ in self.PLUGIN_TYPES.values()
         }
 
         # Expose the internal dicts directly so existing tests and consumers
         # that access ``_searchers`` continue to work.
-        self._searchers: Dict[str, Type[SearchProvider]] = self._registries[
+        self._searchers: dict[str, Type[SearchProvider]] = self._registries[
             "searcher"
         ].plugins  # type: ignore[assignment]
 
         # Track original case for display in list_supported_collections
-        self._original_collections: Dict[str, str] = {}
+        self._original_collections: dict[str, str] = {}
 
         if auto_discover:
             self.discover_plugins()
@@ -211,7 +219,7 @@ class AereoRegistry:
                 return label
         return None
 
-    def register_plugins(self, plugins: Dict[str, Type]) -> None:
+    def register_plugins(self, plugins: dict[str, Type]) -> None:
         """Register pre-discovered plugins without scanning entry points.
 
         This is useful in environments like AWS Lambda where entry point
@@ -264,7 +272,7 @@ class AereoRegistry:
 
     # --- Generic API (FR-5.3) ---
 
-    def find_for(self, type_label: str, collection_name: str) -> List[str]:
+    def find_for(self, type_label: str, collection_name: str) -> list[str]:
         """Return plugin names of *type_label* supporting *collection_name*.
 
         Args:
@@ -315,7 +323,7 @@ class AereoRegistry:
 
     # --- Backward-compatible API ---
 
-    def list_supported_collections(self) -> List[str]:
+    def list_supported_collections(self) -> list[str]:
         """Returns a list of all products supported by currently installed plugins.
 
         Returns:
@@ -328,11 +336,11 @@ class AereoRegistry:
         display_names = [self._original_collections.get(p, p) for p in all_products]
         return sorted(display_names)
 
-    def find_searchers_for(self, collection_name: str) -> List[str]:
+    def find_searchers_for(self, collection_name: str) -> list[str]:
         """Returns names of search plugins that support the requested collection."""
         return self._registries["searcher"].find_for(collection_name, self.WILDCARD)
 
-    def get_searcher_collections(self, plugin_name: str) -> List[str]:
+    def get_searcher_collections(self, plugin_name: str) -> list[str]:
         """Return the supported collections for a named search plugin."""
         return self._registries["searcher"].get_collections(plugin_name)
 
@@ -342,7 +350,7 @@ class AereoRegistry:
 
     def get_collection_mapping_for_searcher(
         self, plugin_name: str, collection_names: Sequence[str]
-    ) -> List[str]:
+    ) -> list[str]:
         """Maps user-provided collection names to a specific search plugin's declared format."""
         return self._registries["searcher"].get_collection_mapping(
             plugin_name, collection_names, self.WILDCARD
