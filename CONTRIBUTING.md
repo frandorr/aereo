@@ -156,6 +156,32 @@ docs(readme): update installation instructions
 
 Configuration is in `pyproject.toml`.
 
+## License Policy
+
+AEREO is distributed under **Apache-2.0**. To stay compatible:
+
+- **Runtime dependencies** must be Apache-2.0, MIT, BSD, ISC, MPL, EPL, or
+  LGPL. Permissive copyleft (LGPL) is acceptable as an unmodified runtime
+  dep; strong copyleft (GPL, AGPL) is **not**.
+- **Optional extras** (`aereo[name]`) follow the same rules — even if a
+  user only installs the extra on demand, the in-tree adapter code becomes
+  a derivative work of the GPL library under the FSF interpretation.
+- **External plugin repos** may use any license (including GPL); they are
+  separate distributions, not part of `aereo`.
+
+A CI job (`.github/workflows/license-check.yml`) enforces this by running
+`scripts/check_licenses.py` against every install permutation. If a new
+dep trips it, either remove the dep, find an alternative, or — if the dep
+is dual-licensed with a permissive option — add it to
+`KNOWN_FALSE_POSITIVES` in the script with a justification.
+
+To run the check locally:
+
+```bash
+uv pip install pip-licenses
+uv run python scripts/check_licenses.py
+```
+
 ---
 
 ## Questions?
