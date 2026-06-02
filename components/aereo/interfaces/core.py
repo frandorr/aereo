@@ -701,8 +701,8 @@ class AereoProfile(_ProfileLoaderMixin, BaseModel):
     - How to download assets (``downloader``)
 
     Plugin-specific settings (e.g. ``reader``, ``calibration``, ``resampling``)
-    belong in ``extract_params`` or ``search_params`` rather than top-level
-    fields.
+    belong in ``read_params``, ``process_params``, ``write_params``, or
+    ``search_params`` rather than top-level fields.
 
     One profile = one coherent pipeline configuration.
     """
@@ -720,9 +720,6 @@ class AereoProfile(_ProfileLoaderMixin, BaseModel):
     read_params: Mapping[str, Any] = Field(default_factory=dict)
     process_params: Mapping[str, Any] = Field(default_factory=dict)
     write_params: Mapping[str, Any] = Field(default_factory=dict)
-    # Backward-compat alias — ``extract_params`` is merged into read/process/write
-    # params at runtime by the TaskRunner.
-    extract_params: Mapping[str, Any] = Field(default_factory=dict)
 
     def __getstate__(self) -> dict[str, Any]:
         """Serialize to a dict, converting live callables to dotted paths.
@@ -868,21 +865,17 @@ class Extractor(AereoPlugin, plugin_abstract=True):
     def resolve_variables(
         task: ExtractionTask,
         collection: str | None = None,
-        extract_params: Mapping[str, Any] | None = None,
     ) -> list[str]:
         """Resolve target variables from profile collections with fallback chain.
 
         Resolution order:
         1. ``task.profile.collections[collection]``
-        2. ``extract_params["dataset_name"]``
-        3. ``task.task_context["dataset_name"]``
+        2. ``task.task_context["dataset_name"]``
 
         Args:
             task: The extraction task containing profile and assets.
             collection: Collection name to look up in profile.collections.
                 If None, uses the first collection found in task assets.
-            extract_params: Additional parameters that may contain a
-                ``dataset_name`` fallback.
 
         Returns:
             List of resolved variable names.
@@ -891,7 +884,6 @@ class Extractor(AereoPlugin, plugin_abstract=True):
             ValueError: If no variables can be resolved.
         """
         variables: list[str] = []
-        extract_params = dict(extract_params or {})
 
         if task.profile.collections:
             if collection is not None:
@@ -903,9 +895,7 @@ class Extractor(AereoPlugin, plugin_abstract=True):
                 variables = list(dict.fromkeys(variables))
 
         if not variables:
-            dataset_name = extract_params.get("dataset_name") or task.task_context.get(
-                "dataset_name"
-            )
+            dataset_name = task.task_context.get("dataset_name")
             if dataset_name:
                 variables = [dataset_name]
 
@@ -918,30 +908,16 @@ class Extractor(AereoPlugin, plugin_abstract=True):
         return variables
 
     @staticmethod
-    def resolve_downloader(
-        task: ExtractionTask,
-        extract_params: Mapping[str, Any] | None = None,
-    ) -> Any | None:
-        """Resolve the downloader callable using the standard priority order.
-
-        Resolution order:
-        1. ``task.profile.downloader`` (per-profile, highest priority)
-        2. ``extract_params["downloader"]`` (batch-level fallback)
-        3. ``None`` (use built-in default)
+    def resolve_downloader(task: ExtractionTask) -> Any | None:
+        """Resolve the downloader callable from the task profile.
 
         Args:
             task: The extraction task containing profile.
-            extract_params: Additional parameters that may contain a downloader.
 
         Returns:
             The resolved downloader callable, or None.
         """
-        downloader = getattr(task.profile, "downloader", None)
-        if downloader is not None:
-            return downloader
-        if extract_params and "downloader" in extract_params:
-            return extract_params["downloader"]
-        return None
+        return getattr(task.profile, "downloader", None)
 
     @staticmethod
     def get_grid_cells(task: ExtractionTask) -> Sequence[Any]:
@@ -1226,24 +1202,14 @@ class Extractor(AereoPlugin, plugin_abstract=True):
     def extract(
         self,
         extraction_task: ExtractionTask,
-        extract_params: Mapping[str, Any] | None,
     ) -> GeoDataFrame[ArtifactSchema]:
         """Extract data for a batch of assets (equivalent to one item of the prepare_for_extraction output).
+
         Args:
             extraction_task: An ExtractionTask containing a batch of assets to extract.
                 This is one of the items returned by the `prepare_for_extraction` method.
-                    extraction_task.task_context holds batch-specific data generated during preparation
-            extract_params: Meta-level or tool-level parameters for the extraction
-                (e.g. ``max_retries``, ``credentials``, ``downloader`` callables).
-                Domain-specific configuration such as ``padding`` should be
-                defined on ``extraction_task.profile`` (via its explicit
-                fields or ``extract_params``) rather than here.
-
-                .. note::
-                    When a downloader is needed, extractors should resolve it in this order:
-                    1. ``extraction_task.profile.downloader`` (per-profile, highest priority)
-                    2. ``extract_params.get("downloader")`` (batch-level fallback)
-                    3. Built-in default download logic.
+                ``extraction_task.task_context`` holds batch-specific data generated
+                during preparation.
 
         Returns:
             A GeoDataFrame of extracted artifacts, where each row corresponds to an extracted asset

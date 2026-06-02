@@ -197,7 +197,7 @@ def test_profile_reconstruction_matches_original(tmp_path: Any) -> None:
         conform_to=(256, 256),
         plugin_hints={"extract": "aereo-extract-aws-goes"},
         search_params={"version": "061"},
-        extract_params={"calibration": "reflectance"},
+        read_params={"calibration": "reflectance"},
     )
 
     df = gpd.GeoDataFrame(

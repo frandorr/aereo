@@ -212,26 +212,9 @@ def profile_to_pipeline(profile: Any) -> ExtractionPipeline:
                     )
                 )
 
-    # Merge extract_params into each stage's params for backward compat
-    read_params = _merge_stage_params(profile.extract_params, profile.read_params)
-    write_params = _merge_stage_params(profile.extract_params, profile.write_params)
-    reproject_params = _merge_stage_params(profile.extract_params, {})
-
-    # If we created processor stages from hints, re-merge extract_params
-    if process_stages:
-        process_stages = [
-            ProcessStageConfig(
-                plugin=p.plugin,
-                stage=p.stage,
-                params=_merge_stage_params(profile.extract_params, p.params),
-            )
-            for p in process_stages
-        ]
-    else:
-        # No processor hints but maybe process_params exist — create a placeholder?
-        # In the old model process_params were just passed to any processor. If none
-        # are configured we drop them (no stage to attach to).
-        pass
+    read_params = dict(profile.read_params)
+    write_params = dict(profile.write_params)
+    reproject_params = {}
 
     return ExtractionPipeline(
         name=profile.name,
@@ -246,11 +229,3 @@ def profile_to_pipeline(profile: Any) -> ExtractionPipeline:
         write=StageConfig(plugin=write_plugin, params=write_params),
     )
 
-
-def _merge_stage_params(
-    extract_params: Mapping[str, Any], stage_params: Mapping[str, Any]
-) -> dict[str, Any]:
-    """Merge extract_params (legacy catch-all) into stage-specific params."""
-    merged: dict[str, Any] = dict(extract_params)
-    merged.update(stage_params)
-    return merged

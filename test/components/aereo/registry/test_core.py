@@ -49,7 +49,6 @@ class DummyExtractor(Extractor):
     def extract(
         self,
         extraction_task: ExtractionTask,
-        extract_params: dict[str, Any] | None,
     ) -> GeoDataFrame[ArtifactSchema]:
         return cast(GeoDataFrame[ArtifactSchema], ArtifactSchema.empty())
 
