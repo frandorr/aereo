@@ -49,9 +49,6 @@ class TaskSerializer:
             dest_dir: Directory that will hold ``task_assets.parquet`` and
                 ``task_meta.json``.  Created automatically if it does not exist.
 
-        Returns:
-            None
-
         Raises:
             OSError: If the destination directory cannot be created.
         """
@@ -62,16 +59,15 @@ class TaskSerializer:
         task.assets.to_parquet(dest_dir / self.ASSETS_NAME)
 
         # Grid cells → lightweight dicts
-        grid_cells_meta: list[dict[str, Any]] = []
-        for cell in task.grid_cells:
-            grid_cells_meta.append(
-                {
-                    self.CELL_ID_KEY: cell.id(),
-                    self.D_KEY: cell.D,
-                    self.IS_PRIMARY_KEY: cell.is_primary,
-                    self.GEOM_WKT_KEY: cell.geom.wkt,
-                }
-            )
+        grid_cells_meta: list[dict[str, Any]] = [
+            {
+                self.CELL_ID_KEY: cell.id(),
+                self.D_KEY: cell.D,
+                self.IS_PRIMARY_KEY: cell.is_primary,
+                self.GEOM_WKT_KEY: cell.geom.wkt,
+            }
+            for cell in task.grid_cells
+        ]
 
         # Metadata → JSON
         meta: dict[str, Any] = {
@@ -88,7 +84,10 @@ class TaskSerializer:
         )
 
         logger.debug(
-            f"task_serialized dest_dir={dest_dir} n_assets={len(task.assets)} n_cells={len(task.grid_cells)}"
+            "task_serialized dest_dir=%s n_assets=%d n_cells=%d",
+            dest_dir,
+            len(task.assets),
+            len(task.grid_cells),
         )
 
     def deserialize(self, src_dir: Path) -> ExtractionTask:
