@@ -4,6 +4,11 @@ Contains schema definitions for search results and grid dataframes
 used across the aereo plugin system.
 """
 
+from __future__ import annotations
+
+from typing import cast
+
+import geopandas as gpd
 import pandera.pandas as pa
 from pandera.typing import Series
 from pandera.typing.geopandas import GeoDataFrame, GeoSeries
@@ -97,9 +102,6 @@ class ArtifactSchema(GridSchema):
             An empty validated GeoDataFrame with the correct schema columns,
             including a geometry column.
         """
-        import geopandas as gpd
-        from typing import cast
-
         columns = list(cls.to_schema().columns.keys())
         if "geometry" not in columns:
             columns.append("geometry")
