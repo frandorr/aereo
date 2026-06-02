@@ -14,6 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 def _import_yaml() -> Any:
+    """Lazily import PyYAML so it remains an optional dependency."""
     try:
         import yaml
 
@@ -80,15 +81,28 @@ class ExtractionPipeline(BaseModel):
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> Self:
-        """Load pipeline from a YAML file."""
-        yaml = _import_yaml()
-        path = Path(path)
-        data = yaml.safe_load(path.read_text())
-        return cls.model_validate(data.get("pipeline", data))
+        """Load pipeline from a YAML file.
+
+        Args:
+            path: Filesystem path to a YAML document. A top-level ``pipeline:``
+                key is unwrapped if present, otherwise the root mapping is used.
+
+        Returns:
+            Validated :class:`ExtractionPipeline` instance.
+        """
+        return cls.from_yaml_string(Path(path).read_text())
 
     @classmethod
     def from_yaml_string(cls, text: str) -> Self:
-        """Load pipeline from a YAML string."""
+        """Load pipeline from a YAML string.
+
+        Args:
+            text: YAML document text. A top-level ``pipeline:`` key is unwrapped
+                if present, otherwise the root mapping is used.
+
+        Returns:
+            Validated :class:`ExtractionPipeline` instance.
+        """
         yaml = _import_yaml()
         data = yaml.safe_load(text)
         return cls.model_validate(data.get("pipeline", data))
@@ -117,6 +131,15 @@ class PipelineBuilder:
         conform_to: tuple[int, int] | None = None,
         collections: Mapping[str, Sequence[str]] | None = None,
     ) -> None:
+        """Initialise the builder with required top-level pipeline fields.
+
+        Args:
+            name: Pipeline name (used for output paths and logs).
+            resolution: Output resolution in CRS units.
+            padding: Optional padding in cells around the target grid.
+            conform_to: Optional ``(width, height)`` to force output dimensions.
+            collections: Optional mapping of collection name to asset keys.
+        """
         self._name = name
         self._resolution = resolution
         self._padding = padding
@@ -128,6 +151,15 @@ class PipelineBuilder:
         self._write: StageConfig | None = None
 
     def read_with(self, plugin: str | None = None, **params: Any) -> "PipelineBuilder":
+        """Configure the read stage.
+
+        Args:
+            plugin: Reader plugin name, or ``None`` for the default reader.
+            **params: Reader-specific parameters forwarded to the plugin.
+
+        Returns:
+            Self, to allow method chaining.
+        """
         self._read = StageConfig(plugin=plugin, params=params)
         return self
 
@@ -137,6 +169,18 @@ class PipelineBuilder:
         stage: str = "post_reproject",
         **params: Any,
     ) -> "PipelineBuilder":
+        """Append a processor stage to the pipeline.
+
+        Call multiple times to chain processors; they run in the order added.
+
+        Args:
+            plugin: Processor plugin name, or ``None`` for the default.
+            stage: Pipeline stage at which the processor runs.
+            **params: Processor-specific parameters.
+
+        Returns:
+            Self, to allow method chaining.
+        """
         self._process.append(
             ProcessStageConfig(plugin=plugin, stage=stage, params=params)
         )
@@ -145,14 +189,39 @@ class PipelineBuilder:
     def reproject_with(
         self, plugin: str | None = None, **params: Any
     ) -> "PipelineBuilder":
+        """Configure the reproject stage.
+
+        Args:
+            plugin: Reprojector plugin name, or ``None`` for the default.
+            **params: Reprojector-specific parameters.
+
+        Returns:
+            Self, to allow method chaining.
+        """
         self._reproject = StageConfig(plugin=plugin, params=params)
         return self
 
     def write_with(self, plugin: str | None = None, **params: Any) -> "PipelineBuilder":
+        """Configure the write stage.
+
+        Args:
+            plugin: Writer plugin name, or ``None`` for the default writer.
+            **params: Writer-specific parameters.
+
+        Returns:
+            Self, to allow method chaining.
+        """
         self._write = StageConfig(plugin=plugin, params=params)
         return self
 
     def build(self) -> ExtractionPipeline:
+        """Materialise the configured :class:`ExtractionPipeline`.
+
+        Unset stages fall back to a default empty :class:`StageConfig`.
+
+        Returns:
+            Immutable pipeline descriptor ready for serialisation or execution.
+        """
         return ExtractionPipeline(
             name=self._name,
             resolution=self._resolution,
