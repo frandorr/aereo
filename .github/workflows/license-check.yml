@@ -1,0 +1,36 @@
+name: License Compatibility
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  license-check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        extras:
+          - ""
+          - "earthaccess"
+          - "aws-goes"
+          - "serverless"
+    name: license-check (extras=${{ matrix.extras || 'none' }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - name: Install project (extras=${{ matrix.extras || 'none' }})
+        run: |
+          if [ -z "${{ matrix.extras }}" ]; then
+            uv pip install --system .
+          else
+            uv pip install --system ".[${{ matrix.extras }}]"
+          fi
+      - name: Install pip-licenses
+        run: uv pip install --system pip-licenses
+      - name: Run license-compat check
+        run: python scripts/check_licenses.py
