@@ -11,7 +11,10 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any, Mapping
+
+import numpy as np
 
 from aereo.grid import GridCell
 from aereo.interfaces import (
@@ -24,9 +27,6 @@ from aereo.interfaces import (
 )
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
-from structlog import get_logger
-
-logger = get_logger()
 
 
 class ReprojectODC(Reprojector):
@@ -43,7 +43,17 @@ class ReprojectODC(Reprojector):
         geobox: Any,
         params: Mapping[str, Any],
     ) -> AereoDataset:
-        """Reproject *ds* to *geobox* using ``odc.geo.xr.reproject``."""
+        """Reproject *ds* to *geobox* using ``odc.geo.xr.reproject``.
+
+        Args:
+            ds: Input dataset.
+            geobox: Target ``odc.geo.geobox.GeoBox``.
+            params: Plugin parameters. Supports ``resampling``
+                (default ``"nearest"``).
+
+        Returns:
+            Reprojected dataset.
+        """
         from odc.geo.xr import reproject as odc_reproject  # type: ignore[reportAttributeAccessIssue]
 
         resampling = params.get("resampling", "nearest")
@@ -94,7 +104,7 @@ class WriteGeoTIFF(Writer):
     def _write_cog(
         self,
         da: Any,
-        fpath: Any,
+        fpath: Path,
         compress: str,
         zlevel: int,
         blocksize: int,
@@ -107,6 +117,18 @@ class WriteGeoTIFF(Writer):
         then moves it to the final destination.  This preserves the requested
         tile size, overviews, and metadata tags without relying on GDAL's
         COG driver (which can override block sizes and strip tags).
+
+        Args:
+            da: DataArray to write.
+            fpath: Destination path.
+            compress: Compression algorithm (e.g. ``"deflate"``).
+            zlevel: Compression level.
+            blocksize: Tile width/height in pixels.
+            overview_resampling: Resampling method for overviews.
+            overview_levels: Explicit decimation levels. Auto-generated if omitted.
+
+        Returns:
+            None
         """
         import shutil
         import tempfile
@@ -139,6 +161,49 @@ class WriteGeoTIFF(Writer):
 
         shutil.move(tmp_path, fpath)
 
+    def _write_band(
+        self,
+        da: Any,
+        fpath: Path,
+        cog: bool,
+        compress: str,
+        zlevel: int,
+        blocksize: int,
+        overview_resampling: str,
+        overview_levels: list[int] | None,
+    ) -> None:
+        """Write a single DataArray to disk, optionally as a COG.
+
+        Args:
+            da: DataArray to write.
+            fpath: Destination path.
+            cog: Whether to write as Cloud Optimized GeoTIFF.
+            compress: Compression algorithm (e.g. ``"deflate"``).
+            zlevel: Compression level.
+            blocksize: Tile width/height in pixels when *cog* is True.
+            overview_resampling: Resampling method for COG overviews.
+            overview_levels: Explicit decimation levels. Auto-generated if omitted.
+
+        Returns:
+            None
+        """
+        if cog:
+            self._write_cog(
+                da,
+                fpath,
+                compress,
+                zlevel,
+                blocksize,
+                overview_resampling,
+                overview_levels,
+            )
+        else:
+            da.rio.to_raster(
+                fpath,
+                compress=compress,
+                zlevel=zlevel,
+            )
+
     def write(
         self,
         ds: AereoDataset,
@@ -151,8 +216,6 @@ class WriteGeoTIFF(Writer):
         Returns:
             GeoDataFrame of written artifacts.
         """
-        from pathlib import Path
-
         import geopandas as gpd
         import pandas as pd
         import rioxarray  # noqa: F401
@@ -179,22 +242,16 @@ class WriteGeoTIFF(Writer):
                     band_da = da.isel(band=band_idx)
                     fname = f"{var_name}_b{band_idx}_{cell_id}.tif"
                     fpath = out_dir / fname
-                    if cog:
-                        self._write_cog(
-                            band_da,
-                            fpath,
-                            compress,
-                            zlevel,
-                            blocksize,
-                            overview_resampling,
-                            overview_levels,
-                        )
-                    else:
-                        band_da.rio.to_raster(
-                            fpath,
-                            compress=compress,
-                            zlevel=zlevel,
-                        )
+                    self._write_band(
+                        band_da,
+                        fpath,
+                        cog,
+                        compress,
+                        zlevel,
+                        blocksize,
+                        overview_resampling,
+                        overview_levels,
+                    )
                     records.append(
                         {
                             "path": str(fpath),
@@ -207,22 +264,16 @@ class WriteGeoTIFF(Writer):
             else:
                 fname = f"{var_name}_{cell_id}.tif"
                 fpath = out_dir / fname
-                if cog:
-                    self._write_cog(
-                        da,
-                        fpath,
-                        compress,
-                        zlevel,
-                        blocksize,
-                        overview_resampling,
-                        overview_levels,
-                    )
-                else:
-                    da.rio.to_raster(
-                        fpath,
-                        compress=compress,
-                        zlevel=zlevel,
-                    )
+                self._write_band(
+                    da,
+                    fpath,
+                    cog,
+                    compress,
+                    zlevel,
+                    blocksize,
+                    overview_resampling,
+                    overview_levels,
+                )
                 records.append(
                     {
                         "path": str(fpath),
@@ -317,8 +368,6 @@ class QAMask(Processor):
         Raises:
             ValueError: If required params are missing or the QA band does not exist.
         """
-        import numpy as np
-
         qa_band = params.get("qa_band")
         qa_mask_bits = params.get("qa_mask_bits")
 
