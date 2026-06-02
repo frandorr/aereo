@@ -18,6 +18,9 @@ from structlog import get_logger
 
 logger = get_logger()
 
+_RE_PRESIGNED_URL = re.compile(r"https?://[^\s]+\?[^\s]*X-Amz-Credential[^\s]*")
+_RE_AWS_KEY = re.compile(r"AKIA[0-9A-Z]{16}")
+
 
 def _safe_truncate(text: str, max_len: int = 2048) -> str:
     """Truncate error text and redact potential credentials.
@@ -29,12 +32,8 @@ def _safe_truncate(text: str, max_len: int = 2048) -> str:
     Returns:
         Sanitised text with credentials redacted and length capped.
     """
-    text = re.sub(
-        r"https?://[^\s]+\?[^\s]*X-Amz-Credential[^\s]*",
-        "[REDACTED-PRESIGNED-URL]",
-        text,
-    )
-    text = re.sub(r"AKIA[0-9A-Z]{16}", "[REDACTED-AWS-KEY]", text)
+    text = _RE_PRESIGNED_URL.sub("[REDACTED-PRESIGNED-URL]", text)
+    text = _RE_AWS_KEY.sub("[REDACTED-AWS-KEY]", text)
     if len(text) > max_len:
         text = text[:max_len] + f"... [{len(text) - max_len} chars truncated]"
     return text
@@ -116,14 +115,17 @@ class LambdaBackend(ExecutionBackend):
 
         Returns:
             An iterable of ``GeoDataFrame[ArtifactSchema]`` results, one per task.
+
+        Raises:
+            RuntimeError: If a Lambda invocation fails or returns a non-2xx
+                status code.
+            RetryableLambdaError: If the Lambda returns a retryable error.
+            ValueError: If the response is missing ``manifest_uri``.
         """
         if not tasks:
             return []
 
-        if len(tasks) == 1:
-            return [self._invoke_single(tasks[0])]
-
-        results: list[GeoDataFrame[ArtifactSchema] | None] = [None] * len(tasks)
+        results_map: dict[int, GeoDataFrame[ArtifactSchema]] = {}
         with ThreadPoolExecutor(max_workers=self.max_concurrent_invokes) as executor:
             futures = {
                 executor.submit(self._invoke_single, task): i
@@ -132,7 +134,7 @@ class LambdaBackend(ExecutionBackend):
             for future in as_completed(futures):
                 idx = futures[future]
                 try:
-                    results[idx] = future.result()
+                    results_map[idx] = future.result()
                 except Exception as exc:
                     logger.error(
                         "lambda_task_failed",
@@ -141,7 +143,7 @@ class LambdaBackend(ExecutionBackend):
                     )
                     raise
 
-        return [r for r in results if r is not None]
+        return [results_map[i] for i in range(len(tasks))]
 
     def _invoke_single(self, task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
         """Serialize, stage, invoke Lambda, and load artifacts for one task.
@@ -172,7 +174,7 @@ class LambdaBackend(ExecutionBackend):
             "job_id": job_id,
             "chunk_id": task_idx,
             "init_params": task.task_context.get("init_params"),
-            "bucket": getattr(self.staging, "bucket", None),
+            "bucket": self.staging.bucket,
         }
         response = self._lambda_client.invoke(
             FunctionName=self.function_name,
