@@ -1,3 +1,11 @@
+"""Coordinate-system helpers for aereo.
+
+Small set of pure functions for reprojecting shapely geometries and inferring
+the UTM EPSG code that best fits a given geometry or (lat, lng) coordinate.
+"""
+
+from __future__ import annotations
+
 import utm
 from pyproj import Transformer
 from shapely.geometry import LineString, MultiPolygon, Point, Polygon
@@ -25,23 +33,23 @@ def reproject_geom(geom: BaseGeometry, src_epsg: str, dst_epsg: str) -> BaseGeom
 
 
 def get_utm_epsg_from_geometry(geometry: BaseGeometry) -> str:
-    """
-    Get the UTM EPSG code from a Shapely geometry.
+    """Get the UTM EPSG code from a Shapely geometry.
 
     Args:
-        geometry (BaseGeometry): A Shapely geometry object.
-    Returns:
-        str: The UTM EPSG code as a string.
-    Raises:
-        ValueError: If the geometry type is not supported.
-    """
+        geometry: A Shapely geometry object.
 
+    Returns:
+        The UTM EPSG code as a string.
+
+    Raises:
+        ValueError: If the geometry type is not supported, or if the UTM zone
+            cannot be determined from the geometry's centroid.
+    """
     if isinstance(geometry, (Polygon, MultiPolygon, LineString)):
         lonlat = (geometry.centroid.x, geometry.centroid.y)
     elif isinstance(geometry, Point):
         lonlat = (geometry.x, geometry.y)
     else:
-        # raise an error if the geometry is not supported
         raise ValueError(f"Unsupported geometry type: {type(geometry).__name__}")
 
     _, _, zone_number, zone_letter = utm.from_latlon(lonlat[1], lonlat[0])  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
