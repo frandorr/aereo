@@ -1,8 +1,16 @@
+"""Core client implementation for the Aereo geospatial pipeline.
+
+This module defines :class:`AereoClient` and its supporting utilities,
+including geometry normalisation, parameter resolution, and parallel
+search / extraction orchestration.
+"""
+
+from collections.abc import Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from enum import Enum
 import json
-from typing import Any, Mapping, Sequence, cast
+from typing import Any, cast
 
 import pandas as pd
 from aereo.backends import LocalProcessBackend, TaskRunner
