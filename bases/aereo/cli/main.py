@@ -7,9 +7,10 @@ import json
 import pickle
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Any, Optional
+from typing import Annotated, Any, Callable
 
 import geopandas as gpd
+import pandas as pd
 import typer
 from rich.console import Console
 from rich.table import Table
@@ -63,6 +64,42 @@ def _load_geometry(geojson_path: Path) -> dict[str, Any] | None:
     raise ValueError("Could not extract geometry from GeoJSON.")
 
 
+def _load_geometry_safe(path: Path | None) -> dict[str, Any] | None:
+    """Load geometry from GeoJSON if path is provided and exists.
+
+    Args:
+        path: Path to GeoJSON file, or None.
+
+    Returns:
+        Geometry dictionary, or None if path is None or missing.
+    """
+    return _load_geometry(path) if path and path.exists() else None
+
+
+def _parse_iso_datetime(value: str | None) -> datetime | None:
+    """Parse an ISO 8601 datetime string.
+
+    Args:
+        value: ISO 8601 datetime string, or None.
+
+    Returns:
+        Parsed datetime, or None if input was None.
+    """
+    return datetime.fromisoformat(value) if value else None
+
+
+def _load_grid_config(path: Path | None) -> GridConfig:
+    """Load a GridConfig from YAML, or return defaults.
+
+    Args:
+        path: Path to grid config YAML, or None.
+
+    Returns:
+        Loaded GridConfig, or a default instance if path is None or missing.
+    """
+    return GridConfig.from_yaml(path) if path and path.exists() else GridConfig()
+
+
 def _search_results_to_json(df: gpd.GeoDataFrame) -> list[dict[str, Any]]:
     """Convert search results GeoDataFrame to JSON-serializable records.
 
@@ -82,7 +119,7 @@ def _search_results_to_json(df: gpd.GeoDataFrame) -> list[dict[str, Any]]:
     for rec in records:
         for key in ("start_time", "end_time"):
             val = rec.get(key)
-            if val is not None and hasattr(val, "isoformat"):
+            if val is not None and isinstance(val, datetime):
                 rec[key] = val.isoformat()
     return records
 
@@ -107,15 +144,18 @@ def _search_results_from_json(records: list[dict[str, Any]]) -> gpd.GeoDataFrame
 
         df["geometry"] = gpd.GeoSeries(df["geometry"].apply(_to_geom))
         df = gpd.GeoDataFrame(df, geometry="geometry")
-        df.set_crs(epsg=4326, inplace=True)
+        df = df.set_crs(epsg=4326)
+        assert df is not None
     for key in ("start_time", "end_time"):
         if key in df.columns:
-            df[key] = gpd.pd.to_datetime(df[key])
+            df[key] = pd.to_datetime(df[key])
     return gpd.GeoDataFrame(AssetSchema.validate(df))
 
 
 def _print_search_table(df: gpd.GeoDataFrame) -> None:
     """Pretty-print search results as a Rich table.
+
+    Displays the first 50 rows with a trailing indicator when more exist.
 
     Args:
         df: GeoDataFrame containing search results.
@@ -173,6 +213,45 @@ def _load_profiles(paths: list[Path]) -> list[AereoProfile]:
     return profiles
 
 
+def _validate_yaml(path: Path, loader: Callable[[Path], Any], label: str) -> None:
+    """Validate a YAML file using the given schema loader.
+
+    Args:
+        path: Path to the YAML file.
+        loader: Callable that loads and validates the file.
+        label: Human-readable label for error messages.
+
+    Raises:
+        typer.Exit: If the file is not found or validation fails.
+    """
+    if not path.exists():
+        console.print(f"[red]{label} not found:[/red] {path}")
+        raise typer.Exit(code=1)
+    try:
+        loader(path)
+        console.print(f"[green]✓ {label} valid:[/green] {path}")
+    except Exception as exc:
+        console.print(f"[red]✗ {label} invalid:[/red] {path}\n{exc}")
+        raise typer.Exit(code=1)
+
+
+def _add_plugin_rows(table: Table, label: str, plugins: dict[str, type]) -> None:
+    """Add plugin summary rows to a Rich table.
+
+    Args:
+        table: Rich Table to append rows to.
+        label: Human-readable plugin type label.
+        plugins: Mapping of plugin name to plugin class.
+    """
+    for name, cls in plugins.items():
+        cols = ", ".join(cls.supported_collections[:3])
+        if len(cls.supported_collections) > 3:
+            cols += " ..."
+        req = str(len(getattr(cls, "required_params", [])))
+        opt = str(len(getattr(cls, "optional_params", [])))
+        table.add_row(label, name, cols, req, opt)
+
+
 # ---------------------------------------------------------------------------
 # Commands
 # ---------------------------------------------------------------------------
@@ -185,19 +264,19 @@ def search(
         typer.Option("--profile", "-p", help="Path to profile YAML (repeatable)"),
     ],
     config: Annotated[
-        Optional[Path], typer.Option("--config", "-c", help="Path to grid config YAML")
+        Path | None, typer.Option("--config", "-c", help="Path to grid config YAML")
     ] = None,
     geojson: Annotated[
-        Optional[Path], typer.Option("--geojson", "-g", help="Path to AOI GeoJSON file")
+        Path | None, typer.Option("--geojson", "-g", help="Path to AOI GeoJSON file")
     ] = None,
     start: Annotated[
-        Optional[str], typer.Option("--start", "-s", help="Start datetime (ISO 8601)")
+        str | None, typer.Option("--start", "-s", help="Start datetime (ISO 8601)")
     ] = None,
     end: Annotated[
-        Optional[str], typer.Option("--end", "-e", help="End datetime (ISO 8601)")
+        str | None, typer.Option("--end", "-e", help="End datetime (ISO 8601)")
     ] = None,
     output: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option("--output", "-o", help="Output JSON file for search results"),
     ] = None,
     fmt: Annotated[
@@ -226,11 +305,11 @@ def search(
     profiles = _load_profiles(profile)
 
     # Load geometry
-    intersects = _load_geometry(geojson) if geojson and geojson.exists() else None
+    intersects = _load_geometry_safe(geojson)
 
     # Parse datetimes
-    start_dt = datetime.fromisoformat(start) if start else None
-    end_dt = datetime.fromisoformat(end) if end else None
+    start_dt = _parse_iso_datetime(start)
+    end_dt = _parse_iso_datetime(end)
 
     client = AereoClient()
     try:
@@ -272,13 +351,13 @@ def prepare(
         typer.Option("--profile", "-p", help="Path to profile YAML (repeatable)"),
     ],
     config: Annotated[
-        Optional[Path], typer.Option("--config", "-c", help="Path to grid config YAML")
+        Path | None, typer.Option("--config", "-c", help="Path to grid config YAML")
     ] = None,
     output_dir: Annotated[
         Path, typer.Option("--output-dir", "-d", help="Output directory for extraction")
     ] = Path("./out"),
     output: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option("--output", "-o", help="Output pickle file for tasks"),
     ] = None,
     cells_per_task: Annotated[
@@ -313,9 +392,7 @@ def prepare(
 
     profiles = _load_profiles(profile)
 
-    grid_config = (
-        GridConfig.from_yaml(config) if config and config.exists() else GridConfig()
-    )
+    grid_config = _load_grid_config(config)
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -396,16 +473,16 @@ def run(
         typer.Option("--profile", "-p", help="Path to profile YAML (repeatable)"),
     ],
     config: Annotated[
-        Optional[Path], typer.Option("--config", "-c", help="Path to grid config YAML")
+        Path | None, typer.Option("--config", "-c", help="Path to grid config YAML")
     ] = None,
     geojson: Annotated[
-        Optional[Path], typer.Option("--geojson", "-g", help="Path to AOI GeoJSON file")
+        Path | None, typer.Option("--geojson", "-g", help="Path to AOI GeoJSON file")
     ] = None,
     start: Annotated[
-        Optional[str], typer.Option("--start", "-s", help="Start datetime (ISO 8601)")
+        str | None, typer.Option("--start", "-s", help="Start datetime (ISO 8601)")
     ] = None,
     end: Annotated[
-        Optional[str], typer.Option("--end", "-e", help="End datetime (ISO 8601)")
+        str | None, typer.Option("--end", "-e", help="End datetime (ISO 8601)")
     ] = None,
     output_dir: Annotated[
         Path, typer.Option("--output-dir", "-d", help="Output directory")
@@ -439,12 +516,10 @@ def run(
     _configure_verbose_logging(verbose)
     profiles = _load_profiles(profile)
 
-    grid_config = (
-        GridConfig.from_yaml(config) if config and config.exists() else GridConfig()
-    )
-    intersects = _load_geometry(geojson) if geojson and geojson.exists() else None
-    start_dt = datetime.fromisoformat(start) if start else None
-    end_dt = datetime.fromisoformat(end) if end else None
+    grid_config = _load_grid_config(config)
+    intersects = _load_geometry_safe(geojson)
+    start_dt = _parse_iso_datetime(start)
+    end_dt = _parse_iso_datetime(end)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     client = AereoClient()
@@ -504,11 +579,11 @@ def run(
 @app.command()
 def validate(
     config: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option("--config", "-c", help="Path to config YAML to validate"),
     ] = None,
     profile: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option("--profile", "-p", help="Path to profile YAML to validate"),
     ] = None,
 ) -> None:
@@ -522,26 +597,10 @@ def validate(
         None. Prints validation result.
     """
     if config:
-        if not config.exists():
-            console.print(f"[red]Config not found:[/red] {config}")
-            raise typer.Exit(code=1)
-        try:
-            GridConfig.from_yaml(config)
-            console.print(f"[green]✓ Config valid:[/green] {config}")
-        except Exception as exc:
-            console.print(f"[red]✗ Config invalid:[/red] {config}\n{exc}")
-            raise typer.Exit(code=1)
+        _validate_yaml(config, GridConfig.from_yaml, "Config")
 
     if profile:
-        if not profile.exists():
-            console.print(f"[red]Profile not found:[/red] {profile}")
-            raise typer.Exit(code=1)
-        try:
-            AereoProfile.from_yaml(profile)
-            console.print(f"[green]✓ Profile valid:[/green] {profile}")
-        except Exception as exc:
-            console.print(f"[red]✗ Profile invalid:[/red] {profile}\n{exc}")
-            raise typer.Exit(code=1)
+        _validate_yaml(profile, AereoProfile.from_yaml, "Profile")
 
     if not config and not profile:
         console.print("[yellow]Provide --config or --profile to validate.[/yellow]")
@@ -566,22 +625,10 @@ def plugins() -> None:
     table.add_column("Required", style="yellow")
     table.add_column("Optional", style="blue")
 
-    for name, cls in registry._searchers.items():
-        cols = ", ".join(cls.supported_collections[:3])
-        if len(cls.supported_collections) > 3:
-            cols += " ..."
-        req = str(len(getattr(cls, "required_params", [])))
-        opt = str(len(getattr(cls, "optional_params", [])))
-        table.add_row("Searcher", name, cols, req, opt)
+    _add_plugin_rows(table, "Searcher", registry._searchers)
 
     for label in ("reader", "reprojector", "processor", "writer"):
-        for name, cls in registry._registries[label].plugins.items():
-            cols = ", ".join(cls.supported_collections[:3])
-            if len(cls.supported_collections) > 3:
-                cols += " ..."
-            req = str(len(getattr(cls, "required_params", [])))
-            opt = str(len(getattr(cls, "optional_params", [])))
-            table.add_row(label.capitalize(), name, cols, req, opt)
+        _add_plugin_rows(table, label.capitalize(), registry._registries[label].plugins)
 
     console.print(table)
 

@@ -191,6 +191,7 @@ class TestHelpers:
     def test_search_results_roundtrip(self, tmp_path: Path):
         from aereo.cli.main import _search_results_to_json
         import geopandas as gpd
+        import pandas as pd
         from shapely.geometry import Point
 
         df = gpd.GeoDataFrame(
@@ -203,8 +204,8 @@ class TestHelpers:
                 "geometry": [Point(0, 0), Point(1, 1)],
             }
         )
-        df["start_time"] = gpd.pd.to_datetime(df["start_time"])
-        df["end_time"] = gpd.pd.to_datetime(df["end_time"])
+        df["start_time"] = pd.to_datetime(df["start_time"])
+        df["end_time"] = pd.to_datetime(df["end_time"])
         df.set_crs(epsg=4326, inplace=True)
 
         records = _search_results_to_json(df)
