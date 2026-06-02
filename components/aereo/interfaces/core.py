@@ -6,7 +6,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import (
     Any,
-    Callable,
     Iterable,
     Literal,
     Mapping,
@@ -26,7 +25,7 @@ import attrs
 from aereo.grid import GridCell
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
-from pydantic import BaseModel, Field, ImportString, TypeAdapter
+from pydantic import BaseModel, Field, TypeAdapter
 from shapely.geometry.base import BaseGeometry
 
 GridFilterMode = Literal["intersection", "within", "coverage"]
@@ -298,14 +297,6 @@ class GridConfig(BaseModel):
         return cls.model_validate(data)
 
 
-class DownloaderCallable(Protocol):
-    """Callable that downloads a URL to a local path."""
-
-    def __call__(self, url: str, local_path: Path) -> None:
-        """Download *url* to *local_path*."""
-        ...
-
-
 class AereoPlugin(ABC):
     """Base class for AEREO plugins"""
 
@@ -373,37 +364,6 @@ class AereoPlugin(ABC):
 # ---------------------------------------------------------------------------
 # New pipeline base classes (Phase 1)
 # ---------------------------------------------------------------------------
-
-
-class Downloader(AereoPlugin, plugin_abstract=True):
-    """Downloads assets for a task before reading.
-
-    Implementations should store downloaded paths in
-    ``task.task_context["downloaded_assets"]`` as a ``dict[str, Path]``
-    mapping asset IDs to local file paths. The :class:`Reader` can then
-    access them via ``task.task_context["downloaded_assets"]`` without
-    re-downloading.
-
-    Example::
-
-        task.task_context["downloaded_assets"] = {
-            "asset-1": Path("/tmp/data/asset-1.tif"),
-        }
-    """
-
-    @abstractmethod
-    def download(
-        self,
-        task: ExtractionTask,
-        params: Mapping[str, Any],
-    ) -> None:
-        """Download assets for the given task.
-
-        Args:
-            task: The extraction task containing asset URIs.
-            params: Download parameters (e.g. credentials, concurrency).
-        """
-        ...
 
 
 class Reader(AereoPlugin, plugin_abstract=True):
@@ -599,6 +559,8 @@ class _ProfileLoaderMixin:
     eliminates the duplication.
     """
 
+    name: str
+
     @classmethod
     def from_yaml(cls, path: str | Path) -> list[Self]:
         """Load profiles from a YAML file.
@@ -715,44 +677,10 @@ class AereoProfile(_ProfileLoaderMixin, BaseModel):
     padding: int | None = 0
     conform_to: tuple[int, int] | None = None
     plugin_hints: Mapping[str, str] = Field(default_factory=dict)
-    downloader: ImportString[Callable[[str, Path], None]] | None = None
     search_params: Mapping[str, Any] = Field(default_factory=dict)
     read_params: Mapping[str, Any] = Field(default_factory=dict)
     process_params: Mapping[str, Any] = Field(default_factory=dict)
     write_params: Mapping[str, Any] = Field(default_factory=dict)
-
-    def __getstate__(self) -> dict[str, Any]:
-        """Serialize to a dict, converting live callables to dotted paths.
-
-        Non-importable callables (lambdas, nested functions, bound methods)
-        are replaced with ``None`` so that pickling never crashes.
-        """
-        try:
-            state = self.model_dump(mode="json")
-        except Exception:
-            # Fallback: dump field-by-field, stringifying anything non-JSON
-            state = {}
-            for name in self.__class__.model_fields:
-                try:
-                    val = getattr(self, name)
-                    # ImportString callables serialize to their dotted path
-                    state[name] = json.loads(json.dumps(val, default=str))
-                except Exception:
-                    state[name] = None
-
-        downloader_path = state.get("downloader")
-        if downloader_path is not None:
-            try:
-                ta = TypeAdapter(ImportString[Callable[[str, Path], None]] | None)
-                ta.validate_python(downloader_path)
-            except Exception:
-                state["downloader"] = None
-        return state
-
-    def __setstate__(self, state: dict[str, Any]) -> None:
-        """Reconstruct from a validated dict."""
-        obj = self.__class__.model_validate(state)
-        object.__setattr__(self, "__dict__", obj.__dict__)
 
 
 class PipelineProfile(_ProfileLoaderMixin, BaseModel):
@@ -771,7 +699,6 @@ class PipelineProfile(_ProfileLoaderMixin, BaseModel):
 
     # Stage-specific parameters
     search_params: Mapping[str, Any] = Field(default_factory=dict)
-    download_params: Mapping[str, Any] = Field(default_factory=dict)
     read_params: Mapping[str, Any] = Field(default_factory=dict)
     reproject_params: Mapping[str, Any] = Field(default_factory=dict)
     write_params: Mapping[str, Any] = Field(default_factory=dict)
@@ -850,372 +777,6 @@ class ExtractionTask:
             f"uri='{self.uri}'"
             f")"
         )
-
-
-class Extractor(AereoPlugin, plugin_abstract=True):
-    """Base class for AEREO extraction plugins.
-
-    Subclasses must implement ``extract()``. Grid parameters are no longer
-    declared as plugin properties; they are supplied at preparation time via
-    ``GridConfig``.
-    """
-
-    @staticmethod
-    def resolve_variables(
-        task: ExtractionTask,
-        collection: str | None = None,
-    ) -> list[str]:
-        """Resolve target variables from profile collections with fallback chain.
-
-        Resolution order:
-        1. ``task.profile.collections[collection]``
-        2. ``task.task_context["dataset_name"]``
-
-        Args:
-            task: The extraction task containing profile and assets.
-            collection: Collection name to look up in profile.collections.
-                If None, uses the first collection found in task assets.
-
-        Returns:
-            List of resolved variable names.
-
-        Raises:
-            ValueError: If no variables can be resolved.
-        """
-        variables: list[str] = []
-
-        if task.profile.collections:
-            if collection is not None:
-                variables = list(task.profile.collections.get(collection, []))
-            else:
-                # Use first collection's variables
-                for col_vars in task.profile.collections.values():
-                    variables.extend(col_vars)
-                variables = list(dict.fromkeys(variables))
-
-        if not variables:
-            dataset_name = task.task_context.get("dataset_name")
-            if dataset_name:
-                variables = [dataset_name]
-
-        if not variables:
-            coll_str = collection or "unknown"
-            raise ValueError(
-                f"No variables found in profile or params for collection {coll_str}"
-            )
-
-        return variables
-
-    @staticmethod
-    def resolve_downloader(task: ExtractionTask) -> Any | None:
-        """Resolve the downloader callable from the task profile.
-
-        Args:
-            task: The extraction task containing profile.
-
-        Returns:
-            The resolved downloader callable, or None.
-        """
-        return getattr(task.profile, "downloader", None)
-
-    @staticmethod
-    def get_grid_cells(task: ExtractionTask) -> Sequence[Any]:
-        """Return the grid cells for a task.
-
-        Prefers ``task.grid_cells`` (set by :meth:`prepare_for_extraction`)
-        so that engines use the exact, pre-computed subset of cells.
-        Falls back to ``task.task_context["grid_cells"]`` if the task was
-        created without the standard preparation flow.
-
-        Args:
-            task: The extraction task whose grid cells should be retrieved.
-
-        Returns:
-            Sequence of grid-cell objects.
-        """
-        if hasattr(task, "grid_cells") and task.grid_cells:
-            return task.grid_cells
-        return task.task_context.get("grid_cells", [])
-
-    def prepare_for_extraction(
-        self,
-        search_results: GeoDataFrame[AssetSchema],
-        grid_config: GridConfig,
-        target_aoi: BaseGeometry | None = None,
-        uri: str | None = None,
-        profiles: Sequence[AereoProfile] | None = None,
-        cells_per_task: int = DEFAULT_CELLS_PER_TASK,
-        extractor_hint: str | None = None,
-        init_params: Mapping[str, Any] | None = None,
-    ) -> Sequence[ExtractionTask]:
-        """Prepare extraction tasks by grouping assets and chunking grid cells.
-
-        Groups search results by profile and start time, generates grid cells,
-        optionally filters them by AOI coverage, then chunks into tasks.
-
-        Args:
-            search_results: GeoDataFrame of assets from the search phase.
-            grid_config: Tiling specification shared by all tasks.
-            target_aoi: Optional geometry to clip the extraction region.
-            uri: Destination URI prefix for extracted artifacts.
-            profiles: Profiles defining what to extract. Must contain at least one.
-            cells_per_task: Maximum number of grid cells per task chunk.
-            extractor_hint: Optional hint string forwarded to task context.
-            init_params: Optional parameters added to each task's context.
-
-        Returns:
-            A sequence of ExtractionTask objects ready for execution.
-
-        Raises:
-            ValueError: If uri is None, no profiles are provided, or
-                grid_dist is not set in grid_config.
-        """
-        if uri is None:
-            raise ValueError(
-                "Default prepare_for_extraction requires uri to be defined."
-            )
-
-        if not profiles:
-            raise ValueError(
-                "Default prepare_for_extraction requires at least one profile to be defined."
-            )
-
-        grid_dist = grid_config.target_grid_dist
-        if grid_dist is None:
-            raise ValueError(
-                "GridConfig.target_grid_dist must be an explicit integer (e.g. 50_000)."
-            )
-
-        from aereo.grid import GridDefinition
-
-        grid_def = GridDefinition(d=grid_dist, overlap=grid_config.target_grid_overlap)
-
-        tasks: list[ExtractionTask] = []
-        for profile in profiles:
-            profile_tasks = self._prepare_profile_tasks(
-                search_results=search_results,
-                profile=profile,
-                grid_def=grid_def,
-                grid_config=grid_config,
-                target_aoi=target_aoi,
-                uri=uri,
-                cells_per_task=cells_per_task,
-                extractor_hint=extractor_hint,
-                init_params=init_params,
-            )
-            tasks.extend(profile_tasks)
-
-        return tasks
-
-    def _prepare_profile_tasks(
-        self,
-        search_results: GeoDataFrame[AssetSchema],
-        profile: AereoProfile,
-        grid_def: Any,
-        grid_config: GridConfig,
-        target_aoi: BaseGeometry | None,
-        uri: str,
-        cells_per_task: int,
-        extractor_hint: str | None,
-        init_params: Mapping[str, Any] | None,
-    ) -> list[ExtractionTask]:
-        """Prepare tasks for a single profile."""
-        import geopandas as gpd
-
-        profile_assets = self._filter_assets_by_profile(search_results, profile)
-        if profile_assets.empty:
-            return []
-
-        cell_groups = self._generate_cell_groups(
-            profile_assets=profile_assets,
-            target_aoi=target_aoi,
-            grid_def=grid_def,
-            grid_config=grid_config,
-        )
-        if not cell_groups:
-            return []
-
-        area_def_cache, wgs84_geom_cache = self._cache_cell_geometries(
-            cell_groups=cell_groups,
-            profile=profile,
-            grid_config=grid_config,
-        )
-
-        tasks: list[ExtractionTask] = []
-        for start_time, time_group, all_cells in cell_groups:
-            cell_chunks = [
-                all_cells[i : i + cells_per_task]
-                for i in range(0, len(all_cells), cells_per_task)
-            ]
-
-            for chunk_idx, cells in enumerate(cell_chunks):
-                cell_geoms = [wgs84_geom_cache[cell] for cell in cells]
-                cells_union = _union_all(gpd.GeoSeries(cell_geoms))
-
-                intersecting_mask = (
-                    time_group.intersects(cells_union) | time_group.geometry.isna()
-                )
-                chunk_assets = cast(
-                    GeoDataFrame[AssetSchema],
-                    time_group[intersecting_mask].copy(),
-                )
-
-                task_context: dict[str, Any] = {
-                    "chunk_id": chunk_idx,
-                    "total_chunks": len(cell_chunks),
-                    "start_time": str(start_time),
-                    "extractor_hint": extractor_hint,
-                    "init_params": dict(init_params) if init_params else {},
-                }
-
-                task = ExtractionTask(
-                    assets=chunk_assets,
-                    profile=profile,
-                    uri=uri,
-                    grid_cells=cells,
-                    grid_config=grid_config,
-                    aoi=target_aoi,
-                    task_context=task_context,
-                )
-                tasks.append(task)
-
-        return tasks
-
-    @staticmethod
-    def _filter_assets_by_profile(
-        search_results: GeoDataFrame[AssetSchema],
-        profile: AereoProfile,
-    ) -> GeoDataFrame[AssetSchema]:
-        """Filter search results to assets matching *profile.collections*."""
-        if profile.collections:
-            filtered = search_results[
-                search_results["collection"].isin(list(profile.collections.keys()))
-            ].copy()
-        else:
-            filtered = search_results.copy()
-        return cast(GeoDataFrame[AssetSchema], filtered)
-
-    @staticmethod
-    def _generate_cell_groups(
-        profile_assets: GeoDataFrame[AssetSchema],
-        target_aoi: BaseGeometry | None,
-        grid_def: Any,
-        grid_config: GridConfig,
-    ) -> list[tuple[Any, GeoDataFrame, list[GridCell]]]:
-        """Group assets by start_time and generate/filter grid cells."""
-        profile_cell_groups: list[tuple[Any, GeoDataFrame, list[GridCell]]] = []
-        grid_filter_mode = str(grid_config.grid_filter_mode).lower()
-        min_coverage = grid_config.min_coverage
-
-        for start_time, time_group in profile_assets.groupby("start_time"):
-            group_geom = _union_all(time_group.geometry)
-            if _skip_empty(group_geom):
-                continue
-
-            aoi_geom = (
-                target_aoi.intersection(group_geom)
-                if target_aoi is not None
-                else group_geom
-            )
-            if _skip_empty(aoi_geom):
-                continue
-
-            all_cells = list(grid_def.generate_grid_cells(aoi_geom))
-            if not all_cells:
-                continue
-
-            if grid_filter_mode != "intersection":
-                all_cells = Extractor._filter_cells_by_mode(
-                    all_cells, aoi_geom, grid_filter_mode, min_coverage
-                )
-                if not all_cells:
-                    continue
-
-            profile_cell_groups.append(
-                (start_time, cast(GeoDataFrame, time_group), all_cells)
-            )
-
-        return profile_cell_groups
-
-    @staticmethod
-    def _filter_cells_by_mode(
-        cells: list[GridCell],
-        aoi_geom: BaseGeometry,
-        mode: str,
-        min_coverage: float,
-    ) -> list[GridCell]:
-        """Filter cells by coverage mode ('within' or 'coverage')."""
-        filtered: list[GridCell] = []
-        for cell in cells:
-            cell_geom = cell.geom
-            if mode == "within":
-                if aoi_geom.contains(cell_geom):
-                    filtered.append(cell)
-            elif mode == "coverage":
-                intersection = cell_geom.intersection(aoi_geom)
-                coverage = (
-                    intersection.area / cell_geom.area if cell_geom.area > 0 else 0.0
-                )
-                if coverage >= min_coverage:
-                    filtered.append(cell)
-            else:
-                raise ValueError(
-                    f"Unknown grid_filter_mode: {mode}. "
-                    f"Use 'intersection', 'within', or 'coverage'."
-                )
-        return filtered
-
-    @staticmethod
-    def _cache_cell_geometries(
-        cell_groups: list[tuple[Any, GeoDataFrame, list[GridCell]]],
-        profile: AereoProfile,
-        grid_config: GridConfig,
-    ) -> tuple[dict[GridCell, Any], dict[GridCell, BaseGeometry]]:
-        """Pre-compute area_def and WGS84 geometries for all cells.
-
-        Returns:
-            Tuple of (area_def_cache, wgs84_geom_cache).
-        """
-        resolution = int(profile.resolution)
-        padding = profile.padding or 0
-        conform_to_shape = profile.conform_to
-        target_grid_margin = grid_config.target_grid_margin
-
-        area_def_cache: dict[GridCell, Any] = {}
-        wgs84_geom_cache: dict[GridCell, BaseGeometry] = {}
-
-        for _, _, cells in cell_groups:
-            for cell in cells:
-                geobox = cell.area_def(
-                    resolution,
-                    padding,
-                    margin=target_grid_margin,
-                    conform_to=conform_to_shape,
-                )
-                area_def_cache[cell] = geobox
-                wgs84_geom_cache[cell] = geobox.extent.to_crs(WGS84_CRS).geom
-
-        return area_def_cache, wgs84_geom_cache
-
-    @abstractmethod
-    def extract(
-        self,
-        extraction_task: ExtractionTask,
-    ) -> GeoDataFrame[ArtifactSchema]:
-        """Extract data for a batch of assets (equivalent to one item of the prepare_for_extraction output).
-
-        Args:
-            extraction_task: An ExtractionTask containing a batch of assets to extract.
-                This is one of the items returned by the `prepare_for_extraction` method.
-                ``extraction_task.task_context`` holds batch-specific data generated
-                during preparation.
-
-        Returns:
-            A GeoDataFrame of extracted artifacts, where each row corresponds to an extracted asset
-            and its corresponding grid_cell, and includes metadata such as collection, geometry,
-            time range, and any other relevant attributes.
-        """
-        ...
 
 
 class TaskStaging(Protocol):

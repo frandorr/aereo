@@ -1,6 +1,5 @@
 # Shared AER profiles for all extraction examples.
 # Load via AereoProfile.from_yaml() and select by name.
-# The *downloader* field accepts a dotted import path string (resolved by pydantic ImportString).
 
 profiles:
     - name: goes_c02
@@ -38,7 +37,6 @@ profiles:
       plugin_hints:
           search: search_earthaccess
           extract: extract_satpy
-      downloader: aereo.search_earthaccess.earthaccess_download_wrapper
 
     - name: olci_o08
       resolution: 300
@@ -52,7 +50,6 @@ profiles:
       plugin_hints:
           search: search_earthaccess
           extract: extract_satpy
-      downloader: aereo.search_earthaccess.earthaccess_download_wrapper
 
     - name: geotessera
       resolution: 10

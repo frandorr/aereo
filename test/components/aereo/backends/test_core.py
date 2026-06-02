@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Any, cast
 from unittest.mock import MagicMock
 
@@ -362,12 +361,9 @@ def test_local_backend_parallel_with_multiple_tasks():
         assert result["i"].iloc[0] == i
 
 
-def test_local_backend_parallel_with_callable_downloader():
-    """ProcessPoolExecutor works when tasks contain live callable downloaders."""
+def test_local_backend_parallel_with_multiple_profiles():
+    """ProcessPoolExecutor works with different profile names."""
     from aereo.interfaces.core import AereoProfile
-
-    def my_dl(url: str, path: Path) -> None:
-        pass
 
     backend = LocalProcessBackend(max_workers=2)
     runner = _PicklableRunner(
@@ -382,7 +378,6 @@ def test_local_backend_parallel_with_callable_downloader():
             profile=AereoProfile(
                 name="p1",
                 resolution=100.0,
-                downloader=my_dl,  # pyright: ignore[reportArgumentType]
             ),
             task_context={"test_idx": 0},
         ),
@@ -390,7 +385,6 @@ def test_local_backend_parallel_with_callable_downloader():
             profile=AereoProfile(
                 name="p2",
                 resolution=100.0,
-                downloader=lambda url, path: None,  # pyright: ignore[reportArgumentType]
             ),
             task_context={"test_idx": 1},
         ),

@@ -5,7 +5,7 @@ import geopandas as gpd
 import pytest
 import pandas as pd
 import xarray as xr
-from shapely.geometry import Point
+from shapely.geometry import Point, Polygon
 
 from aereo.interfaces.core import AereoProfile, ExtractionTask, GridConfig, Reprojector
 from aereo.registry.core import AereoRegistry
@@ -214,9 +214,7 @@ def test_resolve_params_strips_other_collection_keys_case_insensitive():
 def _make_client_for_profile_resolution() -> tuple[AereoClient, MagicMock]:
     mock_registry = MagicMock(spec=AereoRegistry)
     mock_registry.has_searcher.return_value = True
-    mock_registry.has_extractor.return_value = True
     mock_registry.find_searchers_for.return_value = ["auto_searcher"]
-    mock_registry.find_extractors_for.return_value = ["auto_extractor"]
     client = AereoClient(registry=mock_registry)
     return client, mock_registry
 
@@ -261,19 +259,6 @@ def test_resolve_plugin_for_profile_no_collections_returns_none():
     profile = AereoProfile(name="p1", resolution=10.0, collections={})
     result = client._resolve_plugin_for_profile("searcher", profile)
     assert result is None
-
-
-def test_resolve_plugin_for_profile_extract_hint():
-    client, mock_registry = _make_client_for_profile_resolution()
-    profile = AereoProfile(
-        name="p1",
-        resolution=10.0,
-        collections={"X": ["var1"]},
-        plugin_hints={"extract": "hinted_extractor"},
-    )
-    result = client._resolve_plugin_for_profile("extractor", profile)
-    assert result == "hinted_extractor"
-    mock_registry.has_extractor.assert_called_with("hinted_extractor")
 
 
 # ---------------------------------------------------------------------------
@@ -341,79 +326,20 @@ def test_search_merges_profile_search_params(monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def _make_prepare_client(monkeypatch, valid_search_df):
-    """Return a client whose extractor mock captures prepare_for_extraction calls."""
-    mock_registry = MagicMock(spec=AereoRegistry)
-    monkeypatch.setattr("aereo.schemas.core.AssetSchema.validate", lambda x: x)
-
-    mock_registry.has_extractor.return_value = True
-    mock_registry.find_extractors_for.return_value = ["dummy_extractor"]
-    mock_extractor = MagicMock()
-
-    grid_config = GridConfig(target_grid_dist=10_000)
-    task = ExtractionTask(
-        assets=cast(GeoDataFrame, valid_search_df),
-        profile=AereoProfile(
-            name="test", resolution=10, collections={"MODIS": ["var1"]}
-        ),
-        uri="test-uri",
-        grid_cells=[],
-        grid_config=grid_config,
-    )
-    mock_extractor.prepare_for_extraction.return_value = [task]
-    mock_registry.get_extractor.return_value = mock_extractor
-
-    client = AereoClient(registry=mock_registry)
-    return client, mock_extractor
-
-
 def _make_valid_search_df():
-    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    valid_df = gpd.GeoDataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
-    valid_df["geometry"] = Point(0, 0)
+    valid_df["geometry"] = [Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
     valid_df["collection"] = "MODIS"
+    valid_df["start_time"] = pd.Timestamp("2023-01-01")
     return valid_df
-
-
-def test_prepare_for_extraction_passes_grid_config(monkeypatch):
-    """grid_config must be forwarded to extractor.prepare_for_extraction."""
-    valid_search_df = _make_valid_search_df()
-    client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
-
-    grid_config = GridConfig(target_grid_dist=50_000)
-    client.prepare_for_extraction(
-        search_results=cast(GeoDataFrame, valid_search_df),
-        grid_config=grid_config,
-        resolution=100.0,
-        uri="s3://bucket/out/",
-    )
-
-    call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
-    assert call_kwargs.get("grid_config") == grid_config
-
-
-def test_prepare_for_extraction_passes_cells_per_task(monkeypatch):
-    """cells_per_task must be forwarded to extractor.prepare_for_extraction."""
-    valid_search_df = _make_valid_search_df()
-    client, mock_extractor = _make_prepare_client(monkeypatch, valid_search_df)
-
-    grid_config = GridConfig(target_grid_dist=50_000)
-    client.prepare_for_extraction(
-        search_results=cast(GeoDataFrame, valid_search_df),
-        grid_config=grid_config,
-        resolution=100.0,
-        uri="s3://bucket/out/",
-        cells_per_task=10,
-    )
-
-    call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
-    assert call_kwargs.get("cells_per_task") == 10
 
 
 def test_prepare_for_extraction_requires_grid_config(monkeypatch):
     """grid_config must be provided either as argument or client default."""
     valid_search_df = _make_valid_search_df()
-    client, _ = _make_prepare_client(monkeypatch, valid_search_df)
+    mock_registry = MagicMock(spec=AereoRegistry)
+    client = AereoClient(registry=mock_registry)
 
     with pytest.raises(ValueError, match="grid_config must be provided"):
         client.prepare_for_extraction(
@@ -423,68 +349,30 @@ def test_prepare_for_extraction_requires_grid_config(monkeypatch):
         )
 
 
-def test_prepare_uses_profile_extract_hint(monkeypatch):
-    """prepare_for_extraction must resolve extractor from profile.plugin_hints['extract']."""
-    mock_registry = MagicMock(spec=AereoRegistry)
-    mock_registry.has_extractor.return_value = True
-    mock_registry.find_extractors_for.return_value = []
-    mock_extractor = MagicMock()
-    mock_extractor.prepare_for_extraction.return_value = []
-    mock_registry.get_extractor.return_value = mock_extractor
-
+def test_prepare_for_extraction_returns_tasks(monkeypatch):
+    """prepare_for_extraction returns ExtractionTasks using the standalone task builder."""
     monkeypatch.setattr("aereo.schemas.core.AssetSchema.validate", lambda x: x)
-    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
-    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
-    valid_df["geometry"] = Point(0, 0)
-    valid_df["collection"] = "MODIS"
+    valid_df = _make_valid_search_df()
 
+    mock_registry = MagicMock(spec=AereoRegistry)
     client = AereoClient(registry=mock_registry)
-    profile = AereoProfile(
-        name="p1",
-        resolution=10.0,
-        collections={"MODIS": ["var1"]},
-        plugin_hints={"extract": "my_extractor"},
-    )
     grid_config = GridConfig(target_grid_dist=50_000)
-    client.prepare_for_extraction(
-        search_results=cast(GeoDataFrame, valid_df),
-        grid_config=grid_config,
-        profiles=[profile],
-        uri="s3://out",
-    )
-    mock_registry.get_extractor.assert_called_with("my_extractor")
-
-
-def test_prepare_for_extraction_passes_extractor_hint(monkeypatch):
-    """prepare_for_extraction must pass the resolved plugin name as extractor_hint."""
-    mock_registry = MagicMock(spec=AereoRegistry)
-    mock_registry.has_extractor.return_value = True
-    mock_registry.find_extractors_for.return_value = ["resolved_extractor"]
-    mock_extractor = MagicMock()
-    mock_extractor.prepare_for_extraction.return_value = []
-    mock_registry.get_extractor.return_value = mock_extractor
-
-    monkeypatch.setattr("aereo.schemas.core.AssetSchema.validate", lambda x: x)
-    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
-    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
-    valid_df["geometry"] = Point(0, 0)
-    valid_df["collection"] = "MODIS"
-
-    client = AereoClient(registry=mock_registry)
     profile = AereoProfile(
         name="p1",
         resolution=10.0,
         collections={"MODIS": ["var1"]},
     )
-    grid_config = GridConfig(target_grid_dist=50_000)
-    client.prepare_for_extraction(
+    tasks = client.prepare_for_extraction(
         search_results=cast(GeoDataFrame, valid_df),
         grid_config=grid_config,
         profiles=[profile],
         uri="s3://out",
+        cells_per_task=1,
     )
-    call_kwargs = mock_extractor.prepare_for_extraction.call_args.kwargs
-    assert call_kwargs.get("extractor_hint") == "resolved_extractor"
+    assert isinstance(tasks, list)
+    assert len(tasks) > 0
+    assert tasks[0].profile.name == "p1"
+    assert tasks[0].uri == "s3://out"
 
 
 # ---------------------------------------------------------------------------
@@ -517,8 +405,6 @@ def _setup_mock_pipeline_registry(
             return writer_mock is not None
         if type_label == "reprojector":
             return reprojector_mock is not None
-        if type_label == "extractor":
-            return False
         return False
 
     def _mock_get(type_label, name, **kwargs):
@@ -575,67 +461,6 @@ def test_execute_tasks_with_profile_hint(monkeypatch):
     client.execute_tasks([task])
     mock_registry.get.assert_any_call("reader", "read_aws_goes")
     mock_registry.get.assert_any_call("writer", "write_geotiff")
-
-
-def test_execute_tasks_uses_profile_specific_downloaders(monkeypatch):
-    """Tasks with different profile downloaders must be passed to reader intact."""
-    mock_registry = MagicMock(spec=AereoRegistry)
-    mock_reader = MagicMock()
-    mock_reader.read.return_value = xr.Dataset()
-    mock_writer = MagicMock()
-    mock_writer.write.return_value = gpd.GeoDataFrame()
-    mock_reprojector = MagicMock()
-    mock_reprojector.reproject.return_value = xr.Dataset()
-    _setup_mock_pipeline_registry(
-        monkeypatch, mock_registry, mock_reader, mock_writer, mock_reprojector
-    )
-
-    client = AereoClient(registry=mock_registry)
-
-    dl_a = MagicMock()
-    dl_b = MagicMock()
-
-    profile_a = AereoProfile(
-        name="a",
-        resolution=100.0,
-        collections={"C1": ["var1"]},
-        plugin_hints={"read": "dummy_reader", "writer": "dummy_writer"},
-        downloader=dl_a,
-    )
-    profile_b = AereoProfile(
-        name="b",
-        resolution=100.0,
-        collections={"C1": ["var1"]},
-        plugin_hints={"read": "dummy_reader", "writer": "dummy_writer"},
-        downloader=dl_b,
-    )
-
-    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
-    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
-    valid_df["geometry"] = Point(0, 0)
-    valid_df["collection"] = "C1"
-
-    grid_config = GridConfig(target_grid_dist=50_000)
-    task_a = ExtractionTask(
-        assets=cast(GeoDataFrame, valid_df),
-        profile=profile_a,
-        uri="test",
-        grid_cells=[],
-        grid_config=grid_config,
-    )
-    task_b = ExtractionTask(
-        assets=cast(GeoDataFrame, valid_df),
-        profile=profile_b,
-        uri="test",
-        grid_cells=[],
-        grid_config=grid_config,
-    )
-
-    client.execute_tasks([task_a, task_b])
-
-    passed_tasks = [call.args[0] for call in mock_reader.read.call_args_list]
-    assert passed_tasks[0].profile.downloader is dl_a
-    assert passed_tasks[1].profile.downloader is dl_b
 
 
 def test_execute_tasks_failure_mode_strict(monkeypatch):

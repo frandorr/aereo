@@ -3,8 +3,6 @@ from typing import Any, Dict, List, Sequence, Tuple, Type
 
 # Importing the contracts we defined earlier
 from aereo.interfaces import (
-    Downloader,
-    Extractor,
     Processor,
     Reader,
     Reprojector,
@@ -174,13 +172,10 @@ class AereoRegistry:
     # prefix -> (type_label, base_class)
     PLUGIN_TYPES: Dict[str, Tuple[str, Type]] = {
         "search_": ("searcher", SearchProvider),
-        "download_": ("downloader", Downloader),
         "read_": ("reader", Reader),
         "reproject_": ("reprojector", Reprojector),
         "process_": ("processor", Processor),
         "write_": ("writer", Writer),
-        # Backward-compat: extractors are still supported during migration
-        "extract_": ("extractor", Extractor),
     }
 
     def __init__(self, auto_discover: bool = True) -> None:
@@ -198,12 +193,9 @@ class AereoRegistry:
         }
 
         # Expose the internal dicts directly so existing tests and consumers
-        # that access ``_searchers`` / ``_extractors`` continue to work.
+        # that access ``_searchers`` continue to work.
         self._searchers: Dict[str, Type[SearchProvider]] = self._registries[
             "searcher"
-        ].plugins  # type: ignore[assignment]
-        self._extractors: Dict[str, Type[Extractor]] = self._registries[
-            "extractor"
         ].plugins  # type: ignore[assignment]
 
         # Track original case for display in list_supported_collections
@@ -340,25 +332,13 @@ class AereoRegistry:
         """Returns names of search plugins that support the requested collection."""
         return self._registries["searcher"].find_for(collection_name, self.WILDCARD)
 
-    def find_extractors_for(self, collection_name: str) -> List[str]:
-        """Returns names of extraction plugins that support the requested collection."""
-        return self._registries["extractor"].find_for(collection_name, self.WILDCARD)
-
     def get_searcher_collections(self, plugin_name: str) -> List[str]:
         """Return the supported collections for a named search plugin."""
         return self._registries["searcher"].get_collections(plugin_name)
 
-    def get_extractor_collections(self, plugin_name: str) -> List[str]:
-        """Return the supported collections for a named extractor plugin."""
-        return self._registries["extractor"].get_collections(plugin_name)
-
     def has_searcher(self, plugin_name: str) -> bool:
         """Check whether a search plugin with the given name is registered."""
         return self._registries["searcher"].has(plugin_name)
-
-    def has_extractor(self, plugin_name: str) -> bool:
-        """Check whether an extractor plugin with the given name is registered."""
-        return self._registries["extractor"].has(plugin_name)
 
     def get_collection_mapping_for_searcher(
         self, plugin_name: str, collection_names: Sequence[str]
@@ -368,26 +348,14 @@ class AereoRegistry:
             plugin_name, collection_names, self.WILDCARD
         )
 
-    def get_collection_mapping_for_extractor(
-        self, plugin_name: str, collection_names: Sequence[str]
-    ) -> List[str]:
-        """Maps user-provided collection names to a specific extractor plugin's declared format."""
-        return self._registries["extractor"].get_collection_mapping(
-            plugin_name, collection_names, self.WILDCARD
-        )
-
     def get_searcher(self, plugin_name: str, **kwargs) -> SearchProvider:
         """Instantiates and returns a SearchProvider by name."""
         return self._registries["searcher"].get(plugin_name, "Search", **kwargs)
 
-    def get_extractor(self, plugin_name: str, **kwargs) -> Extractor:
-        """Instantiates and returns an Extractor by name."""
-        return self._registries["extractor"].get(plugin_name, "Extractor", **kwargs)
-
     def get_plugin_params(
         self, plugin_name: str, *, detailed: bool = True
     ) -> dict[str, list[dict]]:
-        """Return params metadata for any plugin (search or extract).
+        """Return params metadata for any plugin (search or pipeline stage).
 
         Args:
             plugin_name: Entry-point name of the plugin.

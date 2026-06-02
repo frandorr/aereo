@@ -1,22 +1,22 @@
 import shutil
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from typing import Any
 
 from aereo.asset_downloader._obstore_utils import (
     _resolve_store,
     _stream_obstore_to_disk,
 )
 
-if TYPE_CHECKING:
-    from aereo.interfaces import DownloaderCallable
+DownloaderCallable = Callable[[str, Path], None]
 
 
 def download_asset_safely(
     href: str,
     local_path: Path,
-    downloader: Optional["DownloaderCallable"] = None,
-    store_options: Optional[dict[str, Any]] = None,
+    downloader: DownloaderCallable | None = None,
+    store_options: dict[str, Any] | None = None,
 ) -> None:
     """Download asset with a filelock to avoid corruption in multi-processing.
 
@@ -57,9 +57,9 @@ def download_asset_safely(
 def download_assets_safely(
     hrefs: list[str],
     local_paths: list[Path],
-    downloader: Optional["DownloaderCallable"] = None,
-    store_options: Optional[dict[str, Any]] = None,
-    max_workers: Optional[int] = None,
+    downloader: DownloaderCallable | None = None,
+    store_options: dict[str, Any] | None = None,
+    max_workers: int | None = None,
 ) -> None:
     """Download multiple assets concurrently using a thread pool.
 
@@ -91,8 +91,8 @@ def download_assets_safely(
 
 def extract_asset_safely(
     archive_path: Path,
-    extract_dir: Optional[Path] = None,
-    lock_path: Optional[Path] = None,
+    extract_dir: Path | None = None,
+    lock_path: Path | None = None,
 ) -> None:
     """Extract a zip archive safely with file locking.
 
@@ -153,7 +153,7 @@ def extract_asset_safely(
 
 
 def cleanup_asset_safely(
-    local_path: Path, chunk_id: Optional[int] = None, total_chunks: int = 1
+    local_path: Path, chunk_id: int | None = None, total_chunks: int = 1
 ) -> None:
     """Safely clean up the downloaded asset after all chunks are processed."""
     import filelock

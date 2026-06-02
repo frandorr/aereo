@@ -12,14 +12,12 @@ import geopandas as gpd
 import pandas as pd
 
 from aereo.interfaces import (
-    Downloader,
     ExtractionTask,
     PipelineCallback,
     Processor,
     Reader,
     Reprojector,
     Writer,
-    merge_params,
 )
 from aereo.registry import AereoRegistry
 from aereo.schemas import ArtifactSchema
@@ -96,24 +94,16 @@ class TaskRunner:
         post = [p for p in processors if p.stage == "post_reproject"]
 
         # Build effective params for each stage
-        download_params = dict(getattr(task.profile, "download_params", {}))
         read_params = dict(task.profile.read_params)
-        process_params = dict(task.profile.process_params)
+        process_params = dict(getattr(task.profile, "process_params", {}))
         write_params = dict(task.profile.write_params)
 
         self._fire_callbacks("on_task_start", task)
 
         try:
-            # Stage 0: Download (optional)
-            downloader = self._resolve_downloader(task, task_init)
-            if downloader is not None:
-                downloader.download(task, download_params)
-                self._fire_callbacks("on_download_complete", task)
-
             # Stage 1: Read
             ds = reader.read(task, read_params)
-            if downloader is None:
-                self._fire_callbacks("on_download_complete", task)
+            self._fire_callbacks("on_download_complete", task)
             self._fire_callbacks("on_read_complete", task, ds)
 
             # Stage 2: Pre-reproject processing (once, outside cell loop)
@@ -126,9 +116,9 @@ class TaskRunner:
                 try:
                     geobox = cell.area_def(
                         resolution=int(task.profile.resolution),
-                        padding=task.profile.padding or 0,
+                        padding=getattr(task.profile, "padding", None) or 0,
                         margin=task.grid_config.target_grid_margin,
-                        conform_to=task.profile.conform_to,
+                        conform_to=getattr(task.profile, "conform_to", None),
                     )
                     ds_cell = reprojector.reproject(ds, geobox, read_params)
                     self._fire_callbacks("on_reproject_complete", task, cell, ds_cell)
@@ -172,25 +162,8 @@ class TaskRunner:
 
     # --- Resolution helpers ---
 
-    def _resolve_downloader(
-        self, task: ExtractionTask, init: dict[str, Any]
-    ) -> Downloader | None:
-        """Resolve an optional downloader plugin.
-
-        Returns ``None`` when no downloader is configured, allowing the
-        reader to handle its own downloads.
-        """
-        try:
-            return self._resolve_stage(
-                task, init, stage="download", type_label="downloader"
-            )
-        except ValueError:
-            return None
-
     def _resolve_reader(self, task: ExtractionTask, init: dict[str, Any]) -> Reader:
-        return self._resolve_stage(
-            task, init, stage="read", type_label="reader", fallback="extractor"
-        )
+        return self._resolve_stage(task, init, stage="read", type_label="reader")
 
     def _resolve_reprojector(
         self, task: ExtractionTask, init: dict[str, Any]
@@ -230,9 +203,7 @@ class TaskRunner:
         return processors
 
     def _resolve_writer(self, task: ExtractionTask, init: dict[str, Any]) -> Writer:
-        return self._resolve_stage(
-            task, init, stage="writer", type_label="writer", fallback="extractor"
-        )
+        return self._resolve_stage(task, init, stage="writer", type_label="writer")
 
     def _resolve_stage(
         self,

@@ -244,7 +244,6 @@ def test_pipeline_profile_round_trip(tmp_path: Any) -> None:
         collections={"S3OLCI": ["Oa01", "Oa02"]},
         plugin_hints={"search": "earthaccess", "read": "satpy"},
         search_params={"cloud_cover": 20},
-        download_params={"timeout": 60},
         read_params={"reader": "olci_l1b"},
         reproject_params={"resampling": "bilinear"},
         write_params={"driver": "COG"},

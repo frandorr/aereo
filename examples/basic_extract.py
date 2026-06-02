@@ -12,6 +12,8 @@ from aereo.client import AereoClient
 from aereo.interfaces import GridConfig, PipelineProfile
 from shapely.geometry import box
 
+# To output Cloud Optimized GeoTIFFs, add write_params:
+#   write_params={"cog": True, "blocksize": 512, "overview_resampling": "nearest"}
 profile = PipelineProfile(
     name="s2_ndvi_ndwi",
     resolution=100,
