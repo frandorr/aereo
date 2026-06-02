@@ -7,7 +7,7 @@ import re
 import tempfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Iterable, Optional, Sequence
+from typing import Iterable, Sequence
 
 from aereo.backends.core import TaskRunner
 from aereo.interfaces import ExecutionBackend, ExtractionTask, TaskStaging
@@ -103,7 +103,7 @@ class LambdaBackend(ExecutionBackend):
     def run_tasks(
         self,
         tasks: Sequence[ExtractionTask],
-        runner: Optional[TaskRunner] = None,
+        runner: TaskRunner | None = None,
     ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
         """Execute *tasks* via AWS Lambda.
 
