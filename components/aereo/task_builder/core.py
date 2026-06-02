@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any, Sequence, cast
 
 import geopandas as gpd
-from aereo.grid import GridCell
+from aereo.grid import GridCell, GridDefinition
 from aereo.interfaces.core import (
     DEFAULT_CELLS_PER_TASK,
     ExtractionTask,
@@ -22,12 +22,24 @@ from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
 
+_VALID_FILTER_MODES = frozenset({"intersection", "within", "coverage"})
+
 
 def _filter_assets_by_profile(
     search_results: GeoDataFrame[AssetSchema],
     profile: Any,
 ) -> GeoDataFrame[AssetSchema]:
-    """Filter search results to assets matching *profile.collections*."""
+    """Filter search results to assets matching *profile.collections*.
+
+    Args:
+        search_results: GeoDataFrame of assets from the search phase.
+        profile: Profile whose ``collections`` map (if any) drives the filter.
+
+    Returns:
+        A copy of ``search_results`` containing only assets whose collection
+        is in the profile. If the profile has no ``collections`` attribute or
+        it is empty, the full set is returned.
+    """
     if hasattr(profile, "collections") and profile.collections:
         filtered = search_results[
             search_results["collection"].isin(list(profile.collections.keys()))
@@ -43,9 +55,29 @@ def _generate_cell_groups(
     grid_def: Any,
     grid_config: GridConfig,
 ) -> list[tuple[Any, GeoDataFrame, list[GridCell]]]:
-    """Group assets by start_time and generate/filter grid cells."""
+    """Group assets by start_time and generate/filter grid cells.
+
+    Args:
+        profile_assets: Assets already filtered to the active profile.
+        target_aoi: Optional AOI used to clip each time group before tiling.
+        grid_def: Grid definition providing ``generate_grid_cells``.
+        grid_config: Grid configuration (drives filter mode and min coverage).
+
+    Returns:
+        List of ``(start_time, time_group, cells)`` tuples; entries with no
+        intersecting cells or no contributing assets are omitted.
+
+    Raises:
+        ValueError: If ``grid_config.grid_filter_mode`` is not one of
+            ``"intersection"``, ``"within"``, or ``"coverage"``.
+    """
     profile_cell_groups: list[tuple[Any, GeoDataFrame, list[GridCell]]] = []
     grid_filter_mode = str(grid_config.grid_filter_mode).lower()
+    if grid_filter_mode not in _VALID_FILTER_MODES:
+        raise ValueError(
+            f"Unknown grid_filter_mode: {grid_filter_mode}. "
+            f"Use one of {sorted(_VALID_FILTER_MODES)}."
+        )
     min_coverage = grid_config.min_coverage
 
     for start_time, time_group in profile_assets.groupby("start_time"):
@@ -85,7 +117,37 @@ def _filter_cells_by_mode(
     mode: str,
     min_coverage: float,
 ) -> list[GridCell]:
-    """Filter cells by coverage mode ('within' or 'coverage')."""
+    """Filter cells by AOI coverage mode.
+
+    Modes:
+        ``"within"``: keep cells fully contained in ``aoi_geom``.
+        ``"coverage"``: keep cells whose intersection with ``aoi_geom`` covers
+            at least ``min_coverage`` (a fraction) of the cell.
+        ``"intersection"``: caller handles this mode by skipping the filter
+            entirely (all cells are kept).
+
+    Args:
+        cells: Candidate grid cells.
+        aoi_geom: AOI to test against.
+        mode: One of the strings above; ``"intersection"`` returns the input
+            unchanged.
+        min_coverage: Coverage threshold in ``[0, 1]`` for ``"coverage"`` mode.
+
+    Returns:
+        The filtered list of cells.
+
+    Raises:
+        ValueError: If ``mode`` is not a recognised filter mode (caller-side
+            validation is preferred; this is a defence-in-depth check).
+    """
+    if mode == "intersection":
+        return list(cells)
+    if mode not in _VALID_FILTER_MODES:
+        raise ValueError(
+            f"Unknown grid_filter_mode: {mode}. "
+            f"Use one of {sorted(_VALID_FILTER_MODES)}."
+        )
+
     filtered: list[GridCell] = []
     for cell in cells:
         cell_geom = cell.geom
@@ -97,11 +159,6 @@ def _filter_cells_by_mode(
             coverage = intersection.area / cell_geom.area if cell_geom.area > 0 else 0.0
             if coverage >= min_coverage:
                 filtered.append(cell)
-        else:
-            raise ValueError(
-                f"Unknown grid_filter_mode: {mode}. "
-                f"Use 'intersection', 'within', or 'coverage'."
-            )
     return filtered
 
 
@@ -112,8 +169,13 @@ def _cache_cell_geometries(
 ) -> tuple[dict[GridCell, Any], dict[GridCell, BaseGeometry]]:
     """Pre-compute area_def and WGS84 geometries for all cells.
 
+    Args:
+        cell_groups: Output of :func:`_generate_cell_groups`.
+        profile: Profile providing ``resolution``, ``padding``, ``conform_to``.
+        grid_config: Grid configuration providing ``target_grid_margin``.
+
     Returns:
-        Tuple of (area_def_cache, wgs84_geom_cache).
+        Tuple of ``(area_def_cache, wgs84_geom_cache)`` keyed by ``GridCell``.
     """
     resolution = int(profile.resolution)
     padding = getattr(profile, "padding", None) or 0
@@ -147,7 +209,22 @@ def _prepare_profile_tasks(
     cells_per_task: int,
     init_params: dict[str, Any] | None,
 ) -> list[ExtractionTask]:
-    """Prepare tasks for a single profile."""
+    """Prepare tasks for a single profile.
+
+    Args:
+        search_results: GeoDataFrame of assets from the search phase.
+        profile: Profile defining what to extract.
+        grid_def: Grid definition providing ``generate_grid_cells``.
+        grid_config: Grid configuration shared by all tasks.
+        target_aoi: Optional AOI to clip the extraction region.
+        uri: Destination URI prefix for extracted artifacts.
+        cells_per_task: Maximum number of grid cells per task chunk.
+        init_params: Optional parameters added to each task's context.
+
+    Returns:
+        List of :class:`ExtractionTask` objects; empty if the profile has no
+        matching assets or no intersecting cells.
+    """
     profile_assets = _filter_assets_by_profile(search_results, profile)
     if profile_assets.empty:
         return []
@@ -247,8 +324,6 @@ def prepare_for_extraction(
         raise ValueError(
             "GridConfig.target_grid_dist must be an explicit integer (e.g. 50_000)."
         )
-
-    from aereo.grid import GridDefinition
 
     grid_def = GridDefinition(d=grid_dist, overlap=grid_config.target_grid_overlap)
 
