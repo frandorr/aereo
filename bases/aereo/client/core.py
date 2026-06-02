@@ -1,10 +1,10 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from enum import Enum
+import json
 from typing import Any, Mapping, Sequence, cast
 
 import pandas as pd
-import json
 from aereo.backends import LocalProcessBackend, TaskRunner
 from aereo.interfaces import (
     AereoProfile,
@@ -30,10 +30,7 @@ def _json_default(obj: Any) -> Any:
     """Custom JSON encoder that recursively stringifies non-string dict keys."""
     if isinstance(obj, dict):
         return {str(k): _json_default(v) for k, v in obj.items()}
-    try:
-        return json.JSONEncoder.default(json.JSONEncoder(), obj)
-    except TypeError:
-        return str(obj)
+    return str(obj)
 
 
 class FailureMode(str, Enum):
@@ -84,21 +81,21 @@ class AereoClient:
         profiles: Sequence[AereoProfile] | None = None,
         grid_config: GridConfig | None = None,
         aoi: BaseGeometry | dict | None = None,
-        backend: Any | None = None,
+        backend: ExecutionBackend | None = None,
         cells_per_task: int | None = None,
     ):
-        """
-        Initializes the AereoClient with an optional AereoRegistry instance.
-         - If no registry is provided, a default one is instantiated.
+        """Initialize the AereoClient with an optional AereoRegistry instance.
+
+        If no registry is provided, a default one is instantiated.
 
         Args:
-            registry (Optional[AereoRegistry]): An instance of AereoRegistry to manage plugin discovery and instantiation.
-                If None, a default AereoRegistry is created.
-            profiles (Optional[Sequence[AereoProfile]]): Default profiles to use for search and extraction.
-            grid_config (Optional[GridConfig]): Default grid configuration for extraction.
-            aoi (Optional[BaseGeometry | dict]): Default area of interest geometry.
-            backend (Optional[ExecutionBackend]): Default execution backend.
-            cells_per_task (Optional[int]): Default number of grid cells per extraction task.
+            registry: An instance of AereoRegistry to manage plugin discovery
+                and instantiation. If None, a default AereoRegistry is created.
+            profiles: Default profiles to use for search and extraction.
+            grid_config: Default grid configuration for extraction.
+            aoi: Default area of interest geometry.
+            backend: Default execution backend.
+            cells_per_task: Default number of grid cells per extraction task.
         """
         self.registry = registry or AereoRegistry()
         self._profiles = profiles
@@ -123,8 +120,35 @@ class AereoClient:
         """Return an empty validated AssetSchema GeoDataFrame."""
         return cast(GeoDataFrame, AssetSchema.empty())
 
+    @staticmethod
+    def _empty_artifact_df() -> GeoDataFrame:
+        """Return an empty validated ArtifactSchema GeoDataFrame."""
+        return cast(GeoDataFrame, ArtifactSchema.empty())
+
+    @staticmethod
+    def _first_collection(profile: AereoProfile) -> str:
+        """Return the first collection name from a profile, or empty string."""
+        return next(iter(profile.collections)) if profile.collections else ""
+
+    @staticmethod
+    def _concat_and_validate(dfs: Sequence[GeoDataFrame], schema: Any) -> GeoDataFrame:
+        """Concatenate a list of GeoDataFrames and validate against a schema.
+
+        Args:
+            dfs: Sequence of GeoDataFrames to concatenate.
+            schema: Pandera schema class with a ``validate`` method.
+
+        Returns:
+            A validated GeoDataFrame.
+        """
+        concatenated = pd.concat(dfs, ignore_index=True)
+        return cast(GeoDataFrame, schema.validate(concatenated))
+
     def _resolve_params(
-        self, params: Mapping[str, Any] | None, collection: str
+        self,
+        params: Mapping[str, Any] | None,
+        collection: str,
+        _known_collections_lower: set[str] | None = None,
     ) -> Mapping[str, Any]:
         """Resolves parameters for a specific collection by merging global and per-collection overrides.
 
@@ -140,6 +164,8 @@ class AereoClient:
         Args:
             params: Raw parameter mapping.
             collection: Target collection name.
+            _known_collections_lower: Optional pre-computed set of lowercase known
+                collection names to avoid repeated registry queries.
 
         Returns:
             Resolved parameter mapping with per-collection overrides applied.
@@ -148,7 +174,7 @@ class AereoClient:
             return {}
 
         # canonical set of all known collection names (lowercase)
-        all_known_collections_lower = {
+        all_known_collections_lower = _known_collections_lower or {
             c.lower() for c in self.registry.list_supported_collections()
         }
 
@@ -243,6 +269,10 @@ class AereoClient:
             tuple[str, str], tuple[list[AereoProfile], Mapping[str, Any]]
         ] = {}
 
+        known_collections_lower = {
+            c.lower() for c in self.registry.list_supported_collections()
+        }
+
         for profile in profiles:
             target_plugin = self._resolve_plugin_for_profile("searcher", profile)
             if not target_plugin:
@@ -253,10 +283,12 @@ class AereoClient:
                 )
                 continue
 
-            first_collection = (
-                next(iter(profile.collections)) if profile.collections else ""
+            first_collection = self._first_collection(profile)
+            batch_resolved = self._resolve_params(
+                search_params,
+                first_collection,
+                _known_collections_lower=known_collections_lower,
             )
-            batch_resolved = self._resolve_params(search_params, first_collection)
             c_params = merge_params(batch_resolved, profile.search_params)
             p_key = json.dumps(c_params, sort_keys=True, default=_json_default)
 
@@ -294,25 +326,22 @@ class AereoClient:
         errors: list[Exception] = []
 
         with ThreadPoolExecutor(max_workers=max(1, len(execution_groups))) as executor:
-            futures = {
-                executor.submit(
-                    self.registry.get_searcher(
-                        p_name,
-                        **self._resolve_params(
-                            init_params,
-                            next(iter(s_profiles[0].collections))
-                            if s_profiles and s_profiles[0].collections
-                            else "",
-                        ),
-                    ).search,
+            futures: dict[Any, tuple[str, list[AereoProfile]]] = {}
+            for (p_name, _), (s_profiles, s_params) in execution_groups.items():
+                first_collection = self._first_collection(s_profiles[0])
+                searcher = self.registry.get_searcher(
+                    p_name,
+                    **self._resolve_params(init_params, first_collection),
+                )
+                future = executor.submit(
+                    searcher.search,
                     profiles=s_profiles,
                     intersects=norm_intersects,
                     start_datetime=start_datetime,
                     end_datetime=end_datetime,
                     search_params=s_params,
-                ): (p_name, s_profiles)
-                for (p_name, _), (s_profiles, s_params) in execution_groups.items()
-            }
+                )
+                futures[future] = (p_name, s_profiles)
 
             for future in as_completed(futures):
                 plugin_name, profs = futures[future]
@@ -414,10 +443,7 @@ class AereoClient:
             )
             return self._empty_asset_df()
 
-        return cast(
-            GeoDataFrame,
-            AssetSchema.validate(pd.concat(all_results, ignore_index=True)),
-        )
+        return self._concat_and_validate(all_results, AssetSchema)
 
     def _resolve_cells_per_task(self, cells_per_task: int | None) -> int:
         """Resolve the effective cells-per-task value.
@@ -506,8 +532,7 @@ class AereoClient:
         failure_mode: FailureMode = FailureMode.STRICT,
         init_params: Mapping[str, Any] | None = None,
     ) -> GeoDataFrame[ArtifactSchema]:
-        """
-        Execute a sequence of ExtractionTasks through a configurable backend.
+        """Execute a sequence of ExtractionTasks through a configurable backend.
 
         The client resolves the correct plugin for each task and delegates
         execution to the backend, which controls parallelism, memory, and
@@ -520,13 +545,15 @@ class AereoClient:
             failure_mode: STRICT raises on the first failure; BEST_EFFORT
                 processes tasks individually and returns partial results,
                 skipping only the tasks that fail.
+            init_params: Optional parameters forwarded to plugin instantiation
+                for each task.
 
         Returns:
             A unified GeoDataFrame containing all extracted Artifacts.
         """
         if not tasks:
             logger.warning("execute_tasks_empty", reason="No tasks provided")
-            return cast(GeoDataFrame, ArtifactSchema.empty())
+            return self._empty_artifact_df()
 
         backend = self._backend if backend is None else backend
         backend = backend or LocalProcessBackend()
@@ -550,9 +577,8 @@ class AereoClient:
                     logger.warning("task_failed_best_effort", exc_info=True)
             if not results:
                 logger.warning("execute_tasks_empty_result")
-                return cast(GeoDataFrame, ArtifactSchema.empty())
-            concatenated = pd.concat(results, ignore_index=True)
-            return cast(GeoDataFrame, ArtifactSchema.validate(concatenated))
+                return self._empty_artifact_df()
+            return self._concat_and_validate(results, ArtifactSchema)
 
         # STRICT mode — batch for efficiency, raise on first failure
         try:
@@ -563,7 +589,6 @@ class AereoClient:
 
         if not results:
             logger.warning("execute_tasks_empty_result")
-            return cast(GeoDataFrame, ArtifactSchema.empty())
+            return self._empty_artifact_df()
 
-        concatenated = pd.concat(results, ignore_index=True)
-        return cast(GeoDataFrame, ArtifactSchema.validate(concatenated))
+        return self._concat_and_validate(results, ArtifactSchema)
