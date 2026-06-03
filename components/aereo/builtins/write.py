@@ -54,17 +54,24 @@ class WriteGeoTIFF(Writer):
             default=None,
             required=False,
         ),
+        PluginParam(
+            name="rio_params",
+            type="dict",
+            description="Extra parameters to pass to rioxarray/rasterio when writing.",
+            default=None,
+            required=False,
+        ),
     )
 
     def _write_cog(
         self,
         da: Any,
         fpath: Path,
-        compress: str,
-        zlevel: int,
-        blocksize: int,
-        overview_resampling: str,
-        overview_levels: list[int] | None,
+        *,
+        blocksize: int = 512,
+        overview_resampling: str = "nearest",
+        overview_levels: list[int] | None = None,
+        **kwargs: Any,
     ) -> None:
         """Write a DataArray to a Cloud Optimized GeoTIFF.
 
@@ -76,14 +83,10 @@ class WriteGeoTIFF(Writer):
         Args:
             da: DataArray to write.
             fpath: Destination path.
-            compress: Compression algorithm (e.g. ``"deflate"``).
-            zlevel: Compression level.
             blocksize: Tile width/height in pixels.
             overview_resampling: Resampling method for overviews.
             overview_levels: Explicit decimation levels. Auto-generated if omitted.
-
-        Returns:
-            None
+            **kwargs: Extra parameters passed to rioxarray.to_raster.
         """
         import shutil
         import tempfile
@@ -97,11 +100,10 @@ class WriteGeoTIFF(Writer):
 
         da.rio.to_raster(
             tmp_path,
-            compress=compress,
-            zlevel=zlevel,
             tiled=True,
             blockxsize=blocksize,
             blockysize=blocksize,
+            **kwargs,
         )
 
         with rasterio.open(tmp_path, "r+") as src:
@@ -120,12 +122,12 @@ class WriteGeoTIFF(Writer):
         self,
         da: Any,
         fpath: Path,
-        cog: bool,
-        compress: str,
-        zlevel: int,
-        blocksize: int,
-        overview_resampling: str,
-        overview_levels: list[int] | None,
+        *,
+        cog: bool = False,
+        blocksize: int = 512,
+        overview_resampling: str = "nearest",
+        overview_levels: list[int] | None = None,
+        **kwargs: Any,
     ) -> None:
         """Write a single DataArray to disk, optionally as a COG.
 
@@ -133,30 +135,24 @@ class WriteGeoTIFF(Writer):
             da: DataArray to write.
             fpath: Destination path.
             cog: Whether to write as Cloud Optimized GeoTIFF.
-            compress: Compression algorithm (e.g. ``"deflate"``).
-            zlevel: Compression level.
             blocksize: Tile width/height in pixels when *cog* is True.
             overview_resampling: Resampling method for COG overviews.
             overview_levels: Explicit decimation levels. Auto-generated if omitted.
-
-        Returns:
-            None
+            **kwargs: Extra parameters passed to rioxarray.to_raster.
         """
         if cog:
             self._write_cog(
                 da,
                 fpath,
-                compress,
-                zlevel,
-                blocksize,
-                overview_resampling,
-                overview_levels,
+                blocksize=blocksize,
+                overview_resampling=overview_resampling,
+                overview_levels=overview_levels,
+                **kwargs,
             )
         else:
             da.rio.to_raster(
                 fpath,
-                compress=compress,
-                zlevel=zlevel,
+                **kwargs,
             )
 
     def write(
@@ -189,12 +185,25 @@ class WriteGeoTIFF(Writer):
                 "when no 'time' dimension is present to construct EOIDS compliant paths."
             )
 
-        compress = params.get("compress", "deflate")
-        zlevel = params.get("zlevel", 1)
-        cog = params.get("cog", False)
-        blocksize = params.get("blocksize", 512)
-        overview_resampling = params.get("overview_resampling", "nearest")
-        overview_levels = params.get("overview_levels")
+        rio_params = params.get("rio_params") or {}
+
+        # Default fallback values for backward compatibility and sane default behaviors
+        write_kwargs: dict[str, Any] = {
+            "compress": "deflate",
+            "zlevel": 1,
+            "cog": False,
+            "blocksize": 512,
+            "overview_resampling": "nearest",
+            "overview_levels": None,
+        }
+
+        # Override/extend defaults with top-level params (for backward compatibility)
+        for key in list(write_kwargs.keys()):
+            if key in params:
+                write_kwargs[key] = params[key]
+
+        # Merge with the new explicit dictionary parameters
+        write_kwargs.update(rio_params)
 
         records = []
         for var_name in ds.data_vars:
@@ -235,12 +244,7 @@ class WriteGeoTIFF(Writer):
                     self._write_band(
                         band_da,
                         fpath,
-                        cog,
-                        compress,
-                        zlevel,
-                        blocksize,
-                        overview_resampling,
-                        overview_levels,
+                        **write_kwargs,
                     )
 
                     # Keep band metadata as None for single-band variables to match original behaviour
