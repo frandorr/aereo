@@ -287,8 +287,8 @@ def test_validate_aereo_dataset_accepts_valid():
     import xarray as xr
 
     ds = xr.Dataset(
-        {"B04": (["y", "x"], np.ones((4, 4)))},
-        coords={"y": range(4), "x": range(4)},
+        {"B04": (["band", "y", "x"], np.ones((1, 4, 4)))},
+        coords={"band": [1], "y": range(4), "x": range(4)},
     )
     # rioxarray crs is None by default, so we set require_crs=False
     validate_aereo_dataset(ds, require_crs=False)
@@ -318,8 +318,8 @@ def test_validate_aereo_dataset_checks_crs_when_required():
     import xarray as xr
 
     ds = xr.Dataset(
-        {"B04": (["y", "x"], np.ones((4, 4)))},
-        coords={"y": range(4), "x": range(4)},
+        {"B04": (["band", "y", "x"], np.ones((1, 4, 4)))},
+        coords={"band": [1], "y": range(4), "x": range(4)},
     )
     # Without rioxarray crs, require_crs=True should fail
     with pytest.raises(ValueError, match="must have a CRS"):

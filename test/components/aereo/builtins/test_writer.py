@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -22,9 +24,13 @@ def _patch_artifact_schema(monkeypatch):
     monkeypatch.setattr(ArtifactSchema, "validate", lambda x: x)
 
 
-def _make_dataset(data_vars=None, dims=("y", "x"), shape=(8, 8)):
+def _make_dataset(data_vars=None, dims=("band", "y", "x"), shape=(1, 8, 8)):
     """Return a minimal AereoDataset for testing."""
-    coords = {d: range(s) for d, s in zip(dims, shape)}
+    if len(shape) == 2:
+        shape = (1,) + shape
+    coords: dict[str, Any] = {d: range(s) for d, s in zip(dims, shape)}
+    if "band" in coords:
+        coords["band"] = [1]
     if data_vars is None:
         data_vars = {
             "B04": (dims, np.ones(shape) * 0.3),

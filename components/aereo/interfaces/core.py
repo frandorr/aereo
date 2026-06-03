@@ -87,7 +87,7 @@ def _import_rioxarray() -> Any:
 #        ds.rio.crs  # -> rasterio.crs.CRS (or None if unset)
 #
 # 2. Spatial dimensions are named ``y`` and ``x``.
-# 3. Optional band dimension is named ``band``.
+# 3. Band dimension is named ``band`` (at least size 1).
 # 4. Optional temporal dimension is named ``time``.
 # 5. Data variables are typically named after the physical quantity
 #    (e.g. ``"ndvi"``, ``"B04"``, ``"C01"``).
@@ -107,7 +107,7 @@ def _import_rioxarray() -> Any:
 #:        ds.rio.crs  # -> rasterio.crs.CRS (or None if unset)
 #:
 #: 2. Spatial dimensions are named ``y`` and ``x``.
-#: 3. Optional band dimension is named ``band``.
+#: 3. Band dimension is named ``band`` (at least size 1).
 #: 4. Optional temporal dimension is named ``time``.
 #: 5. Data variables are typically named after the physical quantity
 #:    (e.g. ``"ndvi"``, ``"B04"``, ``"C01"``).
@@ -128,7 +128,7 @@ def validate_aereo_dataset(
     ds: Any,
     *,
     require_crs: bool = True,
-    require_dims: Sequence[str] | None = None,
+    require_dims: Sequence[str] | None = ("band", "y", "x"),
 ) -> None:
     """Validate that *ds* conforms to the AereoDataset conventions.
 
