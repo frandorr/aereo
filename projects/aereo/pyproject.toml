@@ -39,6 +39,7 @@ dependencies = [
   "pandas>=3.0.1",
   "pandera[geopandas]>=0.24",
   "pyproj>=3.7.1",
+  "pystac-client>=0.8",
   "rich>=13",
   "shapely>=2.1.2",
   "structlog>=25.5",
