@@ -1,3 +1,9 @@
+"""Built-in writer plugins for the AEREO pipeline.
+
+This module provides writer plugins such as GeoTIFF/COG writers to output spatial
+datasets to the filesystem or object storage.
+"""
+
 from __future__ import annotations
 
 from pathlib import Path

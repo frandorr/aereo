@@ -1,3 +1,9 @@
+"""Built-in reprojector plugins for the AEREO pipeline.
+
+This module provides spatial reprojection plugins using odc-geo to warp and align
+native-resolution spatial datasets to target grid cell definitions.
+"""
+
 from __future__ import annotations
 
 from typing import Any, Mapping

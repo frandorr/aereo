@@ -1,3 +1,9 @@
+"""Core interface definitions, plugin types, and data models for AEREO.
+
+Defines the AereoProfile configuration schemas, PluginParam parameters, and interface classes
+like SearchProvider, Reader, Writer, and Reprojector.
+"""
+
 from __future__ import annotations
 
 import json

@@ -1,3 +1,9 @@
+"""Built-in processor plugins for the AEREO pipeline.
+
+This module provides data transform plugins such as band selection, QA masking,
+NDVI calculation, scaling normalization, and temporal compositing.
+"""
+
 from __future__ import annotations
 
 from typing import Any, Mapping

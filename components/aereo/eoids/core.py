@@ -1,3 +1,9 @@
+"""Core implementation of EOIDS file naming, path generation, scanning, and loading utilities.
+
+Handles the naming structure of Earth Observation Image Datasets (EOIDS) and integrates
+them with Major TOM format parquet files.
+"""
+
 import datetime
 import re
 from pathlib import Path

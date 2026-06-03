@@ -1,3 +1,9 @@
+"""Built-in search provider plugins for the AEREO pipeline.
+
+This module provides search provider plugins such as generic STAC API searchers
+to query metadata repositories for target assets.
+"""
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
