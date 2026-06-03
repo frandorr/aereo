@@ -47,6 +47,18 @@ class SearchSTAC(SearchProvider, plugin_abstract=False):
             description="List of asset keys to filter/retrieve. If not specified, defaults to the first available asset.",
             required=False,
         ),
+        PluginParam(
+            name="pystac_open_params",
+            type="dict",
+            description="Additional parameters forwarded to Client.open().",
+            required=False,
+        ),
+        PluginParam(
+            name="pystac_search_params",
+            type="dict",
+            description="Additional parameters forwarded to Client.search().",
+            required=False,
+        ),
     ]
 
     def search(
@@ -81,6 +93,8 @@ class SearchSTAC(SearchProvider, plugin_abstract=False):
         # 1. Extract parameters
         headers = search_params.get("headers")
         assets = search_params.get("assets")
+        pystac_open_params = search_params.get("pystac_open_params") or {}
+        pystac_search_params = search_params.get("pystac_search_params") or {}
 
         # 2. Derive collections from all profile mappings
         collections: list[str] = []
@@ -119,6 +133,7 @@ class SearchSTAC(SearchProvider, plugin_abstract=False):
         if headers:
             # Coerce header keys/values to strings
             client_kwargs["headers"] = {str(k): str(v) for k, v in headers.items()}
+        client_kwargs.update(pystac_open_params)
 
         try:
             client = Client.open(stac_api_url, **client_kwargs)
@@ -139,11 +154,21 @@ class SearchSTAC(SearchProvider, plugin_abstract=False):
         if intersects is not None:
             searchkwargs["intersects"] = intersects.__geo_interface__
 
+        # Merge in pystac_search_params
+        searchkwargs.update(pystac_search_params)
+
         # Forward other params excluding plugin-specific ones
-        plugin_specific = {"stac_api_url", "headers", "assets"}
+        plugin_specific = {
+            "stac_api_url",
+            "headers",
+            "assets",
+            "pystac_open_params",
+            "pystac_search_params",
+        }
         for key, value in search_params.items():
             if key not in plugin_specific:
-                searchkwargs[key] = value
+                if key not in searchkwargs:
+                    searchkwargs[key] = value
 
         # 7. Execute search
         try:

@@ -292,3 +292,43 @@ def test_search_stac_partial_datetimes(mock_client, mock_pystac_item):
         search_params={"stac_api_url": "https://example.com/stac"},
     )
     assert mock_catalog.search.call_args[1]["datetime"] == "../2023-05-13T00:00:00Z"
+
+
+@patch("aereo.builtins.search.Client")
+def test_search_stac_pystac_params_forwarding(mock_client, mock_pystac_item):
+    mock_catalog = MagicMock()
+    mock_client.open.return_value = mock_catalog
+    mock_search_request = MagicMock()
+    mock_search_request.items.return_value = [mock_pystac_item]
+    mock_catalog.search.return_value = mock_search_request
+
+    provider = SearchSTAC()
+    profile = AereoProfile(
+        name="test",
+        resolution=10,
+        collections={"test-collection": []},
+    )
+
+    mock_modifier = MagicMock()
+
+    provider.search(
+        profiles=[profile],
+        search_params={
+            "stac_api_url": "https://example.com/stac",
+            "pystac_open_params": {
+                "modifier": mock_modifier,
+                "ignore_conformance": True,
+            },
+            "pystac_search_params": {"method": "GET", "max_items": 10},
+        },
+    )
+
+    mock_client.open.assert_called_once_with(
+        "https://example.com/stac",
+        modifier=mock_modifier,
+        ignore_conformance=True,
+    )
+    mock_catalog.search.assert_called_once()
+    search_kwargs = mock_catalog.search.call_args[1]
+    assert search_kwargs["method"] == "GET"
+    assert search_kwargs["max_items"] == 10
