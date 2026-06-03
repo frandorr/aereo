@@ -179,7 +179,6 @@ class WriteGeoTIFF(Writer):
 
         uri = task.uri
         cell_id = cell.id()
-        derivative = params.get("derivative")
 
         start_time = None
         end_time = None
@@ -218,7 +217,6 @@ class WriteGeoTIFF(Writer):
                         cell_id=cell_id,
                         start_time=start_time,
                         end_time=end_time,
-                        derivative=derivative,
                         desc=f"{var_name}_b{band_idx}",
                         suffix="tif",
                     )
@@ -248,7 +246,6 @@ class WriteGeoTIFF(Writer):
                     cell_id=cell_id,
                     start_time=start_time,
                     end_time=end_time,
-                    derivative=derivative,
                     desc=str(var_name),
                     suffix="tif",
                 )
