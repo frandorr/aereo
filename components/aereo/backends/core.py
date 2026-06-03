@@ -11,9 +11,10 @@ from typing import Any, Literal, Mapping, Sequence, cast
 import geopandas as gpd
 import pandas as pd
 
-from aereo.interfaces import (
+from aereo.interfaces.core import (
     ExtractionTask,
     PipelineCallback,
+    PluginStage,
     Processor,
     Reader,
     Reprojector,
@@ -92,28 +93,21 @@ class TaskRunner:
         # Resolve pipeline stages
         reader = self._resolve_reader(task, task_init)
         reprojector = self._resolve_reprojector(task, task_init)
-        processors = self._resolve_processors(task, task_init)
+        pre_processors = self._resolve_processors(task, task_init, phase="pre")
+        post_processors = self._resolve_processors(task, task_init, phase="post")
         writer = self._resolve_writer(task, task_init)
-
-        pre = [p for p in processors if p.stage == "pre_reproject"]
-        post = [p for p in processors if p.stage == "post_reproject"]
-
-        # Build effective params for each stage
-        read_params = dict(task.profile.read_params)
-        process_params = dict(getattr(task.profile, "process_params", {}))
-        write_params = dict(task.profile.write_params)
 
         self._fire_callbacks("on_task_start", task)
 
         try:
             # Stage 1: Read
-            ds = reader.read(task, read_params)
+            ds = reader.read(task, {})
             self._fire_callbacks("on_download_complete", task)
             self._fire_callbacks("on_read_complete", task, ds)
 
             # Stage 2: Pre-reproject processing (once, outside cell loop)
-            for proc in pre:
-                ds = proc.process(ds, process_params)
+            for proc in pre_processors:
+                ds = proc.process(ds, {})
 
             # Stage 3-5: Per-cell loop
             artifacts: list[GeoDataFrame[ArtifactSchema]] = []
@@ -125,17 +119,17 @@ class TaskRunner:
                         margin=task.grid_config.target_grid_margin,
                         conform_to=getattr(task.profile, "conform_to", None),
                     )
-                    ds_cell = reprojector.reproject(ds, geobox, read_params)
+                    ds_cell = reprojector.reproject(ds, geobox, {})
                     self._fire_callbacks("on_reproject_complete", task, cell, ds_cell)
 
-                    for proc in post:
-                        ds_cell = proc.process(ds_cell, process_params)
+                    for proc in post_processors:
+                        ds_cell = proc.process(ds_cell, {})
 
-                    cell_artifacts = writer.write(ds_cell, task, cell, write_params)
+                    cell_artifacts = writer.write(ds_cell, task, cell, {})
                     artifacts.append(cell_artifacts)
 
                     self._fire_callbacks(
-                        "on_cell_write_complete", task, cell, cell_artifacts
+                        "on_cell_complete", task, cell, ds_cell, cell_artifacts
                     )
                 except Exception as exc:
                     if self.per_cell_failure_mode == "strict":
@@ -168,111 +162,50 @@ class TaskRunner:
     # --- Resolution helpers ---
 
     def _resolve_reader(self, task: ExtractionTask, init: dict[str, Any]) -> Reader:
-        """Resolve the reader plugin for *task*.
-
-        Args:
-            task: The extraction task.
-            init: Constructor kwargs for the plugin.
-
-        Returns:
-            An instantiated reader plugin.
-        """
-        return self._resolve_stage(task, init, stage="read", type_label="reader")
+        return self._resolve_stage(task, task.profile.read, init, type_label="reader")
 
     def _resolve_reprojector(
         self, task: ExtractionTask, init: dict[str, Any]
     ) -> Reprojector:
-        """Resolve the reprojector plugin for *task*.
-
-        Args:
-            task: The extraction task.
-            init: Constructor kwargs for the plugin.
-
-        Returns:
-            An instantiated reprojector plugin.
-        """
         return self._resolve_stage(
-            task, init, stage="reproject", type_label="reprojector"
+            task, task.profile.reproject, init, type_label="reprojector"
         )
 
-    def _resolve_processors(
-        self, task: ExtractionTask, init: dict[str, Any]
-    ) -> list[Processor]:
-        """Resolve all processors declared in plugin hints.
-
-        Args:
-            task: The extraction task.
-            init: Constructor kwargs for each processor.
-
-        Returns:
-            A list of instantiated processor plugins, in declaration order.
-        """
-        hints = self._extract_processor_hints(task)
-        if not hints:
-            return []
-
-        processors: list[Processor] = []
-        for name in hints:
-            if self.registry.has("processor", name):
-                processors.append(self.registry.get("processor", name, **init))
-            else:
-                logger.warning("Processor '%s' not found, skipping.", name)
-        return processors
-
     def _resolve_writer(self, task: ExtractionTask, init: dict[str, Any]) -> Writer:
-        """Resolve the writer plugin for *task*.
-
-        Args:
-            task: The extraction task.
-            init: Constructor kwargs for the plugin.
-
-        Returns:
-            An instantiated writer plugin.
-        """
-        return self._resolve_stage(task, init, stage="writer", type_label="writer")
+        return self._resolve_stage(task, task.profile.write, init, type_label="writer")
 
     def _resolve_stage(
         self,
         task: ExtractionTask,
+        stage: PluginStage | None,
         init: dict[str, Any],
         *,
-        stage: str,
         type_label: str,
-        fallback: str | None = None,
     ) -> Any:
-        """Generic three-tier resolution for a single pipeline stage.
+        """Resolve a single pipeline stage plugin.
 
         Args:
             task: The extraction task.
-            init: Constructor kwargs for the plugin.
-            stage: Key used in ``task_context`` and ``plugin_hints``.
-            type_label: Registry type label (e.g. "reader", "writer").
-            fallback: Optional fallback type label if the primary is not found.
+            stage: The configured PluginStage dict, if any.
+            init: Context kwargs for the plugin.
+            type_label: Registry type label (e.g. "reader").
 
         Returns:
             An instantiated plugin.
-
-        Raises:
-            ValueError: If no plugin can be resolved.
         """
-        # 1. Task context hint (check both stage_hint and type_label_hint)
-        hint = task.task_context.get(f"{stage}_hint") or task.task_context.get(
-            f"{type_label}_hint"
-        )
-        plugin = self._try_resolve_from_hint(hint, type_label, fallback, init)
-        if plugin is not None:
-            return plugin
+        from aereo.interfaces import unpack_stage
 
-        # 2. Profile hint
-        profile_hint = task.profile.plugin_hints.get(
-            stage
-        ) or task.profile.plugin_hints.get(type_label)
-        plugin = self._try_resolve_from_hint(profile_hint, type_label, fallback, init)
-        if plugin is not None:
-            return plugin
+        if stage:
+            plugin_name, params = unpack_stage(stage)
+            final_init = {**init, **params}
+            if self.registry.has(type_label, plugin_name):
+                return self.registry.get(type_label, plugin_name, **final_init)
+            raise ValueError(
+                f"Plugin '{plugin_name}' not found for type '{type_label}'"
+            )
 
-        # 3. Auto-discover from collections
-        plugin_name = self._auto_discover_plugin(task, type_label, fallback)
+        # Fallback to auto-discovery
+        plugin_name = self._auto_discover_plugin(task, type_label)
         if plugin_name is None:
             raise ValueError(
                 f"No {type_label} plugin found for profile: {task.profile.name}"
@@ -280,76 +213,47 @@ class TaskRunner:
 
         return self.registry.get(type_label, plugin_name, **init)
 
-    def _try_resolve_from_hint(
-        self,
-        hint: Any,
-        type_label: str,
-        fallback: str | None,
-        init: dict[str, Any],
-    ) -> Any | None:
-        """Attempt to resolve a plugin from a hint string.
-
-        Args:
-            hint: The hint value (typically a string or None).
-            type_label: Primary registry type label.
-            fallback: Optional fallback registry type label.
-            init: Constructor kwargs for the plugin.
-
-        Returns:
-            An instantiated plugin, or *None* if the hint does not resolve.
-        """
-        if not hint:
-            return None
-        hint_str = str(hint)
-        if self.registry.has(type_label, hint_str):
-            return self.registry.get(type_label, hint_str, **init)
-        if fallback and self.registry.has(fallback, hint_str):
-            return self.registry.get(fallback, hint_str, **init)
-        return None
-
-    def _auto_discover_plugin(
-        self,
-        task: ExtractionTask,
-        type_label: str,
-        fallback: str | None,
-    ) -> str | None:
-        """Auto-discover a plugin name from profile collections.
+    def _resolve_processors(
+        self, task: ExtractionTask, init: dict[str, Any], phase: str = "post"
+    ) -> list[Processor]:
+        """Resolve pre or post processors.
 
         Args:
             task: The extraction task.
-            type_label: Primary registry type label.
-            fallback: Optional fallback registry type label.
-
-        Returns:
-            The first discovered plugin name, or *None* if nothing matches.
+            init: Context kwargs.
+            phase: 'pre' or 'post'.
         """
+        from aereo.interfaces import unpack_stage
+
+        processors: list[Processor] = []
+        stages = (
+            task.profile.pre_processors
+            if phase == "pre"
+            else task.profile.post_processors
+        )
+
+        for stage in stages:
+            if isinstance(stage, str):
+                plugin_name, params = stage, {}
+            else:
+                plugin_name, params = unpack_stage(stage)
+
+            if self.registry.has("processor", plugin_name):
+                final_init = {**init, **params}
+                processors.append(
+                    self.registry.get("processor", plugin_name, **final_init)
+                )
+            else:
+                logger.warning("Processor '%s' not found, skipping.", plugin_name)
+
+        return processors
+
+    def _auto_discover_plugin(
+        self, task: ExtractionTask, type_label: str
+    ) -> str | None:
+        """Auto-discover a plugin name from profile collections."""
         for collection in task.profile.collections:
             plugin_names = self.registry.find_for(type_label, collection)
             if plugin_names:
                 return plugin_names[0]
-        if fallback:
-            for collection in task.profile.collections:
-                plugin_names = self.registry.find_for(fallback, collection)
-                if plugin_names:
-                    return plugin_names[0]
         return None
-
-    def _extract_processor_hints(self, task: ExtractionTask) -> list[str]:
-        """Extract processor hint names from task context or profile.
-
-        Args:
-            task: The extraction task.
-
-        Returns:
-            A list of processor names, or an empty list if none are declared.
-        """
-        for key in ("processor_hints", "processors"):
-            task_hint = task.task_context.get(key)
-            if task_hint:
-                return [h.strip() for h in str(task_hint).split(",")]
-
-        profile_hint = task.profile.plugin_hints.get("processors")
-        if profile_hint:
-            return [h.strip() for h in str(profile_hint).split(",")]
-
-        return []

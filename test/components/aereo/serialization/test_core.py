@@ -1,10 +1,9 @@
-import json
 from datetime import datetime
 from typing import Any, cast
 
 import geopandas as gpd
 from aereo.grid import GridCell
-from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig, PipelineProfile
+from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig
 from aereo.schemas import AssetSchema
 from aereo.serialization import TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
@@ -195,9 +194,8 @@ def test_profile_reconstruction_matches_original(tmp_path: Any) -> None:
         collections={"ABI-L1b-RadC": ["C01", "C02"]},
         padding=4,
         conform_to=(256, 256),
-        plugin_hints={"extract": "aereo-extract-aws-goes"},
-        search_params={"version": "061"},
-        read_params={"calibration": "reflectance"},
+        read={"read_aws_goes": {"calibration": "reflectance"}},
+        search={"search_aws_goes": {"version": "061"}},
     )
 
     df = gpd.GeoDataFrame(
@@ -235,20 +233,22 @@ def test_profile_reconstruction_matches_original(tmp_path: Any) -> None:
     assert reconstructed.grid_config.target_grid_margin == 6.8
 
 
-def test_pipeline_profile_round_trip(tmp_path: Any) -> None:
-    """PipelineProfile survives serialize → deserialize round-trip."""
+def test_aereo_profile_round_trip(tmp_path: Any) -> None:
+    """AereoProfile survives serialize → deserialize round-trip."""
     serializer = TaskSerializer()
-    profile = PipelineProfile(
+    profile = AereoProfile(
         name="pipeline_test",
         resolution=300.0,
         collections={"S3OLCI": ["Oa01", "Oa02"]},
-        plugin_hints={"search": "earthaccess", "read": "satpy"},
-        search_params={"cloud_cover": 20},
-        read_params={"reader": "olci_l1b"},
-        reproject_params={"resampling": "bilinear"},
-        write_params={"driver": "COG"},
+        search={"earthaccess": {"cloud_cover": 20}},
+        read={"satpy": {"reader": "olci_l1b"}},
+        reproject={"repro": {"resampling": "bilinear"}},
+        write={"cog": {"driver": "COG"}},
         pre_processors=["mask_clouds"],
-        post_processors=[{"parallel": ["compute_ndvi", "compute_ndwi"]}, "normalize"],
+        post_processors=[
+            {"parallel": {"procs": ["compute_ndvi", "compute_ndwi"]}},
+            "normalize",
+        ],
     )
 
     df = gpd.GeoDataFrame(
@@ -282,57 +282,10 @@ def test_pipeline_profile_round_trip(tmp_path: Any) -> None:
     serializer.serialize(original, dest)
     reconstructed = serializer.deserialize(dest)
 
-    assert isinstance(reconstructed.profile, PipelineProfile)
+    assert isinstance(reconstructed.profile, AereoProfile)
     assert reconstructed.profile == profile
     assert reconstructed.profile.pre_processors == ["mask_clouds"]
     assert reconstructed.profile.post_processors == [
-        {"parallel": ["compute_ndvi", "compute_ndwi"]},
+        {"parallel": {"procs": ["compute_ndvi", "compute_ndwi"]}},
         "normalize",
     ]
-
-
-def test_backward_compat_missing_profile_type(tmp_path: Any) -> None:
-    """Old serialized data without profile_type key still deserializes as AereoProfile."""
-    serializer = TaskSerializer()
-    profile = AereoProfile(name="legacy", resolution=100.0)
-
-    df = gpd.GeoDataFrame(
-        {
-            "id": ["a"],
-            "collection": ["C"],
-            "start_time": [datetime(2023, 1, 1)],
-            "end_time": [datetime(2023, 1, 1)],
-            "href": ["http://x"],
-        },
-        geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
-        crs="EPSG:4326",
-    )
-
-    original = ExtractionTask(
-        assets=cast(GeoDataFrame[AssetSchema], df),
-        profile=profile,
-        uri="legacy_uri",
-        grid_cells=[
-            GridCell(
-                d=10_000,
-                geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-                is_primary=True,
-                cell_id="0U_0R",
-            )
-        ],
-        grid_config=GridConfig(target_grid_dist=10_000),
-    )
-
-    dest = tmp_path / "task_legacy"
-    serializer.serialize(original, dest)
-
-    # Strip profile_type to simulate old-format serialized task
-    meta_path = dest / serializer.META_NAME
-    meta = json.loads(meta_path.read_text(encoding="utf-8"))
-    meta.pop(serializer.PROFILE_TYPE_KEY, None)
-    meta_path.write_text(json.dumps(meta, default=str), encoding="utf-8")
-
-    reconstructed = serializer.deserialize(dest)
-    assert isinstance(reconstructed.profile, AereoProfile)
-    assert reconstructed.profile.name == "legacy"
-    assert reconstructed.profile.resolution == 100.0

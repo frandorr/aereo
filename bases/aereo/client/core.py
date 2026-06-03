@@ -235,8 +235,8 @@ class AereoClient:
         Raises:
             ValueError: If a hinted plugin is not registered.
         """
-        hint_key = "search"
-        hint = profile.plugin_hints.get(hint_key)
+        hint_stage = profile.search
+        hint = next(iter(hint_stage.keys())) if hint_stage else None
 
         if plugin_type == "searcher":
             has_plugin = self.registry.has_searcher
@@ -297,7 +297,8 @@ class AereoClient:
                 first_collection,
                 _known_collections_lower=known_collections_lower,
             )
-            c_params = merge_params(batch_resolved, profile.search_params)
+            search_p = next(iter(profile.search.values())) if profile.search else {}
+            c_params = merge_params(batch_resolved, search_p)
             p_key = json.dumps(c_params, sort_keys=True, default=_json_default)
 
             group_key = (target_plugin, p_key)

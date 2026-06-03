@@ -17,7 +17,7 @@ from typing import Any
 import geopandas as gpd
 import shapely.wkt
 from aereo.grid import GridCell
-from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig, PipelineProfile
+from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig
 
 logger = logging.getLogger(__name__)
 
@@ -112,11 +112,7 @@ class TaskSerializer:
 
         # Reconstruct Pydantic models
         profile_data = meta[self.PROFILE_KEY]
-        profile_type = meta.get(self.PROFILE_TYPE_KEY)
-        if profile_type == "PipelineProfile":
-            profile = PipelineProfile.model_validate(profile_data)
-        else:
-            profile = AereoProfile.model_validate(profile_data)
+        profile = AereoProfile.model_validate(profile_data)
         grid_config = GridConfig.model_validate(meta[self.GRID_CONFIG_KEY])
 
         # Reconstruct GridCell instances
