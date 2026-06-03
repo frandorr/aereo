@@ -207,19 +207,39 @@ class WriteGeoTIFF(Writer):
         records = []
         for var_name in ds.data_vars:
             da = ds[var_name]
-            if "band" in da.dims:
-                # Multi-band variable — write each band separately
-                for band_idx in range(da.sizes["band"]):
-                    band_da = da.isel(band=band_idx)
+
+            # Handle optional time dimension: if present, slice over it.
+            has_time = "time" in da.dims
+            time_coords = da.coords["time"].values if has_time else [None]
+
+            for time_idx, time_val in enumerate(time_coords):
+                t_da = da.isel(time=time_idx) if has_time else da
+
+                # Resolve timestamp for this specific slice
+                slice_time = (
+                    pd.to_datetime(time_val).to_pydatetime()
+                    if time_val is not None
+                    else start_time
+                )
+
+                # Since band is strictly guaranteed to be present:
+                num_bands = t_da.sizes["band"]
+                for band_idx in range(num_bands):
+                    band_da = t_da.isel(band=band_idx)
+
+                    # Single band gets the variable name, multi-band gets B04_b0
+                    desc = f"{var_name}_b{band_idx}" if num_bands > 1 else str(var_name)
+
                     fpath = build_eoids_path(
                         local_dir=uri,
                         profile=task.profile,
                         cell_id=cell_id,
-                        start_time=start_time,
-                        end_time=end_time,
-                        desc=f"{var_name}_b{band_idx}",
+                        start_time=slice_time,
+                        end_time=slice_time if has_time else end_time,
+                        desc=desc,
                         suffix="tif",
                     )
+
                     self._write_band(
                         band_da,
                         fpath,
@@ -230,44 +250,19 @@ class WriteGeoTIFF(Writer):
                         overview_resampling,
                         overview_levels,
                     )
+
+                    # Keep band metadata as None for single-band variables to match original behaviour
+                    band_val = band_idx if num_bands > 1 else None
+
                     records.append(
                         {
                             "path": str(fpath),
                             "variable": var_name,
-                            "band": band_idx,
+                            "band": band_val,
                             "cell_id": cell_id,
                             "geometry": box(*band_da.rio.bounds()),
                         }
                     )
-            else:
-                fpath = build_eoids_path(
-                    local_dir=uri,
-                    profile=task.profile,
-                    cell_id=cell_id,
-                    start_time=start_time,
-                    end_time=end_time,
-                    desc=str(var_name),
-                    suffix="tif",
-                )
-                self._write_band(
-                    da,
-                    fpath,
-                    cog,
-                    compress,
-                    zlevel,
-                    blocksize,
-                    overview_resampling,
-                    overview_levels,
-                )
-                records.append(
-                    {
-                        "path": str(fpath),
-                        "variable": var_name,
-                        "band": None,
-                        "cell_id": cell_id,
-                        "geometry": box(*da.rio.bounds()),
-                    }
-                )
 
         if records:
             df = pd.DataFrame(records)
