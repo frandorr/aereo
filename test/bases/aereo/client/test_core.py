@@ -758,7 +758,7 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
             _captured.append(
                 {
                     "profile_name": task.profile.name,
-                    "params": self.kwargs,
+                    "params": params,
                 }
             )
             return xr.Dataset()

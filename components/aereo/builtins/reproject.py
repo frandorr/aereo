@@ -30,13 +30,17 @@ class ReprojectODC(Reprojector):
         Args:
             ds: Input dataset.
             geobox: Target ``odc.geo.geobox.GeoBox``.
-            params: Plugin parameters. Supports ``resampling``
-                (default ``"nearest"``).
+            params: Plugin parameters. Supports ``reproject_params`` (dict)
+                which is forwarded verbatim to ``xr_reproject``.  Common
+                keys: ``resampling`` (default ``"nearest"``), ``fill_value``,
+                ``dtype``, …
 
         Returns:
             Reprojected dataset.
         """
-        from odc.geo.xr import reproject as odc_reproject  # type: ignore[reportAttributeAccessIssue]
+        from odc.geo.xr import xr_reproject  # type: ignore[reportAttributeAccessIssue]
 
-        resampling = params.get("resampling", "nearest")
-        return odc_reproject(ds, geobox, resampling=resampling)
+        reproject_params: dict[str, Any] = dict(params.get("reproject_params") or {})
+        if "resampling" not in reproject_params:
+            reproject_params["resampling"] = "nearest"
+        return xr_reproject(ds, geobox, **reproject_params)

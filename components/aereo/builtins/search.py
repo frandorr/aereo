@@ -129,6 +129,8 @@ class SearchSTAC(SearchProvider, plugin_abstract=False):
 
         # 5. Open STAC client
         client_kwargs: dict[str, Any] = dict(pystac_open_params)
+        # Remove 'url' if present — stac_api_url is already passed positionally.
+        client_kwargs.pop("url", None)
         if "headers" in client_kwargs and isinstance(client_kwargs["headers"], dict):
             client_kwargs["headers"] = {
                 str(k): str(v) for k, v in client_kwargs["headers"].items()

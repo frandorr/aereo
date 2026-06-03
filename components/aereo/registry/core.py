@@ -287,6 +287,48 @@ class AereoRegistry:
             return []
         return registry.find_for(collection_name, self.WILDCARD)
 
+    def _try_lazy_load(self, plugin_name: str, type_label: str) -> bool:
+        """Attempt to load a single plugin by name from entry points.
+
+        This enables ``auto_discover=False`` registries to still resolve
+        plugins that are explicitly hinted by name in a profile.
+
+        Args:
+            plugin_name: Entry-point name to look up.
+            type_label: Expected plugin type label (e.g. "reader").  The
+                plugin is only registered and ``True`` is returned when the
+                loaded class actually inherits from the base class that
+                corresponds to *type_label*.
+
+        Returns:
+            True if the plugin was found, its type matches *type_label*, and
+            it was registered. False otherwise.
+        """
+        try:
+            eps = importlib.metadata.entry_points(group=self.ENTRY_POINT_GROUP)
+            for ep in eps:
+                if ep.name == plugin_name:
+                    plugin_class = ep.load()
+                    label = self._label_for(plugin_class)
+                    if label is not None and label == type_label:
+                        self._registries[label].register(
+                            ep.name, plugin_class, self._original_collections
+                        )
+                        logger.debug(f"Lazy-loaded {label}: {ep.name}")
+                        return True
+                    elif label is not None:
+                        logger.debug(
+                            f"Plugin '{ep.name}' is a {label}, not {type_label}. Skipping."
+                        )
+                    else:
+                        logger.warning(
+                            f"Plugin '{ep.name}' does not inherit from any known base class."
+                        )
+                    break
+        except Exception as e:
+            logger.error(f"Failed to lazy-load plugin '{plugin_name}': {e}")
+        return False
+
     def get(self, type_label: str, plugin_name: str, **kwargs) -> Any:
         """Instantiate a plugin of *type_label* by *plugin_name*.
 
@@ -304,22 +346,30 @@ class AereoRegistry:
         registry = self._registries.get(type_label)
         if registry is None:
             raise ValueError(f"Unknown plugin type: {type_label}")
+        if not registry.has(plugin_name):
+            self._try_lazy_load(plugin_name, type_label)
         return registry.get(plugin_name, type_label.capitalize(), **kwargs)
 
     def has(self, type_label: str, plugin_name: str) -> bool:
         """Check whether a plugin of *type_label* with *plugin_name* is registered.
+
+        If the registry was created with ``auto_discover=False``, this will
+        attempt a targeted entry-point load for the requested name before
+        giving up.
 
         Args:
             type_label: Plugin type label.
             plugin_name: Entry-point name of the plugin.
 
         Returns:
-            True if registered, False otherwise.
+            True if registered (or successfully lazy-loaded), False otherwise.
         """
         registry = self._registries.get(type_label)
         if registry is None:
             return False
-        return registry.has(plugin_name)
+        if registry.has(plugin_name):
+            return True
+        return self._try_lazy_load(plugin_name, type_label)
 
     # --- Backward-compatible API ---
 
@@ -346,7 +396,7 @@ class AereoRegistry:
 
     def has_searcher(self, plugin_name: str) -> bool:
         """Check whether a search plugin with the given name is registered."""
-        return self._registries["searcher"].has(plugin_name)
+        return self.has("searcher", plugin_name)
 
     def get_collection_mapping_for_searcher(
         self, plugin_name: str, collection_names: Sequence[str]
@@ -358,7 +408,7 @@ class AereoRegistry:
 
     def get_searcher(self, plugin_name: str, **kwargs) -> SearchProvider:
         """Instantiates and returns a SearchProvider by name."""
-        return self._registries["searcher"].get(plugin_name, "Search", **kwargs)
+        return self.get("searcher", plugin_name, **kwargs)
 
     def get_plugin_params(
         self, plugin_name: str, *, detailed: bool = True

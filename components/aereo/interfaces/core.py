@@ -353,6 +353,10 @@ class AereoPlugin(ABC):
     required_params: Sequence[PluginParam] = ()
     optional_params: Sequence[PluginParam] = ()
 
+    def __init__(self, **kwargs: Any) -> None:
+        """Accept arbitrary kwargs so the registry can pass init params safely."""
+        super().__init__()
+
     def __init_subclass__(cls, plugin_abstract: bool = False, **kwargs):
         """Validate plugin subclasses on definition.
 

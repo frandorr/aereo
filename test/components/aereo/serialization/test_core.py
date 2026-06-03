@@ -242,7 +242,7 @@ def test_aereo_profile_round_trip(tmp_path: Any) -> None:
         collections={"S3OLCI": ["Oa01", "Oa02"]},
         search={"earthaccess": {"cloud_cover": 20}},
         read={"satpy": {"reader": "olci_l1b"}},
-        reproject={"repro": {"resampling": "bilinear"}},
+        reproject={"repro": {"reproject_params": {"resampling": "bilinear"}}},
         write={"cog": {"driver": "COG"}},
         pre_processors=["mask_clouds"],
         post_processors=[

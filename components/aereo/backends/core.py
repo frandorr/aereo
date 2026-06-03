@@ -91,23 +91,23 @@ class TaskRunner:
         task_init.update(task.task_context.get("init_params", {}))
 
         # Resolve pipeline stages
-        reader = self._resolve_reader(task, task_init)
-        reprojector = self._resolve_reprojector(task, task_init)
+        reader, read_params = self._resolve_reader(task, task_init)
+        reprojector, reproject_params = self._resolve_reprojector(task, task_init)
         pre_processors = self._resolve_processors(task, task_init, phase="pre")
         post_processors = self._resolve_processors(task, task_init, phase="post")
-        writer = self._resolve_writer(task, task_init)
+        writer, write_params = self._resolve_writer(task, task_init)
 
         self._fire_callbacks("on_task_start", task)
 
         try:
             # Stage 1: Read
-            ds = reader.read(task, {})
+            ds = reader.read(task, read_params)
             self._fire_callbacks("on_download_complete", task)
             self._fire_callbacks("on_read_complete", task, ds)
 
             # Stage 2: Pre-reproject processing (once, outside cell loop)
-            for proc in pre_processors:
-                ds = proc.process(ds, {})
+            for proc, proc_params in pre_processors:
+                ds = proc.process(ds, proc_params)
 
             # Stage 3-5: Per-cell loop
             artifacts: list[GeoDataFrame[ArtifactSchema]] = []
@@ -119,13 +119,13 @@ class TaskRunner:
                         margin=task.grid_config.target_grid_margin,
                         conform_to=getattr(task.profile, "conform_to", None),
                     )
-                    ds_cell = reprojector.reproject(ds, geobox, {})
+                    ds_cell = reprojector.reproject(ds, geobox, reproject_params)
                     self._fire_callbacks("on_reproject_complete", task, cell, ds_cell)
 
-                    for proc in post_processors:
-                        ds_cell = proc.process(ds_cell, {})
+                    for proc, proc_params in post_processors:
+                        ds_cell = proc.process(ds_cell, proc_params)
 
-                    cell_artifacts = writer.write(ds_cell, task, cell, {})
+                    cell_artifacts = writer.write(ds_cell, task, cell, write_params)
                     artifacts.append(cell_artifacts)
 
                     self._fire_callbacks(
@@ -161,17 +161,21 @@ class TaskRunner:
 
     # --- Resolution helpers ---
 
-    def _resolve_reader(self, task: ExtractionTask, init: dict[str, Any]) -> Reader:
+    def _resolve_reader(
+        self, task: ExtractionTask, init: dict[str, Any]
+    ) -> tuple[Reader, dict[str, Any]]:
         return self._resolve_stage(task, task.profile.read, init, type_label="reader")
 
     def _resolve_reprojector(
         self, task: ExtractionTask, init: dict[str, Any]
-    ) -> Reprojector:
+    ) -> tuple[Reprojector, dict[str, Any]]:
         return self._resolve_stage(
             task, task.profile.reproject, init, type_label="reprojector"
         )
 
-    def _resolve_writer(self, task: ExtractionTask, init: dict[str, Any]) -> Writer:
+    def _resolve_writer(
+        self, task: ExtractionTask, init: dict[str, Any]
+    ) -> tuple[Writer, dict[str, Any]]:
         return self._resolve_stage(task, task.profile.write, init, type_label="writer")
 
     def _resolve_stage(
@@ -181,25 +185,26 @@ class TaskRunner:
         init: dict[str, Any],
         *,
         type_label: str,
-    ) -> Any:
+    ) -> tuple[Any, dict[str, Any]]:
         """Resolve a single pipeline stage plugin.
 
         Args:
             task: The extraction task.
             stage: The configured PluginStage dict, if any.
-            init: Context kwargs for the plugin.
+            init: Context kwargs passed to the plugin ``__init__``.
             type_label: Registry type label (e.g. "reader").
 
         Returns:
-            An instantiated plugin.
+            A tuple of ``(instantiated_plugin, stage_params)``.  *stage_params*
+            are forwarded to the plugin's execution method (``read``,
+            ``reproject``, ``write``, …) rather than ``__init__``.
         """
         from aereo.interfaces import unpack_stage
 
         if stage:
             plugin_name, params = unpack_stage(stage)
-            final_init = {**init, **params}
             if self.registry.has(type_label, plugin_name):
-                return self.registry.get(type_label, plugin_name, **final_init)
+                return self.registry.get(type_label, plugin_name, **init), params
             raise ValueError(
                 f"Plugin '{plugin_name}' not found for type '{type_label}'"
             )
@@ -211,21 +216,25 @@ class TaskRunner:
                 f"No {type_label} plugin found for profile: {task.profile.name}"
             )
 
-        return self.registry.get(type_label, plugin_name, **init)
+        return self.registry.get(type_label, plugin_name, **init), {}
 
     def _resolve_processors(
         self, task: ExtractionTask, init: dict[str, Any], phase: str = "post"
-    ) -> list[Processor]:
+    ) -> list[tuple[Processor, dict[str, Any]]]:
         """Resolve pre or post processors.
 
         Args:
             task: The extraction task.
-            init: Context kwargs.
+            init: Context kwargs passed to each processor ``__init__``.
             phase: 'pre' or 'post'.
+
+        Returns:
+            A list of ``(processor, stage_params)`` tuples.  *stage_params* are
+            forwarded to ``process()`` rather than ``__init__``.
         """
         from aereo.interfaces import unpack_stage
 
-        processors: list[Processor] = []
+        processors: list[tuple[Processor, dict[str, Any]]] = []
         stages = (
             task.profile.pre_processors
             if phase == "pre"
@@ -239,9 +248,8 @@ class TaskRunner:
                 plugin_name, params = unpack_stage(stage)
 
             if self.registry.has("processor", plugin_name):
-                final_init = {**init, **params}
                 processors.append(
-                    self.registry.get("processor", plugin_name, **final_init)
+                    (self.registry.get("processor", plugin_name, **init), params)
                 )
             else:
                 logger.warning("Processor '%s' not found, skipping.", plugin_name)
