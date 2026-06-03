@@ -36,12 +36,6 @@ class SearchSTAC(SearchProvider, plugin_abstract=False):
     ]
     optional_params = [
         PluginParam(
-            name="headers",
-            type="dict",
-            description="HTTP headers for authentication (e.g. Bearer token).",
-            required=False,
-        ),
-        PluginParam(
             name="assets",
             type="list[str]",
             description="List of asset keys to filter/retrieve. If not specified, defaults to the first available asset.",
@@ -91,7 +85,6 @@ class SearchSTAC(SearchProvider, plugin_abstract=False):
             raise ValueError("stac_api_url must be provided in search_params.")
 
         # 1. Extract parameters
-        headers = search_params.get("headers")
         assets = search_params.get("assets")
         pystac_open_params = search_params.get("pystac_open_params") or {}
         pystac_search_params = search_params.get("pystac_search_params") or {}
@@ -129,11 +122,11 @@ class SearchSTAC(SearchProvider, plugin_abstract=False):
             time_range = f"../{q_end.strftime(TIME_FORMAT)}"
 
         # 5. Open STAC client
-        client_kwargs: dict[str, Any] = {}
-        if headers:
-            # Coerce header keys/values to strings
-            client_kwargs["headers"] = {str(k): str(v) for k, v in headers.items()}
-        client_kwargs.update(pystac_open_params)
+        client_kwargs: dict[str, Any] = dict(pystac_open_params)
+        if "headers" in client_kwargs and isinstance(client_kwargs["headers"], dict):
+            client_kwargs["headers"] = {
+                str(k): str(v) for k, v in client_kwargs["headers"].items()
+            }
 
         try:
             client = Client.open(stac_api_url, **client_kwargs)
@@ -160,7 +153,6 @@ class SearchSTAC(SearchProvider, plugin_abstract=False):
         # Forward other params excluding plugin-specific ones
         plugin_specific = {
             "stac_api_url",
-            "headers",
             "assets",
             "pystac_open_params",
             "pystac_search_params",
