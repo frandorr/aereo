@@ -12,6 +12,7 @@ from aereo.builtins.core import (
     SelectBands,
     WriteGeoTIFF,
 )
+from aereo.builtins.search import SearchSTAC
 
 __all__ = [
     "Composite",
@@ -21,4 +22,5 @@ __all__ = [
     "ReprojectODC",
     "SelectBands",
     "WriteGeoTIFF",
+    "SearchSTAC",
 ]
