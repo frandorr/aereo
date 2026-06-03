@@ -650,21 +650,33 @@ class _ProfileLoaderMixin:
             seen.add(p.name)
 
 
+PluginStage: TypeAlias = dict[str, dict[str, Any]]
+
+
+def unpack_stage(stage: PluginStage) -> tuple[str, dict[str, Any]]:
+    """Unpack a PluginStage dictionary into a (plugin_name, params) tuple.
+
+    Raises:
+        ValueError: If the stage dict does not contain exactly one key.
+    """
+    if len(stage) != 1:
+        raise ValueError(
+            f"PluginStage must have exactly one key (plugin_name), got {len(stage)} keys: {list(stage.keys())}"
+        )
+    name, params = next(iter(stage.items()))
+    return name, params
+
+
 class AereoProfile(_ProfileLoaderMixin, BaseModel):
     """Ground-truth configuration for a single search + extraction unit.
 
-    Can be constructed in code or loaded from JSON/YAML. The *downloader*
-    field accepts either a live callable or a dotted import path string.
+    Can be constructed in code or loaded from JSON/YAML.
 
     A profile bundles together:
     - What to search for (``collections`` mapping collection names to variables)
     - How to extract it (``resolution``, ``padding``, ``conform_to``)
-    - Which plugins to use (``plugin_hints``)
-    - How to download assets (``downloader``)
-
-    Plugin-specific settings (e.g. ``reader``, ``calibration``, ``resampling``)
-    belong in ``read_params``, ``process_params``, ``write_params``, or
-    ``search_params`` rather than top-level fields.
+    - Which plugins to use for each pipeline stage (``search``, ``read``, ``write``, ``reproject``)
+    - Additional processing steps (``pre_processors``, ``post_processors``)
 
     One profile = one coherent pipeline configuration.
     """
@@ -676,40 +688,16 @@ class AereoProfile(_ProfileLoaderMixin, BaseModel):
     collections: Mapping[str, Sequence[str]] = Field(default_factory=dict)
     padding: int | None = 0
     conform_to: tuple[int, int] | None = None
-    plugin_hints: Mapping[str, str] = Field(default_factory=dict)
-    search_params: Mapping[str, Any] = Field(default_factory=dict)
-    read_params: Mapping[str, Any] = Field(default_factory=dict)
-    process_params: Mapping[str, Any] = Field(default_factory=dict)
-    write_params: Mapping[str, Any] = Field(default_factory=dict)
 
-
-class PipelineProfile(_ProfileLoaderMixin, BaseModel):
-    """Declarative pipeline configuration for search + extraction.
-
-    One PipelineProfile = one complete configuration. It replaces the
-    extraction-time half of :class:`AereoProfile`.
-    """
-
-    model_config = {"extra": "forbid", "frozen": True}
-
-    name: str
-    resolution: float
-    collections: Mapping[str, Sequence[str]] = Field(default_factory=dict)
-    plugin_hints: Mapping[str, str] = Field(default_factory=dict)
-
-    # Stage-specific parameters
-    search_params: Mapping[str, Any] = Field(default_factory=dict)
-    read_params: Mapping[str, Any] = Field(default_factory=dict)
-    reproject_params: Mapping[str, Any] = Field(default_factory=dict)
-    write_params: Mapping[str, Any] = Field(default_factory=dict)
+    # Stage-specific configurations (replaces old plugin_hints and *_params)
+    search: PluginStage | None = None
+    read: PluginStage | None = None
+    reproject: PluginStage | None = None
+    write: PluginStage | None = None
 
     # Processor configuration
-    pre_processors: Sequence[str | dict[str, Any]] = Field(default_factory=list)
-    post_processors: Sequence[str | dict[str, Any]] = Field(default_factory=list)
-
-
-# Backward-compat alias — will be removed in a later task.
-ExtractionProfile = AereoProfile
+    pre_processors: Sequence[str | PluginStage] = Field(default_factory=list)
+    post_processors: Sequence[str | PluginStage] = Field(default_factory=list)
 
 
 @attrs.frozen
@@ -730,7 +718,7 @@ class ExtractionTask:
     """
 
     assets: GeoDataFrame[AssetSchema]
-    profile: AereoProfile | PipelineProfile
+    profile: AereoProfile
     uri: str
     grid_cells: Sequence[GridCell]
     grid_config: GridConfig

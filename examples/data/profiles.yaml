@@ -6,58 +6,42 @@ profiles:
       resolution: 1000
       collections:
           ABI-L1b-RadF: ["C02"]
-      read_params:
-          reader: abi_l1b
-          calibration: reflectance
-          delay_writes: true
-      search_params:
-          satellite: GOES-19
-      plugin_hints:
-          search: search_aws_goes
-          extract: extract_satpy
+      search:
+          search_aws_goes:
+              satellite: GOES-19
+      # read: extract_satpy (obsolete)
 
     - name: s2_rgb
       resolution: 10
       collections:
           sentinel-2-l2a: ["B04", "B03", "B02"]
-      plugin_hints:
-          search: search_planetary_computer
-          extract: extract_odc_stac
+      search:
+          search_stac:
+              pystac_open_params:
+                  url: "https://planetarycomputer.microsoft.com/api/stac/v1"
+      # read: extract_odc_stac (obsolete)
 
     - name: viirs_i1
       resolution: 375
       collections:
           VJ202IMG: ["I01"]
           VJ203IMG: []
-      read_params:
-          reader: viirs_l1b
-          calibration: reflectance
-          resampling: nearest
-          delay_writes: true
-      plugin_hints:
-          search: search_earthaccess
-          extract: extract_satpy
+      search:
+          search_earthaccess: {}
+      # read: extract_satpy (obsolete)
 
     - name: olci_o08
       resolution: 300
       collections:
           S3A_OL_1_EFR: ["Oa08"]
-      read_params:
-          reader: olci_l1b
-          calibration: radiance
-          resampling: nearest
-          delay_writes: true
-      plugin_hints:
-          search: search_earthaccess
-          extract: extract_satpy
+      search:
+          search_earthaccess: {}
+      # read: extract_satpy (obsolete)
 
     - name: geotessera
       resolution: 10
       collections:
           geotessera: ["0", "1", "2"]
-      read_params:
-          max_download_workers: 4
-          tmp_dir: /root/repos/aereo/examples
-      plugin_hints:
-          search: search_tessera
-          extract: extract_tessera
+      search:
+          search_tessera: {}
+      # read: extract_tessera (obsolete)

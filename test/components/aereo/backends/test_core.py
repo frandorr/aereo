@@ -162,11 +162,6 @@ def test_task_runner_falls_back_to_profile_hint():
     profile = AereoProfile(
         name="test",
         resolution=100.0,
-        plugin_hints={
-            "read": "profile_reader",
-            "reproject": "profile_reprojector",
-            "writer": "profile_writer",
-        },
     )
     task = _make_task(profile=profile)
 
@@ -227,8 +222,9 @@ def test_task_runner_passes_read_params_to_reader():
     profile = AereoProfile(
         name="test",
         resolution=100.0,
-        plugin_hints={"read": "dummy", "reproject": "dummy", "writer": "dummy"},
-        read_params={"calibration": "reflectance"},
+        read={"dummy": {"calibration": "reflectance"}},
+        reproject={"dummy": {}},
+        write={"dummy": {}},
     )
     task = _make_task(profile=profile)
 

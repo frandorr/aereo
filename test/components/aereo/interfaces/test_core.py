@@ -101,12 +101,13 @@ def test_aereo_profile_has_all_fields():
         name="goes_16_abi",
         resolution=1000.0,
         collections={"ABI-L1b-RadC": ["C01", "C02"]},
-        plugin_hints={
-            "search": "aereo-search-aws-goes",
+        search={
+            "aereo-search-aws-goes": {},
         },
     )
     assert profile.collections == {"ABI-L1b-RadC": ["C01", "C02"]}
-    assert profile.plugin_hints["search"] == "aereo-search-aws-goes"
+    assert profile.search is not None
+    assert "aereo-search-aws-goes" in profile.search
 
 
 def test_aereo_profile_defaults():
@@ -114,7 +115,12 @@ def test_aereo_profile_defaults():
 
     profile = AereoProfile(name="minimal", resolution=100.0)
     assert profile.collections == {}
-    assert profile.plugin_hints == {}
+    assert profile.search is None
+    assert profile.read is None
+    assert profile.reproject is None
+    assert profile.write is None
+    assert profile.pre_processors == []
+    assert profile.post_processors == []
     assert profile.conform_to is None
 
 

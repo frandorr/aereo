@@ -225,7 +225,6 @@ def test_resolve_plugin_for_profile_uses_hint():
         name="p1",
         resolution=10.0,
         collections={"X": ["var1"]},
-        plugin_hints={"search": "hinted_searcher"},
     )
     result = client._resolve_plugin_for_profile("searcher", profile)
     assert result == "hinted_searcher"
@@ -247,7 +246,6 @@ def test_resolve_plugin_for_profile_hinted_not_registered():
         name="p1",
         resolution=10.0,
         collections={"X": ["var1"]},
-        plugin_hints={"search": "missing_searcher"},
     )
     with pytest.raises(ValueError, match="not a registered Searcher"):
         client._resolve_plugin_for_profile("searcher", profile)
@@ -285,7 +283,7 @@ def test_search_with_profile_plugin_hint(monkeypatch):
         name="goes",
         resolution=1000.0,
         collections={"ABI-L1b-RadC": ["C01"]},
-        plugin_hints={"search": "aereo-search-aws-goes"},
+        search={"aereo-search-aws-goes": {}},
     )
     client.search(profiles=[profile])
     mock_registry.get_searcher.assert_called_once_with("aereo-search-aws-goes")
@@ -309,11 +307,10 @@ def test_search_merges_profile_search_params(monkeypatch):
         name="modis_thermal",
         resolution=1000.0,
         collections={"MOD021KM": ["var1"]},
-        search_params={"version": "061"},
+        search={"test_searcher": {"version": "061"}},
     )
     client.search(
         profiles=[profile],
-        search_params={"version": "000", "cloud_cover": 20},
     )
 
     call_kwargs = mock_searcher.search.call_args.kwargs
@@ -444,7 +441,6 @@ def test_execute_tasks_with_profile_hint(monkeypatch):
         name="goes",
         resolution=1000.0,
         collections={"ABI-L1b-RadC": ["C01"]},
-        plugin_hints={"read": "read_aws_goes", "writer": "write_geotiff"},
     )
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
@@ -480,7 +476,6 @@ def test_execute_tasks_failure_mode_strict(monkeypatch):
         name="test",
         resolution=100.0,
         collections={"C1": ["var1"]},
-        plugin_hints={"read": "dummy_reader", "writer": "dummy_writer"},
     )
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
@@ -516,7 +511,6 @@ def test_execute_tasks_failure_mode_best_effort(monkeypatch):
         name="test",
         resolution=100.0,
         collections={"C1": ["var1"]},
-        plugin_hints={"read": "dummy_reader", "writer": "dummy_writer"},
     )
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
@@ -571,7 +565,6 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
             name="ok_1",
             resolution=100.0,
             collections={"C1": ["var1"]},
-            plugin_hints={"read": "dummy_reader", "writer": "dummy_writer"},
         ),
         uri="test",
         grid_cells=[],
@@ -583,7 +576,6 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
             name="fail",
             resolution=100.0,
             collections={"C1": ["var1"]},
-            plugin_hints={"read": "dummy_reader", "writer": "dummy_writer"},
         ),
         uri="test",
         grid_cells=[],
@@ -595,7 +587,6 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
             name="ok_2",
             resolution=100.0,
             collections={"C1": ["var1"]},
-            plugin_hints={"read": "dummy_reader", "writer": "dummy_writer"},
         ),
         uri="test",
         grid_cells=[],
@@ -647,7 +638,6 @@ def test_execute_tasks_strict_mode_raises_on_first_failure(monkeypatch):
             name="ok",
             resolution=100.0,
             collections={"C1": ["var1"]},
-            plugin_hints={"read": "dummy_reader", "writer": "dummy_writer"},
         ),
         uri="test",
         grid_cells=[],
@@ -659,7 +649,6 @@ def test_execute_tasks_strict_mode_raises_on_first_failure(monkeypatch):
             name="fail",
             resolution=100.0,
             collections={"C1": ["var1"]},
-            plugin_hints={"read": "dummy_reader", "writer": "dummy_writer"},
         ),
         uri="test",
         grid_cells=[],
@@ -698,16 +687,13 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
         name="profile_a",
         resolution=100.0,
         collections={"C1": ["var1"]},
-        search_params={"version": "061", "cloud_cover": 10},
-        read_params={"calibration": "reflectance"},
+        read={"test_reader": {"calibration": "reflectance"}},
         padding=2,
     )
     profile_b = AereoProfile(
         name="profile_b",
         resolution=100.0,
         collections={"C1": ["var1"]},
-        search_params={"version": "062", "cloud_cover": 20},
-        read_params={"calibration": "radiance"},
         padding=4,
     )
 
@@ -716,7 +702,6 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
     # -- Search phase --------------------------------------------------------
     client.search(
         profiles=[profile_a, profile_b],
-        search_params={"version": "000", "cloud_cover": 5, "limit": 100},
     )
 
     assert mock_searcher.search.call_count == 2
