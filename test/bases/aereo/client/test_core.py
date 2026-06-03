@@ -225,6 +225,7 @@ def test_resolve_plugin_for_profile_uses_hint():
         name="p1",
         resolution=10.0,
         collections={"X": ["var1"]},
+        search={"hinted_searcher": {}},
     )
     result = client._resolve_plugin_for_profile("searcher", profile)
     assert result == "hinted_searcher"
@@ -246,6 +247,7 @@ def test_resolve_plugin_for_profile_hinted_not_registered():
         name="p1",
         resolution=10.0,
         collections={"X": ["var1"]},
+        search={"missing_searcher": {}},
     )
     with pytest.raises(ValueError, match="not a registered Searcher"):
         client._resolve_plugin_for_profile("searcher", profile)
@@ -311,6 +313,7 @@ def test_search_merges_profile_search_params(monkeypatch):
     )
     client.search(
         profiles=[profile],
+        search_params={"version": "000", "cloud_cover": 20},
     )
 
     call_kwargs = mock_searcher.search.call_args.kwargs
@@ -441,6 +444,8 @@ def test_execute_tasks_with_profile_hint(monkeypatch):
         name="goes",
         resolution=1000.0,
         collections={"ABI-L1b-RadC": ["C01"]},
+        read={"read_aws_goes": {}},
+        write={"write_geotiff": {}},
     )
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
@@ -476,6 +481,8 @@ def test_execute_tasks_failure_mode_strict(monkeypatch):
         name="test",
         resolution=100.0,
         collections={"C1": ["var1"]},
+        read={"dummy_reader": {}},
+        write={"dummy_writer": {}},
     )
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
@@ -511,6 +518,8 @@ def test_execute_tasks_failure_mode_best_effort(monkeypatch):
         name="test",
         resolution=100.0,
         collections={"C1": ["var1"]},
+        read={"dummy_reader": {}},
+        write={"dummy_writer": {}},
     )
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
@@ -565,6 +574,8 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
             name="ok_1",
             resolution=100.0,
             collections={"C1": ["var1"]},
+            read={"dummy_reader": {}},
+            write={"dummy_writer": {}},
         ),
         uri="test",
         grid_cells=[],
@@ -576,6 +587,8 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
             name="fail",
             resolution=100.0,
             collections={"C1": ["var1"]},
+            read={"dummy_reader": {}},
+            write={"dummy_writer": {}},
         ),
         uri="test",
         grid_cells=[],
@@ -587,6 +600,8 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
             name="ok_2",
             resolution=100.0,
             collections={"C1": ["var1"]},
+            read={"dummy_reader": {}},
+            write={"dummy_writer": {}},
         ),
         uri="test",
         grid_cells=[],
@@ -638,6 +653,8 @@ def test_execute_tasks_strict_mode_raises_on_first_failure(monkeypatch):
             name="ok",
             resolution=100.0,
             collections={"C1": ["var1"]},
+            read={"dummy_reader": {}},
+            write={"dummy_writer": {}},
         ),
         uri="test",
         grid_cells=[],
@@ -649,6 +666,8 @@ def test_execute_tasks_strict_mode_raises_on_first_failure(monkeypatch):
             name="fail",
             resolution=100.0,
             collections={"C1": ["var1"]},
+            read={"dummy_reader": {}},
+            write={"dummy_writer": {}},
         ),
         uri="test",
         grid_cells=[],
@@ -687,6 +706,7 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
         name="profile_a",
         resolution=100.0,
         collections={"C1": ["var1"]},
+        search={"dummy_searcher": {"version": "061", "cloud_cover": 10}},
         read={"test_reader": {"calibration": "reflectance"}},
         padding=2,
     )
@@ -694,6 +714,8 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
         name="profile_b",
         resolution=100.0,
         collections={"C1": ["var1"]},
+        search={"dummy_searcher": {"version": "062", "cloud_cover": 20}},
+        read={"dummy": {"calibration": "radiance"}},
         padding=4,
     )
 
@@ -702,6 +724,7 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
     # -- Search phase --------------------------------------------------------
     client.search(
         profiles=[profile_a, profile_b],
+        search_params={"limit": 100},
     )
 
     assert mock_searcher.search.call_count == 2
@@ -728,17 +751,23 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
     class _CapturingReader(Reader):
         supported_collections = ["C1"]
 
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+
         def read(self, task, params):
             _captured.append(
                 {
                     "profile_name": task.profile.name,
-                    "params": dict(params) if params else {},
+                    "params": self.kwargs,
                 }
             )
             return xr.Dataset()
 
     class _CapturingWriter(Writer):
         supported_collections = ["C1"]
+
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
 
         def write(self, ds, task, cell, params):
             import geopandas as gpd
@@ -752,6 +781,9 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
     class _CapturingReprojector(Reprojector):
         supported_collections = ["C1"]
 
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+
         def reproject(self, ds, geobox, params):
             return ds
 
@@ -760,11 +792,11 @@ def test_e2e_search_and_extract_with_per_profile_params(monkeypatch):
 
     def _mock_get(type_label, name, **kwargs):
         if type_label == "reader":
-            return _CapturingReader()
+            return _CapturingReader(**kwargs)
         if type_label == "writer":
-            return _CapturingWriter()
+            return _CapturingWriter(**kwargs)
         if type_label == "reprojector":
-            return _CapturingReprojector()
+            return _CapturingReprojector(**kwargs)
         raise ValueError(f"Unknown: {type_label}")
 
     def _mock_find_for(type_label, collection):
