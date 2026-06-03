@@ -1,6 +1,6 @@
 """Built-in plugins for the AEREO pipeline.
 
-Provides default implementations for Reprojector, Writer, and Processor stages.
+Provides default implementations for Reader, Reprojector, Writer, and Processor stages.
 """
 
 from aereo.builtins.processor import (
@@ -10,6 +10,7 @@ from aereo.builtins.processor import (
     QAMask,
     SelectBands,
 )
+from aereo.builtins.read import ReadODCSTAC
 from aereo.builtins.reproject import ReprojectODC
 from aereo.builtins.search import SearchSTAC
 from aereo.builtins.write import WriteGeoTIFF
@@ -19,6 +20,7 @@ __all__ = [
     "NDVI",
     "Normalize",
     "QAMask",
+    "ReadODCSTAC",
     "ReprojectODC",
     "SelectBands",
     "WriteGeoTIFF",
