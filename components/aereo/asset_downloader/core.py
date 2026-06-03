@@ -1,3 +1,8 @@
+"""Core implementation of safe, lock-protected asset downloading and extraction routines.
+
+Provides concurrent download and extract utilities designed for multi-process environments.
+"""
+
 import filelock
 import shutil
 import tempfile

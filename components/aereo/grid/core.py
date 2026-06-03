@@ -1,3 +1,9 @@
+"""Core implementation of Major TOM and ESA-compatible grid cells and definitions.
+
+Provides GridCell and GridDefinition classes to partition geometries into cell areas
+for processing, alignment, and coordinate system projection.
+"""
+
 from functools import cached_property
 from typing import Any, Sequence, cast
 
