@@ -97,6 +97,27 @@ class WriteGeoTIFF(Writer):
 
         rio_params: dict[str, Any] = dict(params.get("rio_params") or {})
 
+        # Build grid-cell metadata once
+        grid_cell_id = cell.id()
+        grid_dist = task.grid_config.target_grid_dist or cell.D
+        cell_geometry = cell.geom
+        cell_utm_crs = cell.utm_crs
+        cell_utm_footprint = cell.utm_footprint
+
+        # Derive source IDs from task assets
+        source_ids = (
+            ",".join(sorted({str(aid) for aid in task.assets["id"] if pd.notna(aid)}))
+            if "id" in task.assets.columns
+            else ""
+        )
+
+        # Determine collection from profile
+        collection = (
+            next(iter(task.profile.collections.keys()), None)
+            if task.profile.collections
+            else None
+        )
+
         records = []
         for var_name in ds.data_vars:
             da = ds[var_name]
@@ -115,10 +136,11 @@ class WriteGeoTIFF(Writer):
                     else start_time
                 )
 
-                # Since band is strictly guaranteed to be present:
-                num_bands = t_da.sizes["band"]
+                # Handle optional band dimension
+                has_band = "band" in t_da.dims
+                num_bands = t_da.sizes["band"] if has_band else 1
                 for band_idx in range(num_bands):
-                    band_da = t_da.isel(band=band_idx)
+                    band_da = t_da.isel(band=band_idx) if has_band else t_da
 
                     # Single band gets the variable name, multi-band gets B04_b0
                     desc = f"{var_name}_b{band_idx}" if num_bands > 1 else str(var_name)
@@ -135,16 +157,25 @@ class WriteGeoTIFF(Writer):
 
                     band_da.rio.to_raster(fpath, **rio_params)
 
-                    # Keep band metadata as None for single-band variables
-                    band_val = band_idx if num_bands > 1 else None
+                    # Unique artifact ID
+                    artifact_id = (
+                        f"{grid_cell_id}_{var_name}_{band_idx if num_bands > 1 else 0}"
+                    )
 
                     records.append(
                         {
-                            "path": str(fpath),
-                            "variable": var_name,
-                            "band": band_val,
-                            "cell_id": cell_id,
+                            "id": artifact_id,
+                            "source_ids": source_ids,
+                            "start_time": slice_time,
+                            "end_time": slice_time if has_time else end_time,
+                            "uri": str(fpath),
+                            "collection": collection,
                             "geometry": box(*band_da.rio.bounds()),
+                            "grid_cell": grid_cell_id,
+                            "grid_dist": grid_dist,
+                            "cell_geometry": cell_geometry,
+                            "cell_utm_crs": cell_utm_crs,
+                            "cell_utm_footprint": cell_utm_footprint,
                         }
                     )
 
@@ -153,7 +184,20 @@ class WriteGeoTIFF(Writer):
             gdf = gpd.GeoDataFrame(df, geometry="geometry", crs=ds.rio.crs)
         else:
             gdf = gpd.GeoDataFrame(
-                columns=["path", "variable", "band", "cell_id", "geometry"],
+                columns=[
+                    "id",
+                    "source_ids",
+                    "start_time",
+                    "end_time",
+                    "uri",
+                    "collection",
+                    "geometry",
+                    "grid_cell",
+                    "grid_dist",
+                    "cell_geometry",
+                    "cell_utm_crs",
+                    "cell_utm_footprint",
+                ],
                 geometry="geometry",
             )
 

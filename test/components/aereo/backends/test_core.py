@@ -33,6 +33,7 @@ from pandera.typing.geopandas import GeoDataFrame
 def _make_task(
     profile: AereoProfile | None = None,
     task_context: dict[str, Any] | None = None,
+    grid_cells: list[Any] | None = None,
 ) -> ExtractionTask:
     """Return a minimal ExtractionTask for testing."""
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
@@ -45,7 +46,7 @@ def _make_task(
         assets=cast(GeoDataFrame, valid_df),
         profile=profile or AereoProfile(name="test", resolution=100.0),
         uri="test-uri",
-        grid_cells=[],
+        grid_cells=grid_cells or [],
         grid_config=grid_config,
         task_context=task_context or {},
     )
@@ -95,7 +96,9 @@ def test_task_runner_resolves_stage_from_profile():
     mock_reprojector.reproject.return_value = xr.Dataset()
 
     mock_writer = MagicMock(spec=_DummyWriter)
-    mock_writer.write.return_value = gpd.GeoDataFrame()
+    mock_writer.write.return_value = gpd.GeoDataFrame(
+        {"id": ["a1"]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
+    )
 
     allowed = {"my_reader", "my_reprojector", "my_writer"}
 
@@ -197,8 +200,8 @@ def test_task_runner_raises_when_no_reader_found():
         runner.run(task)
 
 
-def test_task_runner_passes_read_params_to_reader():
-    """Profile read parameters are passed to the plugin during instantiation."""
+def test_task_runner_passes_stage_params_to_method_calls():
+    """Profile stage parameters are passed to plugin method calls, not __init__."""
     mock_registry = _make_mock_registry()
     mock_reader = MagicMock(spec=_DummyReader)
     mock_reader.read.return_value = xr.Dataset()
@@ -207,7 +210,9 @@ def test_task_runner_passes_read_params_to_reader():
     mock_reprojector.reproject.return_value = xr.Dataset()
 
     mock_writer = MagicMock(spec=_DummyWriter)
-    mock_writer.write.return_value = gpd.GeoDataFrame()
+    mock_writer.write.return_value = gpd.GeoDataFrame(
+        {"id": ["a1"]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
+    )
 
     allowed = {"dummy"}
 
@@ -226,19 +231,41 @@ def test_task_runner_passes_read_params_to_reader():
     mock_registry.has.side_effect = _mock_has
     mock_registry.get.side_effect = _mock_get
 
+    # Create a mock grid cell so the per-cell loop executes
+    mock_cell = MagicMock()
+    mock_cell.id.return_value = "cell-1"
+    mock_cell.geom = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
+    mock_cell.utm_crs = "EPSG:4326"
+    mock_cell.utm_footprint = mock_cell.geom
+    mock_cell.area_def.return_value = MagicMock()
+
     runner = TaskRunner(registry=mock_registry)
     profile = AereoProfile(
         name="test",
         resolution=100.0,
-        read={"dummy": {"calibration": "reflectance"}},
-        reproject={"dummy": {}},
-        write={"dummy": {}},
+        read={"dummy": {"odc_params": {"chunks": {"x": 2048}}}},
+        reproject={"dummy": {"reproject_params": {"resampling": "bilinear"}}},
+        write={"dummy": {"rio_params": {"compress": "deflate"}}},
     )
-    task = _make_task(profile=profile)
+    task = _make_task(profile=profile, grid_cells=[mock_cell])
 
     runner.run(task)
 
-    mock_registry.get.assert_any_call("reader", "dummy", calibration="reflectance")
+    # Stage params go to method calls, NOT __init__ (registry.get)
+    mock_registry.get.assert_any_call("reader", "dummy")
+    mock_registry.get.assert_any_call("reprojector", "dummy")
+    mock_registry.get.assert_any_call("writer", "dummy")
+
+    mock_reader.read.assert_called_once()
+    assert mock_reader.read.call_args[0][1] == {"odc_params": {"chunks": {"x": 2048}}}
+
+    mock_reprojector.reproject.assert_called_once()
+    assert mock_reprojector.reproject.call_args[0][2] == {
+        "reproject_params": {"resampling": "bilinear"}
+    }
+
+    mock_writer.write.assert_called_once()
+    assert mock_writer.write.call_args[0][3] == {"rio_params": {"compress": "deflate"}}
 
 
 def test_task_runner_returns_writer_result():

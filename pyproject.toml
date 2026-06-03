@@ -51,27 +51,24 @@ dependencies = [
   "typer>=0.12",
   "utm>=0.8.1",
 ]
-optional-dependencies.aws-goes = [ "aereo-search-aws-goes>=2" ]
 optional-dependencies.docs = [ "mkdocs-material>=9", "mkdocs-minify-plugin>=0.8", "mkdocstrings[python]>=0.24" ]
-optional-dependencies.earthaccess = [ "aereo-search-earthaccess>=1.1.1" ]
 optional-dependencies.serverless = [ "boto3>=1.34" ]
 urls.Documentation = "https://frandorr.github.io/aereo"
 urls.Homepage = "https://github.com/frandorr/aereo"
 urls.Issues = "https://github.com/frandorr/aereo/issues"
 urls.Repository = "https://github.com/frandorr/aereo"
+entry-points."aereo.plugins".process_composite = "aereo.builtins.processor:Composite"
+entry-points."aereo.plugins".process_ndvi = "aereo.builtins.processor:NDVI"
+entry-points."aereo.plugins".process_normalize = "aereo.builtins.processor:Normalize"
+entry-points."aereo.plugins".process_qa_mask = "aereo.builtins.processor:QAMask"
+entry-points."aereo.plugins".process_select_bands = "aereo.builtins.processor:SelectBands"
+entry-points."aereo.plugins".read_odc_stac = "aereo.builtins.read:ReadODCSTAC"
+entry-points."aereo.plugins".reproject_odc = "aereo.builtins.reproject:ReprojectODC"
+entry-points."aereo.plugins".search_stac = "aereo.builtins.search:SearchSTAC"
+entry-points."aereo.plugins".write_geotiff = "aereo.builtins.write:WriteGeoTIFF"
 
 [dependency-groups]
 dev = [
-  "aereo-extract-aws-goes",
-  "aereo-extract-lazycogs",
-  "aereo-extract-odc-stac",
-  "aereo-extract-satpy",
-  "aereo-extract-tessera",
-  "aereo-search-aws-goes>=2",
-  "aereo-search-earthaccess>=2.0.3,<3",
-  "aereo-search-planetary-computer",
-  "aereo-search-rustac",
-  "aereo-search-tessera",
   "basedpyright>=1.38",
   "cartopy>=0.25",
   "graphviz>=0.21",
@@ -82,6 +79,7 @@ dev = [
   "matplotlib>=3.10.8",
   "nbformat>=5.10.4",
   "obstore>=0.9.3",
+  "planetary-computer>=1",
   "polylith-cli>=1.42.5,<2",
   "pytest>=9.0.2,<10",
   "pytest-cov>=6",
@@ -105,16 +103,6 @@ metadata.allow-direct-references = true
 
 [tool.uv]
 sources.aereo = { path = "projects/aereo", editable = true }
-sources.aereo-extract-aws-goes = { path = "../aereo-extract-aws-goes/projects/aereo-extract-aws-goes", editable = true }
-sources.aereo-extract-lazycogs = { path = "../aereo-extract-lazycogs/projects/aereo-extract-lazycogs", editable = true }
-sources.aereo-extract-odc-stac = { path = "../aereo-extract-odc-stac/projects/aereo-extract-odc-stac", editable = true }
-sources.aereo-extract-satpy = { path = "../aereo-extract-satpy/projects/aereo-extract-satpy", editable = true }
-sources.aereo-extract-tessera = { path = "../aereo-extract-tessera/projects/aereo-extract-tessera", editable = true }
-sources.aereo-search-aws-goes = { path = "../aereo-search-aws-goes/projects/aereo-search-aws-goes", editable = true }
-sources.aereo-search-earthaccess = { path = "../aereo-search-earthaccess/projects/aereo-search-earthaccess", editable = true }
-sources.aereo-search-planetary-computer = { path = "../aereo-search-planetary-computer/projects/aereo-search-planetary-computer", editable = true }
-sources.aereo-search-rustac = { path = "../aereo-search-rustac/projects/aereo-search-rustac", editable = true }
-sources.aereo-search-tessera = { path = "../aereo-search-tessera/projects/aereo-search-tessera", editable = true }
 managed = true
 workspace.members = [ "projects/*" ]
 
