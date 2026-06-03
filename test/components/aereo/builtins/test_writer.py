@@ -258,10 +258,33 @@ def test_write_geotiff_multiband_cog(tmp_path):
 
 
 def test_write_geotiff_optional_params_registered():
-    """COG-related params appear in optional_params."""
+    """COG-related and rio_params appear in optional_params."""
     writer = WriteGeoTIFF()
     names = {p.name for p in writer.optional_params}
     assert "cog" in names
     assert "blocksize" in names
     assert "overview_resampling" in names
     assert "overview_levels" in names
+    assert "rio_params" in names
+
+
+def test_write_geotiff_rio_params_forwarded(tmp_path):
+    """Custom rio_params (like tags and compress) are forwarded directly to to_raster."""
+    ds = _make_dataset()
+    task = _make_task(tmp_path)
+    writer = WriteGeoTIFF()
+
+    result = writer.write(
+        ds,
+        task,
+        task.grid_cells[0],
+        {"rio_params": {"tags": {"custom_key": "custom_val"}, "compress": "lzw"}},
+    )
+
+    import rasterio
+
+    assert len(result) > 0
+    for _, row in result.iterrows():
+        with rasterio.open(row["path"]) as src:
+            assert src.tags().get("custom_key") == "custom_val"
+            assert src.compression.name.lower() == "lzw"
