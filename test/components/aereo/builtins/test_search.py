@@ -200,7 +200,9 @@ def test_search_stac_headers_passing(mock_client, mock_pystac_item):
         profiles=[profile],
         search_params={
             "stac_api_url": "https://example.com/stac",
-            "headers": {"Authorization": "Bearer token", "X-Custom": 123},
+            "pystac_open_params": {
+                "headers": {"Authorization": "Bearer token", "X-Custom": 123}
+            },
         },
     )
 
