@@ -69,12 +69,12 @@ def _make_task(tmp_path, profile=None):
 
 
 # ---------------------------------------------------------------------------
-# Plain GeoTIFF path (backward compatibility)
+# Plain write (no rio_params)
 # ---------------------------------------------------------------------------
 
 
 def test_write_geotiff_plain_mode_driver(tmp_path):
-    """Default path writes plain GTiff, not COG."""
+    """Default path writes a GTiff."""
     ds = _make_dataset()
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
@@ -86,7 +86,6 @@ def test_write_geotiff_plain_mode_driver(tmp_path):
 
         with rasterio.open(row["path"]) as src:
             assert src.driver == "GTiff"
-            assert not src.is_tiled
 
 
 def test_write_geotiff_plain_mode_returns_artifacts(tmp_path):
@@ -102,36 +101,21 @@ def test_write_geotiff_plain_mode_returns_artifacts(tmp_path):
 
 
 # ---------------------------------------------------------------------------
-# COG path
+# Tiled / COG via rio_params
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.skipif(
-    not __import__("rasterio").__version__,
-    reason="rasterio not available",
-)
-def test_write_geotiff_cog_mode_is_tiled(tmp_path):
-    """COG path produces tiled output."""
-    ds = _make_dataset()
-    task = _make_task(tmp_path)
-    writer = WriteGeoTIFF()
-    result = writer.write(ds, task, task.grid_cells[0], {"cog": True})
-
-    assert len(result) == 2
-    for _, row in result.iterrows():
-        import rasterio
-
-        with rasterio.open(row["path"]) as src:
-            block_height: int = src.block_shapes[0][0]
-            assert block_height > 1
-
-
-def test_write_geotiff_cog_mode_tiled(tmp_path):
-    """COG output is tiled."""
+def test_write_geotiff_tiled_via_rio_params(tmp_path):
+    """Tiling is applied when requested through rio_params."""
     ds = _make_dataset(shape=(64, 64))
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
-    result = writer.write(ds, task, task.grid_cells[0], {"cog": True, "blocksize": 32})
+    result = writer.write(
+        ds,
+        task,
+        task.grid_cells[0],
+        {"rio_params": {"tiled": True, "blockxsize": 32, "blockysize": 32}},
+    )
 
     import rasterio
 
@@ -142,65 +126,13 @@ def test_write_geotiff_cog_mode_tiled(tmp_path):
             assert src.block_shapes[0][1] == 32
 
 
-def test_write_geotiff_cog_mode_overviews(tmp_path):
-    """COG output contains internal overviews."""
-    ds = _make_dataset(shape=(64, 64))
-    task = _make_task(tmp_path)
-    writer = WriteGeoTIFF()
-    result = writer.write(ds, task, task.grid_cells[0], {"cog": True})
-
-    import rasterio
-
-    for _, row in result.iterrows():
-        with rasterio.open(row["path"]) as src:
-            assert len(src.overviews(1)) > 0
-
-
-def test_write_geotiff_cog_mode_overview_levels_explicit(tmp_path):
-    """Custom overview_levels are honoured."""
-    ds = _make_dataset(shape=(64, 64))
-    task = _make_task(tmp_path)
-    writer = WriteGeoTIFF()
-    result = writer.write(
-        ds,
-        task,
-        task.grid_cells[0],
-        {"cog": True, "overview_levels": [2, 4]},
-    )
-
-    import rasterio
-
-    for _, row in result.iterrows():
-        with rasterio.open(row["path"]) as src:
-            assert src.overviews(1) == [2, 4]
-
-
-def test_write_geotiff_cog_mode_overview_resampling(tmp_path):
-    """Overview resampling method is forwarded."""
-    ds = _make_dataset(shape=(64, 64))
-    task = _make_task(tmp_path)
-    writer = WriteGeoTIFF()
-    result = writer.write(
-        ds,
-        task,
-        task.grid_cells[0],
-        {"cog": True, "overview_resampling": "bilinear"},
-    )
-
-    import rasterio
-
-    for _, row in result.iterrows():
-        with rasterio.open(row["path"]) as src:
-            assert src.tags(ns="rio_overview")["resampling"] == "bilinear"
-
-
 # ---------------------------------------------------------------------------
 # Multi-band variables
 # ---------------------------------------------------------------------------
 
 
 def test_write_geotiff_multiband_plain(tmp_path):
-    """Multi-band variables are split per band in plain mode."""
+    """Multi-band variables are split per band."""
     ds = xr.Dataset(
         {
             "RGB": (
@@ -223,8 +155,8 @@ def test_write_geotiff_multiband_plain(tmp_path):
     assert all(v == "RGB" for v in result["variable"])
 
 
-def test_write_geotiff_multiband_cog(tmp_path):
-    """Multi-band variables are split per band in COG mode."""
+def test_write_geotiff_multiband_tiled(tmp_path):
+    """Multi-band variables are split per band with tiling via rio_params."""
     ds = xr.Dataset(
         {
             "RGB": (
@@ -240,7 +172,12 @@ def test_write_geotiff_multiband_cog(tmp_path):
 
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
-    result = writer.write(ds, task, task.grid_cells[0], {"cog": True})
+    result = writer.write(
+        ds,
+        task,
+        task.grid_cells[0],
+        {"rio_params": {"tiled": True}},
+    )
 
     import rasterio
 
@@ -249,27 +186,27 @@ def test_write_geotiff_multiband_cog(tmp_path):
         with rasterio.open(row["path"]) as src:
             block_height: int = src.block_shapes[0][0]
             assert block_height > 1
-            assert len(src.overviews(1)) > 0
 
 
 # ---------------------------------------------------------------------------
-# Optional params metadata
+# optional_params metadata
 # ---------------------------------------------------------------------------
 
 
-def test_write_geotiff_optional_params_registered():
-    """COG-related and rio_params appear in optional_params."""
+def test_write_geotiff_only_rio_params_registered():
+    """Only rio_params is declared; no bespoke params remain."""
     writer = WriteGeoTIFF()
     names = {p.name for p in writer.optional_params}
-    assert "cog" in names
-    assert "blocksize" in names
-    assert "overview_resampling" in names
-    assert "overview_levels" in names
-    assert "rio_params" in names
+    assert names == {"rio_params"}
+
+
+# ---------------------------------------------------------------------------
+# rio_params forwarding
+# ---------------------------------------------------------------------------
 
 
 def test_write_geotiff_rio_params_forwarded(tmp_path):
-    """Custom rio_params (like tags and compress) are forwarded directly to to_raster."""
+    """Custom rio_params (tags and compress) are forwarded directly to to_raster."""
     ds = _make_dataset()
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
@@ -288,3 +225,17 @@ def test_write_geotiff_rio_params_forwarded(tmp_path):
         with rasterio.open(row["path"]) as src:
             assert src.tags().get("custom_key") == "custom_val"
             assert src.compression.name.lower() == "lzw"
+
+
+def test_write_geotiff_missing_time_bounds_raises(tmp_path):
+    """A dataset with no time dim and no attrs raises a clear ValueError."""
+    ds = xr.Dataset(
+        {"B04": (["band", "y", "x"], np.ones((1, 4, 4)))},
+        coords={"band": [1], "y": range(4), "x": range(4)},
+    )
+    ds = ds.rio.write_crs("EPSG:4326")
+
+    task = _make_task(tmp_path)
+    writer = WriteGeoTIFF()
+    with pytest.raises(ValueError, match="start_time.*end_time"):
+        writer.write(ds, task, task.grid_cells[0], {})
