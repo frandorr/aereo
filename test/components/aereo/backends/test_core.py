@@ -85,8 +85,8 @@ class _DummyWriter(Writer):
 # ---------------------------------------------------------------------------
 
 
-def test_task_runner_uses_reader_hint_from_task_context():
-    """Resolution priority 1: task_context['reader_hint']."""
+def test_task_runner_resolves_stage_from_profile():
+    """Verify that TaskRunner resolves plugins defined in the profile."""
     mock_registry = _make_mock_registry()
     mock_reader = MagicMock(spec=_DummyReader)
     mock_reader.read.return_value = xr.Dataset()
@@ -114,23 +114,25 @@ def test_task_runner_uses_reader_hint_from_task_context():
     mock_registry.has.side_effect = _mock_has
     mock_registry.get.side_effect = _mock_get
 
-    runner = TaskRunner(registry=mock_registry)
-    task = _make_task(
-        task_context={
-            "reader_hint": "my_reader",
-            "reprojector_hint": "my_reprojector",
-            "writer_hint": "my_writer",
-        }
+    profile = AereoProfile(
+        name="test",
+        resolution=100.0,
+        read={"my_reader": {}},
+        reproject={"my_reprojector": {}},
+        write={"my_writer": {}},
     )
+    runner = TaskRunner(registry=mock_registry)
+    task = _make_task(profile=profile)
 
     runner.run(task)
 
-    # Verify reader was resolved via task context hint
     mock_registry.has.assert_any_call("reader", "my_reader")
+    mock_registry.has.assert_any_call("reprojector", "my_reprojector")
+    mock_registry.has.assert_any_call("writer", "my_writer")
 
 
-def test_task_runner_falls_back_to_profile_hint():
-    """Resolution priority 2: profile.plugin_hints['read']."""
+def test_task_runner_falls_back_to_auto_discovery():
+    """Verify that TaskRunner falls back to auto-discovery when no profile configuration is set."""
     mock_registry = _make_mock_registry()
     mock_reader = MagicMock(spec=_DummyReader)
     mock_reader.read.return_value = xr.Dataset()
@@ -141,34 +143,40 @@ def test_task_runner_falls_back_to_profile_hint():
     mock_writer = MagicMock(spec=_DummyWriter)
     mock_writer.write.return_value = gpd.GeoDataFrame()
 
-    allowed = {"profile_reader", "profile_reprojector", "profile_writer"}
+    mock_registry.has.return_value = False
 
-    def _mock_has(type_label, name):
-        return name in allowed
+    def _mock_find_for(type_label, collection):
+        if type_label == "reader":
+            return ["auto_reader"]
+        if type_label == "reprojector":
+            return ["auto_reprojector"]
+        if type_label == "writer":
+            return ["auto_writer"]
+        return []
 
     def _mock_get(type_label, name, **kwargs):
-        if type_label == "reader" and name == "profile_reader":
+        if type_label == "reader" and name == "auto_reader":
             return mock_reader
-        if type_label == "reprojector" and name == "profile_reprojector":
+        if type_label == "reprojector" and name == "auto_reprojector":
             return mock_reprojector
-        if type_label == "writer" and name == "profile_writer":
+        if type_label == "writer" and name == "auto_writer":
             return mock_writer
         raise ValueError(f"Unexpected get: {type_label}, {name}")
 
-    mock_registry.has.side_effect = _mock_has
+    mock_registry.find_for.side_effect = _mock_find_for
     mock_registry.get.side_effect = _mock_get
 
     runner = TaskRunner(registry=mock_registry)
     profile = AereoProfile(
         name="test",
         resolution=100.0,
+        collections={"C1": ["var1"]},
     )
     task = _make_task(profile=profile)
 
     runner.run(task)
 
-    # Should have checked profile hint
-    mock_registry.has.assert_any_call("reader", "profile_reader")
+    mock_registry.find_for.assert_any_call("reader", "C1")
 
 
 def test_task_runner_raises_when_no_reader_found():
@@ -190,7 +198,7 @@ def test_task_runner_raises_when_no_reader_found():
 
 
 def test_task_runner_passes_read_params_to_reader():
-    """Profile read_params are passed to reader.read()."""
+    """Profile read parameters are passed to the plugin during instantiation."""
     mock_registry = _make_mock_registry()
     mock_reader = MagicMock(spec=_DummyReader)
     mock_reader.read.return_value = xr.Dataset()
@@ -230,9 +238,7 @@ def test_task_runner_passes_read_params_to_reader():
 
     runner.run(task)
 
-    call_args = mock_reader.read.call_args
-    passed_params = call_args.kwargs.get("params") or call_args.args[1]
-    assert passed_params == {"calibration": "reflectance"}
+    mock_registry.get.assert_any_call("reader", "dummy", calibration="reflectance")
 
 
 def test_task_runner_returns_writer_result():
@@ -268,17 +274,18 @@ def test_task_runner_returns_writer_result():
     mock_registry.get.side_effect = _mock_get
 
     runner = TaskRunner(registry=mock_registry)
-    task = _make_task(
-        task_context={
-            "reader_hint": "dummy",
-            "reprojector_hint": "dummy",
-            "writer_hint": "dummy",
-        }
+    profile = AereoProfile(
+        name="test",
+        resolution=100.0,
+        read={"dummy": {}},
+        reproject={"dummy": {}},
+        write={"dummy": {}},
     )
+    task = _make_task(profile=profile)
 
     result = runner.run(task)
 
-    # Result should be a GeoDataFrame (empty in this case since grid_cells is empty)
+    # Result should be a GeoDataFrame
     assert isinstance(result, gpd.GeoDataFrame)
 
 
