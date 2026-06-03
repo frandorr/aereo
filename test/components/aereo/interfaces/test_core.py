@@ -7,7 +7,9 @@ from aereo.interfaces import (
     AereoPlugin,
     GridConfig,
     SearchProvider,
+    infer_dataset_time_bounds,
     merge_params,
+    set_dataset_time_bounds,
     validate_aereo_dataset,
 )
 from pandera.typing.geopandas import GeoDataFrame
@@ -324,3 +326,37 @@ def test_validate_aereo_dataset_checks_crs_when_required():
     # Without rioxarray crs, require_crs=True should fail
     with pytest.raises(ValueError, match="must have a CRS"):
         validate_aereo_dataset(ds, require_crs=True)
+
+
+def test_set_dataset_time_bounds():
+    import xarray as xr
+    from datetime import datetime
+
+    ds = xr.Dataset()
+    t1 = datetime(2026, 1, 1, 12, 0, 0)
+    t2 = datetime(2026, 1, 1, 12, 10, 0)
+    ds = set_dataset_time_bounds(ds, t1, t2)
+
+    assert ds.attrs["start_time"] == t1
+    assert ds.attrs["end_time"] == t2
+
+
+def test_infer_dataset_time_bounds():
+    import numpy as np
+    import xarray as xr
+    from datetime import datetime
+
+    t1 = datetime(2026, 1, 1, 12, 0, 0)
+    t2 = datetime(2026, 1, 1, 12, 10, 0)
+    ds = xr.Dataset(
+        {"B04": (["time", "y", "x"], np.ones((2, 4, 4)))},
+        coords={
+            "time": [t1, t2],
+            "y": range(4),
+            "x": range(4),
+        },
+    )
+
+    ds = infer_dataset_time_bounds(ds)
+    assert ds.attrs["start_time"] == t1
+    assert ds.attrs["end_time"] == t2
