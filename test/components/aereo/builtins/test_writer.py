@@ -41,6 +41,8 @@ def _make_task(tmp_path, profile=None):
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
     valid_df["geometry"] = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
     valid_df["collection"] = "C1"
+    valid_df["start_time"] = pd.Timestamp("2026-01-01T12:00:00")
+    valid_df["end_time"] = pd.Timestamp("2026-01-01T12:10:00")
 
     grid_config = GridConfig(target_grid_dist=50_000)
     cell = GridCell(

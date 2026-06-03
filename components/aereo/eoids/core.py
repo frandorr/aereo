@@ -92,6 +92,7 @@ def build_eoids_path(
             ``AereoProfile`` to ``profile.json`` in the profile directory on the
             first call.
     """
+    derivative = derivative or getattr(profile, "derivative", None)
     parts: list[str] = []
 
     safe_cell = _sanitize_cell(cell_id) if cell_id else None

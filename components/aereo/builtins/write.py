@@ -166,7 +166,7 @@ class WriteGeoTIFF(Writer):
         cell: GridCell,
         params: Mapping[str, Any],
     ) -> GeoDataFrame[ArtifactSchema]:
-        """Write *ds* to GeoTIFF files under ``task.uri``.
+        """Write *ds* to GeoTIFF files using the standard EOIDS layout under ``task.uri``.
 
         Returns:
             GeoDataFrame of written artifacts.
@@ -175,11 +175,28 @@ class WriteGeoTIFF(Writer):
         import pandas as pd
         import rioxarray  # noqa: F401
         from shapely.geometry import box
+        from aereo.eoids import build_eoids_path
 
         uri = task.uri
         cell_id = cell.id()
-        out_dir = Path(uri) / task.profile.name / str(cell_id)
-        out_dir.mkdir(parents=True, exist_ok=True)
+        derivative = params.get("derivative")
+
+        start_time = None
+        end_time = None
+        if "start_time" in task.assets.columns:
+            try:
+                non_null_starts = task.assets["start_time"].dropna()
+                if not non_null_starts.empty:
+                    start_time = pd.to_datetime(non_null_starts.min()).to_pydatetime()
+            except Exception:
+                pass
+        if "end_time" in task.assets.columns:
+            try:
+                non_null_ends = task.assets["end_time"].dropna()
+                if not non_null_ends.empty:
+                    end_time = pd.to_datetime(non_null_ends.max()).to_pydatetime()
+            except Exception:
+                pass
 
         compress = params.get("compress", "deflate")
         zlevel = params.get("zlevel", 1)
@@ -195,8 +212,16 @@ class WriteGeoTIFF(Writer):
                 # Multi-band variable — write each band separately
                 for band_idx in range(da.sizes["band"]):
                     band_da = da.isel(band=band_idx)
-                    fname = f"{var_name}_b{band_idx}_{cell_id}.tif"
-                    fpath = out_dir / fname
+                    fpath = build_eoids_path(
+                        local_dir=uri,
+                        profile=task.profile,
+                        cell_id=cell_id,
+                        start_time=start_time,
+                        end_time=end_time,
+                        derivative=derivative,
+                        desc=f"{var_name}_b{band_idx}",
+                        suffix="tif",
+                    )
                     self._write_band(
                         band_da,
                         fpath,
@@ -217,8 +242,16 @@ class WriteGeoTIFF(Writer):
                         }
                     )
             else:
-                fname = f"{var_name}_{cell_id}.tif"
-                fpath = out_dir / fname
+                fpath = build_eoids_path(
+                    local_dir=uri,
+                    profile=task.profile,
+                    cell_id=cell_id,
+                    start_time=start_time,
+                    end_time=end_time,
+                    derivative=derivative,
+                    desc=str(var_name),
+                    suffix="tif",
+                )
                 self._write_band(
                     da,
                     fpath,

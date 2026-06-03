@@ -694,6 +694,7 @@ class AereoProfile(_ProfileLoaderMixin, BaseModel):
     collections: Mapping[str, Sequence[str]] = Field(default_factory=dict)
     padding: int | None = 0
     conform_to: tuple[int, int] | None = None
+    derivative: str | None = None
 
     # Stage-specific configurations (replaces old plugin_hints and *_params)
     search: PluginStage | None = None
