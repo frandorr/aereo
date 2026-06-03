@@ -191,7 +191,7 @@ class PluginParam(BaseModel):
     model_config = {"extra": "forbid", "frozen": True}
 
     name: str
-    type: Literal["str", "int", "float", "bool", "choice", "path", "list[str]"]
+    type: Literal["str", "int", "float", "bool", "choice", "path", "list[str]", "dict"]
     description: str
     default: Any | None = None
     choices: Sequence[str] | None = None
