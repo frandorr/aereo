@@ -38,6 +38,8 @@ def _make_dataset(data_vars=None, dims=("band", "y", "x"), shape=(1, 8, 8)):
         }
     ds = xr.Dataset(data_vars, coords=coords)
     ds = ds.rio.write_crs("EPSG:4326")
+    ds.attrs["start_time"] = pd.Timestamp("2026-01-01T12:00:00").to_pydatetime()
+    ds.attrs["end_time"] = pd.Timestamp("2026-01-01T12:10:00").to_pydatetime()
     return ds
 
 
@@ -209,6 +211,8 @@ def test_write_geotiff_multiband_plain(tmp_path):
         coords={"band": [1, 2, 3], "y": range(4), "x": range(4)},
     )
     ds = ds.rio.write_crs("EPSG:4326")
+    ds.attrs["start_time"] = pd.Timestamp("2026-01-01T12:00:00").to_pydatetime()
+    ds.attrs["end_time"] = pd.Timestamp("2026-01-01T12:10:00").to_pydatetime()
 
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
@@ -231,6 +235,8 @@ def test_write_geotiff_multiband_cog(tmp_path):
         coords={"band": [1, 2, 3], "y": range(8), "x": range(8)},
     )
     ds = ds.rio.write_crs("EPSG:4326")
+    ds.attrs["start_time"] = pd.Timestamp("2026-01-01T12:00:00").to_pydatetime()
+    ds.attrs["end_time"] = pd.Timestamp("2026-01-01T12:10:00").to_pydatetime()
 
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()

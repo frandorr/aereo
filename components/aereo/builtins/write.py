@@ -180,22 +180,14 @@ class WriteGeoTIFF(Writer):
         uri = task.uri
         cell_id = cell.id()
 
-        start_time = None
-        end_time = None
-        if "start_time" in task.assets.columns:
-            try:
-                non_null_starts = task.assets["start_time"].dropna()
-                if not non_null_starts.empty:
-                    start_time = pd.to_datetime(non_null_starts.min()).to_pydatetime()
-            except Exception:
-                pass
-        if "end_time" in task.assets.columns:
-            try:
-                non_null_ends = task.assets["end_time"].dropna()
-                if not non_null_ends.empty:
-                    end_time = pd.to_datetime(non_null_ends.max()).to_pydatetime()
-            except Exception:
-                pass
+        start_time = ds.attrs.get("start_time")
+        end_time = ds.attrs.get("end_time")
+
+        if "time" not in ds.dims and (start_time is None or end_time is None):
+            raise ValueError(
+                "AereoDataset must contain 'start_time' and 'end_time' in ds.attrs "
+                "when no 'time' dimension is present to construct EOIDS compliant paths."
+            )
 
         compress = params.get("compress", "deflate")
         zlevel = params.get("zlevel", 1)

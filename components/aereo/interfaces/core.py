@@ -160,6 +160,46 @@ def validate_aereo_dataset(
             raise ValueError(f"AereoDataset missing required dimensions: {missing}")
 
 
+def set_dataset_time_bounds(
+    ds: AereoDataset, start_time: datetime, end_time: datetime
+) -> AereoDataset:
+    """Set the start and end time bounds in the dataset's attributes.
+
+    Args:
+        ds: The AereoDataset.
+        start_time: The start time.
+        end_time: The end time.
+
+    Returns:
+        The dataset with time bounds set in its attributes.
+    """
+    ds.attrs["start_time"] = start_time
+    ds.attrs["end_time"] = end_time
+    return ds
+
+
+def infer_dataset_time_bounds(ds: AereoDataset) -> AereoDataset:
+    """Infer and set the start and end time bounds in the dataset's attributes.
+
+    If a ``time`` coordinate is present, uses its minimum and maximum values.
+    Otherwise, leaves the dataset attributes unchanged.
+
+    Args:
+        ds: The AereoDataset.
+
+    Returns:
+        The dataset with inferred time bounds set in its attributes (if possible).
+    """
+    import pandas as pd
+
+    if "time" in ds.coords:
+        times = ds.coords["time"].values
+        if len(times) > 0:
+            ds.attrs["start_time"] = pd.Timestamp(times.min()).to_pydatetime()
+            ds.attrs["end_time"] = pd.Timestamp(times.max()).to_pydatetime()
+    return ds
+
+
 def _skip_empty(geom: BaseGeometry | None) -> bool:
     """Return True if *geom* is None or empty."""
     return geom is None or geom.is_empty
