@@ -3,11 +3,15 @@ from typing import Any, cast
 
 import geopandas as gpd
 from aereo.grid import GridCell
-from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig
+from aereo.interfaces import ExtractionTask, GridConfig
 from aereo.schemas import AssetSchema
 from aereo.serialization import TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
+
+from aereo.builtins.read import ReadODCSTAC
+from aereo.builtins.reproject import ReprojectODC
+from aereo.builtins.write import WriteGeoTIFF
 
 
 def _make_task(
@@ -30,7 +34,11 @@ def _make_task(
         crs="EPSG:4326",
     )
 
-    profile = AereoProfile(name="test_profile", resolution=100.0)
+    pipeline = [
+        ReadODCSTAC(),
+        ReprojectODC(resolution=100.0),
+        WriteGeoTIFF(),
+    ]
     grid_config = GridConfig(target_grid_dist=50_000)
     grid_cell = GridCell(
         d=50_000,
@@ -41,7 +49,7 @@ def _make_task(
 
     return ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
-        profile=profile,
+        pipeline=pipeline,
         uri="test_uri",
         grid_cells=[grid_cell],
         grid_config=grid_config,
@@ -65,9 +73,10 @@ def test_round_trip_basic(tmp_path: Any) -> None:
     assert list(reconstructed.assets["id"]) == ["asset_1"]
     assert list(reconstructed.assets["collection"]) == ["GOES"]
 
-    # Profile
-    assert reconstructed.profile.name == original.profile.name
-    assert reconstructed.profile.resolution == original.profile.resolution
+    # Pipeline
+    assert len(reconstructed.pipeline) == len(original.pipeline)
+    assert type(reconstructed.pipeline[0]) is type(original.pipeline[0])
+    assert type(reconstructed.pipeline[1]) is type(original.pipeline[1])
 
     # Grid config
     assert reconstructed.grid_config == original.grid_config
@@ -152,9 +161,14 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
         ),
     ]
 
+    pipeline = [
+        ReadODCSTAC(),
+        ReprojectODC(resolution=10.0),
+        WriteGeoTIFF(),
+    ]
     original = ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
-        profile=AereoProfile(name="multi", resolution=10.0),
+        pipeline=pipeline,
         uri="out",
         grid_cells=cells,
         grid_config=GridConfig(target_grid_dist=10_000),
@@ -183,109 +197,3 @@ def test_assets_crs_preserved(tmp_path: Any) -> None:
 
     assert reconstructed.assets.crs is not None
     assert reconstructed.assets.crs.to_epsg() == 4326
-
-
-def test_profile_reconstruction_matches_original(tmp_path: Any) -> None:
-    """Complex profiles with collections and params reconstruct identically."""
-    serializer = TaskSerializer()
-    profile = AereoProfile(
-        name="complex",
-        resolution=500.0,
-        collections={"ABI-L1b-RadC": ["C01", "C02"]},
-        padding=4,
-        conform_to=(256, 256),
-        read={"read_aws_goes": {"calibration": "reflectance"}},
-        search={"search_aws_goes": {"version": "061"}},
-    )
-
-    df = gpd.GeoDataFrame(
-        {
-            "id": ["x"],
-            "collection": ["ABI-L1b-RadC"],
-            "start_time": [datetime(2023, 1, 1)],
-            "end_time": [datetime(2023, 1, 1)],
-            "href": ["s3://x"],
-        },
-        geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
-        crs="EPSG:4326",
-    )
-
-    original = ExtractionTask(
-        assets=cast(GeoDataFrame[AssetSchema], df),
-        profile=profile,
-        uri="complex_uri",
-        grid_cells=[
-            GridCell(
-                d=100_000,
-                geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-                is_primary=True,
-                cell_id="0U_0R",
-            )
-        ],
-        grid_config=GridConfig(target_grid_dist=100_000, target_grid_margin=6.8),
-    )
-
-    dest = tmp_path / "task_complex"
-    serializer.serialize(original, dest)
-    reconstructed = serializer.deserialize(dest)
-
-    assert reconstructed.profile == profile
-    assert reconstructed.grid_config.target_grid_margin == 6.8
-
-
-def test_aereo_profile_round_trip(tmp_path: Any) -> None:
-    """AereoProfile survives serialize → deserialize round-trip."""
-    serializer = TaskSerializer()
-    profile = AereoProfile(
-        name="pipeline_test",
-        resolution=300.0,
-        collections={"S3OLCI": ["Oa01", "Oa02"]},
-        search={"earthaccess": {"cloud_cover": 20}},
-        read={"satpy": {"reader": "olci_l1b"}},
-        reproject={"repro": {"reproject_params": {"resampling": "bilinear"}}},
-        write={"cog": {"driver": "COG"}},
-        pre_processors=["mask_clouds"],
-        post_processors=[
-            {"parallel": {"procs": ["compute_ndvi", "compute_ndwi"]}},
-            "normalize",
-        ],
-    )
-
-    df = gpd.GeoDataFrame(
-        {
-            "id": ["asset_1"],
-            "collection": ["S3OLCI"],
-            "start_time": [datetime(2024, 1, 1)],
-            "end_time": [datetime(2024, 1, 1)],
-            "href": ["s3://bucket/granule.nc"],
-        },
-        geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
-        crs="EPSG:4326",
-    )
-
-    original = ExtractionTask(
-        assets=cast(GeoDataFrame[AssetSchema], df),
-        profile=profile,
-        uri="s3://output/",
-        grid_cells=[
-            GridCell(
-                d=50_000,
-                geom=Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]]),
-                is_primary=True,
-                cell_id="0U_0R",
-            )
-        ],
-        grid_config=GridConfig(target_grid_dist=50_000),
-    )
-
-    dest = tmp_path / "task_pipeline"
-    serializer.serialize(original, dest)
-    reconstructed = serializer.deserialize(dest)
-
-    assert isinstance(reconstructed.profile, AereoProfile)
-    assert reconstructed.profile == profile
-    assert reconstructed.profile.pre_processors == ["mask_clouds"]
-    assert reconstructed.profile.post_processors == [
-        {"parallel": {"procs": ["compute_ndvi", "compute_ndwi"]}},
-        "normalize",
-    ]

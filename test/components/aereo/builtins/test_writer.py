@@ -13,7 +13,7 @@ from shapely.geometry import Polygon
 
 from aereo.builtins import WriteGeoTIFF
 from aereo.grid import GridCell
-from aereo.interfaces.core import AereoProfile, ExtractionTask, GridConfig
+from aereo.interfaces.core import ExtractionTask, GridConfig
 from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -43,7 +43,7 @@ def _make_dataset(data_vars=None, dims=("band", "y", "x"), shape=(1, 8, 8)):
     return ds
 
 
-def _make_task(tmp_path, profile=None):
+def _make_task(tmp_path):
     """Return a minimal ExtractionTask for writer tests."""
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
@@ -61,7 +61,7 @@ def _make_task(tmp_path, profile=None):
     )
     return ExtractionTask(
         assets=GeoDataFrame(valid_df),
-        profile=profile or AereoProfile(name="test", resolution=100.0),
+        pipeline=[],
         uri=str(tmp_path),
         grid_cells=[cell],
         grid_config=grid_config,
@@ -78,13 +78,13 @@ def test_write_geotiff_plain_mode_driver(tmp_path):
     ds = _make_dataset()
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
-    result = writer.write(ds, task, task.grid_cells[0], {})
+    result = writer(ds, task, task.grid_cells[0])
 
     assert len(result) == 2
     for _, row in result.iterrows():
         import rasterio
 
-        with rasterio.open(row["path"]) as src:
+        with rasterio.open(row["uri"]) as src:
             assert src.driver == "GTiff"
 
 
@@ -93,11 +93,10 @@ def test_write_geotiff_plain_mode_returns_artifacts(tmp_path):
     ds = _make_dataset()
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
-    result = writer.write(ds, task, task.grid_cells[0], {})
+    result = writer(ds, task, task.grid_cells[0])
 
-    assert set(result["variable"]) == {"B04", "B08"}
-    assert bool(result["band"].isna().all())
-    assert bool((result["cell_id"] == "test_cell").all())
+    assert set(result["id"]) == {"test_cell_B04_0", "test_cell_B08_0"}
+    assert bool((result["grid_cell"] == "test_cell").all())
 
 
 # ---------------------------------------------------------------------------
@@ -109,19 +108,16 @@ def test_write_geotiff_tiled_via_rio_params(tmp_path):
     """Tiling is applied when requested through rio_params."""
     ds = _make_dataset(shape=(64, 64))
     task = _make_task(tmp_path)
-    writer = WriteGeoTIFF()
-    result = writer.write(
-        ds,
-        task,
-        task.grid_cells[0],
-        {"rio_params": {"tiled": True, "blockxsize": 32, "blockysize": 32}},
+    writer = WriteGeoTIFF(
+        rio_params={"tiled": True, "blockxsize": 32, "blockysize": 32}
     )
+    result = writer(ds, task, task.grid_cells[0])
 
     import rasterio
 
     for _, row in result.iterrows():
-        with rasterio.open(row["path"]) as src:
-            assert src.is_tiled
+        with rasterio.open(row["uri"]) as src:
+            assert src.profile.get("tiled", False)
             assert src.block_shapes[0][0] == 32
             assert src.block_shapes[0][1] == 32
 
@@ -148,11 +144,14 @@ def test_write_geotiff_multiband_plain(tmp_path):
 
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
-    result = writer.write(ds, task, task.grid_cells[0], {})
+    result = writer(ds, task, task.grid_cells[0])
 
     assert len(result) == 3
-    assert set(result["band"]) == {0, 1, 2}
-    assert all(v == "RGB" for v in result["variable"])
+    assert set(result["id"]) == {
+        "test_cell_RGB_0",
+        "test_cell_RGB_1",
+        "test_cell_RGB_2",
+    }
 
 
 def test_write_geotiff_multiband_tiled(tmp_path):
@@ -171,33 +170,26 @@ def test_write_geotiff_multiband_tiled(tmp_path):
     ds.attrs["end_time"] = pd.Timestamp("2026-01-01T12:10:00").to_pydatetime()
 
     task = _make_task(tmp_path)
-    writer = WriteGeoTIFF()
-    result = writer.write(
-        ds,
-        task,
-        task.grid_cells[0],
-        {"rio_params": {"tiled": True}},
-    )
+    writer = WriteGeoTIFF(rio_params={"tiled": True})
+    result = writer(ds, task, task.grid_cells[0])
 
     import rasterio
 
     assert len(result) == 3
     for _, row in result.iterrows():
-        with rasterio.open(row["path"]) as src:
+        with rasterio.open(row["uri"]) as src:
             block_height: int = src.block_shapes[0][0]
             assert block_height > 1
 
 
 # ---------------------------------------------------------------------------
-# optional_params metadata
+# Pydantic fields
 # ---------------------------------------------------------------------------
 
 
-def test_write_geotiff_only_rio_params_registered():
-    """Only rio_params is declared; no bespoke params remain."""
-    writer = WriteGeoTIFF()
-    names = {p.name for p in writer.optional_params}
-    assert names == {"rio_params"}
+def test_write_geotiff_fields():
+    """Only rio_params is declared."""
+    assert "rio_params" in WriteGeoTIFF.model_fields
 
 
 # ---------------------------------------------------------------------------
@@ -209,20 +201,17 @@ def test_write_geotiff_rio_params_forwarded(tmp_path):
     """Custom rio_params (tags and compress) are forwarded directly to to_raster."""
     ds = _make_dataset()
     task = _make_task(tmp_path)
-    writer = WriteGeoTIFF()
-
-    result = writer.write(
-        ds,
-        task,
-        task.grid_cells[0],
-        {"rio_params": {"tags": {"custom_key": "custom_val"}, "compress": "lzw"}},
+    writer = WriteGeoTIFF(
+        rio_params={"tags": {"custom_key": "custom_val"}, "compress": "lzw"}
     )
+
+    result = writer(ds, task, task.grid_cells[0])
 
     import rasterio
 
     assert len(result) > 0
     for _, row in result.iterrows():
-        with rasterio.open(row["path"]) as src:
+        with rasterio.open(row["uri"]) as src:
             assert src.tags().get("custom_key") == "custom_val"
             assert src.compression.name.lower() == "lzw"
 
@@ -238,4 +227,4 @@ def test_write_geotiff_missing_time_bounds_raises(tmp_path):
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
     with pytest.raises(ValueError, match="start_time.*end_time"):
-        writer.write(ds, task, task.grid_cells[0], {})
+        writer(ds, task, task.grid_cells[0])

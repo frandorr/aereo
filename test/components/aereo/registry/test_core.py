@@ -1,52 +1,31 @@
-from datetime import datetime
-from typing import Any, Mapping, Sequence, cast
+from typing import Any, cast
 from unittest.mock import MagicMock
 
 import pytest
-from aereo.interfaces import ExtractionTask, PluginParam, Reader, SearchProvider
+from aereo.interfaces import Reader, SearchProvider, ExtractionTask
 from aereo.registry import AereoRegistry
 from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
-from shapely.geometry.base import BaseGeometry
 
 
 # Dummy plugins
 class DummySearchProvider(SearchProvider):
-    supported_collections = ["DummyCollection1", "SharedCollection"]
-    required_params = (
-        PluginParam(name="bbox", type="str", description="Bounding box"),
-    )
-    optional_params = (
-        PluginParam(name="limit", type="int", description="Result limit", default=10),
-    )
+    bbox: str = ""
+    limit: int = 10
 
-    def search(
-        self,
-        collections: Sequence[str],
-        intersects: BaseGeometry | None,
-        start_datetime: datetime | None,
-        end_datetime: datetime | None,
-        search_params: Mapping[str, Any] | None,
-    ) -> GeoDataFrame[AssetSchema]:
+    supported_collections: list[str] = ["DummyCollection1", "SharedCollection"]
+
+    def __call__(self) -> GeoDataFrame[AssetSchema]:
         return cast(GeoDataFrame[AssetSchema], AssetSchema.empty())
 
 
 class DummyReader(Reader):
-    supported_collections = ["SharedCollection", "DummyCollection2"]
-    required_params = (
-        PluginParam(name="output_dir", type="path", description="Output directory"),
-    )
-    optional_params = (
-        PluginParam(
-            name="compress", type="bool", description="Compress output", default=False
-        ),
-    )
+    output_dir: str = ""
+    compress: bool = False
 
-    def read(
-        self,
-        task: ExtractionTask,
-        params: Mapping[str, Any],
-    ) -> Any:
+    supported_collections: list[str] = ["SharedCollection", "DummyCollection2"]
+
+    def __call__(self, task: ExtractionTask) -> Any:
         import xarray as xr
 
         return xr.Dataset()
@@ -207,69 +186,14 @@ def test_get_collection_mapping_for_reader(mock_entry_points):
 
 
 def test_get_plugin_params_detailed(mock_entry_points):
-    """Test get_plugin_params returns full metadata when detailed=True."""
+    """Test get_plugin_params returns full metadata."""
     registry = AereoRegistry()
 
     params = registry.get_plugin_params("dummy_searcher", detailed=True)
-    assert len(params["required"]) == 1
-    assert params["required"][0]["name"] == "bbox"
-    assert "type" in params["required"][0]
-    assert "description" in params["required"][0]
-
-    assert len(params["optional"]) == 1
-    assert params["optional"][0]["name"] == "limit"
-    assert params["optional"][0]["default"] == 10
-    assert "type" in params["optional"][0]
-
-
-def test_get_plugin_params_not_detailed(mock_entry_points):
-    """Test get_plugin_params returns only name and default when detailed=False."""
-    registry = AereoRegistry()
-
-    params = registry.get_plugin_params("dummy_searcher", detailed=False)
-    assert len(params["required"]) == 1
-    assert params["required"][0] == {"name": "bbox", "default": None}
-
-    assert len(params["optional"]) == 1
-    assert params["optional"][0] == {"name": "limit", "default": 10}
-
-    # Ensure no extra keys are present
-    assert set(params["required"][0].keys()) == {"name", "default"}
-    assert set(params["optional"][0].keys()) == {"name", "default"}
-
-
-def test_list_all_params_detailed(mock_entry_points):
-    """Test list_all_params returns full metadata when detailed=True."""
-    registry = AereoRegistry()
-
-    all_params = registry.list_all_params(detailed=True)
-    assert "dummy_searcher" in all_params
-    assert "dummy_reader" in all_params
-
-    searcher = all_params["dummy_searcher"]
-    assert searcher["type"] == "searcher"
-    assert len(searcher["required"]) == 1
-    assert searcher["required"][0]["name"] == "bbox"
-    assert "description" in searcher["required"][0]
-
-
-def test_list_all_params_not_detailed(mock_entry_points):
-    """Test list_all_params returns only name and default when detailed=False."""
-    registry = AereoRegistry()
-
-    all_params = registry.list_all_params(detailed=False)
-    assert "dummy_searcher" in all_params
-    assert "dummy_reader" in all_params
-
-    reader = all_params["dummy_reader"]
-    assert reader["type"] == "reader"
-    assert len(reader["required"]) == 1
-    assert reader["required"][0] == {"name": "output_dir", "default": None}
-    assert set(reader["required"][0].keys()) == {"name", "default"}
-
-    assert len(reader["optional"]) == 1
-    assert reader["optional"][0] == {"name": "compress", "default": False}
-    assert set(reader["optional"][0].keys()) == {"name", "default"}
+    assert len(params["required"]) == 0
+    assert len(params["optional"]) == 2
+    names = {p["name"] for p in params["optional"]}
+    assert names == {"bbox", "limit"}
 
 
 def test_get_plugin_params_unknown_plugin(mock_entry_points):
@@ -281,7 +205,7 @@ def test_get_plugin_params_unknown_plugin(mock_entry_points):
 
 
 # ---------------------------------------------------------------------------
-# Generic API (Phase 1)
+# Generic API
 # ---------------------------------------------------------------------------
 
 

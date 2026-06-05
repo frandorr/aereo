@@ -10,7 +10,7 @@ from __future__ import annotations
 import importlib.metadata
 from typing import Any, Sequence, Type
 
-from aereo.interfaces import (
+from aereo.interfaces.core import (
     Processor,
     Reader,
     Reprojector,
@@ -22,20 +22,35 @@ from structlog import get_logger
 logger = get_logger()
 
 
-def _dump_params(params: Sequence[Any], detailed: bool) -> list[dict]:
-    """Serialize PluginParam instances to JSON-safe dicts.
+def _dump_params_pydantic(cls: Type, detailed: bool) -> dict[str, list[dict]]:
+    """Derive parameter dictionary from Pydantic model fields.
 
     Args:
-        params: Sequence of PluginParam objects.
-        detailed: When ``True``, each param includes all attributes.
-            When ``False``, only ``name`` and ``default`` are returned.
+        cls: The plugin class (which inherits from Pydantic BaseModel).
+        detailed: When ``True``, each param includes all details.
 
     Returns:
-        list of JSON-serializable dicts representing PluginParam.
+        A dict with "required" and "optional" parameter lists.
     """
-    if detailed:
-        return [p.model_dump() for p in params]
-    return [{"name": p.name, "default": p.default} for p in params]
+    required = []
+    optional = []
+
+    for name, field in cls.model_fields.items():
+        if name == "supported_collections":
+            continue
+        is_required = field.is_required()
+        param_info = {
+            "name": name,
+            "default": field.default if not is_required else None,
+            "type": str(field.annotation),
+            "description": field.description or "",
+        }
+        if is_required:
+            required.append(param_info)
+        else:
+            optional.append(param_info)
+
+    return {"required": required, "optional": optional}
 
 
 class _TypedRegistry:
@@ -67,7 +82,16 @@ class _TypedRegistry:
         self.plugins[plugin_name] = plugin_class
 
         plugin_canonical_map: dict[str, str] = {}
-        for product in plugin_class.supported_collections:
+        supported = getattr(plugin_class, "supported_collections", None)
+        if (
+            supported is None
+            and hasattr(plugin_class, "model_fields")
+            and "supported_collections" in plugin_class.model_fields
+        ):
+            supported = plugin_class.model_fields["supported_collections"].default
+        if supported is None:
+            supported = []
+        for product in supported:
             lower_product = product.lower()
             self.collection_to_plugins.setdefault(lower_product, []).append(plugin_name)
             plugin_canonical_map[lower_product] = product
@@ -102,7 +126,15 @@ class _TypedRegistry:
             if the plugin is not known.
         """
         if plugin_name in self.plugins:
-            return list(self.plugins[plugin_name].supported_collections)
+            plugin_class = self.plugins[plugin_name]
+            supported = getattr(plugin_class, "supported_collections", None)
+            if (
+                supported is None
+                and hasattr(plugin_class, "model_fields")
+                and "supported_collections" in plugin_class.model_fields
+            ):
+                supported = plugin_class.model_fields["supported_collections"].default
+            return list(supported or [])
         return []
 
     def has(self, plugin_name: str) -> bool:
@@ -171,7 +203,7 @@ class AereoRegistry:
     """Dynamically discovers and manages aereo plugins via Python entry_points.
 
     The registry is data-driven: adding a new plugin type requires one line in
-    ``PLUGIN_TYPES`` and one new base class (see FR-5.1 / FR-5.2).
+    ``PLUGIN_TYPES`` and one new base class.
     """
 
     ENTRY_POINT_GROUP: str = "aereo.plugins"
@@ -222,10 +254,6 @@ class AereoRegistry:
     def register_plugins(self, plugins: dict[str, Type]) -> None:
         """Register pre-discovered plugins without scanning entry points.
 
-        This is useful in environments like AWS Lambda where entry point
-        scanning is slow (~20-30s with many packages). Instead, import the
-        plugin classes directly and register them explicitly.
-
         Args:
             plugins: Mapping of plugin name to plugin class.
         """
@@ -241,10 +269,6 @@ class AereoRegistry:
 
         Returns:
             None. Populates internal registries as a side effect.
-
-        Raises:
-            Exception: Individual plugin load failures are logged and swallowed
-                so that one broken plugin does not prevent others from loading.
         """
         logger.info("Discovering aereo plugins...")
 
@@ -290,15 +314,9 @@ class AereoRegistry:
     def _try_lazy_load(self, plugin_name: str, type_label: str) -> bool:
         """Attempt to load a single plugin by name from entry points.
 
-        This enables ``auto_discover=False`` registries to still resolve
-        plugins that are explicitly hinted by name in a profile.
-
         Args:
             plugin_name: Entry-point name to look up.
-            type_label: Expected plugin type label (e.g. "reader").  The
-                plugin is only registered and ``True`` is returned when the
-                loaded class actually inherits from the base class that
-                corresponds to *type_label*.
+            type_label: Expected plugin type label (e.g. "reader").
 
         Returns:
             True if the plugin was found, its type matches *type_label*, and
@@ -352,10 +370,6 @@ class AereoRegistry:
 
     def has(self, type_label: str, plugin_name: str) -> bool:
         """Check whether a plugin of *type_label* with *plugin_name* is registered.
-
-        If the registry was created with ``auto_discover=False``, this will
-        attempt a targeted entry-point load for the requested name before
-        giving up.
 
         Args:
             type_label: Plugin type label.
@@ -418,13 +432,10 @@ class AereoRegistry:
         Args:
             plugin_name: Entry-point name of the plugin.
             detailed: When ``True`` (default), each param includes all
-                attributes (name, type, description, default, choices,
-                required). When ``False``, only ``name`` and ``default``
-                are returned.
+                attributes.
 
         Returns:
-            {"required": [...], "optional": [...]} where each item is a
-            JSON-serializable dict representing a PluginParam.
+            {"required": [...], "optional": [...]} representing parameters.
         """
         cls: Type | None = None
         for registry in self._registries.values():
@@ -435,31 +446,26 @@ class AereoRegistry:
         if cls is None:
             raise KeyError(f"Unknown plugin: {plugin_name}")
 
-        return {
-            "required": _dump_params(cls.required_params, detailed),
-            "optional": _dump_params(cls.optional_params, detailed),
-        }
+        return _dump_params_pydantic(cls, detailed)
 
     def list_all_params(self, *, detailed: bool = True) -> dict[str, dict]:
         """JSON-serializable params catalog for all discovered plugins.
 
         Args:
             detailed: When ``True`` (default), each param includes all
-                attributes. When ``False``, only ``name`` and ``default``
-                are returned.
+                attributes.
 
         Returns:
             Mapping of plugin name to a dict with keys ``type``, ``required``,
-            and ``optional``. Each param list contains JSON-serializable dicts
-            representing a PluginParam.
+            and ``optional``.
         """
-
         result: dict[str, dict] = {}
         for label, registry in self._registries.items():
             for name, cls in registry.plugins.items():
+                params_dict = _dump_params_pydantic(cls, detailed)
                 result[name] = {
                     "type": label,
-                    "required": _dump_params(cls.required_params, detailed),
-                    "optional": _dump_params(cls.optional_params, detailed),
+                    "required": params_dict["required"],
+                    "optional": params_dict["optional"],
                 }
         return result

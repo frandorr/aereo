@@ -6,9 +6,10 @@ to lazily load pixel data from STAC items in native CRS as an AereoDataset.
 
 from __future__ import annotations
 
-from typing import Any, Mapping
+from typing import Any
+from pydantic import Field
 
-from aereo.interfaces import AereoDataset, ExtractionTask, PluginParam, Reader
+from aereo.interfaces import AereoDataset, ExtractionTask, Reader
 from aereo.interfaces import infer_dataset_time_bounds
 
 try:
@@ -24,56 +25,13 @@ class ReadODCSTAC(Reader):
     that :class:`~aereo.builtins.search.SearchSTAC` stores in the assets
     GeoDataFrame, then delegates to ``odc.stac.load`` for lazy, dask-backed
     raster loading.
-
-    The only Aereo-specific behaviour injected automatically:
-
-    * **bbox** — derived from the union of ``task.grid_cells`` and intersected
-      with ``task.aoi`` when present.  Injected into ``odc_params`` if the
-      caller did not provide it explicitly.
-    * **bands** — inferred from ``task.profile.collections`` when absent from
-      ``odc_params``.  Pass ``odc_params={"bands": [...]}`` to override.
-    * **time bounds** — ``ds.attrs["start_time"]``/``"end_time"`` are set via
-      :func:`~aereo.interfaces.infer_dataset_time_bounds` so the writer can
-      build EOIDS compliant paths.
-
-    Every other ``odc.stac.load`` option (``groupby``, ``chunks``,
-    ``resampling``, ``dtype``, ``stac_cfg``, ``patch_url``, …) is forwarded
-    verbatim through ``odc_params``.
-
-    Example::
-
-        params = {
-            "odc_params": {
-                "bands": ["B04", "B08"],
-                "groupby": "solar_day",
-                "chunks": {"x": 2048, "y": 2048},
-                "resampling": "bilinear",
-            }
-        }
     """
 
-    supported_collections = ("*",)
+    odc_params: dict[str, Any] = Field(default_factory=dict)
 
-    optional_params = (
-        PluginParam(
-            name="odc_params",
-            type="dict",
-            description=(
-                "Parameters forwarded verbatim to ``odc.stac.load``. "
-                "Accepts any keyword the function understands: ``bands``, "
-                "``groupby``, ``chunks``, ``resampling``, ``dtype``, "
-                "``stac_cfg``, ``patch_url``, … "
-                "``bbox`` is auto-injected from the task's grid cells if absent."
-            ),
-            default=None,
-            required=False,
-        ),
-    )
-
-    def read(
+    def __call__(
         self,
         task: ExtractionTask,
-        params: Mapping[str, Any],
     ) -> AereoDataset:
         """Load STAC assets for *task* using ``odc.stac.load``.
 
@@ -83,8 +41,7 @@ class ReadODCSTAC(Reader):
         ``ds.attrs``.
 
         Args:
-            task: Extraction task carrying assets, profile, grid cells, and AOI.
-            params: Plugin parameters.  Recognised key: ``odc_params`` (dict).
+            task: Extraction task carrying assets, grid cells, and AOI.
 
         Returns:
             AereoDataset (potentially dask-backed) in the native CRS of the
@@ -105,7 +62,6 @@ class ReadODCSTAC(Reader):
             )
 
         assets_df = task.assets
-        profile = task.profile
 
         # ------------------------------------------------------------------
         # 1. Reconstruct pystac.Item objects from the stac_item dict column.
@@ -135,7 +91,7 @@ class ReadODCSTAC(Reader):
         # 2. Build odc_params — start from the caller's dict, then inject
         #    Aereo-managed values only when absent.
         # ------------------------------------------------------------------
-        odc_params: dict[str, Any] = dict(params.get("odc_params") or {})
+        odc_params = dict(self.odc_params)
 
         # Auto-inject bbox from grid cells if not provided.
         if "bbox" not in odc_params:
@@ -156,11 +112,9 @@ class ReadODCSTAC(Reader):
             if spatial_extent is not None and not spatial_extent.is_empty:
                 odc_params["bbox"] = spatial_extent.bounds  # (minx, miny, maxx, maxy)
 
-        # Auto-infer bands from profile collections if not provided.
-        if "bands" not in odc_params and profile.collections:
-            odc_params["bands"] = [
-                v for vars_list in profile.collections.values() for v in vars_list
-            ]
+        # Auto-infer bands from unique channel_ids in assets if not provided.
+        if "bands" not in odc_params and "channel_id" in assets_df.columns:
+            odc_params["bands"] = list(assets_df["channel_id"].unique())
 
         # ------------------------------------------------------------------
         # 3. Load via odc.stac.

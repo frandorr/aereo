@@ -14,7 +14,8 @@ import pytest
 from shapely.geometry import Polygon
 
 from aereo.backends.lambda_backend import LambdaBackend, RetryableLambdaError
-from aereo.interfaces.core import AereoProfile, ExtractionTask, GridConfig
+from aereo.interfaces import AereoPlugin
+from aereo.interfaces.core import ExtractionTask, GridConfig
 from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -24,8 +25,19 @@ from pandera.typing.geopandas import GeoDataFrame
 # ---------------------------------------------------------------------------
 
 
+@pytest.fixture(autouse=True)
+def _mock_botocore():
+    """Automatically mock botocore and botocore.config in sys.modules."""
+    mock_botocore = MagicMock()
+    mock_config = MagicMock()
+    with patch.dict(
+        sys.modules, {"botocore": mock_botocore, "botocore.config": mock_config}
+    ):
+        yield
+
+
 def _make_task(
-    profile: AereoProfile | None = None,
+    pipeline: list[AereoPlugin] | None = None,
     task_context: dict[str, Any] | None = None,
 ) -> ExtractionTask:
     """Return a minimal ExtractionTask for testing."""
@@ -46,7 +58,7 @@ def _make_task(
     grid_config = GridConfig(target_grid_dist=50_000)
     return ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
-        profile=profile or AereoProfile(name="test", resolution=100.0),
+        pipeline=pipeline or [],
         uri="test-uri",
         grid_cells=[],
         grid_config=grid_config,

@@ -6,7 +6,6 @@ NDVI calculation, scaling normalization, and temporal compositing.
 
 from __future__ import annotations
 
-from typing import Any, Mapping
 
 import numpy as np
 
@@ -20,29 +19,21 @@ class SelectBands(Processor):
     expensive reproject step must process.
     """
 
-    supported_collections = ("*",)
-    stage = "pre_reproject"
+    bands: list[str]
 
-    def process(self, ds: AereoDataset, params: Mapping[str, Any]) -> AereoDataset:
-        """Keep only the bands listed in *params["bands"]*.
+    def __call__(self, ds: AereoDataset) -> AereoDataset:
+        """Keep only the bands listed in *bands*.
 
         Args:
             ds: Input dataset.
-            params: Must contain ``"bands"`` — a sequence of variable names to retain.
 
         Returns:
             A new dataset containing only the requested variables.
 
         Raises:
-            ValueError: If ``params["bands"]`` is missing or empty.
+            ValueError: If requested bands are not found.
         """
-        bands = params.get("bands")
-        if not bands:
-            raise ValueError(
-                "SelectBands requires params['bands'] to be a non-empty list of variable names."
-            )
-
-        keep = [str(b) for b in bands]
+        keep = [str(b) for b in self.bands]
         missing = [b for b in keep if b not in ds.data_vars]
         if missing:
             raise ValueError(
@@ -60,19 +51,14 @@ class QAMask(Processor):
     masking.
     """
 
-    supported_collections = ("*",)
-    stage = "pre_reproject"
+    qa_band: str
+    qa_mask_bits: list[int]
 
-    def process(self, ds: AereoDataset, params: Mapping[str, Any]) -> AereoDataset:
+    def __call__(self, ds: AereoDataset) -> AereoDataset:
         """Apply QA-based masking.
 
         Args:
             ds: Input dataset containing a QA variable.
-            params: Must contain:
-                - ``qa_band`` (str): Name of the QA variable in *ds*.
-                - ``qa_mask_bits`` (Sequence[int]): Bit positions to mask.
-                  A pixel is masked if ``(qa_value >> bit) & 1`` is 1 for *any*
-                  listed bit.
 
         Returns:
             Dataset with masked pixels set to NaN.  The QA band is removed.
@@ -80,25 +66,17 @@ class QAMask(Processor):
         Raises:
             ValueError: If required params are missing or the QA band does not exist.
         """
-        qa_band = params.get("qa_band")
-        qa_mask_bits = params.get("qa_mask_bits")
-
-        if not qa_band or qa_mask_bits is None:
+        if self.qa_band not in ds.data_vars:
             raise ValueError(
-                "QAMask requires params['qa_band'] and params['qa_mask_bits']."
+                f"QAMask: QA band '{self.qa_band}' not found in dataset. Available: {list(ds.data_vars)}"
             )
 
-        if qa_band not in ds.data_vars:
-            raise ValueError(
-                f"QAMask: QA band '{qa_band}' not found in dataset. Available: {list(ds.data_vars)}"
-            )
-
-        qa = ds[qa_band]
+        qa = ds[self.qa_band]
         mask = np.zeros(qa.shape, dtype=bool)
-        for bit in qa_mask_bits:
+        for bit in self.qa_mask_bits:
             mask |= ((qa.values >> bit) & 1).astype(bool)
 
-        masked = ds.drop_vars(qa_band)
+        masked = ds.drop_vars(self.qa_band)
         for var in masked.data_vars:
             masked[var] = masked[var].where(~mask)
 
@@ -113,47 +91,36 @@ class NDVI(Processor):
     and only the ``ndvi`` variable is retained.
     """
 
-    supported_collections = ("*",)
-    stage = "post_reproject"
+    ndvi_nir_band: str
+    ndvi_red_band: str
 
-    def process(self, ds: AereoDataset, params: Mapping[str, Any]) -> AereoDataset:
+    def __call__(self, ds: AereoDataset) -> AereoDataset:
         """Compute NDVI = (NIR - Red) / (NIR + Red).
 
         Args:
             ds: Input dataset containing red and NIR variables.
-            params: Must contain:
-                - ``ndvi_nir_band`` (str): Name of the NIR variable.
-                - ``ndvi_red_band`` (str): Name of the red variable.
 
         Returns:
             Dataset with a single ``ndvi`` variable.  Source bands are removed.
 
         Raises:
-            ValueError: If required params are missing or bands are not found.
+            ValueError: If NIR/red bands are not found.
         """
-        nir_band = params.get("ndvi_nir_band")
-        red_band = params.get("ndvi_red_band")
-
-        if not nir_band or not red_band:
+        if self.ndvi_nir_band not in ds.data_vars:
             raise ValueError(
-                "NDVI requires params['ndvi_nir_band'] and params['ndvi_red_band']."
+                f"NDVI: NIR band '{self.ndvi_nir_band}' not found. Available: {list(ds.data_vars)}"
+            )
+        if self.ndvi_red_band not in ds.data_vars:
+            raise ValueError(
+                f"NDVI: red band '{self.ndvi_red_band}' not found. Available: {list(ds.data_vars)}"
             )
 
-        if nir_band not in ds.data_vars:
-            raise ValueError(
-                f"NDVI: NIR band '{nir_band}' not found. Available: {list(ds.data_vars)}"
-            )
-        if red_band not in ds.data_vars:
-            raise ValueError(
-                f"NDVI: red band '{red_band}' not found. Available: {list(ds.data_vars)}"
-            )
-
-        nir = ds[nir_band]
-        red = ds[red_band]
+        nir = ds[self.ndvi_nir_band]
+        red = ds[self.ndvi_red_band]
         ndvi = (nir - red) / (nir + red)
         ndvi = ndvi.where((nir + red) != 0)
 
-        result = ds.drop_vars([nir_band, red_band])
+        result = ds.drop_vars([self.ndvi_nir_band, self.ndvi_red_band])
         result["ndvi"] = ndvi
         return result
 
@@ -165,16 +132,13 @@ class Normalize(Processor):
     when computing statistics.
     """
 
-    supported_collections = ("*",)
-    stage = "post_reproject"
+    normalize_method: str = "minmax"
 
-    def process(self, ds: AereoDataset, params: Mapping[str, Any]) -> AereoDataset:
+    def __call__(self, ds: AereoDataset) -> AereoDataset:
         """Normalise each data variable.
 
         Args:
             ds: Input dataset.
-            params: Must contain:
-                - ``normalize_method`` (str): Either ``"minmax"`` or ``"zscore"``.
 
         Returns:
             Dataset with normalised variables.
@@ -182,7 +146,7 @@ class Normalize(Processor):
         Raises:
             ValueError: If the method is unknown.
         """
-        method = params.get("normalize_method", "minmax")
+        method = self.normalize_method
 
         if method not in ("minmax", "zscore"):
             raise ValueError(
@@ -214,17 +178,13 @@ class Composite(Processor):
     max).  Useful for creating cloud-free or best-pixel composites.
     """
 
-    supported_collections = ("*",)
-    stage = "post_reproject"
+    composite_method: str = "median"
 
-    def process(self, ds: AereoDataset, params: Mapping[str, Any]) -> AereoDataset:
+    def __call__(self, ds: AereoDataset) -> AereoDataset:
         """Reduce the ``time`` dimension to a single composite.
 
         Args:
             ds: Input dataset with a ``time`` dimension.
-            params: Must contain:
-                - ``composite_method`` (str): One of ``"median"``, ``"mean"``,
-                  ``"max"``, ``"min"``.
 
         Returns:
             Dataset with the ``time`` dimension reduced to a single step.
@@ -232,7 +192,7 @@ class Composite(Processor):
         Raises:
             ValueError: If the method is unknown or ``time`` is missing.
         """
-        method = params.get("composite_method", "median")
+        method = self.composite_method
 
         if "time" not in ds.dims:
             raise ValueError("Composite requires a 'time' dimension in the dataset.")

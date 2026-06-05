@@ -7,12 +7,12 @@ them with Major TOM format parquet files.
 import datetime
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import geopandas as gpd
 import pandas as pd
 
-from aereo.interfaces import AereoProfile
+# Removed AereoProfile import
 
 # Known EOIDS key tokens — order matters for greedy matching
 _EOIDS_KEYS = (
@@ -43,19 +43,26 @@ def _normalize_suffix(suffix: str) -> str:
     return suffix.lstrip(".")
 
 
-def _write_profile_meta(base_dir: Path, profile: AereoProfile) -> None:
+def _write_profile_meta(
+    base_dir: Path, profile_name: str, meta: dict[str, Any] | None = None
+) -> None:
     profile_path = base_dir / "profile.json"
-    if not profile_path.exists():
+    if not profile_path.exists() and meta is not None:
+        import json
+
         profile_path.write_text(
-            profile.model_dump_json(exclude={"downloader"}, indent=2),
+            json.dumps(meta, indent=2),
             encoding="utf-8",
         )
 
 
 def build_eoids_path(
     local_dir: str | Path,
-    profile: AereoProfile,
+    profile_name: str,
+    resolution: float,
     *,
+    collections: Sequence[str] | None = None,
+    variables: Sequence[str] | None = None,
     cell_id: str | None = None,
     start_time: datetime.datetime | None = None,
     end_time: datetime.datetime | None = None,
@@ -63,12 +70,12 @@ def build_eoids_path(
     desc: str | None = None,
     suffix: str = "tif",
     write_profile_meta: bool = True,
+    meta_dict: dict[str, Any] | None = None,
     **_kwargs: Any,
 ) -> Path:
     """Build an Earth Observation Imaging Data Structure (EOIDS) compliant file path.
 
-    ``collection`` and ``variable`` are automatically derived from
-    ``profile.collections`` and encoded in the filename (joined by ``+`` when
+    ``collection`` and ``variable`` are encoded in the filename (joined by ``+`` when
     multiple values exist).  The ``variable`` segment names the *set* of bands
     that will be stored as separate raster bands inside the single file — it
     does **not** cause the variables to be split into separate files.
@@ -80,8 +87,10 @@ def build_eoids_path(
 
     Args:
         local_dir: Root directory for the dataset.
-        profile: The AereoProfile used for extraction. Provides the profile name,
-            default resolution, and collection/variable mapping.
+        profile_name: The name of the profile.
+        resolution: Target resolution.
+        collections: Sequence of collection identifiers.
+        variables: Sequence of variables/bands.
         cell_id: Geographic cell identifier (e.g., '36D61L').
         start_time: Start time of the observation.
         end_time: End time of the observation.
@@ -89,10 +98,10 @@ def build_eoids_path(
         desc: Custom descriptor for the file (e.g., 'cloudmask').
         suffix: File extension (default: 'tif').
         write_profile_meta: When *True* (the default), serialize the full
-            ``AereoProfile`` to ``profile.json`` in the profile directory on the
+            metadata to ``profile.json`` in the profile directory on the
             first call.
+        meta_dict: Optional metadata dictionary to save as profile.json.
     """
-    derivative = derivative or getattr(profile, "derivative", None)
     parts: list[str] = []
 
     safe_cell = _sanitize_cell(cell_id) if cell_id else None
@@ -103,18 +112,14 @@ def build_eoids_path(
         parts.append(f"start-{start_time.strftime(_EOIDS_DT_FMT)}")
     if end_time:
         parts.append(f"end-{end_time.strftime(_EOIDS_DT_FMT)}")
-    parts.append(f"profile-{profile.name}")
+    parts.append(f"profile-{profile_name}")
 
-    # Derive collection and variable from profile.collections
-    if profile.collections:
-        collections = list(profile.collections.keys())
-        variables = [v for vars_list in profile.collections.values() for v in vars_list]
-        if collections:
-            parts.append(f"collection-{('+').join(collections)}")
-        if variables:
-            parts.append(f"variable-{('+').join(variables)}")
+    if collections:
+        parts.append(f"collection-{('+').join(collections)}")
+    if variables:
+        parts.append(f"variable-{('+').join(variables)}")
 
-    res_str = f"{int(profile.resolution)}m"
+    res_str = f"{int(resolution)}m"
     parts.append(f"res-{res_str}")
     if desc:
         parts.append(f"desc-{desc}")
@@ -136,12 +141,12 @@ def build_eoids_path(
     if start_time:
         base_dir = base_dir / f"date-{start_time.strftime(_EOIDS_DATE_FMT)}"
 
-    base_dir = base_dir / f"profile-{profile.name}"
+    base_dir = base_dir / f"profile-{profile_name}"
 
     base_dir.mkdir(parents=True, exist_ok=True)
 
     if write_profile_meta:
-        _write_profile_meta(base_dir, profile)
+        _write_profile_meta(base_dir, profile_name, meta_dict)
 
     return base_dir / filename
 

@@ -5,27 +5,25 @@ from __future__ import annotations
 
 import json
 import pickle
+import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Any, Callable
+from typing import Any, Callable
 
 import geopandas as gpd
+import hydra
 import pandas as pd
-import typer
+from omegaconf import DictConfig
 from rich.console import Console
 from rich.table import Table
 
 from aereo.client import AereoClient
 from aereo.backends import LocalProcessBackend
-from aereo.interfaces import AereoProfile, GridConfig
 from aereo.schemas import AssetSchema
+from aereo.registry import AereoRegistry
 
-app = typer.Typer(
-    name="aereo",
-    help="AEREO — Modular satellite data discovery, extraction, and processing",
-    no_args_is_help=True,
-)
 console = Console()
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -86,18 +84,6 @@ def _parse_iso_datetime(value: str | None) -> datetime | None:
         Parsed datetime, or None if input was None.
     """
     return datetime.fromisoformat(value) if value else None
-
-
-def _load_grid_config(path: Path | None) -> GridConfig:
-    """Load a GridConfig from YAML, or return defaults.
-
-    Args:
-        path: Path to grid config YAML, or None.
-
-    Returns:
-        Loaded GridConfig, or a default instance if path is None or missing.
-    """
-    return GridConfig.from_yaml(path) if path and path.exists() else GridConfig()
 
 
 def _search_results_to_json(df: gpd.GeoDataFrame) -> list[dict[str, Any]]:
@@ -194,63 +180,30 @@ def _configure_verbose_logging(verbose: bool) -> None:
         structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(10))
 
 
-def _load_profiles(paths: list[Path]) -> list[AereoProfile]:
-    """Load AereoProfile instances from YAML file paths.
-
-    Args:
-        paths: List of paths to profile YAML files.
-
-    Returns:
-        List of loaded AereoProfile instances.
-
-    Raises:
-        typer.Exit: If a profile file is not found.
-    """
-    profiles: list[AereoProfile] = []
-    for p in paths:
-        if not p.exists():
-            console.print(f"[red]Profile not found:[/red] {p}")
-            raise typer.Exit(code=1)
-        profiles.extend(AereoProfile.from_yaml(p))
-    return profiles
-
-
-def _validate_yaml(path: Path, loader: Callable[[Path], Any], label: str) -> None:
-    """Validate a YAML file using the given schema loader.
-
-    Args:
-        path: Path to the YAML file.
-        loader: Callable that loads and validates the file.
-        label: Human-readable label for error messages.
-
-    Raises:
-        typer.Exit: If the file is not found or validation fails.
-    """
-    if not path.exists():
-        console.print(f"[red]{label} not found:[/red] {path}")
-        raise typer.Exit(code=1)
-    try:
-        loader(path)
-        console.print(f"[green]✓ {label} valid:[/green] {path}")
-    except Exception as exc:
-        console.print(f"[red]✗ {label} invalid:[/red] {path}\n{exc}")
-        raise typer.Exit(code=1)
-
-
-def _add_plugin_rows(table: Table, label: str, plugins: dict[str, type]) -> None:
+def _add_plugin_rows(
+    table: Table, label: str, plugins: dict[str, type], registry: AereoRegistry
+) -> None:
     """Add plugin summary rows to a Rich table.
 
     Args:
         table: Rich Table to append rows to.
         label: Human-readable plugin type label.
         plugins: Mapping of plugin name to plugin class.
+        registry: AereoRegistry instance to query metadata.
     """
     for name, cls in plugins.items():
-        cols = ", ".join(cls.supported_collections[:3])
-        if len(cls.supported_collections) > 3:
+        reg_key = label.lower()
+        collections = registry._registries[reg_key].get_collections(name)
+        cols = ", ".join(collections[:3])
+        if len(collections) > 3:
             cols += " ..."
-        req = str(len(getattr(cls, "required_params", [])))
-        opt = str(len(getattr(cls, "optional_params", [])))
+        try:
+            params = registry.get_plugin_params(name)
+            req = str(len(params.get("required", [])))
+            opt = str(len(params.get("optional", [])))
+        except Exception:
+            req = "0"
+            opt = "0"
         table.add_row(label, name, cols, req, opt)
 
 
@@ -267,15 +220,12 @@ def _run_with_exit(
 
     Returns:
         The return value of *fn*.
-
-    Raises:
-        typer.Exit: With code 1 if *fn* raises an exception.
     """
     try:
         return fn(*args, **kwargs)
     except Exception as exc:
         console.print(f"[red]{label} failed:[/red] {exc}")
-        raise typer.Exit(code=1)
+        sys.exit(1)
 
 
 def _check_results(results: gpd.GeoDataFrame | None) -> None:
@@ -283,361 +233,14 @@ def _check_results(results: gpd.GeoDataFrame | None) -> None:
 
     Args:
         results: GeoDataFrame from a search operation.
-
-    Raises:
-        typer.Exit: With code 2 if *results* is None or empty.
     """
     if results is None or len(results) == 0:
         console.print("[yellow]No results found.[/yellow]")
-        raise typer.Exit(code=2)
+        sys.exit(2)
 
 
-# ---------------------------------------------------------------------------
-# Commands
-# ---------------------------------------------------------------------------
-
-
-@app.command()
-def search(
-    profile: Annotated[
-        list[Path],
-        typer.Option("--profile", "-p", help="Path to profile YAML (repeatable)"),
-    ],
-    config: Annotated[
-        Path | None, typer.Option("--config", "-c", help="Path to grid config YAML")
-    ] = None,
-    geojson: Annotated[
-        Path | None, typer.Option("--geojson", "-g", help="Path to AOI GeoJSON file")
-    ] = None,
-    start: Annotated[
-        str | None, typer.Option("--start", "-s", help="Start datetime (ISO 8601)")
-    ] = None,
-    end: Annotated[
-        str | None, typer.Option("--end", "-e", help="End datetime (ISO 8601)")
-    ] = None,
-    output: Annotated[
-        Path | None,
-        typer.Option("--output", "-o", help="Output JSON file for search results"),
-    ] = None,
-    fmt: Annotated[
-        str, typer.Option("--format", help="Output format: table or json")
-    ] = "table",
-    verbose: Annotated[
-        bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
-    ] = False,
-) -> None:
-    """Search for satellite data across configured profiles.
-
-    Args:
-        profile: Paths to profile YAML files.
-        config: Optional path to grid config YAML.
-        geojson: Optional path to AOI GeoJSON file.
-        start: Optional start datetime (ISO 8601).
-        end: Optional end datetime (ISO 8601).
-        output: Optional output JSON file path.
-        fmt: Output format ("table" or "json").
-        verbose: Enable verbose logging.
-
-    Returns:
-        None. Prints results or writes to output file.
-    """
-    _configure_verbose_logging(verbose)
-    profiles = _load_profiles(profile)
-
-    # Load geometry
-    intersects = _load_geometry_safe(geojson)
-
-    # Parse datetimes
-    start_dt = _parse_iso_datetime(start)
-    end_dt = _parse_iso_datetime(end)
-
-    client = AereoClient()
-    results = _run_with_exit(
-        "Search",
-        client.search,
-        profiles=profiles,
-        intersects=intersects,
-        start_datetime=start_dt,
-        end_datetime=end_dt,
-    )
-    _check_results(results)
-
-    if fmt == "json":
-        records = _search_results_to_json(results)
-        json_out = json.dumps(records, indent=2, default=str)
-        if output:
-            output.write_text(json_out)
-            console.print(f"[green]Wrote {len(records)} results to[/green] {output}")
-        else:
-            console.print(json_out)
-    else:
-        _print_search_table(results)
-        if output:
-            records = _search_results_to_json(results)
-            output.write_text(json.dumps(records, indent=2, default=str))
-            console.print(f"[green]Wrote results to[/green] {output}")
-
-
-@app.command()
-def prepare(
-    search_results: Annotated[Path, typer.Argument(help="Path to search results JSON")],
-    profile: Annotated[
-        list[Path],
-        typer.Option("--profile", "-p", help="Path to profile YAML (repeatable)"),
-    ],
-    config: Annotated[
-        Path | None, typer.Option("--config", "-c", help="Path to grid config YAML")
-    ] = None,
-    output_dir: Annotated[
-        Path, typer.Option("--output-dir", "-d", help="Output directory for extraction")
-    ] = Path("./out"),
-    output: Annotated[
-        Path | None,
-        typer.Option("--output", "-o", help="Output pickle file for tasks"),
-    ] = None,
-    cells_per_task: Annotated[
-        int, typer.Option("--cells-per-task", help="Max grid cells per task")
-    ] = 50,
-    verbose: Annotated[
-        bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
-    ] = False,
-) -> None:
-    """Prepare search results for extraction.
-
-    Args:
-        search_results: Path to search results JSON.
-        profile: Paths to profile YAML files.
-        config: Optional path to grid config YAML.
-        output_dir: Output directory for extraction tasks.
-        output: Optional pickle file path for tasks.
-        cells_per_task: Max grid cells per task.
-        verbose: Enable verbose logging.
-
-    Returns:
-        None. Writes prepared tasks to a pickle file.
-    """
-    _configure_verbose_logging(verbose)
-
-    if not search_results.exists():
-        console.print(f"[red]Search results not found:[/red] {search_results}")
-        raise typer.Exit(code=1)
-
-    records = json.loads(search_results.read_text())
-    df = _search_results_from_json(records)
-
-    profiles = _load_profiles(profile)
-
-    grid_config = _load_grid_config(config)
-
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    client = AereoClient()
-    tasks = _run_with_exit(
-        "Prepare",
-        client.prepare_for_extraction,
-        search_results=df,  # type: ignore[arg-type]
-        grid_config=grid_config,
-        profiles=profiles,
-        uri=str(output_dir),
-        cells_per_task=cells_per_task,
-    )
-
-    task_file = output or (output_dir / "tasks.pkl")
-    task_file.write_bytes(pickle.dumps(tasks))
-    console.print(
-        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cells_per_task}).[/green]"
-    )
-    console.print(f"[green]Wrote tasks to[/green] {task_file}")
-
-
-@app.command()
-def extract(
-    tasks: Annotated[Path, typer.Argument(help="Path to prepared tasks pickle file")],
-    output_dir: Annotated[
-        Path, typer.Option("--output-dir", "-d", help="Output directory")
-    ] = Path("./out"),
-    workers: Annotated[
-        int, typer.Option("--workers", "-w", help="Max batch workers")
-    ] = 1,
-    verbose: Annotated[
-        bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
-    ] = False,
-) -> None:
-    """Run extraction on prepared tasks.
-
-    Args:
-        tasks: Path to prepared tasks pickle file.
-        output_dir: Output directory for artifacts.
-        workers: Max batch workers.
-        verbose: Enable verbose logging.
-
-    Returns:
-        None. Writes extracted artifacts to parquet.
-    """
-    _configure_verbose_logging(verbose)
-
-    if not tasks.exists():
-        console.print(f"[red]Tasks file not found:[/red] {tasks}")
-        raise typer.Exit(code=1)
-
-    task_list = pickle.loads(tasks.read_bytes())
-
-    backend = LocalProcessBackend(max_workers=workers)
-    client = AereoClient()
-    artifacts = _run_with_exit(
-        "Extraction", client.execute_tasks, task_list, backend=backend
-    )
-
-    # Write full GeoDataFrame to parquet
-    parquet_path = output_dir / "artifacts.parquet"
-    artifacts.to_parquet(parquet_path)
-
-    console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
-    console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
-    console.print(f"[green]Output directory:[/green] {output_dir}")
-
-
-@app.command()
-def run(
-    profile: Annotated[
-        list[Path],
-        typer.Option("--profile", "-p", help="Path to profile YAML (repeatable)"),
-    ],
-    config: Annotated[
-        Path | None, typer.Option("--config", "-c", help="Path to grid config YAML")
-    ] = None,
-    geojson: Annotated[
-        Path | None, typer.Option("--geojson", "-g", help="Path to AOI GeoJSON file")
-    ] = None,
-    start: Annotated[
-        str | None, typer.Option("--start", "-s", help="Start datetime (ISO 8601)")
-    ] = None,
-    end: Annotated[
-        str | None, typer.Option("--end", "-e", help="End datetime (ISO 8601)")
-    ] = None,
-    output_dir: Annotated[
-        Path, typer.Option("--output-dir", "-d", help="Output directory")
-    ] = Path("./out"),
-    workers: Annotated[
-        int, typer.Option("--workers", "-w", help="Max batch workers")
-    ] = 1,
-    cells_per_task: Annotated[
-        int, typer.Option("--cells-per-task", help="Max grid cells per task")
-    ] = 50,
-    verbose: Annotated[
-        bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
-    ] = False,
-) -> None:
-    """One-shot: search → prepare → extract.
-
-    Args:
-        profile: Paths to profile YAML files.
-        config: Optional path to grid config YAML.
-        geojson: Optional path to AOI GeoJSON file.
-        start: Optional start datetime (ISO 8601).
-        end: Optional end datetime (ISO 8601).
-        output_dir: Output directory for artifacts.
-        workers: Max batch workers.
-        cells_per_task: Max grid cells per task.
-        verbose: Enable verbose logging.
-
-    Returns:
-        None. Writes extracted artifacts to parquet.
-    """
-    _configure_verbose_logging(verbose)
-    profiles = _load_profiles(profile)
-
-    grid_config = _load_grid_config(config)
-    intersects = _load_geometry_safe(geojson)
-    start_dt = _parse_iso_datetime(start)
-    end_dt = _parse_iso_datetime(end)
-
-    output_dir.mkdir(parents=True, exist_ok=True)
-    client = AereoClient()
-
-    # Search
-    console.print("[bold blue]🔍 Searching...[/bold blue]")
-    results = _run_with_exit(
-        "Search",
-        client.search,
-        profiles=profiles,
-        intersects=intersects,
-        start_datetime=start_dt,
-        end_datetime=end_dt,
-    )
-    _check_results(results)
-    console.print(f"[green]✓ Found {len(results)} scenes.[/green]")
-
-    # Prepare
-    console.print("[bold blue]📦 Preparing...[/bold blue]")
-    tasks = _run_with_exit(
-        "Prepare",
-        client.prepare_for_extraction,
-        search_results=results,
-        grid_config=grid_config,
-        profiles=profiles,
-        uri=str(output_dir),
-        cells_per_task=cells_per_task,
-    )
-    console.print(
-        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cells_per_task}).[/green]"
-    )
-
-    # Extract
-    console.print("[bold blue]⛏️ Extracting...[/bold blue]")
-    backend = LocalProcessBackend(max_workers=workers)
-    artifacts = _run_with_exit(
-        "Extraction", client.execute_tasks, tasks, backend=backend
-    )
-
-    parquet_path = output_dir / "artifacts.parquet"
-    artifacts.to_parquet(parquet_path)
-
-    console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
-    console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
-    console.print(f"[green]Output:[/green] {output_dir}")
-
-
-@app.command()
-def validate(
-    config: Annotated[
-        Path | None,
-        typer.Option("--config", "-c", help="Path to config YAML to validate"),
-    ] = None,
-    profile: Annotated[
-        Path | None,
-        typer.Option("--profile", "-p", help="Path to profile YAML to validate"),
-    ] = None,
-) -> None:
-    """Validate a config or profile YAML against AEREO schemas.
-
-    Args:
-        config: Optional path to config YAML to validate.
-        profile: Optional path to profile YAML to validate.
-
-    Returns:
-        None. Prints validation result.
-    """
-    if config:
-        _validate_yaml(config, GridConfig.from_yaml, "Config")
-
-    if profile:
-        _validate_yaml(profile, AereoProfile.from_yaml, "Profile")
-
-    if not config and not profile:
-        console.print("[yellow]Provide --config or --profile to validate.[/yellow]")
-        raise typer.Exit(code=1)
-
-
-@app.command()
-def plugins() -> None:
-    """List installed AEREO plugins.
-
-    Returns:
-        None. Prints a table of installed plugins.
-    """
-    from aereo.registry import AereoRegistry
-
+def plugins_cmd() -> None:
+    """List installed AEREO plugins."""
     registry = AereoRegistry()
 
     table = Table(title="Installed AEREO Plugins")
@@ -647,32 +250,28 @@ def plugins() -> None:
     table.add_column("Required", style="yellow")
     table.add_column("Optional", style="blue")
 
-    _add_plugin_rows(table, "Searcher", registry._searchers)
+    _add_plugin_rows(table, "Searcher", registry._searchers, registry)
 
     for label in ("reader", "reprojector", "processor", "writer"):
-        _add_plugin_rows(table, label.capitalize(), registry._registries[label].plugins)
+        _add_plugin_rows(
+            table, label.capitalize(), registry._registries[label].plugins, registry
+        )
 
     console.print(table)
 
 
-@app.command()
-def plugin_params(name: str) -> None:
+def plugin_params_cmd(name: str) -> None:
     """Show parameters for a specific AEREO plugin.
 
     Args:
         name: Name of the plugin to inspect.
-
-    Returns:
-        None. Prints a table of plugin parameters.
     """
-    from aereo.registry import AereoRegistry
-
     registry = AereoRegistry()
     try:
         params = registry.get_plugin_params(name)
     except KeyError:
         console.print(f"[red]Plugin '{name}' not found.[/red]")
-        raise typer.Exit(code=1)
+        sys.exit(1)
 
     table = Table(title=f"Parameters for {name}")
     table.add_column("Type", style="cyan")
@@ -696,6 +295,236 @@ def plugin_params(name: str) -> None:
     console.print(table)
 
 
-# Entry point for `python -m aer.cli`
+# ---------------------------------------------------------------------------
+# Main Entry Point with Hydra
+# ---------------------------------------------------------------------------
+
+
+@hydra.main(version_base=None, config_path="conf", config_name="config")
+def main(cfg: DictConfig) -> None:
+    """Main execution entry point loaded by Hydra."""
+    # Setup logging
+    _configure_verbose_logging(cfg.verbose)
+
+    action = cfg.get("action", "run")
+
+    if action == "search":
+        if not cfg.get("search"):
+            console.print(
+                "[red]No search provider configuration provided (search key is missing).[/red]"
+            )
+            sys.exit(1)
+
+        search_provider = hydra.utils.instantiate(cfg.search)
+
+        update_dict = {}
+        intersects = _load_geometry_safe(Path(cfg.geojson) if cfg.geojson else None)
+        if intersects:
+            update_dict["intersects"] = intersects
+        start_dt = _parse_iso_datetime(cfg.start)
+        if start_dt:
+            update_dict["start_datetime"] = start_dt
+        end_dt = _parse_iso_datetime(cfg.end)
+        if end_dt:
+            update_dict["end_datetime"] = end_dt
+
+        if update_dict:
+            search_provider = search_provider.model_copy(update=update_dict)
+
+        client = AereoClient()
+        results = _run_with_exit(
+            "Search",
+            client.search,
+            search_provider=search_provider,
+        )
+        _check_results(results)
+
+        fmt = cfg.get("format", "table")
+        if fmt == "json":
+            records = _search_results_to_json(results)
+            json_out = json.dumps(records, indent=2, default=str)
+            if cfg.output:
+                Path(cfg.output).write_text(json_out)
+                console.print(
+                    f"[green]Wrote {len(records)} results to[/green] {cfg.output}"
+                )
+            else:
+                console.print(json_out)
+        else:
+            _print_search_table(results)
+            if cfg.output:
+                records = _search_results_to_json(results)
+                Path(cfg.output).write_text(json.dumps(records, indent=2, default=str))
+                console.print(f"[green]Wrote results to[/green] {cfg.output}")
+
+    elif action == "prepare":
+        if not cfg.get("search_results"):
+            console.print(
+                "[red]search_results file path is required for prepare action.[/red]"
+            )
+            sys.exit(1)
+
+        search_results_path = Path(cfg.search_results)
+        if not search_results_path.exists():
+            console.print(f"[red]Search results not found:[/red] {search_results_path}")
+            sys.exit(1)
+
+        records = json.loads(search_results_path.read_text())
+        df = _search_results_from_json(records)
+
+        pipeline = hydra.utils.instantiate(cfg.pipeline)
+        grid_config = hydra.utils.instantiate(cfg.grid_config)
+
+        output_dir = Path(cfg.output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        client = AereoClient()
+        tasks = _run_with_exit(
+            "Prepare",
+            client.prepare_tasks,
+            search_results=df,
+            grid_config=grid_config,
+            pipeline=pipeline,
+            uri=str(output_dir),
+            cells_per_task=cfg.cells_per_task,
+        )
+
+        task_file = Path(cfg.output) if cfg.output else (output_dir / "tasks.pkl")
+        task_file.write_bytes(pickle.dumps(tasks))
+        console.print(
+            f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cfg.cells_per_task}).[/green]"
+        )
+        console.print(f"[green]Wrote tasks to[/green] {task_file}")
+
+    elif action == "extract":
+        if not cfg.get("tasks"):
+            console.print(
+                "[red]tasks pickle file path is required for extract action.[/red]"
+            )
+            sys.exit(1)
+
+        tasks_path = Path(cfg.tasks)
+        if not tasks_path.exists():
+            console.print(f"[red]Tasks file not found:[/red] {tasks_path}")
+            sys.exit(1)
+
+        task_list = pickle.loads(tasks_path.read_bytes())
+
+        backend = LocalProcessBackend(max_workers=cfg.workers)
+        client = AereoClient()
+        artifacts = _run_with_exit(
+            "Extraction", client.execute_tasks, task_list, backend=backend
+        )
+
+        output_dir = Path(cfg.output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        parquet_path = output_dir / "artifacts.parquet"
+        artifacts.to_parquet(parquet_path)
+
+        console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
+        console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
+        console.print(f"[green]Output directory:[/green] {output_dir}")
+
+    elif action == "run":
+        if not cfg.get("search"):
+            console.print(
+                "[red]No search provider configuration provided (search key is missing).[/red]"
+            )
+            sys.exit(1)
+
+        search_provider = hydra.utils.instantiate(cfg.search)
+
+        update_dict = {}
+        intersects = _load_geometry_safe(Path(cfg.geojson) if cfg.geojson else None)
+        if intersects:
+            update_dict["intersects"] = intersects
+        start_dt = _parse_iso_datetime(cfg.start)
+        if start_dt:
+            update_dict["start_datetime"] = start_dt
+        end_dt = _parse_iso_datetime(cfg.end)
+        if end_dt:
+            update_dict["end_datetime"] = end_dt
+
+        if update_dict:
+            search_provider = search_provider.model_copy(update=update_dict)
+
+        pipeline = hydra.utils.instantiate(cfg.pipeline)
+        grid_config = hydra.utils.instantiate(cfg.grid_config)
+
+        output_dir = Path(cfg.output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        client = AereoClient()
+
+        # Search
+        console.print("[bold blue]🔍 Searching...[/bold blue]")
+        results = _run_with_exit(
+            "Search",
+            client.search,
+            search_provider=search_provider,
+        )
+        _check_results(results)
+        console.print(f"[green]✓ Found {len(results)} scenes.[/green]")
+
+        # Prepare
+        console.print("[bold blue]📦 Preparing...[/bold blue]")
+        tasks = _run_with_exit(
+            "Prepare",
+            client.prepare_tasks,
+            search_results=results,
+            pipeline=pipeline,
+            grid_config=grid_config,
+            uri=str(output_dir),
+            cells_per_task=cfg.cells_per_task,
+        )
+        console.print(
+            f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cfg.cells_per_task}).[/green]"
+        )
+
+        # Extract
+        console.print("[bold blue]⛏️ Extracting...[/bold blue]")
+        backend = LocalProcessBackend(max_workers=cfg.workers)
+        artifacts = _run_with_exit(
+            "Extraction", client.execute_tasks, tasks, backend=backend
+        )
+
+        parquet_path = output_dir / "artifacts.parquet"
+        artifacts.to_parquet(parquet_path)
+
+        console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
+        console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
+        console.print(f"[green]Output:[/green] {output_dir}")
+
+    elif action == "validate":
+        # Simply attempting to load and validate model signatures
+        # Since Hydra does instantiation, validation happens during loading.
+        try:
+            if cfg.get("search"):
+                hydra.utils.instantiate(cfg.search)
+            if cfg.get("pipeline"):
+                hydra.utils.instantiate(cfg.pipeline)
+            if cfg.get("grid_config"):
+                hydra.utils.instantiate(cfg.grid_config)
+            console.print("[green]✓ Configuration is valid.[/green]")
+        except Exception as exc:
+            console.print(f"[red]✗ Configuration is invalid:[/red] {exc}")
+            sys.exit(1)
+
+    elif action == "plugins":
+        plugins_cmd()
+
+    elif action == "plugin_params":
+        if not cfg.get("plugin_name"):
+            console.print(
+                "[red]plugin_name is required for plugin_params action.[/red]"
+            )
+            sys.exit(1)
+        plugin_params_cmd(cfg.plugin_name)
+
+    else:
+        console.print(f"[red]Unknown action: {action}[/red]")
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    app()
+    main()

@@ -13,7 +13,7 @@ from shapely.geometry import box
 
 from aereo.builtins import ReadODCSTAC
 from aereo.grid import GridCell
-from aereo.interfaces.core import AereoProfile, ExtractionTask, GridConfig
+from aereo.interfaces.core import ExtractionTask, GridConfig
 from aereo.schemas.core import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -61,6 +61,7 @@ def _make_task(stac_item_dict: dict[str, Any] | None = None, aoi=None):
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
     valid_df["geometry"] = box(-70.5, -33.5, -70.0, -33.0)
     valid_df["collection"] = "sentinel-2-l2a"
+    valid_df["channel_id"] = "B04"
     valid_df["start_time"] = pd.Timestamp("2026-01-01T12:00:00")
     valid_df["end_time"] = pd.Timestamp("2026-01-01T12:10:00")
     if stac_item_dict is not None:
@@ -75,11 +76,7 @@ def _make_task(stac_item_dict: dict[str, Any] | None = None, aoi=None):
     )
     return ExtractionTask(
         assets=GeoDataFrame(valid_df),
-        profile=AereoProfile(
-            name="s2_test",
-            resolution=100.0,
-            collections={"sentinel-2-l2a": ["B04", "B08"]},
-        ),
+        pipeline=[],
         uri="/tmp/test",
         grid_cells=[cell],
         grid_config=grid_config,
@@ -109,32 +106,30 @@ def _make_fake_ds() -> xr.Dataset:
 # ---------------------------------------------------------------------------
 
 
-def test_read_odcstac_only_odc_params_registered():
-    """ReadODCSTAC exposes only the odc_params dict — no bespoke params."""
-    reader = ReadODCSTAC()
-    names = {p.name for p in reader.optional_params}
-    assert names == {"odc_params"}
+def test_read_odcstac_fields():
+    """ReadODCSTAC exposes the odc_params Pydantic field."""
+    assert "odc_params" in ReadODCSTAC.model_fields
 
 
 def test_read_odcstac_raises_without_stac_item_column():
-    """read() raises ValueError when stac_item column is absent."""
+    """__call__() raises ValueError when stac_item column is absent."""
     task = _make_task(stac_item_dict=None)
     reader = ReadODCSTAC()
     with pytest.raises(ValueError, match="stac_item"):
-        reader.read(task, {})
+        reader(task)
 
 
 def test_read_odcstac_raises_with_all_none_stac_items():
-    """read() raises ValueError when all stac_item values are None."""
+    """__call__() raises ValueError when all stac_item values are None."""
     task = _make_task(stac_item_dict=None)
     task.assets["stac_item"] = [None]
     reader = ReadODCSTAC()
     with pytest.raises(ValueError, match="No valid STAC items"):
-        reader.read(task, {})
+        reader(task)
 
 
 def test_read_odcstac_calls_odc_load_with_bbox(monkeypatch):
-    """read() auto-injects bbox from grid cells and passes it to odc.stac.load."""
+    """__call__() auto-injects bbox from grid cells and passes it to odc.stac.load."""
     fake_ds = _make_fake_ds()
     captured: dict[str, Any] = {}
 
@@ -147,10 +142,10 @@ def test_read_odcstac_calls_odc_load_with_bbox(monkeypatch):
 
     task = _make_task(_make_stac_item_dict())
     reader = ReadODCSTAC()
-    result = reader.read(task, {})
+    result = reader(task)
 
     assert "bbox" in captured["kwargs"]
-    assert captured["kwargs"]["bands"] == ["B04", "B08"]  # inferred from profile
+    assert captured["kwargs"]["bands"] == ["B04"]
     assert result is fake_ds
 
 
@@ -166,9 +161,9 @@ def test_read_odcstac_explicit_bands_override(monkeypatch):
     monkeypatch.setattr("aereo.builtins.read.odc_load", fake_odc_load)
 
     task = _make_task(_make_stac_item_dict())
-    reader = ReadODCSTAC()
-    reader.read(task, {"odc_params": {"bands": ["B04"]}})
-    assert captured["kwargs"]["bands"] == ["B04"]
+    reader = ReadODCSTAC(odc_params={"bands": ["B04", "B08"]})
+    reader(task)
+    assert captured["kwargs"]["bands"] == ["B04", "B08"]
 
 
 def test_read_odcstac_explicit_bbox_not_overridden(monkeypatch):
@@ -184,8 +179,8 @@ def test_read_odcstac_explicit_bbox_not_overridden(monkeypatch):
 
     custom_bbox = (-71.0, -34.0, -69.0, -32.0)
     task = _make_task(_make_stac_item_dict())
-    reader = ReadODCSTAC()
-    reader.read(task, {"odc_params": {"bbox": custom_bbox}})
+    reader = ReadODCSTAC(odc_params={"bbox": custom_bbox})
+    reader(task)
     assert captured["kwargs"]["bbox"] == custom_bbox
 
 
@@ -210,6 +205,7 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
         }
     valid_df["geometry"] = box(-70.5, -33.5, -70.0, -33.0)
     valid_df["collection"] = "sentinel-2-l2a"
+    valid_df["channel_id"] = "B04"
     valid_df["start_time"] = pd.Timestamp("2026-01-01T12:00:00")
     valid_df["end_time"] = pd.Timestamp("2026-01-01T12:10:00")
     valid_df["stac_item"] = [item_dict, item_dict]
@@ -223,20 +219,20 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
     )
     task = ExtractionTask(
         assets=GeoDataFrame(valid_df),
-        profile=AereoProfile(name="s2_test", resolution=100.0),
+        pipeline=[],
         uri="/tmp/test",
         grid_cells=[cell],
         grid_config=grid_config,
     )
 
     reader = ReadODCSTAC()
-    reader.read(task, {})
+    reader(task)
 
     assert len(captured["items"]) == 1
 
 
 def test_read_odcstac_infers_time_bounds(monkeypatch):
-    """read() tags ds.attrs with start_time and end_time."""
+    """__call__() tags ds.attrs with start_time and end_time."""
     fake_ds = _make_fake_ds()
 
     def fake_odc_load(items, **kwargs):
@@ -246,7 +242,7 @@ def test_read_odcstac_infers_time_bounds(monkeypatch):
 
     task = _make_task(_make_stac_item_dict())
     reader = ReadODCSTAC()
-    result = reader.read(task, {})
+    result = reader(task)
 
     assert "start_time" in result.attrs
     assert "end_time" in result.attrs
@@ -265,17 +261,14 @@ def test_read_odcstac_forwards_odc_params(monkeypatch):
     monkeypatch.setattr("aereo.builtins.read.odc_load", fake_odc_load)
 
     task = _make_task(_make_stac_item_dict())
-    reader = ReadODCSTAC()
-    reader.read(
-        task,
-        {
-            "odc_params": {
-                "resampling": "bilinear",
-                "groupby": "solar_day",
-                "chunks": {"x": 1024, "y": 1024},
-            }
-        },
+    reader = ReadODCSTAC(
+        odc_params={
+            "resampling": "bilinear",
+            "groupby": "solar_day",
+            "chunks": {"x": 1024, "y": 1024},
+        }
     )
+    reader(task)
 
     assert captured["kwargs"]["resampling"] == "bilinear"
     assert captured["kwargs"]["groupby"] == "solar_day"

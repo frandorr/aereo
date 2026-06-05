@@ -1,29 +1,21 @@
 import datetime
 from pathlib import Path
 
-import pytest
 
 from aereo.eoids import build_eoids_path, parse_eoids_filename
 from aereo.eoids.core import _matches_filter
-from aereo.interfaces import AereoProfile
 
 
-@pytest.fixture()
-def dummy_profile():
-    return AereoProfile(
-        name="goes_c01",
-        resolution=1000.0,
-        collections={"ABI-L1b-RadF": ["C01"]},
-    )
-
-
-def test_build_eoids_path_basic(dummy_profile):
+def test_build_eoids_path_basic():
     st = datetime.datetime(2026, 1, 1, 10, 0, 22)
     et = datetime.datetime(2026, 1, 1, 10, 9, 32)
 
     path = build_eoids_path(
         local_dir="/tmp/dataset",
-        profile=dummy_profile,
+        profile_name="goes_c01",
+        resolution=1000.0,
+        collections=["ABI-L1b-RadF"],
+        variables=["C01"],
         cell_id="36D_61L",
         start_time=st,
         end_time=et,
@@ -39,45 +31,18 @@ def test_build_eoids_path_basic(dummy_profile):
     assert path.name == expected_filename
 
 
-def test_build_eoids_path_derivatives(dummy_profile):
+def test_build_eoids_path_derivatives():
     st = datetime.datetime(2026, 1, 1, 10, 0, 22)
 
     path = build_eoids_path(
         local_dir="/tmp/dataset",
-        profile=dummy_profile,
-        cell_id="36D_61L",
-        start_time=st,
-        derivative="cloud_mask",
-        desc="cloudprob",
-        suffix="nc",
-    )
-
-    expected_dir = Path(
-        "/tmp/dataset/derivatives/cloud_mask/loc-36D61L/date-20260101/profile-goes_c01"
-    )
-    expected_filename = (
-        "loc-36D61L_start-20260101T100022_profile-goes_c01_"
-        "collection-ABI-L1b-RadF_variable-C01_res-1000m_desc-cloudprob.nc"
-    )
-
-    assert path.parent == expected_dir
-    assert path.name == expected_filename
-
-
-def test_build_eoids_path_derivatives_from_profile():
-    profile = AereoProfile(
-        name="goes_c01",
+        profile_name="goes_c01",
         resolution=1000.0,
-        collections={"ABI-L1b-RadF": ["C01"]},
-        derivative="cloud_mask",
-    )
-    st = datetime.datetime(2026, 1, 1, 10, 0, 22)
-
-    path = build_eoids_path(
-        local_dir="/tmp/dataset",
-        profile=profile,
+        collections=["ABI-L1b-RadF"],
+        variables=["C01"],
         cell_id="36D_61L",
         start_time=st,
+        derivative="cloud_mask",
         desc="cloudprob",
         suffix="nc",
     )
