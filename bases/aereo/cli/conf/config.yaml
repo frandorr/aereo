@@ -1,0 +1,23 @@
+# default config.yaml
+action: run
+verbose: false
+
+# Overrides / options
+geojson: null
+start: null
+end: null
+output: null
+output_dir: ./out
+workers: 1
+cells_per_task: 50
+search_results: null
+tasks: null
+plugin_name: null
+format: table
+
+# ExtractionJob config defaults
+search: null
+pipeline: []
+grid_config:
+  target_grid_dist: 50000
+uri: ./out

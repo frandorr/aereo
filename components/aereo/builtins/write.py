@@ -6,12 +6,13 @@ datasets to the filesystem or object storage.
 
 from __future__ import annotations
 
-from typing import Any, Mapping
+from typing import Any
 
 from aereo.grid import GridCell
-from aereo.interfaces import AereoDataset, ExtractionTask, PluginParam, Writer
+from aereo.interfaces import AereoDataset, ExtractionTask, Writer
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
+from pydantic import Field
 
 
 class WriteGeoTIFF(Writer):
@@ -21,41 +22,16 @@ class WriteGeoTIFF(Writer):
     nodata, etc.) are forwarded verbatim through the ``rio_params`` parameter.
     This keeps the writer unopinionated — the full rasterio profile API is
     available without any intermediate translation layer.
-
-    Example — write a Cloud Optimized GeoTIFF with LZW compression::
-
-        params = {
-            "rio_params": {
-                "compress": "lzw",
-                "tiled": True,
-                "blockxsize": 512,
-                "blockysize": 512,
-            }
-        }
     """
 
-    supported_collections = ("*",)
+    profile_name: str = "default"
+    rio_params: dict[str, Any] = Field(default_factory=dict)
 
-    optional_params = (
-        PluginParam(
-            name="rio_params",
-            type="dict",
-            description=(
-                "Parameters forwarded verbatim to rioxarray ``to_raster``. "
-                "Accepts any rasterio profile keyword (compress, zlevel, tiled, "
-                "blockxsize, blockysize, nodata, driver, …)."
-            ),
-            default=None,
-            required=False,
-        ),
-    )
-
-    def write(
+    def __call__(
         self,
         ds: AereoDataset,
         task: ExtractionTask,
         cell: GridCell,
-        params: Mapping[str, Any],
     ) -> GeoDataFrame[ArtifactSchema]:
         """Write *ds* to GeoTIFF files using the standard EOIDS layout under ``task.uri``.
 
@@ -67,9 +43,8 @@ class WriteGeoTIFF(Writer):
         Args:
             ds: The AereoDataset to write.  Must contain ``start_time`` and
                 ``end_time`` in ``ds.attrs`` when no ``time`` dimension is present.
-            task: The extraction task providing the output URI and profile.
+            task: The extraction task providing the output URI.
             cell: The grid cell being written.
-            params: Plugin parameters.  Recognised key: ``rio_params`` (dict).
 
         Returns:
             GeoDataFrame of written artifacts conforming to ``ArtifactSchema``.
@@ -95,7 +70,7 @@ class WriteGeoTIFF(Writer):
                 "when no 'time' dimension is present to construct EOIDS compliant paths."
             )
 
-        rio_params: dict[str, Any] = dict(params.get("rio_params") or {})
+        rio_params = dict(self.rio_params)
 
         # Build grid-cell metadata once
         grid_cell_id = cell.id()
@@ -111,12 +86,13 @@ class WriteGeoTIFF(Writer):
             else ""
         )
 
-        # Determine collection from profile
-        collection = (
-            next(iter(task.profile.collections.keys()), None)
-            if task.profile.collections
-            else None
+        # Determine collection
+        collections = (
+            list(task.assets["collection"].unique())
+            if "collection" in task.assets.columns
+            else []
         )
+        collection = collections[0] if collections else None
 
         records = []
         for var_name in ds.data_vars:
@@ -147,7 +123,10 @@ class WriteGeoTIFF(Writer):
 
                     fpath = build_eoids_path(
                         local_dir=uri,
-                        profile=task.profile,
+                        profile_name=self.profile_name,
+                        resolution=grid_dist,
+                        collections=collections,
+                        variables=[str(v) for v in ds.data_vars],
                         cell_id=cell_id,
                         start_time=slice_time,
                         end_time=slice_time if has_time else end_time,

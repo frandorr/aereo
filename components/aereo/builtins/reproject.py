@@ -6,7 +6,7 @@ native-resolution spatial datasets to target grid cell definitions.
 
 from __future__ import annotations
 
-from typing import Any, Mapping
+from typing import Any
 
 from aereo.interfaces import AereoDataset, Reprojector
 
@@ -17,30 +17,30 @@ class ReprojectODC(Reprojector):
     Expects *geobox* to be an ``odc.geo.geobox.GeoBox`` instance.
     """
 
-    supported_collections = ("*",)
+    resampling: str = "nearest"
+    fill_value: Any = None
+    dtype: Any = None
 
-    def reproject(
+    def __call__(
         self,
         ds: AereoDataset,
         geobox: Any,
-        params: Mapping[str, Any],
     ) -> AereoDataset:
         """Reproject *ds* to *geobox* using ``odc.geo.xr.reproject``.
 
         Args:
             ds: Input dataset.
             geobox: Target ``odc.geo.geobox.GeoBox``.
-            params: Plugin parameters. Supports ``reproject_params`` (dict)
-                which is forwarded verbatim to ``xr_reproject``.  Common
-                keys: ``resampling`` (default ``"nearest"``), ``fill_value``,
-                ``dtype``, …
 
         Returns:
             Reprojected dataset.
         """
         from odc.geo.xr import xr_reproject  # type: ignore[reportAttributeAccessIssue]
 
-        reproject_params: dict[str, Any] = dict(params.get("reproject_params") or {})
-        if "resampling" not in reproject_params:
-            reproject_params["resampling"] = "nearest"
-        return xr_reproject(ds, geobox, **reproject_params)
+        kwargs: dict[str, Any] = {"resampling": self.resampling}
+        if self.fill_value is not None:
+            kwargs["fill_value"] = self.fill_value
+        if self.dtype is not None:
+            kwargs["dtype"] = self.dtype
+
+        return xr_reproject(ds, geobox, **kwargs)

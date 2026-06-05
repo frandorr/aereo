@@ -49,7 +49,7 @@ for name, module, cls_name in _search_plugins:
 
 _registry.register_plugins(_plugins_to_register)
 
-_runner = TaskRunner(registry=_registry)
+_runner = TaskRunner()
 _serializer = TaskSerializer()
 
 
@@ -107,7 +107,7 @@ def _is_retryable(exc: Exception) -> bool:
         return True
     # botocore is imported lazily; handle gracefully when missing
     try:
-        from botocore.exceptions import ClientError
+        from botocore.exceptions import ClientError  # type: ignore[reportMissingImports]
 
         if isinstance(exc, ClientError):
             return True
@@ -260,12 +260,7 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
 
         s3 = boto3.client("s3", endpoint_url=endpoint_url)
 
-        init_params = event.get("init_params")
-        runner = (
-            TaskRunner(registry=_registry, init_params=init_params)
-            if init_params
-            else _runner
-        )
+        runner = _runner
 
         timings: dict[str, Any] = {}
         t0 = time.time()

@@ -9,6 +9,7 @@ Each task is written as a pair of files inside a destination directory:
 
 from __future__ import annotations
 
+import importlib
 import json
 import logging
 from pathlib import Path
@@ -17,7 +18,7 @@ from typing import Any
 import geopandas as gpd
 import shapely.wkt
 from aereo.grid import GridCell
-from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig
+from aereo.interfaces import AereoPlugin, ExtractionTask, GridConfig
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +34,7 @@ class TaskSerializer:
     D_KEY = "d"
     IS_PRIMARY_KEY = "is_primary"
     GEOM_WKT_KEY = "geom_wkt"
-    PROFILE_KEY = "profile"
-    PROFILE_TYPE_KEY = "profile_type"
+    PIPELINE_KEY = "pipeline"
     GRID_CONFIG_KEY = "grid_config"
     GRID_CELLS_KEY = "grid_cells"
     URI_KEY = "uri"
@@ -69,10 +69,18 @@ class TaskSerializer:
             for cell in task.grid_cells
         ]
 
+        # Pipeline stages → dicts with class paths
+        pipeline_meta = [
+            {
+                "__plugin_class__": f"{type(plugin).__module__}.{type(plugin).__name__}",
+                "config": plugin.model_dump(mode="json"),
+            }
+            for plugin in task.pipeline
+        ]
+
         # Metadata → JSON
         meta: dict[str, Any] = {
-            self.PROFILE_KEY: task.profile.model_dump(mode="json"),
-            self.PROFILE_TYPE_KEY: type(task.profile).__name__,
+            self.PIPELINE_KEY: pipeline_meta,
             self.GRID_CONFIG_KEY: task.grid_config.model_dump(mode="json"),
             self.GRID_CELLS_KEY: grid_cells_meta,
             self.URI_KEY: task.uri,
@@ -110,9 +118,16 @@ class TaskSerializer:
 
         meta = json.loads((src_dir / self.META_NAME).read_text(encoding="utf-8"))
 
-        # Reconstruct Pydantic models
-        profile_data = meta[self.PROFILE_KEY]
-        profile = AereoProfile.model_validate(profile_data)
+        # Reconstruct Pipeline stages
+        pipeline: list[AereoPlugin] = []
+        for plugin_data in meta[self.PIPELINE_KEY]:
+            cls_path = plugin_data["__plugin_class__"]
+            config = plugin_data["config"]
+            module_name, class_name = cls_path.rsplit(".", 1)
+            module = importlib.import_module(module_name)
+            cls = getattr(module, class_name)
+            pipeline.append(cls.model_validate(config))
+
         grid_config = GridConfig.model_validate(meta[self.GRID_CONFIG_KEY])
 
         # Reconstruct GridCell instances
@@ -137,7 +152,7 @@ class TaskSerializer:
 
         return ExtractionTask(
             assets=assets,  # type: ignore[arg-type]
-            profile=profile,
+            pipeline=pipeline,
             uri=meta[self.URI_KEY],
             grid_cells=grid_cells,
             grid_config=grid_config,

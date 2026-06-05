@@ -6,6 +6,6 @@ entry-point wrappers interact with:
 - :attr:`app`: The main Typer CLI application.
 """
 
-from aereo.cli.main import app
+from aereo.cli.main import main
 
-__all__ = ["app"]
+__all__ = ["main"]
