@@ -19,7 +19,6 @@ from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Point, Polygon
 from shapely.geometry.base import BaseGeometry
 
-
 _WGS84_CRS = "epsg:4326"
 _GEOM_TOLERANCE = 1e-10
 _OVERLAP_SUFFIX = "_OV"
@@ -35,9 +34,20 @@ def _parse_directional_value(value: str, positive: str, negative: str) -> int:
 
     Returns:
         Signed integer magnitude.
+
+    Raises:
+        ValueError: If the direction character is not ``positive`` or ``negative``.
     """
     magnitude = int(value[:-1])
-    return magnitude if value[-1].upper() == positive else -magnitude
+    direction = value[-1].upper()
+    if direction == positive:
+        return magnitude
+    if direction == negative:
+        return -magnitude
+    raise ValueError(
+        f"Invalid direction character {direction!r} in {value!r}. "
+        f"Expected {positive!r} or {negative!r}."
+    )
 
 
 def _n_cols_for_spacing(lon_spacing: float) -> int:
@@ -111,23 +121,24 @@ class GridCell(BaseGridCell):
         """Convert the GridCell to a GeoDataFrame.
 
         Returns:
-            A GeoDataFrame with grid cell metadata.
+            A validated GeoDataFrame with grid cell metadata.
         """
-        return cast(
-            GeoDataFrame,
-            gpd.GeoDataFrame(
-                {
-                    # Note: Changed id(self) to self.id() so it grabs the actual string ID
-                    "grid_cell": [self.id()],
-                    "grid_dist": [self.D],
-                    "cell_geometry": [self.geom],
-                    "cell_utm_crs": [self.utm_crs],
-                    "cell_utm_footprint": [self.utm_footprint],
-                }
-            ),
+        gdf = gpd.GeoDataFrame(
+            {
+                "grid_cell": [self.id()],
+                "grid_dist": [self.D],
+                "cell_geometry": gpd.GeoSeries([self.geom], crs="EPSG:4326"),
+                "cell_utm_crs": [self.utm_crs],
+                "cell_utm_footprint": gpd.GeoSeries(
+                    [self.utm_footprint], crs=self.utm_crs
+                ),
+            },
+            geometry="cell_geometry",
+            crs="EPSG:4326",
         )
+        return cast(GeoDataFrame, GridSchema.validate(gdf))
 
-    @cached_property
+    @property
     def utm_crs(self) -> str:
         """UTM EPSG code for the cell's geometry.
 
@@ -279,6 +290,29 @@ class GridDefinition(MajorTomGrid):
         )
         return GridCell(self.D, overlap_poly, is_primary=False, cell_id=cell_id)
 
+    def _row_id_to_index(self, y_str: str) -> int:
+        """Parse a row ID string (e.g. ``"922U"``) into an absolute row index."""
+        rel_y = _parse_directional_value(y_str, "U", "D")
+        return rel_y + int(self.row_count) // 2
+
+    def _col_id_to_index(self, x_str: str, lat: float) -> int:
+        """Parse a column ID string (e.g. ``"249R"``) into an absolute column index."""
+        lon_spacing = self.get_lon_spacing(lat)
+        n_cols = _n_cols_for_spacing(lon_spacing)
+        rel_x = _parse_directional_value(x_str, "R", "L")
+        return rel_x + n_cols // 2
+
+    def _row_index_to_id(self, row_idx: int) -> str:
+        """Format an absolute row index as a row ID string (e.g. ``"922U"``)."""
+        rel_y = row_idx - int(self.row_count) // 2
+        return f"{abs(rel_y)}{'U' if rel_y >= 0 else 'D'}"
+
+    def _col_index_to_id(self, col_idx: int, lon_spacing: float) -> str:
+        """Format an absolute column index as a column ID string (e.g. ``"249R"``)."""
+        n_cols = _n_cols_for_spacing(lon_spacing)
+        rel_x = col_idx - n_cols // 2
+        return f"{abs(rel_x)}{'R' if rel_x >= 0 else 'L'}"
+
     def cell_from_id(self, cell_id: str) -> "GridCell":
         """Return a GridCell for the given cell ID.
 
@@ -291,7 +325,7 @@ class GridDefinition(MajorTomGrid):
         Returns:
             A GridCell object corresponding to the given cell ID.
         """
-        # Fallback: If no underscore, route to old geohash lookup logic
+        # Fallback: If no underscore, route to old geohash lookup logic from majortom_eg
         if "_" not in cell_id:
             # Revert to base class method if it's an old geohash
             base_cell = super().cell_from_id(cell_id)
@@ -299,26 +333,15 @@ class GridDefinition(MajorTomGrid):
                 self.D, base_cell.geom, base_cell.is_primary, cell_id=cell_id
             )
 
-        # --- NEW O(1) LOOKUP ---
         parts = cell_id.split("_")
         y_str, x_str = parts[0], parts[1]
         is_primary = _OVERLAP_SUFFIX not in parts
 
-        # Reverse-engineer relative Y (Row)
-        rel_y = _parse_directional_value(y_str, "U", "D")
-
-        # Reverse-engineer relative X (Col)
-        rel_x = _parse_directional_value(x_str, "R", "L")
-
-        # Map back to absolute indices
-        row_idx = rel_y + int(self.row_count) // 2
+        row_idx = self._row_id_to_index(y_str)
         row_lat = self.get_row_lat(row_idx)
+        col_idx = self._col_id_to_index(x_str, row_lat)
 
         lon_spacing = self.get_lon_spacing(row_lat)
-        n_cols = _n_cols_for_spacing(lon_spacing)
-
-        col_idx = rel_x + n_cols // 2
-
         return self._cell_from_indices(
             row_idx, col_idx, lon_spacing, is_primary, cell_id
         )
@@ -337,16 +360,7 @@ class GridDefinition(MajorTomGrid):
         Returns:
             The generated cell name following the ESA Major TOM convention.
         """
-        # 1. Calculate row relative to the Equator
-        rel_y = row_idx - int(self.row_count) // 2
-        y_dir = "U" if rel_y >= 0 else "D"
-
-        # 2. Calculate col relative to the Prime Meridian
-        n_cols = _n_cols_for_spacing(lon_spacing)
-        rel_x = col_idx - n_cols // 2
-        x_dir = "R" if rel_x >= 0 else "L"
-
-        name = f"{abs(rel_y)}{y_dir}_{abs(rel_x)}{x_dir}"
+        name = f"{self._row_index_to_id(row_idx)}_{self._col_index_to_id(col_idx, lon_spacing)}"
 
         # Append an indicator for overlapping grids
         if not is_primary:
@@ -463,116 +477,3 @@ class GridDefinition(MajorTomGrid):
                 )
 
         return cells
-
-    def max_shape(
-        self,
-        cells: Sequence[GridCell],
-        resolution: int,
-        padding: int = 0,
-        margin: float = 0.0,
-        **geobox_kwargs: Any,
-    ) -> tuple[int, int]:
-        """Return the maximum (width, height) in pixels across *cells*.
-
-        This is the shape you pass to ``GridCell.area_def(..., conform_to=...)``
-        when you want every cell in the batch to share an identical tensor shape.
-
-        Args:
-            cells: Sequence of GridCell objects to evaluate.
-            resolution: Pixel size in metres.
-            padding: Number of extra pixels added on each side (same semantics as
-                :meth:`GridCell.area_def`).
-            margin: Percentage margin added to ``self.D`` (same semantics as
-                :meth:`GridCell.area_def`).
-            **geobox_kwargs: Forwarded to :meth:`GridCell.area_def`.
-
-        Returns:
-            Tuple of ``(max_width, max_height)`` in pixels.
-        """
-        shapes = [
-            cell.area_def(resolution, padding=0, margin=margin, **geobox_kwargs).shape
-            for cell in cells
-        ]
-        max_w = max((s.x for s in shapes), default=0)
-        max_h = max((s.y for s in shapes), default=0)
-        if padding:
-            max_w += 2 * padding
-            max_h += 2 * padding
-        return max_w, max_h
-
-    def _cell_to_esa_record(self, cell: GridCell) -> tuple[dict[str, Any], Point]:
-        """Build ESA-compatible metadata for a single primary GridCell.
-
-        Args:
-            cell: A primary GridCell.
-
-        Returns:
-            Tuple of (data dict, geometry Point).
-        """
-        parts = cell.id().split("_")
-        r_str, c_str = parts[0], parts[1]
-
-        # ESA grid points are defined as the bottom-left corner of the cell
-        bottom_left = cell.geom.exterior.coords[0]
-        lon, lat = bottom_left[0], bottom_left[1]
-
-        # Reconstruct original ESA row_idx and col_idx
-        rel_y = _parse_directional_value(r_str, "U", "D")
-        row_idx = rel_y + int(self.row_count) // 2
-
-        lon_spacing = self.get_lon_spacing(lat)
-        n_cols = _n_cols_for_spacing(lon_spacing)
-        rel_x = _parse_directional_value(c_str, "R", "L")
-        col_idx = rel_x + n_cols // 2
-
-        # Format the CRS to match ESA exactly (e.g., 'EPSG:32701' and '32701')
-        raw_crs = str(cell.utm_crs).upper()
-        epsg_str = raw_crs if "EPSG:" in raw_crs else f"EPSG:{raw_crs}"
-        utm_zone = epsg_str.split(":")[-1]
-
-        data: dict[str, Any] = {
-            "name": cell.id(),
-            "row": r_str,
-            "col": c_str,
-            "row_idx": row_idx,
-            "col_idx": col_idx,
-            "utm_zone": utm_zone,
-            "epsg": epsg_str,
-        }
-
-        return data, Point(lon, lat)
-
-    def to_esa_compatible_dataframe(self, cells: Sequence[GridCell]) -> GeoDataFrame:
-        """Convert a sequence of GridCells into a GeoDataFrame matching ESA format.
-
-        Args:
-            cells: A list of GridCell objects to convert.
-
-        Returns:
-            A GeoDataFrame with columns and formatting identical to the ESA grid points.
-        """
-        data: dict[str, list[Any]] = {
-            "name": [],
-            "row": [],
-            "col": [],
-            "row_idx": [],
-            "col_idx": [],
-            "utm_zone": [],
-            "epsg": [],
-        }
-        geometries: list[Point] = []
-
-        for cell in cells:
-            # ESA's base grid dataframe only stored primary grid points, not overlaps
-            if not cell.is_primary:
-                continue
-
-            cell_data, point = self._cell_to_esa_record(cell)
-            for key in data:
-                data[key].append(cell_data[key])
-            geometries.append(point)
-
-        # Return a GeoDataFrame with the exact same structure as the ESA one
-        return cast(
-            GeoDataFrame, gpd.GeoDataFrame(data, geometry=geometries, crs="EPSG:4326")
-        )
