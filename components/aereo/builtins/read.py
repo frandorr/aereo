@@ -1,7 +1,7 @@
 """Built-in reader plugins for the AEREO pipeline.
 
 This module provides a default Reader implementation that uses ``odc.stac``
-to lazily load pixel data from STAC items in native CRS as an AereoDataset.
+to lazily load pixel data from STAC items in native CRS as an xarray.Dataset.
 """
 
 from __future__ import annotations
@@ -9,7 +9,9 @@ from __future__ import annotations
 from typing import Any
 from pydantic import Field
 
-from aereo.interfaces import AereoDataset, ExtractionTask, Reader
+import xarray as xr
+
+from aereo.interfaces import ExtractionTask, Reader
 from aereo.interfaces import infer_dataset_time_bounds
 
 try:
@@ -32,7 +34,7 @@ class ReadODCSTAC(Reader):
     def __call__(
         self,
         task: ExtractionTask,
-    ) -> AereoDataset:
+    ) -> xr.Dataset:
         """Load STAC assets for *task* using ``odc.stac.load``.
 
         Reconstructs :class:`pystac.Item` objects from the ``stac_item``
@@ -44,7 +46,7 @@ class ReadODCSTAC(Reader):
             task: Extraction task carrying assets, grid cells, and AOI.
 
         Returns:
-            AereoDataset (potentially dask-backed) in the native CRS of the
+            xr.Dataset (potentially dask-backed) in the native CRS of the
             STAC items.
 
         Raises:
@@ -119,7 +121,7 @@ class ReadODCSTAC(Reader):
         # ------------------------------------------------------------------
         # 3. Load via odc.stac.
         # ------------------------------------------------------------------
-        ds: AereoDataset = odc_load(items, **odc_params)
+        ds: xr.Dataset = odc_load(items, **odc_params)
 
         # ------------------------------------------------------------------
         # 4. Tag ds.attrs with temporal bounds so the writer can build paths.

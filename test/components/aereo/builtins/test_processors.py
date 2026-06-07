@@ -23,7 +23,7 @@ from aereo.builtins import (
 
 
 def _make_dataset(data_vars=None, dims=("y", "x"), shape=(4, 4)):
-    """Return a minimal AereoDataset for testing."""
+    """Return a minimal xarray.Dataset for testing."""
     coords = {d: range(s) for d, s in zip(dims, shape)}
     if data_vars is None:
         data_vars = {

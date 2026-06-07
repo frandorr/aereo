@@ -8,7 +8,6 @@ By defining these interfaces, we ensure that all implementations adhere to a con
 """
 
 from aereo.interfaces.core import (
-    AereoDataset,
     AereoPlugin,
     ExecutionBackend,
     ExtractionTask,
@@ -30,7 +29,6 @@ from aereo.interfaces.core import (
 )
 
 __all__ = [
-    "AereoDataset",
     "AereoPlugin",
     "ExecutionBackend",
     "ExtractionTask",

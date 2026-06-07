@@ -14,7 +14,6 @@ from aereo.backends import (
     ThreadBackend,
 )
 from aereo.interfaces.core import (
-    AereoDataset,
     AereoPlugin,
     ExtractionTask,
     GridConfig,
@@ -55,7 +54,7 @@ def _make_task(
 
 
 class _DummyReader(Reader):
-    def __call__(self, task: ExtractionTask) -> AereoDataset:
+    def __call__(self, task: ExtractionTask) -> xr.Dataset:
         return xr.Dataset(
             {"B04": (["y", "x"], np.ones((4, 4)))},
             coords={"y": range(4), "x": range(4)},
@@ -65,13 +64,13 @@ class _DummyReader(Reader):
 class _DummyReprojector(Reprojector):
     resolution: float = 100.0
 
-    def __call__(self, ds: AereoDataset, geobox: Any) -> AereoDataset:
+    def __call__(self, ds: xr.Dataset, geobox: Any) -> xr.Dataset:
         return ds
 
 
 class _DummyWriter(Writer):
     def __call__(
-        self, ds: AereoDataset, task: ExtractionTask, cell: Any
+        self, ds: xr.Dataset, task: ExtractionTask, cell: Any
     ) -> GeoDataFrame[ArtifactSchema]:
         return cast(
             GeoDataFrame[ArtifactSchema],
@@ -84,7 +83,7 @@ class _DummyWriter(Writer):
 class _DummyProcessor(Processor):
     value: int = 2
 
-    def __call__(self, ds: AereoDataset) -> AereoDataset:
+    def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         ds = ds.copy()
         ds["B04"] = ds["B04"] * self.value
         return ds

@@ -3,7 +3,6 @@ from typing import cast
 import geopandas as gpd
 import pytest
 from aereo.interfaces import (
-    AereoDataset,
     ExtractionTask,
     GridConfig,
     infer_dataset_time_bounds,
@@ -67,15 +66,8 @@ def test_grid_config_forbids_extra_fields():
 
 
 # ---------------------------------------------------------------------------
-# AereoDataset
+# validate_aereo_dataset
 # ---------------------------------------------------------------------------
-
-
-def test_aereo_dataset_is_xarray_dataset():
-    """AereoDataset must be an xarray.Dataset at runtime."""
-    import xarray as xr
-
-    assert AereoDataset is xr.Dataset
 
 
 def test_validate_aereo_dataset_accepts_valid():
