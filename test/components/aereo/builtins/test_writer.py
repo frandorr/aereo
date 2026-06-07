@@ -25,7 +25,7 @@ def _patch_artifact_schema(monkeypatch):
 
 
 def _make_dataset(data_vars=None, dims=("band", "y", "x"), shape=(1, 8, 8)):
-    """Return a minimal AereoDataset for testing."""
+    """Return a minimal xarray.Dataset for testing."""
     if len(shape) == 2:
         shape = (1,) + shape
     coords: dict[str, Any] = {d: range(s) for d, s in zip(dims, shape)}

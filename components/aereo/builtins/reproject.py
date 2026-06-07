@@ -8,7 +8,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from aereo.interfaces import AereoDataset, Reprojector
+import xarray as xr
+from aereo.interfaces import Reprojector
 
 
 class ReprojectODC(Reprojector):
@@ -23,9 +24,9 @@ class ReprojectODC(Reprojector):
 
     def __call__(
         self,
-        ds: AereoDataset,
+        ds: xr.Dataset,
         geobox: Any,
-    ) -> AereoDataset:
+    ) -> xr.Dataset:
         """Reproject *ds* to *geobox* using ``odc.geo.xr.reproject``.
 
         Args:

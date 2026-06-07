@@ -11,14 +11,13 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
 from typing import (
+    TYPE_CHECKING,
     Any,
     Iterable,
     Literal,
     Mapping,
     Protocol,
     Sequence,
-    TYPE_CHECKING,
-    TypeAlias,
     cast,
 )
 
@@ -27,6 +26,7 @@ if TYPE_CHECKING:
 
 
 import attrs
+import xarray as xr
 from aereo.grid import GridCell
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -44,20 +44,7 @@ _YAML_INSTALL_MSG = (
     "YAML support requires PyYAML. Install it with: pip install 'aereo[yaml]'"
 )
 
-_XARRAY_INSTALL_MSG = (
-    "xarray support requires xarray. Install it with: pip install 'aereo[xarray]'"
-)
-
 _RIOXARRAY_INSTALL_MSG = "rioxarray support requires rioxarray. Install it with: pip install 'aereo[rioxarray]'"
-
-
-def _import_xarray() -> Any:
-    """Import xarray with a clear error message if missing."""
-    try:
-        import xarray as xr
-    except ImportError as exc:
-        raise ImportError(_XARRAY_INSTALL_MSG) from exc
-    return xr
 
 
 def _import_rioxarray() -> Any:
@@ -69,41 +56,13 @@ def _import_rioxarray() -> Any:
     return rioxarray
 
 
-#: Canonical in-memory intermediate representation.
-#:
-#: ``AereoDataset`` is an ``xarray.Dataset`` that carries the following
-#: conventions so that every pipeline stage (Reader, Processor, Reprojector,
-#: Writer) can rely on a consistent contract:
-#:
-#: 1. CRS metadata is attached via ``rioxarray``::
-#:
-#:        ds.rio.crs  # -> rasterio.crs.CRS (or None if unset)
-#:
-#: 2. Spatial dimensions are named ``y`` and ``x``.
-#: 3. Band dimension is named ``band`` (at least size 1).
-#: 4. Optional temporal dimension is named ``time``.
-#: 5. Data variables are typically named after the physical quantity
-#:    (e.g. ``"ndvi"``, ``"B04"``, ``"C01"``).
-#:
-#: Whether the underlying data is dask-backed (lazy) or numpy-backed
-#: (eager) is an implementation detail of each stage.
-try:
-    import xarray as _xr
-
-    AereoDataset: TypeAlias = _xr.Dataset
-except ImportError:
-    # Graceful fallback when xarray is not installed — the alias becomes
-    # ``Any`` so that type-checking and runtime imports still work.
-    AereoDataset = Any  # type: ignore[misc,assignment]
-
-
 def validate_aereo_dataset(
     ds: Any,
     *,
     require_crs: bool = True,
     require_dims: Sequence[str] | None = ("band", "y", "x"),
 ) -> None:
-    """Validate that *ds* conforms to the AereoDataset conventions.
+    """Validate that *ds* conforms to the AEREO xarray conventions.
 
     Args:
         ds: The dataset to validate.
@@ -124,22 +83,22 @@ def validate_aereo_dataset(
         # Access the rio accessor to trigger its import side-effects
         if ds.rio.crs is None:
             raise ValueError(
-                "AereoDataset must have a CRS set via rioxarray (ds.rio.crs)"
+                "xarray.Dataset must have a CRS set via rioxarray (ds.rio.crs)"
             )
 
     if require_dims:
         missing = [d for d in require_dims if d not in ds.dims]
         if missing:
-            raise ValueError(f"AereoDataset missing required dimensions: {missing}")
+            raise ValueError(f"xarray.Dataset missing required dimensions: {missing}")
 
 
 def set_dataset_time_bounds(
-    ds: AereoDataset, start_time: datetime, end_time: datetime
-) -> AereoDataset:
+    ds: xr.Dataset, start_time: datetime, end_time: datetime
+) -> xr.Dataset:
     """Set the start and end time bounds in the dataset's attributes.
 
     Args:
-        ds: The AereoDataset.
+        ds: The xarray.Dataset.
         start_time: The start time.
         end_time: The end time.
 
@@ -151,14 +110,14 @@ def set_dataset_time_bounds(
     return ds
 
 
-def infer_dataset_time_bounds(ds: AereoDataset) -> AereoDataset:
+def infer_dataset_time_bounds(ds: xr.Dataset) -> xr.Dataset:
     """Infer and set the start and end time bounds in the dataset's attributes.
 
     If a ``time`` coordinate is present, uses its minimum and maximum values.
     Otherwise, leaves the dataset attributes unchanged.
 
     Args:
-        ds: The AereoDataset.
+        ds: The xarray.Dataset.
 
     Returns:
         The dataset with inferred time bounds set in its attributes (if possible).
@@ -201,11 +160,11 @@ def _import_yaml() -> Any:
 
 
 class GridConfig(BaseModel):
-    """Tiling specification for a single extraction run.
+    """Configuration for partitioning an AOI into a regular grid of cells.
 
-    All profiles in the same ``prepare_for_extraction`` call share one
-    ``GridConfig``. This guarantees that every profile extracts the same
-    geographic bounding box for a given cell ID.
+    ``GridConfig`` controls how the area of interest is diced into
+    :class:`GridCell` objects: their size, overlap, margin expansion,
+    and which cells are kept after filtering against the AOI.
     """
 
     model_config = {"extra": "forbid", "frozen": True}
@@ -288,10 +247,10 @@ class AereoPlugin(BaseModel, ABC):
 
 
 class Reader(AereoPlugin, ABC):
-    """Reads raw satellite data and returns it in native CRS as an AereoDataset."""
+    """Reads raw satellite data and returns it in native CRS as an xarray.Dataset."""
 
     @abstractmethod
-    def __call__(self, task: ExtractionTask) -> AereoDataset:
+    def __call__(self, task: ExtractionTask) -> xr.Dataset:
         """Read data for the given task.
 
         Implementations should:
@@ -303,14 +262,14 @@ class Reader(AereoPlugin, ABC):
 
 
 class Reprojector(AereoPlugin, ABC):
-    """Reprojects/resamples an AereoDataset to a target GeoBox."""
+    """Reprojects/resamples an xarray.Dataset to a target GeoBox."""
 
     resolution: float
     padding: int = 0
     conform_to: tuple[int, int] | None = None
 
     @abstractmethod
-    def __call__(self, ds: AereoDataset, geobox: Any) -> AereoDataset:
+    def __call__(self, ds: xr.Dataset, geobox: Any) -> xr.Dataset:
         """Reproject *ds* to the target *geobox*.
 
         Args:
@@ -324,21 +283,21 @@ class Reprojector(AereoPlugin, ABC):
 
 
 class Processor(AereoPlugin, ABC):
-    """Pure ``AereoDataset -> AereoDataset`` transform."""
+    """Pure ``xarray.Dataset -> xarray.Dataset`` transform."""
 
     @abstractmethod
-    def __call__(self, ds: AereoDataset) -> AereoDataset:
+    def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         """Transform *ds* and return a new dataset."""
         ...
 
 
 class Writer(AereoPlugin, ABC):
-    """Serialises an AereoDataset to disk."""
+    """Serialises an xarray.Dataset to disk."""
 
     @abstractmethod
     def __call__(
         self,
-        ds: AereoDataset,
+        ds: xr.Dataset,
         task: ExtractionTask,
         cell: GridCell,
     ) -> GeoDataFrame[ArtifactSchema]:
@@ -373,7 +332,7 @@ class PipelineCallback:
     def on_read_complete(
         self,
         task: ExtractionTask,
-        ds: AereoDataset,
+        ds: xr.Dataset,
     ) -> None:
         """Called after the Reader finishes."""
         pass
@@ -382,7 +341,7 @@ class PipelineCallback:
         self,
         task: ExtractionTask,
         cell: GridCell,
-        ds: AereoDataset,
+        ds: xr.Dataset,
     ) -> None:
         """Called after a single grid cell has been reprojected."""
         pass

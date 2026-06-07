@@ -8,8 +8,9 @@ from __future__ import annotations
 
 
 import numpy as np
+import xarray as xr
 
-from aereo.interfaces import AereoDataset, Processor
+from aereo.interfaces import Processor
 
 
 class SelectBands(Processor):
@@ -21,7 +22,7 @@ class SelectBands(Processor):
 
     bands: list[str]
 
-    def __call__(self, ds: AereoDataset) -> AereoDataset:
+    def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         """Keep only the bands listed in *bands*.
 
         Args:
@@ -54,7 +55,7 @@ class QAMask(Processor):
     qa_band: str
     qa_mask_bits: list[int]
 
-    def __call__(self, ds: AereoDataset) -> AereoDataset:
+    def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         """Apply QA-based masking.
 
         Args:
@@ -94,7 +95,7 @@ class NDVI(Processor):
     ndvi_nir_band: str
     ndvi_red_band: str
 
-    def __call__(self, ds: AereoDataset) -> AereoDataset:
+    def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         """Compute NDVI = (NIR - Red) / (NIR + Red).
 
         Args:
@@ -134,7 +135,7 @@ class Normalize(Processor):
 
     normalize_method: str = "minmax"
 
-    def __call__(self, ds: AereoDataset) -> AereoDataset:
+    def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         """Normalise each data variable.
 
         Args:
@@ -180,7 +181,7 @@ class Composite(Processor):
 
     composite_method: str = "median"
 
-    def __call__(self, ds: AereoDataset) -> AereoDataset:
+    def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         """Reduce the ``time`` dimension to a single composite.
 
         Args:

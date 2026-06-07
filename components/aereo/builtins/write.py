@@ -8,8 +8,9 @@ from __future__ import annotations
 
 from typing import Any
 
+import xarray as xr
 from aereo.grid import GridCell
-from aereo.interfaces import AereoDataset, ExtractionTask, Writer
+from aereo.interfaces import ExtractionTask, Writer
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
 from pydantic import Field
@@ -29,7 +30,7 @@ class WriteGeoTIFF(Writer):
 
     def __call__(
         self,
-        ds: AereoDataset,
+        ds: xr.Dataset,
         task: ExtractionTask,
         cell: GridCell,
     ) -> GeoDataFrame[ArtifactSchema]:
@@ -41,7 +42,7 @@ class WriteGeoTIFF(Writer):
         tiling, COG conversion, nodata values, etc.
 
         Args:
-            ds: The AereoDataset to write.  Must contain ``start_time`` and
+            ds: The xarray.Dataset to write.  Must contain ``start_time`` and
                 ``end_time`` in ``ds.attrs`` when no ``time`` dimension is present.
             task: The extraction task providing the output URI.
             cell: The grid cell being written.
@@ -66,7 +67,7 @@ class WriteGeoTIFF(Writer):
 
         if "time" not in ds.dims and (start_time is None or end_time is None):
             raise ValueError(
-                "AereoDataset must contain 'start_time' and 'end_time' in ds.attrs "
+                "xarray.Dataset must contain 'start_time' and 'end_time' in ds.attrs "
                 "when no 'time' dimension is present to construct EOIDS compliant paths."
             )
 
