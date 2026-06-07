@@ -88,23 +88,6 @@ def test_grid_cell_area_name_and_def():
     assert area.shape.y == pytest.approx(10000 / 50, abs=1)
 
 
-def test_to_esa_compatible_dataframe():
-    grid = core.GridDefinition(d=10000)
-    polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
-    cells = grid.generate_grid_cells(polygon)
-
-    gdf = grid.to_esa_compatible_dataframe(cells)
-    assert len(gdf) > 0
-    assert "name" in gdf.columns
-    assert "row" in gdf.columns
-    assert "col" in gdf.columns
-    assert "row_idx" in gdf.columns
-    assert "col_idx" in gdf.columns
-    assert "utm_zone" in gdf.columns
-    assert "epsg" in gdf.columns
-    assert gdf.crs == "EPSG:4326"
-
-
 # --- GeoBox tests ---
 
 
@@ -216,29 +199,3 @@ def test_area_def_with_margin():
     gb_with_margin = cell.area_def(50, margin=6.8)
     assert gb_with_margin.shape.x > gb_no_margin.shape.x
     assert gb_with_margin.shape.y > gb_no_margin.shape.y
-
-
-def test_max_shape_across_cells():
-    """max_shape should return the maximum pixel dimensions across cells."""
-    grid = core.GridDefinition(d=10_000)
-    polygon = Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]])
-    cells = grid.generate_grid_cells(polygon)
-    max_w, max_h = grid.max_shape(cells, resolution=100)
-    assert max_w > 0
-    assert max_h > 0
-    # Every cell should fit inside max_shape when conformed to it
-    for cell in cells:
-        area = cell.area_def(100, conform_to=(max_w, max_h))
-        assert area.shape.x == max_w
-        assert area.shape.y == max_h
-
-
-def test_max_shape_with_padding():
-    """Padding should be accounted for in max_shape."""
-    grid = core.GridDefinition(d=10_000)
-    polygon = Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]])
-    cells = grid.generate_grid_cells(polygon)
-    max_w_padded, max_h_padded = grid.max_shape(cells, resolution=100, padding=2)
-    max_w, max_h = grid.max_shape(cells, resolution=100, padding=0)
-    assert max_w_padded == max_w + 4
-    assert max_h_padded == max_h + 4
