@@ -97,13 +97,16 @@ class ReadODCSTAC(Reader):
 
         # Auto-inject bbox from grid cells if not provided.
         if "bbox" not in odc_params:
-            cell_geoms = [
-                cell.geom for cell in task.grid_cells if cell.geom is not None
-            ]
+            spatial_extent = unary_union(
+                [
+                    patch.cell_geometry
+                    for patch in task.patches
+                    if patch.cell_geometry is not None
+                ]
+            )
             aoi = task.aoi
 
-            if cell_geoms:
-                spatial_extent = unary_union(cell_geoms)
+            if not spatial_extent.is_empty:
                 if aoi is not None:
                     spatial_extent = spatial_extent.intersection(aoi)
             elif aoi is not None:

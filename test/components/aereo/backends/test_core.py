@@ -17,6 +17,7 @@ from aereo.interfaces.core import (
     AereoPlugin,
     ExtractionTask,
     GridConfig,
+    PatchConfig,
     Reader,
     Reprojector,
     Writer,
@@ -34,7 +35,7 @@ from pandera.typing.geopandas import GeoDataFrame
 def _make_task(
     pipeline: list[AereoPlugin] | None = None,
     task_context: dict[str, Any] | None = None,
-    grid_cells: list[Any] | None = None,
+    patches: list[Any] | None = None,
 ) -> ExtractionTask:
     """Return a minimal ExtractionTask for testing."""
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
@@ -47,8 +48,9 @@ def _make_task(
         assets=cast(GeoDataFrame, valid_df),
         pipeline=pipeline or [],
         uri="test-uri",
-        grid_cells=grid_cells or [],
+        patches=patches or [],
         grid_config=grid_config,
+        patch_config=PatchConfig(resolution=10.0),
         task_context=task_context or {},
     )
 
@@ -99,9 +101,9 @@ def test_task_runner_executes_pipeline():
     # Create mock grid cell
     mock_cell = MagicMock()
     mock_cell.id.return_value = "cell-1"
-    mock_cell.geom = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
+    mock_cell.cell_geometry = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
     mock_cell.utm_crs = "EPSG:4326"
-    mock_cell.utm_footprint = mock_cell.geom
+    mock_cell.utm_footprint = mock_cell.cell_geometry
     mock_cell.area_def.return_value = MagicMock()
 
     pipeline = [
@@ -112,7 +114,7 @@ def test_task_runner_executes_pipeline():
         _DummyWriter(),
     ]
 
-    task = _make_task(pipeline=pipeline, grid_cells=[mock_cell])
+    task = _make_task(pipeline=pipeline, patches=[mock_cell])
     runner = TaskRunner()
     result = runner.run(task)
 
@@ -144,9 +146,9 @@ def test_task_runner_callbacks():
     """Verify that TaskRunner invokes callbacks."""
     mock_cell = MagicMock()
     mock_cell.id.return_value = "cell-1"
-    mock_cell.geom = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
+    mock_cell.cell_geometry = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
     mock_cell.utm_crs = "EPSG:4326"
-    mock_cell.utm_footprint = mock_cell.geom
+    mock_cell.utm_footprint = mock_cell.cell_geometry
     mock_cell.area_def.return_value = MagicMock()
 
     pipeline = [
@@ -155,7 +157,7 @@ def test_task_runner_callbacks():
         _DummyWriter(),
     ]
 
-    task = _make_task(pipeline=pipeline, grid_cells=[mock_cell])
+    task = _make_task(pipeline=pipeline, patches=[mock_cell])
     mock_callback = MagicMock()
     runner = TaskRunner(callbacks=[mock_callback])
     runner.run(task)
@@ -164,7 +166,7 @@ def test_task_runner_callbacks():
     mock_callback.on_download_complete.assert_called_once_with(task)
     mock_callback.on_read_complete.assert_called_once()
     mock_callback.on_reproject_complete.assert_called_once()
-    mock_callback.on_cell_complete.assert_called_once()
+    mock_callback.on_patch_write_complete.assert_called_once()
     mock_callback.on_task_complete.assert_called_once()
 
 

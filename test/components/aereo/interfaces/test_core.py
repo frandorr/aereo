@@ -5,6 +5,7 @@ import pytest
 from aereo.interfaces import (
     ExtractionTask,
     GridConfig,
+    PatchConfig,
     infer_dataset_time_bounds,
     set_dataset_time_bounds,
     validate_aereo_dataset,
@@ -20,12 +21,14 @@ def test_extraction_task_validation():
         geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
     )
     grid_config = GridConfig(target_grid_dist=10_000)
+    patch_config = PatchConfig(resolution=10.0)
     task = ExtractionTask(
         assets=cast(GeoDataFrame, df),
         pipeline=[],
         uri="test",
-        grid_cells=[],
+        patches=[],
         grid_config=grid_config,
+        patch_config=patch_config,
     )
     assert task.uri == "test"
     assert len(task.pipeline) == 0
@@ -35,7 +38,6 @@ def test_grid_config_defaults_require_explicit_dist():
     gc = GridConfig(target_grid_dist=50_000)
     assert gc.target_grid_dist == 50_000
     assert gc.target_grid_overlap is False
-    assert gc.target_grid_margin == 0.0
     assert gc.grid_filter_mode == "intersection"
 
 
@@ -47,11 +49,11 @@ def test_grid_config_literal_validation():
 def test_grid_config_from_yaml_string():
     yaml_text = """
     target_grid_dist: 100000
-    target_grid_margin: 6.8
+    target_grid_overlap: true
     """
     gc = GridConfig.from_yaml_string(yaml_text)
     assert gc.target_grid_dist == 100_000
-    assert gc.target_grid_margin == 6.8
+    assert gc.target_grid_overlap is True
 
 
 def test_grid_config_is_frozen():

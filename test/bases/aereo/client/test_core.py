@@ -10,6 +10,7 @@ from aereo.client.core import AereoClient, FailureMode, normalize_geometry
 from aereo.interfaces.core import (
     ExtractionTask,
     GridConfig,
+    PatchConfig,
     SearchProvider,
     ExecutionBackend,
 )
@@ -78,10 +79,12 @@ def test_prepare_tasks_returns_tasks(monkeypatch):
 
     client = AereoClient()
     grid_config = GridConfig(target_grid_dist=50_000)
+    patch_config = PatchConfig(resolution=10.0)
     tasks = client.prepare_tasks(
         search_results=cast(GeoDataFrame, valid_df),
         pipeline=[],
         grid_config=grid_config,
+        patch_config=patch_config,
         uri="s3://out",
         cells_per_task=1,
     )
@@ -111,8 +114,9 @@ def test_execute_tasks_failure_mode_strict(monkeypatch):
         assets=cast(GeoDataFrame, _make_valid_search_df()),
         pipeline=[],
         uri="test",
-        grid_cells=[],
+        patches=[],
         grid_config=GridConfig(target_grid_dist=50_000),
+        patch_config=PatchConfig(resolution=10.0),
     )
 
     with pytest.raises(RuntimeError, match="run failed"):
@@ -131,8 +135,9 @@ def test_execute_tasks_failure_mode_best_effort(monkeypatch):
         assets=cast(GeoDataFrame, _make_valid_search_df()),
         pipeline=[],
         uri="test",
-        grid_cells=[],
+        patches=[],
         grid_config=GridConfig(target_grid_dist=50_000),
+        patch_config=PatchConfig(resolution=10.0),
     )
 
     result = client.execute_tasks(
@@ -162,15 +167,17 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
         assets=cast(GeoDataFrame, _make_valid_search_df()),
         pipeline=[],
         uri="ok",
-        grid_cells=[],
+        patches=[],
         grid_config=GridConfig(target_grid_dist=50_000),
+        patch_config=PatchConfig(resolution=10.0),
     )
     task_fail = ExtractionTask(
         assets=cast(GeoDataFrame, _make_valid_search_df()),
         pipeline=[],
         uri="fail",
-        grid_cells=[],
+        patches=[],
         grid_config=GridConfig(target_grid_dist=50_000),
+        patch_config=PatchConfig(resolution=10.0),
     )
 
     result = client.execute_tasks(

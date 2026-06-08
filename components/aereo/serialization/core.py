@@ -3,7 +3,7 @@
 Each task is written as a pair of files inside a destination directory:
 
 * ``task_assets.parquet`` – GeoParquet of the task's ``assets`` GeoDataFrame.
-* ``task_meta.json``       – JSON with profile, grid config, cells, URI, AOI,
+* ``task_meta.json``       – JSON with profile, grid config, patches, URI, AOI,
   and task context.
 """
 
@@ -17,8 +17,8 @@ from typing import Any
 
 import geopandas as gpd
 import shapely.wkt
-from aereo.grid import GridCell
-from aereo.interfaces import AereoPlugin, ExtractionTask, GridConfig
+from aereo.grid import ExtractionPatch
+from aereo.interfaces import AereoPlugin, ExtractionTask, GridConfig, PatchConfig
 
 logger = logging.getLogger(__name__)
 
@@ -32,11 +32,16 @@ class TaskSerializer:
     # JSON field keys for serialize / deserialize parity
     CELL_ID_KEY = "cell_id"
     D_KEY = "d"
-    IS_PRIMARY_KEY = "is_primary"
     GEOM_WKT_KEY = "geom_wkt"
+    RESOLUTION_KEY = "resolution"
+    MARGIN_KEY = "margin"
+    PADDING_KEY = "padding"
+    CONFORM_TO_KEY = "conform_to"
+
     PIPELINE_KEY = "pipeline"
     GRID_CONFIG_KEY = "grid_config"
-    GRID_CELLS_KEY = "grid_cells"
+    PATCH_CONFIG_KEY = "patch_config"
+    PATCHES_KEY = "patches"
     URI_KEY = "uri"
     AOI_WKT_KEY = "aoi_wkt"
     TASK_CONTEXT_KEY = "task_context"
@@ -58,15 +63,18 @@ class TaskSerializer:
         # Assets → GeoParquet
         task.assets.to_parquet(dest_dir / self.ASSETS_NAME)
 
-        # Grid cells → lightweight dicts
-        grid_cells_meta: list[dict[str, Any]] = [
+        # Patches → lightweight dicts
+        patches_meta: list[dict[str, Any]] = [
             {
-                self.CELL_ID_KEY: cell.id(),
-                self.D_KEY: cell.D,
-                self.IS_PRIMARY_KEY: cell.is_primary,
-                self.GEOM_WKT_KEY: cell.geom.wkt,
+                self.CELL_ID_KEY: patch.id,
+                self.D_KEY: patch.d,
+                self.GEOM_WKT_KEY: patch.cell_geometry.wkt,
+                self.RESOLUTION_KEY: patch.resolution,
+                self.MARGIN_KEY: patch.margin,
+                self.PADDING_KEY: patch.padding,
+                self.CONFORM_TO_KEY: patch.conform_to,
             }
-            for cell in task.grid_cells
+            for patch in task.patches
         ]
 
         # Pipeline stages → dicts with class paths
@@ -82,7 +90,8 @@ class TaskSerializer:
         meta: dict[str, Any] = {
             self.PIPELINE_KEY: pipeline_meta,
             self.GRID_CONFIG_KEY: task.grid_config.model_dump(mode="json"),
-            self.GRID_CELLS_KEY: grid_cells_meta,
+            self.PATCH_CONFIG_KEY: task.patch_config.model_dump(mode="json"),
+            self.PATCHES_KEY: patches_meta,
             self.URI_KEY: task.uri,
             self.AOI_WKT_KEY: task.aoi.wkt if task.aoi is not None else None,
             self.TASK_CONTEXT_KEY: dict(task.task_context),
@@ -92,10 +101,10 @@ class TaskSerializer:
         )
 
         logger.debug(
-            "task_serialized dest_dir=%s n_assets=%d n_cells=%d",
+            "task_serialized dest_dir=%s n_assets=%d n_patches=%d",
             dest_dir,
             len(task.assets),
-            len(task.grid_cells),
+            len(task.patches),
         )
 
     def deserialize(self, src_dir: Path) -> ExtractionTask:
@@ -129,17 +138,21 @@ class TaskSerializer:
             pipeline.append(cls.model_validate(config))
 
         grid_config = GridConfig.model_validate(meta[self.GRID_CONFIG_KEY])
+        patch_config = PatchConfig.model_validate(meta[self.PATCH_CONFIG_KEY])
 
-        # Reconstruct GridCell instances
-        grid_cells: list[GridCell] = []
-        for cell_meta in meta[self.GRID_CELLS_KEY]:
-            geom = shapely.wkt.loads(cell_meta[self.GEOM_WKT_KEY])
-            grid_cells.append(
-                GridCell(
-                    d=cell_meta[self.D_KEY],
-                    geom=geom,  # type: ignore[arg-type]
-                    is_primary=cell_meta[self.IS_PRIMARY_KEY],
-                    cell_id=cell_meta[self.CELL_ID_KEY],
+        # Reconstruct ExtractionPatch instances
+        patches: list[ExtractionPatch] = []
+        for patch_meta in meta[self.PATCHES_KEY]:
+            geom = shapely.wkt.loads(patch_meta[self.GEOM_WKT_KEY])
+            patches.append(
+                ExtractionPatch(
+                    id=patch_meta[self.CELL_ID_KEY],
+                    d=patch_meta[self.D_KEY],
+                    cell_geometry=geom,  # type: ignore[arg-type]
+                    resolution=patch_meta[self.RESOLUTION_KEY],
+                    margin=patch_meta[self.MARGIN_KEY],
+                    padding=patch_meta[self.PADDING_KEY],
+                    conform_to=patch_meta.get(self.CONFORM_TO_KEY),
                 )
             )
 
@@ -154,8 +167,9 @@ class TaskSerializer:
             assets=assets,  # type: ignore[arg-type]
             pipeline=pipeline,
             uri=meta[self.URI_KEY],
-            grid_cells=grid_cells,
+            patches=patches,
             grid_config=grid_config,
+            patch_config=patch_config,
             aoi=aoi,
             task_context=meta[self.TASK_CONTEXT_KEY],
         )

@@ -2,8 +2,8 @@ from datetime import datetime
 from typing import Any, cast
 
 import geopandas as gpd
-from aereo.grid import GridCell
-from aereo.interfaces import ExtractionTask, GridConfig
+from aereo.grid import ExtractionPatch
+from aereo.interfaces import ExtractionTask, GridConfig, PatchConfig
 from aereo.schemas import AssetSchema
 from aereo.serialization import TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
@@ -17,7 +17,6 @@ from aereo.builtins.write import WriteGeoTIFF
 def _make_task(
     *,
     cell_id: str = "0U_0R",
-    is_primary: bool = True,
     aoi: Polygon | None = None,
     task_context: dict[str, Any] | None = None,
 ) -> ExtractionTask:
@@ -40,19 +39,23 @@ def _make_task(
         WriteGeoTIFF(),
     ]
     grid_config = GridConfig(target_grid_dist=50_000)
-    grid_cell = GridCell(
+    patch_config = PatchConfig(resolution=100.0, margin=10.0, padding=2)
+    patch = ExtractionPatch(
+        id=cell_id,
         d=50_000,
-        geom=Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]]),
-        is_primary=is_primary,
-        cell_id=cell_id,
+        cell_geometry=Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]]),
+        resolution=100.0,
+        margin=10.0,
+        padding=2,
     )
 
     return ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
         pipeline=pipeline,
         uri="test_uri",
-        grid_cells=[grid_cell],
+        patches=[patch],
         grid_config=grid_config,
+        patch_config=patch_config,
         aoi=aoi,
         task_context=task_context or {},
     )
@@ -81,16 +84,22 @@ def test_round_trip_basic(tmp_path: Any) -> None:
     # Grid config
     assert reconstructed.grid_config == original.grid_config
 
+    # Patch config
+    assert reconstructed.patch_config == original.patch_config
+
     # URI
     assert reconstructed.uri == original.uri
 
-    # Grid cells
-    assert len(reconstructed.grid_cells) == 1
-    assert reconstructed.grid_cells[0].id() == original.grid_cells[0].id()
-    assert reconstructed.grid_cells[0].D == original.grid_cells[0].D
-    assert reconstructed.grid_cells[0].is_primary == original.grid_cells[0].is_primary
-    assert reconstructed.grid_cells[0].geom.equals_exact(
-        original.grid_cells[0].geom, tolerance=1e-9
+    # Patches
+    assert len(reconstructed.patches) == 1
+    assert reconstructed.patches[0].id == original.patches[0].id
+    assert reconstructed.patches[0].d == original.patches[0].d
+    assert reconstructed.patches[0].resolution == original.patches[0].resolution
+    assert reconstructed.patches[0].margin == original.patches[0].margin
+    assert reconstructed.patches[0].padding == original.patches[0].padding
+    assert reconstructed.patches[0].conform_to == original.patches[0].conform_to
+    assert reconstructed.patches[0].cell_geometry.equals_exact(
+        original.patches[0].cell_geometry, tolerance=1e-9
     )
 
     # AOI
@@ -128,7 +137,7 @@ def test_round_trip_task_context(tmp_path: Any) -> None:
 
 
 def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
-    """Tasks with several grid cells reconstruct every cell faithfully."""
+    """Tasks with several patches reconstruct every patch faithfully."""
     serializer = TaskSerializer()
 
     df = gpd.GeoDataFrame(
@@ -146,18 +155,22 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
         crs="EPSG:4326",
     )
 
-    cells = [
-        GridCell(
+    patches = [
+        ExtractionPatch(
+            id="1U_1R",
             d=10_000,
-            geom=Polygon([[0, 0], [0.1, 0], [0.1, 0.1], [0, 0.1]]),
-            is_primary=True,
-            cell_id="1U_1R",
+            cell_geometry=Polygon([[0, 0], [0.1, 0], [0.1, 0.1], [0, 0.1]]),
+            resolution=10.0,
+            margin=5.0,
+            padding=0,
         ),
-        GridCell(
+        ExtractionPatch(
+            id="1U_1R_OV",
             d=10_000,
-            geom=Polygon([[0.1, 0.1], [0.2, 0.1], [0.2, 0.2], [0.1, 0.2]]),
-            is_primary=False,
-            cell_id="1U_1R_OV",
+            cell_geometry=Polygon([[0.1, 0.1], [0.2, 0.1], [0.2, 0.2], [0.1, 0.2]]),
+            resolution=10.0,
+            margin=5.0,
+            padding=0,
         ),
     ]
 
@@ -170,20 +183,22 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
         assets=cast(GeoDataFrame[AssetSchema], df),
         pipeline=pipeline,
         uri="out",
-        grid_cells=cells,
+        patches=patches,
         grid_config=GridConfig(target_grid_dist=10_000),
+        patch_config=PatchConfig(resolution=10.0, margin=5.0, padding=0),
     )
 
     dest = tmp_path / "task_multi"
     serializer.serialize(original, dest)
     reconstructed = serializer.deserialize(dest)
 
-    assert len(reconstructed.grid_cells) == 2
-    for orig, recon in zip(cells, reconstructed.grid_cells):
-        assert recon.id() == orig.id()
-        assert recon.D == orig.D
-        assert recon.is_primary == orig.is_primary
-        assert recon.geom.equals_exact(orig.geom, tolerance=1e-9)
+    assert len(reconstructed.patches) == 2
+    for orig, recon in zip(patches, reconstructed.patches):
+        assert recon.id == orig.id
+        assert recon.d == orig.d
+        assert recon.resolution == orig.resolution
+        assert recon.margin == orig.margin
+        assert recon.cell_geometry.equals_exact(orig.cell_geometry, tolerance=1e-9)
 
 
 def test_assets_crs_preserved(tmp_path: Any) -> None:
