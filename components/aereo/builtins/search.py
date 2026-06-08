@@ -39,11 +39,6 @@ class SearchSTAC(SearchProvider):
         Returns:
             A GeoDataFrame of matched assets.
         """
-        # 1. Extract parameters
-        stac_api_url = self.stac_api_url
-        pystac_open_params = self.pystac_open_params
-        pystac_search_params = self.pystac_search_params
-
         # 2. Derive collections and per-collection asset filters.
         collections, collection_asset_filters = build_collection_asset_filters(
             self.collections
@@ -67,7 +62,7 @@ class SearchSTAC(SearchProvider):
             time_range = f"../{q_end.strftime(TIME_FORMAT)}"
 
         # 5. Open STAC client
-        client_kwargs: dict[str, Any] = dict(pystac_open_params)
+        client_kwargs: dict[str, Any] = dict(self.pystac_open_params)
         # Remove 'url' if present — stac_api_url is already passed positionally.
         client_kwargs.pop("url", None)
         if "headers" in client_kwargs and isinstance(client_kwargs["headers"], dict):
@@ -76,13 +71,13 @@ class SearchSTAC(SearchProvider):
             }
 
         try:
-            client = Client.open(stac_api_url, **client_kwargs)
+            client = Client.open(self.stac_api_url, **client_kwargs)
         except Exception as e:
             logger.error(
-                "Failed to connect to STAC API", url=stac_api_url, error=str(e)
+                "Failed to connect to STAC API", url=self.stac_api_url, error=str(e)
             )
             raise ValueError(
-                f"Failed to connect to STAC API at {stac_api_url}: {e}"
+                f"Failed to connect to STAC API at {self.stac_api_url}: {e}"
             ) from e
 
         # 6. Build search query keyword arguments
@@ -95,7 +90,7 @@ class SearchSTAC(SearchProvider):
             searchkwargs["intersects"] = self.intersects.__geo_interface__
 
         # Merge in pystac_search_params
-        searchkwargs.update(pystac_search_params)
+        searchkwargs.update(self.pystac_search_params)
 
         # 7. Execute search
         try:
