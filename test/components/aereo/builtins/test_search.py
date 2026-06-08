@@ -19,6 +19,8 @@ def mock_pystac_item():
         ],
     }
     mock_item.datetime = datetime(2023, 5, 12, 10, 10, 31, tzinfo=timezone.utc)
+    mock_item.common_metadata.start_datetime = None
+    mock_item.common_metadata.end_datetime = None
     mock_item.properties = {"datetime": "2023-05-12T10:10:31Z"}
     mock_item.to_dict.return_value = {"id": "test-item-123", "type": "Feature"}
 
