@@ -1,3 +1,9 @@
+"""Aereo STAC search built-in plugin.
+
+Provides the SearchSTAC provider for executing spatial and temporal queries
+against generic STAC APIs and mapping the results to Aereo Asset representations.
+"""
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -38,6 +44,9 @@ class SearchSTAC(SearchProvider):
 
         Returns:
             A GeoDataFrame of matched assets.
+
+        Raises:
+            ValueError: If connection to the STAC API fails or the search query fails.
         """
         # 2. Derive collections and per-collection asset filters.
         collections, collection_asset_filters = build_collection_asset_filters(
@@ -104,6 +113,31 @@ class SearchSTAC(SearchProvider):
             return self.empty_result()
 
         # 8. Generate one row per requested asset for each matched item
+        return self._parse_stac_items_to_assets(
+            items=items,
+            collection_asset_filters=collection_asset_filters,
+            q_start=q_start,
+            q_end=q_end,
+        )
+
+    def _parse_stac_items_to_assets(
+        self,
+        items: list[Any],
+        collection_asset_filters: dict[str, Any],
+        q_start: datetime | None,
+        q_end: datetime | None,
+    ) -> GeoDataFrame[AssetSchema]:
+        """Parse PySTAC items into a GeoDataFrame of Aereo assets.
+
+        Args:
+            items: A list of PySTAC items returned by the search query.
+            collection_asset_filters: Mapping of collections to allowed asset keys.
+            q_start: The fallback start datetime.
+            q_end: The fallback end datetime.
+
+        Returns:
+            A GeoDataFrame of matched assets conforming to AssetSchema.
+        """
         rows = []
         for item in items:
             item_geometry = shape(item.geometry) if item.geometry else None
@@ -126,44 +160,18 @@ class SearchSTAC(SearchProvider):
                 else:
                     assets_to_use = []
 
-            # Parse start/end time from properties
-            properties = item.properties or {}
-            item_start = None
-            item_end = None
-
-            for prop_key in ("start_datetime", "datetime"):
-                val = properties.get(prop_key)
-                if val:
-                    try:
-                        if isinstance(val, str):
-                            if val.endswith("Z"):
-                                val = val[:-1] + "+00:00"
-                            item_start = datetime.fromisoformat(val)
-                        elif isinstance(val, datetime):
-                            item_start = val
-                        break
-                    except Exception:
-                        pass
-
-            for prop_key in ("end_datetime", "datetime"):
-                val = properties.get(prop_key)
-                if val:
-                    try:
-                        if isinstance(val, str):
-                            if val.endswith("Z"):
-                                val = val[:-1] + "+00:00"
-                            item_end = datetime.fromisoformat(val)
-                        elif isinstance(val, datetime):
-                            item_end = val
-                        break
-                    except Exception:
-                        pass
-
-            # Fallbacks if properties are missing
-            if item_start is None:
-                item_start = item.datetime or q_start or datetime.now(timezone.utc)
-            if item_end is None:
-                item_end = item.datetime or q_end or datetime.now(timezone.utc)
+            item_start = (
+                item.common_metadata.start_datetime
+                or item.datetime
+                or q_start
+                or datetime.now(timezone.utc)
+            )
+            item_end = (
+                item.common_metadata.end_datetime
+                or item.datetime
+                or q_end
+                or datetime.now(timezone.utc)
+            )
 
             for asset_key in assets_to_use:
                 asset = item.assets[asset_key]
