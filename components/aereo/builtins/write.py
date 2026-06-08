@@ -138,9 +138,10 @@ class WriteGeoTIFF(Writer):
                     band_da.rio.to_raster(fpath, **rio_params)
 
                     # Unique artifact ID
-                    artifact_id = (
-                        f"{grid_cell_id}_{var_name}_{band_idx if num_bands > 1 else 0}"
+                    time_str = (
+                        slice_time.strftime("%Y%m%dT%H%M%S") if slice_time else ""
                     )
+                    artifact_id = f"{grid_cell_id}_{var_name}_{band_idx if num_bands > 1 else 0}_{time_str}"
 
                     records.append(
                         {
