@@ -6,6 +6,8 @@ from aereo.interfaces import (
     ExtractionTask,
     GridConfig,
     PatchConfig,
+)
+from aereo.interfaces.utils import (
     infer_dataset_time_bounds,
     set_dataset_time_bounds,
     validate_aereo_dataset,
