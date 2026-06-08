@@ -14,6 +14,7 @@ from aereo.interfaces import (
     ExecutionBackend,
     ExtractionTask,
     GridConfig,
+    PatchConfig,
     SearchProvider,
 )
 from aereo.schemas import ArtifactSchema, AssetSchema
@@ -70,6 +71,7 @@ class AereoClient:
     def __init__(
         self,
         grid_config: GridConfig | None = None,
+        patch_config: PatchConfig | None = None,
         aoi: BaseGeometry | dict | None = None,
         backend: ExecutionBackend | None = None,
         cells_per_task: int | None = None,
@@ -78,11 +80,13 @@ class AereoClient:
 
         Args:
             grid_config: Default grid configuration for extraction.
+            patch_config: Default patch configuration for ML extraction.
             aoi: Default area of interest geometry.
             backend: Default execution backend.
             cells_per_task: Default number of grid cells per extraction task.
         """
         self._grid_config = grid_config
+        self._patch_config = patch_config
         self._aoi = normalize_geometry(aoi)
         self._backend = backend
         self._cells_per_task = cells_per_task
@@ -107,6 +111,7 @@ class AereoClient:
         search_results: GeoDataFrame[AssetSchema],
         pipeline: Sequence[AereoPlugin],
         grid_config: GridConfig | None = None,
+        patch_config: PatchConfig | None = None,
         uri: str | None = None,
         cells_per_task: int | None = None,
     ) -> Sequence[ExtractionTask]:
@@ -116,6 +121,7 @@ class AereoClient:
             search_results: The merged GeoDataFrame of search results to prepare.
             pipeline: Sequence of pipeline stages to execute.
             grid_config: Explicit tiling specification. Falls back to client default.
+            patch_config: Explicit patch configuration. Falls back to client default.
             uri: An optional URI defining output path.
             cells_per_task: Max grid cells per ExtractionTask. Falls back to client default.
 
@@ -131,6 +137,12 @@ class AereoClient:
                 "grid_config must be provided either as a method argument or as a client default."
             )
 
+        patch_config = self._patch_config if patch_config is None else patch_config
+        if patch_config is None:
+            raise ValueError(
+                "patch_config must be provided either as a method argument or as a client default."
+            )
+
         effective_cells_per_task = (
             cells_per_task
             if cells_per_task is not None
@@ -140,6 +152,7 @@ class AereoClient:
         return prepare_for_extraction(
             search_results=search_results,
             grid_config=grid_config,
+            patch_config=patch_config,
             pipeline=pipeline,
             uri=uri or "",
             target_aoi=self._aoi,

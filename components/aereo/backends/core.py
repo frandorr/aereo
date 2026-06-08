@@ -113,39 +113,28 @@ class TaskRunner:
             for proc in pre_processors:
                 ds = proc(ds)
 
-            # Stage 3-5: Per-cell loop
+            # Stage 3-5: Per-patch loop
             artifacts: list[GeoDataFrame[ArtifactSchema]] = []
-            for cell in task.grid_cells:
+            for patch in task.patches:
                 try:
-                    # Spatial parameters from reprojector
-                    resolution = int(reprojector.resolution)
-                    padding = getattr(reprojector, "padding", None) or 0
-                    conform_to_shape = getattr(reprojector, "conform_to", None)
-
-                    geobox = cell.area_def(
-                        resolution=resolution,
-                        padding=padding,
-                        margin=task.grid_config.target_grid_margin,
-                        conform_to=conform_to_shape,
-                    )
-                    ds_cell = reprojector(ds, geobox)
-                    self._fire_callbacks("on_reproject_complete", task, cell, ds_cell)
+                    ds_patch = reprojector(ds, patch.geobox)
+                    self._fire_callbacks("on_reproject_complete", task, patch, ds_patch)
 
                     for proc in post_processors:
-                        ds_cell = proc(ds_cell)
+                        ds_patch = proc(ds_patch)
 
-                    cell_artifacts = writer(ds_cell, task, cell)
-                    artifacts.append(cell_artifacts)
+                    patch_artifacts = writer(ds_patch, task, patch)
+                    artifacts.append(patch_artifacts)
 
                     self._fire_callbacks(
-                        "on_cell_complete", task, cell, ds_cell, cell_artifacts
+                        "on_patch_write_complete", task, patch, patch_artifacts
                     )
                 except Exception as exc:
                     if self.per_cell_failure_mode == "strict":
                         raise
                     self._fire_callbacks("on_task_failed", task, exc)
                     logger.warning(
-                        "Cell %s failed, skipping: %s", cell.id(), exc, exc_info=True
+                        "Patch %s failed, skipping: %s", patch.id, exc, exc_info=True
                     )
 
             if artifacts:

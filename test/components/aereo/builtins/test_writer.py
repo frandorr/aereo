@@ -9,11 +9,11 @@ import pandas as pd
 import pytest
 import rioxarray  # noqa: F401 — registers the ``rio`` accessor on xarray objects
 import xarray as xr
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, box
 
 from aereo.builtins import WriteGeoTIFF
-from aereo.grid import GridCell
-from aereo.interfaces.core import ExtractionTask, GridConfig
+from aereo.grid import ExtractionPatch
+from aereo.interfaces.core import ExtractionTask, GridConfig, PatchConfig
 from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -53,18 +53,23 @@ def _make_task(tmp_path):
     valid_df["end_time"] = pd.Timestamp("2026-01-01T12:10:00")
 
     grid_config = GridConfig(target_grid_dist=50_000)
-    cell = GridCell(
+    patch_config = PatchConfig(resolution=10.0)
+    patch = ExtractionPatch(
+        id="test_cell",
         d=10_000,
-        geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-        is_primary=True,
-        cell_id="test_cell",
+        cell_geometry=box(-70.5, -33.5, -70.0, -33.0),
+        resolution=10.0,
+        margin=0.0,
+        padding=0,
+        conform_to=None,
     )
     return ExtractionTask(
         assets=GeoDataFrame(valid_df),
         pipeline=[],
         uri=str(tmp_path),
-        grid_cells=[cell],
+        patches=[patch],
         grid_config=grid_config,
+        patch_config=patch_config,
     )
 
 
@@ -78,7 +83,7 @@ def test_write_geotiff_plain_mode_driver(tmp_path):
     ds = _make_dataset()
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
-    result = writer(ds, task, task.grid_cells[0])
+    result = writer(ds, task, task.patches[0])
 
     assert len(result) == 2
     for _, row in result.iterrows():
@@ -93,7 +98,7 @@ def test_write_geotiff_plain_mode_returns_artifacts(tmp_path):
     ds = _make_dataset()
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
-    result = writer(ds, task, task.grid_cells[0])
+    result = writer(ds, task, task.patches[0])
 
     assert set(result["id"]) == {"test_cell_B04_0", "test_cell_B08_0"}
     assert bool((result["grid_cell"] == "test_cell").all())
@@ -111,7 +116,7 @@ def test_write_geotiff_tiled_via_rio_params(tmp_path):
     writer = WriteGeoTIFF(
         rio_params={"tiled": True, "blockxsize": 32, "blockysize": 32}
     )
-    result = writer(ds, task, task.grid_cells[0])
+    result = writer(ds, task, task.patches[0])
 
     import rasterio
 
@@ -144,7 +149,7 @@ def test_write_geotiff_multiband_plain(tmp_path):
 
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
-    result = writer(ds, task, task.grid_cells[0])
+    result = writer(ds, task, task.patches[0])
 
     assert len(result) == 3
     assert set(result["id"]) == {
@@ -171,7 +176,7 @@ def test_write_geotiff_multiband_tiled(tmp_path):
 
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF(rio_params={"tiled": True})
-    result = writer(ds, task, task.grid_cells[0])
+    result = writer(ds, task, task.patches[0])
 
     import rasterio
 
@@ -205,7 +210,7 @@ def test_write_geotiff_rio_params_forwarded(tmp_path):
         rio_params={"tags": {"custom_key": "custom_val"}, "compress": "lzw"}
     )
 
-    result = writer(ds, task, task.grid_cells[0])
+    result = writer(ds, task, task.patches[0])
 
     import rasterio
 
@@ -227,4 +232,4 @@ def test_write_geotiff_missing_time_bounds_raises(tmp_path):
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
     with pytest.raises(ValueError, match="start_time.*end_time"):
-        writer(ds, task, task.grid_cells[0])
+        writer(ds, task, task.patches[0])

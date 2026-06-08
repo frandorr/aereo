@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 import xarray as xr
-from aereo.grid import GridCell
+from aereo.grid import ExtractionPatch
 from aereo.interfaces import ExtractionTask, Writer
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -32,7 +32,7 @@ class WriteGeoTIFF(Writer):
         self,
         ds: xr.Dataset,
         task: ExtractionTask,
-        cell: GridCell,
+        patch: ExtractionPatch,
     ) -> GeoDataFrame[ArtifactSchema]:
         """Write *ds* to GeoTIFF files using the standard EOIDS layout under ``task.uri``.
 
@@ -45,7 +45,7 @@ class WriteGeoTIFF(Writer):
             ds: The xarray.Dataset to write.  Must contain ``start_time`` and
                 ``end_time`` in ``ds.attrs`` when no ``time`` dimension is present.
             task: The extraction task providing the output URI.
-            cell: The grid cell being written.
+            patch: The extraction patch being written.
 
         Returns:
             GeoDataFrame of written artifacts conforming to ``ArtifactSchema``.
@@ -60,7 +60,7 @@ class WriteGeoTIFF(Writer):
         from aereo.eoids import build_eoids_path
 
         uri = task.uri
-        cell_id = cell.id()
+        cell_id = patch.id
 
         start_time = ds.attrs.get("start_time")
         end_time = ds.attrs.get("end_time")
@@ -73,12 +73,12 @@ class WriteGeoTIFF(Writer):
 
         rio_params = dict(self.rio_params)
 
-        # Build grid-cell metadata once
-        grid_cell_id = cell.id()
-        grid_dist = task.grid_config.target_grid_dist or cell.D
-        cell_geometry = cell.geom
-        cell_utm_crs = cell.utm_crs
-        cell_utm_footprint = cell.utm_footprint
+        # Build patch metadata once
+        grid_cell_id = patch.id
+        grid_dist = patch.d
+        cell_geometry = patch.cell_geometry
+        cell_utm_crs = patch.utm_crs
+        cell_utm_footprint = patch.utm_footprint
 
         # Derive source IDs from task assets
         source_ids = (

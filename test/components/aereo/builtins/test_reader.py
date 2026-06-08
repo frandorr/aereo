@@ -12,8 +12,8 @@ import xarray as xr
 from shapely.geometry import box
 
 from aereo.builtins import ReadODCSTAC
-from aereo.grid import GridCell
-from aereo.interfaces.core import ExtractionTask, GridConfig
+from aereo.grid import ExtractionPatch
+from aereo.interfaces.core import ExtractionTask, GridConfig, PatchConfig
 from aereo.schemas.core import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -68,18 +68,23 @@ def _make_task(stac_item_dict: dict[str, Any] | None = None, aoi=None):
         valid_df["stac_item"] = [stac_item_dict]
 
     grid_config = GridConfig(target_grid_dist=50_000)
-    cell = GridCell(
+    patch_config = PatchConfig(resolution=10.0)
+    patch = ExtractionPatch(
+        id="test_cell",
         d=10_000,
-        geom=box(-70.5, -33.5, -70.0, -33.0),
-        is_primary=True,
-        cell_id="test_cell",
+        cell_geometry=box(-70.5, -33.5, -70.0, -33.0),
+        resolution=10.0,
+        margin=0.0,
+        padding=0,
+        conform_to=None,
     )
     return ExtractionTask(
         assets=GeoDataFrame(valid_df),
         pipeline=[],
         uri="/tmp/test",
-        grid_cells=[cell],
+        patches=[patch],
         grid_config=grid_config,
+        patch_config=patch_config,
         aoi=aoi,
     )
 
@@ -211,18 +216,23 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
     valid_df["stac_item"] = [item_dict, item_dict]
 
     grid_config = GridConfig(target_grid_dist=50_000)
-    cell = GridCell(
+    patch_config = PatchConfig(resolution=10.0)
+    patch = ExtractionPatch(
+        id="test_cell",
         d=10_000,
-        geom=box(-70.5, -33.5, -70.0, -33.0),
-        is_primary=True,
-        cell_id="test_cell",
+        cell_geometry=box(-70.5, -33.5, -70.0, -33.0),
+        resolution=10.0,
+        margin=0.0,
+        padding=0,
+        conform_to=None,
     )
     task = ExtractionTask(
         assets=GeoDataFrame(valid_df),
         pipeline=[],
         uri="/tmp/test",
-        grid_cells=[cell],
+        patches=[patch],
         grid_config=grid_config,
+        patch_config=patch_config,
     )
 
     reader = ReadODCSTAC()

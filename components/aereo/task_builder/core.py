@@ -9,14 +9,13 @@ from __future__ import annotations
 from typing import Any, Sequence, cast
 
 import geopandas as gpd
-from aereo.grid import GridCell, GridDefinition
+from aereo.grid import ExtractionPatch, GridDefinition, generate_extraction_patches
 from aereo.interfaces.core import (
     DEFAULT_CELLS_PER_TASK,
     AereoPlugin,
     ExtractionTask,
     GridConfig,
-    Reprojector,
-    WGS84_CRS,
+    PatchConfig,
     _skip_empty,
     _union_all,
 )
@@ -27,29 +26,31 @@ from shapely.geometry.base import BaseGeometry
 _VALID_FILTER_MODES = frozenset({"intersection", "within", "coverage"})
 
 
-def _generate_cell_groups(
+def _generate_patch_groups(
     assets: GeoDataFrame[AssetSchema],
     target_aoi: BaseGeometry | None,
     grid_def: Any,
     grid_config: GridConfig,
-) -> list[tuple[Any, GeoDataFrame, list[GridCell]]]:
-    """Group assets by start_time and generate/filter grid cells.
+    patch_config: PatchConfig,
+) -> list[tuple[Any, GeoDataFrame, list[ExtractionPatch]]]:
+    """Group assets by start_time and generate/filter grid patches.
 
     Args:
         assets: GeoDataFrame of search results.
         target_aoi: Optional AOI used to clip each time group before tiling.
-        grid_def: Grid definition providing ``generate_grid_cells``.
+        grid_def: Grid definition used for raw partitioning.
         grid_config: Grid configuration (drives filter mode and min coverage).
+        patch_config: Patch configuration (drives resolution, margin, padding, etc).
 
     Returns:
-        List of ``(start_time, time_group, cells)`` tuples; entries with no
-        intersecting cells or no contributing assets are omitted.
+        List of ``(start_time, time_group, patches)`` tuples; entries with no
+        intersecting patches or no contributing assets are omitted.
 
     Raises:
         ValueError: If ``grid_config.grid_filter_mode`` is not one of
             ``"intersection"``, ``"within"``, or ``"coverage"``.
     """
-    profile_cell_groups: list[tuple[Any, GeoDataFrame, list[GridCell]]] = []
+    profile_patch_groups: list[tuple[Any, GeoDataFrame, list[ExtractionPatch]]] = []
     grid_filter_mode = str(grid_config.grid_filter_mode).lower()
     if grid_filter_mode not in _VALID_FILTER_MODES:
         raise ValueError(
@@ -71,129 +72,86 @@ def _generate_cell_groups(
         if _skip_empty(aoi_geom):
             continue
 
-        all_cells = list(grid_def.generate_grid_cells(aoi_geom))
-        if not all_cells:
+        all_patches = list(
+            generate_extraction_patches(aoi_geom, grid_def, patch_config)
+        )
+        if not all_patches:
             continue
 
         if grid_filter_mode != "intersection":
-            all_cells = _filter_cells_by_mode(
-                all_cells, aoi_geom, grid_filter_mode, min_coverage
+            all_patches = _filter_patches_by_mode(
+                all_patches, aoi_geom, grid_filter_mode, min_coverage
             )
-            if not all_cells:
+            if not all_patches:
                 continue
 
-        profile_cell_groups.append(
-            (start_time, cast(GeoDataFrame, time_group), all_cells)
+        profile_patch_groups.append(
+            (start_time, cast(GeoDataFrame, time_group), all_patches)
         )
 
-    return profile_cell_groups
+    return profile_patch_groups
 
 
-def _filter_cells_by_mode(
-    cells: list[GridCell],
+def _filter_patches_by_mode(
+    patches: list[ExtractionPatch],
     aoi_geom: BaseGeometry,
     mode: str,
     min_coverage: float,
-) -> list[GridCell]:
-    """Filter cells by AOI coverage mode.
+) -> list[ExtractionPatch]:
+    """Filter patches by AOI coverage mode.
 
     Modes:
-        ``"within"``: keep cells fully contained in ``aoi_geom``.
-        ``"coverage"``: keep cells whose intersection with ``aoi_geom`` covers
-            at least ``min_coverage`` (a fraction) of the cell.
+        ``"within"``: keep patches fully contained in ``aoi_geom``.
+        ``"coverage"``: keep patches whose intersection with ``aoi_geom`` covers
+            at least ``min_coverage`` (a fraction) of the patch.
         ``"intersection"``: caller handles this mode by skipping the filter
-            entirely (all cells are kept).
+            entirely (all patches are kept).
     """
     if mode == "intersection":
-        return list(cells)
+        return list(patches)
     if mode not in _VALID_FILTER_MODES:
         raise ValueError(
             f"Unknown grid_filter_mode: {mode}. "
             f"Use one of {sorted(_VALID_FILTER_MODES)}."
         )
 
-    filtered: list[GridCell] = []
-    for cell in cells:
-        cell_geom = cell.geom
+    filtered: list[ExtractionPatch] = []
+    for patch in patches:
+        cell_geom = patch.cell_geometry
         if mode == "within":
             if aoi_geom.contains(cell_geom):
-                filtered.append(cell)
+                filtered.append(patch)
         elif mode == "coverage":
             intersection = cell_geom.intersection(aoi_geom)
             coverage = intersection.area / cell_geom.area if cell_geom.area > 0 else 0.0
             if coverage >= min_coverage:
-                filtered.append(cell)
+                filtered.append(patch)
     return filtered
-
-
-def _cache_cell_geometries(
-    cell_groups: list[tuple[Any, GeoDataFrame, list[GridCell]]],
-    pipeline: Sequence[AereoPlugin],
-    grid_config: GridConfig,
-) -> tuple[dict[GridCell, Any], dict[GridCell, BaseGeometry]]:
-    """Pre-compute area_def and WGS84 geometries for all cells.
-
-    Args:
-        cell_groups: Output of :func:`_generate_cell_groups`.
-        pipeline: Pipeline stages containing a potential Reprojector.
-        grid_config: Grid configuration providing ``target_grid_margin``.
-
-    Returns:
-        Tuple of ``(area_def_cache, wgs84_geom_cache)`` keyed by ``GridCell``.
-    """
-    reprojector: Reprojector | None = None
-    for plugin in pipeline:
-        if isinstance(plugin, Reprojector):
-            reprojector = plugin
-            break
-
-    resolution = (
-        int(reprojector.resolution)
-        if reprojector is not None
-        else (grid_config.target_grid_dist or 10)
-    )
-    padding = getattr(reprojector, "padding", None) or 0
-    conform_to_shape = getattr(reprojector, "conform_to", None)
-    target_grid_margin = grid_config.target_grid_margin
-
-    area_def_cache: dict[GridCell, Any] = {}
-    wgs84_geom_cache: dict[GridCell, BaseGeometry] = {}
-
-    for _, _, cells in cell_groups:
-        for cell in cells:
-            geobox = cell.area_def(
-                resolution,
-                padding,
-                margin=target_grid_margin,
-                conform_to=conform_to_shape,
-            )
-            area_def_cache[cell] = geobox
-            wgs84_geom_cache[cell] = geobox.extent.to_crs(WGS84_CRS).geom
-
-    return area_def_cache, wgs84_geom_cache
 
 
 def prepare_for_extraction(
     search_results: GeoDataFrame[AssetSchema],
     grid_config: GridConfig,
+    patch_config: PatchConfig,
     pipeline: Sequence[AereoPlugin],
     uri: str,
     target_aoi: BaseGeometry | None = None,
     cells_per_task: int = DEFAULT_CELLS_PER_TASK,
     init_params: dict[str, Any] | None = None,
 ) -> Sequence[ExtractionTask]:
-    """Prepare extraction tasks by grouping assets and chunking grid cells.
+    """Prepare extraction tasks by grouping assets and chunking grid patches.
 
-    Groups search results by start time, generates grid cells,
+    Groups search results by start time, generates extraction patches,
     optionally filters them by AOI coverage, then chunks into tasks.
 
     Args:
         search_results: GeoDataFrame of assets from the search phase.
         grid_config: Tiling specification shared by all tasks.
+        patch_config: ML physical patch boundaries specification.
         pipeline: Sequence of pipeline stages to execute.
         uri: Destination URI prefix for extracted artifacts.
         target_aoi: Optional geometry to clip the extraction region.
-        cells_per_task: Maximum number of grid cells per task chunk.
+        cells_per_task: Maximum number of patches per task chunk.
         init_params: Optional parameters added to each task's context.
 
     Returns:
@@ -213,34 +171,30 @@ def prepare_for_extraction(
     if search_results.empty:
         return []
 
-    cell_groups = _generate_cell_groups(
+    patch_groups = _generate_patch_groups(
         assets=search_results,
         target_aoi=target_aoi,
         grid_def=grid_def,
         grid_config=grid_config,
+        patch_config=patch_config,
     )
-    if not cell_groups:
+    if not patch_groups:
         return []
 
-    area_def_cache, wgs84_geom_cache = _cache_cell_geometries(
-        cell_groups=cell_groups,
-        pipeline=pipeline,
-        grid_config=grid_config,
-    )
-
     tasks: list[ExtractionTask] = []
-    for start_time, time_group, all_cells in cell_groups:
-        cell_chunks = [
-            all_cells[i : i + cells_per_task]
-            for i in range(0, len(all_cells), cells_per_task)
+    for start_time, time_group, all_patches in patch_groups:
+        patch_chunks = [
+            all_patches[i : i + cells_per_task]
+            for i in range(0, len(all_patches), cells_per_task)
         ]
 
-        for chunk_idx, cells in enumerate(cell_chunks):
-            cell_geoms = [wgs84_geom_cache[cell] for cell in cells]
-            cells_union = _union_all(gpd.GeoSeries(cell_geoms))
+        for chunk_idx, patches in enumerate(patch_chunks):
+            # Extract WGS84 raw geometry for grouping mask
+            patch_geoms = [patch.cell_geometry for patch in patches]
+            patches_union = _union_all(gpd.GeoSeries(patch_geoms))
 
             intersecting_mask = (
-                time_group.intersects(cells_union) | time_group.geometry.isna()
+                time_group.intersects(patches_union) | time_group.geometry.isna()
             )
             chunk_assets = cast(
                 GeoDataFrame[AssetSchema],
@@ -249,7 +203,7 @@ def prepare_for_extraction(
 
             task_context: dict[str, Any] = {
                 "chunk_id": chunk_idx,
-                "total_chunks": len(cell_chunks),
+                "total_chunks": len(patch_chunks),
                 "start_time": str(start_time),
                 "init_params": dict(init_params) if init_params else {},
             }
@@ -258,8 +212,9 @@ def prepare_for_extraction(
                 assets=chunk_assets,
                 pipeline=pipeline,
                 uri=uri,
-                grid_cells=cells,
+                patches=patches,
                 grid_config=grid_config,
+                patch_config=patch_config,
                 aoi=target_aoi,
                 task_context=task_context,
             )

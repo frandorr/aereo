@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
 import attrs
 import xarray as xr
-from aereo.grid import GridCell
+from aereo.grid import ExtractionPatch
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from pydantic import BaseModel, Field
@@ -163,7 +163,7 @@ class GridConfig(BaseModel):
     """Configuration for partitioning an AOI into a regular grid of cells.
 
     ``GridConfig`` controls how the area of interest is diced into
-    :class:`GridCell` objects: their size, overlap, margin expansion,
+    mathematical geographic partitions (grid cells): their size, overlap,
     and which cells are kept after filtering against the AOI.
     """
 
@@ -176,10 +176,6 @@ class GridConfig(BaseModel):
     target_grid_overlap: bool = Field(
         default=False,
         description="Whether grid cells overlap.",
-    )
-    target_grid_margin: float = Field(
-        default=0.0,
-        description="Percentage margin added to each cell's nominal size (e.g. 6.8 for 6.8 %).",
     )
     grid_filter_mode: GridFilterMode = Field(
         default="intersection",
@@ -240,6 +236,43 @@ class GridConfig(BaseModel):
         return cls.model_validate(data)
 
 
+class PatchConfig(BaseModel):
+    """Configuration for physical ML patch extraction dimensions.
+
+    This governs the physical map-math to transform a geographic grid
+    cell into a rigid bounding box suitable for tensor extraction.
+    """
+
+    model_config = {"extra": "forbid", "frozen": True}
+
+    resolution: float = Field(
+        description="Spatial resolution of the extracted patch in metres."
+    )
+    padding: int = Field(
+        default=0,
+        description="Additional padding pixels added to the extracted bounding box.",
+    )
+    margin: float = Field(
+        default=0.0,
+        description="Percentage margin added to the patch's nominal size (e.g. 5.0 for 5%).",
+    )
+    conform_to: tuple[int, int] | None = Field(
+        default=None,
+        description="Force the output tensor to this exact shape (H, W).",
+    )
+
+    @classmethod
+    def _from_raw(cls, data: dict[str, Any]) -> "PatchConfig":
+        if not isinstance(data, dict):
+            raise ValueError("PatchConfig data must be a dict.")
+        if "patch_config" in data:
+            data = data["patch_config"]
+        if isinstance(data, dict):
+            data = dict(data)
+            data.pop("_target_", None)
+        return cls.model_validate(data)
+
+
 class AereoPlugin(BaseModel, ABC):
     """Base class for all AEREO plugins, fully configurable via Pydantic/Hydra."""
 
@@ -254,7 +287,7 @@ class Reader(AereoPlugin, ABC):
         """Read data for the given task.
 
         Implementations should:
-        1. Use ``task.grid_cells`` to spatially subset where possible.
+        1. Use ``task.patches`` to spatially subset where possible.
         2. Return dask-backed (lazy) datasets by default for memory efficiency.
         3. Only load data that intersects the task's AOI.
         """
@@ -299,9 +332,9 @@ class Writer(AereoPlugin, ABC):
         self,
         ds: xr.Dataset,
         task: ExtractionTask,
-        cell: GridCell,
+        patch: ExtractionPatch,
     ) -> GeoDataFrame[ArtifactSchema]:
-        """Write *ds* for a single grid cell.
+        """Write *ds* for a single extracted patch.
 
         Returns:
             GeoDataFrame of written artifacts with ``ArtifactSchema``.
@@ -340,19 +373,19 @@ class PipelineCallback:
     def on_reproject_complete(
         self,
         task: ExtractionTask,
-        cell: GridCell,
+        patch: ExtractionPatch,
         ds: xr.Dataset,
     ) -> None:
-        """Called after a single grid cell has been reprojected."""
+        """Called after a single patch has been reprojected."""
         pass
 
-    def on_cell_write_complete(
+    def on_patch_write_complete(
         self,
         task: ExtractionTask,
-        cell: GridCell,
+        patch: ExtractionPatch,
         artifacts: GeoDataFrame[ArtifactSchema],
     ) -> None:
-        """Called after each cell is written."""
+        """Called after each patch is written."""
         pass
 
     def on_task_complete(
@@ -435,8 +468,9 @@ class ExtractionTask:
         assets: GeoDataFrame of assets to extract.
         pipeline: Sequence of pipeline stage plugins to execute.
         uri: Destination URI for extracted artifacts.
-        grid_cells: Spatial grid cells this task covers.
+        patches: Spatial grid patches this task covers.
         grid_config: Tiling specification shared by all tasks in this run.
+        patch_config: ML physical dimensions specification.
         aoi: Optional area-of-interest geometry used to clip the extraction region.
         task_context: Observability metadata generated during task preparation.
     """
@@ -444,8 +478,9 @@ class ExtractionTask:
     assets: GeoDataFrame[AssetSchema]
     pipeline: Sequence[AereoPlugin]
     uri: str
-    grid_cells: Sequence[GridCell]
+    patches: Sequence[ExtractionPatch]
     grid_config: GridConfig
+    patch_config: PatchConfig
     aoi: BaseGeometry | None = None
     task_context: Mapping[str, Any] = attrs.field(factory=dict)
 
@@ -461,10 +496,10 @@ class ExtractionTask:
     def __repr__(self) -> str:
         n_assets = len(self.assets) if self.assets is not None else 0
 
-        if self.grid_cells:
+        if self.patches:
             all_cells_str = (
-                f"{self.grid_cells[0].__class__.__name__}('"
-                + ", ".join([str(c) for c in self.grid_cells])
+                f"{self.patches[0].__class__.__name__}('"
+                + ", ".join([str(p) for p in self.patches])
                 + "')"
             )
         else:
@@ -474,7 +509,7 @@ class ExtractionTask:
             f"{self.__class__.__name__}("
             f"n_assets={n_assets}, "
             f"pipeline_len={len(self.pipeline)}, "
-            f"grid_cells={all_cells_str}, "
+            f"patches={all_cells_str}, "
             f"uri='{self.uri}'"
             f")"
         )
