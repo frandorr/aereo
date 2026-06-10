@@ -12,7 +12,7 @@ from aereo.builtins.processor import (
 )
 from aereo.builtins.read import ReadODCSTAC
 from aereo.builtins.reproject import ReprojectODC
-from aereo.builtins.search import SearchSTAC
+from aereo.builtins.search import SearchSTAC, SearchEarthaccess
 from aereo.builtins.write import WriteGeoTIFF
 
 __all__ = [
@@ -25,4 +25,5 @@ __all__ = [
     "SelectBands",
     "WriteGeoTIFF",
     "SearchSTAC",
+    "SearchEarthaccess",
 ]

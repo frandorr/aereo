@@ -6,18 +6,21 @@ against generic STAC APIs and mapping the results to Aereo Asset representations
 
 from __future__ import annotations
 
+import hashlib
+import warnings
 from datetime import datetime, timezone
-from typing import Any, Mapping, Sequence, cast
+from typing import Any, cast
 
 import geopandas as gpd
+import pandas as pd
 from aereo.interfaces import SearchProvider, build_collection_asset_filters
 from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from pystac_client import Client
-from shapely.geometry import shape
+from pydantic import Field
+from shapely.geometry import MultiPolygon, Polygon, shape
 from shapely.geometry.base import BaseGeometry
 from structlog import get_logger
-from pydantic import Field
 
 logger = get_logger()
 
@@ -32,12 +35,7 @@ class SearchSTAC(SearchProvider):
     """
 
     stac_api_url: str
-    collections: Mapping[str, Sequence[str]] | Sequence[str] | None = None
-    intersects: BaseGeometry | None = None
-    start_datetime: datetime | None = None
-    end_datetime: datetime | None = None
     pystac_open_params: dict[str, Any] = Field(default_factory=dict)
-    pystac_search_params: dict[str, Any] = Field(default_factory=dict)
 
     def __call__(self) -> GeoDataFrame[AssetSchema]:
         """Execute a STAC search against a generic STAC API.
@@ -98,8 +96,8 @@ class SearchSTAC(SearchProvider):
         if self.intersects is not None:
             searchkwargs["intersects"] = self.intersects.__geo_interface__
 
-        # Merge in pystac_search_params
-        searchkwargs.update(self.pystac_search_params)
+        # Merge in search_params
+        searchkwargs.update(self.search_params)
 
         # 7. Execute search
         try:
@@ -192,4 +190,207 @@ class SearchSTAC(SearchProvider):
             return self.empty_result()
 
         gdf = gpd.GeoDataFrame(rows, geometry="geometry")
+        return cast(GeoDataFrame, AssetSchema.validate(gdf))
+
+
+class NoSpatialMetadataError(Exception):
+    """Raised when a UMM representation does not contain spatial metadata."""
+
+
+def _to_polygon_or_multipolygon(polygons: list[Polygon]) -> BaseGeometry:
+    """Return a single Polygon or a MultiPolygon from a list of polygons."""
+    if len(polygons) == 1:
+        return polygons[0]
+    return MultiPolygon(polygons)
+
+
+def _parse_umm_polygon(umm: dict[str, Any]) -> BaseGeometry:
+    """Parse UMM (Unified Metadata Model) spatial extent into a Shapely geometry.
+
+    Tries to find GPolygons -> Boundary -> Points and constructs Polygon(s).
+    If multiple GPolygons are present, returns a MultiPolygon.
+    Falls back to BoundingRectangles if no GPolygons found.
+    If none found, raises NoSpatialMetadataError.
+    """
+    spatial = umm.get("SpatialExtent", {})
+    horiz = spatial.get("HorizontalSpatialDomain", {})
+    geometry = horiz.get("Geometry", {})
+
+    polygons: list[Polygon] = []
+
+    # Check for GPolygons
+    if "GPolygons" in geometry:
+        for p in geometry["GPolygons"]:
+            boundary = p.get("Boundary", {})
+            points = boundary.get("Points", [])
+            if len(points) >= 3:
+                coords = [(pt["Longitude"], pt["Latitude"]) for pt in points]
+                polygons.append(Polygon(coords))
+
+    if polygons:
+        return _to_polygon_or_multipolygon(polygons)
+
+    # Check for BoundingRectangles
+    if "BoundingRectangles" in geometry:
+        for rect in geometry["BoundingRectangles"]:
+            min_x = rect.get("WestBoundingCoordinate")
+            max_x = rect.get("EastBoundingCoordinate")
+            min_y = rect.get("SouthBoundingCoordinate")
+            max_y = rect.get("NorthBoundingCoordinate")
+            if all(v is not None for v in (min_x, max_x, min_y, max_y)):
+                polygons.append(
+                    Polygon(
+                        [
+                            (min_x, min_y),
+                            (max_x, min_y),
+                            (max_x, max_y),
+                            (min_x, max_y),
+                        ]
+                    )
+                )
+
+    if polygons:
+        return _to_polygon_or_multipolygon(polygons)
+
+    raise NoSpatialMetadataError("Could not find GPolygon or BoundingRectangle in UMM")
+
+
+def _process_granule(
+    g: Any,
+    collections: list[str],
+    intersects: BaseGeometry | None,
+) -> dict[str, Any] | None:
+    """Extract metadata from a single earthaccess granule into a row dict."""
+    meta = g["meta"]
+    umm = g["umm"]
+
+    # The Granule UR or concept-id works as a unique identifier
+    cid = meta.get("concept-id") or meta.get("native-id", "unknown")
+    unique_id = hashlib.md5(cid.encode("utf-8")).hexdigest()
+
+    # Collection short name
+    coll_ref = umm.get("CollectionReference", {})
+    collection_name = coll_ref.get("ShortName", collections[0])
+
+    # Parse temporal
+    temp_ext = umm.get("TemporalExtent", {})
+    range_dt = temp_ext.get("RangeDateTime", {})
+    start_str = range_dt.get("BeginningDateTime")
+    end_str = range_dt.get("EndingDateTime")
+
+    # Skip granules with missing temporal metadata
+    if not start_str or not end_str:
+        warnings.warn(
+            f"Skipping granule {cid} from collection {collection_name}: "
+            f"missing or incomplete temporal metadata (start={start_str}, end={end_str}).",
+            UserWarning,
+            stacklevel=2,
+        )
+        logger.warning(
+            "skipping_granule_missing_temporal",
+            granule_id=cid,
+            collection=collection_name,
+            start=start_str,
+            end=end_str,
+        )
+        return None
+
+    try:
+        geom = _parse_umm_polygon(umm)
+    except NoSpatialMetadataError:
+        # If UMM parsing fails, fallback to the requested intersects geometry
+        geom = intersects if intersects is not None else Polygon()
+
+    # Find S3 and HTTPS links independently
+    s3_links = g.data_links(access="direct")
+    https_links = g.data_links(access="external")
+
+    if not s3_links and not https_links:
+        logger.debug("no_links_found", concept_id=cid)
+        return None
+
+    s3_url = s3_links[0] if s3_links else None
+    https_url = https_links[0] if https_links else None
+    href = s3_url if s3_url else https_url
+
+    # S3 credentials endpoint for NASA Earthdata direct access
+    s3_credentials_url = g.get_s3_credentials_endpoint()
+
+    # Estimate size
+    size_mb = g.size()
+
+    return {
+        "id": unique_id,
+        "collection": collection_name,
+        "geometry": geom,
+        "start_time": start_str,
+        "end_time": end_str,
+        "href": href,
+        "s3_url": s3_url,
+        "https_url": https_url,
+        "s3_credentials_url": s3_credentials_url,
+        "size_mb": size_mb,
+        "granule_id": cid,
+    }
+
+
+class SearchEarthaccess(SearchProvider):
+    """Search provider for NASA Earthdata using the earthaccess library.
+
+    All search parameters are configurable as Pydantic fields so that the
+    provider can be instantiated via Hydra or directly in code.
+    Requires the `earthaccess` library to be installed.
+    """
+
+    def __call__(self) -> GeoDataFrame[AssetSchema]:
+        """Search NASA Earthdata using earthaccess."""
+        try:
+            import earthaccess  # type: ignore
+        except ImportError as e:
+            raise ImportError(
+                "The 'earthaccess' library is required to use SearchEarthaccess. "
+                "Please install it (e.g., 'pip install earthaccess')."
+            ) from e
+
+        collections, _ = build_collection_asset_filters(self.collections)
+        if not collections:
+            return self.empty_result()
+
+        kwargs: dict[str, Any] = {"short_name": collections}
+
+        if self.start_datetime is not None and self.end_datetime is not None:
+            kwargs["temporal"] = (
+                self.start_datetime.strftime("%Y-%m-%d %H:%M:%S"),
+                self.end_datetime.strftime("%Y-%m-%d %H:%M:%S"),
+            )
+
+        if self.intersects is not None:
+            bounds = getattr(self.intersects, "bounds", None)
+            if bounds is not None:
+                kwargs["bounding_box"] = bounds
+
+        kwargs.update(self.search_params)
+
+        try:
+            granules = earthaccess.search_data(**kwargs)
+        except Exception as e:
+            logger.error("earthaccess search failed", error=str(e), **kwargs)
+            return self.empty_result()
+
+        if not granules:
+            return self.empty_result()
+
+        rows = []
+        for g in granules:
+            row = _process_granule(g, collections, self.intersects)
+            if row is not None:
+                rows.append(row)
+
+        if not rows:
+            return self.empty_result()
+
+        gdf = gpd.GeoDataFrame(rows, geometry="geometry")
+        gdf["start_time"] = pd.to_datetime(gdf["start_time"])
+        gdf["end_time"] = pd.to_datetime(gdf["end_time"])
+
         return cast(GeoDataFrame, AssetSchema.validate(gdf))

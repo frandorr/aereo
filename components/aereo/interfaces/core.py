@@ -7,6 +7,7 @@ like SearchProvider, Reader, Writer, and Reprojector.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from datetime import datetime
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -306,7 +307,37 @@ class PipelineCallback:
 
 
 class SearchProvider(AereoPlugin, ABC):
-    """Interface for search providers."""
+    """Interface for search providers.
+
+    Common attributes for describing the query:
+
+    collections:
+        - Mapping:
+            Keys are collection IDs.
+            Values are sequences of asset keys to extract.
+        - Sequence:
+            List of collection IDs, each corresponding to the default
+            set of assets for that collection.
+
+    intersects:
+        Geometric AOI for the query, as a Shapely geometry object.
+
+    start_datetime:
+        Optional start of the temporal window (inclusive), in UTC.
+
+    end_datetime:
+        Optional end of the temporal window (inclusive), in UTC.
+
+    search_params:
+        Additional keyword arguments to pass to the underlying search
+        function (e.g. ``pystac_client.search``, ``earthaccess.search_data``).
+    """
+
+    collections: Mapping[str, Sequence[str]] | Sequence[str] | None = None
+    intersects: BaseGeometry | None = None
+    start_datetime: datetime | None = None
+    end_datetime: datetime | None = None
+    search_params: dict[str, Any] = Field(default_factory=dict)
 
     @staticmethod
     def empty_result() -> GeoDataFrame[AssetSchema]:
