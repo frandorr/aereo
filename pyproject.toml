@@ -71,6 +71,7 @@ entry-points."aereo.plugins".write_geotiff = "aereo.builtins.write:WriteGeoTIFF"
 dev = [
   "basedpyright>=1.38",
   "cartopy>=0.25",
+  "earthaccess>=0.18",
   "graphviz>=0.21",
   "icechunk>=2.0.3",
   "ipykernel>=7.2",

@@ -188,7 +188,7 @@ def test_search_stac_params_forwarding_and_datetime(mock_client, mock_pystac_ite
         intersects=polygon,
         start_datetime=start_dt,
         end_datetime=end_dt,
-        pystac_search_params={
+        search_params={
             "limit": 50,
             "query": {"eo:cloud_cover": {"lt": 10}},
         },
@@ -254,7 +254,7 @@ def test_search_stac_pystac_params_forwarding(mock_client, mock_pystac_item):
             "modifier": mock_modifier,
             "ignore_conformance": True,
         },
-        pystac_search_params={"method": "GET", "max_items": 10},
+        search_params={"method": "GET", "max_items": 10},
     )
     provider()
 

@@ -37,8 +37,9 @@ def _resolve_store(
 
         bucket = parsed.netloc
         path = parsed.path.lstrip("/")
-        # Default to anonymous access unless the caller overrides it.
-        if "skip_signature" not in opts:
+        # Default to anonymous access unless the caller overrides it or
+        # provides a credential provider (e.g. NASA Earthdata).
+        if "skip_signature" not in opts and "credential_provider" not in opts:
             opts["skip_signature"] = True
         # Public NOAA GOES buckets are in us-east-1; avoid cross-region
         # redirect errors by setting the correct region.
