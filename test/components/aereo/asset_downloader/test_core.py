@@ -365,6 +365,7 @@ def test_download_assets_safely_s3_fallback_to_non_earthdata_https(
 
 def test_download_with_earthaccess(tmp_path: Path) -> None:
     """_download_with_earthaccess streams through an authenticated session."""
+    pytest.importorskip("earthaccess")
     dest = tmp_path / "earthdata.tif"
     url = "https://data.lpdaac.earthdatacloud.nasa.gov/some/file.tif"
 

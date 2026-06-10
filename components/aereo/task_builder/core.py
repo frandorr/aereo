@@ -12,7 +12,7 @@ import geopandas as gpd
 from aereo.grid import ExtractionPatch, GridDefinition, generate_extraction_patches
 from aereo.interfaces.core import (
     DEFAULT_CELLS_PER_TASK,
-    AereoPlugin,
+    ExtractConfig,
     ExtractionTask,
     GridConfig,
     PatchConfig,
@@ -132,7 +132,7 @@ def prepare_for_extraction(
     search_results: GeoDataFrame[AssetSchema],
     grid_config: GridConfig,
     patch_config: PatchConfig,
-    pipeline: Sequence[AereoPlugin],
+    extract: ExtractConfig,
     uri: str,
     target_aoi: BaseGeometry | None = None,
     cells_per_task: int = DEFAULT_CELLS_PER_TASK,
@@ -147,7 +147,7 @@ def prepare_for_extraction(
         search_results: GeoDataFrame of assets from the search phase.
         grid_config: Tiling specification shared by all tasks.
         patch_config: ML physical patch boundaries specification.
-        pipeline: Sequence of pipeline stages to execute.
+        extract: Declarative configuration of the extraction stages.
         uri: Destination URI prefix for extracted artifacts.
         target_aoi: Optional geometry to clip the extraction region.
         cells_per_task: Maximum number of patches per task chunk.
@@ -209,7 +209,7 @@ def prepare_for_extraction(
 
             task = ExtractionTask(
                 assets=chunk_assets,
-                pipeline=pipeline,
+                extract=extract,
                 uri=uri,
                 patches=patches,
                 grid_config=grid_config,

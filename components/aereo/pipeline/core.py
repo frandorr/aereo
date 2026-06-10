@@ -7,25 +7,27 @@ extraction pipeline configuration.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Sequence
 
-from aereo.interfaces.core import AereoPlugin, GridConfig, SearchProvider
+from aereo.interfaces.core import (
+    SearchProvider,
+    GlobalConfig,
+    ExtractConfig,
+)
 from pydantic import BaseModel, Field
 
 
 class ExtractionJob(BaseModel):
     """Declarative configuration tree for a complete extraction job.
 
-    Bundles search configuration, grid options, and pipeline stages
+    Bundles search configuration, global job settings, and extraction pipeline stages
     together into a single validated Hydra-compatible model.
     """
 
     model_config = {"extra": "forbid", "frozen": True}
 
+    global_config: GlobalConfig = Field(alias="global")
     search: SearchProvider
-    pipeline: Sequence[AereoPlugin] = Field(default_factory=list)
-    grid_config: GridConfig
-    uri: str
+    extract: ExtractConfig
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> ExtractionJob:

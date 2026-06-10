@@ -18,6 +18,9 @@ from shapely.geometry import Polygon
 
 
 def test_extraction_task_validation():
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
     df = gpd.GeoDataFrame(
         {"collection": ["GOES"], "start_time": ["2023-01-01"]},
         geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
@@ -26,14 +29,14 @@ def test_extraction_task_validation():
     patch_config = PatchConfig(resolution=10.0)
     task = ExtractionTask(
         assets=cast(GeoDataFrame, df),
-        pipeline=[],
+        extract=ExtractConfig(read=ReadODCSTAC()),
         uri="test",
         patches=[],
         grid_config=grid_config,
         patch_config=patch_config,
     )
     assert task.uri == "test"
-    assert len(task.pipeline) == 0
+    assert task.extract.read is not None
 
 
 def test_grid_config_defaults_require_explicit_dist():

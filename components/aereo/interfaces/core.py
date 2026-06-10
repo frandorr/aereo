@@ -224,6 +224,28 @@ class Writer(AereoPlugin, ABC):
         ...
 
 
+class ExtractConfig(BaseModel):
+    """Declarative configuration for an extraction pipeline."""
+
+    model_config = {"extra": "forbid", "frozen": True}
+
+    read: Reader
+    preprocess: Sequence[Processor] = Field(default_factory=list)
+    reproject: Reprojector | None = None
+    postprocess: Sequence[Processor] = Field(default_factory=list)
+    write: Writer | None = None
+
+
+class GlobalConfig(BaseModel):
+    """Global configuration settings for an ExtractionJob."""
+
+    model_config = {"extra": "forbid", "frozen": True}
+
+    grid_config: GridConfig
+    patch_config: PatchConfig
+    uri: str
+
+
 class PipelineCallback:
     """Lifecycle hooks for pipeline execution.
 
@@ -348,7 +370,7 @@ class ExtractionTask:
 
     Attributes:
         assets: GeoDataFrame of assets to extract.
-        pipeline: Sequence of pipeline stage plugins to execute.
+        extract: Declarative configuration of extraction stages.
         uri: Destination URI for extracted artifacts.
         patches: Spatial grid patches this task covers.
         grid_config: Tiling specification shared by all tasks in this run.
@@ -358,7 +380,7 @@ class ExtractionTask:
     """
 
     assets: GeoDataFrame[AssetSchema]
-    pipeline: Sequence[AereoPlugin]
+    extract: ExtractConfig
     uri: str
     patches: Sequence[ExtractionPatch]
     grid_config: GridConfig
@@ -387,10 +409,18 @@ class ExtractionTask:
         else:
             all_cells_str = "[]"
 
+        extract_len = (
+            1
+            + len(self.extract.preprocess)
+            + len(self.extract.postprocess)
+            + (1 if self.extract.reproject else 0)
+            + (1 if self.extract.write else 0)
+        )
+
         return (
             f"{self.__class__.__name__}("
             f"n_assets={n_assets}, "
-            f"pipeline_len={len(self.pipeline)}, "
+            f"extract_len={extract_len}, "
             f"patches={all_cells_str}, "
             f"uri='{self.uri}'"
             f")"

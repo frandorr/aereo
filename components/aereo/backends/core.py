@@ -14,10 +14,6 @@ import pandas as pd
 from aereo.interfaces.core import (
     ExtractionTask,
     PipelineCallback,
-    Processor,
-    Reader,
-    Reprojector,
-    Writer,
 )
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -72,34 +68,14 @@ class TaskRunner:
             ValueError: If any required pipeline stage cannot be resolved.
             Exception: In ``strict`` mode, any per-cell exception aborts the task.
         """
-        # Find reader, reprojector, writer in task.pipeline
-        reader = None
-        reprojector = None
-        writer = None
-        reproject_idx = -1
-        writer_idx = -1
-
-        for idx, plugin in enumerate(task.pipeline):
-            if isinstance(plugin, Reader):
-                reader = plugin
-            elif isinstance(plugin, Reprojector):
-                reprojector = plugin
-                reproject_idx = idx
-            elif isinstance(plugin, Writer):
-                writer = plugin
-                writer_idx = idx
+        reader = task.extract.read
+        reprojector = task.extract.reproject
+        writer = task.extract.write
+        pre_processors = task.extract.preprocess
+        post_processors = task.extract.postprocess
 
         if reader is None:
             raise ValueError("Pipeline must contain a Reader stage.")
-        if reprojector is None:
-            raise ValueError("Pipeline must contain a Reprojector stage.")
-        if writer is None:
-            raise ValueError("Pipeline must contain a Writer stage.")
-
-        pre_processors = cast(Sequence[Processor], task.pipeline[1:reproject_idx])
-        post_processors = cast(
-            Sequence[Processor], task.pipeline[reproject_idx + 1 : writer_idx]
-        )
 
         self._fire_callbacks("on_task_start", task)
 
@@ -117,18 +93,23 @@ class TaskRunner:
             artifacts: list[GeoDataFrame[ArtifactSchema]] = []
             for patch in task.patches:
                 try:
-                    ds_patch = reprojector(ds, patch.geobox)
-                    self._fire_callbacks("on_reproject_complete", task, patch, ds_patch)
+                    if reprojector is not None:
+                        ds_patch = reprojector(ds, patch.geobox)
+                        self._fire_callbacks(
+                            "on_reproject_complete", task, patch, ds_patch
+                        )
+                    else:
+                        ds_patch = ds
 
                     for proc in post_processors:
                         ds_patch = proc(ds_patch)
 
-                    patch_artifacts = writer(ds_patch, task, patch)
-                    artifacts.append(patch_artifacts)
-
-                    self._fire_callbacks(
-                        "on_patch_write_complete", task, patch, patch_artifacts
-                    )
+                    if writer is not None:
+                        patch_artifacts = writer(ds_patch, task, patch)
+                        artifacts.append(patch_artifacts)
+                        self._fire_callbacks(
+                            "on_patch_write_complete", task, patch, patch_artifacts
+                        )
                 except Exception as exc:
                     if self.per_cell_failure_mode == "strict":
                         raise

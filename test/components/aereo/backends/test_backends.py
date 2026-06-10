@@ -15,9 +15,12 @@ from shapely.geometry import Polygon
 
 from aereo.backends.lambda_backend import LambdaBackend, RetryableLambdaError
 from aereo.interfaces import AereoPlugin
-from aereo.interfaces.core import ExtractionTask, GridConfig, PatchConfig
+from aereo.interfaces.core import ExtractionTask, GridConfig, PatchConfig, ExtractConfig
 from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
+from aereo.builtins.read import ReadODCSTAC
+from aereo.builtins.reproject import ReprojectODC
+from aereo.builtins.write import WriteGeoTIFF
 
 
 # ---------------------------------------------------------------------------
@@ -56,9 +59,14 @@ def _make_task(
     )
 
     grid_config = GridConfig(target_grid_dist=50_000)
+    extract = ExtractConfig(
+        read=ReadODCSTAC(),
+        reproject=ReprojectODC(resolution=10.0),
+        write=WriteGeoTIFF(),
+    )
     return ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
-        pipeline=pipeline or [],
+        extract=extract,
         uri="test-uri",
         patches=[],
         grid_config=grid_config,

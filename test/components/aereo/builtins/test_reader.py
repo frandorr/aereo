@@ -78,9 +78,12 @@ def _make_task(stac_item_dict: dict[str, Any] | None = None, aoi=None):
         padding=0,
         conform_to=None,
     )
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
     return ExtractionTask(
         assets=GeoDataFrame(valid_df),
-        pipeline=[],
+        extract=ExtractConfig(read=ReadODCSTAC()),
         uri="/tmp/test",
         patches=[patch],
         grid_config=grid_config,
@@ -226,9 +229,12 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
         padding=0,
         conform_to=None,
     )
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
     task = ExtractionTask(
         assets=GeoDataFrame(valid_df),
-        pipeline=[],
+        extract=ExtractConfig(read=ReadODCSTAC()),
         uri="/tmp/test",
         patches=[patch],
         grid_config=grid_config,
