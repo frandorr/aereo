@@ -62,18 +62,24 @@ def _make_valid_search_df():
 
 
 def test_prepare_tasks_requires_grid_config():
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
     valid_search_df = _make_valid_search_df()
     client = AereoClient()
 
     with pytest.raises(ValueError, match="grid_config must be provided"):
         client.prepare_tasks(
             search_results=cast(GeoDataFrame, valid_search_df),
-            pipeline=[],
+            extract=ExtractConfig(read=ReadODCSTAC()),
             uri="s3://bucket/out/",
         )
 
 
 def test_prepare_tasks_returns_tasks(monkeypatch):
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
     monkeypatch.setattr("aereo.schemas.core.AssetSchema.validate", lambda x: x)
     valid_df = _make_valid_search_df()
 
@@ -82,7 +88,7 @@ def test_prepare_tasks_returns_tasks(monkeypatch):
     patch_config = PatchConfig(resolution=10.0)
     tasks = client.prepare_tasks(
         search_results=cast(GeoDataFrame, valid_df),
-        pipeline=[],
+        extract=ExtractConfig(read=ReadODCSTAC()),
         grid_config=grid_config,
         patch_config=patch_config,
         uri="s3://out",
@@ -105,6 +111,9 @@ def test_execute_tasks_empty():
 
 
 def test_execute_tasks_failure_mode_strict(monkeypatch):
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
     monkeypatch.setattr("aereo.schemas.core.ArtifactSchema.validate", lambda x: x)
     mock_backend = MagicMock(spec=ExecutionBackend)
     mock_backend.run_tasks.side_effect = RuntimeError("run failed")
@@ -112,7 +121,7 @@ def test_execute_tasks_failure_mode_strict(monkeypatch):
     client = AereoClient()
     task = ExtractionTask(
         assets=cast(GeoDataFrame, _make_valid_search_df()),
-        pipeline=[],
+        extract=ExtractConfig(read=ReadODCSTAC()),
         uri="test",
         patches=[],
         grid_config=GridConfig(target_grid_dist=50_000),
@@ -126,6 +135,9 @@ def test_execute_tasks_failure_mode_strict(monkeypatch):
 
 
 def test_execute_tasks_failure_mode_best_effort(monkeypatch):
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
     monkeypatch.setattr("aereo.schemas.core.ArtifactSchema.validate", lambda x: x)
     mock_backend = MagicMock(spec=ExecutionBackend)
     mock_backend.run_tasks.side_effect = RuntimeError("run failed")
@@ -133,7 +145,7 @@ def test_execute_tasks_failure_mode_best_effort(monkeypatch):
     client = AereoClient()
     task = ExtractionTask(
         assets=cast(GeoDataFrame, _make_valid_search_df()),
-        pipeline=[],
+        extract=ExtractConfig(read=ReadODCSTAC()),
         uri="test",
         patches=[],
         grid_config=GridConfig(target_grid_dist=50_000),
@@ -147,6 +159,9 @@ def test_execute_tasks_failure_mode_best_effort(monkeypatch):
 
 
 def test_execute_tasks_best_effort_partial_results(monkeypatch):
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
     monkeypatch.setattr("aereo.schemas.core.ArtifactSchema.validate", lambda x: x)
     mock_backend = MagicMock(spec=ExecutionBackend)
 
@@ -165,7 +180,7 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
     client = AereoClient()
     task_ok = ExtractionTask(
         assets=cast(GeoDataFrame, _make_valid_search_df()),
-        pipeline=[],
+        extract=ExtractConfig(read=ReadODCSTAC()),
         uri="ok",
         patches=[],
         grid_config=GridConfig(target_grid_dist=50_000),
@@ -173,7 +188,7 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
     )
     task_fail = ExtractionTask(
         assets=cast(GeoDataFrame, _make_valid_search_df()),
-        pipeline=[],
+        extract=ExtractConfig(read=ReadODCSTAC()),
         uri="fail",
         patches=[],
         grid_config=GridConfig(target_grid_dist=50_000),

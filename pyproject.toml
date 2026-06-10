@@ -88,6 +88,7 @@ dev = [
   "python-semantic-release>=10.5.3,<11",
   "rioxarray>=0.22",
   "satpy>=0.59",
+  "tqdm>=4.68.2",
   "types-requests>=2.32.4.20260107,<3",
   "virtualizarr>=2.4",
   "xarray>=2026.4",

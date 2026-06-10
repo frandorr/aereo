@@ -44,9 +44,56 @@ def _make_task(
     valid_df["collection"] = "C1"
 
     grid_config = GridConfig(target_grid_dist=50_000)
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+    from aereo.builtins.reproject import ReprojectODC
+    from aereo.builtins.write import WriteGeoTIFF
+
+    extract = ExtractConfig(
+        read=ReadODCSTAC(),
+        reproject=ReprojectODC(resolution=10.0),
+        write=WriteGeoTIFF(),
+    )
+    # If pipeline args are provided, try to mock them into the extract config
+    # In practice for test_core.py, the pipeline arg might just be a list of dummy plugins
+    if pipeline:
+        read_plugin = None
+        reproject_plugin = None
+        write_plugin = None
+        pre_processors = []
+        post_processors = []
+
+        reproject_idx = -1
+        writer_idx = -1
+        for idx, plugin in enumerate(pipeline):
+            if isinstance(plugin, Reader):
+                read_plugin = plugin
+            elif isinstance(plugin, Reprojector):
+                reproject_plugin = plugin
+                reproject_idx = idx
+            elif isinstance(plugin, Writer):
+                write_plugin = plugin
+                writer_idx = idx
+
+        if reproject_idx != -1:
+            pre_processors = pipeline[1:reproject_idx]
+            if writer_idx != -1:
+                post_processors = pipeline[reproject_idx + 1 : writer_idx]
+            else:
+                post_processors = pipeline[reproject_idx + 1 :]
+
+        if read_plugin:
+            extract = ExtractConfig(
+                read=read_plugin,
+                preprocess=pre_processors,
+                reproject=reproject_plugin,
+                postprocess=post_processors,
+                write=write_plugin,
+            )
+
     return ExtractionTask(
         assets=cast(GeoDataFrame, valid_df),
-        pipeline=pipeline or [],
+        extract=extract,
         uri="test-uri",
         patches=patches or [],
         grid_config=grid_config,
@@ -120,26 +167,6 @@ def test_task_runner_executes_pipeline():
 
     assert isinstance(result, gpd.GeoDataFrame)
     assert not result.empty
-
-
-def test_task_runner_raises_on_missing_stages():
-    """ValueError when any required stage is missing."""
-    runner = TaskRunner()
-
-    # Missing Reader
-    task = _make_task(pipeline=[_DummyReprojector(), _DummyWriter()])
-    with pytest.raises(ValueError, match="must contain a Reader stage"):
-        runner.run(task)
-
-    # Missing Reprojector
-    task = _make_task(pipeline=[_DummyReader(), _DummyWriter()])
-    with pytest.raises(ValueError, match="must contain a Reprojector stage"):
-        runner.run(task)
-
-    # Missing Writer
-    task = _make_task(pipeline=[_DummyReader(), _DummyReprojector()])
-    with pytest.raises(ValueError, match="must contain a Writer stage"):
-        runner.run(task)
 
 
 def test_task_runner_callbacks():

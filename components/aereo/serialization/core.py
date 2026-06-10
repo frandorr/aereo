@@ -38,7 +38,7 @@ class TaskSerializer:
     PADDING_KEY = "padding"
     CONFORM_TO_KEY = "conform_to"
 
-    PIPELINE_KEY = "pipeline"
+    EXTRACT_KEY = "extract"
     GRID_CONFIG_KEY = "grid_config"
     PATCH_CONFIG_KEY = "patch_config"
     PATCHES_KEY = "patches"
@@ -77,18 +77,26 @@ class TaskSerializer:
             for patch in task.patches
         ]
 
-        # Pipeline stages → dicts with class paths
-        pipeline_meta = [
-            {
+        def serialize_plugin(plugin: AereoPlugin | None) -> dict[str, Any] | None:
+            if plugin is None:
+                return None
+            return {
                 "__plugin_class__": f"{type(plugin).__module__}.{type(plugin).__name__}",
                 "config": plugin.model_dump(mode="json"),
             }
-            for plugin in task.pipeline
-        ]
+
+        # ExtractConfig → dicts with class paths
+        extract_meta = {
+            "read": serialize_plugin(task.extract.read),
+            "preprocess": [serialize_plugin(p) for p in task.extract.preprocess],
+            "reproject": serialize_plugin(task.extract.reproject),
+            "postprocess": [serialize_plugin(p) for p in task.extract.postprocess],
+            "write": serialize_plugin(task.extract.write),
+        }
 
         # Metadata → JSON
         meta: dict[str, Any] = {
-            self.PIPELINE_KEY: pipeline_meta,
+            self.EXTRACT_KEY: extract_meta,
             self.GRID_CONFIG_KEY: task.grid_config.model_dump(mode="json"),
             self.PATCH_CONFIG_KEY: task.patch_config.model_dump(mode="json"),
             self.PATCHES_KEY: patches_meta,
@@ -127,15 +135,30 @@ class TaskSerializer:
 
         meta = json.loads((src_dir / self.META_NAME).read_text(encoding="utf-8"))
 
-        # Reconstruct Pipeline stages
-        pipeline: list[AereoPlugin] = []
-        for plugin_data in meta[self.PIPELINE_KEY]:
+        def deserialize_plugin(
+            plugin_data: dict[str, Any] | None,
+        ) -> AereoPlugin | None:
+            if not plugin_data:
+                return None
             cls_path = plugin_data["__plugin_class__"]
             config = plugin_data["config"]
             module_name, class_name = cls_path.rsplit(".", 1)
             module = importlib.import_module(module_name)
             cls = getattr(module, class_name)
-            pipeline.append(cls.model_validate(config))
+            return cls.model_validate(config)
+
+        # Reconstruct ExtractConfig
+        extract_data = meta[self.EXTRACT_KEY]
+
+        from aereo.interfaces.core import ExtractConfig
+
+        extract = ExtractConfig(
+            read=deserialize_plugin(extract_data["read"]),
+            preprocess=[deserialize_plugin(p) for p in extract_data["preprocess"]],
+            reproject=deserialize_plugin(extract_data["reproject"]),
+            postprocess=[deserialize_plugin(p) for p in extract_data["postprocess"]],
+            write=deserialize_plugin(extract_data["write"]),
+        )
 
         grid_config = GridConfig.model_validate(meta[self.GRID_CONFIG_KEY])
         patch_config = PatchConfig.model_validate(meta[self.PATCH_CONFIG_KEY])
@@ -165,7 +188,7 @@ class TaskSerializer:
 
         return ExtractionTask(
             assets=assets,  # type: ignore[arg-type]
-            pipeline=pipeline,
+            extract=extract,
             uri=meta[self.URI_KEY],
             patches=patches,
             grid_config=grid_config,

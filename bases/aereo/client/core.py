@@ -10,7 +10,7 @@ from typing import Any, cast
 import pandas as pd
 from aereo.backends import LocalProcessBackend, TaskRunner
 from aereo.interfaces import (
-    AereoPlugin,
+    ExtractConfig,
     ExecutionBackend,
     ExtractionTask,
     GridConfig,
@@ -109,7 +109,7 @@ class AereoClient:
     def prepare_tasks(
         self,
         search_results: GeoDataFrame[AssetSchema],
-        pipeline: Sequence[AereoPlugin],
+        extract: ExtractConfig,
         grid_config: GridConfig | None = None,
         patch_config: PatchConfig | None = None,
         uri: str | None = None,
@@ -119,7 +119,7 @@ class AereoClient:
 
         Args:
             search_results: The merged GeoDataFrame of search results to prepare.
-            pipeline: Sequence of pipeline stages to execute.
+            extract: Declarative configuration of extraction stages to execute.
             grid_config: Explicit tiling specification. Falls back to client default.
             patch_config: Explicit patch configuration. Falls back to client default.
             uri: An optional URI defining output path.
@@ -153,7 +153,7 @@ class AereoClient:
             search_results=search_results,
             grid_config=grid_config,
             patch_config=patch_config,
-            pipeline=pipeline,
+            extract=extract,
             uri=uri or "",
             target_aoi=self._aoi,
             cells_per_task=effective_cells_per_task,

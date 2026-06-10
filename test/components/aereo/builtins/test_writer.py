@@ -45,6 +45,11 @@ def _make_dataset(data_vars=None, dims=("band", "y", "x"), shape=(1, 8, 8)):
 
 def _make_task(tmp_path):
     """Return a minimal ExtractionTask for writer tests."""
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+    from aereo.builtins.reproject import ReprojectODC
+    from aereo.builtins.write import WriteGeoTIFF
+
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
     valid_df["geometry"] = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
@@ -65,7 +70,11 @@ def _make_task(tmp_path):
     )
     return ExtractionTask(
         assets=GeoDataFrame(valid_df),
-        pipeline=[],
+        extract=ExtractConfig(
+            read=ReadODCSTAC(),
+            reproject=ReprojectODC(resolution=10.0),
+            write=WriteGeoTIFF(),
+        ),
         uri=str(tmp_path),
         patches=[patch],
         grid_config=grid_config,
@@ -100,7 +109,10 @@ def test_write_geotiff_plain_mode_returns_artifacts(tmp_path):
     writer = WriteGeoTIFF()
     result = writer(ds, task, task.patches[0])
 
-    assert set(result["id"]) == {"test_cell_B04_0", "test_cell_B08_0"}
+    assert set(result["id"]) == {
+        "test_cell_B04_0_20260101T120000",
+        "test_cell_B08_0_20260101T120000",
+    }
     assert bool((result["grid_cell"] == "test_cell").all())
 
 
@@ -153,9 +165,9 @@ def test_write_geotiff_multiband_plain(tmp_path):
 
     assert len(result) == 3
     assert set(result["id"]) == {
-        "test_cell_RGB_0",
-        "test_cell_RGB_1",
-        "test_cell_RGB_2",
+        "test_cell_RGB_0_20260101T120000",
+        "test_cell_RGB_1_20260101T120000",
+        "test_cell_RGB_2_20260101T120000",
     }
 
 

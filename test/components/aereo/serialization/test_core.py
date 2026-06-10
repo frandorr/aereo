@@ -3,7 +3,7 @@ from typing import Any, cast
 
 import geopandas as gpd
 from aereo.grid import ExtractionPatch
-from aereo.interfaces import ExtractionTask, GridConfig, PatchConfig
+from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
 from aereo.schemas import AssetSchema
 from aereo.serialization import TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
@@ -33,11 +33,11 @@ def _make_task(
         crs="EPSG:4326",
     )
 
-    pipeline = [
-        ReadODCSTAC(),
-        ReprojectODC(resolution=100.0),
-        WriteGeoTIFF(),
-    ]
+    extract = ExtractConfig(
+        read=ReadODCSTAC(),
+        reproject=ReprojectODC(resolution=100.0),
+        write=WriteGeoTIFF(),
+    )
     grid_config = GridConfig(target_grid_dist=50_000)
     patch_config = PatchConfig(resolution=100.0, margin=10.0, padding=2)
     patch = ExtractionPatch(
@@ -51,7 +51,7 @@ def _make_task(
 
     return ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
-        pipeline=pipeline,
+        extract=extract,
         uri="test_uri",
         patches=[patch],
         grid_config=grid_config,
@@ -76,10 +76,10 @@ def test_round_trip_basic(tmp_path: Any) -> None:
     assert list(reconstructed.assets["id"]) == ["asset_1"]
     assert list(reconstructed.assets["collection"]) == ["GOES"]
 
-    # Pipeline
-    assert len(reconstructed.pipeline) == len(original.pipeline)
-    assert type(reconstructed.pipeline[0]) is type(original.pipeline[0])
-    assert type(reconstructed.pipeline[1]) is type(original.pipeline[1])
+    # Extract
+    assert type(reconstructed.extract.read) is type(original.extract.read)
+    assert type(reconstructed.extract.reproject) is type(original.extract.reproject)
+    assert type(reconstructed.extract.write) is type(original.extract.write)
 
     # Grid config
     assert reconstructed.grid_config == original.grid_config
@@ -174,14 +174,14 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
         ),
     ]
 
-    pipeline = [
-        ReadODCSTAC(),
-        ReprojectODC(resolution=10.0),
-        WriteGeoTIFF(),
-    ]
+    extract = ExtractConfig(
+        read=ReadODCSTAC(),
+        reproject=ReprojectODC(resolution=10.0),
+        write=WriteGeoTIFF(),
+    )
     original = ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
-        pipeline=pipeline,
+        extract=extract,
         uri="out",
         patches=patches,
         grid_config=GridConfig(target_grid_dist=10_000),
