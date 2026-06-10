@@ -304,3 +304,84 @@ def test_download_assets_safely_unsupported_scheme(tmp_path: Path) -> None:
             hrefs=["ftp://example.com/file.txt"],
             local_paths=[dest],
         )
+
+
+def test_download_assets_safely_s3_fallback_to_earthdata_https(
+    tmp_path: Path,
+) -> None:
+    """When S3 fails and fallback is an Earthdata HTTPS URL, use earthaccess."""
+    dest = tmp_path / "earthdata_file.tif"
+
+    with (
+        patch("obstore.store.S3Store") as mock_s3_cls,
+        patch(
+            "aereo.asset_downloader.core._download_with_earthaccess"
+        ) as mock_earthdata_download,
+    ):
+        mock_s3_cls.side_effect = RuntimeError("cross-region S3 failure")
+
+        download_assets_safely(
+            hrefs=["s3://my-bucket/path/to/file.tif"],
+            local_paths=[dest],
+            fallback_hrefs=[
+                "https://data.lpdaac.earthdatacloud.nasa.gov/some/file.tif"
+            ],
+        )
+
+        mock_earthdata_download.assert_called_once_with(
+            "https://data.lpdaac.earthdatacloud.nasa.gov/some/file.tif",
+            dest,
+        )
+
+
+def test_download_assets_safely_s3_fallback_to_non_earthdata_https(
+    tmp_path: Path,
+) -> None:
+    """When S3 fails and fallback is a generic HTTPS URL, use obstore HTTPStore."""
+    dest = tmp_path / "http_file.tif"
+
+    with (
+        patch("obstore.store.S3Store") as mock_s3_cls,
+        patch("obstore.get") as mock_get,
+        patch("obstore.store.HTTPStore") as mock_http_cls,
+    ):
+        mock_s3_cls.side_effect = RuntimeError("cross-region S3 failure")
+        mock_http_store = MagicMock()
+        mock_http_cls.from_url.return_value = mock_http_store
+        mock_get.return_value = _mock_get_result(b"http-fallback-payload")
+
+        download_assets_safely(
+            hrefs=["s3://my-bucket/path/to/file.tif"],
+            local_paths=[dest],
+            fallback_hrefs=["https://example.com/data/file.tif"],
+        )
+
+        mock_http_cls.from_url.assert_called_once_with(
+            "https://example.com/data/file.tif"
+        )
+        mock_get.assert_called_once_with(mock_http_store, "")
+        assert dest.read_bytes() == b"http-fallback-payload"
+
+
+def test_download_with_earthaccess(tmp_path: Path) -> None:
+    """_download_with_earthaccess streams through an authenticated session."""
+    dest = tmp_path / "earthdata.tif"
+    url = "https://data.lpdaac.earthdatacloud.nasa.gov/some/file.tif"
+
+    mock_response = MagicMock()
+    mock_response.iter_content.return_value = [b"chunk1", b"chunk2"]
+    mock_session = MagicMock()
+    mock_session.get.return_value = mock_response
+
+    with (
+        patch("earthaccess.login") as mock_login,
+        patch("earthaccess.get_requests_https_session", return_value=mock_session),
+    ):
+        from aereo.asset_downloader.core import _download_with_earthaccess
+
+        _download_with_earthaccess(url, dest)
+
+        mock_login.assert_called_once_with(persist=True)
+        mock_session.get.assert_called_once_with(url, stream=True)
+        mock_response.raise_for_status.assert_called_once()
+        assert dest.read_bytes() == b"chunk1chunk2"
