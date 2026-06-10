@@ -69,6 +69,8 @@ entry-points."aereo.plugins".write_geotiff = "aereo.builtins.write:WriteGeoTIFF"
 
 [dependency-groups]
 dev = [
+  "aereo-read-satpy",
+  "aereo-reproject-satpy",
   "basedpyright>=1.38",
   "cartopy>=0.25",
   "earthaccess>=0.18",
@@ -107,6 +109,8 @@ metadata.allow-direct-references = true
 
 [tool.uv]
 sources.aereo = { path = "projects/aereo", editable = true }
+sources.aereo-read-satpy = { path = "../aereo-read-satpy/projects/aereo-read-satpy" }
+sources.aereo-reproject-satpy = { path = "../aereo-reproject-satpy/projects/aereo-reproject-satpy" }
 managed = true
 workspace.members = [ "projects/*" ]
 

@@ -93,6 +93,30 @@ grid_config:
   grid_filter_mode: intersection
 ```
 
+### Profile with satpy reprojector (`goes_satpy.yaml`)
+
+For data loaded via `ReadSatpy`, use `reproject_satpy` to leverage satpy's native resampling:
+
+```yaml
+profiles:
+  - name: goes_abi
+    resolution: 1000
+    collections:
+      ABI-L1b-RadF: ["C02"]
+    extract_params:
+      reader: abi_l1b
+      calibration: reflectance
+    reproject: reproject_satpy
+    reproject_params:
+      resampler: nearest
+      radius_of_influence: 5000
+    search_params:
+      satellite: GOES-19
+    plugin_hints:
+      search: search_aws_goes
+      extract: extract_satpy
+```
+
 These files are also available in `examples/data/` in the repository.
 
 ---
