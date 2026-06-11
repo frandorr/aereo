@@ -61,7 +61,7 @@ def _make_task(
     grid_config = GridConfig(target_grid_dist=50_000)
     extract = ExtractConfig(
         read=ReadODCSTAC(),
-        reproject=ReprojectODC(resolution=10.0),
+        reproject=ReprojectODC(),
         write=WriteGeoTIFF(),
     )
     return ExtractionTask(

@@ -26,7 +26,6 @@ extract:
     _target_: aereo.builtins.ReadODCSTAC
   reproject:
     _target_: aereo.builtins.ReprojectODC
-    resolution: 10.0
     resampling: nearest
   write:
     _target_: aereo.builtins.WriteGeoTIFF

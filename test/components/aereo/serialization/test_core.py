@@ -35,7 +35,7 @@ def _make_task(
 
     extract = ExtractConfig(
         read=ReadODCSTAC(),
-        reproject=ReprojectODC(resolution=100.0),
+        reproject=ReprojectODC(),
         write=WriteGeoTIFF(),
     )
     grid_config = GridConfig(target_grid_dist=50_000)
@@ -176,7 +176,7 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
 
     extract = ExtractConfig(
         read=ReadODCSTAC(),
-        reproject=ReprojectODC(resolution=10.0),
+        reproject=ReprojectODC(),
         write=WriteGeoTIFF(),
     )
     original = ExtractionTask(

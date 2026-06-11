@@ -191,9 +191,16 @@ def test_get_plugin_params_detailed(mock_entry_points):
 
     params = registry.get_plugin_params("dummy_searcher", detailed=True)
     assert len(params["required"]) == 0
-    assert len(params["optional"]) == 2
     names = {p["name"] for p in params["optional"]}
-    assert names == {"bbox", "limit"}
+    assert names == {
+        "collections",
+        "intersects",
+        "start_datetime",
+        "end_datetime",
+        "search_params",
+        "bbox",
+        "limit",
+    }
 
 
 def test_get_plugin_params_unknown_plugin(mock_entry_points):
