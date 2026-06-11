@@ -31,6 +31,13 @@ try:
 except ImportError:
     _EARTHDATA_AUTH_AVAILABLE = False
 
+try:
+    import earthaccess as _earthaccess
+
+    _EARTHACCESS_AVAILABLE = True
+except ImportError:
+    _EARTHACCESS_AVAILABLE = False
+
 logger = get_logger(__name__)
 
 DownloaderCallable = Callable[[str, Path], None]
@@ -84,6 +91,57 @@ def _safe_unlink(path: Path) -> None:
         pass
 
 
+def _download_with_earthaccess(url: str, local_path: Path) -> None:
+    """Download *url* to *local_path* using earthaccess authenticated session.
+
+    Falls back to ``earthaccess`` when obstore fails (e.g. NASA Earthdata
+    URLs that require URS authentication).  This is a tertiary fallback
+    so users do not need to configure a custom *downloader* for
+    Earthdata collections.
+
+    Args:
+        url: Remote URL of the granule to download.
+        local_path: Destination file path on the local filesystem.
+
+    Raises:
+        ValueError: If the URL scheme is not supported by earthaccess.
+        RuntimeError: If earthaccess is not installed or the download fails.
+    """
+    if not _EARTHACCESS_AVAILABLE:
+        raise RuntimeError(
+            "earthaccess is required to download NASA Earthdata assets. "
+            "Install it with: uv pip install earthaccess"
+        )
+
+    if not url.startswith(("http://", "https://", "s3://")):
+        raise ValueError(f"Unsupported URL scheme or path: {url}")
+
+    local_path = Path(local_path)
+    local_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # earthaccess handles auth internally via .netrc or environment
+    _earthaccess.login(persist=True)
+
+    downloaded = _earthaccess.download(
+        url,
+        local_path=local_path.parent,
+        threads=1,
+        show_progress=False,
+    )
+
+    if not downloaded:
+        raise RuntimeError(f"earthaccess.download returned no files for {url}")
+
+    if len(downloaded) != 1:
+        raise RuntimeError(
+            f"earthaccess.download returned {len(downloaded)} files for a single URL, expected 1"
+        )
+
+    downloaded_file = Path(downloaded[0])
+    if downloaded_file.resolve() != local_path.resolve():
+        shutil.move(str(downloaded_file), str(local_path))
+
+
 def download_asset_safely(
     href: str,
     local_path: Path,
@@ -133,15 +191,18 @@ def download_asset_safely(
                     _stream_obstore_to_disk(store, path, local_path)
                 except Exception:
                     if fallback_href:
-                        fb_opts = (
-                            fallback_store_options
-                            if fallback_store_options is not None
-                            else store_options
-                        )
-                        store, path = _resolve_store(fallback_href, fb_opts)
-                        _stream_obstore_to_disk(store, path, local_path)
+                        try:
+                            fb_opts = (
+                                fallback_store_options
+                                if fallback_store_options is not None
+                                else store_options
+                            )
+                            store, path = _resolve_store(fallback_href, fb_opts)
+                            _stream_obstore_to_disk(store, path, local_path)
+                        except Exception:
+                            _download_with_earthaccess(fallback_href, local_path)
                     else:
-                        raise
+                        _download_with_earthaccess(href, local_path)
 
 
 def download_assets_safely(
