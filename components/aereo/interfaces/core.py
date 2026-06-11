@@ -225,8 +225,24 @@ class Writer(AereoPlugin, ABC):
 class BatchWriter(AereoPlugin, ABC):
     """Serialises a dict of lazy patch datasets to disk.
 
-    Receives the entire patch map from the Reprojector and is responsible
-    for its own iteration, compute scheduling, and memory management.
+    Unlike the per-patch ``Writer`` which receives one dataset at a time
+    (controlled by ``TaskRunner``), a ``BatchWriter`` receives the full
+    ``{patch_id: xr.Dataset}`` map from the Reprojector.  This enables:
+
+    * **Batch Dask compute** — merge or schedule multiple patches' graphs together.
+    * **Parallel writes** — write patches concurrently using threads/processes.
+    * **Memory management** — explicitly drop each patch after write.
+
+    Configure via ``ExtractConfig.write``::
+
+        ExtractConfig(
+            read=reader,
+            reproject=reprojector,
+            write=BatchWriteGeoTIFF(max_workers=4),
+        )
+
+    ``TaskRunner`` detects ``isinstance(writer, BatchWriter)`` and hands
+    off the full reprojected map instead of iterating per-patch.
     """
 
     @abstractmethod

@@ -117,7 +117,16 @@ def extract_with_batch_writer():
 
     reader = ReadSatpy(wishlist=["I04"], reader="viirs_l1b")
     reprojector = ReprojectSatpy()
-    writer = BatchWriteGeoTIFF()  # <-- BatchWriter instead of Writer
+
+    # BatchWriter configuration:
+    # - max_workers: parallel write threads (1 = serial, >1 = concurrent)
+    # - profile_name: EOIDS profile for output paths
+    # - rio_params: rasterio options (compression, tiling, COG, etc.)
+    writer = BatchWriteGeoTIFF(
+        max_workers=4,  # write 4 patches concurrently
+        profile_name="default",
+        rio_params={"compress": "deflate", "tiled": True},
+    )
 
     extract_config = ExtractConfig(
         read=reader,
