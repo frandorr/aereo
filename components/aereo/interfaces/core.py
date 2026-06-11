@@ -222,6 +222,32 @@ class Writer(AereoPlugin, ABC):
         ...
 
 
+class BatchWriter(AereoPlugin, ABC):
+    """Serialises a dict of lazy patch datasets to disk.
+
+    Receives the entire patch map from the Reprojector and is responsible
+    for its own iteration, compute scheduling, and memory management.
+    """
+
+    @abstractmethod
+    def __call__(
+        self,
+        patches: Mapping[str, xr.Dataset],
+        task: ExtractionTask,
+    ) -> GeoDataFrame[ArtifactSchema]:
+        """Write *patches* and return artifact metadata for all written outputs.
+
+        Args:
+            patches: Mapping from ``patch.id`` to the (typically lazy) dataset
+                aligned to that patch's geobox.
+            task: Extraction task containing the patches and configuration.
+
+        Returns:
+            GeoDataFrame of written artifacts with ``ArtifactSchema``.
+        """
+        ...
+
+
 class ExtractConfig(BaseModel):
     """Declarative configuration for an extraction pipeline."""
 
@@ -231,7 +257,7 @@ class ExtractConfig(BaseModel):
     preprocess: Sequence[Processor] = Field(default_factory=list)
     reproject: Reprojector | None = None
     postprocess: Sequence[Processor] = Field(default_factory=list)
-    write: Writer | None = None
+    write: Writer | BatchWriter | None = None
 
 
 class GlobalConfig(BaseModel):

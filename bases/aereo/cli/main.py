@@ -252,9 +252,12 @@ def plugins_cmd() -> None:
 
     _add_plugin_rows(table, "Searcher", registry._searchers, registry)
 
-    for label in ("reader", "reprojector", "processor", "writer"):
+    for label in ("reader", "reprojector", "processor", "writer", "batch_writer"):
         _add_plugin_rows(
-            table, label.capitalize(), registry._registries[label].plugins, registry
+            table,
+            label.replace("_", " ").title(),
+            registry._registries[label].plugins,
+            registry,
         )
 
     console.print(table)

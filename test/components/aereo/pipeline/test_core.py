@@ -86,3 +86,35 @@ extract: {}
     # Pydantic or Hydra will raise ValidationError or InstantiationException
     with pytest.raises(Exception):
         ExtractionJob.from_yaml(job_yaml)
+
+
+def test_extraction_job_from_yaml_with_batch_writer(tmp_path: Path):
+    job_yaml = tmp_path / "job.yaml"
+    job_yaml.write_text(
+        """
+global:
+  grid_config:
+    _target_: aereo.interfaces.GridConfig
+    target_grid_dist: 50000
+  patch_config:
+    _target_: aereo.interfaces.PatchConfig
+    resolution: 10.0
+  uri: "out_dir"
+search:
+  _target_: aereo.builtins.SearchSTAC
+  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
+  collections:
+    sentinel-2-l2a: ["B04"]
+extract:
+  read:
+    _target_: aereo.builtins.ReadODCSTAC
+  reproject:
+    _target_: aereo.builtins.ReprojectODC
+  write:
+    _target_: aereo.builtins.BatchWriteGeoTIFF
+"""
+    )
+    job = ExtractionJob.from_yaml(job_yaml)
+    from aereo.interfaces import BatchWriter
+
+    assert isinstance(job.extract.write, BatchWriter)

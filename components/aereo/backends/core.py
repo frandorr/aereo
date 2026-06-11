@@ -8,11 +8,13 @@ from __future__ import annotations
 
 from typing import Any, Literal, Sequence, cast
 
+import attrs
 import geopandas as gpd
 import pandas as pd
 import xarray as xr
 
 from aereo.interfaces.core import (
+    BatchWriter,
     ExtractionTask,
     PipelineCallback,
 )
@@ -99,7 +101,31 @@ class TaskRunner:
                         "Reprojector did not return a dataset for every patch in the task."
                     )
 
-            # Stage 4-5: Per-patch loop
+            # Stage 4-5: Per-patch loop or BatchWriter dispatch
+            if isinstance(writer, BatchWriter):
+                if reprojector is None:
+                    raise ValueError(
+                        "BatchWriter requires a Reprojector. "
+                        "Configure a reproject stage or use a Writer instead."
+                    )
+                if reprojected_map is None:
+                    raise ValueError(
+                        "BatchWriter requires a Reprojector. "
+                        "Configure a reproject stage or use a Writer instead."
+                    )
+                # Fire reproject callbacks before handing off to BatchWriter
+                for patch in task.patches:
+                    ds_patch = reprojected_map[patch.id]
+                    self._fire_callbacks("on_reproject_complete", task, patch, ds_patch)
+                # Inject callbacks into task context for BatchWriter access
+                task = attrs.evolve(
+                    task,
+                    task_context={**task.task_context, "callbacks": self.callbacks},
+                )
+                artifacts_gdf = writer(reprojected_map, task)
+                self._fire_callbacks("on_task_complete", task, artifacts_gdf)
+                return artifacts_gdf
+
             artifacts: list[GeoDataFrame[ArtifactSchema]] = []
             for patch in task.patches:
                 try:

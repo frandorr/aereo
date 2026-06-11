@@ -11,6 +11,7 @@ import importlib.metadata
 from typing import Any, Sequence, Type
 
 from aereo.interfaces.core import (
+    BatchWriter,
     Processor,
     Reader,
     Reprojector,
@@ -216,6 +217,7 @@ class AereoRegistry:
         "reproject_": ("reprojector", Reprojector),
         "process_": ("processor", Processor),
         "write_": ("writer", Writer),
+        "batch_write_": ("batch_writer", BatchWriter),
     }
 
     def __init__(self, auto_discover: bool = True) -> None:
