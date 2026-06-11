@@ -72,7 +72,7 @@ def _make_task(tmp_path):
         assets=GeoDataFrame(valid_df),
         extract=ExtractConfig(
             read=ReadODCSTAC(),
-            reproject=ReprojectODC(resolution=10.0),
+            reproject=ReprojectODC(),
             write=WriteGeoTIFF(),
         ),
         uri=str(tmp_path),

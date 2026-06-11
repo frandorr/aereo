@@ -9,14 +9,11 @@ from __future__ import annotations
 from typing import Any
 
 import xarray as xr
-from aereo.interfaces import Reprojector
+from aereo.interfaces import ExtractionTask, Reprojector
 
 
 class ReprojectODC(Reprojector):
-    """Default reprojector using ``odc-geo``.
-
-    Expects *geobox* to be an ``odc.geo.geobox.GeoBox`` instance.
-    """
+    """Default reprojector using ``odc-geo``."""
 
     resampling: str = "nearest"
     fill_value: Any = None
@@ -25,16 +22,16 @@ class ReprojectODC(Reprojector):
     def __call__(
         self,
         ds: xr.Dataset,
-        geobox: Any,
-    ) -> xr.Dataset:
-        """Reproject *ds* to *geobox* using ``odc.geo.xr.reproject``.
+        task: ExtractionTask,
+    ) -> dict[str, xr.Dataset]:
+        """Reproject *ds* for every patch in *task* using ``odc.geo.xr.reproject``.
 
         Args:
             ds: Input dataset.
-            geobox: Target ``odc.geo.geobox.GeoBox``.
+            task: Extraction task containing the patches to reproject.
 
         Returns:
-            Reprojected dataset.
+            Mapping from ``patch.id`` to the reprojected ``xr.Dataset``.
         """
         from odc.geo.xr import xr_reproject  # type: ignore[reportAttributeAccessIssue]
 
@@ -44,4 +41,7 @@ class ReprojectODC(Reprojector):
         if self.dtype is not None:
             kwargs["dtype"] = self.dtype
 
-        return xr_reproject(ds, geobox, **kwargs)
+        output: dict[str, xr.Dataset] = {}
+        for patch in task.patches:
+            output[patch.id] = xr_reproject(ds, patch.geobox, **kwargs)
+        return output

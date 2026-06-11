@@ -31,7 +31,6 @@ search:
 pipeline:
   - _target_: aereo.builtins.ReadODCSTAC
   - _target_: aereo.builtins.ReprojectODC
-    resolution: 10.0
   - _target_: aereo.builtins.WriteGeoTIFF
 grid_config:
   _target_: aereo.interfaces.GridConfig

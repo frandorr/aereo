@@ -10,6 +10,7 @@ from typing import Any, Literal, Sequence, cast
 
 import geopandas as gpd
 import pandas as pd
+import xarray as xr
 
 from aereo.interfaces.core import (
     ExtractionTask,
@@ -89,17 +90,27 @@ class TaskRunner:
             for proc in pre_processors:
                 ds = proc(ds)
 
-            # Stage 3-5: Per-patch loop
+            # Stage 3: Reproject (once per task, outside cell loop)
+            reprojected_map: dict[str, xr.Dataset] | None = None
+            if reprojector is not None:
+                reprojected_map = reprojector(ds, task)
+                if set(reprojected_map.keys()) != {p.id for p in task.patches}:
+                    raise ValueError(
+                        "Reprojector did not return a dataset for every patch in the task."
+                    )
+
+            # Stage 4-5: Per-patch loop
             artifacts: list[GeoDataFrame[ArtifactSchema]] = []
             for patch in task.patches:
                 try:
-                    if reprojector is not None:
-                        ds_patch = reprojector(ds, patch.geobox)
+                    ds_patch = (
+                        reprojected_map[patch.id] if reprojected_map is not None else ds
+                    )
+
+                    if reprojected_map is not None:
                         self._fire_callbacks(
                             "on_reproject_complete", task, patch, ds_patch
                         )
-                    else:
-                        ds_patch = ds
 
                     for proc in post_processors:
                         ds_patch = proc(ds_patch)

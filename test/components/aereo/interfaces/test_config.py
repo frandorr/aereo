@@ -12,7 +12,7 @@ def test_extraction_job_validation():
         search=SearchSTAC(stac_api_url="https://stac", collections=["s2"]),
         extract=ExtractConfig(
             read=ReadODCSTAC(),
-            reproject=ReprojectODC(resolution=10.0),
+            reproject=ReprojectODC(),
             write=WriteGeoTIFF(),
         ),
         **{

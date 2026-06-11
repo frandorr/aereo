@@ -23,6 +23,7 @@ from aereo.interfaces.core import (
     Writer,
     Processor,
 )
+from typing import Sequence
 from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -51,7 +52,7 @@ def _make_task(
 
     extract = ExtractConfig(
         read=ReadODCSTAC(),
-        reproject=ReprojectODC(resolution=10.0),
+        reproject=ReprojectODC(),
         write=WriteGeoTIFF(),
     )
     # If pipeline args are provided, try to mock them into the extract config
@@ -60,8 +61,8 @@ def _make_task(
         read_plugin = None
         reproject_plugin = None
         write_plugin = None
-        pre_processors = []
-        post_processors = []
+        pre_processors: Sequence[Processor] = []
+        post_processors: Sequence[Processor] = []
 
         reproject_idx = -1
         writer_idx = -1
@@ -76,11 +77,15 @@ def _make_task(
                 writer_idx = idx
 
         if reproject_idx != -1:
-            pre_processors = pipeline[1:reproject_idx]
+            pre_processors = cast(Sequence[Processor], pipeline[1:reproject_idx])
             if writer_idx != -1:
-                post_processors = pipeline[reproject_idx + 1 : writer_idx]
+                post_processors = cast(
+                    Sequence[Processor], pipeline[reproject_idx + 1 : writer_idx]
+                )
             else:
-                post_processors = pipeline[reproject_idx + 1 :]
+                post_processors = cast(
+                    Sequence[Processor], pipeline[reproject_idx + 1 :]
+                )
 
         if read_plugin:
             extract = ExtractConfig(
@@ -111,10 +116,8 @@ class _DummyReader(Reader):
 
 
 class _DummyReprojector(Reprojector):
-    resolution: float = 100.0
-
-    def __call__(self, ds: xr.Dataset, geobox: Any) -> xr.Dataset:
-        return ds
+    def __call__(self, ds: xr.Dataset, task: ExtractionTask) -> dict[str, xr.Dataset]:
+        return {patch.id: ds for patch in task.patches}
 
 
 class _DummyWriter(Writer):
@@ -138,6 +141,14 @@ class _DummyProcessor(Processor):
         return ds
 
 
+def _mock_patch(patch_id: str) -> MagicMock:
+    """Return a minimal mock patch with the given id."""
+    mock = MagicMock()
+    mock.id = patch_id
+    mock.geobox = MagicMock()
+    return mock
+
+
 # ---------------------------------------------------------------------------
 # TaskRunner
 # ---------------------------------------------------------------------------
@@ -147,7 +158,7 @@ def test_task_runner_executes_pipeline():
     """Verify that TaskRunner runs the pipeline successfully."""
     # Create mock grid cell
     mock_cell = MagicMock()
-    mock_cell.id.return_value = "cell-1"
+    mock_cell.id = "cell-1"
     mock_cell.cell_geometry = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
     mock_cell.utm_crs = "EPSG:4326"
     mock_cell.utm_footprint = mock_cell.cell_geometry
@@ -156,7 +167,7 @@ def test_task_runner_executes_pipeline():
     pipeline = [
         _DummyReader(),
         _DummyProcessor(value=3),
-        _DummyReprojector(resolution=50.0),
+        _DummyReprojector(),
         _DummyProcessor(value=2),
         _DummyWriter(),
     ]
@@ -172,7 +183,7 @@ def test_task_runner_executes_pipeline():
 def test_task_runner_callbacks():
     """Verify that TaskRunner invokes callbacks."""
     mock_cell = MagicMock()
-    mock_cell.id.return_value = "cell-1"
+    mock_cell.id = "cell-1"
     mock_cell.cell_geometry = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
     mock_cell.utm_crs = "EPSG:4326"
     mock_cell.utm_footprint = mock_cell.cell_geometry
@@ -180,7 +191,7 @@ def test_task_runner_callbacks():
 
     pipeline = [
         _DummyReader(),
-        _DummyReprojector(resolution=50.0),
+        _DummyReprojector(),
         _DummyWriter(),
     ]
 
@@ -195,6 +206,65 @@ def test_task_runner_callbacks():
     mock_callback.on_reproject_complete.assert_called_once()
     mock_callback.on_patch_write_complete.assert_called_once()
     mock_callback.on_task_complete.assert_called_once()
+
+
+def test_task_runner_calls_reprojector_once_per_task():
+    """Reprojector is called once per task, not once per patch."""
+    mock_reprojector = MagicMock(spec=Reprojector)
+    mock_reprojector.return_value = {"cell-1": xr.Dataset()}
+
+    pipeline = [
+        _DummyReader(),
+        mock_reprojector,
+        _DummyWriter(),
+    ]
+
+    task = _make_task(pipeline=pipeline, patches=[_mock_patch("cell-1")])
+    runner = TaskRunner()
+    runner.run(task)
+
+    mock_reprojector.assert_called_once()
+
+
+def test_task_runner_raises_when_reprojector_misses_patch():
+    """ValueError is raised when the reprojector omits a patch id."""
+
+    class _SparseReprojector(Reprojector):
+        def __call__(
+            self, ds: xr.Dataset, task: ExtractionTask
+        ) -> dict[str, xr.Dataset]:
+            # Only return the first patch, omitting the second.
+            return {task.patches[0].id: ds}
+
+    pipeline = [
+        _DummyReader(),
+        _SparseReprojector(),
+        _DummyWriter(),
+    ]
+
+    task = _make_task(pipeline=pipeline, patches=[_mock_patch("a"), _mock_patch("b")])
+    runner = TaskRunner()
+    with pytest.raises(ValueError, match="did not return a dataset for every patch"):
+        runner.run(task)
+
+
+def test_task_runner_callbacks_fire_per_patch():
+    """on_reproject_complete fires once for every patch."""
+    mock_reprojector = MagicMock(spec=Reprojector)
+    mock_reprojector.return_value = {"a": xr.Dataset(), "b": xr.Dataset()}
+
+    pipeline = [
+        _DummyReader(),
+        mock_reprojector,
+        _DummyWriter(),
+    ]
+
+    task = _make_task(pipeline=pipeline, patches=[_mock_patch("a"), _mock_patch("b")])
+    callback = MagicMock()
+    runner = TaskRunner(callbacks=[callback])
+    runner.run(task)
+
+    assert callback.on_reproject_complete.call_count == 2
 
 
 # ---------------------------------------------------------------------------

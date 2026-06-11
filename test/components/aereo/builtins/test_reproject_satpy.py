@@ -9,5 +9,5 @@ def test_reproject_satpy_registry():
     from aereo.registry import AereoRegistry
 
     reg = AereoRegistry()
-    plugin = reg.get("reprojector", "reproject_satpy", resolution=10.0)
+    plugin = reg.get("reprojector", "reproject_satpy")
     assert isinstance(plugin, Reprojector)

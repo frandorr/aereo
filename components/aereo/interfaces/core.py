@@ -178,22 +178,19 @@ class Reader(AereoPlugin, ABC):
 
 
 class Reprojector(AereoPlugin, ABC):
-    """Reprojects/resamples an xarray.Dataset to a target GeoBox."""
-
-    resolution: float
-    padding: int = 0
-    conform_to: tuple[int, int] | None = None
+    """Reprojects/resamples an xarray.Dataset to target grid cell definitions."""
 
     @abstractmethod
-    def __call__(self, ds: xr.Dataset, geobox: Any) -> xr.Dataset:
-        """Reproject *ds* to the target *geobox*.
+    def __call__(self, ds: xr.Dataset, task: ExtractionTask) -> dict[str, xr.Dataset]:
+        """Reproject *ds* for every patch in *task*.
 
         Args:
             ds: Source dataset in native CRS.
-            geobox: Target grid definition (typically ``odc_geo.geobox.GeoBox``).
+            task: Extraction task containing the patches to reproject.
 
         Returns:
-            Reprojected dataset aligned to *geobox*.
+            Mapping from ``patch.id`` to the reprojected ``xr.Dataset`` aligned to
+            that patch's geobox.
         """
         ...
 
