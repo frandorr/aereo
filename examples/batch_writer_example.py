@@ -72,13 +72,8 @@ def extract_with_writer():
     """Classic approach: WriteGeoTIFF receives one patch at a time."""
     from aereo.read_satpy import ReadSatpy
     from aereo.reproject_satpy import ReprojectSatpy
-    from aereo.search_earthaccess import earthaccess_download_wrapper
 
-    reader = ReadSatpy(
-        wishlist=["I04"],
-        reader="viirs_l1b",
-        downloader=earthaccess_download_wrapper,
-    )
+    reader = ReadSatpy(wishlist=["I04"], reader="viirs_l1b")
     reprojector = ReprojectSatpy()
     writer = WriteGeoTIFF()
 
@@ -119,13 +114,8 @@ def extract_with_batch_writer():
     """
     from aereo.read_satpy import ReadSatpy
     from aereo.reproject_satpy import ReprojectSatpy
-    from aereo.search_earthaccess import earthaccess_download_wrapper
 
-    reader = ReadSatpy(
-        wishlist=["I04"],
-        reader="viirs_l1b",
-        downloader=earthaccess_download_wrapper,
-    )
+    reader = ReadSatpy(wishlist=["I04"], reader="viirs_l1b")
     reprojector = ReprojectSatpy()
     writer = BatchWriteGeoTIFF()  # <-- BatchWriter instead of Writer
 
@@ -160,7 +150,6 @@ def extract_with_client():
     """Use AereoClient for search → prepare → extract with BatchWriter."""
     from aereo.read_satpy import ReadSatpy
     from aereo.reproject_satpy import ReprojectSatpy
-    from aereo.search_earthaccess import earthaccess_download_wrapper
 
     client = AereoClient()
 
@@ -175,11 +164,7 @@ def extract_with_client():
     print(f"Client search: found {len(assets)} assets")
 
     # Prepare
-    reader = ReadSatpy(
-        wishlist=["I04"],
-        reader="viirs_l1b",
-        downloader=earthaccess_download_wrapper,
-    )
+    reader = ReadSatpy(wishlist=["I04"], reader="viirs_l1b")
     reprojector = ReprojectSatpy()
     writer = BatchWriteGeoTIFF()
 
@@ -214,13 +199,8 @@ def manual_inspection():
     """Manually read and reproject a single task for debugging."""
     from aereo.read_satpy import ReadSatpy
     from aereo.reproject_satpy import ReprojectSatpy
-    from aereo.search_earthaccess import earthaccess_download_wrapper
 
-    reader = ReadSatpy(
-        wishlist=["I04"],
-        reader="viirs_l1b",
-        downloader=earthaccess_download_wrapper,
-    )
+    reader = ReadSatpy(wishlist=["I04"], reader="viirs_l1b")
     reprojector = ReprojectSatpy()
 
     extract_config = ExtractConfig(read=reader)
