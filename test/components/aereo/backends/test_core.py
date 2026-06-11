@@ -15,6 +15,7 @@ from aereo.backends import (
 )
 from aereo.interfaces.core import (
     AereoPlugin,
+    BatchWriter,
     ExtractionTask,
     GridConfig,
     PatchConfig,
@@ -72,7 +73,7 @@ def _make_task(
             elif isinstance(plugin, Reprojector):
                 reproject_plugin = plugin
                 reproject_idx = idx
-            elif isinstance(plugin, Writer):
+            elif isinstance(plugin, (Writer, BatchWriter)):
                 write_plugin = plugin
                 writer_idx = idx
 
@@ -457,3 +458,37 @@ def test_thread_backend_exception_propagates():
     tasks = [_make_task()]
     with pytest.raises(RuntimeError, match="task failed"):
         list(backend.run_tasks(tasks, mock_runner))
+
+
+def test_task_runner_dispatches_to_batch_writer():
+    """TaskRunner dispatches to BatchWriter when configured."""
+    from aereo.interfaces.core import BatchWriter
+
+    class _DummyBatchWriter(BatchWriter):
+        def __call__(self, patches, task):
+            assert "cell-1" in patches
+            return gpd.GeoDataFrame(
+                {"id": ["a1"]},
+                geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
+            )
+
+    pipeline = [_DummyReader(), _DummyReprojector(), _DummyBatchWriter()]
+    task = _make_task(pipeline=pipeline, patches=[_mock_patch("cell-1")])
+    runner = TaskRunner()
+    result = runner.run(task)
+    assert isinstance(result, gpd.GeoDataFrame)
+
+
+def test_task_runner_rejects_batch_writer_without_reprojector():
+    """ValueError is raised when BatchWriter is used without a Reprojector."""
+    from aereo.interfaces.core import BatchWriter
+
+    class _DummyBatchWriter(BatchWriter):
+        def __call__(self, patches, task):
+            return gpd.GeoDataFrame()
+
+    pipeline = [_DummyReader(), _DummyBatchWriter()]
+    task = _make_task(pipeline=pipeline, patches=[_mock_patch("cell-1")])
+    runner = TaskRunner()
+    with pytest.raises(ValueError, match="BatchWriter requires a Reprojector"):
+        runner.run(task)
