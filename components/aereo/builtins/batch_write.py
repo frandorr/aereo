@@ -7,7 +7,7 @@ management.
 
 from __future__ import annotations
 
-from typing import Mapping, cast
+from typing import Any, Mapping, cast
 
 import pandas as pd
 from dask.base import compute
@@ -16,6 +16,7 @@ import xarray as xr
 from aereo.interfaces import BatchWriter, ExtractionTask
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
+from pydantic import Field
 from structlog import get_logger
 
 logger = get_logger()
@@ -34,10 +35,22 @@ class BatchWriteGeoTIFF(BatchWriter):
     Attributes:
         profile_name: EOIDS profile name forwarded to ``WriteGeoTIFF``.
         rio_params: Rasterio write options forwarded to ``WriteGeoTIFF``.
+        dask_scheduler: Dask scheduler passed to ``dask.compute()`` (e.g.
+            ``"threads"``, ``"processes"``, ``"synchronous"`` or ``"distributed"``).
+            ``None`` lets Dask pick the default scheduler.
+        dask_client: Optional pre-created ``distributed.Client`` to use when
+            ``dask_scheduler="distributed"``.  When provided, the scheduler
+            defaults to ``"distributed"`` if not already set.
+        dask_compute_kwargs: Additional keyword arguments forwarded verbatim to
+            ``dask.compute()``.  Useful for setting ``num_workers``,
+            ``pool``, ``traverse``, etc.
     """
 
     profile_name: str = "default"
     rio_params: dict[str, object] = {}
+    dask_scheduler: str | None = None
+    dask_client: Any | None = None
+    dask_compute_kwargs: dict[str, Any] = Field(default_factory=dict)
 
     def __call__(
         self,
@@ -75,11 +88,21 @@ class BatchWriteGeoTIFF(BatchWriter):
             return patch_artifacts
 
         delayed_artifacts = [_write_one(p.id) for p in task.patches]
-        computed = compute(*delayed_artifacts)
+        compute_kwargs = dict(self.dask_compute_kwargs)
+        if self.dask_scheduler is not None:
+            compute_kwargs["scheduler"] = self.dask_scheduler
+        if self.dask_client is not None:
+            compute_kwargs.setdefault("scheduler", "distributed")
+            compute_kwargs["client"] = self.dask_client
+        computed = compute(*delayed_artifacts, **compute_kwargs)
 
-        if computed:
-            return cast(
-                GeoDataFrame[ArtifactSchema],
-                pd.concat(list(computed), ignore_index=True),
-            )
-        return ArtifactSchema.empty_geodataframe()
+        # dask.compute() returns a tuple when multiple delayed objects are
+        # passed, but returns the result directly for a single object.
+        if not computed:
+            return ArtifactSchema.empty_geodataframe()
+        if not isinstance(computed, tuple):
+            computed = (computed,)
+        return cast(
+            GeoDataFrame[ArtifactSchema],
+            pd.concat(list(computed), ignore_index=True),
+        )

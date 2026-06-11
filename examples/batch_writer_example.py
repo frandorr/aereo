@@ -119,11 +119,14 @@ def extract_with_batch_writer():
     reprojector = ReprojectSatpy()
 
     # BatchWriter configuration:
-    # - max_workers: parallel write threads (1 = serial, >1 = concurrent)
+    # - dask_scheduler: Dask scheduler used by dask.compute()
+    # - dask_compute_kwargs: extra kwargs for dask.compute(), e.g. num_workers
+    # - dask_client: pass an existing distributed.Client for a remote cluster
     # - profile_name: EOIDS profile for output paths
     # - rio_params: rasterio options (compression, tiling, COG, etc.)
     writer = BatchWriteGeoTIFF(
-        max_workers=4,  # write 4 patches concurrently
+        dask_scheduler="threads",
+        dask_compute_kwargs={"num_workers": 4},  # write 4 patches concurrently
         profile_name="default",
         rio_params={"compress": "deflate", "tiled": True},
     )
