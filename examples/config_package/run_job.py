@@ -21,10 +21,6 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-import hydra
-from hydra import compose, initialize_config_dir
-from omegaconf import OmegaConf
-
 from aereo.backends import LocalProcessBackend
 from aereo.client import AereoClient
 from aereo.pipeline import ExtractionJob
@@ -33,25 +29,24 @@ from aereo.pipeline import ExtractionJob
 DRY_RUN = os.environ.get("DRY_RUN", "false").lower() in ("1", "true", "yes")
 
 
-def load_job(
-    config_dir: str | Path, overrides: list[str] | None = None
-) -> ExtractionJob:
-    """Load and validate an ExtractionJob from a Hydra config package.
+def load_and_print_job(config_dir: Path) -> ExtractionJob:
+    """Load a validated ``ExtractionJob`` from the config package.
 
     Args:
         config_dir: Directory containing the Hydra config package.
-        overrides: Optional Hydra command-line style overrides.
 
     Returns:
         A validated ``ExtractionJob`` instance.
     """
-    with initialize_config_dir(version_base=None, config_dir=str(config_dir)):
-        cfg = compose(config_name="main_config", overrides=overrides or [])
-        print("--- Composed OmegaConf ---")
-        print(OmegaConf.to_yaml(cfg))
+    # Optional Hydra overrides, e.g.:
+    # overrides = ["patch_config=high_res", "target_aoi=/path/to/aoi.geojson"]
+    overrides: list[str] | None = None
 
-        instantiated = hydra.utils.instantiate(cfg, _convert_="all")
-        job = ExtractionJob.model_validate(instantiated)
+    job = ExtractionJob.load_from_config(
+        config_dir,
+        config_name="main_config",
+        overrides=overrides,
+    )
 
     print("\n--- Validated ExtractionJob ---")
     print(f"output_uri: {job.output_uri}")
@@ -60,7 +55,8 @@ def load_job(
     print(f"search.intersects type: {type(job.search.intersects).__name__}")
     print(f"target_aoi type: {type(job.target_aoi).__name__}")
     print(
-        f"effective_target_aoi is target_aoi: {job.effective_target_aoi is job.target_aoi}"
+        "effective_target_aoi is target_aoi: "
+        f"{job.effective_target_aoi is job.target_aoi}"
     )
 
     return job
@@ -108,11 +104,7 @@ def main() -> None:
     config_dir = Path(__file__).parent.resolve()
     print(f"Loading config package from: {config_dir}\n")
 
-    # Example override: switch to a different patch config or AOI path
-    # overrides = ["patch_config=high_res", f"target_aoi={config_dir / 'aoi/sample.geojson'}"]
-    overrides: list[str] | None = None
-
-    job = load_job(config_dir, overrides=overrides)
+    job = load_and_print_job(config_dir)
 
     if DRY_RUN:
         print("\nDRY_RUN enabled: skipping search/prepare/extract.")

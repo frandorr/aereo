@@ -27,30 +27,49 @@ swapped independently via Hydra ``defaults`` composition.
 
 ## Usage
 
-This config package is consumed through ``ExtractionJob.from_yaml`` or via the
-Python API with Hydra composition. It is **not** the same schema as the AEREO
-CLI config (which also includes ``action``, ``verbose``, etc.).
+The easiest way to consume a config package is through
+``ExtractionJob.load_from_config``. It wraps Hydra composition, plugin
+instantiation, and Pydantic validation in one call. It is **not** the same
+schema as the AEREO CLI config (which also includes ``action``, ``verbose``,
+etc.).
+
+```python
+from aereo.pipeline import ExtractionJob
+
+job = ExtractionJob.load_from_config(
+    "examples/config_package",
+    config_name="main_config",
+)
+
+print(job.output_uri)
+print(job.grid_config.target_grid_dist)
+print(job.patch_config.resolution)
+print(job.effective_target_aoi)  # target_aoi or search.intersects
+```
+
+Override configuration values with Hydra-style overrides:
+
+```python
+job = ExtractionJob.load_from_config(
+    "examples/config_package",
+    overrides=["patch_config=high_res"],
+)
+```
+
+If you need full control over Hydra, you can still compose and instantiate
+manually:
 
 ```python
 from hydra import initialize_config_dir, compose
-from aereo.pipeline import ExtractionJob
 from pathlib import Path
+import hydra
+from aereo.pipeline import ExtractionJob
 
 config_dir = str(Path("examples/config_package").resolve())
 with initialize_config_dir(version_base=None, config_dir=config_dir):
     cfg = compose(config_name="main_config")
     instantiated = hydra.utils.instantiate(cfg, _convert_="all")
     job = ExtractionJob.model_validate(instantiated)
-
-print(job.output_uri)
-print(job.grid_config.target_grid_dist)
-print(job.patch_config.resolution)
-```
-
-Override the patch configuration on the command line:
-
-```python
-cfg = compose(config_name="main_config", overrides=["patch_config=high_res"])
 ```
 
 ## Passing an AOI geometry
