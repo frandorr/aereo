@@ -30,6 +30,7 @@ from aereo.interfaces.core import (
 )
 from aereo.interfaces.utils import (
     infer_dataset_time_bounds,
+    normalize_geometry_input,
     set_dataset_time_bounds,
     validate_aereo_dataset,
 )
@@ -53,6 +54,7 @@ __all__ = [
     "Writer",
     "build_collection_asset_filters",
     "infer_dataset_time_bounds",
+    "normalize_geometry_input",
     "set_dataset_time_bounds",
     "validate_aereo_dataset",
     "DEFAULT_CELLS_PER_TASK",

@@ -53,7 +53,7 @@ print(results[["id", "collection", "start_time"]].head())
 | Parameter | What it does |
 |-----------|--------------|
 | `profiles` | **Required.** List of `AereoProfile` objects. Each profile carries its own `collections`, `search_params`, and `plugin_hints`. The client groups profiles by target plugin to avoid redundant API calls. |
-| `intersects` | Spatial filter. Accepts a Shapely `BaseGeometry` or a GeoJSON `dict`. |
+| `intersects` | Spatial filter. Accepts a Shapely `BaseGeometry`, a GeoJSON `dict`, or a path to a GeoJSON file (``.geojson``/``.json``). |
 | `start_datetime` / `end_datetime` | UTC `datetime` objects for temporal filtering. |
 | `search_params` | Meta-level dict forwarded to search plugins. Supports **per-collection overrides** using collection names as top-level keys (case-insensitive). Profile-level `search_params` always wins over batch-level. |
 | `failure_mode` | `BEST_EFFORT` (default) logs failures and continues. `STRICT` raises on any plugin failure. |

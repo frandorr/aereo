@@ -20,7 +20,11 @@ from typing import (
     cast,
 )
 
-from .utils import _import_yaml, _load_json_file
+from .utils import (
+    _import_yaml,
+    _load_json_file,
+    normalize_geometry_input,
+)
 
 if TYPE_CHECKING:
     from aereo.backends import TaskRunner
@@ -31,7 +35,7 @@ import xarray as xr
 from aereo.grid import ExtractionPatch
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from shapely.geometry.base import BaseGeometry
 
 GridFilterMode = Literal["intersection", "within", "coverage"]
@@ -363,10 +367,21 @@ class SearchProvider(AereoPlugin, ABC):
     """
 
     collections: Mapping[str, Sequence[str]] | Sequence[str] | None = None
-    intersects: BaseGeometry | None = None
+    intersects: BaseGeometry | dict[str, Any] | str | Path | None = Field(
+        default=None,
+        description="AOI geometry as a Shapely object, GeoJSON dict, or path to a GeoJSON file.",
+    )
     start_datetime: datetime | None = None
     end_datetime: datetime | None = None
     search_params: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("intersects", mode="before")
+    @classmethod
+    def _validate_intersects(
+        cls, value: BaseGeometry | dict[str, Any] | str | Path | None
+    ) -> BaseGeometry | None:
+        """Normalize intersects input into a Shapely geometry."""
+        return normalize_geometry_input(value)
 
     @staticmethod
     def empty_result() -> GeoDataFrame[AssetSchema]:

@@ -61,7 +61,7 @@ Find satellite granules across one or more collections that intersect a given AO
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `collections` | `Sequence[str]` | Yes | Collection identifiers to search (e.g. `["MOD021KM", "VJ202IMG"]`). |
-| `intersects` | `BaseGeometry \| dict \| None` | No | Spatial filter. Shapely geometry or GeoJSON dict. |
+| `intersects` | `BaseGeometry \| dict \| str \| Path \| None` | No | Spatial filter. Shapely geometry, GeoJSON dict, or path to a GeoJSON file. |
 | `start_datetime` | `datetime \| None` | No | Temporal start (UTC). |
 | `end_datetime` | `datetime \| None` | No | Temporal end (UTC). |
 | `search_params` | `Mapping[str, Any] \| None` | No | Per-collection or global params forwarded to the search plugin. Collection names as top-level keys trigger per-collection overrides. |

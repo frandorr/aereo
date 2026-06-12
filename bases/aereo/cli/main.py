@@ -16,10 +16,11 @@ import pandas as pd
 from omegaconf import DictConfig
 from rich.console import Console
 from rich.table import Table
+from shapely.geometry.base import BaseGeometry
 
 from aereo.client import AereoClient
 from aereo.backends import LocalProcessBackend
-from aereo.interfaces import ExtractConfig
+from aereo.interfaces import ExtractConfig, normalize_geometry_input
 from aereo.schemas import AssetSchema
 from aereo.registry import AereoRegistry
 
@@ -63,16 +64,17 @@ def _load_geometry(geojson_path: Path) -> dict[str, Any] | None:
     raise ValueError("Could not extract geometry from GeoJSON.")
 
 
-def _load_geometry_safe(path: Path | None) -> dict[str, Any] | None:
+def _load_geometry_safe(path: Path | None) -> BaseGeometry | None:
     """Load geometry from GeoJSON if path is provided and exists.
 
     Args:
         path: Path to GeoJSON file, or None.
 
     Returns:
-        Geometry dictionary, or None if path is None or missing.
+        Shapely geometry, or None if path is None or missing.
     """
-    return _load_geometry(path) if path and path.exists() else None
+    geom_dict = _load_geometry(path) if path and path.exists() else None
+    return normalize_geometry_input(geom_dict) if geom_dict is not None else None
 
 
 def _parse_iso_datetime(value: str | None) -> datetime | None:

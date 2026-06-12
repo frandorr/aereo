@@ -267,3 +267,37 @@ def test_search_stac_pystac_params_forwarding(mock_client, mock_pystac_item):
     search_kwargs = mock_catalog.search.call_args[1]
     assert search_kwargs["method"] == "GET"
     assert search_kwargs["max_items"] == 10
+
+
+def test_search_stac_accepts_geojson_path(tmp_path):
+    geojson_path = tmp_path / "aoi.geojson"
+    geojson_path.write_text(
+        '{"type": "Feature", "geometry": {"type": "Polygon", '
+        '"coordinates": [[[10, 45], [11, 45], [11, 46], [10, 46], [10, 45]]]}, '
+        '"properties": {}}'
+    )
+
+    provider = SearchSTAC(
+        stac_api_url="https://example.com/stac",
+        collections={"test-collection": []},
+        intersects=str(geojson_path),
+    )
+
+    assert isinstance(provider.intersects, Polygon)
+    assert provider.intersects.is_valid
+
+
+def test_search_stac_accepts_geojson_dict():
+    geojson = {
+        "type": "Polygon",
+        "coordinates": [[[10, 45], [11, 45], [11, 46], [10, 46], [10, 45]]],
+    }
+
+    provider = SearchSTAC(
+        stac_api_url="https://example.com/stac",
+        collections={"test-collection": []},
+        intersects=geojson,
+    )
+
+    assert isinstance(provider.intersects, Polygon)
+    assert provider.intersects.is_valid

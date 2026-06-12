@@ -14,6 +14,8 @@ search:
   stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
   collections:
     sentinel-2-l2a: ["B04"]
+  # intersects accepts a GeoJSON dict, a Shapely geometry, or a GeoJSON file path.
+  # intersects: /absolute/path/to/aoi.geojson
 extract:
   read:
     _target_: aereo.builtins.ReadODCSTAC
