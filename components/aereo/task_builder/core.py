@@ -17,6 +17,7 @@ from aereo.interfaces.core import (
     GridConfig,
     PatchConfig,
 )
+from aereo.pipeline import ExtractionJob
 from aereo.interfaces.utils import _skip_empty, _union_all
 from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -137,6 +138,7 @@ def prepare_for_extraction(
     target_aoi: BaseGeometry | None = None,
     cells_per_task: int = DEFAULT_CELLS_PER_TASK,
     init_params: dict[str, Any] | None = None,
+    job: ExtractionJob | None = None,
 ) -> Sequence[ExtractionTask]:
     """Prepare extraction tasks by grouping assets and chunking grid patches.
 
@@ -152,6 +154,7 @@ def prepare_for_extraction(
         target_aoi: Optional geometry to clip the extraction region.
         cells_per_task: Maximum number of patches per task chunk.
         init_params: Optional parameters added to each task's context.
+        job: Optional parent ``ExtractionJob`` to attach to each task.
 
     Returns:
         A sequence of ExtractionTask objects ready for execution.
@@ -216,6 +219,7 @@ def prepare_for_extraction(
                 patch_config=patch_config,
                 aoi=target_aoi,
                 task_context=task_context,
+                job=job,
             )
             tasks.append(task)
 

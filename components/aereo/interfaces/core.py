@@ -28,6 +28,7 @@ from .utils import (
 
 if TYPE_CHECKING:
     from aereo.backends import TaskRunner
+    from aereo.pipeline import ExtractionJob
 
 
 import attrs
@@ -169,6 +170,8 @@ class AereoPlugin(BaseModel, ABC):
 class Reader(AereoPlugin, ABC):
     """Reads raw satellite data and returns it in native CRS as an xarray.Dataset."""
 
+    read_kwargs: dict[str, Any] = Field(default_factory=dict)
+
     @abstractmethod
     def __call__(self, task: ExtractionTask) -> xr.Dataset:
         """Read data for the given task.
@@ -183,6 +186,8 @@ class Reader(AereoPlugin, ABC):
 
 class Reprojector(AereoPlugin, ABC):
     """Reprojects/resamples an xarray.Dataset to target grid cell definitions."""
+
+    reproject_kwargs: dict[str, Any] = Field(default_factory=dict)
 
     @abstractmethod
     def __call__(self, ds: xr.Dataset, task: ExtractionTask) -> dict[str, xr.Dataset]:
@@ -202,6 +207,8 @@ class Reprojector(AereoPlugin, ABC):
 class Processor(AereoPlugin, ABC):
     """Pure ``xarray.Dataset -> xarray.Dataset`` transform."""
 
+    process_kwargs: dict[str, Any] = Field(default_factory=dict)
+
     @abstractmethod
     def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         """Transform *ds* and return a new dataset."""
@@ -210,6 +217,8 @@ class Processor(AereoPlugin, ABC):
 
 class Writer(AereoPlugin, ABC):
     """Serialises an xarray.Dataset to disk."""
+
+    write_kwargs: dict[str, Any] = Field(default_factory=dict)
 
     @abstractmethod
     def __call__(
@@ -248,6 +257,8 @@ class BatchWriter(AereoPlugin, ABC):
     ``TaskRunner`` detects ``isinstance(writer, BatchWriter)`` and hands
     off the full reprojected map instead of iterating per-patch.
     """
+
+    write_kwargs: dict[str, Any] = Field(default_factory=dict)
 
     @abstractmethod
     def __call__(
@@ -452,6 +463,7 @@ class ExtractionTask:
         patch_config: ML physical dimensions specification.
         aoi: Optional area-of-interest geometry used to clip the extraction region.
         task_context: Observability metadata generated during task preparation.
+        job: Optional reference to the parent ExtractionJob.
     """
 
     assets: GeoDataFrame[AssetSchema]
@@ -462,6 +474,7 @@ class ExtractionTask:
     patch_config: PatchConfig
     aoi: BaseGeometry | None = None
     task_context: Mapping[str, Any] = attrs.field(factory=dict)
+    job: ExtractionJob | None = None
 
     def __attrs_post_init__(self) -> None:
         """Validate task invariants after construction.

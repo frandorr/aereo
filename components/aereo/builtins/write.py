@@ -25,7 +25,7 @@ class WriteGeoTIFF(Writer):
     available without any intermediate translation layer.
     """
 
-    profile_name: str = "default"
+    job_name: str | None = None
     rio_params: dict[str, Any] = Field(default_factory=dict)
 
     def __call__(
@@ -122,9 +122,14 @@ class WriteGeoTIFF(Writer):
                     # Single band gets the variable name, multi-band gets B04_b0
                     desc = f"{var_name}_b{band_idx}" if num_bands > 1 else str(var_name)
 
+                    job_name = (
+                        task.job.name
+                        if task.job is not None
+                        else (self.job_name or "default")
+                    )
                     fpath = build_eoids_path(
                         local_dir=uri,
-                        profile_name=self.profile_name,
+                        job_name=job_name,
                         resolution=grid_dist,
                         collections=collections,
                         variables=[str(v) for v in ds.data_vars],

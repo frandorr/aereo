@@ -10,6 +10,7 @@ defaults:
   - extract: sentinel2
   - _self_
 
+name: sentinel2_b04_sample
 output_uri: /tmp/aereo_extraction
 
 # Optional AOI used to clip prepared extraction tasks. When omitted,
