@@ -306,20 +306,21 @@ Load a Hydra config package in one call:
 from aereo.pipeline import ExtractionJob
 
 job = ExtractionJob.load_from_config(
-    "examples/config_package",
+    "examples/config",
     config_name="main_config",
     overrides=["patch_config=high_res"],
 )
 ```
 
-Or write the same layout as a single YAML file:
+Or write the same layout as a single YAML file. ``grid_config`` and
+``patch_config`` are concrete Pydantic models, so they do not need
+``_target_``; only plugin/config groups that select an implementation
+(``search``, ``extract.read``, etc.) require it:
 
 ```yaml
 grid_config:
-  _target_: aereo.interfaces.GridConfig
   target_grid_dist: 10000
 patch_config:
-  _target_: aereo.interfaces.PatchConfig
   resolution: 10.0
 output_uri: /tmp/aereo_extraction
 target_aoi: /absolute/path/to/aoi.geojson

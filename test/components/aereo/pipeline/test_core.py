@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 from aereo.builtins import SearchSTAC
+from aereo.interfaces import GridConfig, PatchConfig
 from aereo.pipeline import ExtractionJob
 from shapely.geometry import Polygon
 
@@ -221,15 +222,52 @@ extract:
     assert job.patch_config.resolution == 5.0
 
 
+def test_extraction_job_load_from_config_package_without_targets(tmp_path: Path):
+    """Concrete Pydantic models do not need ``_target_`` in Hydra configs."""
+    config_dir = tmp_path / "conf"
+    config_dir.mkdir()
+
+    (config_dir / "main_config.yaml").write_text(
+        """
+defaults:
+  - grid_config: default
+  - patch_config: base
+  - _self_
+
+output_uri: "out_dir"
+search:
+  _target_: aereo.builtins.SearchSTAC
+  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
+  collections:
+    sentinel-2-l2a: ["B04"]
+extract:
+  read:
+    _target_: aereo.builtins.ReadODCSTAC
+"""
+    )
+
+    grid_dir = config_dir / "grid_config"
+    grid_dir.mkdir()
+    (grid_dir / "default.yaml").write_text("target_grid_dist: 75000\n")
+
+    patch_dir = config_dir / "patch_config"
+    patch_dir.mkdir()
+    (patch_dir / "base.yaml").write_text("resolution: 20.0\n")
+
+    job = ExtractionJob.load_from_config(config_dir)
+    assert isinstance(job.grid_config, GridConfig)
+    assert job.grid_config.target_grid_dist == 75_000
+    assert isinstance(job.patch_config, PatchConfig)
+    assert job.patch_config.resolution == 20.0
+
+
 def test_extraction_job_accepts_geojson_dict(tmp_path: Path):
     job_yaml = tmp_path / "job.yaml"
     job_yaml.write_text(
         """
 grid_config:
-  _target_: aereo.interfaces.GridConfig
   target_grid_dist: 50000
 patch_config:
-  _target_: aereo.interfaces.PatchConfig
   resolution: 10.0
 output_uri: "out_dir"
 target_aoi:

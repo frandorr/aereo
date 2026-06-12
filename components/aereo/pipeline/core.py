@@ -97,6 +97,7 @@ class ExtractionJob(BaseModel):
         """
         from hydra import compose, initialize_config_dir
 
+        config_dir = Path(config_dir).resolve()
         with initialize_config_dir(version_base=None, config_dir=str(config_dir)):
             cfg = compose(config_name=config_name, overrides=overrides or [])
             instantiated = hydra.utils.instantiate(cfg, _convert_="all")
