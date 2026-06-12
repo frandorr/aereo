@@ -13,3 +13,7 @@ defaults:
   - _self_
 
 output_uri: /tmp/aereo_extraction
+
+# Optional AOI used to clip prepared extraction tasks. When omitted,
+# ``target_aoi`` falls back to ``search.intersects``.
+target_aoi: aoi/sample.geojson

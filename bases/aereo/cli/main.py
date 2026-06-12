@@ -8,7 +8,7 @@ import pickle
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Sequence, cast
 
 import geopandas as gpd
 import hydra
@@ -75,6 +75,40 @@ def _load_geometry_safe(path: Path | None) -> BaseGeometry | None:
     """
     geom_dict = _load_geometry(path) if path and path.exists() else None
     return normalize_geometry_input(geom_dict) if geom_dict is not None else None
+
+
+def _resolve_target_aoi(
+    cfg: DictConfig,
+    fallback: BaseGeometry | None = None,
+) -> BaseGeometry | None:
+    """Resolve the target AOI used to clip prepared extraction tasks.
+
+    Resolution order:
+        1. ``cfg.target_aoi`` (GeoJSON dict, file path, or Shapely object).
+        2. ``cfg.geojson`` path.
+        3. ``fallback`` geometry (commonly ``search_provider.intersects``).
+
+    Args:
+        cfg: Hydra DictConfig.
+        fallback: Optional fallback geometry.
+
+    Returns:
+        A Shapely BaseGeometry, or None if no AOI is available.
+    """
+    target = cfg.get("target_aoi")
+    if target is not None:
+        from omegaconf import DictConfig as OmegaConfDictConfig, OmegaConf
+
+        if isinstance(target, OmegaConfDictConfig):
+            target = OmegaConf.to_container(target, resolve=True)
+        return normalize_geometry_input(
+            cast("BaseGeometry | dict[str, Any] | str | Path | None", target)
+        )
+
+    if cfg.geojson:
+        return _load_geometry_safe(Path(cfg.geojson))
+
+    return fallback
 
 
 def _parse_iso_datetime(value: str | None) -> datetime | None:
@@ -435,6 +469,8 @@ def main(cfg: DictConfig) -> None:
         output_dir = Path(cfg.output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
 
+        target_aoi = _resolve_target_aoi(cfg)
+
         client = AereoClient()
         tasks = _run_with_exit(
             "Prepare",
@@ -444,6 +480,7 @@ def main(cfg: DictConfig) -> None:
             patch_config=patch_config,
             extract=extract,
             output_uri=cfg.get("output_uri") or str(output_dir),
+            target_aoi=target_aoi,
             cells_per_task=cfg.cells_per_task,
         )
 
@@ -514,6 +551,8 @@ def main(cfg: DictConfig) -> None:
         output_dir = Path(cfg.output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
 
+        target_aoi = _resolve_target_aoi(cfg, fallback=search_provider.intersects)
+
         client = AereoClient()
 
         # Search
@@ -536,6 +575,7 @@ def main(cfg: DictConfig) -> None:
             grid_config=grid_config,
             patch_config=patch_config,
             output_uri=cfg.get("output_uri") or str(output_dir),
+            target_aoi=target_aoi,
             cells_per_task=cfg.cells_per_task,
         )
         console.print(

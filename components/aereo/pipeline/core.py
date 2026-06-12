@@ -7,6 +7,7 @@ extraction pipeline configuration.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any, cast
 
 from aereo.interfaces import (
     ExtractConfig,
@@ -14,7 +15,9 @@ from aereo.interfaces import (
     PatchConfig,
     SearchProvider,
 )
-from pydantic import BaseModel, Field
+from aereo.interfaces.utils import normalize_geometry_input
+from pydantic import BaseModel, Field, field_validator
+from shapely.geometry.base import BaseGeometry
 
 
 class ExtractionJob(BaseModel):
@@ -25,7 +28,7 @@ class ExtractionJob(BaseModel):
     Hydra-compatible model.
     """
 
-    model_config = {"extra": "forbid", "frozen": True}
+    model_config = {"extra": "forbid", "frozen": True, "arbitrary_types_allowed": True}
 
     grid_config: GridConfig
     patch_config: PatchConfig
@@ -34,6 +37,31 @@ class ExtractionJob(BaseModel):
     )
     search: SearchProvider
     extract: ExtractConfig
+    target_aoi: BaseGeometry | dict[str, Any] | str | Path | None = Field(
+        default=None,
+        description=(
+            "AOI geometry used to clip prepared extraction tasks. "
+            "Accepts a Shapely object, GeoJSON dict, or path to a GeoJSON file. "
+            "When omitted, the search provider's ``intersects`` geometry is used."
+        ),
+    )
+
+    @field_validator("target_aoi", mode="before")
+    @classmethod
+    def _validate_target_aoi(cls, value):
+        return normalize_geometry_input(value)
+
+    @property
+    def effective_target_aoi(self) -> BaseGeometry | None:
+        """Return the geometry used to clip prepared tasks.
+
+        Falls back to ``search.intersects`` when ``target_aoi`` is not
+        explicitly provided.
+        """
+        return cast(
+            "BaseGeometry | None",
+            self.target_aoi or self.search.intersects,
+        )
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> ExtractionJob:

@@ -21,9 +21,9 @@ flat ``ExtractionJob`` schema:
     └── goes.yaml
 ```
 
-Top-level keys (``grid_config``, ``patch_config``, ``output_uri``) are first-class
-citizens of the job config, so they can be swapped independently via Hydra
-``defaults`` composition.
+Top-level keys (``grid_config``, ``patch_config``, ``output_uri``,
+``target_aoi``) are first-class citizens of the job config, so they can be
+swapped independently via Hydra ``defaults`` composition.
 
 ## Usage
 
@@ -55,27 +55,43 @@ cfg = compose(config_name="main_config", overrides=["patch_config=high_res"])
 
 ## Passing an AOI geometry
 
-``SearchProvider.intersects`` accepts a Shapely geometry, a GeoJSON dict, or a
-path to a GeoJSON file. In a config package you can point to an AOI file with
-an override:
+Both ``SearchProvider.intersects`` and the top-level ``target_aoi`` key accept
+a Shapely geometry, a GeoJSON dict, or a path to a GeoJSON file.
+``target_aoi`` is the AOI used to clip prepared extraction tasks; when it is
+omitted, ``ExtractionJob.effective_target_aoi`` automatically falls back to
+``search.intersects``.
+
+In a config package you can point to an AOI file with an override:
 
 ```python
 aoi_path = str(Path("examples/config_package/aoi/sample.geojson").resolve())
 cfg = compose(
     config_name="main_config",
-    overrides=[f"search/default.intersects={aoi_path}"],
+    overrides=[f"target_aoi={aoi_path}"],
 )
 ```
 
 Or in a single-file ``ExtractionJob`` YAML:
 
 ```yaml
+grid_config:
+  _target_: aereo.interfaces.GridConfig
+  target_grid_dist: 10000
+patch_config:
+  _target_: aereo.interfaces.PatchConfig
+  resolution: 10.0
+output_uri: /tmp/aereo_extraction
+target_aoi: /absolute/path/to/aoi.geojson
 search:
   _target_: aereo.builtins.SearchSTAC
   stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
   collections:
     sentinel-2-l2a: ["B04"]
   intersects: /absolute/path/to/aoi.geojson
+extract:
+  read:
+    _target_: aereo.builtins.ReadODCSTAC
+  ...
 ```
 
 Relative paths are resolved against the current working directory of the

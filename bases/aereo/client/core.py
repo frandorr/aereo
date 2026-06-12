@@ -5,6 +5,7 @@ This module defines :class:`AereoClient` and its supporting utilities.
 
 from collections.abc import Sequence
 from enum import Enum
+from pathlib import Path
 from typing import Any, cast
 
 import pandas as pd
@@ -105,6 +106,7 @@ class AereoClient:
         grid_config: GridConfig | None = None,
         patch_config: PatchConfig | None = None,
         output_uri: str | None = None,
+        target_aoi: BaseGeometry | dict | str | Path | None = None,
         cells_per_task: int | None = None,
     ) -> Sequence[ExtractionTask]:
         """Groups search results by start time and distributes batches into tasks.
@@ -115,6 +117,8 @@ class AereoClient:
             grid_config: Explicit tiling specification. Falls back to client default.
             patch_config: Explicit patch configuration. Falls back to client default.
             output_uri: An optional URI defining output path.
+            target_aoi: Optional AOI geometry used to clip prepared tasks. Falls back
+                to the client default AOI if not provided.
             cells_per_task: Max grid cells per ExtractionTask. Falls back to client default.
 
         Returns:
@@ -141,13 +145,19 @@ class AereoClient:
             else (self._cells_per_task or DEFAULT_CELLS_PER_TASK)
         )
 
+        effective_aoi = (
+            normalize_geometry_input(target_aoi)
+            if target_aoi is not None
+            else self._aoi
+        )
+
         return prepare_for_extraction(
             search_results=search_results,
             grid_config=grid_config,
             patch_config=patch_config,
             extract=extract,
             output_uri=output_uri or "",
-            target_aoi=self._aoi,
+            target_aoi=effective_aoi,
             cells_per_task=effective_cells_per_task,
         )
 
