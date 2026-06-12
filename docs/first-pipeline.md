@@ -71,7 +71,7 @@ from aereo.interfaces import GridConfig
 tasks = client.prepare_for_extraction(
     results,
     profiles=[profile],
-    uri="./out",
+    output_uri="./out",
     grid_config=GridConfig(target_grid_dist=256000),
 )
 print(f"Prepared {len(tasks)} extraction tasks")

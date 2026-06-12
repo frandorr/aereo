@@ -1,0 +1,7 @@
+read:
+  _target_: aereo.builtins.ReadODCSTAC
+reproject:
+  _target_: aereo.builtins.ReprojectODC
+  resampling: nearest
+write:
+  _target_: aereo.builtins.BatchWriteGeoTIFF

@@ -1,0 +1,2 @@
+_target_: aereo.interfaces.GridConfig
+target_grid_dist: 10000

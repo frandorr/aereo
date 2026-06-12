@@ -8,10 +8,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from aereo.interfaces.core import (
-    SearchProvider,
-    GlobalConfig,
+from aereo.interfaces import (
     ExtractConfig,
+    GridConfig,
+    PatchConfig,
+    SearchProvider,
 )
 from pydantic import BaseModel, Field
 
@@ -19,13 +20,18 @@ from pydantic import BaseModel, Field
 class ExtractionJob(BaseModel):
     """Declarative configuration tree for a complete extraction job.
 
-    Bundles search configuration, global job settings, and extraction pipeline stages
-    together into a single validated Hydra-compatible model.
+    Bundles search configuration, grid/patch settings, an output URI, and
+    extraction pipeline stages together into a single validated
+    Hydra-compatible model.
     """
 
     model_config = {"extra": "forbid", "frozen": True}
 
-    global_config: GlobalConfig = Field(alias="global")
+    grid_config: GridConfig
+    patch_config: PatchConfig
+    output_uri: str = Field(
+        description="Destination URI for extracted artifacts (local path or object store)."
+    )
     search: SearchProvider
     extract: ExtractConfig
 
@@ -36,6 +42,18 @@ class ExtractionJob(BaseModel):
         Loads the configuration via OmegaConf, recursively instantiates all
         target classes using hydra.utils.instantiate, and returns an
         ExtractionJob instance.
+
+        The expected YAML layout places ``grid_config``, ``patch_config`` and
+        ``output_uri`` as top-level keys alongside ``search`` and ``extract``,
+        enabling Hydra config package composition::
+
+            defaults:
+              - grid_config: default
+              - patch_config: base
+              - extract: sentinel2
+              - _self_
+
+            output_uri: /tmp/extraction
         """
         from omegaconf import OmegaConf
         import hydra

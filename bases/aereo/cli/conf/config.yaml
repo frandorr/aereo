@@ -8,6 +8,7 @@ start: null
 end: null
 output: null
 output_dir: ./out
+output_uri: ${output_dir}
 workers: 1
 cells_per_task: 50
 search_results: null
@@ -19,5 +20,10 @@ format: table
 search: null
 pipeline: []
 grid_config:
+  _target_: aereo.interfaces.GridConfig
   target_grid_dist: 50000
-uri: ./out
+patch_config:
+  _target_: aereo.interfaces.PatchConfig
+  resolution: 10.0
+  padding: 0
+  margin: 10.0

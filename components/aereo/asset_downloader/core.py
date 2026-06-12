@@ -470,7 +470,7 @@ def download_task_assets(
         fallback_hrefs.append(cast(str, https_url) if https_url else None)
         per_asset_store_options.append(opts)
         per_asset_fallback_store_options.append(fallback_opts)
-        local_path = Path(task.uri).absolute() / Path(href).name
+        local_path = Path(task.output_uri).absolute() / Path(href).name
         local_paths.append(local_path)
 
     try:

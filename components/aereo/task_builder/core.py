@@ -133,7 +133,7 @@ def prepare_for_extraction(
     grid_config: GridConfig,
     patch_config: PatchConfig,
     extract: ExtractConfig,
-    uri: str,
+    output_uri: str,
     target_aoi: BaseGeometry | None = None,
     cells_per_task: int = DEFAULT_CELLS_PER_TASK,
     init_params: dict[str, Any] | None = None,
@@ -148,7 +148,7 @@ def prepare_for_extraction(
         grid_config: Tiling specification shared by all tasks.
         patch_config: ML physical patch boundaries specification.
         extract: Declarative configuration of the extraction stages.
-        uri: Destination URI prefix for extracted artifacts.
+        output_uri: Destination URI prefix for extracted artifacts.
         target_aoi: Optional geometry to clip the extraction region.
         cells_per_task: Maximum number of patches per task chunk.
         init_params: Optional parameters added to each task's context.
@@ -157,7 +157,7 @@ def prepare_for_extraction(
         A sequence of ExtractionTask objects ready for execution.
 
     Raises:
-        ValueError: If uri is not provided or grid_dist is not set in grid_config.
+        ValueError: If output_uri is not provided or grid_dist is not set in grid_config.
     """
     grid_dist = grid_config.target_grid_dist
     if grid_dist is None:
@@ -210,7 +210,7 @@ def prepare_for_extraction(
             task = ExtractionTask(
                 assets=chunk_assets,
                 extract=extract,
-                uri=uri,
+                output_uri=output_uri,
                 patches=patches,
                 grid_config=grid_config,
                 patch_config=patch_config,

@@ -66,7 +66,7 @@ class MyExtractor(Extractor):
         search_results: GeoDataFrame[AssetSchema],
         grid_config: GridConfig,
         target_aoi: BaseGeometry | None = None,
-        uri: str | None = None,
+        output_uri: str | None = None,
         profiles: Sequence[AereoProfile] | None = None,
         cells_per_task: int = 50,
         extractor_hint: str | None = None,
@@ -186,7 +186,7 @@ print(f"Found {len(search_results)} assets.")
 tasks = client.prepare_for_extraction(
     search_results,
     profiles=profiles,
-    uri="output/goes",
+    output_uri="output/goes",
 )
 
 from aereo.backends import LocalProcessBackend

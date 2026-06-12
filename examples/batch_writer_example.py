@@ -88,7 +88,7 @@ def extract_with_writer():
         grid_config=GRID_CONFIG,
         patch_config=PATCH_CONFIG,
         extract=extract_config,
-        uri="tmp_writer/",
+        output_uri="tmp_writer/",
         target_aoi=POLYGON,
         cells_per_task=2,
     )
@@ -142,7 +142,7 @@ def extract_with_batch_writer():
         grid_config=GRID_CONFIG,
         patch_config=PATCH_CONFIG,
         extract=extract_config,
-        uri="tmp_batch_writer/",
+        output_uri="tmp_batch_writer/",
         target_aoi=POLYGON,
         cells_per_task=2,
     )
@@ -191,7 +191,7 @@ def extract_with_client():
         grid_config=GRID_CONFIG,
         patch_config=PATCH_CONFIG,
         extract=extract_config,
-        uri="tmp_client/",
+        output_uri="tmp_client/",
         cells_per_task=2,
     )
     print(f"Client prepared: {len(tasks)} tasks")
@@ -222,7 +222,7 @@ def manual_inspection():
         grid_config=GRID_CONFIG,
         patch_config=PATCH_CONFIG,
         extract=extract_config,
-        uri="tmp_manual/",
+        output_uri="tmp_manual/",
         target_aoi=POLYGON,
         cells_per_task=2,
     )

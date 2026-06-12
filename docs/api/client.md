@@ -26,7 +26,7 @@ results = client.search(
     start_datetime=datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc),
     end_datetime=datetime(2026, 4, 2, 14, 9, tzinfo=timezone.utc),
 )
-tasks = client.prepare_for_extraction(results, profiles=[profile], target_aoi=aoi, uri="./out")
+tasks = client.prepare_for_extraction(results, profiles=[profile], target_aoi=aoi, output_uri="./out")
 
 backend = LocalProcessBackend()
 artifacts = client.execute_tasks(tasks, backend=backend)

@@ -34,7 +34,7 @@ class WriteGeoTIFF(Writer):
         task: ExtractionTask,
         patch: ExtractionPatch,
     ) -> GeoDataFrame[ArtifactSchema]:
-        """Write *ds* to GeoTIFF files using the standard EOIDS layout under ``task.uri``.
+        """Write *ds* to GeoTIFF files using the standard EOIDS layout under ``task.output_uri``.
 
         Each (variable × band [× time-slice]) combination is written to its own
         file.  The ``rio_params`` entry in *params* is forwarded unchanged to
@@ -59,7 +59,7 @@ class WriteGeoTIFF(Writer):
         from shapely.geometry import box
         from aereo.eoids import build_eoids_path
 
-        uri = task.uri
+        uri = task.output_uri
         cell_id = patch.id
 
         start_time = ds.attrs.get("start_time")

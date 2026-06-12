@@ -13,7 +13,7 @@ import importlib
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import geopandas as gpd
 import shapely.wkt
@@ -42,7 +42,8 @@ class TaskSerializer:
     GRID_CONFIG_KEY = "grid_config"
     PATCH_CONFIG_KEY = "patch_config"
     PATCHES_KEY = "patches"
-    URI_KEY = "uri"
+    OUTPUT_URI_KEY = "output_uri"
+    URI_KEY = "uri"  # legacy key for backward-compatible deserialization
     AOI_WKT_KEY = "aoi_wkt"
     TASK_CONTEXT_KEY = "task_context"
 
@@ -100,7 +101,7 @@ class TaskSerializer:
             self.GRID_CONFIG_KEY: task.grid_config.model_dump(mode="json"),
             self.PATCH_CONFIG_KEY: task.patch_config.model_dump(mode="json"),
             self.PATCHES_KEY: patches_meta,
-            self.URI_KEY: task.uri,
+            self.OUTPUT_URI_KEY: task.output_uri,
             self.AOI_WKT_KEY: task.aoi.wkt if task.aoi is not None else None,
             self.TASK_CONTEXT_KEY: dict(task.task_context),
         }
@@ -150,14 +151,32 @@ class TaskSerializer:
         # Reconstruct ExtractConfig
         extract_data = meta[self.EXTRACT_KEY]
 
-        from aereo.interfaces.core import ExtractConfig
+        from aereo.interfaces.core import (
+            BatchWriter,
+            ExtractConfig,
+            Processor,
+            Reader,
+            Reprojector,
+            Writer,
+        )
 
         extract = ExtractConfig(
-            read=deserialize_plugin(extract_data["read"]),
-            preprocess=[deserialize_plugin(p) for p in extract_data["preprocess"]],
-            reproject=deserialize_plugin(extract_data["reproject"]),
-            postprocess=[deserialize_plugin(p) for p in extract_data["postprocess"]],
-            write=deserialize_plugin(extract_data["write"]),
+            read=cast(Reader, deserialize_plugin(extract_data["read"])),
+            preprocess=[
+                cast(Processor, deserialize_plugin(p))
+                for p in extract_data["preprocess"]
+            ],
+            reproject=cast(
+                Reprojector | None, deserialize_plugin(extract_data["reproject"])
+            ),
+            postprocess=[
+                cast(Processor, deserialize_plugin(p))
+                for p in extract_data["postprocess"]
+            ],
+            write=cast(
+                Writer | BatchWriter | None,
+                deserialize_plugin(extract_data["write"]),
+            ),
         )
 
         grid_config = GridConfig.model_validate(meta[self.GRID_CONFIG_KEY])
@@ -186,10 +205,17 @@ class TaskSerializer:
             else None
         )
 
+        # Support both the new output_uri key and the legacy uri key.
+        output_uri = meta.get(self.OUTPUT_URI_KEY, meta.get(self.URI_KEY))
+        if output_uri is None:
+            raise ValueError(
+                f"Task metadata must contain '{self.OUTPUT_URI_KEY}' (or legacy '{self.URI_KEY}')."
+            )
+
         return ExtractionTask(
             assets=assets,  # type: ignore[arg-type]
             extract=extract,
-            uri=meta[self.URI_KEY],
+            output_uri=output_uri,
             patches=patches,
             grid_config=grid_config,
             patch_config=patch_config,

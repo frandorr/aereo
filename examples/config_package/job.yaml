@@ -1,0 +1,24 @@
+# Single-file ExtractionJob config using the flat schema.
+# Load with: ExtractionJob.from_yaml("examples/config_package/job.yaml")
+grid_config:
+  _target_: aereo.interfaces.GridConfig
+  target_grid_dist: 10000
+patch_config:
+  _target_: aereo.interfaces.PatchConfig
+  resolution: 10.0
+  padding: 0
+  margin: 10.0
+output_uri: /tmp/aereo_extraction
+search:
+  _target_: aereo.builtins.SearchSTAC
+  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
+  collections:
+    sentinel-2-l2a: ["B04"]
+extract:
+  read:
+    _target_: aereo.builtins.ReadODCSTAC
+  reproject:
+    _target_: aereo.builtins.ReprojectODC
+    resampling: nearest
+  write:
+    _target_: aereo.builtins.WriteGeoTIFF

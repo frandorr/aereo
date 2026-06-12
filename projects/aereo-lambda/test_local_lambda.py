@@ -27,8 +27,9 @@ from shapely.geometry import Polygon
 # Add repo to path so imports work
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from aereo.grid import GridCell
-from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig
+from aereo.builtins.read import ReadODCSTAC
+from aereo.grid import ExtractionPatch
+from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
 from aereo.schemas import AssetSchema
 from aereo.serialization import TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
@@ -45,7 +46,7 @@ REGION = "us-east-1"
 
 
 def _get_s3_client() -> Any:
-    import boto3
+    import boto3  # type: ignore[import-not-found]
 
     return boto3.client(
         "s3",
@@ -68,24 +69,23 @@ def _make_minimal_task() -> ExtractionTask:
         geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
         crs="EPSG:4326",
     )
-    profile = AereoProfile(
-        name="test_profile",
-        resolution=100.0,
-        plugin_hints={"extract": "test_extractor"},
-    )
     grid_config = GridConfig(target_grid_dist=50_000)
-    grid_cell = GridCell(
+    patch_config = PatchConfig(resolution=100.0)
+    patch = ExtractionPatch(
+        id="0U_0R",
         d=50_000,
-        geom=Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]]),
-        is_primary=True,
-        cell_id="0U_0R",
+        cell_geometry=Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]]),
+        resolution=100.0,
+        margin=0.0,
+        padding=0,
     )
     return ExtractionTask(
         assets=GeoDataFrame[AssetSchema](df),
-        profile=profile,
-        uri="test_uri",
-        grid_cells=[grid_cell],
+        extract=ExtractConfig(read=ReadODCSTAC()),
+        output_uri="test_uri",
+        patches=[patch],
         grid_config=grid_config,
+        patch_config=patch_config,
         task_context={"job_id": "test-job", "chunk_id": 0},
     )
 

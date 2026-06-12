@@ -75,7 +75,7 @@ def _make_task(tmp_path):
             reproject=ReprojectODC(),
             write=WriteGeoTIFF(),
         ),
-        uri=str(tmp_path),
+        output_uri=str(tmp_path),
         patches=[patch],
         grid_config=grid_config,
         patch_config=patch_config,

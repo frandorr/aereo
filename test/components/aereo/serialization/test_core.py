@@ -52,7 +52,7 @@ def _make_task(
     return ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
         extract=extract,
-        uri="test_uri",
+        output_uri="test_uri",
         patches=[patch],
         grid_config=grid_config,
         patch_config=patch_config,
@@ -87,8 +87,8 @@ def test_round_trip_basic(tmp_path: Any) -> None:
     # Patch config
     assert reconstructed.patch_config == original.patch_config
 
-    # URI
-    assert reconstructed.uri == original.uri
+    # output URI
+    assert reconstructed.output_uri == original.output_uri
 
     # Patches
     assert len(reconstructed.patches) == 1
@@ -182,7 +182,7 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
     original = ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
         extract=extract,
-        uri="out",
+        output_uri="out",
         patches=patches,
         grid_config=GridConfig(target_grid_dist=10_000),
         patch_config=PatchConfig(resolution=10.0, margin=5.0, padding=0),
@@ -230,7 +230,7 @@ def test_batch_writer_round_trip(tmp_path: Any) -> None:
             postprocess=original.extract.postprocess,
             write=BatchWriteGeoTIFF(),
         ),
-        uri=original.uri,
+        output_uri=original.output_uri,
         patches=original.patches,
         grid_config=original.grid_config,
         patch_config=original.patch_config,
