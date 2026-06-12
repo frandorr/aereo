@@ -134,6 +134,93 @@ def _sample_geojson() -> dict:
     }
 
 
+def test_extraction_job_load_from_config_package(tmp_path: Path):
+    config_dir = tmp_path / "conf"
+    config_dir.mkdir()
+
+    (config_dir / "main_config.yaml").write_text(
+        """
+defaults:
+  - grid_config: default
+  - patch_config: base
+  - _self_
+
+output_uri: "out_dir"
+target_aoi:
+  type: Polygon
+  coordinates:
+    - [[-1.0, -1.0], [1.0, -1.0], [1.0, 1.0], [-1.0, 1.0], [-1.0, -1.0]]
+search:
+  _target_: aereo.builtins.SearchSTAC
+  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
+  collections:
+    sentinel-2-l2a: ["B04"]
+extract:
+  read:
+    _target_: aereo.builtins.ReadODCSTAC
+"""
+    )
+
+    grid_dir = config_dir / "grid_config"
+    grid_dir.mkdir()
+    (grid_dir / "default.yaml").write_text(
+        "_target_: aereo.interfaces.GridConfig\ntarget_grid_dist: 75000\n"
+    )
+
+    patch_dir = config_dir / "patch_config"
+    patch_dir.mkdir()
+    (patch_dir / "base.yaml").write_text(
+        "_target_: aereo.interfaces.PatchConfig\nresolution: 20.0\n"
+    )
+
+    job = ExtractionJob.load_from_config(config_dir)
+    assert job.output_uri == "out_dir"
+    assert job.grid_config.target_grid_dist == 75_000
+    assert job.patch_config.resolution == 20.0
+    assert isinstance(job.target_aoi, Polygon)
+    assert isinstance(job.search, SearchSTAC)
+
+
+def test_extraction_job_load_from_config_package_with_override(tmp_path: Path):
+    config_dir = tmp_path / "conf"
+    config_dir.mkdir()
+
+    (config_dir / "main_config.yaml").write_text(
+        """
+defaults:
+  - patch_config: base
+  - _self_
+
+grid_config:
+  _target_: aereo.interfaces.GridConfig
+  target_grid_dist: 50000
+output_uri: "out_dir"
+search:
+  _target_: aereo.builtins.SearchSTAC
+  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
+  collections:
+    sentinel-2-l2a: ["B04"]
+extract:
+  read:
+    _target_: aereo.builtins.ReadODCSTAC
+"""
+    )
+
+    patch_dir = config_dir / "patch_config"
+    patch_dir.mkdir()
+    (patch_dir / "base.yaml").write_text(
+        "_target_: aereo.interfaces.PatchConfig\nresolution: 10.0\n"
+    )
+    (patch_dir / "high_res.yaml").write_text(
+        "_target_: aereo.interfaces.PatchConfig\nresolution: 5.0\n"
+    )
+
+    job = ExtractionJob.load_from_config(
+        config_dir, overrides=["patch_config=high_res"]
+    )
+    assert job.patch_config.resolution == 5.0
+
+
 def test_extraction_job_accepts_geojson_dict(tmp_path: Path):
     job_yaml = tmp_path / "job.yaml"
     job_yaml.write_text(

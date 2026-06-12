@@ -300,6 +300,20 @@ path to a GeoJSON file. When ``target_aoi`` is omitted, the job falls back to
 ``search.intersects`` for clipping prepared tasks via
 ``job.effective_target_aoi``.
 
+Load a Hydra config package in one call:
+
+```python
+from aereo.pipeline import ExtractionJob
+
+job = ExtractionJob.load_from_config(
+    "examples/config_package",
+    config_name="main_config",
+    overrides=["patch_config=high_res"],
+)
+```
+
+Or write the same layout as a single YAML file:
+
 ```yaml
 grid_config:
   _target_: aereo.interfaces.GridConfig
