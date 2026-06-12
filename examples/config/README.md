@@ -11,7 +11,7 @@ flat ``ExtractionJob`` schema:
 ├── search/
 │   └── default.yaml
 ├── grid_config/
-│   └── default.yaml
+│   └── grid_10km.yaml
 ├── patch_config/
 │   ├── base.yaml
 │   └── high_res.yaml
@@ -20,6 +20,11 @@ flat ``ExtractionJob`` schema:
     ├── viirs.yaml
     └── goes.yaml
 ```
+
+`grid_config` and `patch_config` are concrete Pydantic models, so their YAML
+files only need the field values; ``_target_`` is optional. ``_target_`` is
+required for plugin/config groups that select an implementation, such as
+``search``, ``extract.read``, ``extract.reproject``, and ``extract.write``.
 
 Top-level keys (``grid_config``, ``patch_config``, ``output_uri``,
 ``target_aoi``) are first-class citizens of the job config, so they can be
@@ -37,7 +42,7 @@ etc.).
 from aereo.pipeline import ExtractionJob
 
 job = ExtractionJob.load_from_config(
-    "examples/config_package",
+    "examples/config",
     config_name="main_config",
 )
 
@@ -51,7 +56,7 @@ Override configuration values with Hydra-style overrides:
 
 ```python
 job = ExtractionJob.load_from_config(
-    "examples/config_package",
+    "examples/config",
     overrides=["patch_config=high_res"],
 )
 ```
@@ -65,7 +70,7 @@ from pathlib import Path
 import hydra
 from aereo.pipeline import ExtractionJob
 
-config_dir = str(Path("examples/config_package").resolve())
+config_dir = str(Path("examples/config").resolve())
 with initialize_config_dir(version_base=None, config_dir=config_dir):
     cfg = compose(config_name="main_config")
     instantiated = hydra.utils.instantiate(cfg, _convert_="all")
@@ -83,7 +88,7 @@ omitted, ``ExtractionJob.effective_target_aoi`` automatically falls back to
 In a config package you can point to an AOI file with an override:
 
 ```python
-aoi_path = str(Path("examples/config_package/aoi/sample.geojson").resolve())
+aoi_path = str(Path("examples/config/aoi/sample.geojson").resolve())
 cfg = compose(
     config_name="main_config",
     overrides=[f"target_aoi={aoi_path}"],
@@ -94,10 +99,8 @@ Or in a single-file ``ExtractionJob`` YAML:
 
 ```yaml
 grid_config:
-  _target_: aereo.interfaces.GridConfig
   target_grid_dist: 10000
 patch_config:
-  _target_: aereo.interfaces.PatchConfig
   resolution: 10.0
 output_uri: /tmp/aereo_extraction
 target_aoi: /absolute/path/to/aoi.geojson
@@ -123,10 +126,8 @@ that follows the same flat structure:
 
 ```yaml
 grid_config:
-  _target_: aereo.interfaces.GridConfig
   target_grid_dist: 10000
 patch_config:
-  _target_: aereo.interfaces.PatchConfig
   resolution: 10.0
 output_uri: /tmp/aereo_extraction
 search:
