@@ -67,7 +67,7 @@ def _make_task(
     return ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
         extract=extract,
-        uri="test-uri",
+        output_uri="test-uri",
         patches=[],
         grid_config=grid_config,
         patch_config=PatchConfig(resolution=10.0),

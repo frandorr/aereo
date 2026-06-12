@@ -35,7 +35,10 @@ pipeline:
 grid_config:
   _target_: aereo.interfaces.GridConfig
   target_grid_dist: 50000
-uri: "out"
+patch_config:
+  _target_: aereo.interfaces.PatchConfig
+  resolution: 10.0
+output_uri: "out"
 """
         )
         run_cli_config(tmp_path, "config", [])

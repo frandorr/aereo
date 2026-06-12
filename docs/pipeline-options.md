@@ -125,7 +125,7 @@ client = AereoClient(
 
 tasks = client.prepare_for_extraction(
     search_results=results,
-    uri="/tmp/goes_extraction",
+    output_uri="/tmp/goes_extraction",
 )
 print(f"Prepared {len(tasks)} extraction tasks")
 print(f"Task 0 covers {len(tasks[0].grid_cells)} cells")
@@ -138,7 +138,7 @@ print(f"Task 0 covers {len(tasks[0].grid_cells)} cells")
 | `search_results` | **Required.** Output from `client.search()`. |
 | `profiles` / `resolution` | **At least one is required.** If `profiles` is omitted, a default profile named `"default"` is created with the given `resolution`. |
 | `target_aoi` | Clipping geometry. If `None`, the extractor uses the union of all asset geometries. |
-| `uri` | Base output directory for extracted artifacts. |
+| `output_uri` | Base output directory or URI prefix for extracted artifacts. |
 | `prepare_params` | Forwarded to the extractor. Common keys: `cells_per_task` (default 50), `grid_filter_mode` (`"intersection"`, `"within"`, `"coverage"`), `min_coverage` (float 0.0–1.0). |
 | `target_grid_dist` | Override grid cell size in metres (e.g. `256000` for 256 km cells). |
 | `target_grid_overlap` | Override whether grid cells are allowed to overlap. |
@@ -156,7 +156,7 @@ client = AereoClient(
 
 tasks = client.prepare_for_extraction(
     results,
-    uri="/tmp/output",
+    output_uri="/tmp/output",
 )
 ```
 
@@ -169,7 +169,7 @@ tasks = client.prepare_for_extraction(
 | `assets` | GeoDataFrame of granules this task will process |
 | `profile` | The `AereoProfile` with bands, resolution, and params |
 | `grid_cells` | Spatial cells this task covers |
-| `uri` | Destination path for artifacts |
+| `output_uri` | Destination path or URI for artifacts |
 | `task_context` | Metadata such as `chunk_id`, `total_chunks`, `start_time`. Contains `conform_to_shape` when the profile enables fixed-shape batching. |
 
 ### Gotcha: `target_grid_dist` is cell size, `resolution` is pixel size

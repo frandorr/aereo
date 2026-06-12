@@ -66,7 +66,7 @@ results = client.search(
 tasks = client.prepare_for_extraction(
     results,
     profiles=[profile],
-    uri="./out",
+    output_uri="./out",
     grid_config=GridConfig(target_grid_dist=256000),
 )
 client.execute_tasks(tasks)

@@ -141,7 +141,7 @@ class AcmeExtractor(Extractor):
         search_results: GeoDataFrame[AssetSchema],
         grid_config: GridConfig,
         target_aoi: BaseGeometry | None = None,
-        uri: str | None = None,
+        output_uri: str | None = None,
         profiles: Sequence[AereoProfile] | None = None,
         cells_per_task: int = 50,
         extractor_hint: str | None = None,
@@ -324,7 +324,7 @@ results = client.search(
 tasks = client.prepare_for_extraction(
     results,
     profiles=profiles,
-    uri="output/acme",
+    output_uri="output/acme",
 )
 
 # 3. Extract

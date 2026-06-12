@@ -112,7 +112,7 @@ class AereoClient:
         extract: ExtractConfig,
         grid_config: GridConfig | None = None,
         patch_config: PatchConfig | None = None,
-        uri: str | None = None,
+        output_uri: str | None = None,
         cells_per_task: int | None = None,
     ) -> Sequence[ExtractionTask]:
         """Groups search results by start time and distributes batches into tasks.
@@ -122,7 +122,7 @@ class AereoClient:
             extract: Declarative configuration of extraction stages to execute.
             grid_config: Explicit tiling specification. Falls back to client default.
             patch_config: Explicit patch configuration. Falls back to client default.
-            uri: An optional URI defining output path.
+            output_uri: An optional URI defining output path.
             cells_per_task: Max grid cells per ExtractionTask. Falls back to client default.
 
         Returns:
@@ -154,7 +154,7 @@ class AereoClient:
             grid_config=grid_config,
             patch_config=patch_config,
             extract=extract,
-            uri=uri or "",
+            output_uri=output_uri or "",
             target_aoi=self._aoi,
             cells_per_task=effective_cells_per_task,
         )

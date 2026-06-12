@@ -72,7 +72,7 @@ def test_prepare_tasks_requires_grid_config():
         client.prepare_tasks(
             search_results=cast(GeoDataFrame, valid_search_df),
             extract=ExtractConfig(read=ReadODCSTAC()),
-            uri="s3://bucket/out/",
+            output_uri="s3://bucket/out/",
         )
 
 
@@ -91,12 +91,12 @@ def test_prepare_tasks_returns_tasks(monkeypatch):
         extract=ExtractConfig(read=ReadODCSTAC()),
         grid_config=grid_config,
         patch_config=patch_config,
-        uri="s3://out",
+        output_uri="s3://out",
         cells_per_task=1,
     )
     assert isinstance(tasks, list)
     assert len(tasks) > 0
-    assert tasks[0].uri == "s3://out"
+    assert tasks[0].output_uri == "s3://out"
 
 
 # ---------------------------------------------------------------------------
@@ -122,7 +122,7 @@ def test_execute_tasks_failure_mode_strict(monkeypatch):
     task = ExtractionTask(
         assets=cast(GeoDataFrame, _make_valid_search_df()),
         extract=ExtractConfig(read=ReadODCSTAC()),
-        uri="test",
+        output_uri="test",
         patches=[],
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),
@@ -146,7 +146,7 @@ def test_execute_tasks_failure_mode_best_effort(monkeypatch):
     task = ExtractionTask(
         assets=cast(GeoDataFrame, _make_valid_search_df()),
         extract=ExtractConfig(read=ReadODCSTAC()),
-        uri="test",
+        output_uri="test",
         patches=[],
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),
@@ -171,7 +171,7 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
     )
 
     def _run_tasks(tasks, runner=None):
-        if tasks[0].uri == "fail":
+        if tasks[0].output_uri == "fail":
             raise RuntimeError("intentional failure")
         return [df_ok]
 
@@ -181,7 +181,7 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
     task_ok = ExtractionTask(
         assets=cast(GeoDataFrame, _make_valid_search_df()),
         extract=ExtractConfig(read=ReadODCSTAC()),
-        uri="ok",
+        output_uri="ok",
         patches=[],
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),
@@ -189,7 +189,7 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
     task_fail = ExtractionTask(
         assets=cast(GeoDataFrame, _make_valid_search_df()),
         extract=ExtractConfig(read=ReadODCSTAC()),
-        uri="fail",
+        output_uri="fail",
         patches=[],
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),

@@ -84,7 +84,7 @@ def _make_task(stac_item_dict: dict[str, Any] | None = None, aoi=None):
     return ExtractionTask(
         assets=GeoDataFrame(valid_df),
         extract=ExtractConfig(read=ReadODCSTAC()),
-        uri="/tmp/test",
+        output_uri="/tmp/test",
         patches=[patch],
         grid_config=grid_config,
         patch_config=patch_config,
@@ -235,7 +235,7 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
     task = ExtractionTask(
         assets=GeoDataFrame(valid_df),
         extract=ExtractConfig(read=ReadODCSTAC()),
-        uri="/tmp/test",
+        output_uri="/tmp/test",
         patches=[patch],
         grid_config=grid_config,
         patch_config=patch_config,

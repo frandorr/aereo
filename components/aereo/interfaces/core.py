@@ -276,16 +276,6 @@ class ExtractConfig(BaseModel):
     write: Writer | BatchWriter | None = None
 
 
-class GlobalConfig(BaseModel):
-    """Global configuration settings for an ExtractionJob."""
-
-    model_config = {"extra": "forbid", "frozen": True}
-
-    grid_config: GridConfig
-    patch_config: PatchConfig
-    uri: str
-
-
 class PipelineCallback:
     """Lifecycle hooks for pipeline execution.
 
@@ -441,7 +431,7 @@ class ExtractionTask:
     Attributes:
         assets: GeoDataFrame of assets to extract.
         extract: Declarative configuration of extraction stages.
-        uri: Destination URI for extracted artifacts.
+        output_uri: Destination URI for extracted artifacts (local path or object store).
         patches: Spatial grid patches this task covers.
         grid_config: Tiling specification shared by all tasks in this run.
         patch_config: ML physical dimensions specification.
@@ -451,7 +441,7 @@ class ExtractionTask:
 
     assets: GeoDataFrame[AssetSchema]
     extract: ExtractConfig
-    uri: str
+    output_uri: str
     patches: Sequence[ExtractionPatch]
     grid_config: GridConfig
     patch_config: PatchConfig
@@ -492,7 +482,7 @@ class ExtractionTask:
             f"n_assets={n_assets}, "
             f"extract_len={extract_len}, "
             f"patches={all_cells_str}, "
-            f"uri='{self.uri}'"
+            f"output_uri='{self.output_uri}'"
             f")"
         )
 

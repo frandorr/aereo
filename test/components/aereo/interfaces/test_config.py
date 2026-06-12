@@ -3,7 +3,7 @@ from aereo.builtins.search import SearchSTAC
 from aereo.builtins.read import ReadODCSTAC
 from aereo.builtins.reproject import ReprojectODC
 from aereo.builtins.write import WriteGeoTIFF
-from aereo.interfaces import GridConfig, PatchConfig, GlobalConfig, ExtractConfig
+from aereo.interfaces import GridConfig, PatchConfig, ExtractConfig
 
 
 def test_extraction_job_validation():
@@ -15,14 +15,10 @@ def test_extraction_job_validation():
             reproject=ReprojectODC(),
             write=WriteGeoTIFF(),
         ),
-        **{
-            "global": GlobalConfig(
-                grid_config=GridConfig(target_grid_dist=50000),
-                patch_config=PatchConfig(resolution=10.0),
-                uri="out",
-            )
-        },
+        grid_config=GridConfig(target_grid_dist=50000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="out",
     )
-    assert job.global_config.uri == "out"
+    assert job.output_uri == "out"
     assert job.extract.read is not None
-    assert job.global_config.grid_config.target_grid_dist == 50000
+    assert job.grid_config.target_grid_dist == 50000

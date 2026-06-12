@@ -1,0 +1,14 @@
+# Top-level Hydra config package for an AEREO extraction job.
+#
+# Run with the AEREO CLI from this directory:
+#   aer --config-dir . --config-name main_config run
+#
+# Or compose programmatically with OmegaConf / Hydra.
+defaults:
+  - search: default
+  - grid_config: default
+  - patch_config: base
+  - extract: sentinel2
+  - _self_
+
+output_uri: /tmp/aereo_extraction

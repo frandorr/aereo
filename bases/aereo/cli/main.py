@@ -8,7 +8,7 @@ import pickle
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Sequence
 
 import geopandas as gpd
 import hydra
@@ -19,6 +19,7 @@ from rich.table import Table
 
 from aereo.client import AereoClient
 from aereo.backends import LocalProcessBackend
+from aereo.interfaces import ExtractConfig
 from aereo.schemas import AssetSchema
 from aereo.registry import AereoRegistry
 
@@ -166,6 +167,55 @@ def _print_search_table(df: gpd.GeoDataFrame) -> None:
     if len(df) > 50:
         table.add_row("...", f"... and {len(df) - 50} more rows", "", "", "")
     console.print(table)
+
+
+def _pipeline_to_extract(
+    pipeline: Sequence[Any] | None,
+) -> ExtractConfig | None:
+    """Convert a list of instantiated plugins into an ``ExtractConfig``.
+
+    The CLI ``pipeline`` key is a flat list ordered as
+    ``[reader, preprocess..., reprojector, postprocess..., writer]``.
+    This helper partitions the list into the structured ``ExtractConfig``
+    expected by ``AereoClient.prepare_tasks``.
+    """
+    if not pipeline:
+        return None
+
+    from aereo.interfaces import (
+        BatchWriter,
+        Processor,
+        Reader,
+        Reprojector,
+        Writer,
+    )
+
+    read: Reader | None = None
+    reproject: Reprojector | None = None
+    write: Writer | BatchWriter | None = None
+    preprocess: list[Processor] = []
+    postprocess: list[Processor] = []
+
+    for plugin in pipeline:
+        if isinstance(plugin, Reader):
+            read = plugin
+        elif isinstance(plugin, Reprojector):
+            reproject = plugin
+        elif isinstance(plugin, (Writer, BatchWriter)):
+            write = plugin
+        elif isinstance(plugin, Processor):
+            (postprocess if reproject is not None else preprocess).append(plugin)
+
+    if read is None:
+        raise ValueError("pipeline must include a Reader plugin as its first element.")
+
+    return ExtractConfig(
+        read=read,
+        preprocess=preprocess,
+        reproject=reproject,
+        postprocess=postprocess,
+        write=write,
+    )
 
 
 def _configure_verbose_logging(verbose: bool) -> None:
@@ -377,6 +427,8 @@ def main(cfg: DictConfig) -> None:
 
         pipeline = hydra.utils.instantiate(cfg.pipeline)
         grid_config = hydra.utils.instantiate(cfg.grid_config)
+        patch_config = hydra.utils.instantiate(cfg.patch_config)
+        extract = _pipeline_to_extract(pipeline)
 
         output_dir = Path(cfg.output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -387,8 +439,9 @@ def main(cfg: DictConfig) -> None:
             client.prepare_tasks,
             search_results=df,
             grid_config=grid_config,
-            pipeline=pipeline,
-            uri=str(output_dir),
+            patch_config=patch_config,
+            extract=extract,
+            output_uri=cfg.get("output_uri") or str(output_dir),
             cells_per_task=cfg.cells_per_task,
         )
 
@@ -453,6 +506,8 @@ def main(cfg: DictConfig) -> None:
 
         pipeline = hydra.utils.instantiate(cfg.pipeline)
         grid_config = hydra.utils.instantiate(cfg.grid_config)
+        patch_config = hydra.utils.instantiate(cfg.patch_config)
+        extract = _pipeline_to_extract(pipeline)
 
         output_dir = Path(cfg.output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -475,9 +530,10 @@ def main(cfg: DictConfig) -> None:
             "Prepare",
             client.prepare_tasks,
             search_results=results,
-            pipeline=pipeline,
+            extract=extract,
             grid_config=grid_config,
-            uri=str(output_dir),
+            patch_config=patch_config,
+            output_uri=cfg.get("output_uri") or str(output_dir),
             cells_per_task=cfg.cells_per_task,
         )
         console.print(
@@ -508,6 +564,8 @@ def main(cfg: DictConfig) -> None:
                 hydra.utils.instantiate(cfg.pipeline)
             if cfg.get("grid_config"):
                 hydra.utils.instantiate(cfg.grid_config)
+            if cfg.get("patch_config"):
+                hydra.utils.instantiate(cfg.patch_config)
             console.print("[green]✓ Configuration is valid.[/green]")
         except Exception as exc:
             console.print(f"[red]✗ Configuration is invalid:[/red] {exc}")

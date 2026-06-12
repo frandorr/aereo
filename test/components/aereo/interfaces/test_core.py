@@ -30,12 +30,12 @@ def test_extraction_task_validation():
     task = ExtractionTask(
         assets=cast(GeoDataFrame, df),
         extract=ExtractConfig(read=ReadODCSTAC()),
-        uri="test",
+        output_uri="test",
         patches=[],
         grid_config=grid_config,
         patch_config=patch_config,
     )
-    assert task.uri == "test"
+    assert task.output_uri == "test"
     assert task.extract.read is not None
 
 
