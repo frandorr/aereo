@@ -53,6 +53,19 @@ def normalize_geometry(geom: Any) -> BaseGeometry | None:
     return normalize_geometry_input(geom)
 
 
+class _NoopSearchProvider(SearchProvider):
+    """Placeholder search provider for jobs created from explicit client args.
+
+    This provider is never invoked; it only carries an optional intersects
+    geometry so that ``ExtractionJob.effective_target_aoi`` can fall back
+    correctly when no explicit ``target_aoi`` is supplied.
+    """
+
+    def __call__(self) -> GeoDataFrame[AssetSchema]:
+        """Raise unconditionally; this provider is a configuration-only stub."""
+        raise NotImplementedError("_NoopSearchProvider cannot perform searches.")
+
+
 class AereoClient:
     """Core external entrypoint orchestrating the Geospatial pipeline.
 
@@ -103,7 +116,7 @@ class AereoClient:
     def prepare_tasks(
         self,
         search_results: GeoDataFrame[AssetSchema],
-        extract: ExtractConfig,
+        extract: ExtractConfig | None = None,
         grid_config: GridConfig | None = None,
         patch_config: PatchConfig | None = None,
         output_uri: str | None = None,
@@ -116,31 +129,30 @@ class AereoClient:
         Args:
             search_results: The merged GeoDataFrame of search results to prepare.
             extract: Declarative configuration of extraction stages to execute.
-            grid_config: Explicit tiling specification. Falls back to client default.
-            patch_config: Explicit patch configuration. Falls back to client default.
-            output_uri: An optional URI defining output path.
+                Required when ``job`` is not provided; ignored when ``job`` is
+                provided unless passed explicitly.
+            grid_config: Explicit tiling specification. Falls back to client default
+                or ``job.grid_config`` when ``job`` is provided.
+            patch_config: Explicit patch configuration. Falls back to client default
+                or ``job.patch_config`` when ``job`` is provided.
+            output_uri: An optional URI defining output path. Falls back to
+                ``job.output_uri`` when ``job`` is provided.
             target_aoi: Optional AOI geometry used to clip prepared tasks. Falls back
-                to the client default AOI if not provided.
+                to ``job.effective_target_aoi`` or the client default AOI if not
+                provided.
             cells_per_task: Max grid cells per ExtractionTask. Falls back to client default.
-            job: Optional parent ``ExtractionJob`` to attach to each task.
+            job: Optional parent ``ExtractionJob`` to attach to each task. When
+                provided, missing explicit args are derived from the job.
 
         Returns:
             A Sequence of prepared ExtractionTasks.
+
+        Raises:
+            ValueError: If required configuration cannot be resolved from either
+                explicit arguments or ``job``.
         """
         if search_results.empty:
             return []
-
-        grid_config = self._grid_config if grid_config is None else grid_config
-        if grid_config is None:
-            raise ValueError(
-                "grid_config must be provided either as a method argument or as a client default."
-            )
-
-        patch_config = self._patch_config if patch_config is None else patch_config
-        if patch_config is None:
-            raise ValueError(
-                "patch_config must be provided either as a method argument or as a client default."
-            )
 
         effective_cells_per_task = (
             cells_per_task
@@ -154,15 +166,51 @@ class AereoClient:
             else self._aoi
         )
 
-        return prepare_for_extraction(
-            search_results=search_results,
+        if job is not None:
+            grid_config = grid_config or job.grid_config
+            patch_config = patch_config or job.patch_config
+            output_uri = output_uri or job.output_uri
+            extract = extract or job.extract
+            if target_aoi is None and self._aoi is None:
+                effective_aoi = effective_aoi or job.effective_target_aoi
+        else:
+            grid_config = self._grid_config if grid_config is None else grid_config
+            patch_config = self._patch_config if patch_config is None else patch_config
+            output_uri = output_uri or ""
+
+        if grid_config is None:
+            raise ValueError(
+                "grid_config must be provided either as a method argument, "
+                "as a client default, or via ``job``."
+            )
+        if patch_config is None:
+            raise ValueError(
+                "patch_config must be provided either as a method argument, "
+                "as a client default, or via ``job``."
+            )
+        if extract is None:
+            raise ValueError(
+                "extract must be provided either as a method argument or via ``job``."
+            )
+
+        resolved_job = ExtractionJob(
+            name=job.name if job is not None else "default",
             grid_config=grid_config,
             patch_config=patch_config,
-            extract=extract,
             output_uri=output_uri or "",
+            search=(
+                job.search
+                if job is not None and job.search is not None
+                else _NoopSearchProvider(intersects=effective_aoi)
+            ),
+            extract=extract,
             target_aoi=effective_aoi,
+        )
+
+        return prepare_for_extraction(
+            search_results=search_results,
+            job=resolved_job,
             cells_per_task=effective_cells_per_task,
-            job=job,
         )
 
     def execute_tasks(

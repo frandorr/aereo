@@ -456,25 +456,37 @@ class ExtractionTask:
 
     Attributes:
         assets: GeoDataFrame of assets to extract.
-        extract: Declarative configuration of extraction stages.
-        output_uri: Destination URI for extracted artifacts (local path or object store).
         patches: Spatial grid patches this task covers.
-        grid_config: Tiling specification shared by all tasks in this run.
-        patch_config: ML physical dimensions specification.
         aoi: Optional area-of-interest geometry used to clip the extraction region.
         task_context: Observability metadata generated during task preparation.
-        job: Optional reference to the parent ExtractionJob.
+        job: Parent ``ExtractionJob`` that owns this task's extraction configuration.
     """
 
     assets: GeoDataFrame[AssetSchema]
-    extract: ExtractConfig
-    output_uri: str
     patches: Sequence[ExtractionPatch]
-    grid_config: GridConfig
-    patch_config: PatchConfig
+    job: ExtractionJob
     aoi: BaseGeometry | None = None
     task_context: Mapping[str, Any] = attrs.field(factory=dict)
-    job: ExtractionJob | None = None
+
+    @property
+    def extract(self) -> ExtractConfig:
+        """Declarative configuration of extraction stages (delegated to ``job``)."""
+        return self.job.extract
+
+    @property
+    def output_uri(self) -> str:
+        """Destination URI for extracted artifacts (delegated to ``job``)."""
+        return self.job.output_uri
+
+    @property
+    def grid_config(self) -> GridConfig:
+        """Tiling specification shared by all tasks in this run (delegated to ``job``)."""
+        return self.job.grid_config
+
+    @property
+    def patch_config(self) -> PatchConfig:
+        """ML physical dimensions specification (delegated to ``job``)."""
+        return self.job.patch_config
 
     def __attrs_post_init__(self) -> None:
         """Validate task invariants after construction.

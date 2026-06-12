@@ -25,6 +25,7 @@ from aereo.interfaces.core import (
     Processor,
 )
 from typing import Sequence
+from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -97,13 +98,17 @@ def _make_task(
                 write=write_plugin,
             )
 
-    return ExtractionTask(
-        assets=cast(GeoDataFrame, valid_df),
-        extract=extract,
-        output_uri="test-uri",
-        patches=patches or [],
+    job = ExtractionJob(
         grid_config=grid_config,
         patch_config=PatchConfig(resolution=10.0),
+        output_uri="test-uri",
+        search=None,
+        extract=extract,
+    )
+    return ExtractionTask(
+        assets=cast(GeoDataFrame, valid_df),
+        job=job,
+        patches=patches or [],
         task_context=task_context or {},
     )
 

@@ -53,6 +53,9 @@ def load_and_print_job(config_dir: Path) -> ExtractionJob:
     print(f"output_uri: {job.output_uri}")
     print(f"grid_config.target_grid_dist: {job.grid_config.target_grid_dist}")
     print(f"patch_config.resolution: {job.patch_config.resolution}")
+    if job.search is None:
+        raise ValueError("Loaded job is missing a search provider.")
+
     print(f"search.intersects type: {type(job.search.intersects).__name__}")
     print(f"target_aoi type: {type(job.target_aoi).__name__}")
     print(
@@ -69,6 +72,9 @@ def run_pipeline(job: ExtractionJob) -> None:
     Args:
         job: The validated ``ExtractionJob`` to execute.
     """
+    if job.search is None:
+        raise ValueError("Loaded job is missing a search provider.")
+
     client = AereoClient()
 
     # Search
@@ -84,11 +90,7 @@ def run_pipeline(job: ExtractionJob) -> None:
     print("\n📦 Preparing tasks...")
     tasks = client.prepare_tasks(
         search_results=search_results,
-        extract=job.extract,
-        grid_config=job.grid_config,
-        patch_config=job.patch_config,
-        output_uri=job.output_uri,
-        target_aoi=job.effective_target_aoi,
+        job=job,
         cells_per_task=50,
     )
     print(f"✓ Prepared {len(tasks)} tasks")
