@@ -17,10 +17,10 @@ from aereo.interfaces import (
     PatchConfig,
     SearchProvider,
 )
+from aereo.interfaces import normalize_geometry_input
 from aereo.schemas import ArtifactSchema, AssetSchema
 from aereo.task_builder import prepare_for_extraction
 from pandera.typing.geopandas import GeoDataFrame
-from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
 from structlog import get_logger
 
@@ -40,7 +40,7 @@ def normalize_geometry(geom: Any) -> BaseGeometry | None:
     """Ensures input geometries are Shapely objects before passing to Plugins.
 
     Args:
-        geom: Geometry input (dict, BaseGeometry, or None).
+        geom: Geometry input (dict, BaseGeometry, path string/Path, or None).
 
     Returns:
         A Shapely BaseGeometry, or None if input was None.
@@ -48,15 +48,7 @@ def normalize_geometry(geom: Any) -> BaseGeometry | None:
     Raises:
         ValueError: If the geometry format is unsupported.
     """
-    if geom is None:
-        return None
-    if isinstance(geom, dict):
-        return shape(geom)
-    if isinstance(geom, BaseGeometry):
-        return geom
-    raise ValueError(
-        f"Invalid geometry format. Expected dict or BaseGeometry, got {type(geom)}"
-    )
+    return normalize_geometry_input(geom)
 
 
 class AereoClient:

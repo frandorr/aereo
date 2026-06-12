@@ -38,7 +38,7 @@ class MySearchProvider(SearchProvider):
     def search(
         self,
         profiles: Sequence[AereoProfile],
-        intersects: BaseGeometry | None,
+        intersects: BaseGeometry | dict | str | Path | None,
         start_datetime: datetime | None,
         end_datetime: datetime | None,
         search_params: Mapping[str, Any] | None,

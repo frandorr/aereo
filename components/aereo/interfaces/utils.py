@@ -11,6 +11,7 @@ from typing import (
 )
 
 import xarray as xr
+from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
 
 _YAML_INSTALL_MSG = (
@@ -114,6 +115,99 @@ def _load_json_file(path: str | Path) -> dict[str, Any]:
     """Load and parse a JSON file."""
     path = Path(path)
     return json.loads(path.read_text())
+
+
+def normalize_geometry_input(
+    value: BaseGeometry | dict[str, Any] | str | Path | None,
+) -> BaseGeometry | None:
+    """Normalize a geometry input into a Shapely ``BaseGeometry``.
+
+    Supports:
+
+    * ``BaseGeometry`` instances (returned unchanged)
+    * GeoJSON-like ``dict``
+    * A ``str`` or ``Path`` pointing to a GeoJSON file (``.geojson`` or ``.json``)
+
+    Args:
+        value: Geometry input to normalize.
+
+    Returns:
+        A Shapely geometry, or ``None`` if the input was ``None``.
+
+    Raises:
+        ValueError: If the input cannot be parsed into a geometry.
+    """
+    if value is None:
+        return None
+
+    if isinstance(value, BaseGeometry):
+        return value
+
+    if isinstance(value, Path):
+        return _geometry_from_geojson_path(value)
+
+    if isinstance(value, str):
+        if _looks_like_geojson_path(value):
+            return _geometry_from_geojson_path(Path(value))
+        raise ValueError(
+            "Invalid geometry input type: str. "
+            "Expected a path to a GeoJSON file (ending in .geojson or .json) "
+            "or a file-system path containing a separator."
+        )
+
+    if isinstance(value, dict):
+        return shape(value)
+
+    raise ValueError(
+        f"Invalid geometry input type: {type(value).__name__}. "
+        "Expected BaseGeometry, GeoJSON dict, or path to a GeoJSON file."
+    )
+
+
+def _looks_like_geojson_path(value: str) -> bool:
+    """Return True if *value* looks like a GeoJSON file path."""
+    lowered = value.lower()
+    return (
+        lowered.endswith(".geojson")
+        or lowered.endswith(".json")
+        or "/" in value
+        or "\\" in value
+    )
+
+
+def _geometry_from_geojson_path(path: Path) -> BaseGeometry:
+    """Load a GeoJSON file and return its geometry as a Shapely object."""
+    if not path.exists():
+        raise ValueError(f"Geometry file not found: {path}")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    geojson = _extract_geometry_from_geojson(data)
+    if geojson is None:
+        raise ValueError(f"Could not extract a geometry from {path}")
+    return shape(geojson)
+
+
+def _extract_geometry_from_geojson(
+    data: dict[str, Any],
+) -> dict[str, Any] | None:
+    """Extract a GeoJSON geometry dict from Feature, FeatureCollection, or raw geometry."""
+    if data.get("type") == "FeatureCollection":
+        features = data.get("features") or []
+        if not features:
+            return None
+        return features[0].get("geometry")
+    if data.get("type") == "Feature":
+        return data.get("geometry")
+    if "type" in data and data["type"] in (
+        "Point",
+        "MultiPoint",
+        "LineString",
+        "MultiLineString",
+        "Polygon",
+        "MultiPolygon",
+        "GeometryCollection",
+    ):
+        return data
+    return None
 
 
 def _union_all(geom_series) -> BaseGeometry:

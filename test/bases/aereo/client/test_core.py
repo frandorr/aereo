@@ -27,7 +27,7 @@ def test_normalize_geometry_dict_to_shapely():
 
 
 def test_normalize_geometry_invalid():
-    with pytest.raises(ValueError, match="Invalid geometry format"):
+    with pytest.raises(ValueError, match="Invalid geometry input type"):
         normalize_geometry("Not a dict or geometry")
 
 

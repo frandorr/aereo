@@ -9,6 +9,7 @@ from aereo.interfaces import (
 )
 from aereo.interfaces.utils import (
     infer_dataset_time_bounds,
+    normalize_geometry_input,
     set_dataset_time_bounds,
     validate_aereo_dataset,
 )
@@ -70,6 +71,47 @@ def test_grid_config_is_frozen():
 def test_grid_config_forbids_extra_fields():
     with pytest.raises(ValidationError):
         GridConfig(target_grid_dist=50_000, unknown_field=42)  # type: ignore[call-arg]
+
+
+# ---------------------------------------------------------------------------
+# normalize_geometry_input
+# ---------------------------------------------------------------------------
+
+
+def test_normalize_geometry_input_passes_through_base_geometry():
+    geom = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
+    assert normalize_geometry_input(geom) is geom
+
+
+def test_normalize_geometry_input_accepts_geojson_dict():
+    geojson = {
+        "type": "Polygon",
+        "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
+    }
+    geom = normalize_geometry_input(geojson)
+    assert isinstance(geom, Polygon)
+    assert geom.is_valid
+
+
+def test_normalize_geometry_input_accepts_geojson_path(tmp_path):
+    geojson_path = tmp_path / "aoi.geojson"
+    geojson_path.write_text(
+        '{"type": "Feature", "geometry": {"type": "Polygon", '
+        '"coordinates": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]}, '
+        '"properties": {}}'
+    )
+    geom = normalize_geometry_input(str(geojson_path))
+    assert isinstance(geom, Polygon)
+    assert geom.is_valid
+
+
+def test_normalize_geometry_input_returns_none_for_none():
+    assert normalize_geometry_input(None) is None
+
+
+def test_normalize_geometry_input_rejects_unknown_type():
+    with pytest.raises(ValueError, match="Invalid geometry input type"):
+        normalize_geometry_input(12345)  # type: ignore[arg-type]
 
 
 # ---------------------------------------------------------------------------

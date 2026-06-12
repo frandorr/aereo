@@ -130,7 +130,8 @@ search: null
 
 class TestHelpers:
     def test_load_geometry_feature(self, tmp_path: Path):
-        from aereo.cli.main import _load_geometry
+        from aereo.cli.main import _load_geometry_safe
+        from shapely.geometry import Point
 
         geojson = tmp_path / "aoi.geojson"
         geojson.write_text(
@@ -144,11 +145,14 @@ class TestHelpers:
                 }
             )
         )
-        geom = _load_geometry(geojson)
-        assert geom == {"type": "Point", "coordinates": [0, 0]}
+        geom = _load_geometry_safe(geojson)
+        assert isinstance(geom, Point)
+        assert geom.x == 0.0
+        assert geom.y == 0.0
 
     def test_load_geometry_feature_collection(self, tmp_path: Path):
-        from aereo.cli.main import _load_geometry
+        from aereo.cli.main import _load_geometry_safe
+        from shapely.geometry import Polygon
 
         geojson = tmp_path / "aoi.geojson"
         geojson.write_text(
@@ -169,9 +173,9 @@ class TestHelpers:
                 }
             )
         )
-        geom = _load_geometry(geojson)
-        assert geom is not None
-        assert geom["type"] == "Polygon"
+        geom = _load_geometry_safe(geojson)
+        assert isinstance(geom, Polygon)
+        assert geom.is_valid
 
     def test_search_results_roundtrip(self, tmp_path: Path):
         from aereo.cli.main import _search_results_to_json

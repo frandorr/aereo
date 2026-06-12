@@ -1,9 +1,10 @@
 # Top-level Hydra config package for an AEREO extraction job.
 #
-# Run with the AEREO CLI from this directory:
-#   aer --config-dir . --config-name main_config run
-#
-# Or compose programmatically with OmegaConf / Hydra.
+# Run with the Python API:
+#   from hydra import initialize_config_dir, compose
+#   from aereo.pipeline import ExtractionJob
+#   cfg = compose(config_name="main_config")
+#   job = ExtractionJob.model_validate(hydra.utils.instantiate(cfg, _convert_="all"))
 defaults:
   - search: default
   - grid_config: default
