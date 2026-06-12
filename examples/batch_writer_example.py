@@ -122,12 +122,12 @@ def extract_with_batch_writer():
     # - dask_scheduler: Dask scheduler used by dask.compute()
     # - dask_compute_kwargs: extra kwargs for dask.compute(), e.g. num_workers
     # - dask_client: pass an existing distributed.Client for a remote cluster
-    # - profile_name: EOIDS profile for output paths
+    # - job_name: EOIDS job name for output paths (optional; falls back to task.job.name)
     # - rio_params: rasterio options (compression, tiling, COG, etc.)
     writer = BatchWriteGeoTIFF(
         dask_scheduler="threads",
         dask_compute_kwargs={"num_workers": 4},  # write 4 patches concurrently
-        profile_name="default",
+        job_name="viirs_i04",
         rio_params={"compress": "deflate", "tiled": True},
     )
 

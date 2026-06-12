@@ -20,6 +20,7 @@ from aereo.interfaces import (
 )
 from aereo.interfaces import normalize_geometry_input
 from aereo.schemas import ArtifactSchema, AssetSchema
+from aereo.pipeline import ExtractionJob
 from aereo.task_builder import prepare_for_extraction
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
@@ -108,6 +109,7 @@ class AereoClient:
         output_uri: str | None = None,
         target_aoi: BaseGeometry | dict | str | Path | None = None,
         cells_per_task: int | None = None,
+        job: ExtractionJob | None = None,
     ) -> Sequence[ExtractionTask]:
         """Groups search results by start time and distributes batches into tasks.
 
@@ -120,6 +122,7 @@ class AereoClient:
             target_aoi: Optional AOI geometry used to clip prepared tasks. Falls back
                 to the client default AOI if not provided.
             cells_per_task: Max grid cells per ExtractionTask. Falls back to client default.
+            job: Optional parent ``ExtractionJob`` to attach to each task.
 
         Returns:
             A Sequence of prepared ExtractionTasks.
@@ -159,6 +162,7 @@ class AereoClient:
             output_uri=output_uri or "",
             target_aoi=effective_aoi,
             cells_per_task=effective_cells_per_task,
+            job=job,
         )
 
     def execute_tasks(

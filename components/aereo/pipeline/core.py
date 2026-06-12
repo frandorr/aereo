@@ -31,6 +31,10 @@ class ExtractionJob(BaseModel):
 
     model_config = {"extra": "forbid", "frozen": True, "arbitrary_types_allowed": True}
 
+    name: str = Field(
+        default="default",
+        description="Human-readable job name used to identify outputs.",
+    )
     grid_config: GridConfig
     patch_config: PatchConfig
     output_uri: str = Field(

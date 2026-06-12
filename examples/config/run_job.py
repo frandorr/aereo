@@ -49,6 +49,7 @@ def load_and_print_job(config_dir: Path) -> ExtractionJob:
     )
 
     print("\n--- Validated ExtractionJob ---")
+    print(f"name: {job.name}")
     print(f"output_uri: {job.output_uri}")
     print(f"grid_config.target_grid_dist: {job.grid_config.target_grid_dist}")
     print(f"patch_config.resolution: {job.patch_config.resolution}")

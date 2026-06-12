@@ -19,7 +19,7 @@ _EOIDS_KEYS = (
     "loc",
     "start",
     "end",
-    "profile",
+    "job",
     "collection",
     "variable",
     "res",
@@ -39,26 +39,36 @@ def _sanitize_cell(cell_id: str) -> str:
     return str(cell_id).replace("_", "")
 
 
+def _sanitize_job_name(name: str) -> str:
+    """Return a filesystem-safe version of a job name.
+
+    Replaces path separators and whitespace with underscores and strips
+    leading/trailing whitespace.
+    """
+    return re.sub(r"[\\/\s]+", "_", str(name)).strip("_") or "default"
+
+
 def _normalize_suffix(suffix: str) -> str:
     return suffix.lstrip(".")
 
 
-def _write_profile_meta(
-    base_dir: Path, profile_name: str, meta: dict[str, Any] | None = None
+def _write_job_meta(
+    base_dir: Path, job_name: str, meta: dict[str, Any] | None = None
 ) -> None:
-    profile_path = base_dir / "profile.json"
-    if not profile_path.exists() and meta is not None:
+    job_path = base_dir / "job.json"
+    if not job_path.exists() and meta is not None:
         import json
 
-        profile_path.write_text(
-            json.dumps(meta, indent=2),
+        payload = {"job": job_name, **meta}
+        job_path.write_text(
+            json.dumps(payload, indent=2),
             encoding="utf-8",
         )
 
 
 def build_eoids_path(
     local_dir: str | Path,
-    profile_name: str,
+    job_name: str,
     resolution: float,
     *,
     collections: Sequence[str] | None = None,
@@ -69,7 +79,7 @@ def build_eoids_path(
     derivative: str | None = None,
     desc: str | None = None,
     suffix: str = "tif",
-    write_profile_meta: bool = True,
+    write_job_meta: bool = True,
     meta_dict: dict[str, Any] | None = None,
     **_kwargs: Any,
 ) -> Path:
@@ -82,12 +92,12 @@ def build_eoids_path(
     The directory hierarchy is flattened — there are no
     ``collection-<name>/`` or ``variable-<name>/`` subdirectories.
 
-    On the first call for a given profile, a ``profile.json`` sidecar is written
-    next to the data file so the full profile metadata can be recovered from disk.
+    On the first call for a given job, a ``job.json`` sidecar is written
+    next to the data file so the job metadata can be recovered from disk.
 
     Args:
         local_dir: Root directory for the dataset.
-        profile_name: The name of the profile.
+        job_name: Human-readable name of the extraction job.
         resolution: Target resolution.
         collections: Sequence of collection identifiers.
         variables: Sequence of variables/bands.
@@ -97,11 +107,11 @@ def build_eoids_path(
         derivative: Name of the derivative pipeline (places file in derivatives/<name>/).
         desc: Custom descriptor for the file (e.g., 'cloudmask').
         suffix: File extension (default: 'tif').
-        write_profile_meta: When *True* (the default), serialize the full
-            metadata to ``profile.json`` in the profile directory on the
-            first call.
-        meta_dict: Optional metadata dictionary to save as profile.json.
+        write_job_meta: When *True* (the default), serialize metadata to
+            ``job.json`` in the job directory on the first call.
+        meta_dict: Optional metadata dictionary to save as job.json.
     """
+    safe_job = _sanitize_job_name(job_name)
     parts: list[str] = []
 
     safe_cell = _sanitize_cell(cell_id) if cell_id else None
@@ -112,7 +122,7 @@ def build_eoids_path(
         parts.append(f"start-{start_time.strftime(_EOIDS_DT_FMT)}")
     if end_time:
         parts.append(f"end-{end_time.strftime(_EOIDS_DT_FMT)}")
-    parts.append(f"profile-{profile_name}")
+    parts.append(f"job-{safe_job}")
 
     if collections:
         parts.append(f"collection-{('+').join(collections)}")
@@ -135,18 +145,18 @@ def build_eoids_path(
     if derivative:
         base_dir = base_dir / "derivatives" / derivative
 
+    base_dir = base_dir / f"job-{safe_job}"
+
     if safe_cell:
         base_dir = base_dir / f"loc-{safe_cell}"
 
     if start_time:
         base_dir = base_dir / f"date-{start_time.strftime(_EOIDS_DATE_FMT)}"
 
-    base_dir = base_dir / f"profile-{profile_name}"
-
     base_dir.mkdir(parents=True, exist_ok=True)
 
-    if write_profile_meta:
-        _write_profile_meta(base_dir, profile_name, meta_dict)
+    if write_job_meta:
+        _write_job_meta(base_dir, safe_job, meta_dict)
 
     return base_dir / filename
 
@@ -159,7 +169,7 @@ def build_eoids_path(
 def parse_eoids_filename(path: str | Path) -> dict[str, str]:
     """Extract metadata key-value pairs from an EOIDS-compliant filename.
 
-    Values whose keys contain underscores (e.g. ``profile-goes_c01``) are handled
+    Values whose keys contain underscores (e.g. ``job-goes_c01``) are handled
     correctly thanks to a greedy regex that stops only at the next recognised
     EOIDS key token.
 
@@ -167,7 +177,7 @@ def parse_eoids_filename(path: str | Path) -> dict[str, str]:
         path: Full path or bare filename following the EOIDS naming convention.
 
     Returns:
-        Dictionary mapping EOIDS keys (``loc``, ``start``, ``end``, ``profile``,
+        Dictionary mapping EOIDS keys (``loc``, ``start``, ``end``, ``job``,
         ``collection``, ``variable``, ``res``, ``desc``) to their string values.
         Only keys present in the filename are included.
 
@@ -175,10 +185,10 @@ def parse_eoids_filename(path: str | Path) -> dict[str, str]:
 
         >>> parse_eoids_filename(
         ...     "loc-0U38L_start-20260101T100022_end-20260101T100953_"
-        ...     "profile-goes_east_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
+        ...     "job-goes_east_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
         ... )
         {'loc': '0U38L', 'start': '20260101T100022', 'end': '20260101T100953',
-         'profile': 'goes_east', 'collection': 'ABI-L1b-RadF',
+         'job': 'goes_east', 'collection': 'ABI-L1b-RadF',
          'variable': 'C01', 'res': '1000m'}
     """
     stem = Path(path).stem
@@ -217,7 +227,7 @@ def scan_eoids_dir(
     root_dir: str | Path,
     *,
     date: str | None = None,
-    profile: str | None = None,
+    job: str | None = None,
     collection: str | None = None,
     variable: str | None = None,
     cell_id: str | None = None,
@@ -233,7 +243,7 @@ def scan_eoids_dir(
         root_dir: Top-level EOIDS dataset directory.
         date: Filter by date string as it appears in the directory hierarchy
             (e.g. ``"20260101"``).
-        profile: Filter by profile name (e.g. ``"goes_c01"``).
+        job: Filter by job name (e.g. ``"goes_c01"``).
         collection: Filter by collection value (e.g. ``"ABI-L1b-RadF"``).
         variable: Filter by variable value (e.g. ``"C01"``).
         cell_id: Filter by cell identifier (e.g. ``"0U38L"``).
@@ -265,7 +275,7 @@ def scan_eoids_dir(
         # Apply filters — skip if any filter doesn't match
         if date is not None and file_date != date:
             continue
-        if profile is not None and meta.get("profile") != profile:
+        if job is not None and meta.get("job") != job:
             continue
         if not _matches_filter(collection, meta.get("collection")):
             continue

@@ -11,11 +11,10 @@ def test_extraction_job_from_yaml_dict(tmp_path: Path):
     job_yaml = tmp_path / "job.yaml"
     job_yaml.write_text(
         """
+name: s2_b04_over_my_aoi
 grid_config:
-  _target_: aereo.interfaces.GridConfig
   target_grid_dist: 50000
 patch_config:
-  _target_: aereo.interfaces.PatchConfig
   resolution: 10.0
 output_uri: "out_dir"
 search:
@@ -34,6 +33,7 @@ extract:
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
+    assert job.name == "s2_b04_over_my_aoi"
     assert job.output_uri == "out_dir"
     assert job.grid_config.target_grid_dist == 50000
     assert job.extract.read is not None

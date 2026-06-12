@@ -12,7 +12,7 @@ def test_build_eoids_path_basic():
 
     path = build_eoids_path(
         local_dir="/tmp/dataset",
-        profile_name="goes_c01",
+        job_name="goes_c01",
         resolution=1000.0,
         collections=["ABI-L1b-RadF"],
         variables=["C01"],
@@ -21,10 +21,10 @@ def test_build_eoids_path_basic():
         end_time=et,
     )
 
-    expected_dir = Path("/tmp/dataset/loc-36D61L/date-20260101/profile-goes_c01")
+    expected_dir = Path("/tmp/dataset/job-goes_c01/loc-36D61L/date-20260101")
     expected_filename = (
         "loc-36D61L_start-20260101T100022_end-20260101T100932_"
-        "profile-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
+        "job-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
     )
 
     assert path.parent == expected_dir
@@ -36,7 +36,7 @@ def test_build_eoids_path_derivatives():
 
     path = build_eoids_path(
         local_dir="/tmp/dataset",
-        profile_name="goes_c01",
+        job_name="goes_c01",
         resolution=1000.0,
         collections=["ABI-L1b-RadF"],
         variables=["C01"],
@@ -48,10 +48,10 @@ def test_build_eoids_path_derivatives():
     )
 
     expected_dir = Path(
-        "/tmp/dataset/derivatives/cloud_mask/loc-36D61L/date-20260101/profile-goes_c01"
+        "/tmp/dataset/derivatives/cloud_mask/job-goes_c01/loc-36D61L/date-20260101"
     )
     expected_filename = (
-        "loc-36D61L_start-20260101T100022_profile-goes_c01_"
+        "loc-36D61L_start-20260101T100022_job-goes_c01_"
         "collection-ABI-L1b-RadF_variable-C01_res-1000m_desc-cloudprob.nc"
     )
 
@@ -62,13 +62,13 @@ def test_build_eoids_path_derivatives():
 def test_parse_eoids_filename():
     fname = (
         "loc-36D61L_start-20260101T100022_end-20260101T100932_"
-        "profile-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
+        "job-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
     )
     parsed = parse_eoids_filename(fname)
     assert parsed["loc"] == "36D61L"
     assert parsed["start"] == "20260101T100022"
     assert parsed["end"] == "20260101T100932"
-    assert parsed["profile"] == "goes_c01"
+    assert parsed["job"] == "goes_c01"
     assert parsed["collection"] == "ABI-L1b-RadF"
     assert parsed["variable"] == "C01"
     assert parsed["res"] == "1000m"
