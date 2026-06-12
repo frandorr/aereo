@@ -4,6 +4,7 @@ verbose: false
 
 # Overrides / options
 geojson: null
+target_aoi: null
 start: null
 end: null
 output: null

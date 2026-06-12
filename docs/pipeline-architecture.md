@@ -290,6 +290,35 @@ Plugins are discovered automatically via Python `entry_points(group="aereo.plugi
 
 ---
 
+## Declarative `ExtractionJob` config
+
+The flat ``ExtractionJob`` schema places ``grid_config``, ``patch_config``,
+``output_uri``, ``search``, ``extract``, and ``target_aoi`` as top-level keys.
+``target_aoi`` accepts the same flexible geometry inputs as
+``SearchProvider.intersects``: a Shapely ``BaseGeometry``, a GeoJSON dict, or a
+path to a GeoJSON file. When ``target_aoi`` is omitted, the job falls back to
+``search.intersects`` for clipping prepared tasks via
+``job.effective_target_aoi``.
+
+```yaml
+grid_config:
+  _target_: aereo.interfaces.GridConfig
+  target_grid_dist: 10000
+patch_config:
+  _target_: aereo.interfaces.PatchConfig
+  resolution: 10.0
+output_uri: /tmp/aereo_extraction
+target_aoi: /absolute/path/to/aoi.geojson
+search:
+  _target_: aereo.builtins.SearchSTAC
+  intersects: /absolute/path/to/aoi.geojson
+  ...
+extract:
+  read:
+    _target_: aereo.builtins.ReadODCSTAC
+  ...
+```
+
 ## Complete Pipeline Data Flow
 
 ```
@@ -307,14 +336,14 @@ User Query
     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ 2. PREPARE FOR EXTRACTION                                                   │
-│    Input:  search_results, profiles, target_aoi, prepare_params, output_uri│
+│    Input:  search_results, grid_config, patch_config, target_aoi, output_uri│
 │    Output: Sequence[ExtractionTask]                                         │
 │    ──────────────────────────────────────────────────────────────────────── │
 │    task.assets  → GeoDataFrame[AssetSchema]                                 │
-│    task.profile → AereoProfile (bands, resolution, search_params, extract_params) │
-│    task.grid_cells → Sequence[GridCell] (with UTM CRS & area_def)           │
+│    task.extract → ExtractConfig (reader, processors, reprojector, writer)   │
+│    task.patches → Sequence[Patch] (UTM cells with area_def)                 │
+│    task.aoi     → BaseGeometry | None (clipping geometry)                   │
 │    task.output_uri → output path                                            │
-│    task.task_context → {chunk_id, total_chunks, start_time}                 │
 └─────────────────────────────────────────────────────────────────────────────┘
     │
     ▼

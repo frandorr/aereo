@@ -99,6 +99,35 @@ def test_prepare_tasks_returns_tasks(monkeypatch):
     assert tasks[0].output_uri == "s3://out"
 
 
+def test_prepare_tasks_accepts_target_aoi(monkeypatch, tmp_path):
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
+    monkeypatch.setattr("aereo.schemas.core.AssetSchema.validate", lambda x: x)
+    valid_df = _make_valid_search_df()
+
+    aoi_path = tmp_path / "aoi.geojson"
+    aoi_path.write_text(
+        '{"type": "Polygon", "coordinates": [[[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5], [0, 0]]]}'
+    )
+
+    client = AereoClient()
+    grid_config = GridConfig(target_grid_dist=50_000)
+    patch_config = PatchConfig(resolution=10.0)
+    tasks = client.prepare_tasks(
+        search_results=cast(GeoDataFrame, valid_df),
+        extract=ExtractConfig(read=ReadODCSTAC()),
+        grid_config=grid_config,
+        patch_config=patch_config,
+        output_uri="s3://out",
+        target_aoi=str(aoi_path),
+        cells_per_task=1,
+    )
+    assert isinstance(tasks, list)
+    assert len(tasks) > 0
+    assert tasks[0].aoi is not None
+
+
 # ---------------------------------------------------------------------------
 # execute_tasks
 # ---------------------------------------------------------------------------
