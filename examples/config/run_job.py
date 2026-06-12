@@ -6,7 +6,7 @@ with ``AereoClient``. It also demonstrates the ``target_aoi`` key and its
 fallback to ``search.intersects``.
 
 Usage:
-    cd examples/config_package
+    cd examples/config
     uv run python run_job.py
 
 The default config performs a real STAC search against the Planetary Computer

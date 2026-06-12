@@ -1,4 +1,3 @@
-_target_: aereo.interfaces.PatchConfig
 resolution: 2.5
 padding: 0
 margin: 10.0

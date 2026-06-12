@@ -1,13 +1,11 @@
 # Top-level Hydra config package for an AEREO extraction job.
 #
 # Run with the Python API:
-#   from hydra import initialize_config_dir, compose
 #   from aereo.pipeline import ExtractionJob
-#   cfg = compose(config_name="main_config")
-#   job = ExtractionJob.model_validate(hydra.utils.instantiate(cfg, _convert_="all"))
+#   job = ExtractionJob.load_from_config("examples/config")
 defaults:
   - search: default
-  - grid_config: default
+  - grid_config: grid_10km
   - patch_config: base
   - extract: sentinel2
   - _self_
