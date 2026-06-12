@@ -18,7 +18,9 @@ from typing import Any, cast
 import geopandas as gpd
 import shapely.wkt
 from aereo.grid import ExtractionPatch
-from aereo.interfaces import AereoPlugin, ExtractionTask, GridConfig, PatchConfig
+from shapely.geometry.base import BaseGeometry
+from aereo.interfaces import AereoPlugin, ExtractionTask
+from aereo.pipeline import ExtractionJob
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +48,8 @@ class TaskSerializer:
     URI_KEY = "uri"  # legacy key for backward-compatible deserialization
     AOI_WKT_KEY = "aoi_wkt"
     TASK_CONTEXT_KEY = "task_context"
+    JOB_NAME_KEY = "job_name"
+    TARGET_AOI_WKT_KEY = "target_aoi_wkt"
 
     def serialize(self, task: ExtractionTask, dest_dir: Path) -> None:
         """Write *task* into *dest_dir* as GeoParquet + JSON.
@@ -104,6 +108,12 @@ class TaskSerializer:
             self.OUTPUT_URI_KEY: task.output_uri,
             self.AOI_WKT_KEY: task.aoi.wkt if task.aoi is not None else None,
             self.TASK_CONTEXT_KEY: dict(task.task_context),
+            self.JOB_NAME_KEY: task.job.name,
+            self.TARGET_AOI_WKT_KEY: (
+                cast(BaseGeometry, task.job.target_aoi).wkt
+                if task.job.target_aoi is not None
+                else None
+            ),
         }
         (dest_dir / self.META_NAME).write_text(
             json.dumps(meta, default=str), encoding="utf-8"
@@ -179,8 +189,22 @@ class TaskSerializer:
             ),
         )
 
-        grid_config = GridConfig.model_validate(meta[self.GRID_CONFIG_KEY])
-        patch_config = PatchConfig.model_validate(meta[self.PATCH_CONFIG_KEY])
+        # Reconstruct the parent ExtractionJob from serialized metadata.
+        target_aoi_wkt = meta.get(self.TARGET_AOI_WKT_KEY)
+        target_aoi = (
+            shapely.wkt.loads(target_aoi_wkt) if target_aoi_wkt is not None else None
+        )
+        job = ExtractionJob.model_validate(
+            {
+                "name": meta.get(self.JOB_NAME_KEY, "default"),
+                "grid_config": meta[self.GRID_CONFIG_KEY],
+                "patch_config": meta[self.PATCH_CONFIG_KEY],
+                "output_uri": meta.get(self.OUTPUT_URI_KEY, meta.get(self.URI_KEY)),
+                "search": None,
+                "extract": extract,
+                "target_aoi": target_aoi,
+            }
+        )
 
         # Reconstruct ExtractionPatch instances
         patches: list[ExtractionPatch] = []
@@ -205,20 +229,10 @@ class TaskSerializer:
             else None
         )
 
-        # Support both the new output_uri key and the legacy uri key.
-        output_uri = meta.get(self.OUTPUT_URI_KEY, meta.get(self.URI_KEY))
-        if output_uri is None:
-            raise ValueError(
-                f"Task metadata must contain '{self.OUTPUT_URI_KEY}' (or legacy '{self.URI_KEY}')."
-            )
-
         return ExtractionTask(
             assets=assets,  # type: ignore[arg-type]
-            extract=extract,
-            output_uri=output_uri,
+            job=job,
             patches=patches,
-            grid_config=grid_config,
-            patch_config=patch_config,
             aoi=aoi,
             task_context=meta[self.TASK_CONTEXT_KEY],
         )

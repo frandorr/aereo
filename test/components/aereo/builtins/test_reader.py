@@ -14,6 +14,7 @@ from shapely.geometry import box
 from aereo.builtins import ReadODCSTAC
 from aereo.grid import ExtractionPatch
 from aereo.interfaces.core import ExtractionTask, GridConfig, PatchConfig
+from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -81,13 +82,18 @@ def _make_task(stac_item_dict: dict[str, Any] | None = None, aoi=None):
     from aereo.interfaces.core import ExtractConfig
     from aereo.builtins.read import ReadODCSTAC
 
-    return ExtractionTask(
-        assets=GeoDataFrame(valid_df),
-        extract=ExtractConfig(read=ReadODCSTAC()),
-        output_uri="/tmp/test",
-        patches=[patch],
+    job = ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
+        output_uri="/tmp/test",
+        search=None,
+        extract=ExtractConfig(read=ReadODCSTAC()),
+        target_aoi=aoi,
+    )
+    return ExtractionTask(
+        assets=GeoDataFrame(valid_df),
+        job=job,
+        patches=[patch],
         aoi=aoi,
     )
 
@@ -232,13 +238,17 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
     from aereo.interfaces.core import ExtractConfig
     from aereo.builtins.read import ReadODCSTAC
 
-    task = ExtractionTask(
-        assets=GeoDataFrame(valid_df),
-        extract=ExtractConfig(read=ReadODCSTAC()),
-        output_uri="/tmp/test",
-        patches=[patch],
+    job = ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
+        output_uri="/tmp/test",
+        search=None,
+        extract=ExtractConfig(read=ReadODCSTAC()),
+    )
+    task = ExtractionTask(
+        assets=GeoDataFrame(valid_df),
+        job=job,
+        patches=[patch],
     )
 
     reader = ReadODCSTAC()

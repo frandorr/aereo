@@ -40,7 +40,7 @@ class ExtractionJob(BaseModel):
     output_uri: str = Field(
         description="Destination URI for extracted artifacts (local path or object store)."
     )
-    search: SearchProvider
+    search: SearchProvider | None = None
     extract: ExtractConfig
     target_aoi: BaseGeometry | dict[str, Any] | str | Path | None = Field(
         default=None,
@@ -65,7 +65,8 @@ class ExtractionJob(BaseModel):
         """
         return cast(
             "BaseGeometry | None",
-            self.target_aoi or self.search.intersects,
+            self.target_aoi
+            or (self.search.intersects if self.search is not None else None),
         )
 
     @classmethod

@@ -12,7 +12,6 @@ import geopandas as gpd
 from aereo.grid import ExtractionPatch, GridDefinition, generate_extraction_patches
 from aereo.interfaces.core import (
     DEFAULT_CELLS_PER_TASK,
-    ExtractConfig,
     ExtractionTask,
     GridConfig,
     PatchConfig,
@@ -131,14 +130,10 @@ def _filter_patches_by_mode(
 
 def prepare_for_extraction(
     search_results: GeoDataFrame[AssetSchema],
-    grid_config: GridConfig,
-    patch_config: PatchConfig,
-    extract: ExtractConfig,
-    output_uri: str,
-    target_aoi: BaseGeometry | None = None,
+    job: ExtractionJob,
     cells_per_task: int = DEFAULT_CELLS_PER_TASK,
     init_params: dict[str, Any] | None = None,
-    job: ExtractionJob | None = None,
+    target_aoi: BaseGeometry | None = None,
 ) -> Sequence[ExtractionTask]:
     """Prepare extraction tasks by grouping assets and chunking grid patches.
 
@@ -147,21 +142,26 @@ def prepare_for_extraction(
 
     Args:
         search_results: GeoDataFrame of assets from the search phase.
-        grid_config: Tiling specification shared by all tasks.
-        patch_config: ML physical patch boundaries specification.
-        extract: Declarative configuration of the extraction stages.
-        output_uri: Destination URI prefix for extracted artifacts.
-        target_aoi: Optional geometry to clip the extraction region.
+        job: Parent ``ExtractionJob`` supplying extraction configuration.
         cells_per_task: Maximum number of patches per task chunk.
         init_params: Optional parameters added to each task's context.
-        job: Optional parent ``ExtractionJob`` to attach to each task.
+        target_aoi: Optional geometry to override ``job.effective_target_aoi``.
 
     Returns:
         A sequence of ExtractionTask objects ready for execution.
 
     Raises:
-        ValueError: If output_uri is not provided or grid_dist is not set in grid_config.
+        ValueError: If ``job.output_uri`` is empty or ``grid_dist`` is not set in
+            ``job.grid_config``.
     """
+    grid_config = job.grid_config
+    patch_config = job.patch_config
+    output_uri = job.output_uri
+    effective_aoi = target_aoi if target_aoi is not None else job.effective_target_aoi
+
+    if not output_uri:
+        raise ValueError("ExtractionJob.output_uri must be a non-empty string.")
+
     grid_dist = grid_config.target_grid_dist
     if grid_dist is None:
         raise ValueError(
@@ -175,7 +175,7 @@ def prepare_for_extraction(
 
     patch_groups = _generate_patch_groups(
         assets=search_results,
-        target_aoi=target_aoi,
+        target_aoi=effective_aoi,
         grid_def=grid_def,
         grid_config=grid_config,
         patch_config=patch_config,
@@ -212,14 +212,10 @@ def prepare_for_extraction(
 
             task = ExtractionTask(
                 assets=chunk_assets,
-                extract=extract,
-                output_uri=output_uri,
-                patches=patches,
-                grid_config=grid_config,
-                patch_config=patch_config,
-                aoi=target_aoi,
-                task_context=task_context,
                 job=job,
+                patches=patches,
+                aoi=effective_aoi,
+                task_context=task_context,
             )
             tasks.append(task)
 

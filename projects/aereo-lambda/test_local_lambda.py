@@ -30,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from aereo.builtins.read import ReadODCSTAC
 from aereo.grid import ExtractionPatch
 from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
+from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from aereo.serialization import TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
@@ -79,13 +80,18 @@ def _make_minimal_task() -> ExtractionTask:
         margin=0.0,
         padding=0,
     )
-    return ExtractionTask(
-        assets=GeoDataFrame[AssetSchema](df),
-        extract=ExtractConfig(read=ReadODCSTAC()),
-        output_uri="test_uri",
-        patches=[patch],
+    job = ExtractionJob(
+        name="test-job",
         grid_config=grid_config,
         patch_config=patch_config,
+        output_uri="test_uri",
+        search=None,
+        extract=ExtractConfig(read=ReadODCSTAC()),
+    )
+    return ExtractionTask(
+        assets=GeoDataFrame[AssetSchema](df),
+        job=job,
+        patches=[patch],
         task_context={"job_id": "test-job", "chunk_id": 0},
     )
 

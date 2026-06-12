@@ -15,6 +15,7 @@ from aereo.builtins import BatchWriteGeoTIFF
 from aereo.builtins.write import WriteGeoTIFF
 from aereo.grid import ExtractionPatch
 from aereo.interfaces.core import ExtractionTask, GridConfig, PatchConfig
+from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -68,17 +69,21 @@ def _make_task(tmp_path):
         padding=0,
         conform_to=None,
     )
-    return ExtractionTask(
-        assets=GeoDataFrame(valid_df),
+    job = ExtractionJob(
+        grid_config=grid_config,
+        patch_config=patch_config,
+        output_uri=str(tmp_path),
+        search=None,
         extract=ExtractConfig(
             read=ReadODCSTAC(),
             reproject=ReprojectODC(),
             write=WriteGeoTIFF(),
         ),
-        output_uri=str(tmp_path),
+    )
+    return ExtractionTask(
+        assets=GeoDataFrame(valid_df),
+        job=job,
         patches=[patch],
-        grid_config=grid_config,
-        patch_config=patch_config,
     )
 
 
@@ -129,17 +134,21 @@ def test_batch_write_geotiff_multiple_patches(tmp_path):
             conform_to=None,
         ),
     ]
-    task = ExtractionTask(
-        assets=GeoDataFrame(valid_df),
+    job = ExtractionJob(
+        grid_config=grid_config,
+        patch_config=patch_config,
+        output_uri=str(tmp_path),
+        search=None,
         extract=ExtractConfig(
             read=ReadODCSTAC(),
             reproject=ReprojectODC(),
             write=WriteGeoTIFF(),
         ),
-        output_uri=str(tmp_path),
+    )
+    task = ExtractionTask(
+        assets=GeoDataFrame(valid_df),
+        job=job,
         patches=patches,
-        grid_config=grid_config,
-        patch_config=patch_config,
     )
 
     writer = BatchWriteGeoTIFF()

@@ -14,6 +14,7 @@ from aereo.interfaces.core import (
     SearchProvider,
     ExecutionBackend,
 )
+from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -148,13 +149,17 @@ def test_execute_tasks_failure_mode_strict(monkeypatch):
     mock_backend.run_tasks.side_effect = RuntimeError("run failed")
 
     client = AereoClient()
-    task = ExtractionTask(
-        assets=cast(GeoDataFrame, _make_valid_search_df()),
-        extract=ExtractConfig(read=ReadODCSTAC()),
-        output_uri="test",
-        patches=[],
+    job = ExtractionJob(
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),
+        output_uri="test",
+        search=None,
+        extract=ExtractConfig(read=ReadODCSTAC()),
+    )
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, _make_valid_search_df()),
+        job=job,
+        patches=[],
     )
 
     with pytest.raises(RuntimeError, match="run failed"):
@@ -172,13 +177,17 @@ def test_execute_tasks_failure_mode_best_effort(monkeypatch):
     mock_backend.run_tasks.side_effect = RuntimeError("run failed")
 
     client = AereoClient()
-    task = ExtractionTask(
-        assets=cast(GeoDataFrame, _make_valid_search_df()),
-        extract=ExtractConfig(read=ReadODCSTAC()),
-        output_uri="test",
-        patches=[],
+    job = ExtractionJob(
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),
+        output_uri="test",
+        search=None,
+        extract=ExtractConfig(read=ReadODCSTAC()),
+    )
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, _make_valid_search_df()),
+        job=job,
+        patches=[],
     )
 
     result = client.execute_tasks(
@@ -207,21 +216,29 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
     mock_backend.run_tasks.side_effect = _run_tasks
 
     client = AereoClient()
-    task_ok = ExtractionTask(
-        assets=cast(GeoDataFrame, _make_valid_search_df()),
-        extract=ExtractConfig(read=ReadODCSTAC()),
-        output_uri="ok",
-        patches=[],
+    job_ok = ExtractionJob(
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),
+        output_uri="ok",
+        search=None,
+        extract=ExtractConfig(read=ReadODCSTAC()),
+    )
+    job_fail = ExtractionJob(
+        grid_config=GridConfig(target_grid_dist=50_000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="fail",
+        search=None,
+        extract=ExtractConfig(read=ReadODCSTAC()),
+    )
+    task_ok = ExtractionTask(
+        assets=cast(GeoDataFrame, _make_valid_search_df()),
+        job=job_ok,
+        patches=[],
     )
     task_fail = ExtractionTask(
         assets=cast(GeoDataFrame, _make_valid_search_df()),
-        extract=ExtractConfig(read=ReadODCSTAC()),
-        output_uri="fail",
+        job=job_fail,
         patches=[],
-        grid_config=GridConfig(target_grid_dist=50_000),
-        patch_config=PatchConfig(resolution=10.0),
     )
 
     result = client.execute_tasks(

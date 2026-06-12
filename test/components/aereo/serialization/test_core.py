@@ -4,6 +4,7 @@ from typing import Any, cast
 import geopandas as gpd
 from aereo.grid import ExtractionPatch
 from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
+from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from aereo.serialization import TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
@@ -49,13 +50,20 @@ def _make_task(
         padding=2,
     )
 
-    return ExtractionTask(
-        assets=cast(GeoDataFrame[AssetSchema], df),
-        extract=extract,
-        output_uri="test_uri",
-        patches=[patch],
+    job = ExtractionJob(
+        name="test-job",
         grid_config=grid_config,
         patch_config=patch_config,
+        output_uri="test_uri",
+        search=None,
+        extract=extract,
+        target_aoi=aoi,
+    )
+
+    return ExtractionTask(
+        assets=cast(GeoDataFrame[AssetSchema], df),
+        job=job,
+        patches=[patch],
         aoi=aoi,
         task_context=task_context or {},
     )
@@ -179,13 +187,17 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
         reproject=ReprojectODC(),
         write=WriteGeoTIFF(),
     )
-    original = ExtractionTask(
-        assets=cast(GeoDataFrame[AssetSchema], df),
-        extract=extract,
-        output_uri="out",
-        patches=patches,
+    job = ExtractionJob(
         grid_config=GridConfig(target_grid_dist=10_000),
         patch_config=PatchConfig(resolution=10.0, margin=5.0, padding=0),
+        output_uri="out",
+        search=None,
+        extract=extract,
+    )
+    original = ExtractionTask(
+        assets=cast(GeoDataFrame[AssetSchema], df),
+        job=job,
+        patches=patches,
     )
 
     dest = tmp_path / "task_multi"
@@ -221,8 +233,12 @@ def test_batch_writer_round_trip(tmp_path: Any) -> None:
     serializer = TaskSerializer()
     original = _make_task()
     # Replace write with BatchWriteGeoTIFF
-    original = ExtractionTask(
-        assets=original.assets,
+    job = ExtractionJob(
+        name=original.job.name,
+        grid_config=original.grid_config,
+        patch_config=original.patch_config,
+        output_uri=original.output_uri,
+        search=None,
         extract=ExtractConfig(
             read=original.extract.read,
             preprocess=original.extract.preprocess,
@@ -230,11 +246,12 @@ def test_batch_writer_round_trip(tmp_path: Any) -> None:
             postprocess=original.extract.postprocess,
             write=BatchWriteGeoTIFF(),
         ),
-        output_uri=original.output_uri,
+        target_aoi=original.aoi,
+    )
+    original = ExtractionTask(
+        assets=original.assets,
+        job=job,
         patches=original.patches,
-        grid_config=original.grid_config,
-        patch_config=original.patch_config,
-        aoi=original.aoi,
         task_context=original.task_context,
     )
 

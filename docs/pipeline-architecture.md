@@ -148,12 +148,14 @@ Each `ExtractionTask` (from `aereo.interfaces.core`) contains:
 | Attribute | Type | Description |
 |-----------|------|-------------|
 | `assets` | `GeoDataFrame[AssetSchema]` | The granule batch this task will extract. |
-| `profile` | `AereoProfile` | Target bands, resolution, search_params, and extract_params. |
-| `output_uri` | `str` | Destination path or URI for artifacts. |
-| `grid_cells` | `Sequence[GridCell]` | Spatial cells this task covers. |
+| `patches` | `Sequence[ExtractionPatch]` | Spatial patches this task covers. |
+| `job` | `ExtractionJob` | Parent job that owns `extract`, `output_uri`, `grid_config`, and `patch_config`. |
+| `extract` | `ExtractConfig` | Declarative configuration of extraction stages (delegated to `job.extract`). |
+| `output_uri` | `str` | Destination path or URI for artifacts (delegated to `job.output_uri`). |
+| `grid_config` | `GridConfig` | Tiling specification for this run (delegated to `job.grid_config`). |
+| `patch_config` | `PatchConfig` | ML physical patch dimensions (delegated to `job.patch_config`). |
 | `aoi` | `BaseGeometry \| None` | Clipping geometry used during preparation. |
-| `prepare_params` | `Mapping[str, Any]` | Params that drove task construction (e.g. `chunk_id`, `cells_per_task`). |
-| `task_context` | `Mapping[str, Any]` | Observability metadata: `chunk_id`, `total_chunks`, `start_time`. May also contain `conform_to_shape` when the profile enables fixed-shape batching. |
+| `task_context` | `Mapping[str, Any]` | Observability metadata: `chunk_id`, `total_chunks`, `start_time`. |
 
 ### `ExtractionProfile` Fields
 

@@ -167,10 +167,14 @@ tasks = client.prepare_for_extraction(
 | Attribute | Description |
 |-----------|-------------|
 | `assets` | GeoDataFrame of granules this task will process |
-| `profile` | The `AereoProfile` with bands, resolution, and params |
-| `grid_cells` | Spatial cells this task covers |
-| `output_uri` | Destination path or URI for artifacts |
-| `task_context` | Metadata such as `chunk_id`, `total_chunks`, `start_time`. Contains `conform_to_shape` when the profile enables fixed-shape batching. |
+| `patches` | Spatial patches this task covers |
+| `job` | Parent `ExtractionJob` owning extraction configuration |
+| `extract` | Declarative configuration of extraction stages (from `job.extract`) |
+| `output_uri` | Destination path or URI for artifacts (from `job.output_uri`) |
+| `grid_config` | Tiling specification for this run (from `job.grid_config`) |
+| `patch_config` | ML physical patch dimensions (from `job.patch_config`) |
+| `aoi` | Clipping geometry used during preparation |
+| `task_context` | Metadata such as `chunk_id`, `total_chunks`, `start_time` |
 
 ### Gotcha: `target_grid_dist` is cell size, `resolution` is pixel size
 

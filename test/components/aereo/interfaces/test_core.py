@@ -7,6 +7,7 @@ from aereo.interfaces import (
     GridConfig,
     PatchConfig,
 )
+from aereo.pipeline import ExtractionJob
 from aereo.interfaces.utils import (
     infer_dataset_time_bounds,
     normalize_geometry_input,
@@ -28,13 +29,18 @@ def test_extraction_task_validation():
     )
     grid_config = GridConfig(target_grid_dist=10_000)
     patch_config = PatchConfig(resolution=10.0)
-    task = ExtractionTask(
-        assets=cast(GeoDataFrame, df),
-        extract=ExtractConfig(read=ReadODCSTAC()),
-        output_uri="test",
-        patches=[],
+    extract = ExtractConfig(read=ReadODCSTAC())
+    job = ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
+        output_uri="test",
+        search=None,
+        extract=extract,
+    )
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, df),
+        job=job,
+        patches=[],
     )
     assert task.output_uri == "test"
     assert task.extract.read is not None
