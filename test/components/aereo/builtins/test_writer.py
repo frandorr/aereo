@@ -93,32 +93,42 @@ def _make_task(tmp_path):
 
 
 def test_write_geotiff_plain_mode_driver(tmp_path):
-    """Default path writes a GTiff."""
+    """Default path writes a single GTiff containing all variables as bands."""
     ds = _make_dataset()
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
     result = writer(ds, task, task.patches[0])
 
-    assert len(result) == 2
+    assert len(result) == 1
     for _, row in result.iterrows():
         import rasterio
 
         with rasterio.open(row["uri"]) as src:
             assert src.driver == "GTiff"
+            assert src.count == 2
 
 
 def test_write_geotiff_plain_mode_returns_artifacts(tmp_path):
-    """Plain path returns correct artifact metadata."""
+    """Plain path returns one artifact that groups all variables."""
     ds = _make_dataset()
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF()
     result = writer(ds, task, task.patches[0])
 
-    assert set(result["id"]) == {
-        "test_cell_B04_20260101T120000",
-        "test_cell_B08_20260101T120000",
-    }
+    assert len(result) == 1
+    assert set(result["id"]) == {"test_cell_B04+B08_20260101T120000"}
     assert bool((result["grid_cell"] == "test_cell").all())
+
+    # Filename should use patch resolution, not grid distance.
+    from pathlib import Path
+
+    assert "res-10m" in Path(result.iloc[0]["uri"]).name
+    assert "res-10000m" not in Path(result.iloc[0]["uri"]).name
+
+    import rasterio
+
+    with rasterio.open(result.iloc[0]["uri"]) as src:
+        assert src.count == 2
 
 
 # ---------------------------------------------------------------------------
@@ -127,7 +137,7 @@ def test_write_geotiff_plain_mode_returns_artifacts(tmp_path):
 
 
 def test_write_geotiff_tiled_via_rio_params(tmp_path):
-    """Tiling is applied when requested through rio_params."""
+    """Tiling is applied to the single multi-band output file."""
     ds = _make_dataset(shape=(64, 64))
     task = _make_task(tmp_path)
     writer = WriteGeoTIFF(
@@ -137,9 +147,11 @@ def test_write_geotiff_tiled_via_rio_params(tmp_path):
 
     import rasterio
 
+    assert len(result) == 1
     for _, row in result.iterrows():
         with rasterio.open(row["uri"]) as src:
             assert src.profile.get("tiled", False)
+            assert src.count == 2
             assert src.block_shapes[0][0] == 32
             assert src.block_shapes[0][1] == 32
 
@@ -230,7 +242,7 @@ def test_write_geotiff_rio_params_forwarded(tmp_path):
 
     import rasterio
 
-    assert len(result) > 0
+    assert len(result) == 1
     for _, row in result.iterrows():
         with rasterio.open(row["uri"]) as src:
             assert src.tags().get("custom_key") == "custom_val"
@@ -249,3 +261,18 @@ def test_write_geotiff_missing_time_bounds_raises(tmp_path):
     writer = WriteGeoTIFF()
     with pytest.raises(ValueError, match="start_time.*end_time"):
         writer(ds, task, task.patches[0])
+
+
+def test_write_geotiff_derivative_folder(tmp_path):
+    """Derivative jobs are placed under derivatives/<name>/."""
+    import attrs
+
+    ds = _make_dataset()
+    task = _make_task(tmp_path)
+    job_with_derivative = task.job.model_copy(update={"derivative": "ndvi"})
+    task = attrs.evolve(task, job=job_with_derivative)
+    writer = WriteGeoTIFF()
+    result = writer(ds, task, task.patches[0])
+
+    assert len(result) == 1
+    assert "derivatives/ndvi" in str(result.iloc[0]["uri"])

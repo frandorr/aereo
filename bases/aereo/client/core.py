@@ -195,6 +195,7 @@ class AereoClient:
 
         resolved_job = ExtractionJob(
             name=job.name if job is not None else "default",
+            derivative=job.derivative if job is not None else None,
             grid_config=grid_config,
             patch_config=patch_config,
             output_uri=output_uri or "",

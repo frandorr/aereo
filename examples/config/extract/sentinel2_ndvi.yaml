@@ -4,5 +4,11 @@ read:
 reproject:
   _target_: aereo.builtins.ReprojectODC
   resampling: nearest
+
+postprocess:
+  - _target_: aereo.builtins.NDVI
+    ndvi_nir_band: B08
+    ndvi_red_band: B04
+
 write:
   _target_: aereo.builtins.WriteGeoTIFF

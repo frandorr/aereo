@@ -129,6 +129,36 @@ def test_prepare_tasks_accepts_target_aoi(monkeypatch, tmp_path):
     assert tasks[0].aoi is not None
 
 
+def test_prepare_tasks_preserves_job_derivative(monkeypatch):
+    """Passing a job preserves its derivative field on the resolved tasks."""
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
+    monkeypatch.setattr("aereo.schemas.core.AssetSchema.validate", lambda x: x)
+    valid_df = _make_valid_search_df()
+
+    job = ExtractionJob(
+        name="s2_ndvi",
+        derivative="ndvi",
+        grid_config=GridConfig(target_grid_dist=50_000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="s3://out",
+        search=None,
+        extract=ExtractConfig(read=ReadODCSTAC()),
+    )
+
+    client = AereoClient()
+    tasks = client.prepare_tasks(
+        search_results=cast(GeoDataFrame, valid_df),
+        job=job,
+        cells_per_task=1,
+    )
+    assert isinstance(tasks, list)
+    assert len(tasks) > 0
+    assert tasks[0].job.derivative == "ndvi"
+    assert tasks[0].job.name == "s2_ndvi"
+
+
 # ---------------------------------------------------------------------------
 # execute_tasks
 # ---------------------------------------------------------------------------

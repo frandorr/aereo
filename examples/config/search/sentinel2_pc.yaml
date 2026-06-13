@@ -1,0 +1,11 @@
+_target_: aereo.builtins.SearchSTAC
+stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
+pystac_open_params:
+  modifier:
+    _target_: planetary_computer.sign_inplace
+    _partial_: true
+collections:
+  sentinel-2-l2a: ["B04", "B08"]
+intersects: config/aoi/sample.geojson
+start_datetime: "2024-01-01T00:00:00Z"
+end_datetime: "2024-01-10T23:59:59Z"

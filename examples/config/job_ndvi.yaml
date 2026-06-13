@@ -2,8 +2,9 @@ defaults:
   - search: sentinel2_pc
   - grid_config: grid_10km
   - patch_config: patch_10m
-  - extract: sentinel2
+  - extract: sentinel2_ndvi
   - _self_
 
 name: sentinel2_sample
+derivative: ndvi
 output_uri: /tmp/aereo_extraction
