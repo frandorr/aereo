@@ -115,8 +115,8 @@ def test_write_geotiff_plain_mode_returns_artifacts(tmp_path):
     result = writer(ds, task, task.patches[0])
 
     assert set(result["id"]) == {
-        "test_cell_B04_0_20260101T120000",
-        "test_cell_B08_0_20260101T120000",
+        "test_cell_B04_20260101T120000",
+        "test_cell_B08_20260101T120000",
     }
     assert bool((result["grid_cell"] == "test_cell").all())
 
@@ -150,7 +150,7 @@ def test_write_geotiff_tiled_via_rio_params(tmp_path):
 
 
 def test_write_geotiff_multiband_plain(tmp_path):
-    """Multi-band variables are split per band."""
+    """Multi-band variables are written as a single multi-band file."""
     ds = xr.Dataset(
         {
             "RGB": (
@@ -168,16 +168,14 @@ def test_write_geotiff_multiband_plain(tmp_path):
     writer = WriteGeoTIFF()
     result = writer(ds, task, task.patches[0])
 
-    assert len(result) == 3
+    assert len(result) == 1
     assert set(result["id"]) == {
-        "test_cell_RGB_0_20260101T120000",
-        "test_cell_RGB_1_20260101T120000",
-        "test_cell_RGB_2_20260101T120000",
+        "test_cell_RGB_20260101T120000",
     }
 
 
 def test_write_geotiff_multiband_tiled(tmp_path):
-    """Multi-band variables are split per band with tiling via rio_params."""
+    """Multi-band variables are written as a single multi-band file with tiling via rio_params."""
     ds = xr.Dataset(
         {
             "RGB": (
@@ -197,9 +195,10 @@ def test_write_geotiff_multiband_tiled(tmp_path):
 
     import rasterio
 
-    assert len(result) == 3
+    assert len(result) == 1
     for _, row in result.iterrows():
         with rasterio.open(row["uri"]) as src:
+            assert src.count == 3  # all bands in one file
             block_height: int = src.block_shapes[0][0]
             assert block_height > 1
 

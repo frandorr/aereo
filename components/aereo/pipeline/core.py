@@ -35,6 +35,14 @@ class ExtractionJob(BaseModel):
         default="default",
         description="Human-readable job name used to identify outputs.",
     )
+    derivative: str | None = Field(
+        default=None,
+        description=(
+            "Name of the derivative pipeline. When set, output files are placed "
+            "under a ``derivatives/<name>/`` subdirectory of ``output_uri``, "
+            "following the EOIDS convention for processed/derived products."
+        ),
+    )
     grid_config: GridConfig
     patch_config: PatchConfig
     output_uri: str = Field(

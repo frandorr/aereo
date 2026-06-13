@@ -43,7 +43,6 @@ def test_build_eoids_path_derivatives():
         cell_id="36D_61L",
         start_time=st,
         derivative="cloud_mask",
-        desc="cloudprob",
         suffix="nc",
     )
 
@@ -52,7 +51,7 @@ def test_build_eoids_path_derivatives():
     )
     expected_filename = (
         "loc-36D61L_start-20260101T100022_job-goes_c01_"
-        "collection-ABI-L1b-RadF_variable-C01_res-1000m_desc-cloudprob.nc"
+        "collection-ABI-L1b-RadF_variable-C01_res-1000m.nc"
     )
 
     assert path.parent == expected_dir
