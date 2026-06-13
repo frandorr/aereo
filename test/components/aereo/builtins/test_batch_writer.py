@@ -88,13 +88,13 @@ def _make_task(tmp_path):
 
 
 def test_batch_write_geotiff_single_patch(tmp_path):
-    """BatchWriteGeoTIFF returns correct artifacts for a single patch."""
+    """BatchWriteGeoTIFF returns one artifact per patch (all variables grouped)."""
     task = _make_task(tmp_path)
     writer = BatchWriteGeoTIFF()
     ds = _make_dataset()
 
     result = writer({"test_cell": ds}, task)
-    assert len(result) == 2
+    assert len(result) == 1
     assert "id" in result.columns
     assert "uri" in result.columns
 
@@ -155,7 +155,7 @@ def test_batch_write_geotiff_multiple_patches(tmp_path):
     ds = _make_dataset()
 
     result = writer({"cell_1": ds, "cell_2": ds}, task)
-    assert len(result) == 4  # 2 variables × 2 patches
+    assert len(result) == 2  # 1 artifact per patch
     assert set(result["grid_cell"].unique()) == {"cell_1", "cell_2"}
 
 

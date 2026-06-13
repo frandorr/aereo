@@ -1,0 +1,9 @@
+defaults:
+  - search: viirs
+  - grid_config: grid_50km
+  - patch_config: patch_375m
+  - extract: viirs
+  - _self_
+
+name: viirs_sample
+output_uri: /tmp/aereo_extraction
