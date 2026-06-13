@@ -49,6 +49,7 @@ class TaskSerializer:
     AOI_WKT_KEY = "aoi_wkt"
     TASK_CONTEXT_KEY = "task_context"
     JOB_NAME_KEY = "job_name"
+    DERIVATIVE_KEY = "derivative"
     TARGET_AOI_WKT_KEY = "target_aoi_wkt"
 
     def serialize(self, task: ExtractionTask, dest_dir: Path) -> None:
@@ -109,6 +110,7 @@ class TaskSerializer:
             self.AOI_WKT_KEY: task.aoi.wkt if task.aoi is not None else None,
             self.TASK_CONTEXT_KEY: dict(task.task_context),
             self.JOB_NAME_KEY: task.job.name,
+            self.DERIVATIVE_KEY: task.job.derivative,
             self.TARGET_AOI_WKT_KEY: (
                 cast(BaseGeometry, task.job.target_aoi).wkt
                 if task.job.target_aoi is not None
@@ -197,6 +199,7 @@ class TaskSerializer:
         job = ExtractionJob.model_validate(
             {
                 "name": meta.get(self.JOB_NAME_KEY, "default"),
+                "derivative": meta.get(self.DERIVATIVE_KEY),
                 "grid_config": meta[self.GRID_CONFIG_KEY],
                 "patch_config": meta[self.PATCH_CONFIG_KEY],
                 "output_uri": meta.get(self.OUTPUT_URI_KEY, meta.get(self.URI_KEY)),

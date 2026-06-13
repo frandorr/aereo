@@ -33,8 +33,6 @@ class BatchWriteGeoTIFF(BatchWriter):
     upstream dependencies.
 
     Attributes:
-        job_name: Optional EOIDS job name forwarded to ``WriteGeoTIFF``.
-            When omitted, the job name is taken from ``task.job.name``.
         rio_params: Rasterio write options forwarded to ``WriteGeoTIFF``.
         dask_scheduler: Dask scheduler passed to ``dask.compute()`` (e.g.
             ``"threads"``, ``"processes"``, ``"synchronous"`` or ``"distributed"``).
@@ -47,7 +45,6 @@ class BatchWriteGeoTIFF(BatchWriter):
             ``pool``, ``traverse``, etc.
     """
 
-    job_name: str | None = None
     rio_params: dict[str, object] = {}
     dask_scheduler: str | None = None
     dask_client: Any | None = None
@@ -74,7 +71,6 @@ class BatchWriteGeoTIFF(BatchWriter):
         from aereo.builtins.write import WriteGeoTIFF
 
         writer = WriteGeoTIFF(
-            job_name=self.job_name,
             rio_params=dict(self.rio_params),
         )
         callbacks = task.task_context.get("callbacks", [])

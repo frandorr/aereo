@@ -43,7 +43,7 @@ dataset/
 │   │   ├── job-sentinel2_b04_sample/
 │   │   │   ├── loc-36D61L/
 │   │   │   │   ├── date-20260101/
-│   │   │   │   │   ├── loc-36D61L_start-20260101T100022_desc-cloudprob.nc
+│   │   │   │   │   ├── loc-36D61L_start-20260101T100022_variable-cloud_prob.nc
 ```
 
 ### `job.json` sidecar
@@ -86,7 +86,6 @@ Filenames consist of strict `key-value` entities.
 * `collection`: Collection identifier (e.g., `ABI-L1b-RadF`). Auto-derived from the search results.
 * `variable`: Specific variable or band (e.g., `C01`, `B04`). Auto-derived from the dataset.
 * `res`: Spatial resolution (e.g., `1000m`).
-* `desc`: Custom descriptor, typically used for derived data (e.g., `cloudmask`).
 
 **Example:**
 `loc-36D61L_start-20260101T100022_end-20260101T100932_job-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif`
@@ -143,11 +142,10 @@ mask_path = build_eoids_path(
     job_name="goes_c01",
     resolution=1000.0,
     collections=["ABI-L1b-RadF"],
-    variables=["C01"],
+    variables=["cloud_prob"],
     cell_id="36D61L",
     start_time=datetime.datetime(2026, 1, 1, 10, 0, 22),
     derivative="cloud_mask",
-    desc="probability",
     suffix="nc",
 )
 ```

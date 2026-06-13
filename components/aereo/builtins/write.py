@@ -17,15 +17,22 @@ from pydantic import Field
 
 
 class WriteGeoTIFF(Writer):
-    """Default writer that serialises each band as a GeoTIFF via ``rioxarray``.
+    """Default writer that serialises each variable as a GeoTIFF via ``rioxarray``.
+
+    Each ``(variable × time-slice)`` combination is written to its own file.
+    When a variable contains multiple bands they are stored as raster bands
+    inside the same file — the ``variable`` EOIDS key lists all bands.
 
     All rasterio/rioxarray write options (compression, tiling, COG overviews,
     nodata, etc.) are forwarded verbatim through the ``rio_params`` parameter.
     This keeps the writer unopinionated — the full rasterio profile API is
     available without any intermediate translation layer.
+
+    If the parent :class:`~aereo.pipeline.ExtractionJob` declares a
+    ``derivative`` name, outputs are placed under a
+    ``derivatives/<name>/`` subdirectory of ``output_uri``.
     """
 
-    job_name: str | None = None
     rio_params: dict[str, Any] = Field(default_factory=dict)
 
     def __call__(
@@ -36,8 +43,9 @@ class WriteGeoTIFF(Writer):
     ) -> GeoDataFrame[ArtifactSchema]:
         """Write *ds* to GeoTIFF files using the standard EOIDS layout under ``task.output_uri``.
 
-        Each (variable × band [× time-slice]) combination is written to its own
-        file.  The ``rio_params`` entry in *params* is forwarded unchanged to
+        Each (variable × time-slice) combination is written to its own file.
+        Multiple bands within a variable are stored as raster bands inside
+        the same file.  The ``rio_params`` entry is forwarded unchanged to
         ``da.rio.to_raster()``, giving callers full control over compression,
         tiling, COG conversion, nodata values, etc.
 
@@ -95,6 +103,9 @@ class WriteGeoTIFF(Writer):
         )
         collection = collections[0] if collections else None
 
+        job_name = task.job.name
+        derivative = task.derivative
+
         records = []
         for var_name in ds.data_vars:
             da = ds[var_name]
@@ -113,57 +124,41 @@ class WriteGeoTIFF(Writer):
                     else start_time
                 )
 
-                # Handle optional band dimension
-                has_band = "band" in t_da.dims
-                num_bands = t_da.sizes["band"] if has_band else 1
-                for band_idx in range(num_bands):
-                    band_da = t_da.isel(band=band_idx) if has_band else t_da
+                fpath = build_eoids_path(
+                    local_dir=uri,
+                    job_name=job_name,
+                    resolution=grid_dist,
+                    collections=collections,
+                    variables=[str(var_name)],
+                    cell_id=cell_id,
+                    start_time=slice_time,
+                    end_time=slice_time if has_time else end_time,
+                    derivative=derivative,
+                    suffix="tif",
+                )
 
-                    # Single band gets the variable name, multi-band gets B04_b0
-                    desc = f"{var_name}_b{band_idx}" if num_bands > 1 else str(var_name)
+                t_da.rio.to_raster(fpath, **rio_params)
 
-                    job_name = (
-                        task.job.name
-                        if task.job is not None
-                        else (self.job_name or "default")
-                    )
-                    fpath = build_eoids_path(
-                        local_dir=uri,
-                        job_name=job_name,
-                        resolution=grid_dist,
-                        collections=collections,
-                        variables=[str(v) for v in ds.data_vars],
-                        cell_id=cell_id,
-                        start_time=slice_time,
-                        end_time=slice_time if has_time else end_time,
-                        desc=desc,
-                        suffix="tif",
-                    )
+                # Unique artifact ID
+                time_str = slice_time.strftime("%Y%m%dT%H%M%S") if slice_time else ""
+                artifact_id = f"{grid_cell_id}_{var_name}_{time_str}"
 
-                    band_da.rio.to_raster(fpath, **rio_params)
-
-                    # Unique artifact ID
-                    time_str = (
-                        slice_time.strftime("%Y%m%dT%H%M%S") if slice_time else ""
-                    )
-                    artifact_id = f"{grid_cell_id}_{var_name}_{band_idx if num_bands > 1 else 0}_{time_str}"
-
-                    records.append(
-                        {
-                            "id": artifact_id,
-                            "source_ids": source_ids,
-                            "start_time": slice_time,
-                            "end_time": slice_time if has_time else end_time,
-                            "uri": str(fpath),
-                            "collection": collection,
-                            "geometry": box(*band_da.rio.bounds()),
-                            "grid_cell": grid_cell_id,
-                            "grid_dist": grid_dist,
-                            "cell_geometry": cell_geometry,
-                            "cell_utm_crs": cell_utm_crs,
-                            "cell_utm_footprint": cell_utm_footprint,
-                        }
-                    )
+                records.append(
+                    {
+                        "id": artifact_id,
+                        "source_ids": source_ids,
+                        "start_time": slice_time,
+                        "end_time": slice_time if has_time else end_time,
+                        "uri": str(fpath),
+                        "collection": collection,
+                        "geometry": box(*t_da.rio.bounds()),
+                        "grid_cell": grid_cell_id,
+                        "grid_dist": grid_dist,
+                        "cell_geometry": cell_geometry,
+                        "cell_utm_crs": cell_utm_crs,
+                        "cell_utm_footprint": cell_utm_footprint,
+                    }
+                )
 
         if records:
             df = pd.DataFrame(records)

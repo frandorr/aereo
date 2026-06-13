@@ -488,6 +488,11 @@ class ExtractionTask:
         """ML physical dimensions specification (delegated to ``job``)."""
         return self.job.patch_config
 
+    @property
+    def derivative(self) -> str | None:
+        """Derivative pipeline name, or ``None`` for raw extraction (delegated to ``job``)."""
+        return self.job.derivative
+
     def __attrs_post_init__(self) -> None:
         """Validate task invariants after construction.
 

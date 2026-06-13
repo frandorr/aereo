@@ -23,7 +23,6 @@ _EOIDS_KEYS = (
     "collection",
     "variable",
     "res",
-    "desc",
 )
 _EOIDS_PATTERN = re.compile(
     r"(" + "|".join(_EOIDS_KEYS) + r")-"
@@ -77,7 +76,6 @@ def build_eoids_path(
     start_time: datetime.datetime | None = None,
     end_time: datetime.datetime | None = None,
     derivative: str | None = None,
-    desc: str | None = None,
     suffix: str = "tif",
     write_job_meta: bool = True,
     meta_dict: dict[str, Any] | None = None,
@@ -105,7 +103,6 @@ def build_eoids_path(
         start_time: Start time of the observation.
         end_time: End time of the observation.
         derivative: Name of the derivative pipeline (places file in derivatives/<name>/).
-        desc: Custom descriptor for the file (e.g., 'cloudmask').
         suffix: File extension (default: 'tif').
         write_job_meta: When *True* (the default), serialize metadata to
             ``job.json`` in the job directory on the first call.
@@ -131,8 +128,6 @@ def build_eoids_path(
 
     res_str = f"{int(resolution)}m"
     parts.append(f"res-{res_str}")
-    if desc:
-        parts.append(f"desc-{desc}")
 
     safe_suffix = _normalize_suffix(suffix)
     if not parts:
@@ -178,7 +173,7 @@ def parse_eoids_filename(path: str | Path) -> dict[str, str]:
 
     Returns:
         Dictionary mapping EOIDS keys (``loc``, ``start``, ``end``, ``job``,
-        ``collection``, ``variable``, ``res``, ``desc``) to their string values.
+        ``collection``, ``variable``, ``res``) to their string values.
         Only keys present in the filename are included.
 
     Example::
