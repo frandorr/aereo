@@ -302,6 +302,14 @@ class PipelineCallback:
         """Called before any processing begins."""
         pass
 
+    def on_task_cache_hit(self, task: ExtractionTask) -> None:
+        """Called when a cached artifact catalog is reused for *task*."""
+        pass
+
+    def on_task_cache_miss(self, task: ExtractionTask) -> None:
+        """Called when no cached artifact catalog exists for *task*."""
+        pass
+
     def on_download_complete(self, task: ExtractionTask) -> None:
         """Called after assets have been fetched to local storage.
 

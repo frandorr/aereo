@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Any, Sequence, cast
 from unittest.mock import MagicMock
 
 import geopandas as gpd
@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from pydantic import PrivateAttr
 from shapely.geometry import Polygon
 
 from aereo.backends import (
@@ -19,12 +20,11 @@ from aereo.interfaces.core import (
     ExtractionTask,
     GridConfig,
     PatchConfig,
+    Processor,
     Reader,
     Reprojector,
     Writer,
-    Processor,
 )
-from typing import Sequence
 from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -497,3 +497,162 @@ def test_task_runner_rejects_batch_writer_without_reprojector():
     runner = TaskRunner()
     with pytest.raises(ValueError, match="BatchWriter requires a Reprojector"):
         runner.run(task)
+
+
+# ---------------------------------------------------------------------------
+# TaskResultCache integration
+# ---------------------------------------------------------------------------
+
+
+class _CountingReader(Reader):
+    """Reader that counts how many times it is invoked."""
+
+    _call_count: int = PrivateAttr(default=0)
+
+    def __call__(self, task: ExtractionTask) -> xr.Dataset:
+        self._call_count += 1
+        return xr.Dataset(
+            {"B04": (["y", "x"], np.ones((4, 4)))},
+            coords={"y": range(4), "x": range(4)},
+        )
+
+    @property
+    def call_count(self) -> int:
+        return self._call_count
+
+
+class _FailingReader(Reader):
+    """Reader that always raises."""
+
+    def __call__(self, task: ExtractionTask) -> xr.Dataset:
+        raise RuntimeError("download failed")
+
+
+def _task_with_output_uri(task: ExtractionTask, output_uri: str) -> ExtractionTask:
+    """Return a copy of *task* with its job output_uri updated."""
+    return cast(
+        ExtractionTask,
+        task.__class__(
+            assets=task.assets,
+            job=task.job.model_copy(update={"output_uri": output_uri}),
+            patches=task.patches,
+            task_context=task.task_context,
+        ),
+    )
+
+
+def test_task_runner_cache_miss_executes_and_writes_cache(tmp_path):
+    """When no cache exists, the pipeline runs and writes a cache file."""
+    from aereo.cache import TaskResultCache
+
+    pipeline = [_DummyReader(), _DummyReprojector(), _DummyWriter()]
+    task = _task_with_output_uri(
+        _make_task(pipeline=pipeline, patches=[_mock_patch("cell-1")]),
+        str(tmp_path),
+    )
+
+    cache = TaskResultCache()
+    runner = TaskRunner(cache=cache)
+    result = runner.run(task)
+
+    assert isinstance(result, gpd.GeoDataFrame)
+    assert cache.path(task).exists()
+
+
+def test_task_runner_cache_hit_skips_execution(tmp_path):
+    """When a cache exists, the pipeline is skipped and cached artifacts are returned."""
+    from aereo.cache import TaskResultCache
+
+    reader = _CountingReader()
+    task = _task_with_output_uri(
+        _make_task(
+            pipeline=[reader, _DummyReprojector(), _DummyWriter()],
+            patches=[_mock_patch("cell-1")],
+        ),
+        str(tmp_path),
+    )
+
+    cache = TaskResultCache()
+    runner = TaskRunner(cache=cache)
+    first_result = runner.run(task)
+    assert reader.call_count == 1
+
+    second_result = runner.run(task)
+    assert reader.call_count == 1
+    assert len(second_result) == len(first_result)
+
+
+def test_task_runner_overwrite_bypasses_cache(tmp_path):
+    """When overwrite is True, the cache is ignored and the pipeline re-runs."""
+    from aereo.cache import TaskResultCache
+
+    reader = _CountingReader()
+    task = _task_with_output_uri(
+        _make_task(
+            pipeline=[reader, _DummyReprojector(), _DummyWriter()],
+            patches=[_mock_patch("cell-1")],
+        ),
+        str(tmp_path),
+    )
+
+    cache = TaskResultCache()
+    runner = TaskRunner(cache=cache)
+    runner.run(task)
+    assert reader.call_count == 1
+
+    overwrite_task = cast(
+        ExtractionTask,
+        task.__class__(
+            assets=task.assets,
+            job=task.job.model_copy(update={"overwrite": True}),
+            patches=task.patches,
+            task_context=task.task_context,
+        ),
+    )
+    runner.run(overwrite_task)
+    assert reader.call_count == 2
+
+
+def test_task_runner_failure_does_not_write_cache(tmp_path):
+    """Failed tasks must not leave a cache entry behind."""
+    from aereo.cache import TaskResultCache
+
+    task = _task_with_output_uri(
+        _make_task(
+            pipeline=[_FailingReader()],
+            patches=[_mock_patch("cell-1")],
+        ),
+        str(tmp_path),
+    )
+
+    cache = TaskResultCache()
+    runner = TaskRunner(cache=cache)
+    with pytest.raises(RuntimeError, match="download failed"):
+        runner.run(task)
+
+    assert not cache.path(task).exists()
+
+
+def test_task_runner_cache_callbacks_fire(tmp_path):
+    """Cache hit/miss callbacks are invoked correctly."""
+    from aereo.cache import TaskResultCache
+
+    pipeline = [_DummyReader(), _DummyReprojector(), _DummyWriter()]
+    task = _task_with_output_uri(
+        _make_task(pipeline=pipeline, patches=[_mock_patch("cell-1")]),
+        str(tmp_path),
+    )
+
+    cache = TaskResultCache()
+    callback = MagicMock()
+    runner = TaskRunner(cache=cache, callbacks=[callback])
+    runner.run(task)
+
+    callback.on_task_cache_miss.assert_called_once_with(task)
+    callback.on_task_cache_hit.assert_not_called()
+
+    # Second run hits cache.
+    callback.reset_mock()
+    runner.run(task)
+    callback.on_task_cache_hit.assert_called_once_with(task)
+    callback.on_task_cache_miss.assert_not_called()

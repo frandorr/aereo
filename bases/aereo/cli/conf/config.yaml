@@ -12,6 +12,7 @@ output_dir: ./out
 output_uri: ${output_dir}
 workers: 1
 cells_per_task: 50
+overwrite: false
 search_results: null
 tasks: null
 plugin_name: null
