@@ -13,6 +13,7 @@ import geopandas as gpd
 import pandas as pd
 import xarray as xr
 
+from aereo.cache import TaskResultCache
 from aereo.interfaces.core import (
     BatchWriter,
     ExtractionTask,
@@ -36,6 +37,7 @@ class TaskRunner:
         self,
         callbacks: Sequence[PipelineCallback] | None = None,
         per_cell_failure_mode: Literal["strict", "best_effort"] = "strict",
+        cache: TaskResultCache | None = None,
     ) -> None:
         """Create a new TaskRunner.
 
@@ -44,9 +46,13 @@ class TaskRunner:
             per_cell_failure_mode: How to handle exceptions in the per-cell loop.
                 ``"strict"`` aborts the entire task; ``"best_effort"`` skips
                 failed cells and continues.
+            cache: Optional per-task artifact catalog cache. When provided and
+                ``task.job.overwrite`` is False, cached results are returned
+                without re-executing the pipeline.
         """
         self.callbacks = list(callbacks or [])
         self.per_cell_failure_mode = per_cell_failure_mode
+        self.cache = cache
 
     def _fire_callbacks(self, event: str, *args: Any) -> None:
         """Fire a lifecycle event across all registered callbacks.
@@ -81,6 +87,14 @@ class TaskRunner:
             raise ValueError("Pipeline must contain a Reader stage.")
 
         self._fire_callbacks("on_task_start", task)
+
+        if self.cache is not None and not task.job.overwrite:
+            cached = self.cache.load(task)
+            if cached is not None:
+                self._fire_callbacks("on_task_cache_hit", task)
+                self._fire_callbacks("on_task_complete", task, cached)
+                return cached
+            self._fire_callbacks("on_task_cache_miss", task)
 
         try:
             # Stage 1: Read
@@ -123,6 +137,8 @@ class TaskRunner:
                     task_context={**task.task_context, "callbacks": self.callbacks},
                 )
                 artifacts_gdf = writer(reprojected_map, task)
+                if self.cache is not None:
+                    self.cache.save(task, artifacts_gdf)
                 self._fire_callbacks("on_task_complete", task, artifacts_gdf)
                 return artifacts_gdf
 
@@ -167,6 +183,8 @@ class TaskRunner:
                 )
 
             artifacts_gdf = cast(GeoDataFrame[ArtifactSchema], artifacts_gdf)
+            if self.cache is not None:
+                self.cache.save(task, artifacts_gdf)
             self._fire_callbacks("on_task_complete", task, artifacts_gdf)
 
             return artifacts_gdf

@@ -48,6 +48,13 @@ class ExtractionJob(BaseModel):
     output_uri: str = Field(
         description="Destination URI for extracted artifacts (local path or object store)."
     )
+    overwrite: bool = Field(
+        default=False,
+        description=(
+            "When False, reuse cached per-task artifact catalogs if they exist. "
+            "When True, always execute tasks and overwrite existing caches."
+        ),
+    )
     search: SearchProvider | None = None
     extract: ExtractConfig
     target_aoi: BaseGeometry | dict[str, Any] | str | Path | None = Field(

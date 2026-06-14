@@ -6,6 +6,8 @@ from __future__ import annotations
 import json
 import pickle
 import sys
+
+import attrs
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Sequence, cast
@@ -482,6 +484,7 @@ def main(cfg: DictConfig) -> None:
             output_uri=cfg.get("output_uri") or str(output_dir),
             target_aoi=target_aoi,
             cells_per_task=cfg.cells_per_task,
+            overwrite=cfg.overwrite,
         )
 
         task_file = Path(cfg.output) if cfg.output else (output_dir / "tasks.pkl")
@@ -504,6 +507,15 @@ def main(cfg: DictConfig) -> None:
             sys.exit(1)
 
         task_list = pickle.loads(tasks_path.read_bytes())
+
+        if cfg.get("overwrite") is not None:
+            task_list = [
+                attrs.evolve(
+                    task,
+                    job=task.job.model_copy(update={"overwrite": cfg.overwrite}),
+                )
+                for task in task_list
+            ]
 
         backend = LocalProcessBackend(max_workers=cfg.workers)
         client = AereoClient()
@@ -577,6 +589,7 @@ def main(cfg: DictConfig) -> None:
             output_uri=cfg.get("output_uri") or str(output_dir),
             target_aoi=target_aoi,
             cells_per_task=cfg.cells_per_task,
+            overwrite=cfg.overwrite,
         )
         console.print(
             f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cfg.cells_per_task}).[/green]"

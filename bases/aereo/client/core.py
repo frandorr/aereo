@@ -10,6 +10,7 @@ from typing import Any, cast
 
 import pandas as pd
 from aereo.backends import LocalProcessBackend, TaskRunner
+from aereo.cache import TaskResultCache
 from aereo.interfaces import (
     ExtractConfig,
     ExecutionBackend,
@@ -123,6 +124,7 @@ class AereoClient:
         target_aoi: BaseGeometry | dict | str | Path | None = None,
         cells_per_task: int | None = None,
         job: ExtractionJob | None = None,
+        overwrite: bool = False,
     ) -> Sequence[ExtractionTask]:
         """Groups search results by start time and distributes batches into tasks.
 
@@ -143,6 +145,9 @@ class AereoClient:
             cells_per_task: Max grid cells per ExtractionTask. Falls back to client default.
             job: Optional parent ``ExtractionJob`` to attach to each task. When
                 provided, missing explicit args are derived from the job.
+            overwrite: Whether prepared tasks should bypass any existing per-task
+                artifact cache. Ignored when ``job`` is provided (the job's own
+                ``overwrite`` value is used instead).
 
         Returns:
             A Sequence of prepared ExtractionTasks.
@@ -199,6 +204,7 @@ class AereoClient:
             grid_config=grid_config,
             patch_config=patch_config,
             output_uri=output_uri or "",
+            overwrite=job.overwrite if job is not None else overwrite,
             search=(
                 job.search
                 if job is not None and job.search is not None
@@ -235,10 +241,12 @@ class AereoClient:
             return cast(GeoDataFrame, ArtifactSchema.empty())
 
         backend = backend or self._backend or LocalProcessBackend()
+        cache = TaskResultCache()
         runner = TaskRunner(
             per_cell_failure_mode="strict"
             if failure_mode == FailureMode.STRICT
-            else "best_effort"
+            else "best_effort",
+            cache=cache,
         )
 
         logger.info(
