@@ -139,9 +139,9 @@ class AereoClient:
                 or ``job.patch_config`` when ``job`` is provided.
             output_uri: An optional URI defining output path. Falls back to
                 ``job.output_uri`` when ``job`` is provided.
-            target_aoi: Optional AOI geometry used to clip prepared tasks. Falls back
-                to ``job.effective_target_aoi`` or the client default AOI if not
-                provided.
+            target_aoi: Optional AOI geometry used to clip prepared tasks.
+                Resolution order: explicit argument, ``job.target_aoi``,
+                client default ``aoi``, ``job.search.intersects``.
             cells_per_task: Max grid cells per ExtractionTask. Falls back to client default.
             job: Optional parent ``ExtractionJob`` to attach to each task. When
                 provided, missing explicit args are derived from the job.
@@ -165,19 +165,22 @@ class AereoClient:
             else (self._cells_per_task or DEFAULT_CELLS_PER_TASK)
         )
 
-        effective_aoi = (
-            normalize_geometry_input(target_aoi)
-            if target_aoi is not None
-            else self._aoi
-        )
+        if target_aoi is not None:
+            effective_aoi = normalize_geometry_input(target_aoi)
+        elif job is not None and job.target_aoi is not None:
+            effective_aoi = job.target_aoi
+        elif self._aoi is not None:
+            effective_aoi = self._aoi
+        elif job is not None:
+            effective_aoi = job.effective_target_aoi
+        else:
+            effective_aoi = None
 
         if job is not None:
             grid_config = grid_config or job.grid_config
             patch_config = patch_config or job.patch_config
             output_uri = output_uri or job.output_uri
             extract = extract or job.extract
-            if target_aoi is None and self._aoi is None:
-                effective_aoi = effective_aoi or job.effective_target_aoi
         else:
             grid_config = self._grid_config if grid_config is None else grid_config
             patch_config = self._patch_config if patch_config is None else patch_config
