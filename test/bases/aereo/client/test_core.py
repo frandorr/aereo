@@ -159,6 +159,70 @@ def test_prepare_tasks_preserves_job_derivative(monkeypatch):
     assert tasks[0].job.name == "s2_ndvi"
 
 
+def test_prepare_tasks_job_target_aoi_beats_client_aoi(monkeypatch):
+    """Job.target_aoi is used before the client-level default aoi."""
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
+    monkeypatch.setattr("aereo.schemas.core.AssetSchema.validate", lambda x: x)
+    valid_df = _make_valid_search_df()
+
+    job_aoi = Polygon([[0, 0], [0.3, 0], [0.3, 0.3], [0, 0.3], [0, 0]])
+    client_aoi = Polygon([[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]])
+
+    job = ExtractionJob(
+        name="s2_ndvi",
+        grid_config=GridConfig(target_grid_dist=50_000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="s3://out",
+        search=None,
+        extract=ExtractConfig(read=ReadODCSTAC()),
+        target_aoi=job_aoi,
+    )
+
+    client = AereoClient(aoi=client_aoi)
+    tasks = client.prepare_tasks(
+        search_results=cast(GeoDataFrame, valid_df),
+        job=job,
+        cells_per_task=1,
+    )
+    assert isinstance(tasks, list)
+    assert len(tasks) > 0
+    assert tasks[0].job.target_aoi is job_aoi
+
+
+def test_prepare_tasks_falls_back_to_search_intersects(monkeypatch):
+    """When no target_aoi or client aoi exist, job.search.intersects is used."""
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
+    monkeypatch.setattr("aereo.schemas.core.AssetSchema.validate", lambda x: x)
+    valid_df = _make_valid_search_df()
+
+    search_aoi = Polygon([[0, 0], [0.3, 0], [0.3, 0.3], [0, 0.3], [0, 0]])
+    mock_searcher = MagicMock(spec=SearchProvider)
+    mock_searcher.intersects = search_aoi
+
+    job = ExtractionJob(
+        name="s2_ndvi",
+        grid_config=GridConfig(target_grid_dist=50_000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="s3://out",
+        search=mock_searcher,
+        extract=ExtractConfig(read=ReadODCSTAC()),
+    )
+
+    client = AereoClient()
+    tasks = client.prepare_tasks(
+        search_results=cast(GeoDataFrame, valid_df),
+        job=job,
+        cells_per_task=1,
+    )
+    assert isinstance(tasks, list)
+    assert len(tasks) > 0
+    assert tasks[0].job.effective_target_aoi is search_aoi
+
+
 # ---------------------------------------------------------------------------
 # execute_tasks
 # ---------------------------------------------------------------------------
