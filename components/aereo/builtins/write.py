@@ -56,7 +56,13 @@ def _dataset_to_raster_bands(ds: xr.Dataset) -> xr.DataArray:
         raise ValueError("Dataset contains no data variables to write.")
 
     combined = xr.concat(band_arrays, dim="band")
-    return combined.transpose("band", ...)
+    combined = combined.transpose("band", ...)
+    # Ensure each raster band gets a distinct description. rioxarray writes
+    # band descriptions from the ``long_name`` attribute; when it is a list or
+    # tuple with one entry per band, each band is labelled correctly. Without
+    # this, the first variable's ``long_name`` is applied to every band.
+    combined.attrs["long_name"] = list(combined.coords["band"].values)
+    return combined
 
 
 class WriteGeoTIFF(Writer):

@@ -131,6 +131,26 @@ def test_write_geotiff_plain_mode_returns_artifacts(tmp_path):
         assert src.count == 2
 
 
+def test_write_geotiff_band_descriptions_match_variables(tmp_path):
+    """Each raster band is labelled with its source variable name."""
+    ds = _make_dataset()
+    task = _make_task(tmp_path)
+    writer = WriteGeoTIFF()
+    result = writer(ds, task, task.patches[0])
+
+    assert len(result) == 1
+    import rasterio
+
+    with rasterio.open(result.iloc[0]["uri"]) as src:
+        assert src.count == 2
+        assert src.descriptions == ("B04", "B08")
+
+    # Reading back with rioxarray should expose all band names.
+    da = rioxarray.open_rasterio(result.iloc[0]["uri"])
+    assert isinstance(da, xr.DataArray)
+    assert da.attrs.get("long_name") in [("B04", "B08"), ["B04", "B08"]]
+
+
 # ---------------------------------------------------------------------------
 # Tiled / COG via rio_params
 # ---------------------------------------------------------------------------
