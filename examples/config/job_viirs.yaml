@@ -7,3 +7,4 @@ defaults:
 
 name: viirs_sample
 output_uri: /tmp/aereo_extraction
+overwrite: false
