@@ -385,6 +385,45 @@ def cleanup_asset_safely(
         _safe_unlink(local_path)
 
 
+def _resolve_extracted_path(extract_dir: Path) -> Path:
+    """Return the usable product path inside an extraction directory.
+
+    Many satellite products (e.g. Sentinel-3 ``.SEN3`` archives) ship as a
+    ZIP file that contains exactly one root directory.  After extracting to
+    ``extract_dir`` the real product directory is therefore nested one level
+    deeper.  When *extract_dir* contains a single directory and nothing else,
+    that directory is returned; otherwise *extract_dir* itself is returned.
+    """
+    if not extract_dir.exists():
+        return extract_dir
+
+    entries = list(extract_dir.iterdir())
+    if len(entries) == 1 and entries[0].is_dir():
+        return entries[0]
+    return extract_dir
+
+
+def _expand_product_directory(product_path: Path) -> list[str]:
+    """Expand a satellite product directory into scene-ready file paths.
+
+    Satpy 0.60+ expects explicit file paths rather than product directories
+    for readers such as ``olci_l1b``.  When *product_path* is a Sentinel-3
+    ``.SEN3`` directory, return the sorted list of netCDF files inside it.
+    Otherwise return the path itself.
+
+    Args:
+        product_path: Path to an extracted product directory or file.
+
+    Returns:
+        List of scene-ready file paths.
+    """
+    if product_path.is_dir() and product_path.suffix == ".SEN3":
+        nc_files = sorted(product_path.glob("*.nc"))
+        if nc_files:
+            return [str(f) for f in nc_files]
+    return [str(product_path)]
+
+
 def extract_archives(local_paths: list[str]) -> list[str]:
     """Expand ZIP archives (e.g. Sentinel-3 ``.SEN3`` products) and return ready paths.
 
@@ -405,8 +444,9 @@ def extract_archives(local_paths: list[str]) -> list[str]:
         if path.suffix == ".zip":
             extract_dir = path.parent / path.stem
             extract_asset_safely(path, extract_dir)
-
-            scene_paths.append(str(p))
+            scene_paths.extend(
+                _expand_product_directory(_resolve_extracted_path(extract_dir))
+            )
         else:
             scene_paths.append(str(p))
     return scene_paths
