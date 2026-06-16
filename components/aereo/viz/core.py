@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     import geopandas as gpd
+    import numpy as np
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
@@ -340,6 +341,25 @@ def plot_coverage(
     return fig
 
 
+def _mask_raster_data(data: np.ndarray, nodata: float | None) -> np.ma.MaskedArray:
+    """Mask nodata and invalid floating-point values in a raster array.
+
+    Args:
+        data: Raster data array.
+        nodata: Nodata value to mask. If ``None``, only invalid floating-point
+            values (NaN/Inf) are masked.
+
+    Returns:
+        A masked array with nodata/invalid values masked.
+    """
+    import numpy.ma as ma
+
+    masked = ma.masked_invalid(data)
+    if nodata is not None:
+        masked = ma.masked_equal(masked, nodata, copy=False)
+    return masked
+
+
 def plot_artifact_patches(
     artifacts: gpd.GeoDataFrame,
     *,
@@ -351,6 +371,11 @@ def plot_artifact_patches(
     annotation_color: str = "cyan",
     fig_width: float = 20.0,
     title: str = "Extracted Patches Spatial Overview",
+    vmin: float | None = None,
+    vmax: float | None = None,
+    colorbar: bool = True,
+    colorbar_label: str | None = None,
+    nodata: float | None = None,
 ) -> tuple[Figure, Axes]:
     """Plot extracted raster patches and their grid-cell footprints on one canvas.
 
@@ -358,6 +383,11 @@ def plot_artifact_patches(
     produced by the extraction pipeline. Each patch's first band is plotted
     at a downsampled resolution, the UTM footprint is overlaid as a dashed
     polygon, and the grid cell ID is annotated at the footprint centre.
+
+    By default all patches share a single color normalization (computed from
+    the global data range) and a colorbar is drawn, making adjacent patches
+    look like one continuous raster. Pass ``vmin``/``vmax`` to fix the range
+    for variables such as NDVI.
 
     Heavy dependencies (matplotlib, geopandas, rasterio) are imported lazily
     so callers only pay the import cost when this function is actually used.
@@ -376,6 +406,15 @@ def plot_artifact_patches(
         fig_width: Width of the figure in inches. The height is derived from
             the data's aspect ratio.
         title: Title shown above the map.
+        vmin: Fixed lower bound for the colormap. If ``None``, the minimum
+            value across all patches is used.
+        vmax: Fixed upper bound for the colormap. If ``None``, the maximum
+            value across all patches is used.
+        colorbar: Whether to draw a colorbar for the raster data.
+        colorbar_label: Optional label for the colorbar.
+        nodata: Nodata value to mask as transparent. If ``None``, the nodata
+            value read from each raster is used. Invalid floating-point values
+            are always masked.
 
     Returns:
         A tuple of ``(figure, axes)``.
@@ -386,6 +425,7 @@ def plot_artifact_patches(
     import geopandas as gpd
     import matplotlib.pyplot as plt
     import matplotlib.patches as mpatches
+    import numpy.ma as ma
     import rasterio
     from shapely.geometry.base import BaseGeometry
 
@@ -404,20 +444,58 @@ def plot_artifact_patches(
 
     fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 
-    for _, row in artifacts.iterrows():
-        footprint = cast(BaseGeometry, row["cell_utm_footprint"])
+    # First pass: load every patch (downsampled) so we can use a single
+    # color scale across the whole canvas. Raster nodata values and NaN/Inf
+    # are masked so gaps/overlaps between patches stay transparent.
+    patch_infos: list[tuple[np.ma.MaskedArray, Any] | None] = []
+    global_min = float("inf")
+    global_max = float("-inf")
 
-        # Plot the downsampled raster patch at its physical UTM location.
+    for _, row in artifacts.iterrows():
         try:
             with rasterio.open(row["uri"]) as src:
                 out_shape = (int(src.height / ds_factor), int(src.width / ds_factor))
                 data = src.read(1, out_shape=out_shape)
                 bounds = src.bounds
-                extent = (bounds.left, bounds.right, bounds.bottom, bounds.top)
-            ax.imshow(data, cmap=cmap, extent=extent, origin="upper")
+                src_nodata = src.nodata
         except Exception:
-            # If the raster cannot be read, still show the footprint.
-            pass
+            patch_infos.append(None)
+            continue
+
+        data = _mask_raster_data(data, nodata if nodata is not None else src_nodata)
+        if ma.count(data):
+            global_min = min(global_min, float(data.min()))
+            global_max = max(global_max, float(data.max()))
+
+        patch_infos.append((data, bounds))
+
+    plot_vmin = (
+        vmin
+        if vmin is not None
+        else (global_min if global_min != float("inf") else None)
+    )
+    plot_vmax = (
+        vmax
+        if vmax is not None
+        else (global_max if global_max != float("-inf") else None)
+    )
+
+    im = None
+    for idx, (_, row) in enumerate(artifacts.iterrows()):
+        footprint = cast(BaseGeometry, row["cell_utm_footprint"])
+
+        patch_info = patch_infos[idx]
+        if patch_info is not None:
+            data, bounds = patch_info
+            extent = (bounds.left, bounds.right, bounds.bottom, bounds.top)
+            im = ax.imshow(
+                data,
+                cmap=cmap,
+                extent=extent,
+                origin="upper",
+                vmin=plot_vmin,
+                vmax=plot_vmax,
+            )
 
         # Overlay the grid-cell footprint.
         gpd.GeoSeries([footprint]).plot(
@@ -469,5 +547,10 @@ def plot_artifact_patches(
         ncol=1,
         fontsize=12,
     )
+
+    if colorbar and im is not None and plot_vmin is not None and plot_vmax is not None:
+        cbar = fig.colorbar(im, ax=ax, shrink=0.6)
+        if colorbar_label:
+            cbar.set_label(colorbar_label)
 
     return fig, ax
