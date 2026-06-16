@@ -5,7 +5,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from aereo.asset_downloader import download_assets_safely, extract_asset_safely
+from aereo.asset_downloader import (
+    download_assets_safely,
+    extract_archives,
+    extract_asset_safely,
+)
 
 
 def _make_zip(archive: Path, members: dict[str, str]) -> None:
@@ -113,6 +117,72 @@ def test_extract_asset_safely_recovers_from_stale_dir(tmp_path: Path) -> None:
 
     assert not (extract_dir / "partial.tmp").exists()
     assert (extract_dir / "data.txt").read_text() == "hello"
+
+
+def test_extract_archives_returns_extracted_directory(tmp_path: Path) -> None:
+    """ZIP archives are extracted and the extracted directory is returned."""
+    archive = tmp_path / "product.zip"
+    _make_zip(archive, {"data.txt": "hello", "sub/nested.bin": "world"})
+
+    result = extract_archives([str(archive)])
+
+    assert len(result) == 1
+    extract_dir = Path(result[0])
+    assert extract_dir.name == "product"
+    assert (extract_dir / "data.txt").read_text() == "hello"
+    assert (extract_dir / "sub" / "nested.bin").read_text() == "world"
+
+
+def test_extract_archives_hoists_single_root_directory(tmp_path: Path) -> None:
+    """SEN3-style ZIPs with one root directory return the inner directory."""
+    archive = tmp_path / "product.SEN3.zip"
+    _make_zip(
+        archive,
+        {
+            "product.SEN3/data.txt": "hello",
+            "product.SEN3/meta.xml": "<xml/>",
+        },
+    )
+
+    result = extract_archives([str(archive)])
+
+    assert len(result) == 1
+    product_dir = Path(result[0])
+    assert product_dir.name == "product.SEN3"
+    assert (product_dir / "data.txt").read_text() == "hello"
+    assert (product_dir / "meta.xml").read_text() == "<xml/>"
+
+
+def test_extract_archives_expands_sen3_to_netcdf_files(tmp_path: Path) -> None:
+    """SEN3 product directories are expanded to their netCDF files for Satpy."""
+    archive = tmp_path / "product.SEN3.zip"
+    _make_zip(
+        archive,
+        {
+            "S3A_OL_1_EFR____20240101T141748_20240101T142048_20240102T142948_0179_107_224_3600_PS1_O_NT_003.SEN3/Oa08_radiance.nc": "nc8",
+            "S3A_OL_1_EFR____20240101T141748_20240101T142048_20240102T142948_0179_107_224_3600_PS1_O_NT_003.SEN3/Oa17_radiance.nc": "nc17",
+            "S3A_OL_1_EFR____20240101T141748_20240101T142048_20240102T142948_0179_107_224_3600_PS1_O_NT_003.SEN3/geo_coordinates.nc": "geo",
+            "S3A_OL_1_EFR____20240101T141748_20240101T142048_20240102T142948_0179_107_224_3600_PS1_O_NT_003.SEN3/Oa08_radiance_unc.nc": "unc",
+        },
+    )
+
+    result = extract_archives([str(archive)])
+
+    assert len(result) == 4
+    names = [Path(p).name for p in result]
+    assert names == [
+        "Oa08_radiance.nc",
+        "Oa08_radiance_unc.nc",
+        "Oa17_radiance.nc",
+        "geo_coordinates.nc",
+    ]
+    assert all(Path(p).exists() for p in result)
+
+
+def test_extract_archives_leaves_non_zip_paths_unchanged() -> None:
+    """Non-ZIP paths are returned unchanged."""
+    paths = ["/tmp/some_file.nc", "/data/another_file.h5"]
+    assert extract_archives(paths) == paths
 
 
 # ---------------------------------------------------------------------------
