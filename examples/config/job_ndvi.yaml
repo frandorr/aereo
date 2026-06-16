@@ -8,3 +8,4 @@ defaults:
 name: sentinel2_sample
 derivative: ndvi
 output_uri: /tmp/aereo_extraction
+overwrite: false

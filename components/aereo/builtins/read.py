@@ -117,6 +117,9 @@ class ReadODCSTAC(Reader):
             if spatial_extent is not None and not spatial_extent.is_empty:
                 odc_params["bbox"] = spatial_extent.bounds  # (minx, miny, maxx, maxy)
 
+        if "chunks" not in odc_params:
+            odc_params["chunks"] = {}
+
         # Auto-infer bands from unique channel_ids in assets if not provided.
         if "bands" not in odc_params and "channel_id" in assets_df.columns:
             odc_params["bands"] = list(assets_df["channel_id"].unique())

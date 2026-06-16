@@ -97,10 +97,12 @@ class TaskResultCache:
         assets_df = assets_df.sort_values(by=sort_cols, kind="mergesort").reset_index(
             drop=True
         )
-        asset_cols = ["id", "collection", "start_time", "end_time", "href"]
+        asset_cols = ["id", "collection", "start_time", "end_time"]
         if "channel_id" in assets_df.columns:
             asset_cols.append("channel_id")
-        # Only keep columns we know are stable identifiers; ignore geometry.
+        # Only keep columns we know are stable identifiers; ignore geometry and
+        # hrefs, because signed URLs (e.g. Planetary Computer SAS tokens) change
+        # on every search and would otherwise invalidate the cache each session.
         assets_data = cast(
             list[dict[str, Any]],
             assets_df[asset_cols].to_dict(orient="records"),  # pyright: ignore[reportCallIssue]
