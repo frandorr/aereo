@@ -1,0 +1,10 @@
+defaults:
+  - search: sentinel3
+  - grid_config: grid_50km
+  - patch_config: patch_375m
+  - extract: sentinel3
+  - _self_
+
+name: sentinel3_sample
+output_uri: /tmp/aereo_extraction
+overwrite: false

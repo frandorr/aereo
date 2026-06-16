@@ -7,5 +7,5 @@ defaults:
 
 name: sentinel2_sample
 target_aoi: config/aoi/chocon.geojson
-output_uri: aereo_extraction
+output_uri: /tmp/aereo_extraction
 overwrite: false
