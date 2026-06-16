@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     import geopandas as gpd
@@ -338,3 +338,136 @@ def plot_coverage(
 
     plt.tight_layout()
     return fig
+
+
+def plot_artifact_patches(
+    artifacts: gpd.GeoDataFrame,
+    *,
+    cmap: str = "gray",
+    ds_factor: int = 10,
+    footprint_edgecolor: str = "red",
+    footprint_linewidth: float = 2.0,
+    annotate_cells: bool = True,
+    annotation_color: str = "cyan",
+    fig_width: float = 20.0,
+    title: str = "Extracted Patches Spatial Overview",
+) -> tuple[Figure, Axes]:
+    """Plot extracted raster patches and their grid-cell footprints on one canvas.
+
+    This is useful for quickly inspecting the spatial layout of artifacts
+    produced by the extraction pipeline. Each patch's first band is plotted
+    at a downsampled resolution, the UTM footprint is overlaid as a dashed
+    polygon, and the grid cell ID is annotated at the footprint centre.
+
+    Heavy dependencies (matplotlib, geopandas, rasterio) are imported lazily
+    so callers only pay the import cost when this function is actually used.
+
+    Args:
+        artifacts: GeoDataFrame of extracted artifacts. Must contain the
+            columns ``uri``, ``cell_utm_footprint``, and ``grid_cell``.
+        cmap: Colormap passed to ``imshow`` for the raster data.
+        ds_factor: Downsample factor applied to each patch before plotting.
+            Larger values produce a lighter, faster render.
+        footprint_edgecolor: Colour of the dashed footprint outline.
+        footprint_linewidth: Width of the dashed footprint outline.
+        annotate_cells: Whether to draw the grid cell ID at each footprint's
+            centre.
+        annotation_color: Colour of the grid-cell ID text.
+        fig_width: Width of the figure in inches. The height is derived from
+            the data's aspect ratio.
+        title: Title shown above the map.
+
+    Returns:
+        A tuple of ``(figure, axes)``.
+
+    Raises:
+        ValueError: If ``artifacts`` is empty or missing a required column.
+    """
+    import geopandas as gpd
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as mpatches
+    import rasterio
+    from shapely.geometry.base import BaseGeometry
+
+    required_cols = {"uri", "cell_utm_footprint", "grid_cell"}
+    missing = required_cols - set(artifacts.columns)
+    if missing:
+        raise ValueError(f"artifacts is missing required columns: {sorted(missing)}")
+    if artifacts.empty:
+        raise ValueError("artifacts GeoDataFrame is empty")
+
+    minx, miny, maxx, maxy = artifacts["cell_utm_footprint"].total_bounds
+    width = maxx - minx
+    height = maxy - miny
+    aspect_ratio = width / height if height > 0 else 1.0
+    fig_height = max(fig_width / aspect_ratio, 2.0)
+
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+
+    for _, row in artifacts.iterrows():
+        footprint = cast(BaseGeometry, row["cell_utm_footprint"])
+
+        # Plot the downsampled raster patch at its physical UTM location.
+        try:
+            with rasterio.open(row["uri"]) as src:
+                out_shape = (int(src.height / ds_factor), int(src.width / ds_factor))
+                data = src.read(1, out_shape=out_shape)
+                bounds = src.bounds
+                extent = (bounds.left, bounds.right, bounds.bottom, bounds.top)
+            ax.imshow(data, cmap=cmap, extent=extent, origin="upper")
+        except Exception:
+            # If the raster cannot be read, still show the footprint.
+            pass
+
+        # Overlay the grid-cell footprint.
+        gpd.GeoSeries([footprint]).plot(
+            ax=ax,
+            facecolor="none",
+            edgecolor=footprint_edgecolor,
+            linestyle="--",
+            linewidth=footprint_linewidth,
+        )
+
+        # Annotate the grid cell ID at the footprint centre.
+        if annotate_cells:
+            centroid = footprint.centroid
+            ax.text(
+                centroid.x,
+                centroid.y,
+                str(row.get("grid_cell", "")),
+                color=annotation_color,
+                ha="center",
+                va="center",
+                fontsize=8,
+                fontweight="bold",
+                bbox={
+                    "facecolor": "black",
+                    "alpha": 0.5,
+                    "pad": 1,
+                    "edgecolor": "none",
+                },
+            )
+
+    ax.set_title(title, fontsize=16)
+    ax.set_xlabel("UTM X")
+    ax.set_ylabel("UTM Y")
+    ax.set_aspect("equal", "datalim")
+    ax.set_xlim(minx - 1000, maxx + 1000)
+    ax.set_ylim(miny - 1000, maxy + 1000)
+
+    legend_patch = mpatches.Patch(
+        edgecolor=footprint_edgecolor,
+        facecolor="none",
+        linestyle="--",
+        linewidth=footprint_linewidth,
+        label="Target Grid Cell",
+    )
+    fig.legend(
+        handles=[legend_patch],
+        loc="upper center",
+        bbox_to_anchor=(0.5, 1.1),
+        ncol=1,
+        fontsize=12,
+    )
+
+    return fig, ax
