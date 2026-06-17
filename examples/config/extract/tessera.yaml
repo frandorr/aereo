@@ -1,0 +1,10 @@
+read:
+  _target_: aereo.read_tessera.ReadTessera
+  bands: [0, 1, 2]
+  tile_whiten: true
+
+reproject:
+  _target_: aereo.builtins.ReprojectODC
+  resampling: nearest
+write:
+  _target_: aereo.builtins.WriteGeoTIFF

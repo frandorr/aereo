@@ -1,0 +1,11 @@
+defaults:
+  - search: tessera
+  - grid_config: grid_10km
+  - patch_config: patch_10m
+  - extract: tessera
+  - _self_
+
+name: tessera_sample
+target_aoi: config/aoi/chocon.geojson
+output_uri: /tmp/aereo_extraction
+overwrite: false
