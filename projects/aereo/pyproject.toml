@@ -33,9 +33,12 @@ classifiers = [
 dependencies = [
   "attrs>=25.4",
   "cattrs>=24.1",
+  "dask>=2025.4",
+  "filelock>=3.13",
   "geopandas>=1.1.2",
   "majortom-eg",
   "obstore>=0.9.3",
+  "odc-geo>=0.5.1",
   "pandas>=3.0.1",
   "pandera[geopandas]>=0.24",
   "pyproj>=3.7.1",
@@ -45,6 +48,7 @@ dependencies = [
   "structlog>=25.5",
   "typer>=0.12",
   "utm>=0.8.1",
+  "xarray>=2026.4",
 ]
 urls.Documentation = "https://frandorr.github.io/aereo"
 urls.Homepage = "https://github.com/frandorr/aereo"
