@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import geopandas as gpd
 import numpy as np
@@ -40,6 +40,34 @@ def _make_test_tiff(
         nodata=nodata,
     ) as dst:
         dst.write(data, 1)
+
+
+def _make_test_tiff_multiband(
+    path: Path,
+    bounds: tuple[float, float, float, float],
+    *,
+    data: np.ndarray | None = None,
+    nodata: float | None = None,
+) -> None:
+    """Write a small 3-band GeoTIFF for testing RGB plots."""
+    width, height = 32, 32
+    transform = from_bounds(*bounds, width, height)
+    if data is None:
+        data = np.ones((3, height, width), dtype=np.float32)
+    with rasterio.open(
+        path,
+        "w",
+        driver="GTiff",
+        height=height,
+        width=width,
+        count=3,
+        dtype=data.dtype,
+        crs="EPSG:32633",
+        transform=transform,
+        nodata=nodata,
+    ) as dst:
+        for i in range(3):
+            dst.write(data[i], i + 1)
 
 
 @pytest.fixture
@@ -205,4 +233,188 @@ def test_plot_artifact_patches_masks_nodata(
     mask = np.asarray(plotted.mask)
     assert mask[:16, :].all()
     assert not mask[16:, :].any()
+    fig.clf()
+
+
+def test_plot_artifact_patches_rgb(
+    tmp_path: Path,
+) -> None:
+    """Three bands can be plotted as an RGB composite."""
+    bounds = (300000.0, 5000000.0, 301000.0, 5001000.0)
+    path = tmp_path / "cell_rgb.tif"
+
+    data = np.stack(
+        [
+            np.full((32, 32), 0.0, dtype=np.float32),
+            np.full((32, 32), 0.5, dtype=np.float32),
+            np.full((32, 32), 1.0, dtype=np.float32),
+        ]
+    )
+    _make_test_tiff_multiband(path, bounds, data=data)
+
+    gdf = gpd.GeoDataFrame(
+        {
+            "uri": [str(path)],
+            "grid_cell": ["cell_rgb"],
+            "cell_utm_footprint": [box(*bounds)],
+        },
+        geometry="cell_utm_footprint",
+        crs="EPSG:32633",
+    )
+
+    fig, ax = plot_artifact_patches(gdf, bands=[1, 2, 3])
+    assert len(ax.images) == 1
+    # RGB images have shape (H, W, 3) and no colorbar axis.
+    rgb_array = ax.images[0].get_array()
+    assert rgb_array is not None
+    assert rgb_array.shape[-1] == 3
+    assert len(fig.axes) == 1
+    fig.clf()
+
+
+def test_plot_artifact_patches_single_band_int(
+    sample_artifacts: gpd.GeoDataFrame,
+) -> None:
+    """An integer band index is accepted for single-band plots."""
+    fig, ax = plot_artifact_patches(sample_artifacts, bands=1, cmap="gray")
+    assert len(ax.images) == 2
+    fig.clf()
+
+
+def test_plot_artifact_patches_rgb_ignores_cmap_and_colorbar(
+    tmp_path: Path,
+) -> None:
+    """RGB mode ignores cmap, vmin/vmax and does not add a colorbar."""
+    bounds = (300000.0, 5000000.0, 301000.0, 5001000.0)
+    path = tmp_path / "cell_rgb.tif"
+    _make_test_tiff_multiband(path, bounds)
+
+    gdf = gpd.GeoDataFrame(
+        {
+            "uri": [str(path)],
+            "grid_cell": ["cell_rgb"],
+            "cell_utm_footprint": [box(*bounds)],
+        },
+        geometry="cell_utm_footprint",
+        crs="EPSG:32633",
+    )
+
+    fig, _ax = plot_artifact_patches(
+        gdf,
+        bands=[1, 2, 3],
+        cmap="viridis",
+        vmin=-100.0,
+        vmax=100.0,
+        colorbar=True,
+    )
+    # No colorbar axis is created in RGB mode.
+    assert len(fig.axes) == 1
+    fig.clf()
+
+
+def test_plot_artifact_patches_rgb_masks_nodata(
+    tmp_path: Path,
+) -> None:
+    """Nodata pixels in RGB rasters are rendered transparently."""
+    bounds = (300000.0, 5000000.0, 301000.0, 5001000.0)
+    path = tmp_path / "cell_rgb_nodata.tif"
+
+    data = np.ones((3, 32, 32), dtype=np.float32)
+    data[:, :16, :] = -9999.0
+    _make_test_tiff_multiband(path, bounds, data=data, nodata=-9999.0)
+
+    gdf = gpd.GeoDataFrame(
+        {
+            "uri": [str(path)],
+            "grid_cell": ["cell_rgb"],
+            "cell_utm_footprint": [box(*bounds)],
+        },
+        geometry="cell_utm_footprint",
+        crs="EPSG:32633",
+    )
+
+    fig, ax = plot_artifact_patches(gdf, bands=[1, 2, 3], ds_factor=1)
+    rgb = np.ma.asarray(ax.images[0].get_array())
+    mask = np.asarray(rgb.mask)
+    assert mask[:16, :, :].all()
+    assert not mask[16:, :, :].any()
+    fig.clf()
+
+
+def test_plot_artifact_patches_percentile_stretch(
+    tmp_path: Path,
+) -> None:
+    """Percentile stretch clips outliers and uses 2nd/98th percentiles."""
+    bounds = (300000.0, 5000000.0, 301000.0, 5001000.0)
+    path = tmp_path / "cell.tif"
+
+    data = np.zeros((32, 32), dtype=np.float32)
+    data[:, :16] = 1.0
+    data[0, 0] = 100.0  # outlier
+    _make_test_tiff(path, bounds, data=data)
+
+    gdf = gpd.GeoDataFrame(
+        {
+            "uri": [str(path)],
+            "grid_cell": ["cell"],
+            "cell_utm_footprint": [box(*bounds)],
+        },
+        geometry="cell_utm_footprint",
+        crs="EPSG:32633",
+    )
+
+    fig, ax = plot_artifact_patches(gdf, stretch="percentile")
+    # Percentile stretch should ignore the 100 outlier and stay near [0, 1].
+    assert cast(float, ax.images[0].norm.vmin) < 0.1
+    assert 0.9 < cast(float, ax.images[0].norm.vmax) < 2.0
+    fig.clf()
+
+
+def test_plot_artifact_patches_zscore_stretch(
+    tmp_path: Path,
+) -> None:
+    """Z-score stretch keeps values as z-scores and defaults to +/- 2."""
+    bounds = (300000.0, 5000000.0, 301000.0, 5001000.0)
+    path = tmp_path / "cell.tif"
+    _make_test_tiff(path, bounds, data=np.full((32, 32), 0.5, dtype=np.float32))
+
+    gdf = gpd.GeoDataFrame(
+        {
+            "uri": [str(path)],
+            "grid_cell": ["cell"],
+            "cell_utm_footprint": [box(*bounds)],
+        },
+        geometry="cell_utm_footprint",
+        crs="EPSG:32633",
+    )
+
+    fig, ax = plot_artifact_patches(gdf, stretch="zscore")
+    assert ax.images[0].norm.vmin == -2.0
+    assert ax.images[0].norm.vmax == 2.0
+    fig.clf()
+
+
+def test_plot_artifact_patches_rgb_zscore_stretch(
+    tmp_path: Path,
+) -> None:
+    """Z-score stretch works for RGB composites."""
+    bounds = (300000.0, 5000000.0, 301000.0, 5001000.0)
+    path = tmp_path / "cell_rgb_zscore.tif"
+    _make_test_tiff_multiband(path, bounds)
+
+    gdf = gpd.GeoDataFrame(
+        {
+            "uri": [str(path)],
+            "grid_cell": ["cell_rgb"],
+            "cell_utm_footprint": [box(*bounds)],
+        },
+        geometry="cell_utm_footprint",
+        crs="EPSG:32633",
+    )
+
+    fig, ax = plot_artifact_patches(gdf, bands=[1, 2, 3], stretch="zscore")
+    assert len(ax.images) == 1
+    rgb_array = ax.images[0].get_array()
+    assert rgb_array is not None
+    assert rgb_array.shape[-1] == 3
     fig.clf()
