@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 if TYPE_CHECKING:
     import geopandas as gpd
@@ -341,29 +342,31 @@ def plot_coverage(
     return fig
 
 
-def _mask_raster_data(data: np.ndarray, nodata: float | None) -> np.ma.MaskedArray:
-    """Mask nodata and invalid floating-point values in a raster array.
+def _normalize_bands(bands: int | Sequence[int] | None) -> tuple[int, ...]:
+    """Normalize the ``bands`` argument into a 1-based band index tuple."""
+    if bands is None:
+        return (1,)
+    if isinstance(bands, int):
+        return (bands,)
+    return tuple(int(b) for b in bands)
 
-    Args:
-        data: Raster data array.
-        nodata: Nodata value to mask. If ``None``, only invalid floating-point
-            values (NaN/Inf) are masked.
 
-    Returns:
-        A masked array with nodata/invalid values masked.
-    """
-    import numpy.ma as ma
+def _compute_stretch_params(values: np.ndarray) -> tuple[float, float, float, float]:
+    """Return (lo, hi, mean, std) for a flattened array of valid values."""
+    import numpy as np
 
-    masked = ma.masked_invalid(data)
-    if nodata is not None:
-        masked = ma.masked_equal(masked, nodata, copy=False)
-    return masked
+    if values.size == 0:
+        return np.nan, np.nan, np.nan, np.nan
+    lo, hi = np.percentile(values, [2.0, 98.0])
+    return float(lo), float(hi), float(np.mean(values)), float(np.std(values))
 
 
 def plot_artifact_patches(
     artifacts: gpd.GeoDataFrame,
     *,
     cmap: str = "gray",
+    bands: int | Sequence[int] | None = None,
+    stretch: Literal["minmax", "percentile", "zscore"] = "minmax",
     ds_factor: int = 10,
     footprint_edgecolor: str = "red",
     footprint_linewidth: float = 2.0,
@@ -380,14 +383,31 @@ def plot_artifact_patches(
     """Plot extracted raster patches and their grid-cell footprints on one canvas.
 
     This is useful for quickly inspecting the spatial layout of artifacts
-    produced by the extraction pipeline. Each patch's first band is plotted
-    at a downsampled resolution, the UTM footprint is overlaid as a dashed
-    polygon, and the grid cell ID is annotated at the footprint centre.
+    produced by the extraction pipeline. By default each patch's first band
+    is plotted at a downsampled resolution, the UTM footprint is overlaid as
+    a dashed polygon, and the grid cell ID is annotated at the footprint
+    centre.
 
-    By default all patches share a single color normalization (computed from
-    the global data range) and a colorbar is drawn, making adjacent patches
-    look like one continuous raster. Pass ``vmin``/``vmax`` to fix the range
-    for variables such as NDVI.
+    Pass ``bands`` as a sequence of band indices (1-based) to render multiple
+    bands together as an RGB/RGBA image. When more than one band is requested,
+    ``cmap`` and ``colorbar`` are ignored. ``vmin``/``vmax`` are only used by
+    the single-band ``zscore`` stretch.
+
+    All normalization is computed across the **whole AOI** (all patches) so
+    adjacent patches share the same color scale. Choose ``stretch`` to control
+    how that normalization is performed:
+
+    * ``"minmax"`` (default): linear stretch from the global minimum to the
+      global maximum.
+    * ``"percentile"``: linear stretch between the global 2nd and 98th
+      percentiles; outliers are clipped.
+    * ``"zscore"``: subtract the global mean and divide by the global standard
+      deviation. For single-band plots the values are kept as z-scores and
+      displayed with ``vmin=-2``, ``vmax=2`` by default. For multi-band plots
+      the z-scores are clipped to ``[-2, 2]`` and mapped to ``[0, 1]``.
+
+    Pass ``vmin``/``vmax`` to fix the range for variables such as NDVI, or to
+    override the z-score bounds when using ``stretch="zscore"``.
 
     Heavy dependencies (matplotlib, geopandas, rasterio) are imported lazily
     so callers only pay the import cost when this function is actually used.
@@ -395,7 +415,10 @@ def plot_artifact_patches(
     Args:
         artifacts: GeoDataFrame of extracted artifacts. Must contain the
             columns ``uri``, ``cell_utm_footprint``, and ``grid_cell``.
-        cmap: Colormap passed to ``imshow`` for the raster data.
+        cmap: Colormap passed to ``imshow`` for single-band raster data.
+        bands: Band index or list of band indices to plot (1-based). Use a
+            sequence of 3 bands (e.g. ``[1, 2, 3]``) for an RGB composite.
+        stretch: Normalization strategy applied across the whole AOI.
         ds_factor: Downsample factor applied to each patch before plotting.
             Larger values produce a lighter, faster render.
         footprint_edgecolor: Colour of the dashed footprint outline.
@@ -406,11 +429,12 @@ def plot_artifact_patches(
         fig_width: Width of the figure in inches. The height is derived from
             the data's aspect ratio.
         title: Title shown above the map.
-        vmin: Fixed lower bound for the colormap. If ``None``, the minimum
-            value across all patches is used.
-        vmax: Fixed upper bound for the colormap. If ``None``, the maximum
-            value across all patches is used.
-        colorbar: Whether to draw a colorbar for the raster data.
+        vmin: Fixed lower bound for the colormap. Only used for single-band
+            plots. For ``stretch="zscore"`` it defaults to ``-2``.
+        vmax: Fixed upper bound for the colormap. Only used for single-band
+            plots. For ``stretch="zscore"`` it defaults to ``2``.
+        colorbar: Whether to draw a colorbar for the raster data. Only used
+            for single-band plots.
         colorbar_label: Optional label for the colorbar.
         nodata: Nodata value to mask as transparent. If ``None``, the nodata
             value read from each raster is used. Invalid floating-point values
@@ -425,7 +449,7 @@ def plot_artifact_patches(
     import geopandas as gpd
     import matplotlib.pyplot as plt
     import matplotlib.patches as mpatches
-    import numpy.ma as ma
+    import numpy as np
     import rasterio
     from shapely.geometry.base import BaseGeometry
 
@@ -436,6 +460,10 @@ def plot_artifact_patches(
     if artifacts.empty:
         raise ValueError("artifacts GeoDataFrame is empty")
 
+    band_list = _normalize_bands(bands)
+    n_bands = len(band_list)
+    is_rgb = n_bands > 1
+
     minx, miny, maxx, maxy = artifacts["cell_utm_footprint"].total_bounds
     width = maxx - minx
     height = maxy - miny
@@ -444,41 +472,73 @@ def plot_artifact_patches(
 
     fig, ax = plt.subplots(figsize=(fig_width, fig_height))
 
-    # First pass: load every patch (downsampled) so we can use a single
-    # color scale across the whole canvas. Raster nodata values and NaN/Inf
-    # are masked so gaps/overlaps between patches stay transparent.
-    patch_infos: list[tuple[np.ma.MaskedArray, Any] | None] = []
-    global_min = float("inf")
-    global_max = float("-inf")
+    # First pass: load every patch (downsampled) and collect all valid pixel
+    # values per band so normalization is computed across the whole AOI.
+    # Nodata and NaN/Inf are converted to NaN so gaps/overlaps stay transparent.
+    patch_infos: list[tuple[np.ndarray, Any] | None] = []
+    band_values: list[list[np.ndarray]] = [[] for _ in range(n_bands)]
 
     for _, row in artifacts.iterrows():
         try:
             with rasterio.open(row["uri"]) as src:
                 out_shape = (int(src.height / ds_factor), int(src.width / ds_factor))
-                data = src.read(1, out_shape=out_shape)
                 bounds = src.bounds
                 src_nodata = src.nodata
+                mask_value = nodata if nodata is not None else src_nodata
+
+                if is_rgb:
+                    data = src.read(band_list, out_shape=out_shape).astype(np.float32)
+                else:
+                    data = src.read(band_list[0], out_shape=out_shape).astype(
+                        np.float32
+                    )
+                    data = data[None, :, :]
+
+                data = np.where(np.isfinite(data), data, np.nan)
+                if mask_value is not None:
+                    data = np.where(data == mask_value, np.nan, data)
+
+                for b in range(n_bands):
+                    valid = data[b][np.isfinite(data[b])]
+                    if valid.size:
+                        band_values[b].append(valid.ravel())
         except Exception:
             patch_infos.append(None)
             continue
 
-        data = _mask_raster_data(data, nodata if nodata is not None else src_nodata)
-        if ma.count(data):
-            global_min = min(global_min, float(data.min()))
-            global_max = max(global_max, float(data.max()))
-
         patch_infos.append((data, bounds))
 
-    plot_vmin = (
-        vmin
-        if vmin is not None
-        else (global_min if global_min != float("inf") else None)
-    )
-    plot_vmax = (
-        vmax
-        if vmax is not None
-        else (global_max if global_max != float("-inf") else None)
-    )
+    band_params = [
+        _compute_stretch_params(np.concatenate(v) if v else np.array([]))
+        for v in band_values
+    ]
+
+    if is_rgb:
+        band_lo: list[float] = []
+        band_hi: list[float] = []
+        for b in range(n_bands):
+            lo, hi, mean, std = band_params[b]
+            values = np.concatenate(band_values[b]) if band_values[b] else np.array([])
+            if stretch == "minmax" and values.size:
+                lo = float(values.min())
+                hi = float(values.max())
+            elif stretch == "zscore":
+                lo = mean - 2 * std if np.isfinite(std) and std > 0 else np.nan
+                hi = mean + 2 * std if np.isfinite(std) and std > 0 else np.nan
+            band_lo.append(lo)
+            band_hi.append(hi)
+    else:
+        lo, hi, mean, std = band_params[0]
+        values = np.concatenate(band_values[0]) if band_values[0] else np.array([])
+        if stretch == "minmax" and values.size:
+            plot_lo = float(values.min())
+            plot_hi = float(values.max())
+        elif stretch == "percentile":
+            plot_lo, plot_hi = lo, hi
+        else:  # zscore
+            plot_lo, plot_hi = -2.0, 2.0
+        plot_vmin = vmin if vmin is not None else plot_lo
+        plot_vmax = vmax if vmax is not None else plot_hi
 
     im = None
     for idx, (_, row) in enumerate(artifacts.iterrows()):
@@ -488,14 +548,37 @@ def plot_artifact_patches(
         if patch_info is not None:
             data, bounds = patch_info
             extent = (bounds.left, bounds.right, bounds.bottom, bounds.top)
-            im = ax.imshow(
-                data,
-                cmap=cmap,
-                extent=extent,
-                origin="upper",
-                vmin=plot_vmin,
-                vmax=plot_vmax,
-            )
+            if is_rgb:
+                rgb = np.zeros(
+                    (data.shape[1], data.shape[2], n_bands), dtype=np.float32
+                )
+                for b in range(n_bands):
+                    lo = band_lo[b]
+                    hi = band_hi[b]
+                    if np.isfinite(lo) and np.isfinite(hi) and hi > lo:
+                        rgb[:, :, b] = np.clip((data[b] - lo) / (hi - lo), 0.0, 1.0)
+                    else:
+                        rgb[:, :, b] = np.where(np.isfinite(data[b]), 0.5, np.nan)
+                im = ax.imshow(
+                    rgb,
+                    extent=extent,
+                    origin="upper",
+                )
+            else:
+                data = data[0]
+                if stretch == "zscore":
+                    if np.isfinite(std) and std > 0:
+                        data = (data - mean) / std
+                    else:
+                        data = np.where(np.isfinite(data), 0.0, np.nan)
+                im = ax.imshow(
+                    data,
+                    cmap=cmap,
+                    extent=extent,
+                    origin="upper",
+                    vmin=plot_vmin,
+                    vmax=plot_vmax,
+                )
 
         # Overlay the grid-cell footprint.
         gpd.GeoSeries([footprint]).plot(
@@ -548,7 +631,13 @@ def plot_artifact_patches(
         fontsize=12,
     )
 
-    if colorbar and im is not None and plot_vmin is not None and plot_vmax is not None:
+    if (
+        not is_rgb
+        and colorbar
+        and im is not None
+        and plot_vmin is not None
+        and plot_vmax is not None
+    ):
         cbar = fig.colorbar(im, ax=ax, shrink=0.6)
         if colorbar_label:
             cbar.set_label(colorbar_label)
