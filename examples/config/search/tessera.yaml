@@ -1,6 +1,8 @@
 _target_: aereo.search_tessera.SearchTessera
 collections:
   geotessera: []
-intersects: config/aoi/chocon.geojson
-start_datetime: "2024-01-01T00:00:00Z"
-end_datetime: "2024-01-10T23:59:59Z"
+intersects: config/aoi/oxford.geojson
+start_datetime: "2025-01-01T00:00:00Z"
+end_datetime: "2025-01-10T23:59:59Z"
+tessera_version: "v1.1"
+tessera_variant: "cambridge"
