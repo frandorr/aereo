@@ -37,7 +37,7 @@ _search_plugins = [
         "PlanetaryComputerSearcher",
     ),
     ("search_rustac", "aereo.search_rustac.core", "RustacSearcher"),
-    ("search_tessera", "aereo.search_tessera.core", "TesseraSearcher"),
+    ("search_tessera", "aereo.search_tessera.core", "SearchTessera"),
 ]
 
 for name, module, cls_name in _search_plugins:
