@@ -6,6 +6,6 @@ defaults:
   - _self_
 
 name: tessera_sample
-target_aoi: config/aoi/chocon.geojson
+target_aoi: config/aoi/oxford.geojson
 output_uri: /tmp/aereo_extraction
 overwrite: false
