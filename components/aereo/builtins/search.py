@@ -27,6 +27,22 @@ logger = get_logger()
 TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
+def _extract_stac_crs(item: Any) -> str | None:
+    """Extract the native CRS from a PySTAC item using the projection extension.
+
+    Prefers ``proj:epsg`` and falls back to ``proj:code``. Returns ``None`` if
+    neither is present.
+    """
+    properties = item.properties or {}
+    epsg = properties.get("proj:epsg")
+    if epsg is not None:
+        return f"EPSG:{epsg}"
+    code = properties.get("proj:code")
+    if code is not None:
+        return str(code)
+    return None
+
+
 class SearchSTAC(SearchProvider):
     """Search provider for generic STAC APIs.
 
@@ -94,7 +110,9 @@ class SearchSTAC(SearchProvider):
         if time_range:
             searchkwargs["datetime"] = time_range
         if self.intersects is not None:
-            searchkwargs["intersects"] = self.intersects.__geo_interface__
+            searchkwargs["intersects"] = cast(
+                BaseGeometry, self.intersects
+            ).__geo_interface__
 
         # Merge in search_params
         searchkwargs.update(self.search_params)
@@ -171,6 +189,7 @@ class SearchSTAC(SearchProvider):
                 or datetime.now(timezone.utc)
             )
 
+            item_crs = _extract_stac_crs(item)
             for asset_key in assets_to_use:
                 asset = item.assets[asset_key]
                 rows.append(
@@ -182,6 +201,7 @@ class SearchSTAC(SearchProvider):
                         "end_time": item_end,
                         "href": asset.href,
                         "channel_id": asset_key,
+                        "crs": item_crs,
                         "stac_item": stac_item_dict,
                     }
                 )
@@ -190,6 +210,10 @@ class SearchSTAC(SearchProvider):
             return self.empty_result()
 
         gdf = gpd.GeoDataFrame(rows, geometry="geometry")
+        # Only expose crs when at least one item provided it. A column of all
+        # nulls is equivalent to "not provided" for downstream grouping.
+        if "crs" in gdf.columns.tolist() and bool(gdf["crs"].isna().all()):
+            gdf = gdf.drop(columns=["crs"])
         return cast(GeoDataFrame, AssetSchema.validate(gdf))
 
 
@@ -382,7 +406,9 @@ class SearchEarthaccess(SearchProvider):
 
         rows = []
         for g in granules:
-            row = _process_granule(g, collections, self.intersects)
+            row = _process_granule(
+                g, collections, cast(BaseGeometry | None, self.intersects)
+            )
             if row is not None:
                 rows.append(row)
 
