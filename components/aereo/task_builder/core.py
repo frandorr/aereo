@@ -7,6 +7,7 @@ grouping assets temporally and chunking them spatially.
 from __future__ import annotations
 
 from typing import Any, Sequence, cast
+from warnings import warn
 
 import geopandas as gpd
 from aereo.grid import ExtractionPatch, GridDefinition, generate_extraction_patches
@@ -31,25 +32,29 @@ def _generate_patch_groups(
     grid_def: Any,
     grid_config: GridConfig,
     patch_config: PatchConfig,
-) -> list[tuple[Any, GeoDataFrame, list[ExtractionPatch]]]:
-    """Group assets by start_time and generate/filter grid patches.
+) -> list[tuple[Any, Any, GeoDataFrame, list[ExtractionPatch]]]:
+    """Group assets by start_time and native CRS, then generate/filter patches.
 
     Args:
         assets: GeoDataFrame of search results.
-        target_aoi: Optional AOI used to clip each time group before tiling.
+        target_aoi: Optional AOI used to clip each group before tiling.
         grid_def: Grid definition used for raw partitioning.
         grid_config: Grid configuration (drives filter mode and min coverage).
         patch_config: Patch configuration (drives resolution, margin, padding, etc).
 
     Returns:
-        List of ``(start_time, time_group, patches)`` tuples; entries with no
-        intersecting patches or no contributing assets are omitted.
+        List of ``(start_time, crs, time_group, patches)`` tuples; entries with
+        no intersecting patches or no contributing assets are omitted. ``crs``
+        is ``None`` when the input has no ``crs`` column.
 
     Raises:
         ValueError: If ``grid_config.grid_filter_mode`` is not one of
-            ``"intersection"``, ``"within"``, or ``"coverage"``.
+            ``"intersection"``, ``"within"``, or ``"coverage"``, or if the
+            ``crs`` column exists but contains null values.
     """
-    profile_patch_groups: list[tuple[Any, GeoDataFrame, list[ExtractionPatch]]] = []
+    profile_patch_groups: list[
+        tuple[Any, Any, GeoDataFrame, list[ExtractionPatch]]
+    ] = []
     grid_filter_mode = str(grid_config.grid_filter_mode).lower()
     if grid_filter_mode not in _VALID_FILTER_MODES:
         raise ValueError(
@@ -58,7 +63,20 @@ def _generate_patch_groups(
         )
     min_coverage = grid_config.min_coverage
 
-    for start_time, time_group in assets.groupby("start_time"):
+    has_crs = "crs" in assets.columns
+    if has_crs and bool(assets["crs"].isna().any()):
+        raise ValueError(
+            "assets['crs'] contains null values. "
+            "Either populate crs for all assets or omit the column entirely."
+        )
+
+    group_keys = ["start_time", "crs"] if has_crs else ["start_time"]
+    for keys, time_group in assets.groupby(group_keys):
+        if has_crs:
+            start_time, crs = keys  # type: ignore[misc]
+        else:
+            start_time, crs = keys, None  # type: ignore[assignment]
+
         group_geom = _union_all(time_group.geometry)
         if _skip_empty(group_geom):
             continue
@@ -85,7 +103,7 @@ def _generate_patch_groups(
                 continue
 
         profile_patch_groups.append(
-            (start_time, cast(GeoDataFrame, time_group), all_patches)
+            (start_time, crs, cast(GeoDataFrame, time_group), all_patches)
         )
 
     return profile_patch_groups
@@ -173,6 +191,16 @@ def prepare_for_extraction(
     if search_results.empty:
         return []
 
+    has_crs = "crs" in search_results.columns
+    if not has_crs:
+        warn(
+            "assets has no 'crs' column; assuming all assets share the same "
+            "native CRS. Mixed-CRS assets in one task may fail or produce "
+            "incorrect results.",
+            UserWarning,
+            stacklevel=2,
+        )
+
     patch_groups = _generate_patch_groups(
         assets=search_results,
         target_aoi=effective_aoi,
@@ -184,7 +212,7 @@ def prepare_for_extraction(
         return []
 
     tasks: list[ExtractionTask] = []
-    for start_time, time_group, all_patches in patch_groups:
+    for start_time, crs, time_group, all_patches in patch_groups:
         patch_chunks = [
             all_patches[i : i + cells_per_task]
             for i in range(0, len(all_patches), cells_per_task)
@@ -207,6 +235,7 @@ def prepare_for_extraction(
                 "chunk_id": chunk_idx,
                 "total_chunks": len(patch_chunks),
                 "start_time": str(start_time),
+                "crs": crs,
                 "init_params": dict(init_params) if init_params else {},
             }
 

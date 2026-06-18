@@ -21,7 +21,10 @@ def mock_pystac_item():
     mock_item.datetime = datetime(2023, 5, 12, 10, 10, 31, tzinfo=timezone.utc)
     mock_item.common_metadata.start_datetime = None
     mock_item.common_metadata.end_datetime = None
-    mock_item.properties = {"datetime": "2023-05-12T10:10:31Z"}
+    mock_item.properties = {
+        "datetime": "2023-05-12T10:10:31Z",
+        "proj:epsg": 32633,
+    }
     mock_item.to_dict.return_value = {"id": "test-item-123", "type": "Feature"}
 
     mock_asset_b04 = MagicMock()
@@ -101,6 +104,8 @@ def test_search_stac_with_wildcard_assets(mock_client, mock_pystac_item):
     assert len(result) == 2
     channel_ids = set(result["channel_id"])
     assert channel_ids == {"B04", "visual"}
+    assert bool(result["crs"].notna().all())
+    assert set(result["crs"]) == {"EPSG:32633"}
 
 
 @patch("aereo.builtins.search.Client")
@@ -143,6 +148,27 @@ def test_search_stac_empty_variables_all_assets(mock_client, mock_pystac_item):
     assert len(result) == 2
     channel_ids = set(result["channel_id"])
     assert channel_ids == {"B04", "visual"}
+
+
+@patch("aereo.builtins.search.Client")
+def test_search_stac_no_crs_when_proj_missing(mock_client, mock_pystac_item):
+    """If the STAC item has no projection extension, crs column is omitted."""
+    mock_pystac_item.properties = {"datetime": "2023-05-12T10:10:31Z"}
+
+    mock_catalog = MagicMock()
+    mock_client.open.return_value = mock_catalog
+    mock_search_request = MagicMock()
+    mock_search_request.items.return_value = [mock_pystac_item]
+    mock_catalog.search.return_value = mock_search_request
+
+    provider = SearchSTAC(
+        stac_api_url="https://example.com/stac",
+        collections={"test-collection": ["*"]},
+    )
+    result = provider()
+
+    assert not result.empty
+    assert "crs" not in result.columns
 
 
 @patch("aereo.builtins.search.Client")

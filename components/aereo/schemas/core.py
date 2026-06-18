@@ -56,6 +56,10 @@ class AssetSchema(pa.DataFrameModel):
         start_time: Start time of the data acquisition.
         end_time: End time of the data acquisition.
         href: URL or reference to the data source for extraction.
+        crs: Native coordinate reference system of the asset (e.g., "EPSG:32633").
+            When present, all assets in an ``ExtractionTask`` must share the
+            same value so the reader can return a single ``xr.Dataset`` in
+            native CRS.
     """
 
     id: Series[pa.String] = pa.Field(nullable=False)

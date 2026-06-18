@@ -505,10 +505,23 @@ class ExtractionTask:
         """Validate task invariants after construction.
 
         Raises:
-            ValueError: If assets is empty.
+            ValueError: If assets is empty or assets have mixed native CRS.
         """
         if self.assets is None or len(self.assets) == 0:
             raise ValueError("assets cannot be empty")
+
+        if any(col == "crs" for col in self.assets.columns):
+            if bool(self.assets["crs"].isna().any()):
+                raise ValueError(
+                    "assets['crs'] contains null values. "
+                    "Either populate crs for all assets or omit the column entirely."
+                )
+            unique_crs = self.assets["crs"].unique()
+            if len(unique_crs) > 1:
+                raise ValueError(
+                    "All assets in an ExtractionTask must share the same native CRS, "
+                    f"but found: {sorted(unique_crs)}."
+                )
 
     def __repr__(self) -> str:
         n_assets = len(self.assets) if self.assets is not None else 0

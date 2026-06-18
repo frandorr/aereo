@@ -46,6 +46,74 @@ def test_extraction_task_validation():
     assert task.extract.read is not None
 
 
+def test_extraction_task_rejects_mixed_crs():
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
+    df = gpd.GeoDataFrame(
+        {
+            "collection": ["S2", "S2"],
+            "start_time": ["2023-01-01", "2023-01-01"],
+            "crs": ["EPSG:32631", "EPSG:32632"],
+        },
+        geometry=[
+            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
+            Polygon([[2, 0], [3, 0], [3, 1], [2, 1]]),
+        ],
+    )
+    grid_config = GridConfig(target_grid_dist=10_000)
+    patch_config = PatchConfig(resolution=10.0)
+    extract = ExtractConfig(read=ReadODCSTAC())
+    job = ExtractionJob(
+        grid_config=grid_config,
+        patch_config=patch_config,
+        output_uri="test",
+        search=None,
+        extract=extract,
+    )
+
+    with pytest.raises(ValueError, match="share the same native CRS"):
+        ExtractionTask(
+            assets=cast(GeoDataFrame, df),
+            job=job,
+            patches=[],
+        )
+
+
+def test_extraction_task_accepts_single_crs():
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import ReadODCSTAC
+
+    df = gpd.GeoDataFrame(
+        {
+            "collection": ["S2", "S2"],
+            "start_time": ["2023-01-01", "2023-01-01"],
+            "crs": ["EPSG:32631", "EPSG:32631"],
+        },
+        geometry=[
+            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
+            Polygon([[2, 0], [3, 0], [3, 1], [2, 1]]),
+        ],
+    )
+    grid_config = GridConfig(target_grid_dist=10_000)
+    patch_config = PatchConfig(resolution=10.0)
+    extract = ExtractConfig(read=ReadODCSTAC())
+    job = ExtractionJob(
+        grid_config=grid_config,
+        patch_config=patch_config,
+        output_uri="test",
+        search=None,
+        extract=extract,
+    )
+
+    task = ExtractionTask(
+        assets=cast(GeoDataFrame, df),
+        job=job,
+        patches=[],
+    )
+    assert task is not None
+
+
 def test_grid_config_defaults_require_explicit_dist():
     gc = GridConfig(target_grid_dist=50_000)
     assert gc.target_grid_dist == 50_000
