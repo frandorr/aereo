@@ -1,0 +1,12 @@
+read:
+  _target_: aereo.read_satpy.ReadSatpy
+  reader: abi_l1b
+  wishlist:
+    - C02
+  calibration: "counts"
+reproject:
+  _target_: aereo.reproject_satpy.ReprojectSatpy
+  reproject_params:
+    resampler: nearest
+write:
+  _target_: aereo.builtins.WriteGeoTIFF
