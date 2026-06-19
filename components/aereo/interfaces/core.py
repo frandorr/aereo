@@ -431,31 +431,20 @@ def build_collection_asset_filters(
     Returns:
         A ``(collections, asset_filters)`` tuple.
     """
-    collections: list[str] = []
-    asset_filters: dict[str, set[str] | None] = {}
-
     if collections_config is None:
-        return collections, asset_filters
+        return [], {}
 
     if isinstance(collections_config, Mapping):
+        asset_filters: dict[str, set[str] | None] = {}
         for coll, vars_list in collections_config.items():
-            if coll not in collections:
-                collections.append(coll)
-
-            if vars_list:
-                if "*" in vars_list:
-                    asset_filters[coll] = None
-                else:
-                    asset_filters[coll] = set(str(v) for v in vars_list)
+            if vars_list and "*" not in vars_list:
+                asset_filters[coll] = set(str(v) for v in vars_list)
             else:
                 asset_filters[coll] = None
-    else:
-        for coll in collections_config:
-            if coll not in collections:
-                collections.append(coll)
-            asset_filters[coll] = None
+        return list(collections_config.keys()), asset_filters
 
-    return collections, asset_filters
+    collections = list(dict.fromkeys(collections_config))
+    return collections, {coll: None for coll in collections}
 
 
 @attrs.frozen
