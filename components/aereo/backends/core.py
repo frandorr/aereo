@@ -25,6 +25,34 @@ from structlog import get_logger
 
 logger = get_logger()
 
+_STRICT_MODE = "strict"
+_BEST_EFFORT_MODE = "best_effort"
+
+
+def _build_artifacts_gdf(
+    artifacts: list[GeoDataFrame[ArtifactSchema]],
+) -> GeoDataFrame[ArtifactSchema]:
+    """Build a validated GeoDataFrame from a list of per-patch artifact frames.
+
+    Args:
+        artifacts: Per-patch artifact GeoDataFrames. If empty, an empty
+            schema-valid frame is returned.
+
+    Returns:
+        A validated GeoDataFrame containing all artifacts.
+    """
+    if artifacts:
+        gdf = gpd.GeoDataFrame(
+            pd.concat(artifacts, ignore_index=True),
+            geometry="geometry",
+        )
+    else:
+        gdf = gpd.GeoDataFrame(
+            columns=list(ArtifactSchema.to_schema().columns.keys()),
+            geometry="geometry",
+        )
+    return cast(GeoDataFrame[ArtifactSchema], gdf)
+
 
 class TaskRunner:
     """Orchestrates the refactored extraction pipeline for a single task.
@@ -36,7 +64,7 @@ class TaskRunner:
     def __init__(
         self,
         callbacks: Sequence[PipelineCallback] | None = None,
-        per_cell_failure_mode: Literal["strict", "best_effort"] = "strict",
+        per_cell_failure_mode: Literal["strict", "best_effort"] = _STRICT_MODE,
         cache: TaskResultCache | None = None,
     ) -> None:
         """Create a new TaskRunner.
@@ -110,19 +138,14 @@ class TaskRunner:
             reprojected_map: dict[str, xr.Dataset] | None = None
             if reprojector is not None:
                 reprojected_map = reprojector(ds, task)
-                if set(reprojected_map.keys()) != {p.id for p in task.patches}:
+                if set(reprojected_map) != {p.id for p in task.patches}:
                     raise ValueError(
                         "Reprojector did not return a dataset for every patch in the task."
                     )
 
             # Stage 4-5: Per-patch loop or BatchWriter dispatch
             if isinstance(writer, BatchWriter):
-                if reprojector is None:
-                    raise ValueError(
-                        "BatchWriter requires a Reprojector. "
-                        "Configure a reproject stage or use a Writer instead."
-                    )
-                if reprojected_map is None:
+                if reprojector is None or reprojected_map is None:
                     raise ValueError(
                         "BatchWriter requires a Reprojector. "
                         "Configure a reproject stage or use a Writer instead."
@@ -164,25 +187,14 @@ class TaskRunner:
                             "on_patch_write_complete", task, patch, patch_artifacts
                         )
                 except Exception as exc:
-                    if self.per_cell_failure_mode == "strict":
+                    if self.per_cell_failure_mode == _STRICT_MODE:
                         raise
                     self._fire_callbacks("on_task_failed", task, exc)
                     logger.warning(
                         "Patch %s failed, skipping: %s", patch.id, exc, exc_info=True
                     )
 
-            if artifacts:
-                artifacts_gdf = gpd.GeoDataFrame(
-                    pd.concat(artifacts, ignore_index=True),
-                    geometry="geometry",
-                )
-            else:
-                artifacts_gdf = gpd.GeoDataFrame(
-                    columns=list(ArtifactSchema.to_schema().columns.keys()),
-                    geometry="geometry",
-                )
-
-            artifacts_gdf = cast(GeoDataFrame[ArtifactSchema], artifacts_gdf)
+            artifacts_gdf = _build_artifacts_gdf(artifacts)
             if self.cache is not None:
                 self.cache.save(task, artifacts_gdf)
             self._fire_callbacks("on_task_complete", task, artifacts_gdf)
