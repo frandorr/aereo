@@ -294,10 +294,8 @@ def plot_coverage(
 
     # Plot asset footprints coloured by group_by
     if group_by in search_results.columns and not search_results.empty:
-        groups = search_results[group_by].unique()
         cmap = plt.get_cmap("tab10")
-        for idx, group in enumerate(groups):
-            subset = search_results[search_results[group_by] == group]
+        for idx, (group, subset) in enumerate(search_results.groupby(group_by)):
             color = cmap(idx % 10)
             subset.plot(
                 ax=ax_map,
@@ -499,7 +497,8 @@ def plot_artifact_patches(
                     data = np.where(data == mask_value, np.nan, data)
 
                 for b in range(n_bands):
-                    valid = data[b][np.isfinite(data[b])]
+                    band_data = data[b]
+                    valid = band_data[np.isfinite(band_data)]
                     if valid.size:
                         band_values[b].append(valid.ravel())
         except Exception:
