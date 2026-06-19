@@ -7,8 +7,8 @@ from __future__ import annotations
 
 import importlib.metadata
 import importlib.util
+from collections.abc import Mapping
 from types import ModuleType
-from typing import Mapping
 
 from structlog import get_logger
 

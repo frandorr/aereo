@@ -28,8 +28,7 @@ def reproject_geom(geom: BaseGeometry, src_epsg: str, dst_epsg: str) -> BaseGeom
         The reprojected Shapely geometry.
     """
     transformer = Transformer.from_crs(src_epsg, dst_epsg, always_xy=True)
-    projected_geom = transform(transformer.transform, geom)
-    return projected_geom
+    return transform(transformer.transform, geom)
 
 
 def get_utm_epsg_from_geometry(geometry: BaseGeometry) -> str:

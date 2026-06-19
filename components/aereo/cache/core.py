@@ -108,18 +108,17 @@ class TaskResultCache:
             assets_df[asset_cols].to_dict(orient="records"),  # pyright: ignore[reportCallIssue]
         )
 
-        patches_data = []
-        for patch in sorted(task.patches, key=lambda p: p.id):
-            patches_data.append(
-                {
-                    "id": patch.id,
-                    "cell_geometry": _geometry_to_wkt(patch.cell_geometry),
-                    "resolution": patch.resolution,
-                    "margin": patch.margin,
-                    "padding": patch.padding,
-                    "conform_to": patch.conform_to,
-                }
-            )
+        patches_data = [
+            {
+                "id": patch.id,
+                "cell_geometry": _geometry_to_wkt(patch.cell_geometry),
+                "resolution": patch.resolution,
+                "margin": patch.margin,
+                "padding": patch.padding,
+                "conform_to": patch.conform_to,
+            }
+            for patch in sorted(task.patches, key=lambda p: p.id)
+        ]
 
         task_context = dict(task.task_context)
         # Callbacks are injected at runtime and do not affect output.

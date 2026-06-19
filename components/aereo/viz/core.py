@@ -22,6 +22,15 @@ _WATER_EDGE_COLOR = "#5dade2"
 _LAND_COLOR = "#f5f5f0"
 _DEFAULT_LINEWIDTH = 0.4
 
+_ASSET_EDGE_COLOR = "blue"
+_AOI_EDGE_COLOR = "red"
+_PERCENTILE_LOW = 2.0
+_PERCENTILE_HIGH = 98.0
+_ZSCORE_STD_MULTIPLIER = 2.0
+_ZSCORE_PLOT_LO = -2.0
+_ZSCORE_PLOT_HI = 2.0
+_FOOTPRINT_VIEW_BUFFER_M = 1000.0
+
 
 def _add_base_layer(ax, tiles: bool, zoom: int) -> None:
     """Add base map layer to the axes.
@@ -101,12 +110,15 @@ def _build_legend_patches(
     handles: list = []
     if assets is not None and not assets.empty:
         asset_patch = mpatches.Patch(
-            facecolor="none", edgecolor="blue", linewidth=1.5, label=asset_label
+            facecolor="none",
+            edgecolor=_ASSET_EDGE_COLOR,
+            linewidth=1.5,
+            label=asset_label,
         )
         handles.append(asset_patch)
 
     aoi_patch = mpatches.Patch(
-        facecolor="none", edgecolor="red", linewidth=2.5, label=label
+        facecolor="none", edgecolor=_AOI_EDGE_COLOR, linewidth=2.5, label=label
     )
     handles.append(aoi_patch)
     return handles
@@ -228,10 +240,20 @@ def plot_aoi(
 
     # Plot asset footprints (under AOI so AOI is visible on top)
     if assets is not None and not assets.empty:
-        assets.plot(ax=ax, facecolor="none", edgecolor="blue", linewidth=1.5)
+        assets.plot(
+            ax=ax,
+            facecolor="none",
+            edgecolor=_ASSET_EDGE_COLOR,
+            linewidth=1.5,
+        )
 
     # Plot AOI
-    gdf.plot(ax=ax, facecolor="none", edgecolor="red", linewidth=2.5)
+    gdf.plot(
+        ax=ax,
+        facecolor="none",
+        edgecolor=_AOI_EDGE_COLOR,
+        linewidth=2.5,
+    )
 
     handles = _build_legend_patches(assets, asset_label, label)
 
@@ -315,7 +337,7 @@ def plot_coverage(
         aoi.plot(
             ax=ax_map,
             facecolor="none",
-            edgecolor="red",
+            edgecolor=_AOI_EDGE_COLOR,
             linewidth=2.0,
             label="AOI",
             transform=ccrs.PlateCarree(),
@@ -374,7 +396,7 @@ def _compute_stretch_params(values: np.ndarray) -> tuple[float, float, float, fl
 
     if values.size == 0:
         return np.nan, np.nan, np.nan, np.nan
-    lo, hi = np.percentile(values, [2.0, 98.0])
+    lo, hi = np.percentile(values, [_PERCENTILE_LOW, _PERCENTILE_HIGH])
     return float(lo), float(hi), float(np.mean(values)), float(np.std(values))
 
 
@@ -385,7 +407,7 @@ def plot_artifact_patches(
     bands: int | Sequence[int] | None = None,
     stretch: Literal["minmax", "percentile", "zscore"] = "minmax",
     ds_factor: int = 10,
-    footprint_edgecolor: str = "red",
+    footprint_edgecolor: str = _AOI_EDGE_COLOR,
     footprint_linewidth: float = 2.0,
     annotate_cells: bool = True,
     annotation_color: str = "cyan",
@@ -544,8 +566,16 @@ def plot_artifact_patches(
                 lo = float(values.min())
                 hi = float(values.max())
             elif stretch == "zscore":
-                lo = mean - 2 * std if np.isfinite(std) and std > 0 else np.nan
-                hi = mean + 2 * std if np.isfinite(std) and std > 0 else np.nan
+                lo = (
+                    mean - _ZSCORE_STD_MULTIPLIER * std
+                    if np.isfinite(std) and std > 0
+                    else np.nan
+                )
+                hi = (
+                    mean + _ZSCORE_STD_MULTIPLIER * std
+                    if np.isfinite(std) and std > 0
+                    else np.nan
+                )
             band_lo.append(lo)
             band_hi.append(hi)
     else:
@@ -557,7 +587,7 @@ def plot_artifact_patches(
         elif stretch == "percentile":
             plot_lo, plot_hi = lo, hi
         else:  # zscore
-            plot_lo, plot_hi = -2.0, 2.0
+            plot_lo, plot_hi = _ZSCORE_PLOT_LO, _ZSCORE_PLOT_HI
         plot_vmin = vmin if vmin is not None else plot_lo
         plot_vmax = vmax if vmax is not None else plot_hi
 
@@ -634,8 +664,8 @@ def plot_artifact_patches(
     ax.set_xlabel("UTM X")
     ax.set_ylabel("UTM Y")
     ax.set_aspect("equal", "datalim")
-    ax.set_xlim(minx - 1000, maxx + 1000)
-    ax.set_ylim(miny - 1000, maxy + 1000)
+    ax.set_xlim(minx - _FOOTPRINT_VIEW_BUFFER_M, maxx + _FOOTPRINT_VIEW_BUFFER_M)
+    ax.set_ylim(miny - _FOOTPRINT_VIEW_BUFFER_M, maxy + _FOOTPRINT_VIEW_BUFFER_M)
 
     legend_patch = mpatches.Patch(
         edgecolor=footprint_edgecolor,
