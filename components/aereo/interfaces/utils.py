@@ -28,7 +28,7 @@ _RIOXARRAY_INSTALL_MSG = "rioxarray support requires rioxarray. Install it with:
 def _import_rioxarray() -> Any:
     """Import rioxarray with a clear error message if missing."""
     try:
-        import rioxarray  # noqa: F401
+        import rioxarray
     except ImportError as exc:
         raise ImportError(_RIOXARRAY_INSTALL_MSG) from exc
     return rioxarray
@@ -51,8 +51,6 @@ def validate_aereo_dataset(
         ValueError: If any convention is violated.
         ImportError: If ``rioxarray`` is not installed and *require_crs* is True.
     """
-    import xarray as xr
-
     if not isinstance(ds, xr.Dataset):
         raise ValueError(f"Expected xarray.Dataset, got {type(ds).__name__}")
 
@@ -171,12 +169,7 @@ def normalize_geometry_input(
 def _looks_like_geojson_path(value: str) -> bool:
     """Return True if *value* looks like a GeoJSON file path."""
     lowered = value.lower()
-    return (
-        lowered.endswith(".geojson")
-        or lowered.endswith(".json")
-        or "/" in value
-        or "\\" in value
-    )
+    return lowered.endswith((".geojson", ".json")) or "/" in value or "\\" in value
 
 
 def _geometry_from_geojson_path(path: Path) -> BaseGeometry:

@@ -26,6 +26,10 @@ logger = get_logger()
 
 TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
+_PROJ_EPSG_KEY = "proj:epsg"
+_PROJ_CODE_KEY = "proj:code"
+_EPSG_PREFIX = "EPSG:"
+
 
 def _extract_stac_crs(item: Any) -> str | None:
     """Extract the native CRS from a PySTAC item using the projection extension.
@@ -37,10 +41,10 @@ def _extract_stac_crs(item: Any) -> str | None:
         The CRS string (e.g. ``"EPSG:4326"``) or ``None`` if not present.
     """
     properties = item.properties or {}
-    epsg = properties.get("proj:epsg")
+    epsg = properties.get(_PROJ_EPSG_KEY)
     if epsg is not None:
-        return f"EPSG:{epsg}"
-    code = properties.get("proj:code")
+        return f"{_EPSG_PREFIX}{epsg}"
+    code = properties.get(_PROJ_CODE_KEY)
     if code is not None:
         return str(code)
     return None

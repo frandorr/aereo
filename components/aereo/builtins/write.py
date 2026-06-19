@@ -133,7 +133,7 @@ class WriteGeoTIFF(Writer):
         rio_params = dict(self.rio_params)
 
         # Build patch metadata once
-        grid_cell_id = patch.id
+        grid_cell_id = cell_id
         grid_dist = patch.d
         resolution = patch.resolution
         cell_geometry = patch.cell_geometry
