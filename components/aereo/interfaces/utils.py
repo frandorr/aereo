@@ -6,6 +6,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import (
+    TYPE_CHECKING,
     Any,
     Sequence,
 )
@@ -13,6 +14,9 @@ from typing import (
 import xarray as xr
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
+
+if TYPE_CHECKING:
+    import geopandas as gpd
 
 _YAML_INSTALL_MSG = (
     "YAML support requires PyYAML. Install it with: pip install 'aereo[yaml]'"
@@ -210,8 +214,15 @@ def _extract_geometry_from_geojson(
     return None
 
 
-def _union_all(geom_series) -> BaseGeometry:
-    """Return the union of a geometry series, handling API differences."""
+def _union_all(geom_series: gpd.GeoSeries) -> BaseGeometry:
+    """Return the union of a geometry series, handling API differences.
+
+    Args:
+        geom_series: GeoPandas ``GeoSeries`` to union.
+
+    Returns:
+        A Shapely geometry representing the union.
+    """
     if hasattr(geom_series, "union_all"):
         return geom_series.union_all()
     return geom_series.unary_union

@@ -35,6 +35,7 @@ _EOIDS_DATE_FMT = "%Y%m%d"
 
 
 def _sanitize_cell(cell_id: str) -> str:
+    """Remove underscores from a cell id to make it filename-safe."""
     return str(cell_id).replace("_", "")
 
 
@@ -48,6 +49,7 @@ def _sanitize_job_name(name: str) -> str:
 
 
 def _normalize_suffix(suffix: str) -> str:
+    """Strip a leading dot from a file extension suffix."""
     return suffix.lstrip(".")
 
 

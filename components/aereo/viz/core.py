@@ -345,7 +345,14 @@ def plot_coverage(
 
 
 def _normalize_bands(bands: int | Sequence[int] | None) -> tuple[int, ...]:
-    """Normalize the ``bands`` argument into a 1-based band index tuple."""
+    """Normalize the ``bands`` argument into a 1-based band index tuple.
+
+    Args:
+        bands: Single band index, sequence of band indices, or ``None``.
+
+    Returns:
+        Tuple of 1-based band indices.
+    """
     if bands is None:
         return (1,)
     if isinstance(bands, int):
@@ -354,7 +361,15 @@ def _normalize_bands(bands: int | Sequence[int] | None) -> tuple[int, ...]:
 
 
 def _compute_stretch_params(values: np.ndarray) -> tuple[float, float, float, float]:
-    """Return (lo, hi, mean, std) for a flattened array of valid values."""
+    """Return (lo, hi, mean, std) for a flattened array of valid values.
+
+    Args:
+        values: Flattened array of valid pixel values.
+
+    Returns:
+        ``(lo, hi, mean, std)`` where ``lo`` and ``hi`` are the 2nd and 98th
+        percentiles.
+    """
     import numpy as np
 
     if values.size == 0:

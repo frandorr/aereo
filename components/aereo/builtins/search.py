@@ -30,8 +30,11 @@ TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 def _extract_stac_crs(item: Any) -> str | None:
     """Extract the native CRS from a PySTAC item using the projection extension.
 
-    Prefers ``proj:epsg`` and falls back to ``proj:code``. Returns ``None`` if
-    neither is present.
+    Args:
+        item: A PySTAC item.
+
+    Returns:
+        The CRS string (e.g. ``"EPSG:4326"``) or ``None`` if not present.
     """
     properties = item.properties or {}
     epsg = properties.get("proj:epsg")
@@ -222,7 +225,14 @@ class NoSpatialMetadataError(Exception):
 
 
 def _to_polygon_or_multipolygon(polygons: list[Polygon]) -> BaseGeometry:
-    """Return a single Polygon or a MultiPolygon from a list of polygons."""
+    """Return a single Polygon or a MultiPolygon from a list of polygons.
+
+    Args:
+        polygons: List of polygons to combine.
+
+    Returns:
+        A single ``Polygon`` or a ``MultiPolygon``.
+    """
     if len(polygons) == 1:
         return polygons[0]
     return MultiPolygon(polygons)
@@ -231,10 +241,18 @@ def _to_polygon_or_multipolygon(polygons: list[Polygon]) -> BaseGeometry:
 def _parse_umm_polygon(umm: dict[str, Any]) -> BaseGeometry:
     """Parse UMM (Unified Metadata Model) spatial extent into a Shapely geometry.
 
-    Tries to find GPolygons -> Boundary -> Points and constructs Polygon(s).
-    If multiple GPolygons are present, returns a MultiPolygon.
-    Falls back to BoundingRectangles if no GPolygons found.
-    If none found, raises NoSpatialMetadataError.
+    Tries to find ``GPolygons -> Boundary -> Points`` and constructs ``Polygon``
+    objects. If multiple GPolygons are present, returns a ``MultiPolygon``.
+    Falls back to ``BoundingRectangles`` if no GPolygons are found.
+
+    Args:
+        umm: UMM metadata dict for an earthaccess granule.
+
+    Returns:
+        A Shapely geometry representing the granule footprint.
+
+    Raises:
+        NoSpatialMetadataError: If no GPolygon or BoundingRectangle is found.
     """
     spatial = umm.get("SpatialExtent", {})
     horiz = spatial.get("HorizontalSpatialDomain", {})
@@ -376,7 +394,14 @@ class SearchEarthaccess(SearchProvider):
     """
 
     def __call__(self) -> GeoDataFrame[AssetSchema]:
-        """Search NASA Earthdata using earthaccess."""
+        """Search NASA Earthdata using earthaccess.
+
+        Returns:
+            A GeoDataFrame of matched assets.
+
+        Raises:
+            ImportError: If the ``earthaccess`` library is not installed.
+        """
         try:
             import earthaccess  # type: ignore
         except ImportError as e:
