@@ -12,6 +12,7 @@ import pandas as pd
 from aereo.backends import LocalProcessBackend, TaskRunner
 from aereo.cache import TaskResultCache
 from aereo.interfaces import (
+    DEFAULT_CELLS_PER_TASK,
     ExtractConfig,
     ExecutionBackend,
     ExtractionTask,
@@ -28,8 +29,6 @@ from shapely.geometry.base import BaseGeometry
 from structlog import get_logger
 
 logger = get_logger()
-
-DEFAULT_CELLS_PER_TASK = 50
 
 
 class FailureMode(str, Enum):
