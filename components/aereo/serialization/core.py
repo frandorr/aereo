@@ -20,9 +20,64 @@ import shapely.wkt
 from aereo.grid import ExtractionPatch
 from shapely.geometry.base import BaseGeometry
 from aereo.interfaces import AereoPlugin, ExtractionTask
+from aereo.interfaces.core import (
+    BatchWriter,
+    ExtractConfig,
+    Processor,
+    Reader,
+    Reprojector,
+    Writer,
+)
 from aereo.pipeline import ExtractionJob
 
 logger = logging.getLogger(__name__)
+
+
+class PluginSerializer:
+    """Serialize / deserialize :class:`AereoPlugin` instances for task transport."""
+
+    CLASS_KEY = "__plugin_class__"
+    CONFIG_KEY = "config"
+
+    @classmethod
+    def dumps(cls, plugin: AereoPlugin | None) -> dict[str, Any] | None:
+        """Serialize a plugin to a JSON-safe dict with its import path and config.
+
+        Args:
+            plugin: Plugin instance to serialize, or ``None``.
+
+        Returns:
+            A dict with ``__plugin_class__`` and ``config`` keys, or ``None``.
+        """
+        if plugin is None:
+            return None
+        return {
+            cls.CLASS_KEY: f"{type(plugin).__module__}.{type(plugin).__name__}",
+            cls.CONFIG_KEY: plugin.model_dump(mode="json"),
+        }
+
+    @classmethod
+    def loads(cls, plugin_data: dict[str, Any] | None) -> AereoPlugin | None:
+        """Reconstruct a plugin from its serialized dict.
+
+        Args:
+            plugin_data: Serialized plugin dict, or ``None``.
+
+        Returns:
+            A validated plugin instance, or ``None``.
+
+        Raises:
+            KeyError: If ``plugin_data`` is missing required keys.
+            ImportError: If the plugin module cannot be imported.
+        """
+        if not plugin_data:
+            return None
+        cls_path = plugin_data[cls.CLASS_KEY]
+        config = plugin_data[cls.CONFIG_KEY]
+        module_name, class_name = cls_path.rsplit(".", 1)
+        module = importlib.import_module(module_name)
+        plugin_cls = getattr(module, class_name)
+        return plugin_cls.model_validate(config)
 
 
 class TaskSerializer:
@@ -51,6 +106,13 @@ class TaskSerializer:
     JOB_NAME_KEY = "job_name"
     DERIVATIVE_KEY = "derivative"
     TARGET_AOI_WKT_KEY = "target_aoi_wkt"
+
+    # ExtractConfig stage keys (must stay in sync with ExtractConfig fields)
+    READ_KEY = "read"
+    PREPROCESS_KEY = "preprocess"
+    REPROJECT_KEY = "reproject"
+    POSTPROCESS_KEY = "postprocess"
+    WRITE_KEY = "write"
 
     def serialize(self, task: ExtractionTask, dest_dir: Path) -> None:
         """Write *task* into *dest_dir* as GeoParquet + JSON.
@@ -83,21 +145,17 @@ class TaskSerializer:
             for patch in task.patches
         ]
 
-        def serialize_plugin(plugin: AereoPlugin | None) -> dict[str, Any] | None:
-            if plugin is None:
-                return None
-            return {
-                "__plugin_class__": f"{type(plugin).__module__}.{type(plugin).__name__}",
-                "config": plugin.model_dump(mode="json"),
-            }
-
         # ExtractConfig → dicts with class paths
         extract_meta = {
-            "read": serialize_plugin(task.extract.read),
-            "preprocess": [serialize_plugin(p) for p in task.extract.preprocess],
-            "reproject": serialize_plugin(task.extract.reproject),
-            "postprocess": [serialize_plugin(p) for p in task.extract.postprocess],
-            "write": serialize_plugin(task.extract.write),
+            self.READ_KEY: PluginSerializer.dumps(task.extract.read),
+            self.PREPROCESS_KEY: [
+                PluginSerializer.dumps(p) for p in task.extract.preprocess
+            ],
+            self.REPROJECT_KEY: PluginSerializer.dumps(task.extract.reproject),
+            self.POSTPROCESS_KEY: [
+                PluginSerializer.dumps(p) for p in task.extract.postprocess
+            ],
+            self.WRITE_KEY: PluginSerializer.dumps(task.extract.write),
         }
 
         # Metadata → JSON
@@ -148,46 +206,26 @@ class TaskSerializer:
 
         meta = json.loads((src_dir / self.META_NAME).read_text(encoding="utf-8"))
 
-        def deserialize_plugin(
-            plugin_data: dict[str, Any] | None,
-        ) -> AereoPlugin | None:
-            if not plugin_data:
-                return None
-            cls_path = plugin_data["__plugin_class__"]
-            config = plugin_data["config"]
-            module_name, class_name = cls_path.rsplit(".", 1)
-            module = importlib.import_module(module_name)
-            cls = getattr(module, class_name)
-            return cls.model_validate(config)
-
         # Reconstruct ExtractConfig
         extract_data = meta[self.EXTRACT_KEY]
 
-        from aereo.interfaces.core import (
-            BatchWriter,
-            ExtractConfig,
-            Processor,
-            Reader,
-            Reprojector,
-            Writer,
-        )
-
         extract = ExtractConfig(
-            read=cast(Reader, deserialize_plugin(extract_data["read"])),
+            read=cast(Reader, PluginSerializer.loads(extract_data[self.READ_KEY])),
             preprocess=[
-                cast(Processor, deserialize_plugin(p))
-                for p in extract_data["preprocess"]
+                cast(Processor, PluginSerializer.loads(p))
+                for p in extract_data[self.PREPROCESS_KEY]
             ],
             reproject=cast(
-                Reprojector | None, deserialize_plugin(extract_data["reproject"])
+                Reprojector | None,
+                PluginSerializer.loads(extract_data[self.REPROJECT_KEY]),
             ),
             postprocess=[
-                cast(Processor, deserialize_plugin(p))
-                for p in extract_data["postprocess"]
+                cast(Processor, PluginSerializer.loads(p))
+                for p in extract_data[self.POSTPROCESS_KEY]
             ],
             write=cast(
                 Writer | BatchWriter | None,
-                deserialize_plugin(extract_data["write"]),
+                PluginSerializer.loads(extract_data[self.WRITE_KEY]),
             ),
         )
 
