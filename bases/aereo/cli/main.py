@@ -1,16 +1,15 @@
 """AEREO CLI — command-line interface for the AEREO satellite data framework."""
 
-# ruff: noqa: E402
 from __future__ import annotations
 
 import json
 import pickle
 import sys
-
-import attrs
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Sequence, cast
+
+import attrs
 
 import geopandas as gpd
 import hydra
@@ -23,10 +22,14 @@ from shapely.geometry.base import BaseGeometry
 from aereo.client import AereoClient
 from aereo.backends import LocalProcessBackend
 from aereo.interfaces import ExtractConfig, normalize_geometry_input
+from aereo.interfaces.utils import _extract_geometry_from_geojson
 from aereo.schemas import AssetSchema
 from aereo.registry import AereoRegistry
 
 console = Console()
+
+_MAX_TABLE_ROWS = 50
+_HREF_PREVIEW_CHARS = 60
 
 
 # ---------------------------------------------------------------------------
@@ -47,23 +50,10 @@ def _load_geometry(geojson_path: Path) -> dict[str, Any] | None:
         ValueError: If the GeoJSON has no extractable geometry.
     """
     data = json.loads(geojson_path.read_text())
-    if data.get("type") == "FeatureCollection":
-        if not data.get("features"):
-            raise ValueError("GeoJSON FeatureCollection has no features.")
-        return data["features"][0]["geometry"]
-    elif data.get("type") == "Feature":
-        return data["geometry"]
-    elif "type" in data and data["type"] in (
-        "Point",
-        "MultiPoint",
-        "LineString",
-        "MultiLineString",
-        "Polygon",
-        "MultiPolygon",
-        "GeometryCollection",
-    ):
-        return data
-    raise ValueError("Could not extract geometry from GeoJSON.")
+    geometry = _extract_geometry_from_geojson(data)
+    if geometry is None:
+        raise ValueError("Could not extract geometry from GeoJSON.")
+    return geometry
 
 
 def _load_geometry_safe(path: Path | None) -> BaseGeometry | None:
@@ -77,6 +67,35 @@ def _load_geometry_safe(path: Path | None) -> BaseGeometry | None:
     """
     geom_dict = _load_geometry(path) if path and path.exists() else None
     return normalize_geometry_input(geom_dict) if geom_dict is not None else None
+
+
+def _build_search_provider(cfg: DictConfig) -> Any:
+    """Instantiate and configure a search provider from CLI config.
+
+    Args:
+        cfg: Hydra DictConfig containing ``search``, ``geojson``, ``start``, and
+            ``end`` keys.
+
+    Returns:
+        Configured search provider instance.
+    """
+    search_provider = hydra.utils.instantiate(cfg.search)
+
+    update_dict: dict[str, Any] = {}
+    intersects = _load_geometry_safe(Path(cfg.geojson) if cfg.geojson else None)
+    if intersects:
+        update_dict["intersects"] = intersects
+    start_dt = _parse_iso_datetime(cfg.start)
+    if start_dt:
+        update_dict["start_datetime"] = start_dt
+    end_dt = _parse_iso_datetime(cfg.end)
+    if end_dt:
+        update_dict["end_datetime"] = end_dt
+
+    if update_dict:
+        search_provider = search_provider.model_copy(update=update_dict)
+
+    return search_provider
 
 
 def _resolve_target_aoi(
@@ -170,9 +189,7 @@ def _search_results_from_json(records: list[dict[str, Any]]) -> gpd.GeoDataFrame
 
         df["geometry"] = gpd.GeoSeries(df["geometry"].apply(_to_geom))
         df = gpd.GeoDataFrame(df, geometry="geometry")
-        df = df.set_crs(epsg=4326)
-        if df is None:
-            raise ValueError("Failed to construct GeoDataFrame from records.")
+        df = cast(gpd.GeoDataFrame, df.set_crs(epsg=4326))
     for key in ("start_time", "end_time"):
         if key in df.columns:
             df[key] = pd.to_datetime(df[key])
@@ -194,16 +211,22 @@ def _print_search_table(df: gpd.GeoDataFrame) -> None:
     table.add_column("End Time", style="green")
     table.add_column("Href", style="blue", overflow="fold")
 
-    for row in df.head(50).itertuples(index=False):
+    for row in df.head(_MAX_TABLE_ROWS).itertuples(index=False):
         table.add_row(
             str(getattr(row, "id", "")),
             str(getattr(row, "collection", "")),
             str(getattr(row, "start_time", "")),
             str(getattr(row, "end_time", "")),
-            str(getattr(row, "href", ""))[:60] + "...",
+            str(getattr(row, "href", ""))[:_HREF_PREVIEW_CHARS] + "...",
         )
-    if len(df) > 50:
-        table.add_row("...", f"... and {len(df) - 50} more rows", "", "", "")
+    if len(df) > _MAX_TABLE_ROWS:
+        table.add_row(
+            "...",
+            f"... and {len(df) - _MAX_TABLE_ROWS} more rows",
+            "",
+            "",
+            "",
+        )
     console.print(table)
 
 
@@ -327,8 +350,13 @@ def _check_results(results: gpd.GeoDataFrame | None) -> None:
         sys.exit(2)
 
 
-def plugins_cmd() -> None:
-    """List installed AEREO plugins."""
+def plugins_cmd(cfg: DictConfig | None = None) -> None:
+    """List installed AEREO plugins.
+
+    Args:
+        cfg: Unused; accepted so ``plugins_cmd`` matches the action runner
+            signature.
+    """
     registry = AereoRegistry()
 
     table = Table(title="Installed AEREO Plugins")
@@ -387,6 +415,217 @@ def plugin_params_cmd(name: str) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Action runners
+# ---------------------------------------------------------------------------
+
+
+def _run_search_action(cfg: DictConfig) -> None:
+    """Execute the ``search`` CLI action."""
+    if not cfg.get("search"):
+        console.print(
+            "[red]No search provider configuration provided (search key is missing).[/red]"
+        )
+        sys.exit(1)
+
+    search_provider = _build_search_provider(cfg)
+    client = AereoClient()
+    results = _run_with_exit("Search", client.search, search_provider=search_provider)
+    _check_results(results)
+
+    fmt = cfg.get("format", "table")
+    if fmt == "json":
+        records = _search_results_to_json(results)
+        json_out = json.dumps(records, indent=2, default=str)
+        if cfg.output:
+            Path(cfg.output).write_text(json_out)
+            console.print(
+                f"[green]Wrote {len(records)} results to[/green] {cfg.output}"
+            )
+        else:
+            console.print(json_out)
+    else:
+        _print_search_table(results)
+        if cfg.output:
+            records = _search_results_to_json(results)
+            Path(cfg.output).write_text(json.dumps(records, indent=2, default=str))
+            console.print(f"[green]Wrote results to[/green] {cfg.output}")
+
+
+def _run_prepare_action(cfg: DictConfig) -> None:
+    """Execute the ``prepare`` CLI action."""
+    if not cfg.get("search_results"):
+        console.print(
+            "[red]search_results file path is required for prepare action.[/red]"
+        )
+        sys.exit(1)
+
+    search_results_path = Path(cfg.search_results)
+    if not search_results_path.exists():
+        console.print(f"[red]Search results not found:[/red] {search_results_path}")
+        sys.exit(1)
+
+    records = json.loads(search_results_path.read_text())
+    df = _search_results_from_json(records)
+
+    pipeline = hydra.utils.instantiate(cfg.pipeline)
+    grid_config = hydra.utils.instantiate(cfg.grid_config)
+    patch_config = hydra.utils.instantiate(cfg.patch_config)
+    extract = _pipeline_to_extract(pipeline)
+
+    output_dir = Path(cfg.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    target_aoi = _resolve_target_aoi(cfg)
+
+    client = AereoClient()
+    tasks = _run_with_exit(
+        "Prepare",
+        client.prepare_tasks,
+        search_results=df,
+        grid_config=grid_config,
+        patch_config=patch_config,
+        extract=extract,
+        output_uri=cfg.get("output_uri") or str(output_dir),
+        target_aoi=target_aoi,
+        cells_per_task=cfg.cells_per_task,
+        overwrite=cfg.overwrite,
+    )
+
+    task_file = Path(cfg.output) if cfg.output else (output_dir / "tasks.pkl")
+    task_file.write_bytes(pickle.dumps(tasks))
+    console.print(
+        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cfg.cells_per_task}).[/green]"
+    )
+    console.print(f"[green]Wrote tasks to[/green] {task_file}")
+
+
+def _run_extract_action(cfg: DictConfig) -> None:
+    """Execute the ``extract`` CLI action."""
+    if not cfg.get("tasks"):
+        console.print(
+            "[red]tasks pickle file path is required for extract action.[/red]"
+        )
+        sys.exit(1)
+
+    tasks_path = Path(cfg.tasks)
+    if not tasks_path.exists():
+        console.print(f"[red]Tasks file not found:[/red] {tasks_path}")
+        sys.exit(1)
+
+    task_list = pickle.loads(tasks_path.read_bytes())
+
+    if cfg.get("overwrite") is not None:
+        task_list = [
+            attrs.evolve(
+                task,
+                job=task.job.model_copy(update={"overwrite": cfg.overwrite}),
+            )
+            for task in task_list
+        ]
+
+    backend = LocalProcessBackend(max_workers=cfg.workers)
+    client = AereoClient()
+    artifacts = _run_with_exit(
+        "Extraction", client.execute_tasks, task_list, backend=backend
+    )
+
+    output_dir = Path(cfg.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    parquet_path = output_dir / "artifacts.parquet"
+    artifacts.to_parquet(parquet_path)
+
+    console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
+    console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
+    console.print(f"[green]Output directory:[/green] {output_dir}")
+
+
+def _run_run_action(cfg: DictConfig) -> None:
+    """Execute the full ``run`` pipeline action."""
+    if not cfg.get("search"):
+        console.print(
+            "[red]No search provider configuration provided (search key is missing).[/red]"
+        )
+        sys.exit(1)
+
+    search_provider = _build_search_provider(cfg)
+
+    pipeline = hydra.utils.instantiate(cfg.pipeline)
+    grid_config = hydra.utils.instantiate(cfg.grid_config)
+    patch_config = hydra.utils.instantiate(cfg.patch_config)
+    extract = _pipeline_to_extract(pipeline)
+
+    output_dir = Path(cfg.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    target_aoi = _resolve_target_aoi(cfg, fallback=search_provider.intersects)
+
+    client = AereoClient()
+
+    # Search
+    console.print("[bold blue]🔍 Searching...[/bold blue]")
+    results = _run_with_exit("Search", client.search, search_provider=search_provider)
+    _check_results(results)
+    console.print(f"[green]✓ Found {len(results)} scenes.[/green]")
+
+    # Prepare
+    console.print("[bold blue]📦 Preparing...[/bold blue]")
+    tasks = _run_with_exit(
+        "Prepare",
+        client.prepare_tasks,
+        search_results=results,
+        extract=extract,
+        grid_config=grid_config,
+        patch_config=patch_config,
+        output_uri=cfg.get("output_uri") or str(output_dir),
+        target_aoi=target_aoi,
+        cells_per_task=cfg.cells_per_task,
+        overwrite=cfg.overwrite,
+    )
+    console.print(
+        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cfg.cells_per_task}).[/green]"
+    )
+
+    # Extract
+    console.print("[bold blue]⛏️ Extracting...[/bold blue]")
+    backend = LocalProcessBackend(max_workers=cfg.workers)
+    artifacts = _run_with_exit(
+        "Extraction", client.execute_tasks, tasks, backend=backend
+    )
+
+    parquet_path = output_dir / "artifacts.parquet"
+    artifacts.to_parquet(parquet_path)
+
+    console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
+    console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
+    console.print(f"[green]Output:[/green] {output_dir}")
+
+
+def _run_validate_action(cfg: DictConfig) -> None:
+    """Execute the ``validate`` CLI action."""
+    try:
+        if cfg.get("search"):
+            hydra.utils.instantiate(cfg.search)
+        if cfg.get("pipeline"):
+            hydra.utils.instantiate(cfg.pipeline)
+        if cfg.get("grid_config"):
+            hydra.utils.instantiate(cfg.grid_config)
+        if cfg.get("patch_config"):
+            hydra.utils.instantiate(cfg.patch_config)
+        console.print("[green]✓ Configuration is valid.[/green]")
+    except Exception as exc:
+        console.print(f"[red]✗ Configuration is invalid:[/red] {exc}")
+        sys.exit(1)
+
+
+def _run_plugin_params_action(cfg: DictConfig) -> None:
+    """Execute the ``plugin_params`` CLI action."""
+    if not cfg.get("plugin_name"):
+        console.print("[red]plugin_name is required for plugin_params action.[/red]")
+        sys.exit(1)
+    plugin_params_cmd(cfg.plugin_name)
+
+
+# ---------------------------------------------------------------------------
 # Main Entry Point with Hydra
 # ---------------------------------------------------------------------------
 
@@ -394,252 +633,24 @@ def plugin_params_cmd(name: str) -> None:
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(cfg: DictConfig) -> None:
     """Main execution entry point loaded by Hydra."""
-    # Setup logging
     _configure_verbose_logging(cfg.verbose)
 
     action = cfg.get("action", "run")
+    runners: dict[str, Callable[[DictConfig], None]] = {
+        "search": _run_search_action,
+        "prepare": _run_prepare_action,
+        "extract": _run_extract_action,
+        "run": _run_run_action,
+        "validate": _run_validate_action,
+        "plugins": plugins_cmd,
+        "plugin_params": _run_plugin_params_action,
+    }
 
-    if action == "search":
-        if not cfg.get("search"):
-            console.print(
-                "[red]No search provider configuration provided (search key is missing).[/red]"
-            )
-            sys.exit(1)
-
-        search_provider = hydra.utils.instantiate(cfg.search)
-
-        update_dict = {}
-        intersects = _load_geometry_safe(Path(cfg.geojson) if cfg.geojson else None)
-        if intersects:
-            update_dict["intersects"] = intersects
-        start_dt = _parse_iso_datetime(cfg.start)
-        if start_dt:
-            update_dict["start_datetime"] = start_dt
-        end_dt = _parse_iso_datetime(cfg.end)
-        if end_dt:
-            update_dict["end_datetime"] = end_dt
-
-        if update_dict:
-            search_provider = search_provider.model_copy(update=update_dict)
-
-        client = AereoClient()
-        results = _run_with_exit(
-            "Search",
-            client.search,
-            search_provider=search_provider,
-        )
-        _check_results(results)
-
-        fmt = cfg.get("format", "table")
-        if fmt == "json":
-            records = _search_results_to_json(results)
-            json_out = json.dumps(records, indent=2, default=str)
-            if cfg.output:
-                Path(cfg.output).write_text(json_out)
-                console.print(
-                    f"[green]Wrote {len(records)} results to[/green] {cfg.output}"
-                )
-            else:
-                console.print(json_out)
-        else:
-            _print_search_table(results)
-            if cfg.output:
-                records = _search_results_to_json(results)
-                Path(cfg.output).write_text(json.dumps(records, indent=2, default=str))
-                console.print(f"[green]Wrote results to[/green] {cfg.output}")
-
-    elif action == "prepare":
-        if not cfg.get("search_results"):
-            console.print(
-                "[red]search_results file path is required for prepare action.[/red]"
-            )
-            sys.exit(1)
-
-        search_results_path = Path(cfg.search_results)
-        if not search_results_path.exists():
-            console.print(f"[red]Search results not found:[/red] {search_results_path}")
-            sys.exit(1)
-
-        records = json.loads(search_results_path.read_text())
-        df = _search_results_from_json(records)
-
-        pipeline = hydra.utils.instantiate(cfg.pipeline)
-        grid_config = hydra.utils.instantiate(cfg.grid_config)
-        patch_config = hydra.utils.instantiate(cfg.patch_config)
-        extract = _pipeline_to_extract(pipeline)
-
-        output_dir = Path(cfg.output_dir)
-        output_dir.mkdir(parents=True, exist_ok=True)
-
-        target_aoi = _resolve_target_aoi(cfg)
-
-        client = AereoClient()
-        tasks = _run_with_exit(
-            "Prepare",
-            client.prepare_tasks,
-            search_results=df,
-            grid_config=grid_config,
-            patch_config=patch_config,
-            extract=extract,
-            output_uri=cfg.get("output_uri") or str(output_dir),
-            target_aoi=target_aoi,
-            cells_per_task=cfg.cells_per_task,
-            overwrite=cfg.overwrite,
-        )
-
-        task_file = Path(cfg.output) if cfg.output else (output_dir / "tasks.pkl")
-        task_file.write_bytes(pickle.dumps(tasks))
-        console.print(
-            f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cfg.cells_per_task}).[/green]"
-        )
-        console.print(f"[green]Wrote tasks to[/green] {task_file}")
-
-    elif action == "extract":
-        if not cfg.get("tasks"):
-            console.print(
-                "[red]tasks pickle file path is required for extract action.[/red]"
-            )
-            sys.exit(1)
-
-        tasks_path = Path(cfg.tasks)
-        if not tasks_path.exists():
-            console.print(f"[red]Tasks file not found:[/red] {tasks_path}")
-            sys.exit(1)
-
-        task_list = pickle.loads(tasks_path.read_bytes())
-
-        if cfg.get("overwrite") is not None:
-            task_list = [
-                attrs.evolve(
-                    task,
-                    job=task.job.model_copy(update={"overwrite": cfg.overwrite}),
-                )
-                for task in task_list
-            ]
-
-        backend = LocalProcessBackend(max_workers=cfg.workers)
-        client = AereoClient()
-        artifacts = _run_with_exit(
-            "Extraction", client.execute_tasks, task_list, backend=backend
-        )
-
-        output_dir = Path(cfg.output_dir)
-        output_dir.mkdir(parents=True, exist_ok=True)
-        parquet_path = output_dir / "artifacts.parquet"
-        artifacts.to_parquet(parquet_path)
-
-        console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
-        console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
-        console.print(f"[green]Output directory:[/green] {output_dir}")
-
-    elif action == "run":
-        if not cfg.get("search"):
-            console.print(
-                "[red]No search provider configuration provided (search key is missing).[/red]"
-            )
-            sys.exit(1)
-
-        search_provider = hydra.utils.instantiate(cfg.search)
-
-        update_dict = {}
-        intersects = _load_geometry_safe(Path(cfg.geojson) if cfg.geojson else None)
-        if intersects:
-            update_dict["intersects"] = intersects
-        start_dt = _parse_iso_datetime(cfg.start)
-        if start_dt:
-            update_dict["start_datetime"] = start_dt
-        end_dt = _parse_iso_datetime(cfg.end)
-        if end_dt:
-            update_dict["end_datetime"] = end_dt
-
-        if update_dict:
-            search_provider = search_provider.model_copy(update=update_dict)
-
-        pipeline = hydra.utils.instantiate(cfg.pipeline)
-        grid_config = hydra.utils.instantiate(cfg.grid_config)
-        patch_config = hydra.utils.instantiate(cfg.patch_config)
-        extract = _pipeline_to_extract(pipeline)
-
-        output_dir = Path(cfg.output_dir)
-        output_dir.mkdir(parents=True, exist_ok=True)
-
-        target_aoi = _resolve_target_aoi(cfg, fallback=search_provider.intersects)
-
-        client = AereoClient()
-
-        # Search
-        console.print("[bold blue]🔍 Searching...[/bold blue]")
-        results = _run_with_exit(
-            "Search",
-            client.search,
-            search_provider=search_provider,
-        )
-        _check_results(results)
-        console.print(f"[green]✓ Found {len(results)} scenes.[/green]")
-
-        # Prepare
-        console.print("[bold blue]📦 Preparing...[/bold blue]")
-        tasks = _run_with_exit(
-            "Prepare",
-            client.prepare_tasks,
-            search_results=results,
-            extract=extract,
-            grid_config=grid_config,
-            patch_config=patch_config,
-            output_uri=cfg.get("output_uri") or str(output_dir),
-            target_aoi=target_aoi,
-            cells_per_task=cfg.cells_per_task,
-            overwrite=cfg.overwrite,
-        )
-        console.print(
-            f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cfg.cells_per_task}).[/green]"
-        )
-
-        # Extract
-        console.print("[bold blue]⛏️ Extracting...[/bold blue]")
-        backend = LocalProcessBackend(max_workers=cfg.workers)
-        artifacts = _run_with_exit(
-            "Extraction", client.execute_tasks, tasks, backend=backend
-        )
-
-        parquet_path = output_dir / "artifacts.parquet"
-        artifacts.to_parquet(parquet_path)
-
-        console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
-        console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
-        console.print(f"[green]Output:[/green] {output_dir}")
-
-    elif action == "validate":
-        # Simply attempting to load and validate model signatures
-        # Since Hydra does instantiation, validation happens during loading.
-        try:
-            if cfg.get("search"):
-                hydra.utils.instantiate(cfg.search)
-            if cfg.get("pipeline"):
-                hydra.utils.instantiate(cfg.pipeline)
-            if cfg.get("grid_config"):
-                hydra.utils.instantiate(cfg.grid_config)
-            if cfg.get("patch_config"):
-                hydra.utils.instantiate(cfg.patch_config)
-            console.print("[green]✓ Configuration is valid.[/green]")
-        except Exception as exc:
-            console.print(f"[red]✗ Configuration is invalid:[/red] {exc}")
-            sys.exit(1)
-
-    elif action == "plugins":
-        plugins_cmd()
-
-    elif action == "plugin_params":
-        if not cfg.get("plugin_name"):
-            console.print(
-                "[red]plugin_name is required for plugin_params action.[/red]"
-            )
-            sys.exit(1)
-        plugin_params_cmd(cfg.plugin_name)
-
-    else:
+    runner = runners.get(action)
+    if runner is None:
         console.print(f"[red]Unknown action: {action}[/red]")
         sys.exit(1)
+    runner(cfg)
 
 
 if __name__ == "__main__":
