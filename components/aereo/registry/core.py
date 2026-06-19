@@ -23,6 +23,28 @@ from structlog import get_logger
 logger = get_logger()
 
 
+def _get_supported_collections(plugin_class: Type) -> Sequence[str]:
+    """Return the declared supported collections for a plugin class.
+
+    Checks the class attribute first, then falls back to the Pydantic
+    ``supported_collections`` field default.
+
+    Args:
+        plugin_class: Plugin class to inspect.
+
+    Returns:
+        Sequence of supported collection names, or an empty sequence.
+    """
+    supported = getattr(plugin_class, "supported_collections", None)
+    if (
+        supported is None
+        and hasattr(plugin_class, "model_fields")
+        and "supported_collections" in plugin_class.model_fields
+    ):
+        supported = plugin_class.model_fields["supported_collections"].default
+    return supported or []
+
+
 def _dump_params_pydantic(cls: Type, detailed: bool) -> dict[str, list[dict]]:
     """Derive parameter dictionary from Pydantic model fields.
 
@@ -83,15 +105,7 @@ class _TypedRegistry:
         self.plugins[plugin_name] = plugin_class
 
         plugin_canonical_map: dict[str, str] = {}
-        supported = getattr(plugin_class, "supported_collections", None)
-        if (
-            supported is None
-            and hasattr(plugin_class, "model_fields")
-            and "supported_collections" in plugin_class.model_fields
-        ):
-            supported = plugin_class.model_fields["supported_collections"].default
-        if supported is None:
-            supported = []
+        supported = _get_supported_collections(plugin_class)
         for product in supported:
             lower_product = product.lower()
             self.collection_to_plugins.setdefault(lower_product, []).append(plugin_name)
@@ -127,15 +141,7 @@ class _TypedRegistry:
             if the plugin is not known.
         """
         if plugin_name in self.plugins:
-            plugin_class = self.plugins[plugin_name]
-            supported = getattr(plugin_class, "supported_collections", None)
-            if (
-                supported is None
-                and hasattr(plugin_class, "model_fields")
-                and "supported_collections" in plugin_class.model_fields
-            ):
-                supported = plugin_class.model_fields["supported_collections"].default
-            return list(supported or [])
+            return list(_get_supported_collections(self.plugins[plugin_name]))
         return []
 
     def has(self, plugin_name: str) -> bool:
