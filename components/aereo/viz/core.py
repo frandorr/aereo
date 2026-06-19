@@ -5,11 +5,15 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, Literal, cast
 
+from structlog import get_logger
+
 if TYPE_CHECKING:
     import geopandas as gpd
     import numpy as np
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
+
+logger = get_logger()
 
 _BASE_ZORDER = 0
 _OVERLAY_ZORDER = 1
@@ -476,6 +480,8 @@ def plot_artifact_patches(
     patch_infos: list[tuple[np.ndarray, Any] | None] = []
     band_values: list[list[np.ndarray]] = [[] for _ in range(n_bands)]
 
+    import rasterio.errors
+
     for _, row in artifacts.iterrows():
         try:
             with rasterio.open(row["uri"]) as src:
@@ -501,7 +507,8 @@ def plot_artifact_patches(
                     valid = band_data[np.isfinite(band_data)]
                     if valid.size:
                         band_values[b].append(valid.ravel())
-        except Exception:
+        except (rasterio.errors.RasterioError, OSError) as exc:
+            logger.warning("patch_read_failed", uri=row["uri"], error=str(exc))
             patch_infos.append(None)
             continue
 
