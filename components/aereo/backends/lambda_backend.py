@@ -18,8 +18,11 @@ from structlog import get_logger
 
 logger = get_logger()
 
+# Regexes for redacting sensitive strings from Lambda error messages.
 _RE_PRESIGNED_URL = re.compile(r"https?://[^\s]+\?[^\s]*X-Amz-Credential[^\s]*")
+"""Matches presigned S3 URLs so they can be redacted from logs."""
 _RE_AWS_KEY = re.compile(r"AKIA[0-9A-Z]{16}")
+"""Matches AWS access key IDs so they can be redacted from logs."""
 
 
 def _safe_truncate(text: str, max_len: int = 2048) -> str:
