@@ -4,6 +4,7 @@ Provides concurrent download and extract utilities designed for multi-process en
 """
 
 import base64
+import contextlib
 import filelock
 import netrc
 import os
@@ -21,6 +22,8 @@ from ._obstore_utils import (
 )
 from aereo.interfaces.core import ExtractionTask
 from structlog import get_logger
+
+_LOCK_TIMEOUT_SECONDS = 600
 
 try:
     from obstore.auth.earthdata import (
@@ -85,10 +88,8 @@ def _read_earthdata_auth_header(
 
 def _safe_unlink(path: Path) -> None:
     """Remove a file, ignoring errors if it does not exist or is inaccessible."""
-    try:
+    with contextlib.suppress(OSError):
         path.unlink()
-    except OSError:
-        pass
 
 
 def _download_with_earthaccess(url: str, local_path: Path) -> None:
@@ -181,7 +182,7 @@ def download_asset_safely(
     local_path.parent.mkdir(parents=True, exist_ok=True)
     lock_path = local_path.with_suffix(".lock")
 
-    with filelock.FileLock(str(lock_path), timeout=600):
+    with filelock.FileLock(str(lock_path), timeout=_LOCK_TIMEOUT_SECONDS):
         if not local_path.exists():
             if downloader is not None:
                 downloader(href, local_path)
@@ -189,7 +190,12 @@ def download_asset_safely(
                 try:
                     store, path = _resolve_store(href, store_options)
                     _stream_obstore_to_disk(store, path, local_path)
-                except Exception:
+                except Exception as primary_exc:
+                    logger.warning(
+                        "primary_download_failed",
+                        href=href,
+                        error=str(primary_exc),
+                    )
                     if fallback_href:
                         try:
                             fb_opts = (
@@ -199,7 +205,12 @@ def download_asset_safely(
                             )
                             store, path = _resolve_store(fallback_href, fb_opts)
                             _stream_obstore_to_disk(store, path, local_path)
-                        except Exception:
+                        except Exception as fallback_exc:
+                            logger.warning(
+                                "fallback_download_failed",
+                                href=fallback_href,
+                                error=str(fallback_exc),
+                            )
                             _download_with_earthaccess(fallback_href, local_path)
                     else:
                         _download_with_earthaccess(href, local_path)
@@ -308,7 +319,7 @@ def extract_asset_safely(
 
     marker_path = extract_dir.with_suffix(".extracted")
 
-    with filelock.FileLock(str(lock_path)):
+    with filelock.FileLock(str(lock_path), timeout=_LOCK_TIMEOUT_SECONDS):
         # Already extracted and marked complete
         if marker_path.exists() and extract_dir.exists():
             return
@@ -374,7 +385,7 @@ def cleanup_asset_safely(
     if total_chunks > 1 and chunk_id is not None:
         done_file = local_path.with_suffix(f".chunk_{chunk_id}.done")
         done_file.touch()
-        with filelock.FileLock(str(lock_path)):
+        with filelock.FileLock(str(lock_path), timeout=_LOCK_TIMEOUT_SECONDS):
             done_files = list(local_path.parent.glob(f"{local_path.stem}.chunk_*.done"))
             if len(done_files) >= total_chunks:
                 _safe_unlink(local_path)
