@@ -74,11 +74,12 @@ class BatchWriteGeoTIFF(BatchWriter):
             rio_params=dict(self.rio_params),
         )
         callbacks = task.task_context.get("callbacks", [])
+        patch_by_id = {p.id: p for p in task.patches}
 
         @delayed
         def _write_one(patch_id: str) -> GeoDataFrame[ArtifactSchema]:
             ds_patch = patches[patch_id]
-            patch = next(p for p in task.patches if p.id == patch_id)
+            patch = patch_by_id[patch_id]
             patch_artifacts = writer(ds_patch, task, patch)
             for cb in callbacks:
                 cb.on_patch_write_complete(task, patch, patch_artifacts)
