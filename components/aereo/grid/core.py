@@ -7,7 +7,7 @@ for processing, alignment, and coordinate system projection.
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Sequence, cast
+from typing import TYPE_CHECKING, Callable, Sequence, cast
 
 import attrs
 import geopandas as gpd
@@ -27,6 +27,33 @@ if TYPE_CHECKING:
 _WGS84_CRS = "epsg:4326"
 _GEOM_TOLERANCE = 1e-10
 _OVERLAP_SUFFIX = "_OV"
+
+
+def _expand_bounds(
+    low: int,
+    high: int,
+    value_low: float,
+    value_high: float,
+    get_value: Callable[[int], float],
+) -> tuple[int, int]:
+    """Expand integer bounds until ``get_value`` covers the target range.
+
+    Args:
+        low: Initial lower bound.
+        high: Initial upper bound.
+        value_low: Target minimum coordinate value.
+        value_high: Target maximum coordinate value.
+        get_value: Callable returning a coordinate value for an integer index.
+
+    Returns:
+        Expanded ``(low, high)`` bounds.
+    """
+    tolerance = _GEOM_TOLERANCE
+    while get_value(low) > value_low + tolerance:
+        low -= 1
+    while get_value(high) < value_high - tolerance:
+        high += 1
+    return low, high
 
 
 def _parse_directional_value(value: str, positive: str, negative: str) -> int:
@@ -64,7 +91,11 @@ def _make_cell_polygon(
 
 @attrs.frozen
 class ExtractionPatch:
-    """A unified physical representation of a Grid Cell and its ML patch boundary."""
+    """A unified physical representation of a grid cell and its ML patch boundary.
+
+    Captures the WGS84 cell geometry, target resolution, margin, padding, and
+    UTM footprint used to build an ``odc-geo`` GeoBox for extraction.
+    """
 
     id: str
     d: int
@@ -149,9 +180,20 @@ class ExtractionPatch:
 
 
 class GridDefinition(MajorTomGrid):
-    """A grid definition that generates grid cells intersecting a given polygon."""
+    """A grid definition that generates cells intersecting a given polygon.
 
-    def __init__(self, d: int = 10000, overlap=False):
+    Wraps ``MajorTomGrid`` to produce raw geographic cells and IDs, and is
+    consumed by ``generate_extraction_patches`` to create ``ExtractionPatch``
+    instances aligned to a ``PatchConfig``.
+    """
+
+    def __init__(self, d: int = 10000, overlap: bool = False) -> None:
+        """Initialize a grid definition.
+
+        Args:
+            d: Cell size in meters passed to ``MajorTomGrid``.
+            overlap: Whether to generate half-offset overlap cells.
+        """
         super().__init__(d=d, overlap=overlap)
 
     def _cell_from_indices(
@@ -221,8 +263,23 @@ class GridDefinition(MajorTomGrid):
         )
 
     def get_cell_name(
-        self, row_idx: int, col_idx: int, lon_spacing: float, is_primary=True
+        self,
+        row_idx: int,
+        col_idx: int,
+        lon_spacing: float,
+        is_primary: bool = True,
     ) -> str:
+        """Build a cell identifier from row/column indices.
+
+        Args:
+            row_idx: Row index in the global grid.
+            col_idx: Column index in the global grid.
+            lon_spacing: Longitude spacing at the row's latitude.
+            is_primary: If False, append the overlap suffix.
+
+        Returns:
+            Cell identifier such as ``"0U_0R"`` or ``"0U_0R_OV"``.
+        """
         name = f"{self._row_index_to_id(row_idx)}_{self._col_index_to_id(col_idx, lon_spacing)}"
         if not is_primary:
             name += f"_{_OVERLAP_SUFFIX}"
@@ -264,10 +321,9 @@ class GridDefinition(MajorTomGrid):
         start_row = int(np.floor((min_lat + 90 - self._lat_offset) / self.lat_spacing))
         end_row = int(np.ceil((max_lat + 90 - self._lat_offset) / self.lat_spacing))
 
-        while self.get_row_lat(start_row) > min_lat + _GEOM_TOLERANCE:
-            start_row -= 1
-        while self.get_row_lat(end_row) < max_lat - _GEOM_TOLERANCE:
-            end_row += 1
+        start_row, end_row = _expand_bounds(
+            start_row, end_row, min_lat, max_lat, self.get_row_lat
+        )
 
         cells: list[tuple[Polygon, str, bool]] = []
 
@@ -279,16 +335,13 @@ class GridDefinition(MajorTomGrid):
             start_col = int(np.floor((min_lon + 180 - lon_offset) / lon_spacing))
             end_col = int(np.ceil((max_lon + 180 - lon_offset) / lon_spacing))
 
-            while (
-                self.get_col_lon(start_col, lon_spacing, lon_offset)
-                > min_lon + _GEOM_TOLERANCE
-            ):
-                start_col -= 1
-            while (
-                self.get_col_lon(end_col, lon_spacing, lon_offset)
-                < max_lon - _GEOM_TOLERANCE
-            ):
-                end_col += 1
+            start_col, end_col = _expand_bounds(
+                start_col,
+                end_col,
+                min_lon,
+                max_lon,
+                lambda col: self.get_col_lon(col, lon_spacing, lon_offset),
+            )
 
             cols = np.arange(start_col, end_col + 1)
             lons = self.get_col_lon(cols, lon_spacing, lon_offset)
@@ -320,24 +373,25 @@ def generate_extraction_patches(
     grid_def: GridDefinition,
     patch_config: PatchConfig,
 ) -> Sequence[ExtractionPatch]:
-    """Generate ExtractionPatch objects that intersect with the given polygon.
+    """Generate ``ExtractionPatch`` objects intersecting ``polygon``.
 
-    Combines the raw geographic earth partitions from GridDefinition with the
-    physical ML constraints from PatchConfig.
+    Args:
+        polygon: Geometry to tile.
+        grid_def: Grid definition used to generate raw cells.
+        patch_config: Physical constraints (resolution, margin, padding).
+
+    Returns:
+        Sequence of constructed ``ExtractionPatch`` objects.
     """
-    raw_cells = grid_def.generate_raw_cells(polygon)
-
-    patches = []
-    for geom, cell_id, _ in raw_cells:
-        patches.append(
-            ExtractionPatch(
-                id=cell_id,
-                d=grid_def.D,
-                cell_geometry=geom,
-                resolution=patch_config.resolution,
-                margin=patch_config.margin,
-                padding=patch_config.padding,
-                conform_to=patch_config.conform_to,
-            )
+    return [
+        ExtractionPatch(
+            id=cell_id,
+            d=grid_def.D,
+            cell_geometry=geom,
+            resolution=patch_config.resolution,
+            margin=patch_config.margin,
+            padding=patch_config.padding,
+            conform_to=patch_config.conform_to,
         )
-    return patches
+        for geom, cell_id, _ in grid_def.generate_raw_cells(polygon)
+    ]
