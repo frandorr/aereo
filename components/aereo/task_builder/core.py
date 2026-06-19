@@ -26,6 +26,28 @@ from shapely.geometry.base import BaseGeometry
 _VALID_FILTER_MODES = frozenset({"intersection", "within", "coverage"})
 
 
+def _validate_filter_mode(mode: str) -> str:
+    """Normalize and validate a grid filter mode string.
+
+    Args:
+        mode: Grid filter mode to validate.
+
+    Returns:
+        Lowercase validated mode string.
+
+    Raises:
+        ValueError: If ``mode`` is not one of ``"intersection"``, ``"within"``,
+            or ``"coverage"``.
+    """
+    mode = str(mode).lower()
+    if mode not in _VALID_FILTER_MODES:
+        raise ValueError(
+            f"Unknown grid_filter_mode: {mode}. "
+            f"Use one of {sorted(_VALID_FILTER_MODES)}."
+        )
+    return mode
+
+
 def _generate_patch_groups(
     assets: GeoDataFrame[AssetSchema],
     target_aoi: BaseGeometry | None,
@@ -55,12 +77,7 @@ def _generate_patch_groups(
     profile_patch_groups: list[
         tuple[Any, Any, GeoDataFrame, list[ExtractionPatch]]
     ] = []
-    grid_filter_mode = str(grid_config.grid_filter_mode).lower()
-    if grid_filter_mode not in _VALID_FILTER_MODES:
-        raise ValueError(
-            f"Unknown grid_filter_mode: {grid_filter_mode}. "
-            f"Use one of {sorted(_VALID_FILTER_MODES)}."
-        )
+    grid_filter_mode = _validate_filter_mode(grid_config.grid_filter_mode)
     min_coverage = grid_config.min_coverage
 
     has_crs = "crs" in assets.columns
@@ -117,20 +134,22 @@ def _filter_patches_by_mode(
 ) -> list[ExtractionPatch]:
     """Filter patches by AOI coverage mode.
 
-    Modes:
-        ``"within"``: keep patches fully contained in ``aoi_geom``.
-        ``"coverage"``: keep patches whose intersection with ``aoi_geom`` covers
-            at least ``min_coverage`` (a fraction) of the patch.
-        ``"intersection"``: caller handles this mode by skipping the filter
-            entirely (all patches are kept).
+    Args:
+        patches: Candidate patches.
+        aoi_geom: Area of interest geometry.
+        mode: One of ``"intersection"``, ``"within"``, or ``"coverage"``.
+        min_coverage: Minimum fraction of patch area that must be covered
+            when ``mode == "coverage"``.
+
+    Returns:
+        Patches passing the filter.
+
+    Raises:
+        ValueError: If ``mode`` is unknown.
     """
+    mode = _validate_filter_mode(mode)
     if mode == "intersection":
         return list(patches)
-    if mode not in _VALID_FILTER_MODES:
-        raise ValueError(
-            f"Unknown grid_filter_mode: {mode}. "
-            f"Use one of {sorted(_VALID_FILTER_MODES)}."
-        )
 
     filtered: list[ExtractionPatch] = []
     for patch in patches:
