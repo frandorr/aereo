@@ -68,8 +68,41 @@ class ExtractionJob(BaseModel):
 
     @field_validator("target_aoi", mode="before")
     @classmethod
-    def _validate_target_aoi(cls, value):
+    def _validate_target_aoi(cls, value: Any) -> BaseGeometry | None:
+        """Normalize the ``target_aoi`` input before Pydantic validation.
+
+        Args:
+            value: Shapely geometry, GeoJSON dict, path, or ``None``.
+
+        Returns:
+            A normalized geometry or ``None``.
+        """
         return normalize_geometry_input(value)
+
+    @classmethod
+    def _from_instantiated(cls, instantiated: Any, source: str) -> ExtractionJob:
+        """Validate an object produced by Hydra instantiation as an ExtractionJob.
+
+        Args:
+            instantiated: Object produced by ``hydra.utils.instantiate``.
+            source: Human-readable description of the config source for errors.
+
+        Returns:
+            A validated ``ExtractionJob`` instance.
+
+        Raises:
+            ValueError: If *instantiated* is neither an ``ExtractionJob`` nor a dict.
+        """
+        if isinstance(instantiated, cls):
+            return instantiated
+
+        if isinstance(instantiated, dict):
+            return cls.model_validate(instantiated)
+
+        raise ValueError(
+            f"Failed to instantiate ExtractionJob from {source}: "
+            f"expected ExtractionJob or dict, got {type(instantiated).__name__}"
+        )
 
     @property
     def effective_target_aoi(self) -> BaseGeometry | None:
@@ -122,15 +155,8 @@ class ExtractionJob(BaseModel):
             cfg = compose(config_name=config_name, overrides=overrides or [])
             instantiated = hydra.utils.instantiate(cfg, _convert_="all")
 
-        if isinstance(instantiated, cls):
-            return instantiated
-
-        if isinstance(instantiated, dict):
-            return cls.model_validate(instantiated)
-
-        raise ValueError(
-            f"Failed to load ExtractionJob from config at {config_dir}/{config_name}: "
-            f"expected ExtractionJob or dict, got {type(instantiated).__name__}"
+        return cls._from_instantiated(
+            instantiated, f"config at {config_dir}/{config_name}"
         )
 
     @classmethod
@@ -152,6 +178,16 @@ class ExtractionJob(BaseModel):
               - _self_
 
             output_uri: /tmp/extraction
+
+        Args:
+            path: Path to the YAML config file.
+
+        Returns:
+            A validated ``ExtractionJob`` instance.
+
+        Raises:
+            ValueError: If Hydra instantiation does not produce an
+                ``ExtractionJob`` or a dict.
         """
         from omegaconf import OmegaConf
 
@@ -159,13 +195,4 @@ class ExtractionJob(BaseModel):
         cfg = OmegaConf.load(path)
 
         instantiated = hydra.utils.instantiate(cfg, _convert_="all")
-        if isinstance(instantiated, cls):
-            return instantiated
-
-        if isinstance(instantiated, dict):
-            return cls.model_validate(instantiated)
-
-        raise ValueError(
-            f"Failed to instantiate ExtractionJob from configuration at {path}: "
-            f"expected ExtractionJob or dict, got {type(instantiated).__name__}"
-        )
+        return cls._from_instantiated(instantiated, f"configuration at {path}")
