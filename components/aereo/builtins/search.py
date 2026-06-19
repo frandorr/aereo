@@ -284,7 +284,17 @@ def _process_granule(
     collections: list[str],
     intersects: BaseGeometry | None,
 ) -> dict[str, Any] | None:
-    """Extract metadata from a single earthaccess granule into a row dict."""
+    """Extract metadata from a single earthaccess granule into a row dict.
+
+    Args:
+        g: An earthaccess granule object.
+        collections: Collection short names used as a fallback.
+        intersects: Optional AOI geometry used as a fallback for missing UMM
+            spatial metadata.
+
+    Returns:
+        A metadata row dict, or ``None`` if the granule should be skipped.
+    """
     meta = g["meta"]
     umm = g["umm"]
 
@@ -304,12 +314,11 @@ def _process_granule(
 
     # Skip granules with missing temporal metadata
     if not start_str or not end_str:
-        warnings.warn(
+        msg = (
             f"Skipping granule {cid} from collection {collection_name}: "
-            f"missing or incomplete temporal metadata (start={start_str}, end={end_str}).",
-            UserWarning,
-            stacklevel=2,
+            f"missing or incomplete temporal metadata (start={start_str}, end={end_str})."
         )
+        warnings.warn(msg, UserWarning, stacklevel=2)
         logger.warning(
             "skipping_granule_missing_temporal",
             granule_id=cid,

@@ -12,6 +12,16 @@ import xarray as xr
 
 from aereo.interfaces import Processor
 
+_MINMAX = "minmax"
+_ZSCORE = "zscore"
+_DEFAULT_NORMALIZE_METHOD = _MINMAX
+
+_MEDIAN = "median"
+_MEAN = "mean"
+_MAX = "max"
+_MIN = "min"
+_DEFAULT_COMPOSITE_METHOD = _MEDIAN
+
 
 class SelectBands(Processor):
     """Pre-reproject processor that keeps only specified data variables.
@@ -74,8 +84,9 @@ class QAMask(Processor):
 
         qa = ds[self.qa_band]
         mask = np.zeros(qa.shape, dtype=bool)
+        qa_arr = qa.values
         for bit in self.qa_mask_bits:
-            mask |= ((qa.values >> bit) & 1).astype(bool)
+            mask |= ((qa_arr >> bit) & 1).astype(bool)
 
         masked = ds.drop_vars(self.qa_band)
         for var in masked.data_vars:
@@ -118,8 +129,9 @@ class NDVI(Processor):
 
         nir = ds[self.ndvi_nir_band]
         red = ds[self.ndvi_red_band]
-        ndvi = (nir - red) / (nir + red)
-        ndvi = ndvi.where((nir + red) != 0)
+        denom = nir + red
+        ndvi = (nir - red) / denom
+        ndvi = ndvi.where(denom != 0)
 
         result = ds.drop_vars([self.ndvi_nir_band, self.ndvi_red_band])
         result["ndvi"] = ndvi
@@ -133,7 +145,7 @@ class Normalize(Processor):
     when computing statistics.
     """
 
-    normalize_method: str = "minmax"
+    normalize_method: str = _DEFAULT_NORMALIZE_METHOD
 
     def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         """Normalise each data variable.
@@ -149,7 +161,7 @@ class Normalize(Processor):
         """
         method = self.normalize_method
 
-        if method not in ("minmax", "zscore"):
+        if method not in (_MINMAX, _ZSCORE):
             raise ValueError(
                 f"Normalize: unknown method '{method}'. Use 'minmax' or 'zscore'."
             )
@@ -157,13 +169,13 @@ class Normalize(Processor):
         normalized = ds.copy()
         for var in normalized.data_vars:
             da = normalized[var]
-            if method == "minmax":
+            if method == _MINMAX:
                 vmin = da.min(skipna=True)
                 vmax = da.max(skipna=True)
                 denom = vmax - vmin
                 denom = denom.where(denom != 0, 1)
                 normalized[var] = (da - vmin) / denom
-            else:  # zscore
+            else:  # _ZSCORE
                 mean = da.mean(skipna=True)
                 std = da.std(skipna=True)
                 std = std.where(std != 0, 1)
@@ -179,7 +191,7 @@ class Composite(Processor):
     max).  Useful for creating cloud-free or best-pixel composites.
     """
 
-    composite_method: str = "median"
+    composite_method: str = _DEFAULT_COMPOSITE_METHOD
 
     def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         """Reduce the ``time`` dimension to a single composite.
@@ -198,15 +210,15 @@ class Composite(Processor):
         if "time" not in ds.dims:
             raise ValueError("Composite requires a 'time' dimension in the dataset.")
 
-        if method == "median":
+        if method == _MEDIAN:
             return ds.median(dim="time", keep_attrs=True)
-        if method == "mean":
+        if method == _MEAN:
             return ds.mean(dim="time", keep_attrs=True)
-        if method == "max":
+        if method == _MAX:
             return ds.max(dim="time", keep_attrs=True)
-        if method == "min":
+        if method == _MIN:
             return ds.min(dim="time", keep_attrs=True)
 
         raise ValueError(
-            f"Composite: unknown method '{method}'. Use 'median', 'mean', 'max', or 'min'."
+            f"Composite: unknown method '{method}'. Use '{_MEDIAN}', '{_MEAN}', '{_MAX}', or '{_MIN}'."
         )
