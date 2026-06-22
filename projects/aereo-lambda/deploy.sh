@@ -6,20 +6,30 @@
 set -euo pipefail
 
 STACK_NAME="${1:-aereo-stack}"
-REGION="${2:-us-east-1}"
+REGION="${2:-us-west-2}"
 ECR_REPO="${3:-aereo-lambda}"
 S3_BUCKET="${4:-aereo-tasks}"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
+DOCKERFILE="${DOCKERFILE:-Dockerfile}"
+
+# Validate AWS credentials before doing anything.
+if ! aws sts get-caller-identity >/dev/null 2>&1; then
+    echo "ERROR: AWS credentials not configured or invalid."
+    echo "Run 'aws configure' and ensure 'aws sts get-caller-identity' works."
+    exit 1
+fi
+
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ECR_URI="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${ECR_REPO}"
 
 echo "========================================"
 echo "AEREO Lambda Deploy"
 echo "========================================"
-echo "Stack:     ${STACK_NAME}"
-echo "Region:    ${REGION}"
-echo "ECR:       ${ECR_URI}"
-echo "S3 Bucket: ${S3_BUCKET}"
+echo "Stack:      ${STACK_NAME}"
+echo "Region:     ${REGION}"
+echo "ECR:        ${ECR_URI}"
+echo "S3 Bucket:  ${S3_BUCKET}"
+echo "Dockerfile: ${DOCKERFILE}"
 echo "========================================"
 
 # ---------------------------------------------------------------------------
@@ -64,9 +74,9 @@ aws ecr get-login-password --region "${REGION}" | \
 # 4. Build and push image
 # ---------------------------------------------------------------------------
 echo ""
-echo "[4/6] Building Docker image..."
+echo "[4/6] Building Docker image using ${DOCKERFILE}..."
 cd "$(dirname "$0")/../../.." || exit 1  # go to /root/repos
-DOCKER_BUILDKIT=1 docker buildx build --provenance=false -f aereo/projects/aereo-lambda/Dockerfile.local -t "aereo-lambda:${IMAGE_TAG}" .
+DOCKER_BUILDKIT=1 docker buildx build --load --provenance=false -f "aereo/projects/aereo-lambda/${DOCKERFILE}" -t "aereo-lambda:${IMAGE_TAG}" .
 
 echo ""
 echo "Tagging and pushing image..."

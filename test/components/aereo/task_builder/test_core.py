@@ -102,3 +102,32 @@ def test_prepare_for_extraction_rejects_partial_crs():
 
     with pytest.raises(ValueError, match="contains null values"):
         list(prepare_for_extraction(assets, _make_job()))
+
+
+def test_prepare_for_extraction_includes_job_id_in_context():
+    """Each task's context carries the parent job's name as job_id."""
+    assets = _make_assets(geometries=[box(2.0, 45.0, 2.1, 45.1)])
+    job = _make_job()
+    tasks = list(prepare_for_extraction(assets, job))
+
+    assert len(tasks) == 1
+    assert tasks[0].task_context.get("job_id") == job.name
+    assert tasks[0].task_context.get("chunk_id") == 0
+
+
+def test_prepare_for_extraction_uses_globally_unique_chunk_ids():
+    """chunk_id is unique across all tasks and total_chunks matches task count."""
+    geometries = [
+        box(2.0, 45.0, 2.1, 45.1),
+        box(8.0, 45.0, 8.1, 45.1),
+    ]
+    assets = _make_assets(
+        geometries=geometries,
+        crs_values=["EPSG:32631", "EPSG:32632"],
+    )
+
+    tasks = list(prepare_for_extraction(assets, _make_job(), cells_per_task=1))
+
+    chunk_ids = [t.task_context.get("chunk_id") for t in tasks]
+    assert len(chunk_ids) == len(set(chunk_ids))
+    assert all(t.task_context.get("total_chunks") == len(tasks) for t in tasks)

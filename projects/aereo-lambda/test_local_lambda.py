@@ -24,16 +24,18 @@ import geopandas as gpd
 import requests
 from shapely.geometry import Polygon
 
-# Add repo to path so imports work
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+# Add repo and local test pipeline to path so imports work from source.
+repo_root = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(repo_root))
+sys.path.insert(0, str(Path(__file__).parent / "test_pipeline"))
 
-from aereo.builtins.read import ReadODCSTAC
-from aereo.grid import ExtractionPatch
-from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
-from aereo.pipeline import ExtractionJob
-from aereo.schemas import AssetSchema
-from aereo.serialization import TaskSerializer
-from pandera.typing.geopandas import GeoDataFrame
+from aereo.grid import ExtractionPatch  # noqa: E402
+from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig  # noqa: E402
+from aereo.pipeline import ExtractionJob  # noqa: E402
+from aereo.schemas import AssetSchema  # noqa: E402
+from aereo.serialization import TaskSerializer  # noqa: E402
+from pandera.typing.geopandas import GeoDataFrame  # noqa: E402
+from test_pipeline import TestReader, TestReprojector, TestWriter  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Config
@@ -62,12 +64,12 @@ def _make_minimal_task() -> ExtractionTask:
     df = gpd.GeoDataFrame(
         {
             "id": ["asset_1"],
-            "collection": ["GOES"],
+            "collection": ["test"],
             "start_time": [datetime(2023, 1, 1, 12, 0)],
             "end_time": [datetime(2023, 1, 1, 12, 30)],
             "href": ["s3://bucket/key.tif"],
         },
-        geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
+        geometry=[Polygon([[0, 0], [0.01, 0], [0.01, 0.01], [0, 0.01]])],
         crs="EPSG:4326",
     )
     grid_config = GridConfig(target_grid_dist=50_000)
@@ -75,7 +77,7 @@ def _make_minimal_task() -> ExtractionTask:
     patch = ExtractionPatch(
         id="0U_0R",
         d=50_000,
-        cell_geometry=Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]]),
+        cell_geometry=Polygon([[0, 0], [0.005, 0], [0.005, 0.005], [0, 0.005]]),
         resolution=100.0,
         margin=0.0,
         padding=0,
@@ -84,9 +86,13 @@ def _make_minimal_task() -> ExtractionTask:
         name="test-job",
         grid_config=grid_config,
         patch_config=patch_config,
-        output_uri="test_uri",
+        output_uri="/tmp/aereo_lambda_test",
         search=None,
-        extract=ExtractConfig(read=ReadODCSTAC()),
+        extract=ExtractConfig(
+            read=TestReader(),
+            reproject=TestReprojector(),
+            write=TestWriter(),
+        ),
     )
     return ExtractionTask(
         assets=GeoDataFrame[AssetSchema](df),
@@ -160,6 +166,15 @@ def verify_results(manifest_uri: str) -> None:
             df = gpd.read_parquet(parquet_path)
             print(f"\nArtifacts GeoDataFrame: {len(df)} rows")
             print(df.head())
+
+            # Verify the uploaded GeoTIFF placeholder exists in S3.
+            if len(df) > 0 and "uri" in df.columns:
+                geotiff_uri = df["uri"].iloc[0]
+                geotiff_bucket, geotiff_key = geotiff_uri.replace("s3://", "").split(
+                    "/", 1
+                )
+                s3.head_object(Bucket=geotiff_bucket, Key=geotiff_key)
+                print(f"Verified GeoTIFF in S3: {geotiff_uri}")
 
 
 def main() -> int:

@@ -1,13 +1,15 @@
 # AEREO Lambda AWS Deployment Guide
 
-This guide walks you through deploying the AEREO Lambda function to AWS with all extractor plugins included.
+This guide walks you through deploying the AEREO Lambda function to AWS with the pipeline plugins you need for your data source.
+
+> **Architecture note:** AEREO now uses a stage-based pipeline (`Reader` → `Reprojector` → `Writer`) configured through `ExtractConfig`. The Lambda handler receives a fully instantiated `ExtractionTask` and executes it with `TaskRunner`; no runtime plugin registry is required inside the container. Older single-class "extractor" plugins are no longer used.
 
 ## Overview
 
 The deployment process:
 1. Creates an S3 bucket for task staging
 2. Creates an ECR repository for the Docker image
-3. Builds a Docker image with AEREO core + all local extractor plugins
+3. Builds a Docker image with AEREO core + the pipeline plugins you need (reader, reprojector, writer)
 4. Pushes the image to ECR
 5. Deploys a CloudFormation stack with IAM role + Lambda function
 
@@ -114,7 +116,7 @@ docker build -f aereo/projects/aereo-lambda/Dockerfile.local -t aereo-lambda:loc
 Use this for production - installs plugins from PyPI:
 
 ```dockerfile
-# Uncomment to install real extractor plugins from PyPI:
+# Uncomment to install real pipeline plugins from PyPI:
 RUN pip install aereo-extract-satpy aereo-extract-odc-stac
 ```
 
@@ -129,14 +131,18 @@ for ep in importlib.metadata.entry_points(group='aereo.plugins'):
     print(f'{ep.name}: {ep.value}')
 "
 ```
+Expected output depends on which plugins are installed, but should include the built-ins and any extras you added:
 
-Expected output:
 ```
-extract_tessera: aereo.extract_tessera.core:ExtractTessera
-extract_odc_stac: aereo.extract_odc_stac.core:ExtractOdcStac
-extract_lazycogs: aereo.extract_lazycogs.core:ExtractLazycogs
-extract_aws_goes: aereo.extract_aws_goes.core:AwsGoesExtractor
-extract_satpy: aereo.extract_satpy.core:SatpyExtractor
+process_composite: aereo.builtins.processor:Composite
+process_ndvi: aereo.builtins.processor:NDVI
+process_normalize: aereo.builtins.processor:Normalize
+process_qa_mask: aereo.builtins.processor:QAMask
+process_select_bands: aereo.builtins.processor:SelectBands
+read_odc_stac: aereo.builtins.read:ReadODCSTAC
+reproject_odc: aereo.builtins.reproject:ReprojectODC
+search_stac: aereo.builtins.search:SearchSTAC
+write_geotiff: aereo.builtins.write:WriteGeoTIFF
 ```
 
 ### Test Lambda Invocation
@@ -151,19 +157,17 @@ aws lambda invoke \
 cat response.json
 ```
 
-### Extractor Plugin Recommendation
+### Pipeline Plugin Recommendation
 
-For GOES data extraction, we recommend **`extract_satpy`** over `extract_aws_goes`:
+For GOES data extraction, configure an `ExtractConfig` with a satpy-based reader and the built-in `WriteGeoTIFF` writer. The old single-class `extract_satpy` / `extract_aws_goes` extractor plugins are no longer used.
 
-- **extract_satpy**: Generic satpy-based extractor, works with multiple satellite sources, better memory management
-- **extract_aws_goes**: GOES-specific, may have compatibility issues with certain Lambda configurations
+## Full Working Example: Sentinel-2 Extraction via Lambda
 
-Set the extractor hint in your profile:
-```python
-plugin_hints={"search": "search_aws_goes", "extract": "extract_satpy"}
-```
+See `examples/serverless/lambda_sentinel2_extraction.py`. It reproduces `examples/01-sentinel2.ipynb` end-to-end using `LambdaBackend` and stores GeoTIFF artifacts in S3.
 
-## Full Working Example: GOES-19 ABI Extraction via Lambda
+## Legacy GOES-19 ABI Example
+
+> **Outdated:** The example below uses the previous single-class extractor plugin API (`AereoProfile`, `prepare_for_extraction`, `plugin_hints`). It is left for reference but will not work with the current `ExtractConfig` / `AereoClient` API. For an up-to-date Lambda example, use the Sentinel-2 script above.
 
 This example searches for GOES-19 ABI C02 data, prepares extraction tasks, and executes them via Lambda. Results (GeoTIFFs + metadata) are stored in S3.
 
@@ -398,9 +402,9 @@ sleep 30
 
 ### "[Errno 30] Read-only file system: '/var/task/s3:'"
 
-**Cause:** The extractor plugin is trying to write to a path derived from `task.uri`, which is an S3 URI (e.g., `s3://bucket/path`). When treated as a local path, it becomes `/var/task/s3:/...` which is read-only in Lambda.
+**Cause:** The pipeline `Writer` is trying to write to a path derived from `task.output_uri`, which is an S3 URI (e.g., `s3://bucket/path`). When treated as a local path, it becomes `/var/task/s3:/...` which is read-only in Lambda.
 
-**Fix:** Ensure the extractor uses a temporary directory for local file operations. See "Fixes Applied → Temporary Directory" above.
+**Fix:** Ensure the job's `output_uri` is a local path inside `/tmp` (e.g., `/tmp/aereo_extraction`) so the writer has a writable destination. The Lambda handler then uploads the resulting files to S3.
 
 ### "ImportError: libexpat.so.1: cannot open shared object file"
 
@@ -450,17 +454,16 @@ RUN dnf install -y expat && dnf clean all
 
 ### 2. Temporary Directory for Local File Operations
 
-**Problem:** Extractor plugins were using `task.uri` (an S3 URI like `s3://bucket/path`) as a local filesystem path. In Lambda, this resolves to `/var/task/s3:/...` which is on a read-only filesystem.
+**Problem:** Pipeline `Writer` stages were using `task.output_uri` as a local filesystem path. If the job was configured with an S3 URI, this resolved to `/var/task/s3:/...` which is on a read-only filesystem in Lambda.
 
-**Fix:** Modified `create_metadata_from_row()` in both extractors to use `tempfile.gettempdir()` instead of the task URI:
+**Fix:** Configure jobs with a local `/tmp` output URI (e.g. `/tmp/aereo_extraction`). The writer writes GeoTIFFs there, and the Lambda handler uploads them to S3:
 
 ```python
-local_dir = Path(tempfile.gettempdir()) / "aereo_satpy" / profile_name
+ExtractionJob(
+    ...,
+    output_uri="/tmp/aereo_extraction",
+)
 ```
-
-Files affected:
-- `aereo-extract-satpy/components/aereo/extract_satpy/config.py`
-- `aereo-extract-aws-goes/components/aereo/extract_aws_goes/utils.py`
 
 ### 3. Cross-Region S3 Access (NOAA GOES Buckets)
 
@@ -480,11 +483,11 @@ File affected:
 
 **Problem:** The Lambda handler originally only uploaded metadata (`artifacts.parquet` + `manifest.json`) but not the actual GeoTIFF raster files.
 
-**Fix:** Modified `lambda_handler/core.py` to upload each GeoTIFF file and update the artifact URIs to point to S3:
+**Fix:** `lambda_handler/core.py` now uploads each GeoTIFF file and updates the artifact URIs to point to S3:
 
 ```python
 for idx, row in artifacts.iterrows():
-    local_path = Path(row["uri"])
+    local_path = Path(str(row["uri"]))
     if local_path.exists():
         rel_key = f"{out_prefix}{local_path.name}"
         s3.upload_file(str(local_path), out_bucket, rel_key)
@@ -511,16 +514,16 @@ docker buildx build --platform linux/amd64 ...  # for x86_64 Lambda
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Event JSON    │     │  S3 Download     │     │  Extractor      │
-│  (task_uri)     │────▶│  (task_assets    │────▶│  Plugin         │
+│   Event JSON    │     │  S3 Download     │     │  ExtractConfig  │
+│  (task_uri)     │────▶│  (task_assets    │────▶│  Pipeline       │
 │                 │     │   + task_meta)   │     │  (TaskRunner)   │
 └─────────────────┘     └──────────────────┘     └─────────────────┘
-                                                        │
-                                                        ▼
+                                                         │
+                                                         ▼
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
 │  Response JSON  │◄────│  S3 Upload       │◄────│  GeoDataFrame   │
-│  (manifest_uri) │     │  (artifacts      │     │  [ArtifactSchema]│
-│                 │     │   + manifest)    │     │                 │
+│  (manifest_uri) │     │  (GeoTIFFs +     │     │  [ArtifactSchema]│
+│                 │     │   artifacts)     │     │                 │
 └─────────────────┘     └──────────────────┘     └─────────────────┘
 ```
 
@@ -535,7 +538,7 @@ docker buildx build --platform linux/amd64 ...  # for x86_64 Lambda
 | `docker-compose.yml` | Local testing with LocalStack + Lambda RIE |
 | `test_local_lambda.py` | Local integration test script |
 | `events/extraction-task.json` | Sample Lambda event payload |
-| `test_extractor/` | Minimal extractor plugin for testing |
+| `test_pipeline/` | Synthetic reader/reprojector/writer for integration testing |
 
 ### Modified Files for Lambda Compatibility
 
@@ -545,8 +548,7 @@ These files were modified to work in the Lambda environment. If you're using the
 |------|--------|-----|
 | `aereo/components/aereo/asset_downloader/_obstore_utils.py` | Auto-detect `us-east-1` for `noaa-goes*` buckets | Cross-region S3 access |
 | `aereo/bases/aereo/lambda_handler/core.py` | Upload GeoTIFF files + update URIs | Results were metadata-only |
-| `aereo-extract-satpy/components/aereo/extract_satpy/config.py` | Use `/tmp` instead of task URI | Read-only filesystem in Lambda |
-| `aereo-extract-aws-goes/components/aereo/extract_aws_goes/utils.py` | Use `/tmp` instead of task URI | Read-only filesystem in Lambda |
+| Job configuration | Use `/tmp/...` for `output_uri` | Read-only filesystem in Lambda |
 
 ## Updating the Deployment
 

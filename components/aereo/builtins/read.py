@@ -7,9 +7,10 @@ to lazily load pixel data from STAC items in native CRS as an xarray.Dataset.
 from __future__ import annotations
 
 from typing import Any
-from pydantic import Field
 
+import numpy as np
 import xarray as xr
+from pydantic import Field
 
 from aereo.interfaces import ExtractionTask, Reader
 from aereo.interfaces import infer_dataset_time_bounds
@@ -18,6 +19,24 @@ try:
     from odc.stac import load as odc_load
 except ImportError:  # pragma: no cover
     odc_load = None  # type: ignore[assignment]
+
+
+def _to_native(obj: Any) -> Any:
+    """Recursively convert numpy containers in *obj* to plain Python types.
+
+    Parquet round-trips can leave list fields as ``np.ndarray`` instances.
+    ``pystac.Item.from_dict`` expects JSON-like structures, so this helper
+    normalises arrays/scalars before reconstruction.
+    """
+    if isinstance(obj, np.ndarray):
+        return [_to_native(v) for v in obj.tolist()]
+    if isinstance(obj, np.generic):
+        return obj.item()
+    if isinstance(obj, dict):
+        return {k: _to_native(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_to_native(v) for v in obj]
+    return obj
 
 
 class ReadODCSTAC(Reader):
@@ -81,7 +100,7 @@ class ReadODCSTAC(Reader):
         for raw in assets_df["stac_item"]:
             if raw is None:
                 continue
-            item = pystac.Item.from_dict(raw)
+            item = pystac.Item.from_dict(_to_native(raw))
             if item.id not in seen_ids:
                 seen_ids.add(item.id)
                 items.append(item)

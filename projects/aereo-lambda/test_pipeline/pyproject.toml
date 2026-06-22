@@ -3,18 +3,23 @@ build-backend = "setuptools.build_meta"
 requires = [ "setuptools>=61", "wheel" ]
 
 [project]
-name = "aereo-test-extractor"
+name = "aereo-test-pipeline"
 version = "0.1.0"
+description = "Synthetic pipeline for AEREO Lambda integration testing"
+requires-python = ">=3.12"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
-dependencies = [ "aereo", "geopandas" ]
-entry-points."aereo.plugins".test_extractor = "test_extractor.core:TestExtractor"
+dependencies = [
+  "aereo",
+  "geopandas",
+  "numpy",
+  "pandas",
+  "xarray",
+]
 
 [tool.setuptools]
-packages = [ "test_extractor" ]
+packages.find.where = [ "src" ]

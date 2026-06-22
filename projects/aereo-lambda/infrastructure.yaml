@@ -66,6 +66,8 @@ Resources:
     Properties:
       FunctionName: !Ref LambdaFunctionName
       PackageType: Image
+      Architectures:
+        - arm64
       Code:
         ImageUri: !Ref ImageUri
       Role: !GetAtt AereoLambdaExecutionRole.Arn
