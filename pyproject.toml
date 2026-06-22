@@ -118,7 +118,7 @@ build.dev-mode-dirs = [ "components", "bases", "development", "../majortom", "."
 metadata.allow-direct-references = true
 
 [tool.uv]
-sources.aereo = { path = "projects/aereo", editable = true }
+sources.aereo = { workspace = true }
 sources.aereo-read-satpy = { path = "../aereo-read-satpy/projects/aereo-read-satpy" }
 sources.aereo-read-tessera = { path = "../aereo-read-tessera/projects/aereo-read-tessera" }
 sources.aereo-reproject-satpy = { path = "../aereo-reproject-satpy/projects/aereo-reproject-satpy" }
@@ -206,6 +206,7 @@ bricks."components/aereo/backends" = "aereo/backends"
 bricks."components/aereo/serialization" = "aereo/serialization"
 bricks."components/aereo/storage" = "aereo/storage"
 bricks."components/aereo/viz" = "aereo/viz"
+bricks."components/aereo_extract" = "aereo_extract"
 bricks."bases/aereo/cli" = "aereo/cli"
 bricks."bases/aereo/client" = "aereo/client"
 bricks."bases/aereo/lambda_handler" = "aereo/lambda_handler"
