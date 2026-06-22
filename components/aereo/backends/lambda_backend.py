@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 import re
 import tempfile
@@ -9,12 +10,14 @@ import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Any, Iterable, Sequence
+from typing import Any, Iterable, Literal, Sequence, cast
 
 from aereo.backends.core import TaskRunner
+from aereo.backends.staging import CloudTaskStaging
 from aereo.interfaces import ExecutionBackend, ExtractionTask, TaskStaging
 from aereo.schemas import ArtifactSchema
 from aereo.serialization import TaskSerializer
+from aereo.storage import storage_for_uri
 from pandera.typing.geopandas import GeoDataFrame
 from structlog import get_logger
 
@@ -25,6 +28,8 @@ _RE_PRESIGNED_URL = re.compile(r"https?://[^\s]+\?[^\s]*X-Amz-Credential[^\s]*")
 """Matches presigned S3 URLs so they can be redacted from logs."""
 _RE_AWS_KEY = re.compile(r"AKIA[0-9A-Z]{16}")
 """Matches AWS access key IDs so they can be redacted from logs."""
+
+_DEFAULT_DIRECT_PAYLOAD_THRESHOLD_BYTES = 5 * 1024 * 1024
 
 
 def _safe_truncate(text: str, max_len: int = 2048) -> str:
@@ -42,6 +47,17 @@ def _safe_truncate(text: str, max_len: int = 2048) -> str:
     if len(text) > max_len:
         text = text[:max_len] + f"... [{len(text) - max_len} chars truncated]"
     return text
+
+
+def _normalize_output_prefix(uri: str) -> str:
+    """Return a URI-style output prefix understood by storage backends.
+
+    Plain filesystem paths are converted to ``file://`` URIs so the remote
+    worker can route them through :func:`aereo.storage.storage_for_uri`.
+    """
+    if uri.startswith("s3://") or uri.startswith("file://"):
+        return uri
+    return f"file://{Path(uri).resolve()}"
 
 
 class RetryableLambdaError(RuntimeError):
@@ -64,19 +80,24 @@ class LambdaBackend(ExecutionBackend):
     def __init__(
         self,
         function_name: str,
-        staging: TaskStaging,
+        staging: TaskStaging | Literal["auto"] | None = "auto",
         serializer: TaskSerializer | None = None,
         endpoint_url: str | None = None,
         max_concurrent_invokes: int = 10,
         invoke_timeout: int = 900,
         lambda_url: str | None = None,
+        direct_payload_threshold_bytes: int = _DEFAULT_DIRECT_PAYLOAD_THRESHOLD_BYTES,
+        staging_bucket: str | None = None,
     ) -> None:
         """Create a new Lambda backend.
 
         Args:
             function_name: AWS Lambda function name or ARN.
-            staging: A :class:`TaskStaging` implementation that knows how to upload
-                serialized tasks and download result manifests.
+            staging: Staging behaviour. ``"auto"`` serializes the task to a temp
+                directory, sends it directly if the zip is below
+                *direct_payload_threshold_bytes*, otherwise stages it on S3.
+                ``None`` always sends the task directly. A :class:`TaskStaging`
+                instance always stages on S3.
             serializer: Optional :class:`TaskSerializer` instance. A default one
                 is created when ``None``.
             endpoint_url: Optional boto3 endpoint URL (e.g. ``http://localhost:4566``
@@ -85,11 +106,14 @@ class LambdaBackend(ExecutionBackend):
             invoke_timeout: Read timeout in seconds for the boto3 Lambda client.
             lambda_url: Optional direct HTTP URL for the Lambda function. When set,
                 the backend POSTs the invocation payload to this URL instead of using
-                ``boto3``. This is useful for testing against the Lambda Runtime
-                Interface Emulator (RIE).
+                ``boto3``. This is useful for testing against a local container.
+            direct_payload_threshold_bytes: Size threshold for auto direct mode.
+            staging_bucket: Bucket used when ``staging="auto"`` falls back to S3.
 
         Raises:
             ImportError: If ``boto3`` is not installed and ``lambda_url`` is ``None``.
+            ValueError: If ``staging`` is a :class:`TaskStaging` and ``lambda_url``
+                is set (HTTP mode requires direct payloads).
         """
         self.function_name = function_name
         self.staging = staging
@@ -97,6 +121,14 @@ class LambdaBackend(ExecutionBackend):
         self.max_concurrent_invokes = max_concurrent_invokes
         self._lambda_url = lambda_url
         self._invoke_timeout = invoke_timeout
+        self._direct_payload_threshold_bytes = direct_payload_threshold_bytes
+        self._endpoint_url = endpoint_url
+        self._staging_bucket = staging_bucket
+
+        if lambda_url is not None and staging is not None and staging != "auto":
+            raise ValueError(
+                "lambda_url requires direct payloads; use staging=None or staging='auto'"
+            )
 
         if lambda_url is None:
             try:
@@ -183,19 +215,7 @@ class LambdaBackend(ExecutionBackend):
         job_id = task.task_context.get("job_id", "default")
         task_idx = task.task_context.get("chunk_id", 0)
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            self.serializer.serialize(task, Path(tmpdir))
-            task_uri = self.staging.stage(Path(tmpdir), job_id, task_idx)
-
-        output_prefix = self.staging.result_prefix(job_id, task_idx)
-        payload_dict = {
-            "task_uri": task_uri,
-            "output_prefix": output_prefix,
-            "job_id": job_id,
-            "chunk_id": task_idx,
-            "init_params": task.task_context.get("init_params"),
-            "bucket": self.staging.bucket,
-        }
+        payload_dict, load_manifest = self._prepare_payload(task, job_id, task_idx)
         payload_bytes = self._invoke_payload(payload_dict, job_id, task_idx)
 
         payload = json.loads(payload_bytes)
@@ -214,7 +234,77 @@ class LambdaBackend(ExecutionBackend):
                 f"of job {job_id}: {payload}"
             )
 
-        return self.staging.load_artifacts(manifest_uri)
+        return load_manifest(manifest_uri)
+
+    def _prepare_payload(
+        self, task: ExtractionTask, job_id: str, task_idx: int
+    ) -> tuple[dict[str, Any], Any]:
+        """Build the invocation payload and a loader for the result manifest."""
+        staging = self.staging
+
+        if staging is None:
+            return self._direct_payload(task, job_id, task_idx), self._load_manifest
+
+        if staging == "auto":
+            task_bytes = self.serializer.serialize_to_bytes(task)
+            if len(task_bytes) <= self._direct_payload_threshold_bytes:
+                return (
+                    self._direct_payload(task, job_id, task_idx, task_bytes),
+                    self._load_manifest,
+                )
+            if self._lambda_url is not None:
+                raise ValueError(
+                    "Task too large for direct HTTP invocation; "
+                    "use staging with S3 or increase direct_payload_threshold_bytes"
+                )
+            if self._staging_bucket is None:
+                raise ValueError(
+                    "staging='auto' fallback to S3 requires staging_bucket"
+                )
+            staging_impl: TaskStaging = CloudTaskStaging(
+                bucket=self._staging_bucket, endpoint_url=self._endpoint_url
+            )
+        else:
+            staging_impl = cast(TaskStaging, staging)
+
+        # Explicit TaskStaging: stage to S3 and send task_uri.
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.serializer.serialize(task, Path(tmpdir))
+            task_uri = staging_impl.stage(Path(tmpdir), job_id, task_idx)
+
+        output_prefix = staging_impl.result_prefix(job_id, task_idx)
+        payload_dict = {
+            "mode": "staged",
+            "task_uri": task_uri,
+            "output_prefix": output_prefix,
+            "job_id": job_id,
+            "chunk_id": task_idx,
+            "init_params": task.task_context.get("init_params"),
+            "bucket": staging_impl.bucket,
+        }
+        return payload_dict, staging_impl.load_artifacts
+
+    def _direct_payload(
+        self,
+        task: ExtractionTask,
+        job_id: str,
+        task_idx: int,
+        task_bytes: bytes | None = None,
+    ) -> dict[str, Any]:
+        """Build a direct payload with a base64-encoded task."""
+        if task_bytes is None:
+            task_bytes = self.serializer.serialize_to_bytes(task)
+        return {
+            "mode": "direct",
+            "task": base64.b64encode(task_bytes).decode("ascii"),
+            "output_prefix": _normalize_output_prefix(task.output_uri),
+            "job_id": job_id,
+            "chunk_id": task_idx,
+        }
+
+    def _load_manifest(self, manifest_uri: str) -> GeoDataFrame[ArtifactSchema]:
+        """Load artifacts from a manifest URI using the matching storage backend."""
+        return storage_for_uri(manifest_uri).load_artifacts(manifest_uri)
 
     def _invoke_payload(
         self, payload_dict: dict[str, Any], job_id: str, task_idx: int
