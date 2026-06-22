@@ -1,16 +1,50 @@
 #!/usr/bin/env bash
 # deploy.sh — Build and deploy AEREO Lambda to AWS
-# Usage: ./deploy.sh [STACK_NAME] [AWS_REGION] [ECR_REPO_NAME] [S3_BUCKET]
-# Defaults: aereo-stack, us-east-1, aereo-lambda, aereo-tasks
+# Usage: ./deploy.sh --stack-name <name> --region <region> --ecr-repo <repo> --s3-bucket <bucket>
+#
+# Required arguments:
+#   --stack-name     Name of the CloudFormation stack
+#   --region         AWS Region to deploy to
+#   --ecr-repo       Name of the ECR repository
+#   --s3-bucket      Name of the S3 bucket for task staging (must be globally unique)
+#
+# Optional arguments:
+#   --lambda-name    Name of the Lambda function (default: aereo-extractor)
+#   --image-tag      Docker image tag (default: latest)
+#   --dockerfile     Dockerfile to use (default: Dockerfile)
 
 set -euo pipefail
 
-STACK_NAME="${1:-aereo-stack}"
-REGION="${2:-us-west-2}"
-ECR_REPO="${3:-aereo-lambda}"
-S3_BUCKET="${4:-aereo-tasks}"
+STACK_NAME=""
+REGION=""
+ECR_REPO=""
+S3_BUCKET=""
+LAMBDA_NAME="aereo-extractor"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
 DOCKERFILE="${DOCKERFILE:-Dockerfile}"
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --stack-name) STACK_NAME="$2"; shift ;;
+        --region) REGION="$2"; shift ;;
+        --ecr-repo) ECR_REPO="$2"; shift ;;
+        --s3-bucket) S3_BUCKET="$2"; shift ;;
+        --lambda-name) LAMBDA_NAME="$2"; shift ;;
+        --image-tag) IMAGE_TAG="$2"; shift ;;
+        --dockerfile) DOCKERFILE="$2"; shift ;;
+        -h|--help)
+            grep "^#" "$0" | cut -c 3-
+            exit 0
+            ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+if [[ -z "$STACK_NAME" ]]; then echo "Error: --stack-name is required"; exit 1; fi
+if [[ -z "$REGION" ]]; then echo "Error: --region is required"; exit 1; fi
+if [[ -z "$ECR_REPO" ]]; then echo "Error: --ecr-repo is required"; exit 1; fi
+if [[ -z "$S3_BUCKET" ]]; then echo "Error: --s3-bucket is required"; exit 1; fi
 
 # Validate AWS credentials before doing anything.
 if ! aws sts get-caller-identity >/dev/null 2>&1; then
@@ -96,7 +130,7 @@ aws cloudformation deploy \
     --parameter-overrides \
         ImageUri="${ECR_URI}:${IMAGE_TAG}" \
         S3BucketName="${S3_BUCKET}" \
-        LambdaFunctionName="aereo-extractor"
+        LambdaFunctionName="${LAMBDA_NAME}"
 
 # ---------------------------------------------------------------------------
 # 6. Get outputs
@@ -115,7 +149,7 @@ echo "DEPLOYMENT COMPLETE"
 echo "========================================"
 echo ""
 echo "Next steps:"
-echo "  1. Test with: aws lambda invoke --function-name aereo-extractor --payload '{}' response.json"
+echo "  1. Test with: aws lambda invoke --function-name ${LAMBDA_NAME} --payload '{}' response.json"
 echo "  2. Update your Python code to use:"
-echo "       LambdaBackend('aereo-extractor', S3Staging(bucket='${S3_BUCKET}'))"
+echo "       LambdaBackend('${LAMBDA_NAME}', S3Staging(bucket='${S3_BUCKET}'))"
 echo ""

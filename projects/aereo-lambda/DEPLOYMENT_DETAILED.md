@@ -385,9 +385,10 @@ Choose values for:
 | `REGION` | `us-east-1` | Must match your AWS CLI default region. |
 | `ECR_REPO` | `aereo-lambda` | ECR repository name; created if missing. |
 | `S3_BUCKET` | `aereo-tasks-<account-id>` | Must be globally unique, DNS-compatible, no underscores. |
-| `FUNCTION_NAME` | `aereo-extractor` | Hard-coded in `infrastructure.yaml` via `LambdaFunctionName` parameter default. |
+| `LAMBDA_NAME` | `aereo-extractor` | Optional. Pass `--lambda-name` to `deploy.sh` to override. |
+| `IMAGE_TAG` | `latest` | Optional. Pass `--image-tag` to `deploy.sh` to version builds. |
 
-The Lambda function name defaults to `aereo-extractor` in the CloudFormation template. If you need a different name, edit `infrastructure.yaml` or pass `LambdaFunctionName=...` in `deploy.sh`.
+The Lambda function name defaults to `aereo-extractor` in the CloudFormation template. If you need a different name, pass `--lambda-name` to `deploy.sh` or set the `LambdaFunctionName` parameter in `infrastructure.yaml`.
 
 ### Step 3: Review the Dockerfile
 
@@ -425,13 +426,21 @@ AereoLambdaFunction:
 
 ```bash
 cd /root/repos/aereo/projects/aereo-lambda
-./deploy.sh <STACK_NAME> <REGION> <ECR_REPO> <S3_BUCKET>
+./deploy.sh \
+  --stack-name <STACK_NAME> \
+  --region <REGION> \
+  --ecr-repo <ECR_REPO> \
+  --s3-bucket <S3_BUCKET>
 ```
 
 Example:
 
 ```bash
-./deploy.sh aereo-stack us-east-1 aereo-lambda aereo-tasks-123456789012
+./deploy.sh \
+  --stack-name aereo-stack \
+  --region us-east-1 \
+  --ecr-repo aereo-lambda \
+  --s3-bucket aereo-tasks-123456789012
 ```
 
 > Replace `123456789012` with your AWS account ID so the S3 bucket name is globally unique.
@@ -443,11 +452,11 @@ The script performs these steps:
 3. Creates the ECR repository if it does not exist.
 4. Logs Docker into ECR.
 5. Builds the Docker image from the repository parent directory (`/root/repos`).
-6. Tags the image as `<account-id>.dkr.ecr.<region>.amazonaws.com/<repo>:latest` and pushes it.
+6. Tags the image as `<account-id>.dkr.ecr.<region>.amazonaws.com/<repo>:<tag>` (default `:latest`) and pushes it.
 7. Deploys the CloudFormation stack.
 8. Prints stack outputs (Lambda ARN, function name, bucket name).
 
-> **Image tagging:** The script pushes a `:latest` tag for simplicity. For reproducibility and easier rollbacks, consider tagging each build with a Git commit hash or timestamp and updating the Lambda to use that tag instead of `:latest`.
+> **Image tagging:** The script uses the tag passed via `--image-tag` (default `latest`). For reproducibility and easier rollbacks, tag each build with a Git commit hash or timestamp.
 
 Successful output ends with a table similar to:
 
@@ -607,8 +616,8 @@ results/<job-id>/<chunk-id>/<id>.tif
 
 ```bash
 aws lambda update-function-code \
-  --function-name aereo-extractor \
-  --image-uri $(aws sts get-caller-identity --query Account --output text).dkr.ecr.<your-region>.amazonaws.com/<your-ecr-repo>:latest \
+  --function-name <your-lambda-name> \
+  --image-uri $(aws sts get-caller-identity --query Account --output text).dkr.ecr.<your-region>.amazonaws.com/<your-ecr-repo>:<image-tag> \
   --region <your-region>
 ```
 
@@ -635,7 +644,11 @@ To deploy a new version of the code, rerun `deploy.sh` with the same arguments:
 
 ```bash
 cd /root/repos/aereo/projects/aereo-lambda
-./deploy.sh <STACK_NAME> <REGION> <ECR_REPO> <S3_BUCKET>
+./deploy.sh \
+  --stack-name <STACK_NAME> \
+  --region <REGION> \
+  --ecr-repo <ECR_REPO> \
+  --s3-bucket <S3_BUCKET>
 ```
 
 The script will:
@@ -650,7 +663,7 @@ To roll back to the previous image quickly:
 
 ```bash
 aws lambda update-function-code \
-  --function-name aereo-extractor \
+  --function-name <your-lambda-name> \
   --image-uri <previous-image-uri> \
   --region <your-region>
 ```
