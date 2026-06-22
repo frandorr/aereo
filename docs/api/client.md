@@ -1,34 +1,23 @@
 # Client API
 
-`AereoClient` is the single entry point for almost all AEREO workflows. Create one instance and call `search()`, `prepare_for_extraction()`, and `execute_tasks()` in sequence. The sections below document every parameter and return type.
+`AereoClient` is the single entry point for almost all AEREO workflows. Create
+one instance and call `search()`, `prepare_tasks()`, and `execute_tasks()` in
+sequence. The sections below document every parameter and return type.
 
 ```python
-from datetime import datetime, timezone
-from shapely.geometry import box
+from aereo.pipeline import ExtractionJob
 from aereo.client import AereoClient
-from aereo.interfaces import AereoProfile
 from aereo.backends import LocalProcessBackend
 
 client = AereoClient()
 
-profile = AereoProfile(
-    name="goes",
-    resolution=1000,
-    collections={"ABI-L1b-RadF": ["C01"]},
-    plugin_hints={"search": "search_aws_goes", "extract": "extract_satpy"},
-    search_params={"satellite": "GOES-19"},
-)
-aoi = box(-69.76, -39.98, -68.24, -39.05)
+# Load a Hydra config package (recommended)
+job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
 
-results = client.search(
-    profiles=[profile],
-    intersects=aoi,
-    start_datetime=datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc),
-    end_datetime=datetime(2026, 4, 2, 14, 9, tzinfo=timezone.utc),
-)
-tasks = client.prepare_for_extraction(results, profiles=[profile], target_aoi=aoi, output_uri="./out")
+results = client.search(job.search)
+tasks = client.prepare_tasks(results, job=job)
 
-backend = LocalProcessBackend()
+backend = LocalProcessBackend(max_workers=2)
 artifacts = client.execute_tasks(tasks, backend=backend)
 ```
 

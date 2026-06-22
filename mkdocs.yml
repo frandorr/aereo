@@ -7,6 +7,9 @@ repo_name: frandorr/aereo
 repo_url: https://github.com/frandorr/aereo
 edit_uri: edit/main/docs/
 
+hooks:
+  - docs/hooks/copy_notebooks.py
+
 theme:
   name: material
   variant: classic
@@ -60,6 +63,16 @@ plugins:
   - search:
       separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?=\w)'
       lang: en
+  - mknotebooks:
+      execute: true
+      timeout: 600
+      allow_errors: true
+  - exclude:
+      glob:
+        - "hooks/*"
+        - "includes/*"
+        - "examples/config/*"
+        - "examples/config/**/*"
   - mkdocstrings:
       handlers:
         python:
@@ -80,7 +93,6 @@ plugins:
             show_symbol_type_toc: true
 
 markdown_extensions:
-  - zensical.extensions.macros
   - abbr
   - attr_list
   - footnotes
@@ -129,34 +141,58 @@ extra:
       link: https://pypi.org/project/aereo/
 
 validation:
-  unresolved_references: false
+  links:
+    not_found: warn
+    absolute_links: warn
+
+not_in_nav: |
+  includes/abbreviations.md
+  examples/config/README.md
 
 nav:
     - Home: index.md
-    - Search and Extract:
+    - Get Started:
           - Install: install.md
           - Your First Pipeline: first-pipeline.md
-          - Pipeline Options: pipeline-options.md
-          - Working with Grids: grids.md
-          - Output Formats: output-formats.md
-          - CLI Recipes: cli-recipes.md
-          - How-To Guides: how-to.md
-          - Examples Gallery: examples-gallery.md
-    - Build a Plugin:
-          - How Plugins Work: plugin-overview.md
-          - Build Your First Plugin: build-first-plugin.md
-          - Advanced Patterns: plugin-advanced.md
-          - Architecture:
-                - Overview: architecture-overview.md
-                - Pipeline Architecture: pipeline-architecture.md
-                - Execution Backends: execution-backends.md
-                - Visual Architecture Guide: architecture-visual.md
+    - Run Aereo:
+          - run/index.md
+          - Python API: run/run-with-python.md
+          - CLI: run/run-with-cli.md
+          - AWS Lambda: run/run-on-lambda.md
+    - Concepts:
+          - Pipeline Architecture: concepts/pipeline-architecture.md
+          - Working with Grids: concepts/grids.md
+          - Output Formats: concepts/output-formats.md
+          - How Plugins Work: plugins/plugin-overview.md
+    - Examples:
+          - examples/index.md
+          - 01 — Sentinel-2 true-color: examples/01-sentinel2.ipynb
+          - 01b — Sentinel-2 NDVI: examples/01b-sentinel2-ndvi.ipynb
+          - 02 — VIIRS: examples/02-viirs.ipynb
+          - 03 — Sentinel-3 OLCI: examples/03-sentinel3.ipynb
+          - 03b — Sentinel-3 NDVI: examples/03b-sentinel3-ndvi.ipynb
+          - 04 — Tessera: examples/04-tessera.ipynb
+          - 05 — GOES-19 ABI: examples/05-goes19.ipynb
+    - Build Plugins:
+          - Build Your First Plugin: plugins/build-first-plugin.md
+          - Advanced Patterns: plugins/plugin-advanced.md
+    - Architecture:
+          - architecture/index.md
+          - Overview: architecture/architecture-overview.md
+          - Pipeline Architecture: concepts/pipeline-architecture.md
+          - Execution Backends: execution-backends.md
+          - Visual Architecture Guide: architecture/architecture-visual.md
     - API Reference:
           - Core:
                 - Client: api/client.md
+                - Pipeline: api/pipeline.md
                 - Interfaces: api/interfaces.md
                 - Registry: api/registry.md
                 - Schemas: api/schemas.md
+                - Task Builder: api/task_builder.md
+          - Built-ins:
+                - Built-in Plugins: api/builtins.md
+                - Cache: api/cache.md
           - Data and Grid:
                 - Grid: api/grid.md
                 - Spatial: api/spatial.md

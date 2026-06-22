@@ -5,99 +5,121 @@ redirect_from: quickstart.md
 
 # Your First Pipeline
 
-Get from zero to your first extracted satellite image in under 5 minutes.
+Get from zero to your first extracted satellite image in under 5 minutes. This
+tutorial uses the existing `examples/01-sentinel2.ipynb` notebook, which searches
+Planetary Computer for Sentinel-2 data and extracts a true-color GeoTIFF on the
+Major TOM grid.
 
-AEREO's entire user experience is built around three `AereoClient` methods: `search()`, `prepare_for_extraction()`, and `execute_tasks()`. This tutorial walks you through each one with a single sensor. For the full parameter reference and advanced patterns, see [Pipeline Options](pipeline-options.md).
+---
 
 ## 1. Install
 
-Install AEREO and the GOES plugins (public S3, no authentication required):
+```bash
+pip install aereo aereo-search-planetary-computer
+```
+
+You will also need a Planetary Computer subscription key if you want signed
+assets. See [Install](install.md) for credential setup.
+
+---
+
+## 2. Open the notebook
 
 ```bash
-pip install aereo aereo-search-aws-goes aereo-extract-satpy
+cd examples
+jupyter lab 01-sentinel2.ipynb
 ```
 
-## 2. Define a profile
+The notebook contains the full pipeline. Below is a cell-by-cell explanation.
 
-An `AereoProfile` describes *what* you want to extract, *from which sensor*, and *how*.
+---
+
+## 3. Load the job from a Hydra config package
+
+AEREO pipelines are easiest to run when they are declared as a Hydra config
+package. The repo ships an example package under `examples/config`.
 
 ```python
-from aereo.interfaces import AereoProfile
+from aereo.pipeline import ExtractionJob
 
-profile = AereoProfile(
-    name="goes_c02",
-    resolution=1000,
-    collections={"ABI-L1b-RadF": ["C02"]},
-    plugin_hints={"search": "search_aws_goes", "extract": "extract_satpy"},
-    search_params={"satellite": "GOES-19"},
-    extract_params={"reader": "abi_l1b", "calibration": "reflectance"},
+job = ExtractionJob.load_from_config(
+    "examples/config",
+    config_name="job_sentinel2",
 )
+print(job.name)
+print(job.output_uri)
 ```
 
-## 3. Search
+A job bundles four things:
 
-Find granules matching your time range and area of interest:
+| Ingredient | Purpose |
+|------------|---------|
+| `search` | A `SearchProvider` that queries the catalog. |
+| `grid_config` | How the AOI is tiled into Major TOM cells. |
+| `patch_config` | Physical patch dimensions for extraction. |
+| `extract` | The stage pipeline: reader, reprojector, writer, processors. |
+
+---
+
+## 4. Search
 
 ```python
-from datetime import datetime, timezone
-from shapely.geometry import box
 from aereo.client import AereoClient
 
-aoi = box(-70, -40, -68, -39)
 client = AereoClient()
-
-results = client.search(
-    profiles=[profile],
-    start_datetime=datetime(2026, 4, 2, 14, 0, tzinfo=timezone.utc),
-    end_datetime=datetime(2026, 4, 2, 14, 10, tzinfo=timezone.utc),
-    intersects=aoi,
-)
+results = client.search(job.search)
 print(f"Found {len(results)} assets")
 ```
 
+`client.search()` takes a single `SearchProvider` instance and returns a
+validated `GeoDataFrame[AssetSchema]`.
+
 > [!TIP]
 > **Search returns empty?** Check these three things:
-> 1. **Collection name** — Collection names are case-sensitive. `ABI-L1B-RADF` is wrong; `ABI-L1b-RadF` is correct. `sentinel-2-l1c` is wrong; `sentinel-2-l2a` is correct.
-> 2. **`search_params`** — GOES ABI requires `search_params={"satellite": "GOES-19"}` (or `GOES-18`, `GOES-16`). Without it, the search plugin may return results for the wrong satellite or nothing at all.
-> 3. **Date range** — Some sensors have infrequent revisit times. A 10-minute window may contain zero granules. Try widening to a few hours or a full day.
+> 1. **Collection name** — Collection names are case-sensitive. `sentinel-2-l1c` is wrong; `sentinel-2-l2a` is correct.
+> 2. **Date range** — Sentinel-2 has a 5-day revisit at the equator. A one-day window may contain zero scenes for a small AOI; try widening to a week or month.
+> 3. **AOI** — Make sure your GeoJSON intersects the sensor's orbit footprint.
 
-## 4. Prepare
+---
 
-Turn search results into extraction tasks. AEREO builds a grid over your AOI and chunks everything into parallelizable tasks.
+## 5. Prepare tasks
 
 ```python
-from aereo.interfaces import GridConfig
-
-tasks = client.prepare_for_extraction(
-    results,
-    profiles=[profile],
-    output_uri="./out",
-    grid_config=GridConfig(target_grid_dist=256000),
-)
+tasks = client.prepare_tasks(results, job=job)
 print(f"Prepared {len(tasks)} extraction tasks")
 ```
 
-## 5. Extract
+`prepare_tasks()` turns search results into a list of `ExtractionTask` objects,
+each carrying the grid cells, assets, and extraction stages it needs.
 
-Run the extraction. Each task is handed to the extractor plugin, which downloads granules, resamples to the target grid, and writes GeoTIFFs.
+---
+
+## 6. Extract
 
 ```python
 from aereo.backends import LocalProcessBackend
 
-backend = LocalProcessBackend(max_workers=4)
+backend = LocalProcessBackend(max_workers=2)
 artifacts = client.execute_tasks(tasks, backend=backend)
 print(f"Extracted {len(artifacts)} artifacts")
 ```
 
-## 6. Verify
-
-Open your output directory (`./out/`) and look for `.tif` files. You now have analysis-ready GeoTIFFs on disk.
+Each task is run through the stage pipeline configured in `job.extract`. The
+result is a `GeoDataFrame[ArtifactSchema]` with one row per extracted GeoTIFF.
 
 ---
 
-## Next Steps
+## 7. Verify
 
-- Explore more sensors in [Examples Gallery](examples-gallery.md) and [How Plugins Work](plugin-overview.md)
-- Understand grid options in [Working with Grids](grids.md)
-- Prefer the command line? See the [CLI Recipes](cli-recipes.md)
-- Learn advanced pipeline options in [Pipeline Options](pipeline-options.md)
+Open `job.output_uri` and look for `.tif` files organized by Major TOM cell and
+date. You now have analysis-ready GeoTIFFs on a shared grid.
+
+---
+
+## Next steps
+
+- Run the same pipeline from the command line: [Run with CLI](run/run-with-cli.md)
+- Understand the stage pipeline model: [Pipeline Architecture](concepts/pipeline-architecture.md)
+- Choose grid settings for your AOI: [Working with Grids](concepts/grids.md)
+- Browse more sensors: [Examples Gallery](examples/index.md)
+- Build your own reader or search plugin: [Build Your First Plugin](plugins/build-first-plugin.md)

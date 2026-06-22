@@ -1,94 +1,111 @@
 # AEREO Examples
 
-This directory contains reference examples and data for working with the AEREO satellite data extraction framework.
+This directory contains runnable examples for the AEREO satellite data
+extraction framework.
 
 ## Structure
 
-```
+```text
 examples/
-├── data/                 # Shared input data (AOI GeoJSONs, grid configs)
-├── grid/                 # Notebooks demonstrating the AEREO grid system
-├── grid_configs/         # Example JSON grid configurations
-├── helpers/              # Shared Python helper utilities used by examples
-└── serverless/           # AWS Lambda deployment examples
+├── *.ipynb                 # Jupyter notebooks (one per sensor / workflow)
+├── config/                 # Hydra config package (search, grid, patch, extract, aoi)
+└── serverless/             # AWS Lambda deployment examples
 ```
 
 ## Quickstart
 
-The recommended entry point is the interactive search notebook:
+The recommended entry point is the Sentinel-2 notebook:
 
 ```bash
-cd development/local/search
-jupyter notebook search.ipynb
+cd examples
+jupyter lab 01-sentinel2.ipynb
 ```
 
-This notebook demonstrates the full **search → prepare → extract** pipeline using a Hydra-native YAML configuration loaded from `development/local/data/search_job.yaml`.
+This notebook demonstrates the full **search → prepare → extract** pipeline
+using the Hydra config package in `examples/config`.
 
 ## Configuration
 
-All pipeline configurations use the Hydra `_target_` convention for declarative instantiation:
+All pipeline configurations live under `examples/config` and use the Hydra
+`_target_` convention for declarative instantiation:
 
 ```yaml
-# development/local/data/search_job.yaml
-search:
-  _target_: aereo.builtins.SearchSTAC
-  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
-  collections:
-    sentinel-2-l2a: ["B04", "B03", "B02"]
-  start_datetime: "2024-01-01T00:00:00Z"
-  end_datetime: "2024-01-10T00:00:00Z"
-
-pipeline:
-  - _target_: aereo.builtins.ReadODCSTAC
-  - _target_: aereo.builtins.ReprojectODC
-    resolution: 10.0
-  - _target_: aereo.builtins.WriteGeoTIFF
-
-grid_config:
-  _target_: aereo.interfaces.GridConfig
-  target_grid_dist: 50000
-
-uri: "/tmp/output"
+# examples/config/search/sentinel2_pc.yaml
+_target_: aereo.builtins.SearchSTAC
+stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
+collections:
+  sentinel-2-l2a: ["B04", "B08"]
+intersects: config/aoi/chocon.geojson
+start_datetime: "2024-01-01T00:00:00Z"
+end_datetime: "2024-01-10T23:59:59Z"
 ```
 
-Configurations can be loaded and instantiated programmatically:
-
-```python
-from omegaconf import OmegaConf
-import hydra
-
-cfg = OmegaConf.load("development/local/data/search_job.yaml")
-job = hydra.utils.instantiate(cfg, _convert_="all")
+```yaml
+# examples/config/extract/sentinel2.yaml
+read:
+  _target_: aereo.builtins.ReadODCSTAC
+reproject:
+  _target_: aereo.builtins.ReprojectODC
+  resampling: nearest
+write:
+  _target_: aereo.builtins.WriteGeoTIFF
 ```
 
-Or loaded directly from a YAML file into an `ExtractionJob`:
+Load the full job from the config package:
 
 ```python
 from aereo.pipeline import ExtractionJob
 
+job = ExtractionJob.load_from_config(
+    "examples/config",
+    config_name="job_sentinel2",
+)
+```
+
+Or load a single YAML file:
+
+```python
 job = ExtractionJob.from_yaml("my_job.yaml")
 ```
 
 ## CLI
 
-Run extractions from the command line using Hydra overrides:
+Run the same configs from the command line:
 
 ```bash
-# Full run with a job config file
-aereo action=run search.start_datetime="2024-01-01T00:00:00Z"
+cd examples/config
+
+# Full pipeline
+aereo action=run \
+  search=sentinel2_pc \
+  grid_config=grid_10km \
+  patch_config=patch_10m \
+  extract=sentinel2
 
 # Search only
-aereo action=search
+aereo action=search search=sentinel2_pc
 
 # List installed plugins
 aereo action=plugins
 ```
 
-## Shared Data
+## Notebooks
+
+| Notebook | Sensor | Description |
+|----------|--------|-------------|
+| `01-sentinel2.ipynb` | Sentinel-2 MSI | True-color extraction from Planetary Computer |
+| `01b-sentinel2-ndvi.ipynb` | Sentinel-2 MSI | NDVI processing example |
+| `02-viirs.ipynb` | VIIRS | Earthaccess search + Satpy read |
+| `03-sentinel3.ipynb` | Sentinel-3 OLCI | Earthaccess search + Satpy read |
+| `03b-sentinel3-ndvi.ipynb` | Sentinel-3 OLCI | NDVI processing example |
+| `04-tessera.ipynb` | GeoTessera | Tessera tile search and extraction |
+| `05-goes19.ipynb` | GOES-19 ABI | Public AWS S3 search + Satpy read |
+
+## Shared data
 
 | File | Description |
 |---|---|
-| `data/chocon.geojson` | AOI polygon — Chocon reservoir, Argentina |
-| `data/lake_barkley.geojson` | AOI polygon — Lake Barkley, USA |
-| `data/grid_config.yaml` | 50 km grid configuration |
-| `data/grid_config_10km.yaml` | 10 km grid configuration |
+| `config/aoi/chocon.geojson` | AOI polygon — Chocón reservoir, Argentina |
+| `config/aoi/cordoba.geojson` | AOI polygon — Córdoba, Argentina |
+| `config/aoi/oxford.geojson` | AOI polygon — Oxford, UK |
+| `config/aoi/sample.geojson` | Sample AOI |
