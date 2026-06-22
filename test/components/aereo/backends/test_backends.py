@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
+import tempfile
 import time
 import urllib.error
 from http.client import HTTPMessage
@@ -12,6 +13,7 @@ from typing import Any, cast
 from unittest.mock import MagicMock, patch
 
 import geopandas as gpd
+import pandas as pd
 import pytest
 from shapely.geometry import Polygon
 
@@ -20,6 +22,7 @@ from aereo.interfaces import AereoPlugin
 from aereo.interfaces.core import ExtractionTask, GridConfig, PatchConfig, ExtractConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import ArtifactSchema, AssetSchema
+from aereo.storage import FileSystemStorage
 from pandera.typing.geopandas import GeoDataFrame
 from aereo.builtins.read import ReadODCSTAC
 from aereo.builtins.reproject import ReprojectODC
@@ -115,6 +118,70 @@ class _FakeStaging:
 
 def _make_empty_artifacts() -> GeoDataFrame[ArtifactSchema]:
     return cast(GeoDataFrame, ArtifactSchema.empty())
+
+
+def _make_artifacts() -> GeoDataFrame[ArtifactSchema]:
+    """Return a non-empty ArtifactSchema GeoDataFrame that can round-trip parquet."""
+    df = gpd.GeoDataFrame(
+        {
+            "grid_cell": ["A"],
+            "grid_dist": [100],
+            "cell_geometry": gpd.GeoSeries(
+                [Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])], crs="EPSG:4326"
+            ),
+            "cell_utm_crs": ["EPSG:32630"],
+            "cell_utm_footprint": gpd.GeoSeries(
+                [Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])], crs="EPSG:4326"
+            ),
+            "id": ["art-1"],
+            "source_ids": ["src-1"],
+            "start_time": [pd.Timestamp("2024-01-01T00:00:00Z")],
+            "end_time": [pd.Timestamp("2024-01-01T00:00:00Z")],
+            "uri": ["file:///tmp/art.tif"],
+            "geometry": gpd.GeoSeries(
+                [Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])], crs="EPSG:4326"
+            ),
+            "collection": ["test"],
+        },
+        geometry="geometry",
+        crs="EPSG:4326",
+    )
+    return cast(GeoDataFrame[ArtifactSchema], df)
+
+
+class _FakeS3Client:
+    """In-memory S3 client for unit tests."""
+
+    def __init__(self) -> None:
+        self.objects: dict[tuple[str, str], bytes] = {}
+        self.invoke = MagicMock(
+            return_value={"Payload": MagicMock(), "StatusCode": 200}
+        )
+
+    def upload_file(self, filename: str, bucket: str, key: str) -> None:
+        self.objects[(bucket, key)] = Path(filename).read_bytes()
+
+    def download_file(self, bucket: str, key: str, filename: str) -> None:
+        data = self.objects[(bucket, key)]
+        Path(filename).write_bytes(data)
+
+
+def _upload_result_to_fake_s3(
+    s3: _FakeS3Client,
+    bucket: str,
+    prefix: str,
+    artifacts: GeoDataFrame[ArtifactSchema],
+) -> None:
+    """Upload artifacts and manifest to the in-memory fake S3 client."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        parquet_path = Path(tmpdir) / "artifacts.parquet"
+        artifacts.to_parquet(parquet_path)
+        s3.upload_file(str(parquet_path), bucket, f"{prefix}artifacts.parquet")
+
+        manifest = {"artifacts_uri": f"s3://{bucket}/{prefix}artifacts.parquet"}
+        manifest_path = Path(tmpdir) / "manifest.json"
+        manifest_path.write_text(json.dumps(manifest))
+        s3.upload_file(str(manifest_path), bucket, f"{prefix}manifest.json")
 
 
 # ---------------------------------------------------------------------------
@@ -536,32 +603,34 @@ def test_safe_truncate_truncates_long_text():
 
 def test_lambda_backend_lambda_url_does_not_require_boto3():
     """LambdaBackend accepts lambda_url without boto3 installed."""
-    staging = _FakeStaging()
     with patch.dict(sys.modules, {"boto3": None}):
         backend = LambdaBackend(
             function_name="ignored",
-            staging=staging,
+            staging=None,
             lambda_url="http://localhost:9000/2015-03-31/functions/function/invocations",
         )
     assert backend._lambda_client is None
 
 
-def test_lambda_backend_lambda_url_posts_payload():
+def test_lambda_backend_lambda_url_posts_payload(tmp_path: Path):
     """LambdaBackend POSTs JSON payload to lambda_url and parses the response."""
-    staging = _FakeStaging()
-    staging.artifacts_to_return = [_make_empty_artifacts()]
-    task = _make_task(task_context={"job_id": "job-http", "chunk_id": 3})
+    prefix = f"file://{tmp_path}/results/job-http/3/"
+    manifest = FileSystemStorage().upload_artifacts(_make_artifacts(), prefix)
+
+    task = _make_task(
+        task_context={"job_id": "job-http", "chunk_id": 3},
+    )
 
     mock_response = MagicMock()
     mock_response.read.return_value = json.dumps(
-        {"manifest_uri": "s3://bucket/results/job-http/3/manifest.json"}
+        {"manifest_uri": manifest["manifest_uri"]}
     ).encode("utf-8")
     mock_response.__enter__.return_value = mock_response
 
     with patch.dict(sys.modules, {"boto3": None}):
         backend = LambdaBackend(
             function_name="ignored",
-            staging=staging,
+            staging=None,
             lambda_url="http://localhost:9000/2015-03-31/functions/function/invocations",
         )
         with patch(
@@ -580,11 +649,12 @@ def test_lambda_backend_lambda_url_posts_payload():
     payload = json.loads(request.data.decode("utf-8"))
     assert payload["job_id"] == "job-http"
     assert payload["chunk_id"] == 3
+    assert payload["mode"] == "direct"
+    assert "task" in payload
 
 
 def test_lambda_backend_lambda_url_http_error_raises_runtime():
     """HTTP errors from lambda_url are surfaced as RuntimeError."""
-    staging = _FakeStaging()
     task = _make_task(task_context={"job_id": "job-http", "chunk_id": 0})
 
     error_body = b'{"error": "boom"}'
@@ -602,9 +672,118 @@ def test_lambda_backend_lambda_url_http_error_raises_runtime():
     with patch.dict(sys.modules, {"boto3": None}):
         backend = LambdaBackend(
             function_name="ignored",
-            staging=staging,
+            staging=None,
             lambda_url="http://localhost/invocations",
         )
         with patch("urllib.request.urlopen", side_effect=http_error):
             with pytest.raises(RuntimeError, match="Lambda HTTP invocation failed"):
                 list(backend.run_tasks([task]))
+
+
+def test_lambda_backend_direct_mode_posts_base64_task(tmp_path: Path):
+    """staging=None sends the task as a base64 zip payload."""
+    prefix = f"file://{tmp_path}/out/"
+    manifest = FileSystemStorage().upload_artifacts(_make_artifacts(), prefix)
+
+    task = _make_task(task_context={"job_id": "direct", "chunk_id": 0})
+
+    mock_response = MagicMock()
+    mock_response.read.return_value = json.dumps(
+        {"manifest_uri": manifest["manifest_uri"]}
+    ).encode("utf-8")
+    mock_response.__enter__.return_value = mock_response
+
+    with patch.dict(sys.modules, {"boto3": None}):
+        backend = LambdaBackend(
+            function_name="ignored",
+            staging=None,
+            lambda_url="http://localhost:8080/extract",
+        )
+        with patch(
+            "urllib.request.urlopen", return_value=mock_response
+        ) as mock_urlopen:
+            results = list(backend.run_tasks([task]))
+
+    assert len(results) == 1
+    payload = json.loads(mock_urlopen.call_args.args[0].data.decode("utf-8"))
+    assert payload["mode"] == "direct"
+    assert "task" in payload
+    assert payload["output_prefix"].startswith("file://")
+
+
+def test_lambda_backend_auto_uses_staging_for_large_task():
+    """staging='auto' falls back to S3 when the task exceeds the threshold."""
+    task = _make_task(task_context={"job_id": "auto", "chunk_id": 0})
+
+    fake_s3 = _FakeS3Client()
+    mock_boto3 = MagicMock()
+    mock_boto3.client.return_value = fake_s3
+
+    # Pre-populate the result manifest + artifacts that the "remote worker" returns.
+    result_prefix = "results/auto/0/"
+    _upload_result_to_fake_s3(fake_s3, "aer-tasks", result_prefix, _make_artifacts())
+
+    mock_payload = MagicMock()
+    mock_payload.read.return_value = json.dumps(
+        {"manifest_uri": f"s3://aer-tasks/{result_prefix}manifest.json"}
+    ).encode("utf-8")
+
+    with patch.dict(sys.modules, {"boto3": mock_boto3}):
+        backend = LambdaBackend(
+            function_name="aer-extract",
+            staging="auto",
+            staging_bucket="aer-tasks",
+            direct_payload_threshold_bytes=1,
+        )
+        mock_client: Any = backend._lambda_client
+        mock_client.invoke.return_value = {
+            "Payload": mock_payload,
+            "StatusCode": 200,
+        }
+        results = list(backend.run_tasks([task]))
+
+    assert len(results) == 1
+    payload = json.loads(mock_client.invoke.call_args.kwargs["Payload"].decode("utf-8"))
+    assert payload["mode"] == "staged"
+    assert payload["task_uri"].startswith("s3://aer-tasks/aereo-tasks/auto/0/")
+
+
+def test_lambda_backend_auto_direct_for_small_task(tmp_path: Path):
+    """staging='auto' sends a direct payload when the task is small enough."""
+    prefix = f"file://{tmp_path}/out/"
+    manifest = FileSystemStorage().upload_artifacts(_make_artifacts(), prefix)
+
+    task = _make_task(task_context={"job_id": "auto", "chunk_id": 0})
+
+    mock_response = MagicMock()
+    mock_response.read.return_value = json.dumps(
+        {"manifest_uri": manifest["manifest_uri"]}
+    ).encode("utf-8")
+    mock_response.__enter__.return_value = mock_response
+
+    with patch.dict(sys.modules, {"boto3": None}):
+        backend = LambdaBackend(
+            function_name="ignored",
+            staging="auto",
+            lambda_url="http://localhost:8080/extract",
+            direct_payload_threshold_bytes=100 * 1024 * 1024,
+        )
+        with patch(
+            "urllib.request.urlopen", return_value=mock_response
+        ) as mock_urlopen:
+            results = list(backend.run_tasks([task]))
+
+    assert len(results) == 1
+    payload = json.loads(mock_urlopen.call_args.args[0].data.decode("utf-8"))
+    assert payload["mode"] == "direct"
+
+
+def test_lambda_backend_lambda_url_rejects_explicit_staging():
+    """lambda_url with an explicit TaskStaging instance raises ValueError."""
+    staging = _FakeStaging()
+    with pytest.raises(ValueError, match="lambda_url requires direct payloads"):
+        LambdaBackend(
+            function_name="ignored",
+            staging=staging,
+            lambda_url="http://localhost/invocations",
+        )
