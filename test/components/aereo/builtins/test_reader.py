@@ -299,3 +299,28 @@ def test_read_odcstac_forwards_odc_params(monkeypatch):
     assert captured["kwargs"]["resampling"] == "bilinear"
     assert captured["kwargs"]["groupby"] == "solar_day"
     assert captured["kwargs"]["chunks"] == {"x": 1024, "y": 1024}
+
+
+def test_read_odcstac_handles_numpy_arrays_in_stac_item(monkeypatch):
+    """Numpy arrays round-tripped through Parquet are normalised to Python lists."""
+    fake_ds = _make_fake_ds()
+    captured: dict[str, Any] = {}
+
+    def fake_odc_load(items, **kwargs):
+        captured["items"] = items
+        return fake_ds
+
+    monkeypatch.setattr("aereo.builtins.read.odc_load", fake_odc_load)
+
+    item_dict = _make_stac_item_dict("np-item")
+    # Simulate a Parquet round-trip that leaves list fields as ndarrays.
+    item_dict["stac_extensions"] = np.array(["eo", "projection"])
+    item_dict["bbox"] = np.array([-70.5, -33.5, -70.0, -33.0])
+    item_dict["properties"]["numeric"] = np.int64(42)
+
+    task = _make_task(item_dict)
+    reader = ReadODCSTAC()
+    reader(task)
+
+    assert len(captured["items"]) == 1
+    assert captured["items"][0].id == "np-item"

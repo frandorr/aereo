@@ -4,17 +4,17 @@ AEREO Lambda container image — packages the AWS Lambda handler and AEREO core 
 
 ## Overview
 
-The Lambda handler at `aereo.lambda_handler.core.handler` receives a single `ExtractionTask`, executes it via the local plugin registry, and stores results in S3. It is designed for the remote-execution backend (`LambdaBackend`) which serializes tasks to S3 and invokes one Lambda per task.
+The Lambda handler at `aereo.lambda_handler.core.handler` receives a single `ExtractionTask`, executes it through `TaskRunner`, and stores results in S3. It is designed for the remote-execution backend (`LambdaBackend`) which serializes tasks to S3 and invokes one Lambda per task.
 
 ### What it does
 
 1. **Deserialize** — Downloads a serialized `ExtractionTask` from S3 (GeoParquet + JSON)
-2. **Execute** — Runs `TaskRunner` which resolves the correct extractor plugin and calls `extract()`
-3. **Store** — Uploads the resulting `GeoDataFrame[ArtifactSchema]` as a Parquet file + manifest JSON back to S3
+2. **Execute** — Runs `TaskRunner` using the task's own `ExtractConfig` (reader, reprojector, writer)
+3. **Store** — Uploads any local GeoTIFF artifacts to S3, updates their URIs, and writes the `GeoDataFrame[ArtifactSchema]` metadata as a Parquet file + manifest JSON back to S3
 
 ### What it does NOT do (current limitations)
 
-- **Direct GeoTIFF return**: The architecture enforces `Extractor.extract()` → `GeoDataFrame[ArtifactSchema]` → Parquet → S3 manifest. It cannot return raw GeoTIFF bytes in the Lambda response. See [GeoTIFF Return Options](#geotiff-return-options) for alternatives.
+- **Direct GeoTIFF return**: The architecture enforces a pipeline that ends with a `Writer` producing `GeoDataFrame[ArtifactSchema]` → Parquet → S3 manifest. It cannot return raw GeoTIFF bytes in the Lambda response. See [GeoTIFF Return Options](#geotiff-return-options) for alternatives.
 
 ---
 
@@ -62,7 +62,7 @@ This starts two containers:
 
 ### Run the integration test
 
-The test script creates a bucket, stages a sample `ExtractionTask` with a test extractor plugin, and invokes the Lambda:
+The test script creates a bucket, stages a sample `ExtractionTask` containing a synthetic test pipeline (`test_pipeline`), and invokes the Lambda. The pipeline writes a placeholder GeoTIFF that the handler uploads to S3, so the full artifact-upload path is exercised.
 
 ```bash
 cd projects/aereo-lambda
@@ -96,7 +96,8 @@ Manifest contents:
   "artifacts_uri": "s3://aereo-tasks/results/test-job/0/artifacts.parquet"
 }
 
-Artifacts GeoDataFrame: 0 rows
+Artifacts GeoDataFrame: 1 rows
+Verified GeoTIFF in S3: s3://aereo-tasks/results/test-job/0/test.tif
 ```
 
 ### Manual invocation with curl
@@ -121,16 +122,16 @@ docker compose down -v
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Event JSON    │     │  S3 Download     │     │  Extractor      │
-│  (task_uri)     │────▶│  (task_assets    │────▶│  Plugin         │
+│   Event JSON    │     │  S3 Download     │     │  ExtractConfig  │
+│  (task_uri)     │────▶│  (task_assets    │────▶│  Pipeline       │
 │                 │     │   + task_meta)   │     │  (TaskRunner)   │
 └─────────────────┘     └──────────────────┘     └─────────────────┘
-                                                        │
-                                                        ▼
+                                                         │
+                                                         ▼
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
 │  Response JSON  │◄────│  S3 Upload       │◄────│  GeoDataFrame   │
-│  (manifest_uri) │     │  (artifacts      │     │  [ArtifactSchema]│
-│                 │     │   + manifest)    │     │                 │
+│  (manifest_uri) │     │  (GeoTIFFs +     │     │  [ArtifactSchema]│
+│                 │     │   artifacts)     │     │                 │
 └─────────────────┘     └──────────────────┘     └─────────────────┘
 ```
 
@@ -202,9 +203,9 @@ Then POST to `http://localhost:3000/invoke`.
 
 ---
 
-## Using Real Extractor Plugins
+## Using Real Pipeline Plugins
 
-The test setup includes a minimal `test_extractor` plugin that returns an empty `GeoDataFrame`. To test with a real extractor (e.g., `extract_satpy` for GOES data), you need to install the plugin in the Lambda container.
+The local test setup uses the `test_pipeline` package, which provides a tiny synthetic reader/reprojector/writer that requires no network access. To process real satellite data, install the appropriate AEREO pipeline plugins (reader, reprojector, writer) in the Lambda container.
 
 ### Option 1: Install from PyPI (production)
 
@@ -229,11 +230,11 @@ services:
 
 ### Option 3: Build plugins into the image (monorepo)
 
-Copy plugin wheels into the Docker image alongside the main AEREO wheels. See the builder stage in the Dockerfile for the pattern.
+Copy plugin wheels into the Docker image alongside the main AEREO wheels. See the builder stage in `Dockerfile.local` for the pattern.
 
 ### Plugin Discovery
 
-Plugins are discovered via Python entry points (`aereo.plugins` group). The Lambda container's `AereoRegistry` scans for these on cold start. Verify installed plugins:
+Pipeline stages are carried inside each `ExtractionTask` as an `ExtractConfig`, so the Lambda handler does not need to discover them at runtime. Search plugins are still discovered via Python entry points (`aereo.plugins` group) when the client constructs a search on the caller side. Verify installed plugins:
 
 ```bash
 docker exec aereo-lambda-aereo-lambda-1 python -c "
@@ -249,8 +250,8 @@ for ep in importlib.metadata.entry_points(group='aereo.plugins'):
 
 The current Lambda handler **cannot** return a GeoTIFF directly because:
 
-1. `Extractor.extract()` contract returns `GeoDataFrame[ArtifactSchema]`
-2. The handler always serializes that to Parquet + uploads to S3
+1. The pipeline `Writer` contract returns `GeoDataFrame[ArtifactSchema]`
+2. The handler uploads any local GeoTIFF files to S3 and updates `uri` columns
 3. The response is JSON with a `manifest_uri`, not binary data
 
 ### Workarounds
@@ -290,19 +291,15 @@ return {
 | `template.yaml` | SAM template for `sam local invoke` |
 | `events/extraction-task.json` | Sample Lambda event payload |
 | `test_local_lambda.py` | End-to-end integration test script |
-| `test_extractor/` | Minimal extractor plugin for testing |
+| `test_pipeline/` | Synthetic reader/reprojector/writer for integration testing |
 
 ---
 
 ## Troubleshooting
 
-### "No extractor plugin found for profile"
+### "No writer configured"
 
-The extractor hint in the profile doesn't match any registered plugin. Check:
-
-1. Plugin is installed in the Lambda container (`pip list | grep aereo`)
-2. Entry point is registered (`python -c "import importlib.metadata; ..."`)
-3. Profile's `plugin_hints.extract` matches the entry point name
+The staged `ExtractionTask` must have a non-null `job.extract.write` stage. The Lambda handler only uploads files produced by the writer. If the writer is `None`, the result will be an empty `GeoDataFrame` and no GeoTIFFs.
 
 ### "Missing optional dependency 'pyarrow.parquet'"
 
@@ -325,10 +322,11 @@ docker build -f projects/aereo-lambda/Dockerfile -t aereo-lambda:latest .
 
 ## Development Notes
 
-- The Lambda handler initializes `AereoRegistry` and `TaskRunner` at module load time (cold start optimization)
+- The Lambda handler initializes `TaskRunner` at module load time (cold-start optimization)
 - Memory errors are re-raised so the Lambda runtime can handle them
 - All other errors are caught, logged with `structlog`, and returned as JSON with `retryable` flag
 - `boto3` is imported lazily so the handler can be imported without AWS SDK installed
+- Pipeline stages are fully contained in the deserialized `ExtractionTask`; no runtime plugin registry is required inside the handler
 
 ---
 

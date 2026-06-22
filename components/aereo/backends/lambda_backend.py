@@ -5,9 +5,11 @@ from __future__ import annotations
 import json
 import re
 import tempfile
+import urllib.error
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Iterable, Sequence
+from typing import Any, Iterable, Sequence
 
 from aereo.backends.core import TaskRunner
 from aereo.interfaces import ExecutionBackend, ExtractionTask, TaskStaging
@@ -42,6 +44,10 @@ def _safe_truncate(text: str, max_len: int = 2048) -> str:
     return text
 
 
+class RetryableLambdaError(RuntimeError):
+    """Raised when a Lambda invocation fails with a retryable error."""
+
+
 class LambdaBackend(ExecutionBackend):
     """Execute tasks remotely via AWS Lambda container functions.
 
@@ -63,6 +69,7 @@ class LambdaBackend(ExecutionBackend):
         endpoint_url: str | None = None,
         max_concurrent_invokes: int = 10,
         invoke_timeout: int = 900,
+        lambda_url: str | None = None,
     ) -> None:
         """Create a new Lambda backend.
 
@@ -76,31 +83,41 @@ class LambdaBackend(ExecutionBackend):
                 for LocalStack emulation).
             max_concurrent_invokes: Maximum number of concurrent Lambda invocations.
             invoke_timeout: Read timeout in seconds for the boto3 Lambda client.
+            lambda_url: Optional direct HTTP URL for the Lambda function. When set,
+                the backend POSTs the invocation payload to this URL instead of using
+                ``boto3``. This is useful for testing against the Lambda Runtime
+                Interface Emulator (RIE).
 
         Raises:
-            ImportError: If ``boto3`` is not installed.
+            ImportError: If ``boto3`` is not installed and ``lambda_url`` is ``None``.
         """
-        try:
-            import boto3  # pyright: ignore[reportMissingImports]
-            from botocore.config import Config  # pyright: ignore[reportMissingImports]
-        except ImportError as exc:
-            raise ImportError(
-                "boto3 is required for LambdaBackend. "
-                "Install it with: pip install boto3"
-            ) from exc
-
         self.function_name = function_name
         self.staging = staging
         self.serializer = serializer or TaskSerializer()
         self.max_concurrent_invokes = max_concurrent_invokes
-        self._lambda_client = boto3.client(
-            "lambda",
-            endpoint_url=endpoint_url,
-            config=Config(
-                read_timeout=invoke_timeout,
-                retries={"max_attempts": 3, "mode": "adaptive"},
-            ),
-        )
+        self._lambda_url = lambda_url
+        self._invoke_timeout = invoke_timeout
+
+        if lambda_url is None:
+            try:
+                import boto3  # pyright: ignore[reportMissingImports]
+                from botocore.config import Config  # pyright: ignore[reportMissingImports]
+            except ImportError as exc:
+                raise ImportError(
+                    "boto3 is required for LambdaBackend. "
+                    "Install it with: pip install boto3"
+                ) from exc
+
+            self._lambda_client = boto3.client(
+                "lambda",
+                endpoint_url=endpoint_url,
+                config=Config(
+                    read_timeout=invoke_timeout,
+                    retries={"max_attempts": 3, "mode": "adaptive"},
+                ),
+            )
+        else:
+            self._lambda_client = None
 
     def run_tasks(
         self,
@@ -179,9 +196,39 @@ class LambdaBackend(ExecutionBackend):
             "init_params": task.task_context.get("init_params"),
             "bucket": self.staging.bucket,
         }
+        payload_bytes = self._invoke_payload(payload_dict, job_id, task_idx)
+
+        payload = json.loads(payload_bytes)
+
+        status_code = payload.get("statusCode", 200)
+        if status_code >= 400:
+            error = payload.get("error", "Unknown Lambda error")
+            if payload.get("retryable"):
+                raise RetryableLambdaError(error)
+            raise RuntimeError(f"Lambda returned error: {error}")
+
+        manifest_uri = payload.get("manifest_uri")
+        if manifest_uri is None:
+            raise ValueError(
+                f"Lambda response missing 'manifest_uri' for task {task_idx} "
+                f"of job {job_id}: {payload}"
+            )
+
+        return self.staging.load_artifacts(manifest_uri)
+
+    def _invoke_payload(
+        self, payload_dict: dict[str, Any], job_id: str, task_idx: int
+    ) -> bytes:
+        """Dispatch *payload_dict* and return the raw response body."""
+        payload_json = json.dumps(payload_dict, default=str).encode("utf-8")
+
+        if self._lambda_url is not None:
+            return self._invoke_via_http(payload_json)
+
+        assert self._lambda_client is not None
         response = self._lambda_client.invoke(
             FunctionName=self.function_name,
-            Payload=json.dumps(payload_dict, default=str).encode("utf-8"),
+            Payload=payload_json,
         )
 
         payload_stream = response["Payload"]
@@ -203,24 +250,27 @@ class LambdaBackend(ExecutionBackend):
                 f"for task {task_idx} of job {job_id}: {error_msg}"
             )
 
-        payload = json.loads(payload_bytes)
+        return payload_bytes
 
-        status_code = payload.get("statusCode", 200)
-        if status_code >= 400:
-            error = payload.get("error", "Unknown Lambda error")
-            if payload.get("retryable"):
-                raise RetryableLambdaError(error)
-            raise RuntimeError(f"Lambda returned error: {error}")
+    def _invoke_via_http(self, payload_json: bytes) -> bytes:
+        """POST *payload_json* directly to :attr:`_lambda_url`.
 
-        manifest_uri = payload.get("manifest_uri")
-        if manifest_uri is None:
-            raise ValueError(
-                f"Lambda response missing 'manifest_uri' for task {task_idx} "
-                f"of job {job_id}: {payload}"
-            )
-
-        return self.staging.load_artifacts(manifest_uri)
-
-
-class RetryableLambdaError(RuntimeError):
-    """Raised when a Lambda invocation fails with a retryable error."""
+        Raises:
+            RuntimeError: If the HTTP request fails or returns a non-2xx code.
+        """
+        request = urllib.request.Request(
+            self._lambda_url,  # type: ignore[arg-type]
+            data=payload_json,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=self._invoke_timeout) as resp:
+                return resp.read()
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(
+                f"Lambda HTTP invocation failed ({exc.code}): {body}"
+            ) from exc
+        except urllib.error.URLError as exc:
+            raise RuntimeError(f"Lambda HTTP invocation failed: {exc.reason}") from exc

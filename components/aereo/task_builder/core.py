@@ -230,14 +230,22 @@ def prepare_for_extraction(
     if not patch_groups:
         return []
 
+    # Pre-compute total chunks across all groups so chunk_id is globally unique
+    # and total_chunks reflects the entire job.
+    total_chunks = sum(
+        max(1, (len(all_patches) + cells_per_task - 1) // cells_per_task)
+        for _, _, _, all_patches in patch_groups
+    )
+
     tasks: list[ExtractionTask] = []
+    global_chunk_id = 0
     for start_time, crs, time_group, all_patches in patch_groups:
         patch_chunks = [
             all_patches[i : i + cells_per_task]
             for i in range(0, len(all_patches), cells_per_task)
         ]
 
-        for chunk_idx, patches in enumerate(patch_chunks):
+        for patches in patch_chunks:
             # Extract WGS84 raw geometry for grouping mask
             patch_geoms = [patch.cell_geometry for patch in patches]
             patches_union = _union_all(gpd.GeoSeries(patch_geoms))
@@ -251,12 +259,14 @@ def prepare_for_extraction(
             )
 
             task_context: dict[str, Any] = {
-                "chunk_id": chunk_idx,
-                "total_chunks": len(patch_chunks),
+                "job_id": job.name or "default",
+                "chunk_id": global_chunk_id,
+                "total_chunks": total_chunks,
                 "start_time": str(start_time),
                 "crs": crs,
                 "init_params": dict(init_params) if init_params else {},
             }
+            global_chunk_id += 1
 
             task = ExtractionTask(
                 assets=chunk_assets,

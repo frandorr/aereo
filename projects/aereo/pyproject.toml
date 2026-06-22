@@ -32,7 +32,6 @@ classifiers = [
 ]
 dependencies = [
   "attrs>=25.4",
-  "cartopy>=0.25",
   "cattrs>=24.1",
   "dask>=2025.4",
   "earthaccess>=0.18",
@@ -61,6 +60,7 @@ dependencies = [
   "utm>=0.8.1",
   "xarray>=2026.4",
 ]
+optional-dependencies.viz = [ "cartopy>=0.25" ]
 urls.Documentation = "https://frandorr.github.io/aereo"
 urls.Homepage = "https://github.com/frandorr/aereo"
 urls.Issues = "https://github.com/frandorr/aereo/issues"
@@ -85,10 +85,12 @@ build.targets.wheel.packages = [ "aereo" ]
 bricks."../../bases/aereo/cli" = "aereo/cli"
 bricks."../../bases/aereo/client" = "aereo/client"
 bricks."../../components/aereo/asset_downloader" = "aereo/asset_downloader"
+bricks."../../components/aereo/cache" = "aereo/cache"
 bricks."../../components/aereo/eoids" = "aereo/eoids"
 bricks."../../components/aereo/backends" = "aereo/backends"
 bricks."../../components/aereo/grid" = "aereo/grid"
 bricks."../../components/aereo/interfaces" = "aereo/interfaces"
+bricks."../../components/aereo/pipeline" = "aereo/pipeline"
 bricks."../../components/aereo/registry" = "aereo/registry"
 bricks."../../components/aereo/schemas" = "aereo/schemas"
 bricks."../../components/aereo/serialization" = "aereo/serialization"

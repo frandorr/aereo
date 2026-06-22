@@ -1,8 +1,16 @@
-"""AEREO Lambda handler entrypoint."""
+"""AEREO Lambda handler entrypoint.
+
+The handler receives a serialized :class:`~aereo.interfaces.ExtractionTask`
+from S3, executes it through :class:`~aereo.backends.TaskRunner`, and uploads
+the resulting artifacts (GeoTIFFs + metadata) back to S3.
+
+No plugin registry is required at module load time: the task itself carries
+a fully instantiated :class:`~aereo.interfaces.ExtractConfig` (reader,
+reprojector, writer, etc.) so the runner can execute it directly.
+"""
 
 from __future__ import annotations
 
-import importlib
 import logging
 import os
 import tempfile
@@ -12,43 +20,13 @@ from typing import Any
 
 from aereo.backends import CloudTaskStaging, TaskRunner
 from aereo.backends.lambda_backend import _safe_truncate
-from aereo.registry import AereoRegistry
 from aereo.serialization import TaskSerializer
 
 logger = logging.getLogger(__name__)
 
 _S3_PREFIX = "s3://"
 
-# Initialize once per cold start — eagerly import plugins to avoid
-# the ~20-30s entry-point scanning overhead in Lambda.
-_registry = AereoRegistry(auto_discover=False)
-
-# Eagerly register known plugins (import once, fast path).
-# Use conditional imports so the image stays lean — only plugins
-# that were actually installed in the Dockerfile get registered.
-_plugins_to_register: dict[str, Any] = {}
-
-_search_plugins = [
-    ("search_aws_goes", "aereo.search_aws_goes.core", "AwsGoesSearcher"),
-    ("search_earthaccess", "aereo.search_earthaccess.core", "EarthAccessSearcher"),
-    (
-        "search_planetary_computer",
-        "aereo.search_planetary_computer.core",
-        "PlanetaryComputerSearcher",
-    ),
-    ("search_rustac", "aereo.search_rustac.core", "RustacSearcher"),
-    ("search_tessera", "aereo.search_tessera.core", "SearchTessera"),
-]
-
-for name, module, cls_name in _search_plugins:
-    try:
-        mod = importlib.import_module(module)
-        _plugins_to_register[name] = getattr(mod, cls_name)
-    except (ModuleNotFoundError, ImportError, AttributeError):
-        pass  # Plugin not installed — skip
-
-_registry.register_plugins(_plugins_to_register)
-
+# Initialize once per cold start.
 _runner = TaskRunner()
 _serializer = TaskSerializer()
 

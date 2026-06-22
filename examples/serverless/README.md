@@ -12,6 +12,7 @@ This directory contains resources to run and test the AEREO Lambda container loc
 
 - `docker-compose.yml`: Set up a local stack containing the Lambda container and a MinIO service simulating S3.
 - `sample-event.json`: A mock event payload simulating an incoming task invocation.
+- `lambda_sentinel2_extraction.py`: Reproduces `examples/01-sentinel2.ipynb` using the Lambda backend and S3 storage.
 
 ## Step-by-Step Local Execution
 
@@ -43,7 +44,7 @@ You can use the `aereo` client to stage a task programmatically, pointing to Min
 
 ```python
 from aereo.client import AereoClient
-from aereo.backends import CloudTaskStaging
+from aereo.backends.staging import CloudTaskStaging
 
 # Set up local staging pointing to MinIO
 staging = CloudTaskStaging(bucket="aereo-local", endpoint_url="http://localhost:9000")
@@ -74,9 +75,20 @@ The emulator will execute `aereo.lambda_handler.core.handler` inside the contain
 }
 ```
 
-### 5. Installing Custom Extractor Plugins
+### 5. Reproduce the Sentinel-2 Notebook via Lambda
 
-To use the Lambda container with a custom extractor (e.g. `odc-stac` or `satpy`), you can modify `projects/aereo-lambda/Dockerfile` to install them from PyPI or copy local wheels:
+The `lambda_sentinel2_extraction.py` script mirrors `examples/01-sentinel2.ipynb` but executes each prepared task through the Lambda function and stores the resulting GeoTIFF artifacts in S3.
+
+```bash
+cd /root/repos/aereo
+uv run python examples/serverless/lambda_sentinel2_extraction.py
+```
+
+Set `AEREO_S3_BUCKET` and `AEREO_LAMBDA_FUNCTION` to target your deployment, and `AWS_ENDPOINT_URL` to point at MinIO/LocalStack when testing locally.
+
+### 6. Installing Custom Pipeline Plugins
+
+To use the Lambda container with a custom pipeline (e.g. `odc-stac` reader or `satpy` reader), modify `projects/aereo-lambda/Dockerfile` to install them from PyPI or copy local wheels:
 
 ```dockerfile
 # Inside projects/aereo-lambda/Dockerfile, Stage 2:

@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 import sys
 import time
+import urllib.error
+from http.client import HTTPMessage
 from pathlib import Path
 from typing import Any, cast
 from unittest.mock import MagicMock, patch
@@ -530,3 +532,79 @@ def test_safe_truncate_truncates_long_text():
     result = _safe_truncate(text, max_len=2048)
     assert len(result) < 3000
     assert "truncated" in result
+
+
+def test_lambda_backend_lambda_url_does_not_require_boto3():
+    """LambdaBackend accepts lambda_url without boto3 installed."""
+    staging = _FakeStaging()
+    with patch.dict(sys.modules, {"boto3": None}):
+        backend = LambdaBackend(
+            function_name="ignored",
+            staging=staging,
+            lambda_url="http://localhost:9000/2015-03-31/functions/function/invocations",
+        )
+    assert backend._lambda_client is None
+
+
+def test_lambda_backend_lambda_url_posts_payload():
+    """LambdaBackend POSTs JSON payload to lambda_url and parses the response."""
+    staging = _FakeStaging()
+    staging.artifacts_to_return = [_make_empty_artifacts()]
+    task = _make_task(task_context={"job_id": "job-http", "chunk_id": 3})
+
+    mock_response = MagicMock()
+    mock_response.read.return_value = json.dumps(
+        {"manifest_uri": "s3://bucket/results/job-http/3/manifest.json"}
+    ).encode("utf-8")
+    mock_response.__enter__.return_value = mock_response
+
+    with patch.dict(sys.modules, {"boto3": None}):
+        backend = LambdaBackend(
+            function_name="ignored",
+            staging=staging,
+            lambda_url="http://localhost:9000/2015-03-31/functions/function/invocations",
+        )
+        with patch(
+            "urllib.request.urlopen", return_value=mock_response
+        ) as mock_urlopen:
+            results = list(backend.run_tasks([task]))
+
+    assert len(results) == 1
+    mock_urlopen.assert_called_once()
+    request = mock_urlopen.call_args.args[0]
+    assert (
+        request.full_url
+        == "http://localhost:9000/2015-03-31/functions/function/invocations"
+    )
+    assert request.get_method() == "POST"
+    payload = json.loads(request.data.decode("utf-8"))
+    assert payload["job_id"] == "job-http"
+    assert payload["chunk_id"] == 3
+
+
+def test_lambda_backend_lambda_url_http_error_raises_runtime():
+    """HTTP errors from lambda_url are surfaced as RuntimeError."""
+    staging = _FakeStaging()
+    task = _make_task(task_context={"job_id": "job-http", "chunk_id": 0})
+
+    error_body = b'{"error": "boom"}'
+    error_fp = MagicMock()
+    error_fp.read.return_value = error_body
+    headers = HTTPMessage()
+    http_error = urllib.error.HTTPError(
+        url="http://localhost/invocations",
+        code=500,
+        msg="Internal Server Error",
+        hdrs=headers,
+        fp=error_fp,
+    )
+
+    with patch.dict(sys.modules, {"boto3": None}):
+        backend = LambdaBackend(
+            function_name="ignored",
+            staging=staging,
+            lambda_url="http://localhost/invocations",
+        )
+        with patch("urllib.request.urlopen", side_effect=http_error):
+            with pytest.raises(RuntimeError, match="Lambda HTTP invocation failed"):
+                list(backend.run_tasks([task]))
