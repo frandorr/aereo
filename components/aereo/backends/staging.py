@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import json
-import tempfile
 from pathlib import Path
 from typing import Any
 
-import geopandas as gpd
 from aereo.interfaces import TaskStaging
 from aereo.schemas import ArtifactSchema
+from aereo.storage import S3Storage
 from pandera.typing.geopandas import GeoDataFrame
 from structlog import get_logger
 
@@ -19,9 +17,6 @@ __all__ = ["CloudTaskStaging"]
 
 _TASK_PREFIX = "aereo-tasks/"
 _RESULTS_PREFIX = "results/"
-_ARTIFACTS_FILENAME = "artifacts.parquet"
-_MANIFEST_FILENAME = "manifest.json"
-_ARTIFACTS_URI_KEY = "artifacts_uri"
 
 
 def _parse_s3_uri(uri: str) -> tuple[str, str]:
@@ -73,6 +68,7 @@ class CloudTaskStaging(TaskStaging):
         self.bucket = bucket
         self.provider = provider
         self.endpoint_url = endpoint_url
+        self._storage = S3Storage(endpoint_url=endpoint_url)
         self._s3: Any | None = None
 
     def _client(self) -> Any:
@@ -140,29 +136,8 @@ class CloudTaskStaging(TaskStaging):
 
         Returns:
             A ``GeoDataFrame[ArtifactSchema]`` containing the downloaded artifacts.
-
-        Raises:
-            ValueError: If the manifest is missing the ``artifacts_uri`` key.
         """
-        s3 = self._client()
-        bucket, key = _parse_s3_uri(manifest_uri)
-
-        with tempfile.TemporaryDirectory() as tmpdir:
-            manifest_path = Path(tmpdir) / _MANIFEST_FILENAME
-            s3.download_file(bucket, key, str(manifest_path))
-            manifest = json.loads(manifest_path.read_text())
-
-        artifacts_uri = manifest.get(_ARTIFACTS_URI_KEY)
-        if not artifacts_uri:
-            raise ValueError(f"Manifest missing '{_ARTIFACTS_URI_KEY}': {manifest}")
-
-        bucket, key = _parse_s3_uri(artifacts_uri)
-        with tempfile.TemporaryDirectory() as tmpdir:
-            parquet_path = Path(tmpdir) / _ARTIFACTS_FILENAME
-            s3.download_file(bucket, key, str(parquet_path))
-            df = gpd.read_parquet(parquet_path)
-
-        return GeoDataFrame[ArtifactSchema](df)
+        return self._storage.load_artifacts(manifest_uri)
 
     def upload_artifacts(
         self,
@@ -178,19 +153,4 @@ class CloudTaskStaging(TaskStaging):
         Returns:
             A dict with ``manifest_uri`` pointing at the uploaded manifest.
         """
-        s3 = self._client()
-        bucket, prefix = _parse_s3_uri(output_prefix)
-
-        with tempfile.TemporaryDirectory() as tmpdir:
-            parquet_path = Path(tmpdir) / _ARTIFACTS_FILENAME
-            artifacts.to_parquet(parquet_path)
-            s3.upload_file(str(parquet_path), bucket, f"{prefix}{_ARTIFACTS_FILENAME}")
-
-            manifest = {
-                _ARTIFACTS_URI_KEY: f"s3://{bucket}/{prefix}{_ARTIFACTS_FILENAME}"
-            }
-            manifest_path = Path(tmpdir) / _MANIFEST_FILENAME
-            manifest_path.write_text(json.dumps(manifest))
-            s3.upload_file(str(manifest_path), bucket, f"{prefix}{_MANIFEST_FILENAME}")
-
-        return {"manifest_uri": f"s3://{bucket}/{prefix}{_MANIFEST_FILENAME}"}
+        return self._storage.upload_artifacts(artifacts, output_prefix)
