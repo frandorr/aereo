@@ -10,8 +10,11 @@ Each task is written as a pair of files inside a destination directory:
 from __future__ import annotations
 
 import importlib
+import io
 import json
 import logging
+import tempfile
+import zipfile
 from pathlib import Path
 from typing import Any, cast
 
@@ -277,3 +280,38 @@ class TaskSerializer:
             aoi=aoi,
             task_context=meta[self.TASK_CONTEXT_KEY],
         )
+
+    def serialize_to_bytes(self, task: ExtractionTask) -> bytes:
+        """Serialize *task* to an in-memory zip of GeoParquet + JSON.
+
+        Args:
+            task: The extraction task to serialize.
+
+        Returns:
+            Bytes containing a zip archive with ``task_assets.parquet`` and
+            ``task_meta.json``.
+        """
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                task_dir = Path(tmpdir)
+                self.serialize(task, task_dir)
+                zf.write(task_dir / self.ASSETS_NAME, self.ASSETS_NAME)
+                zf.write(task_dir / self.META_NAME, self.META_NAME)
+        return buffer.getvalue()
+
+    def deserialize_from_bytes(self, data: bytes) -> ExtractionTask:
+        """Reconstruct an :class:`ExtractionTask` from a zip byte payload.
+
+        Args:
+            data: Bytes previously produced by :meth:`serialize_to_bytes`.
+
+        Returns:
+            A fully reconstructed ``ExtractionTask``.
+        """
+        buffer = io.BytesIO(data)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir)
+            with zipfile.ZipFile(buffer, "r") as zf:
+                zf.extractall(task_dir)
+            return self.deserialize(task_dir)

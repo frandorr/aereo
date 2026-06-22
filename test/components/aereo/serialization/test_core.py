@@ -260,3 +260,30 @@ def test_batch_writer_round_trip(tmp_path: Any) -> None:
     reconstructed = serializer.deserialize(dest)
 
     assert isinstance(reconstructed.extract.write, BatchWriteGeoTIFF)
+
+
+def test_serialize_to_bytes_round_trip() -> None:
+    """Task round-trips through a zip byte payload."""
+    serializer = TaskSerializer()
+    original = _make_task()
+
+    payload = serializer.serialize_to_bytes(original)
+    reconstructed = serializer.deserialize_from_bytes(payload)
+
+    assert len(reconstructed.assets) == len(original.assets)
+    assert type(reconstructed.extract.read) is type(original.extract.read)
+    assert reconstructed.grid_config == original.grid_config
+    assert reconstructed.patches[0].id == original.patches[0].id
+    assert reconstructed.task_context == original.task_context
+
+
+def test_serialize_to_bytes_preserved_crs() -> None:
+    """Assets CRS survives byte payload round-trip."""
+    serializer = TaskSerializer()
+    original = _make_task()
+
+    payload = serializer.serialize_to_bytes(original)
+    reconstructed = serializer.deserialize_from_bytes(payload)
+
+    assert reconstructed.assets.crs is not None
+    assert reconstructed.assets.crs.to_epsg() == 4326
