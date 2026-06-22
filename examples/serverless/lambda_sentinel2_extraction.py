@@ -10,7 +10,7 @@ Prerequisites:
     - An AWS account and credentials configured (``aws configure``), *or* a
       local Lambda Runtime Interface Emulator (RIE) endpoint set via
       ``LAMBDA_URL``.
-    - The AEREO Lambda function deployed (see ``projects/aereo-lambda/DEPLOYMENT.md``).
+    - The AEREO Lambda function deployed (see ``projects/aereo-lambda/DEPLOYMENT_DETAILED.md``).
     - ``boto3`` installed (``uv pip install boto3`` or ``pip install boto3``),
       unless testing locally through ``LAMBDA_URL``.
 
