@@ -355,7 +355,7 @@ class AereoRegistry:
             logger.error(f"Failed to lazy-load plugin '{plugin_name}': {e}")
         return False
 
-    def get(self, type_label: str, plugin_name: str, **kwargs) -> Any:
+    def get(self, type_label: str, plugin_name: str, **kwargs: Any) -> Any:
         """Instantiate a plugin of *type_label* by *plugin_name*.
 
         Args:

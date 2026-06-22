@@ -159,6 +159,11 @@ venv.bak/
 # mkdocs documentation
 /site
 
+# Generated docs build artifacts (copied by docs/hooks/copy_notebooks.py)
+/docs/examples/*.ipynb
+/docs/examples/config/
+/docs/examples/serverless/
+
 # mypy
 .mypy_cache/
 .dmypy.json
@@ -239,11 +244,6 @@ examples/*.geojson
 !examples/buenos_aires*.geojson
 examples/data/*.geojson
 !examples/data/buenos_aires*.geojson
-examples/extraction/extract_buenos_aires_sentinel2_pc/
-examples/grid/*.png
-examples/visualization/*.png
-examples/PIPELINE_ARCHITECTURE.md
-examples/test_aoi.geojson
 *.pyc
 
 # AER public-release hygiene
@@ -251,5 +251,4 @@ examples/test_aoi.geojson
 
 # Generated example outputs & dev artifacts
 /*.png
-examples/extraction/*_output/
 site/

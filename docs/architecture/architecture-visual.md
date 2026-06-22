@@ -1,6 +1,6 @@
 # AEREO Architecture — Simplified Visual Guide
 
-> A clean, high-level map of the AEREO system. For deep implementation details, see [`pipeline-architecture.md`](./pipeline-architecture.md).
+> A clean, high-level map of the AEREO system. For deep implementation details, see [Pipeline Architecture](../concepts/pipeline-architecture.md).
 >
 > Rendered SVGs are available alongside this file: `aer-architecture-visualization-1.svg` through `aer-architecture-visualization-7.svg`.
 
@@ -130,7 +130,7 @@ flowchart TB
 | **Entry** | `aereo.cli` | Terminal commands (`search`, `run`, `plugins`) |
 | **Entry** | `aereo.client` | Python API — `AereoClient` class |
 | **Entry** | `aereo.lambda_handler` | AWS Lambda entrypoint |
-| **Core** | `aereo.interfaces` | Contracts — `SearchProvider`, `Extractor`, `AereoProfile`, `GridConfig` |
+| **Core** | `aereo.interfaces` | Contracts — `SearchProvider`, `Reader`, `Processor`, `Reprojector`, `Writer`, `GridConfig`, `ExtractConfig` |
 | **Core** | `aereo.registry` | Plugin discovery via `entry_points` |
 | **Data** | `aereo.schemas` | Pandera validation — `AssetSchema`, `ArtifactSchema`, `GridSchema` |
 | **Data** | `aereo.grid` | MajorTOM tiling — `GridDefinition`, `GridCell` |
