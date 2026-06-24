@@ -42,7 +42,7 @@ Ask the user (or infer from context) what type of plugin they need, interfaces l
 | **Extract** | `Extractor` | `extract()` | Processing/searching assets into raster artifacts (GeoTIFF, netCDF, etc.) |
 
 - Search plugins implements "search" method and return a `GeoDataFrame[AssetSchema]`
-- Extract plugins implements extract (and optionally prepare_for_extraction) and return a `GeoDataFrame[ArtifactSchema]` with raster output paths and grid metadata.
+- Extract plugins implement the pipeline stages in an `ExtractConfig` (reader, reprojector, processor, writer) and produce a `GeoDataFrame[ArtifactSchema]` with raster output paths and grid metadata. Task preparation is handled by a `TaskBuilder` plugin.
 
 ### 2. Gather Reference Plugins as Context
 

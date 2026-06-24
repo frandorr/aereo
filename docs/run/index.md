@@ -16,7 +16,7 @@ anything.
     ---
 
     `ExtractionJob.load_from_config()` → `AereoClient.search()` →
-    `prepare_tasks()` → `execute_tasks()`.
+    `build_tasks()` → `execute_tasks()`.
 
     [:octicons-arrow-right-24: Run with Python](run-with-python.md)
 

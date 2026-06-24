@@ -9,7 +9,7 @@ cells that cover an AOI is produced by a `GridDefinition`.
 ## GridDefinition
 
 A `GridDefinition` creates the cells that intersect any polygon. It is the first
-thing built during `prepare_tasks` (unless the extractor provides its own
+thing built during `build_tasks` (unless the extractor provides its own
 defaults).
 
 ```python
@@ -107,7 +107,7 @@ stacking arrays.
 
 ## Grid filtering modes
 
-During `prepare_tasks`, AEREO intersects the generated grid with the **asset
+During `build_tasks`, AEREO intersects the generated grid with the **asset
 geometry** (the actual satellite swath footprint, not the AOI). You can control
 how strict that intersection is via the grid config or prepare arguments:
 

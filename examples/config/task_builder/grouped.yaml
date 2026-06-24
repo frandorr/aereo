@@ -1,0 +1,3 @@
+_target_: aereo.builtins.task_builder.GroupedTaskBuilder
+cells_per_task: 50
+init_params: {}

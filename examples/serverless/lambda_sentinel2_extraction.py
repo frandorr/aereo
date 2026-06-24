@@ -110,10 +110,9 @@ def main() -> int:
     # 5. Prepare extraction tasks (same call as the notebook)
     # -----------------------------------------------------------------------
     print("\nPreparing extraction tasks...")
-    tasks = client.prepare_tasks(
+    tasks = client.build_tasks(
         search_results=search_results,
         job=job,
-        cells_per_task=5,
     )
     print(f"Prepared {len(tasks)} task(s)")
 

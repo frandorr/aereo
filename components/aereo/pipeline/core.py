@@ -15,17 +15,29 @@ from aereo.interfaces import (
     GridConfig,
     PatchConfig,
     SearchProvider,
+    TaskBuilder,
 )
 from aereo.interfaces.utils import normalize_geometry_input
 from pydantic import BaseModel, Field, field_validator
 from shapely.geometry.base import BaseGeometry
 
 
+def _default_task_builder() -> TaskBuilder:
+    """Return the default grouped task builder.
+
+    Imported lazily to avoid a circular import between ``aereo.pipeline`` and
+    ``aereo.builtins``.
+    """
+    from aereo.builtins.task_builder import GroupedTaskBuilder
+
+    return GroupedTaskBuilder()
+
+
 class ExtractionJob(BaseModel):
     """Declarative configuration tree for a complete extraction job.
 
-    Bundles search configuration, grid/patch settings, an output URI, and
-    extraction pipeline stages together into a single validated
+    Bundles search configuration, grid/patch settings, an output URI, a task
+    builder, and extraction pipeline stages together into a single validated
     Hydra-compatible model.
     """
 
@@ -56,6 +68,10 @@ class ExtractionJob(BaseModel):
         ),
     )
     search: SearchProvider | None = None
+    task_builder: TaskBuilder = Field(
+        default_factory=_default_task_builder,
+        description="Plugin that turns search results into extraction tasks.",
+    )
     extract: ExtractConfig
     target_aoi: BaseGeometry | dict[str, Any] | str | Path | None = Field(
         default=None,

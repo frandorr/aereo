@@ -20,6 +20,10 @@ format: table
 
 # ExtractionJob config defaults
 search: null
+task_builder:
+  _target_: aereo.builtins.task_builder.GroupedTaskBuilder
+  cells_per_task: 50
+  init_params: {}
 pipeline: []
 grid_config:
   _target_: aereo.interfaces.GridConfig

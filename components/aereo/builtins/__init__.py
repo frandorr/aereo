@@ -14,11 +14,13 @@ from aereo.builtins.read import ReadODCSTAC
 from aereo.builtins.reproject import ReprojectODC
 from aereo.builtins.search import SearchSTAC, SearchEarthaccess
 from aereo.builtins.batch_write import BatchWriteGeoTIFF
+from aereo.builtins.task_builder import GroupedTaskBuilder
 from aereo.builtins.write import WriteGeoTIFF
 
 __all__ = [
     "BatchWriteGeoTIFF",
     "Composite",
+    "GroupedTaskBuilder",
     "NDVI",
     "Normalize",
     "QAMask",

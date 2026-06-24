@@ -71,6 +71,7 @@ entry-points."aereo.plugins".process_select_bands = "aereo.builtins.processor:Se
 entry-points."aereo.plugins".read_odc_stac = "aereo.builtins.read:ReadODCSTAC"
 entry-points."aereo.plugins".reproject_odc = "aereo.builtins.reproject:ReprojectODC"
 entry-points."aereo.plugins".search_stac = "aereo.builtins.search:SearchSTAC"
+entry-points."aereo.plugins".task_builder_grouped = "aereo.builtins.task_builder:GroupedTaskBuilder"
 entry-points."aereo.plugins".write_geotiff = "aereo.builtins.write:WriteGeoTIFF"
 
 [dependency-groups]

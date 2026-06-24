@@ -1,7 +1,8 @@
-"""Standalone task builder for preparing extraction tasks.
+"""Built-in task builder plugin.
 
-This module provides functions to prepare extraction tasks from search results,
-grouping assets temporally and chunking them spatially.
+Provides the default ``GroupedTaskBuilder`` which groups search-result assets
+by ``start_time`` and native ``crs``, intersects them with the effective AOI,
+generates grid patches, and chunks the patches into ``ExtractionTask`` objects.
 """
 
 from __future__ import annotations
@@ -16,11 +17,13 @@ from aereo.interfaces.core import (
     ExtractionTask,
     GridConfig,
     PatchConfig,
+    TaskBuilder,
 )
-from aereo.pipeline import ExtractionJob
 from aereo.interfaces.utils import _skip_empty, _union_all
+from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
+from pydantic import Field
 from shapely.geometry.base import BaseGeometry
 
 _VALID_FILTER_MODES = frozenset({"intersection", "within", "coverage"})
@@ -165,116 +168,127 @@ def _filter_patches_by_mode(
     return filtered
 
 
-def prepare_for_extraction(
-    search_results: GeoDataFrame[AssetSchema],
-    job: ExtractionJob,
-    cells_per_task: int = DEFAULT_CELLS_PER_TASK,
-    init_params: dict[str, Any] | None = None,
-    target_aoi: BaseGeometry | None = None,
-) -> Sequence[ExtractionTask]:
-    """Prepare extraction tasks by grouping assets and chunking grid patches.
+class GroupedTaskBuilder(TaskBuilder):
+    """Default task builder: group assets by time/CRS, grid, filter, and chunk.
 
-    Groups search results by start time, generates extraction patches,
-    optionally filters them by AOI coverage, then chunks into tasks.
-
-    Args:
-        search_results: GeoDataFrame of assets from the search phase.
-        job: Parent ``ExtractionJob`` supplying extraction configuration.
-        cells_per_task: Maximum number of patches per task chunk.
-        init_params: Optional parameters added to each task's context.
-        target_aoi: Optional geometry to override ``job.effective_target_aoi``.
-
-    Returns:
-        A sequence of ExtractionTask objects ready for execution.
-
-    Raises:
-        ValueError: If ``job.output_uri`` is empty or ``grid_dist`` is not set in
-            ``job.grid_config``.
+    Assets are grouped by ``start_time`` and native ``crs``. For each group,
+    the union of asset geometries is intersected with the effective AOI and
+    diced into grid cells. The resulting patches are filtered according to
+    ``grid_config.grid_filter_mode`` and chunked into tasks of at most
+    ``cells_per_task`` patches.
     """
-    grid_config = job.grid_config
-    patch_config = job.patch_config
-    output_uri = job.output_uri
-    effective_aoi = target_aoi if target_aoi is not None else job.effective_target_aoi
 
-    if not output_uri:
-        raise ValueError("ExtractionJob.output_uri must be a non-empty string.")
-
-    grid_dist = grid_config.target_grid_dist
-    if grid_dist is None:
-        raise ValueError(
-            "GridConfig.target_grid_dist must be an explicit integer (e.g. 50_000)."
-        )
-
-    grid_def = GridDefinition(d=grid_dist, overlap=grid_config.target_grid_overlap)
-
-    if search_results.empty:
-        return []
-
-    has_crs = "crs" in search_results.columns
-    if not has_crs:
-        warn(
-            "assets has no 'crs' column; assuming all assets share the same "
-            "native CRS. Mixed-CRS assets in one task may fail or produce "
-            "incorrect results.",
-            UserWarning,
-            stacklevel=2,
-        )
-
-    patch_groups = _generate_patch_groups(
-        assets=search_results,
-        target_aoi=effective_aoi,
-        grid_def=grid_def,
-        grid_config=grid_config,
-        patch_config=patch_config,
+    cells_per_task: int = Field(
+        default=DEFAULT_CELLS_PER_TASK,
+        description="Maximum number of patches per task chunk.",
     )
-    if not patch_groups:
-        return []
-
-    # Pre-compute total chunks across all groups so chunk_id is globally unique
-    # and total_chunks reflects the entire job.
-    total_chunks = sum(
-        max(1, (len(all_patches) + cells_per_task - 1) // cells_per_task)
-        for _, _, _, all_patches in patch_groups
+    init_params: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Optional parameters added to each task's context.",
     )
 
-    tasks: list[ExtractionTask] = []
-    global_chunk_id = 0
-    for start_time, crs, time_group, all_patches in patch_groups:
-        patch_chunks = [
-            all_patches[i : i + cells_per_task]
-            for i in range(0, len(all_patches), cells_per_task)
-        ]
+    def __call__(
+        self,
+        search_results: GeoDataFrame[AssetSchema],
+        job: ExtractionJob,
+    ) -> Sequence[ExtractionTask]:
+        """Build extraction tasks from *search_results* using *job* configuration.
 
-        for patches in patch_chunks:
-            # Extract WGS84 raw geometry for grouping mask
-            patch_geoms = [patch.cell_geometry for patch in patches]
-            patches_union = _union_all(gpd.GeoSeries(patch_geoms))
+        Args:
+            search_results: GeoDataFrame of assets from the search phase.
+            job: Parent ``ExtractionJob`` supplying extraction configuration.
 
-            intersecting_mask = (
-                time_group.intersects(patches_union) | time_group.geometry.isna()
+        Returns:
+            A sequence of ``ExtractionTask`` objects ready for execution.
+
+        Raises:
+            ValueError: If ``job.output_uri`` is empty or ``grid_dist`` is not set in
+                ``job.grid_config``.
+        """
+        grid_config = job.grid_config
+        patch_config = job.patch_config
+        output_uri = job.output_uri
+        effective_aoi = job.effective_target_aoi
+
+        if not output_uri:
+            raise ValueError("ExtractionJob.output_uri must be a non-empty string.")
+
+        grid_dist = grid_config.target_grid_dist
+        if grid_dist is None:
+            raise ValueError(
+                "GridConfig.target_grid_dist must be an explicit integer (e.g. 50_000)."
             )
-            chunk_assets = cast(
-                GeoDataFrame[AssetSchema],
-                time_group[intersecting_mask].copy(),
+
+        grid_def = GridDefinition(d=grid_dist, overlap=grid_config.target_grid_overlap)
+
+        if search_results.empty:
+            return []
+
+        has_crs = "crs" in search_results.columns
+        if not has_crs:
+            warn(
+                "assets has no 'crs' column; assuming all assets share the same "
+                "native CRS. Mixed-CRS assets in one task may fail or produce "
+                "incorrect results.",
+                UserWarning,
+                stacklevel=2,
             )
 
-            task_context: dict[str, Any] = {
-                "job_id": job.name or "default",
-                "chunk_id": global_chunk_id,
-                "total_chunks": total_chunks,
-                "start_time": str(start_time),
-                "crs": crs,
-                "init_params": dict(init_params) if init_params else {},
-            }
-            global_chunk_id += 1
+        patch_groups = _generate_patch_groups(
+            assets=search_results,
+            target_aoi=effective_aoi,
+            grid_def=grid_def,
+            grid_config=grid_config,
+            patch_config=patch_config,
+        )
+        if not patch_groups:
+            return []
 
-            task = ExtractionTask(
-                assets=chunk_assets,
-                job=job,
-                patches=patches,
-                aoi=effective_aoi,
-                task_context=task_context,
-            )
-            tasks.append(task)
+        # Pre-compute total chunks across all groups so chunk_id is globally unique
+        # and total_chunks reflects the entire job.
+        total_chunks = sum(
+            max(1, (len(all_patches) + self.cells_per_task - 1) // self.cells_per_task)
+            for _, _, _, all_patches in patch_groups
+        )
 
-    return tasks
+        tasks: list[ExtractionTask] = []
+        global_chunk_id = 0
+        for start_time, crs, time_group, all_patches in patch_groups:
+            patch_chunks = [
+                all_patches[i : i + self.cells_per_task]
+                for i in range(0, len(all_patches), self.cells_per_task)
+            ]
+
+            for patches in patch_chunks:
+                # Extract WGS84 raw geometry for grouping mask
+                patch_geoms = [patch.cell_geometry for patch in patches]
+                patches_union = _union_all(gpd.GeoSeries(patch_geoms))
+
+                intersecting_mask = (
+                    time_group.intersects(patches_union) | time_group.geometry.isna()
+                )
+                chunk_assets = cast(
+                    GeoDataFrame[AssetSchema],
+                    time_group[intersecting_mask].copy(),
+                )
+
+                task_context: dict[str, Any] = {
+                    "job_id": job.name or "default",
+                    "chunk_id": global_chunk_id,
+                    "total_chunks": total_chunks,
+                    "start_time": str(start_time),
+                    "crs": crs,
+                    "init_params": dict(self.init_params),
+                }
+                global_chunk_id += 1
+
+                task = ExtractionTask(
+                    assets=chunk_assets,
+                    job=job,
+                    patches=patches,
+                    aoi=effective_aoi,
+                    task_context=task_context,
+                )
+                tasks.append(task)
+
+        return tasks

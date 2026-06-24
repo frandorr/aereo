@@ -189,7 +189,6 @@ nav:
                 - Interfaces: api/interfaces.md
                 - Registry: api/registry.md
                 - Schemas: api/schemas.md
-                - Task Builder: api/task_builder.md
           - Built-ins:
                 - Built-in Plugins: api/builtins.md
                 - Cache: api/cache.md
