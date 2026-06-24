@@ -22,6 +22,7 @@ from shapely.geometry.base import BaseGeometry
 from aereo.client import AereoClient
 from aereo.backends import LocalProcessBackend
 from aereo.interfaces import ExtractConfig, normalize_geometry_input
+from aereo.pipeline import ExtractionJob
 from aereo.interfaces.utils import _extract_geometry_from_geojson
 from aereo.schemas import AssetSchema
 from aereo.registry import AereoRegistry
@@ -238,7 +239,7 @@ def _pipeline_to_extract(
     The CLI ``pipeline`` key is a flat list ordered as
     ``[reader, preprocess..., reprojector, postprocess..., writer]``.
     This helper partitions the list into the structured ``ExtractConfig``
-    expected by ``AereoClient.prepare_tasks``.
+    expected by ``ExtractionJob``.
     """
     if not pipeline:
         return None
@@ -303,7 +304,7 @@ def _add_plugin_rows(
         registry: AereoRegistry instance to query metadata.
     """
     for name, cls in plugins.items():
-        reg_key = label.lower()
+        reg_key = label.replace(" ", "_").lower()
         collections = registry._registries[reg_key].get_collections(name)
         cols = ", ".join(collections[:3])
         if len(collections) > 3:
@@ -367,6 +368,12 @@ def plugins_cmd(cfg: DictConfig | None = None) -> None:
     table.add_column("Optional", style="blue")
 
     _add_plugin_rows(table, "Searcher", registry._searchers, registry)
+    _add_plugin_rows(
+        table,
+        "Task Builder",
+        registry._registries["task_builder"].plugins,
+        registry,
+    )
 
     for label in ("reader", "reprojector", "processor", "writer", "batch_writer"):
         _add_plugin_rows(
@@ -470,32 +477,43 @@ def _run_prepare_action(cfg: DictConfig) -> None:
     pipeline = hydra.utils.instantiate(cfg.pipeline)
     grid_config = hydra.utils.instantiate(cfg.grid_config)
     patch_config = hydra.utils.instantiate(cfg.patch_config)
+    task_builder = hydra.utils.instantiate(cfg.task_builder)
     extract = _pipeline_to_extract(pipeline)
+    if extract is None:
+        console.print(
+            "[red]pipeline must include a Reader plugin as its first element.[/red]"
+        )
+        sys.exit(1)
 
     output_dir = Path(cfg.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     target_aoi = _resolve_target_aoi(cfg)
 
+    job = ExtractionJob(
+        grid_config=grid_config,
+        patch_config=patch_config,
+        output_uri=cfg.get("output_uri") or str(output_dir),
+        search=None,
+        task_builder=task_builder,
+        extract=extract,
+        target_aoi=target_aoi,
+        overwrite=cfg.overwrite,
+    )
+
     client = AereoClient()
     tasks = _run_with_exit(
         "Prepare",
-        client.prepare_tasks,
+        client.build_tasks,
         search_results=df,
-        grid_config=grid_config,
-        patch_config=patch_config,
-        extract=extract,
-        output_uri=cfg.get("output_uri") or str(output_dir),
-        target_aoi=target_aoi,
-        cells_per_task=cfg.cells_per_task,
-        overwrite=cfg.overwrite,
+        job=job,
     )
 
     task_file = Path(cfg.output) if cfg.output else (output_dir / "tasks.pkl")
     task_file.write_bytes(pickle.dumps(tasks))
-    console.print(
-        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cfg.cells_per_task}).[/green]"
-    )
+    chunk_size = getattr(job.task_builder, "cells_per_task", None)
+    chunk_msg = f" (chunk size: {chunk_size})" if chunk_size is not None else ""
+    console.print(f"[green]✓ Prepared {len(tasks)} tasks{chunk_msg}.[/green]")
     console.print(f"[green]Wrote tasks to[/green] {task_file}")
 
 
@@ -552,12 +570,29 @@ def _run_run_action(cfg: DictConfig) -> None:
     pipeline = hydra.utils.instantiate(cfg.pipeline)
     grid_config = hydra.utils.instantiate(cfg.grid_config)
     patch_config = hydra.utils.instantiate(cfg.patch_config)
+    task_builder = hydra.utils.instantiate(cfg.task_builder)
     extract = _pipeline_to_extract(pipeline)
+    if extract is None:
+        console.print(
+            "[red]pipeline must include a Reader plugin as its first element.[/red]"
+        )
+        sys.exit(1)
 
     output_dir = Path(cfg.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     target_aoi = _resolve_target_aoi(cfg, fallback=search_provider.intersects)
+
+    job = ExtractionJob(
+        grid_config=grid_config,
+        patch_config=patch_config,
+        output_uri=cfg.get("output_uri") or str(output_dir),
+        search=search_provider,
+        task_builder=task_builder,
+        extract=extract,
+        target_aoi=target_aoi,
+        overwrite=cfg.overwrite,
+    )
 
     client = AereoClient()
 
@@ -571,19 +606,13 @@ def _run_run_action(cfg: DictConfig) -> None:
     console.print("[bold blue]📦 Preparing...[/bold blue]")
     tasks = _run_with_exit(
         "Prepare",
-        client.prepare_tasks,
+        client.build_tasks,
         search_results=results,
-        extract=extract,
-        grid_config=grid_config,
-        patch_config=patch_config,
-        output_uri=cfg.get("output_uri") or str(output_dir),
-        target_aoi=target_aoi,
-        cells_per_task=cfg.cells_per_task,
-        overwrite=cfg.overwrite,
+        job=job,
     )
-    console.print(
-        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cfg.cells_per_task}).[/green]"
-    )
+    chunk_size = getattr(job.task_builder, "cells_per_task", None)
+    chunk_msg = f" (chunk size: {chunk_size})" if chunk_size is not None else ""
+    console.print(f"[green]✓ Prepared {len(tasks)} tasks{chunk_msg}.[/green]")
 
     # Extract
     console.print("[bold blue]⛏️ Extracting...[/bold blue]")
@@ -605,6 +634,8 @@ def _run_validate_action(cfg: DictConfig) -> None:
     try:
         if cfg.get("search"):
             hydra.utils.instantiate(cfg.search)
+        if cfg.get("task_builder"):
+            hydra.utils.instantiate(cfg.task_builder)
         if cfg.get("pipeline"):
             hydra.utils.instantiate(cfg.pipeline)
         if cfg.get("grid_config"):

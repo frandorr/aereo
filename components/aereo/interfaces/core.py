@@ -358,6 +358,33 @@ class PipelineCallback:
         pass
 
 
+class TaskBuilder(AereoPlugin, ABC):
+    """Builds a sequence of extraction tasks from search results.
+
+    Task builders are job-level plugins: they run once per job, grouping and
+    chunking search-result assets into ``ExtractionTask`` objects that the
+    per-task extraction pipeline can execute.
+    """
+
+    @abstractmethod
+    def __call__(
+        self,
+        search_results: GeoDataFrame[AssetSchema],
+        job: ExtractionJob,
+    ) -> Sequence[ExtractionTask]:
+        """Build extraction tasks from *search_results* using *job* configuration.
+
+        Args:
+            search_results: GeoDataFrame of assets returned by a search provider.
+            job: Parent extraction job supplying grid, patch, output, and stage
+                configuration.
+
+        Returns:
+            A sequence of prepared extraction tasks.
+        """
+        ...
+
+
 class SearchProvider(AereoPlugin, ABC):
     """Interface for search providers.
 

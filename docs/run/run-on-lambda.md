@@ -12,7 +12,7 @@ cells or heavy resampling work and want to offload it from your local machine.
 Your machine                          AWS Lambda
 ┌─────────────────┐                   ┌─────────────────┐
 │ AereoClient     │  1. Serialize     │ Lambda handler  │
-│ prepare_tasks() │ ──▶ task assets   │ receives task   │
+│ build_tasks() │ ──▶ task assets   │ receives task   │
 │                 │    + metadata     │                 │
 └─────────────────┘                   └─────────────────┘
         │                                    │
@@ -61,7 +61,7 @@ job = ExtractionJob.load_from_config("examples/config", config_name="job_sentine
 client = AereoClient()
 
 results = client.search(job.search)
-tasks = client.prepare_tasks(results, job=job)
+tasks = client.build_tasks(results, job=job)
 
 backend = LambdaBackend(
     function_name="aereo-extract",

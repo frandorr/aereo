@@ -5,27 +5,15 @@ This module defines :class:`AereoClient` and its supporting utilities.
 
 from collections.abc import Sequence
 from enum import Enum
-from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 import pandas as pd
 from aereo.backends import LocalProcessBackend, TaskRunner
 from aereo.cache import TaskResultCache
-from aereo.interfaces import (
-    DEFAULT_CELLS_PER_TASK,
-    ExtractConfig,
-    ExecutionBackend,
-    ExtractionTask,
-    GridConfig,
-    PatchConfig,
-    SearchProvider,
-)
-from aereo.interfaces import normalize_geometry_input
-from aereo.schemas import ArtifactSchema, AssetSchema
+from aereo.interfaces import ExecutionBackend, ExtractionTask, SearchProvider
 from aereo.pipeline import ExtractionJob
-from aereo.task_builder import prepare_for_extraction
+from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
-from shapely.geometry.base import BaseGeometry
 from structlog import get_logger
 
 logger = get_logger()
@@ -38,70 +26,24 @@ class FailureMode(str, Enum):
     BEST_EFFORT = "best_effort"
 
 
-def normalize_geometry(geom: Any) -> BaseGeometry | None:
-    """Ensures input geometries are Shapely objects before passing to Plugins.
-
-    Args:
-        geom: Geometry input (dict, BaseGeometry, path string/Path, or None).
-
-    Returns:
-        A Shapely BaseGeometry, or None if input was None.
-
-    Raises:
-        ValueError: If the geometry format is unsupported.
-    """
-    return normalize_geometry_input(geom)
-
-
-class _NoopSearchProvider(SearchProvider):
-    """Placeholder search provider for jobs created from explicit client args.
-
-    This provider is never invoked; it only carries an optional intersects
-    geometry so that ``ExtractionJob.effective_target_aoi`` can fall back
-    correctly when no explicit ``target_aoi`` is supplied.
-    """
-
-    def __call__(self) -> GeoDataFrame[AssetSchema]:
-        """Raise unconditionally; this provider is a configuration-only stub."""
-        raise NotImplementedError("_NoopSearchProvider cannot perform searches.")
-
-
 class AereoClient:
     """Core external entrypoint orchestrating the Geospatial pipeline.
 
     Responsibilities:
-    - Accepts user queries and parameters
-    - Executes search dispatch to remote plugin APIs
-    - Prepares and distributes extraction tasks dynamically based on results
+    - Execute search dispatch to remote plugin APIs.
+    - Build extraction tasks from search results via the job's task builder.
+    - Execute prepared tasks through a configurable backend.
     """
 
-    def __init__(
-        self,
-        grid_config: GridConfig | None = None,
-        patch_config: PatchConfig | None = None,
-        aoi: BaseGeometry | dict | None = None,
-        backend: ExecutionBackend | None = None,
-        cells_per_task: int | None = None,
-    ):
+    def __init__(self, backend: ExecutionBackend | None = None):
         """Initialize the AereoClient.
 
         Args:
-            grid_config: Default grid configuration for extraction.
-            patch_config: Default patch configuration for ML extraction.
-            aoi: Default area of interest geometry.
-            backend: Default execution backend.
-            cells_per_task: Default number of grid cells per extraction task.
+            backend: Default execution backend for :meth:`execute_tasks`.
         """
-        self._grid_config = grid_config
-        self._patch_config = patch_config
-        self._aoi = normalize_geometry(aoi)
         self._backend = backend
-        self._cells_per_task = cells_per_task
 
-    def search(
-        self,
-        search_provider: SearchProvider,
-    ) -> GeoDataFrame[AssetSchema]:
+    def search(self, search_provider: SearchProvider) -> GeoDataFrame[AssetSchema]:
         """Execute search via the given search provider.
 
         Args:
@@ -113,114 +55,29 @@ class AereoClient:
         logger.info("search_called", provider=search_provider.__class__.__name__)
         return search_provider()
 
-    def prepare_tasks(
+    def build_tasks(
         self,
         search_results: GeoDataFrame[AssetSchema],
-        extract: ExtractConfig | None = None,
-        grid_config: GridConfig | None = None,
-        patch_config: PatchConfig | None = None,
-        output_uri: str | None = None,
-        target_aoi: BaseGeometry | dict | str | Path | None = None,
-        cells_per_task: int | None = None,
-        job: ExtractionJob | None = None,
-        overwrite: bool = False,
+        job: ExtractionJob,
     ) -> Sequence[ExtractionTask]:
-        """Groups search results by start time and distributes batches into tasks.
+        """Build extraction tasks from search results using the job's task builder.
 
         Args:
             search_results: The merged GeoDataFrame of search results to prepare.
-            extract: Declarative configuration of extraction stages to execute.
-                Required when ``job`` is not provided; ignored when ``job`` is
-                provided unless passed explicitly.
-            grid_config: Explicit tiling specification. Falls back to client default
-                or ``job.grid_config`` when ``job`` is provided.
-            patch_config: Explicit patch configuration. Falls back to client default
-                or ``job.patch_config`` when ``job`` is provided.
-            output_uri: An optional URI defining output path. Falls back to
-                ``job.output_uri`` when ``job`` is provided.
-            target_aoi: Optional AOI geometry used to clip prepared tasks.
-                Resolution order: explicit argument, ``job.target_aoi``,
-                client default ``aoi``, ``job.search.intersects``.
-            cells_per_task: Max grid cells per ExtractionTask. Falls back to client default.
-            job: Optional parent ``ExtractionJob`` to attach to each task. When
-                provided, missing explicit args are derived from the job.
-            overwrite: Whether prepared tasks should bypass any existing per-task
-                artifact cache. Ignored when ``job`` is provided (the job's own
-                ``overwrite`` value is used instead).
+            job: Parent ``ExtractionJob`` whose ``task_builder`` produces tasks.
 
         Returns:
-            A Sequence of prepared ExtractionTasks.
-
-        Raises:
-            ValueError: If required configuration cannot be resolved from either
-                explicit arguments or ``job``.
+            A sequence of prepared ``ExtractionTask`` objects.
         """
         if search_results.empty:
             return []
 
-        effective_cells_per_task = (
-            cells_per_task
-            if cells_per_task is not None
-            else (self._cells_per_task or DEFAULT_CELLS_PER_TASK)
+        logger.info(
+            "build_tasks_start",
+            builder=job.task_builder.__class__.__name__,
+            assets=len(search_results),
         )
-
-        if target_aoi is not None:
-            effective_aoi = normalize_geometry_input(target_aoi)
-        elif job is not None and job.target_aoi is not None:
-            effective_aoi = job.target_aoi
-        elif self._aoi is not None:
-            effective_aoi = self._aoi
-        elif job is not None:
-            effective_aoi = job.effective_target_aoi
-        else:
-            effective_aoi = None
-
-        if job is not None:
-            grid_config = grid_config or job.grid_config
-            patch_config = patch_config or job.patch_config
-            output_uri = output_uri or job.output_uri
-            extract = extract or job.extract
-        else:
-            grid_config = self._grid_config if grid_config is None else grid_config
-            patch_config = self._patch_config if patch_config is None else patch_config
-            output_uri = output_uri or ""
-
-        if grid_config is None:
-            raise ValueError(
-                "grid_config must be provided either as a method argument, "
-                "as a client default, or via ``job``."
-            )
-        if patch_config is None:
-            raise ValueError(
-                "patch_config must be provided either as a method argument, "
-                "as a client default, or via ``job``."
-            )
-        if extract is None:
-            raise ValueError(
-                "extract must be provided either as a method argument or via ``job``."
-            )
-
-        resolved_job = ExtractionJob(
-            name=job.name if job is not None else "default",
-            derivative=job.derivative if job is not None else None,
-            grid_config=grid_config,
-            patch_config=patch_config,
-            output_uri=output_uri or "",
-            overwrite=job.overwrite if job is not None else overwrite,
-            search=(
-                job.search
-                if job is not None and job.search is not None
-                else _NoopSearchProvider(intersects=effective_aoi)
-            ),
-            extract=extract,
-            target_aoi=effective_aoi,
-        )
-
-        return prepare_for_extraction(
-            search_results=search_results,
-            job=resolved_job,
-            cells_per_task=effective_cells_per_task,
-        )
+        return job.task_builder(search_results, job)
 
     def execute_tasks(
         self,
@@ -231,7 +88,7 @@ class AereoClient:
         """Execute a sequence of ExtractionTasks through a configurable backend.
 
         Args:
-            tasks: A sequence of ExtractionTasks, usually from prepare_tasks.
+            tasks: A sequence of ExtractionTasks, usually from :meth:`build_tasks`.
             backend: An ExecutionBackend implementation. Defaults to LocalProcessBackend().
             failure_mode: STRICT raises on the first failure; BEST_EFFORT processes tasks individually.
 
@@ -282,7 +139,6 @@ class AereoClient:
             raise
 
         if not results:
-            logger.warning("execute_tasks_empty_result")
             return cast(GeoDataFrame, ArtifactSchema.empty())
 
         concatenated = pd.concat(results, ignore_index=True)

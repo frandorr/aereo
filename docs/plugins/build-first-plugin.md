@@ -225,7 +225,7 @@ job = ExtractionJob.load_from_config("configs/acme", config_name="job")
 client = AereoClient()
 
 results = client.search(job.search)
-tasks = client.prepare_tasks(results, job=job)
+tasks = client.build_tasks(results, job=job)
 artifacts = client.execute_tasks(tasks, backend=LocalProcessBackend(max_workers=2))
 ```
 

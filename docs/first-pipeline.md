@@ -85,11 +85,11 @@ validated `GeoDataFrame[AssetSchema]`.
 ## 5. Prepare tasks
 
 ```python
-tasks = client.prepare_tasks(results, job=job)
+tasks = client.build_tasks(results, job=job)
 print(f"Prepared {len(tasks)} extraction tasks")
 ```
 
-`prepare_tasks()` turns search results into a list of `ExtractionTask` objects,
+`build_tasks()` turns search results into a list of `ExtractionTask` objects,
 each carrying the grid cells, assets, and extraction stages it needs.
 
 ---

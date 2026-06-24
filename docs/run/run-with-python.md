@@ -61,7 +61,7 @@ results = client.search(job.search)
 print(f"Found {len(results)} assets")
 
 # 2. Prepare tasks
-tasks = client.prepare_tasks(results, job=job)
+tasks = client.build_tasks(results, job=job)
 print(f"Prepared {len(tasks)} tasks")
 
 # 3. Execute
@@ -75,7 +75,7 @@ Each step returns a typed GeoDataFrame:
 | Step | Method | Input | Output |
 |------|--------|-------|--------|
 | Search | `client.search(search_provider)` | `SearchProvider` | `GeoDataFrame[AssetSchema]` |
-| Prepare | `client.prepare_tasks(search_results, job=job)` | search results + job | `Sequence[ExtractionTask]` |
+| Prepare | `client.build_tasks(search_results, job=job)` | search results + job | `Sequence[ExtractionTask]` |
 | Execute | `client.execute_tasks(tasks, backend=backend)` | tasks + backend | `GeoDataFrame[ArtifactSchema]` |
 
 ---
@@ -93,7 +93,7 @@ job = ExtractionJob.load_from_config("examples/config", config_name="job_sentine
 client = AereoClient()
 
 results = client.search(job.search)
-tasks = client.prepare_tasks(results, job=job)
+tasks = client.build_tasks(results, job=job)
 artifacts = client.execute_tasks(tasks, backend=LocalProcessBackend(max_workers=2))
 
 print(artifacts[["id", "grid_cell", "uri"]].head())
@@ -110,8 +110,10 @@ config package.
 from datetime import datetime
 from aereo.client import AereoClient
 from aereo.builtins import SearchSTAC, ReadODCSTAC, ReprojectODC, WriteGeoTIFF
-from aereo.grid import UTMGridConfig
+from aereo.grid import GridConfig
 from aereo.interfaces import PatchConfig, ExtractConfig
+from aereo.pipeline import ExtractionJob
+from aereo.builtins import GroupedTaskBuilder
 
 search = SearchSTAC(
     stac_api_url="https://planetarycomputer.microsoft.com/api/stac/v1",
@@ -127,35 +129,39 @@ extract = ExtractConfig(
     write=WriteGeoTIFF(),
 )
 
-client = AereoClient()
-results = client.search(search)
-tasks = client.prepare_tasks(
-    results,
-    extract=extract,
-    grid_config=UTMGridConfig(target_grid_dist=10_000),
+job = ExtractionJob(
+    search=search,
+    task_builder=GroupedTaskBuilder(cells_per_task=50),
+    grid_config=GridConfig(target_grid_dist=10_000),
     patch_config=PatchConfig(resolution=10.0),
     output_uri="/tmp/aereo_python",
+    extract=extract,
 )
-artifacts = client.execute_tasks(tasks)
+
+client = AereoClient()
+results = client.search(job.search)
+tasks = client.build_tasks(results, job=job)
+artifacts = client.execute_tasks(tasks, job=job)
 ```
 
 ---
 
 ## Troubleshooting
 
-### `ValueError: grid_config must be provided`
+### `ValueError: ExtractionJob.output_uri must be a non-empty string`
 
-`prepare_tasks()` needs a `grid_config`. Pass it explicitly, set it as a client
-default, or load the job from a config package.
+`build_tasks()` receives a complete ``ExtractionJob``. Make sure ``output_uri``
+is set, either in your YAML config or when constructing the job in Python.
 
-### `ValueError: patch_config must be provided`
+### `ValueError: GridConfig.target_grid_dist must be an explicit integer`
 
-Same as above: `patch_config` is required.
+`build_tasks()` needs a ``GridConfig`` with an explicit ``target_grid_dist``.
+Set it in your job config or ``ExtractionJob`` constructor.
 
 ### `ValueError: extract must be provided`
 
-`prepare_tasks()` needs an `ExtractConfig`. When loading from a config package,
-make sure the `extract:` group is selected in your YAML defaults.
+``ExtractionJob`` needs an ``ExtractConfig``. When loading from a config package,
+make sure the ``extract:`` group is selected in your YAML defaults.
 
 ### Empty search results
 

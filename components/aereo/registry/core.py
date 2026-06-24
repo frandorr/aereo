@@ -16,6 +16,7 @@ from aereo.interfaces.core import (
     Reader,
     Reprojector,
     SearchProvider,
+    TaskBuilder,
     Writer,
 )
 from structlog import get_logger
@@ -219,6 +220,7 @@ class AereoRegistry:
     # prefix -> (type_label, base_class)
     PLUGIN_TYPES: dict[str, tuple[str, Type]] = {
         "search_": ("searcher", SearchProvider),
+        "task_builder_": ("task_builder", TaskBuilder),
         "read_": ("reader", Reader),
         "reproject_": ("reprojector", Reprojector),
         "process_": ("processor", Processor),

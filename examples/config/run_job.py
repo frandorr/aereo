@@ -88,10 +88,9 @@ def run_pipeline(job: ExtractionJob) -> None:
 
     # Prepare
     print("\n📦 Preparing tasks...")
-    tasks = client.prepare_tasks(
+    tasks = client.build_tasks(
         search_results=search_results,
         job=job,
-        cells_per_task=50,
     )
     print(f"✓ Prepared {len(tasks)} tasks")
 

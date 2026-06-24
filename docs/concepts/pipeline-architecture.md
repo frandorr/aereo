@@ -116,11 +116,11 @@ into parallelizable units.
 
 ```text
 ┌─────────────────┐          ┌─────────────┐              ┌─────────────────────┐
-│  GeoDataFrame   │          │  AereoClient│              │  Grid / Patch logic │
+│  GeoDataFrame   │          │  AereoClient│              │    Task builder     │
 │ [AssetSchema]   │          │             │              │                     │
 └────────┬────────┘          └──────┬──────┘              └──────────┬──────────┘
          │                          │                                │
-         │  prepare_tasks(          │                                │
+         │  build_tasks(            │                                │
          │    search_results,       │                                │
          │    job=job)              │                                │
          │─────────────────────────▶│                                │
@@ -145,20 +145,25 @@ into parallelizable units.
 ### API
 
 ```python
-tasks = client.prepare_tasks(results, job=job)
+tasks = client.build_tasks(results, job=job)
 ```
 
-When calling without a job, provide `extract`, `grid_config`, and
-`patch_config` explicitly:
+`build_tasks()` always receives a complete ``ExtractionJob``. Construct one
+in Python or load it from a Hydra config package:
 
 ```python
-tasks = client.prepare_tasks(
-    results,
-    extract=extract_config,
+from aereo.pipeline import ExtractionJob
+
+job = ExtractionJob(
+    search=search_provider,
+    task_builder=GroupedTaskBuilder(cells_per_task=50),
     grid_config=grid_config,
     patch_config=patch_config,
     output_uri="/tmp/out",
+    extract=extract_config,
 )
+
+tasks = client.build_tasks(results, job=job)
 ```
 
 ### Output: `Sequence[ExtractionTask]`

@@ -1,4 +1,4 @@
-"""Tests for task_builder.core."""
+"""Tests for aereo.builtins.task_builder."""
 
 from __future__ import annotations
 
@@ -10,10 +10,10 @@ import pytest
 from shapely.geometry import box
 
 from aereo.builtins.read import ReadODCSTAC
+from aereo.builtins.task_builder import GroupedTaskBuilder
 from aereo.interfaces.core import ExtractConfig, GridConfig, PatchConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
-from aereo.task_builder import prepare_for_extraction
 from pandera.typing.geopandas import GeoDataFrame
 
 
@@ -56,7 +56,7 @@ def _make_assets(
     return cast(GeoDataFrame, AssetSchema.validate(gdf))
 
 
-def test_prepare_for_extraction_groups_by_crs():
+def test_grouped_task_builder_groups_by_crs():
     """Assets with the same start_time but different CRS split into separate tasks."""
     geometries = [
         box(2.0, 45.0, 2.1, 45.1),  # UTM zone 31N-ish
@@ -67,7 +67,8 @@ def test_prepare_for_extraction_groups_by_crs():
         crs_values=["EPSG:32631", "EPSG:32632"],
     )
 
-    tasks = list(prepare_for_extraction(assets, _make_job()))
+    builder = GroupedTaskBuilder()
+    tasks = list(builder(assets, _make_job()))
 
     assert len(tasks) == 2
     task_crs = {t.task_context.get("crs") for t in tasks}
@@ -76,21 +77,22 @@ def test_prepare_for_extraction_groups_by_crs():
         assert task.assets["crs"].nunique() == 1
 
 
-def test_prepare_for_extraction_warns_without_crs():
+def test_grouped_task_builder_warns_without_crs():
     """A warning is emitted when the assets GeoDataFrame has no crs column."""
     assets = _make_assets(
         geometries=[box(2.0, 45.0, 2.1, 45.1)],
         crs_values=None,
     )
 
+    builder = GroupedTaskBuilder()
     with pytest.warns(UserWarning, match="no 'crs' column"):
-        tasks = list(prepare_for_extraction(assets, _make_job()))
+        tasks = list(builder(assets, _make_job()))
 
     assert len(tasks) == 1
     assert tasks[0].task_context.get("crs") is None
 
 
-def test_prepare_for_extraction_rejects_partial_crs():
+def test_grouped_task_builder_rejects_partial_crs():
     """A ValueError is raised if crs exists but contains nulls."""
     assets = _make_assets(
         geometries=[
@@ -100,22 +102,25 @@ def test_prepare_for_extraction_rejects_partial_crs():
         crs_values=["EPSG:32631", None],
     )
 
+    builder = GroupedTaskBuilder()
     with pytest.raises(ValueError, match="contains null values"):
-        list(prepare_for_extraction(assets, _make_job()))
+        list(builder(assets, _make_job()))
 
 
-def test_prepare_for_extraction_includes_job_id_in_context():
+def test_grouped_task_builder_includes_job_id_in_context():
     """Each task's context carries the parent job's name as job_id."""
     assets = _make_assets(geometries=[box(2.0, 45.0, 2.1, 45.1)])
     job = _make_job()
-    tasks = list(prepare_for_extraction(assets, job))
+
+    builder = GroupedTaskBuilder()
+    tasks = list(builder(assets, job))
 
     assert len(tasks) == 1
     assert tasks[0].task_context.get("job_id") == job.name
     assert tasks[0].task_context.get("chunk_id") == 0
 
 
-def test_prepare_for_extraction_uses_globally_unique_chunk_ids():
+def test_grouped_task_builder_uses_globally_unique_chunk_ids():
     """chunk_id is unique across all tasks and total_chunks matches task count."""
     geometries = [
         box(2.0, 45.0, 2.1, 45.1),
@@ -126,7 +131,8 @@ def test_prepare_for_extraction_uses_globally_unique_chunk_ids():
         crs_values=["EPSG:32631", "EPSG:32632"],
     )
 
-    tasks = list(prepare_for_extraction(assets, _make_job(), cells_per_task=1))
+    builder = GroupedTaskBuilder(cells_per_task=1)
+    tasks = list(builder(assets, _make_job()))
 
     chunk_ids = [t.task_context.get("chunk_id") for t in tasks]
     assert len(chunk_ids) == len(set(chunk_ids))
