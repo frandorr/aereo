@@ -161,6 +161,7 @@ nav:
           - AWS Lambda: run/run-on-lambda.md
     - Concepts:
           - Pipeline Architecture: concepts/pipeline-architecture.md
+          - Pipeline Walkthrough: concepts/pipeline-walkthrough.md
           - Working with Grids: concepts/grids.md
           - Output Formats: concepts/output-formats.md
           - How Plugins Work: plugins/plugin-overview.md
