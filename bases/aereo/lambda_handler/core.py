@@ -1,7 +1,7 @@
 """AEREO Lambda handler entrypoint.
 
 The handler receives a serialized :class:`~aereo.interfaces.ExtractionTask`
-from S3, executes it through :class:`~aereo.backends.TaskRunner`, and uploads
+from S3, executes it through :func:`~aereo.execution.run_task`, and uploads
 the resulting artifacts (GeoTIFFs + metadata) back to S3.
 
 No plugin registry is required at module load time: the task itself carries
@@ -18,7 +18,8 @@ import time
 from pathlib import Path
 from typing import Any
 
-from aereo.backends import CloudTaskStaging, TaskRunner
+from aereo.backends import CloudTaskStaging
+from aereo.execution import run_task
 from aereo.backends.lambda_backend import _safe_truncate
 from aereo.serialization import TaskSerializer
 
@@ -27,7 +28,6 @@ logger = logging.getLogger(__name__)
 _S3_PREFIX = "s3://"
 
 # Initialize once per cold start.
-_runner = TaskRunner()
 _serializer = TaskSerializer()
 
 
@@ -238,8 +238,6 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
 
         s3 = boto3.client("s3", endpoint_url=endpoint_url)
 
-        runner = _runner
-
         timings: dict[str, Any] = {}
         t0 = time.time()
 
@@ -255,7 +253,7 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             timings["deserialize_task"] = time.time() - t2
 
             t3 = time.time()
-            artifacts = runner.run(task)
+            artifacts = run_task(task)
             timings["extractor_run"] = time.time() - t3
 
             manifest_uri = _upload_artifacts_to_s3(

@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Iterable,
     Literal,
     Mapping,
     Protocol,
@@ -27,7 +26,6 @@ from .utils import (
 )
 
 if TYPE_CHECKING:
-    from aereo.backends import TaskRunner
     from aereo.pipeline import ExtractionJob
 
 
@@ -245,73 +243,6 @@ class ExtractConfig(BaseModel):
     reproject: Reprojector | None = None
     postprocess: Sequence[Processor] = Field(default_factory=list)
     write: Writer | None = None
-
-
-class PipelineCallback:
-    """Lifecycle hooks for pipeline execution.
-
-    Similar to PyTorch Lightning callbacks, these allow external code to
-    observe and react to pipeline stages without modifying the TaskRunner.
-    """
-
-    def on_task_start(self, task: ExtractionTask) -> None:
-        """Called before any processing begins."""
-        pass
-
-    def on_task_cache_hit(self, task: ExtractionTask) -> None:
-        """Called when a cached artifact catalog is reused for *task*."""
-        pass
-
-    def on_task_cache_miss(self, task: ExtractionTask) -> None:
-        """Called when no cached artifact catalog exists for *task*."""
-        pass
-
-    def on_download_complete(self, task: ExtractionTask) -> None:
-        """Called after assets have been fetched to local storage.
-
-        In AEREO's stage-based pipeline the download step is typically
-        handled inside :meth:`Reader.read`, so this hook fires
-        immediately after the reader returns.
-        """
-        pass
-
-    def on_read_complete(
-        self,
-        task: ExtractionTask,
-        ds: xr.Dataset,
-    ) -> None:
-        """Called after the Reader finishes."""
-        pass
-
-    def on_reproject_complete(
-        self,
-        task: ExtractionTask,
-        patch: ExtractionPatch,
-        ds: xr.Dataset,
-    ) -> None:
-        """Called after a single patch has been reprojected."""
-        pass
-
-    def on_patch_write_complete(
-        self,
-        task: ExtractionTask,
-        patch: ExtractionPatch,
-        artifacts: GeoDataFrame[ArtifactSchema],
-    ) -> None:
-        """Called after each patch is written."""
-        pass
-
-    def on_task_complete(
-        self,
-        task: ExtractionTask,
-        artifacts_gdf: GeoDataFrame[ArtifactSchema],
-    ) -> None:
-        """Called after all cells are processed."""
-        pass
-
-    def on_task_failed(self, task: ExtractionTask, error: Exception) -> None:
-        """Called when a task fails at any stage."""
-        pass
 
 
 class TaskBuilder(AereoPlugin, ABC):
@@ -586,32 +517,5 @@ class TaskStaging(Protocol):
 
         Returns:
             A URI prefix (e.g. ``s3://bucket/results/{job_id}/{task_idx}/``).
-        """
-        ...
-
-
-class ExecutionBackend(Protocol):
-    """Protocol for pluggable task execution backends.
-
-    Backends decide **where** and **how** a batch of :class:`ExtractionTask`
-    objects are executed.  Local backends use the supplied *runner* directly;
-    remote backends may serialize tasks and dispatch to external workers.
-    """
-
-    def run_tasks(
-        self,
-        tasks: Sequence[ExtractionTask],
-        runner: TaskRunner | None = None,
-    ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
-        """Execute *tasks* and yield or return their results.
-
-        Because the return type is :class:`Iterable`, implementations are free
-        to process tasks asynchronously and yield results as they arrive,
-        enabling streaming consumption by the caller.
-
-        Args:
-            tasks: The extraction tasks to run.
-            runner: A client-side :class:`TaskRunner` that knows how to execute
-                a single task using the correct local plugin.
         """
         ...

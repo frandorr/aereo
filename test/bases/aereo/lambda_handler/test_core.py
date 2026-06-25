@@ -27,11 +27,11 @@ def test_handler_missing_output_prefix():
 
 
 @patch("aereo.lambda_handler.core._serializer")
-@patch("aereo.lambda_handler.core._runner")
+@patch("aereo.lambda_handler.core.run_task")
 @patch("aereo.lambda_handler.core.CloudTaskStaging")
 def test_handler_success(
     mock_staging_class: MagicMock,
-    mock_runner: MagicMock,
+    mock_run_task: MagicMock,
     mock_serializer: MagicMock,
 ):
     import sys
@@ -64,7 +64,7 @@ def test_handler_success(
 
     mock_boto3.client.assert_called_once_with("s3", endpoint_url=None)
     mock_serializer.deserialize.assert_called_once()
-    mock_runner.run.assert_called_once()
+    mock_run_task.assert_called_once()
     mock_staging_class.assert_called_once_with(bucket="bucket", endpoint_url=None)
     mock_staging.upload_artifacts.assert_called_once()
 
@@ -101,11 +101,11 @@ def _make_artifact_with_local_file(tmp_path: Path) -> GeoDataFrame[ArtifactSchem
 
 
 @patch("aereo.lambda_handler.core._serializer")
-@patch("aereo.lambda_handler.core._runner")
+@patch("aereo.lambda_handler.core.run_task")
 @patch("aereo.lambda_handler.core.CloudTaskStaging")
 def test_handler_uploads_geotiffs_and_updates_uris(
     mock_staging_class: MagicMock,
-    mock_runner: MagicMock,
+    mock_run_task: MagicMock,
     mock_serializer: MagicMock,
     tmp_path: Path,
 ):
@@ -113,7 +113,7 @@ def test_handler_uploads_geotiffs_and_updates_uris(
     import sys
 
     artifacts = _make_artifact_with_local_file(tmp_path)
-    mock_runner.run.return_value = artifacts
+    mock_run_task.return_value = artifacts
 
     uploaded_keys: list[tuple[str, str, str]] = []
 

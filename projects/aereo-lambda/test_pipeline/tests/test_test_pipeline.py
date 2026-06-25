@@ -40,7 +40,6 @@ def _make_task(tmp_path: Path) -> ExtractionTask:
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=100.0),
         output_uri=str(tmp_path / "output"),
-        search=None,
         extract=ExtractConfig(
             read=TestReader(),
             reproject=TestReprojector(),
@@ -84,12 +83,11 @@ def test_writer_creates_file_and_valid_artifact(tmp_path: Path):
     assert Path(artifact_uri).exists()
 
 
-def test_full_pipeline_via_task_runner(tmp_path: Path):
-    from aereo.backends import TaskRunner
+def test_full_pipeline_via_run_task(tmp_path: Path):
+    from aereo.execution import run_task
 
     task = _make_task(tmp_path)
-    runner = TaskRunner()
-    artifacts = runner.run(task)
+    artifacts = run_task(task)
 
     ArtifactSchema.validate(artifacts)
     assert len(artifacts) == 1

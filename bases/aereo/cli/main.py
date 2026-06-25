@@ -19,8 +19,7 @@ from rich.console import Console
 from rich.table import Table
 from shapely.geometry.base import BaseGeometry
 
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
+from aereo.executors import LocalExecutor
 from aereo.interfaces import ExtractConfig, normalize_geometry_input
 from aereo.pipeline import ExtractionJob
 from aereo.interfaces.utils import _extract_geometry_from_geojson
@@ -434,8 +433,7 @@ def _run_search_action(cfg: DictConfig) -> None:
         sys.exit(1)
 
     search_provider = _build_search_provider(cfg)
-    client = AereoClient()
-    results = _run_with_exit("Search", client.search, search_provider=search_provider)
+    results = _run_with_exit("Search", search_provider)
     _check_results(results)
 
     fmt = cfg.get("format", "table")
@@ -537,11 +535,8 @@ def _run_extract_action(cfg: DictConfig) -> None:
             for task in task_list
         ]
 
-    backend = LocalProcessBackend(max_workers=cfg.workers)
-    client = AereoClient()
-    artifacts = _run_with_exit(
-        "Extraction", client.execute_tasks, task_list, backend=backend
-    )
+    executor = LocalExecutor(workers=cfg.workers)
+    artifacts = _run_with_exit("Extraction", executor, task_list)
 
     output_dir = Path(cfg.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -588,11 +583,9 @@ def _run_run_action(cfg: DictConfig) -> None:
         overwrite=cfg.overwrite,
     )
 
-    client = AereoClient()
-
     # Search
     console.print("[bold blue]🔍 Searching...[/bold blue]")
-    results = _run_with_exit("Search", client.search, search_provider=search_provider)
+    results = _run_with_exit("Search", job.search, search_provider)
     _check_results(results)
     console.print(f"[green]✓ Found {len(results)} scenes.[/green]")
 
@@ -600,9 +593,9 @@ def _run_run_action(cfg: DictConfig) -> None:
     console.print("[bold blue]📦 Preparing...[/bold blue]")
     tasks = _run_with_exit(
         "Prepare",
+        job.build_tasks,
+        results,
         task_builder,
-        search_results=results,
-        job=job,
     )
     chunk_size = getattr(task_builder, "cells_per_task", None)
     chunk_msg = f" (chunk size: {chunk_size})" if chunk_size is not None else ""
@@ -610,10 +603,8 @@ def _run_run_action(cfg: DictConfig) -> None:
 
     # Extract
     console.print("[bold blue]⛏️ Extracting...[/bold blue]")
-    backend = LocalProcessBackend(max_workers=cfg.workers)
-    artifacts = _run_with_exit(
-        "Extraction", client.execute_tasks, tasks, backend=backend
-    )
+    executor = LocalExecutor(workers=cfg.workers)
+    artifacts = _run_with_exit("Extraction", job.execute, tasks, executor)
 
     parquet_path = output_dir / "artifacts.parquet"
     artifacts.to_parquet(parquet_path)

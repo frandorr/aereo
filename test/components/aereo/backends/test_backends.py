@@ -225,7 +225,7 @@ def test_lambda_backend_invokes_lambda_for_single_task():
             function_name="aer-extract",
             staging=staging,
         )
-        results = list(backend.run_tasks([task], runner=MagicMock()))
+        results = list(backend.run_tasks([task]))
 
     assert len(results) == 1
     assert len(staging.staged) == 1
@@ -275,7 +275,7 @@ def test_lambda_backend_invokes_lambda_for_multiple_tasks():
             function_name="aer-extract",
             staging=staging,
         )
-        results = list(backend.run_tasks(tasks, runner=MagicMock()))
+        results = list(backend.run_tasks(tasks))
 
     assert len(results) == 2
     assert mock_client.invoke.call_count == 2
@@ -304,7 +304,7 @@ def test_lambda_backend_propagates_function_error():
             staging=staging,
         )
         with pytest.raises(RuntimeError, match="Lambda function .* returned error"):
-            list(backend.run_tasks([task], runner=MagicMock()))
+            list(backend.run_tasks([task]))
 
 
 def test_lambda_backend_raises_on_missing_manifest_uri():
@@ -329,7 +329,7 @@ def test_lambda_backend_raises_on_missing_manifest_uri():
             staging=staging,
         )
         with pytest.raises(ValueError, match="missing 'manifest_uri'"):
-            list(backend.run_tasks([task], runner=MagicMock()))
+            list(backend.run_tasks([task]))
 
 
 def test_lambda_backend_uses_custom_serializer():
@@ -358,7 +358,7 @@ def test_lambda_backend_uses_custom_serializer():
             staging=staging,
             serializer=custom_serializer,
         )
-        list(backend.run_tasks([task], runner=MagicMock()))
+        list(backend.run_tasks([task]))
 
     custom_serializer.serialize.assert_called_once()
 
@@ -388,7 +388,7 @@ def test_lambda_backend_uses_endpoint_url():
             staging=staging,
             endpoint_url="http://localhost:4566",
         )
-        list(backend.run_tasks([task], runner=MagicMock()))
+        list(backend.run_tasks([task]))
 
     call_args = mock_boto3.client.call_args
     assert call_args.kwargs["endpoint_url"] == "http://localhost:4566"
@@ -431,7 +431,7 @@ def test_lambda_backend_concurrent_invokes_with_thread_pool():
             staging=staging,
             max_concurrent_invokes=3,
         )
-        results = list(backend.run_tasks(tasks, runner=MagicMock()))
+        results = list(backend.run_tasks(tasks))
 
     assert len(results) == 3
     assert mock_client.invoke.call_count == 3
@@ -512,7 +512,7 @@ def test_lambda_backend_retryable_error_raises_retryable_lambda_error():
             staging=staging,
         )
         with pytest.raises(RetryableLambdaError, match="Connection timed out"):
-            list(backend.run_tasks([task], runner=MagicMock()))
+            list(backend.run_tasks([task]))
 
 
 def test_lambda_backend_structured_error_not_retryable_raises_runtime_error():
@@ -543,7 +543,7 @@ def test_lambda_backend_structured_error_not_retryable_raises_runtime_error():
             staging=staging,
         )
         with pytest.raises(RuntimeError, match="Lambda returned error"):
-            list(backend.run_tasks([task], runner=MagicMock()))
+            list(backend.run_tasks([task]))
 
 
 def test_safe_truncate_redacts_credentials():
