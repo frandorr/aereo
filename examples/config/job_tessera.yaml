@@ -1,6 +1,4 @@
 defaults:
-  - search: tessera
-  - task_builder: grouped
   - grid_config: grid_10km
   - patch_config: patch_10m
   - extract: tessera
