@@ -6,18 +6,28 @@ extraction pipeline configuration.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, cast
 
 import hydra
+from aereo.executors import Executor, LocalExecutor
 from aereo.interfaces import (
     ExtractConfig,
+    ExtractionTask,
     GridConfig,
     PatchConfig,
+    SearchProvider,
+    TaskBuilder,
 )
 from aereo.interfaces.utils import normalize_geometry_input
+from aereo.schemas import ArtifactSchema, AssetSchema
+from pandera.typing.geopandas import GeoDataFrame
 from pydantic import BaseModel, Field, field_validator
 from shapely.geometry.base import BaseGeometry
+from structlog import get_logger
+
+logger = get_logger()
 
 
 class ExtractionJob(BaseModel):
@@ -111,6 +121,125 @@ class ExtractionJob(BaseModel):
         ``None``.
         """
         return cast("BaseGeometry | None", self.target_aoi)
+
+    def search(
+        self,
+        provider: SearchProvider,
+        aoi: BaseGeometry | dict[str, Any] | str | Path | None = None,
+        **search_kwargs: Any,
+    ) -> GeoDataFrame[AssetSchema]:
+        """Execute a search using *provider*.
+
+        Runtime search parameters win over the job's fixed ``target_aoi``.
+        The resolved AOI is passed to the provider as ``intersects``.
+
+        Args:
+            provider: Search provider to execute.
+            aoi: Optional AOI geometry overriding ``job.target_aoi``.
+            **search_kwargs: Additional arguments used to update the provider
+                before execution (e.g. ``start_datetime``, ``end_datetime``).
+
+        Returns:
+            A validated GeoDataFrame of matched assets.
+        """
+        logger.info("search_called", provider=provider.__class__.__name__)
+
+        resolved_aoi = (
+            normalize_geometry_input(aoi)
+            if aoi is not None
+            else self.effective_target_aoi
+        )
+        if resolved_aoi is not None:
+            search_kwargs["intersects"] = resolved_aoi
+
+        if search_kwargs:
+            provider = provider.model_copy(update=search_kwargs)
+
+        return provider()
+
+    def build_tasks(
+        self,
+        assets: GeoDataFrame[AssetSchema],
+        task_builder: TaskBuilder,
+        **builder_kwargs: Any,
+    ) -> Sequence[ExtractionTask]:
+        """Build extraction tasks from search results.
+
+        Args:
+            assets: GeoDataFrame of assets returned by a search provider.
+            task_builder: Task builder used to group assets into tasks.
+            **builder_kwargs: Additional arguments used to update the task
+                builder before execution (e.g. ``cells_per_task``).
+
+        Returns:
+            A sequence of prepared ``ExtractionTask`` objects.
+        """
+        if assets.empty:
+            return []
+
+        logger.info(
+            "build_tasks_start",
+            builder=task_builder.__class__.__name__,
+            assets=len(assets),
+        )
+
+        if builder_kwargs:
+            task_builder = task_builder.model_copy(update=builder_kwargs)
+
+        return task_builder(assets, self)
+
+    def execute(
+        self,
+        tasks: Sequence[ExtractionTask],
+        executor: Executor | None = None,
+    ) -> GeoDataFrame[ArtifactSchema]:
+        """Run prepared tasks and return the combined artifacts.
+
+        Args:
+            tasks: Extraction tasks to execute.
+            executor: Optional executor. Defaults to ``LocalExecutor()``.
+
+        Returns:
+            A validated ``GeoDataFrame[ArtifactSchema]``.
+        """
+        if not tasks:
+            return cast(
+                GeoDataFrame[ArtifactSchema], ArtifactSchema.empty_geodataframe()
+            )
+
+        selected_executor = executor or LocalExecutor()
+        logger.info(
+            "execute_start",
+            task_count=len(tasks),
+            executor=selected_executor.__class__.__name__,
+        )
+        return selected_executor(tasks)
+
+    def write_catalog(
+        self,
+        artifacts: GeoDataFrame[ArtifactSchema],
+        uri: str | Path | None = None,
+    ) -> str:
+        """Write the artifact catalog to parquet.
+
+        Args:
+            artifacts: GeoDataFrame of extracted artifacts.
+            uri: Destination URI. Defaults to
+                ``{output_uri}/artifacts.parquet``.
+
+        Returns:
+            The URI where the catalog was written.
+        """
+        if uri is None:
+            uri = f"{self.output_uri.rstrip('/')}/artifacts.parquet"
+
+        str_uri = str(uri)
+        if not str_uri.startswith("s3://"):
+            path = Path(str_uri.removeprefix("file://"))
+            path.parent.mkdir(parents=True, exist_ok=True)
+
+        artifacts.to_parquet(str_uri)  # pyright: ignore[reportArgumentType]
+        return str_uri
 
     @classmethod
     def load_from_config(
