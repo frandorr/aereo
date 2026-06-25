@@ -33,12 +33,16 @@ from __future__ import annotations
 import os
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Generator
+from typing import Any, Generator
 
+import geopandas as gpd
+import hydra
+import pandas as pd
 from aereo.backends import LambdaBackend
 from aereo.backends.staging import CloudTaskStaging
-from aereo.client import AereoClient
+from aereo.interfaces import SearchProvider, TaskBuilder
 from aereo.pipeline import ExtractionJob
+from hydra import compose, initialize_config_dir
 
 
 @contextmanager
@@ -52,22 +56,46 @@ def _chdir(path: Path) -> Generator[None, None, None]:
         os.chdir(original)
 
 
+def _load_job_and_plugins(
+    config_dir: Path,
+    config_name: str = "job_sentinel2",
+) -> tuple[ExtractionJob, SearchProvider, TaskBuilder]:
+    """Load a validated ``ExtractionJob`` plus search/task-builder plugins."""
+    with initialize_config_dir(version_base=None, config_dir=str(config_dir)):
+        cfg = compose(config_name=config_name)
+        instantiated = hydra.utils.instantiate(cfg, _convert_="all")
+
+    if not isinstance(instantiated, dict):
+        raise ValueError(
+            f"Expected Hydra to produce a dict, got {type(instantiated).__name__}"
+        )
+
+    job_kwargs: dict[str, Any] = dict(instantiated)
+    search_provider = job_kwargs.pop("search", None)
+    task_builder = job_kwargs.pop("task_builder", None)
+
+    if search_provider is None:
+        raise ValueError("Loaded config is missing a search provider.")
+    if task_builder is None:
+        raise ValueError("Loaded config is missing a task builder.")
+
+    job = ExtractionJob(**job_kwargs)
+    return job, search_provider, task_builder
+
+
 def main() -> int:
     """Run the Sentinel-2 notebook workflow through Lambda."""
     # The notebook loads configs relative to the examples/ directory; mirror that
     # so target_aoi and search intersects paths resolve correctly.
     example_dir = Path(__file__).resolve().parent.parent
     with _chdir(example_dir):
-        # -------------------------------------------------------------------
-        # 1. Load the same config used by examples/01-sentinel2.ipynb
-        # -------------------------------------------------------------------
-        job = ExtractionJob.load_from_config(
-            config_dir="config",
+        job, search_provider, task_builder = _load_job_and_plugins(
+            config_dir=Path("config"),
             config_name="job_sentinel2",
         )
 
     # -----------------------------------------------------------------------
-    # 2. Configure S3 staging and the Lambda execution backend
+    # Configure S3 staging and the Lambda execution backend
     # -----------------------------------------------------------------------
     bucket = os.getenv("AEREO_S3_BUCKET", "aereo-tasks")
     function_name = os.getenv("AEREO_LAMBDA_FUNCTION", "aereo-extractor")
@@ -88,18 +116,10 @@ def main() -> int:
     )
 
     # -----------------------------------------------------------------------
-    # 3. Create a client that uses Lambda for execution
+    # Search for Sentinel-2 scenes
     # -----------------------------------------------------------------------
-    client = AereoClient(backend=backend)
-
-    # -----------------------------------------------------------------------
-    # 4. Search for Sentinel-2 scenes (same call as the notebook)
-    # -----------------------------------------------------------------------
-    if job.search is None:
-        raise ValueError("Loaded ExtractionJob has no search provider.")
-
     print("Searching for Sentinel-2 L2A assets...")
-    search_results = client.search(job.search)
+    search_results = job.search(search_provider)
     print(f"Found {len(search_results)} asset rows")
 
     if search_results.empty:
@@ -107,13 +127,10 @@ def main() -> int:
         return 0
 
     # -----------------------------------------------------------------------
-    # 5. Prepare extraction tasks (same call as the notebook)
+    # Prepare extraction tasks
     # -----------------------------------------------------------------------
     print("\nPreparing extraction tasks...")
-    tasks = client.build_tasks(
-        search_results=search_results,
-        job=job,
-    )
+    tasks = job.build_tasks(search_results, task_builder)
     print(f"Prepared {len(tasks)} task(s)")
 
     if not tasks:
@@ -121,14 +138,20 @@ def main() -> int:
         return 0
 
     # -----------------------------------------------------------------------
-    # 6. Execute via Lambda (artifacts are stored in S3 by the handler)
+    # Execute via Lambda (artifacts are stored in S3 by the handler)
     # -----------------------------------------------------------------------
     print(f"\nExecuting {len(tasks)} task(s) via Lambda '{function_name}'...")
-    artifacts = client.execute_tasks(tasks)
+    result_frames = list(backend.run_tasks(tasks))
+    if result_frames:
+        artifacts = gpd.GeoDataFrame(
+            pd.concat(result_frames, ignore_index=True), geometry="geometry"
+        )
+    else:
+        artifacts = gpd.GeoDataFrame()
     print(f"Extracted {len(artifacts)} artifact(s)")
 
     # -----------------------------------------------------------------------
-    # 7. Inspect results
+    # Inspect results
     # -----------------------------------------------------------------------
     if len(artifacts) > 0:
         print("\nResult columns:", list(artifacts.columns))

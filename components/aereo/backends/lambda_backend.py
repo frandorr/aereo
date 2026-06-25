@@ -12,9 +12,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, Iterable, Literal, Sequence, cast
 
-from aereo.backends.core import TaskRunner
 from aereo.backends.staging import CloudTaskStaging
-from aereo.interfaces import ExecutionBackend, ExtractionTask, TaskStaging
+from aereo.interfaces import ExtractionTask, TaskStaging
 from aereo.schemas import ArtifactSchema
 from aereo.serialization import TaskSerializer
 from aereo.storage import storage_for_uri
@@ -64,7 +63,7 @@ class RetryableLambdaError(RuntimeError):
     """Raised when a Lambda invocation fails with a retryable error."""
 
 
-class LambdaBackend(ExecutionBackend):
+class LambdaBackend:
     """Execute tasks remotely via AWS Lambda container functions.
 
     Each :class:`ExtractionTask` is serialized, staged to remote object storage,
@@ -154,16 +153,11 @@ class LambdaBackend(ExecutionBackend):
     def run_tasks(
         self,
         tasks: Sequence[ExtractionTask],
-        runner: TaskRunner | None = None,
     ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
         """Execute *tasks* via AWS Lambda.
 
-        The supplied *runner* is ignored because the remote Lambda container
-        has its own :class:`TaskRunner` and plugin registry.
-
         Args:
             tasks: Extraction tasks to dispatch.
-            runner: Client-side runner (ignored by this backend).
 
         Returns:
             An iterable of ``GeoDataFrame[ArtifactSchema]`` results, one per task.

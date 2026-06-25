@@ -19,7 +19,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 import attrs
-from aereo.backends import TaskRunner
+from aereo.execution import run_task
 from aereo.interfaces import ExtractionTask
 from aereo.serialization import TaskSerializer
 from aereo.storage import storage_for_uri
@@ -28,7 +28,6 @@ logger = logging.getLogger(__name__)
 
 _S3_PREFIX = "s3://"
 
-_runner = TaskRunner()
 _serializer = TaskSerializer()
 
 
@@ -148,7 +147,7 @@ def handle_event(event: dict[str, Any]) -> dict[str, Any]:
             job=task.job.model_copy(update={"output_uri": output_prefix}),
         )
 
-        artifacts = _runner.run(task)
+        artifacts = run_task(task)
         storage = storage_for_uri(output_prefix)
         result = storage.upload_artifacts(artifacts, output_prefix)
 
