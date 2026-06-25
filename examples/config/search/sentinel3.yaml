@@ -1,4 +1,4 @@
-_target_: aereo.builtins.SearchEarthaccess
+_target_: aereo.builtins.search.search_earthaccess
 collections:
   S3A_OL_1_EFR: ["Oa08", "Oa17"]
 intersects: config/aoi/chocon.geojson

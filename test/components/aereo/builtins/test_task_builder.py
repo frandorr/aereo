@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 from datetime import datetime
+from functools import partial
 from typing import cast
 
 import geopandas as gpd
 import pytest
 from shapely.geometry import box
 
-from aereo.builtins.read import ReadODCSTAC
-from aereo.builtins.task_builder import GroupedTaskBuilder
+from aereo.builtins.read import read_odc_stac
+from aereo.builtins.task_builder import build_grouped_tasks
 from aereo.interfaces.core import ExtractConfig, GridConfig, PatchConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
@@ -21,7 +22,7 @@ def _make_job(output_uri: str = "s3://test/output") -> ExtractionJob:
     """Return a minimal ExtractionJob for task-builder tests."""
     grid_config = GridConfig(target_grid_dist=10_000)
     patch_config = PatchConfig(resolution=10.0)
-    extract = ExtractConfig(read=ReadODCSTAC())
+    extract = ExtractConfig(read=read_odc_stac)
     return ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
@@ -66,7 +67,7 @@ def test_grouped_task_builder_groups_by_crs():
         crs_values=["EPSG:32631", "EPSG:32632"],
     )
 
-    builder = GroupedTaskBuilder()
+    builder = build_grouped_tasks
     tasks = list(builder(assets, _make_job()))
 
     assert len(tasks) == 2
@@ -83,7 +84,7 @@ def test_grouped_task_builder_warns_without_crs():
         crs_values=None,
     )
 
-    builder = GroupedTaskBuilder()
+    builder = build_grouped_tasks
     with pytest.warns(UserWarning, match="no 'crs' column"):
         tasks = list(builder(assets, _make_job()))
 
@@ -101,7 +102,7 @@ def test_grouped_task_builder_rejects_partial_crs():
         crs_values=["EPSG:32631", None],
     )
 
-    builder = GroupedTaskBuilder()
+    builder = build_grouped_tasks
     with pytest.raises(ValueError, match="contains null values"):
         list(builder(assets, _make_job()))
 
@@ -111,7 +112,7 @@ def test_grouped_task_builder_includes_job_id_in_context():
     assets = _make_assets(geometries=[box(2.0, 45.0, 2.1, 45.1)])
     job = _make_job()
 
-    builder = GroupedTaskBuilder()
+    builder = build_grouped_tasks
     tasks = list(builder(assets, job))
 
     assert len(tasks) == 1
@@ -130,7 +131,7 @@ def test_grouped_task_builder_uses_globally_unique_chunk_ids():
         crs_values=["EPSG:32631", "EPSG:32632"],
     )
 
-    builder = GroupedTaskBuilder(cells_per_task=1)
+    builder = partial(build_grouped_tasks, cells_per_task=1)
     tasks = list(builder(assets, _make_job()))
 
     chunk_ids = [t.task_context.get("chunk_id") for t in tasks]

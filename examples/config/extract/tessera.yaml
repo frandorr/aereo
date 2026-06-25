@@ -3,7 +3,7 @@ read:
   bands: [0, 1, 2]
 
 reproject:
-  _target_: aereo.builtins.ReprojectODC
+  _target_: aereo.builtins.reproject.reproject_odc
   resampling: nearest
 write:
-  _target_: aereo.builtins.WriteGeoTIFF
+  _target_: aereo.builtins.write.write_geotiff

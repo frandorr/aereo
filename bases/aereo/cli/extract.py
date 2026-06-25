@@ -43,10 +43,10 @@ from __future__ import annotations
 
 import numpy as np
 import xarray as xr
-from aereo.interfaces import ExtractionTask, Reader
+from aereo.interfaces import ExtractionTask
 
 
-class CustomReader(Reader):
+class CustomReader:
     \"\"\"A minimal example reader.\"\"\"
 
     def __call__(self, task: ExtractionTask) -> xr.Dataset:
@@ -92,8 +92,8 @@ OUTPUT_PREFIX = "file:///tmp/aereo/output/job/0/"
 
 
 def _make_task() -> ExtractionTask:
-    from aereo.builtins.reproject import ReprojectODC
-    from aereo.builtins.write import WriteGeoTIFF
+    from aereo.builtins.reproject import reproject_odc
+    from aereo.builtins.write import write_geotiff
 
     df = gpd.GeoDataFrame(
         {{
@@ -121,8 +121,8 @@ def _make_task() -> ExtractionTask:
         output_uri="/tmp/aereo/output",
         extract=ExtractConfig(
             read=CustomReader(),
-            reproject=ReprojectODC(),
-            write=WriteGeoTIFF(),
+            reproject=reproject_odc,
+            write=write_geotiff,
         ),
     )
     return ExtractionTask(

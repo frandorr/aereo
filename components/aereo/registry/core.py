@@ -7,8 +7,10 @@ public entry point and ``PLUGIN_TYPES`` for the supported plugin kinds.
 
 from __future__ import annotations
 
+import functools
 import importlib.metadata
-from typing import Any, Sequence, Type
+import inspect
+from typing import Any, Sequence
 
 from aereo.interfaces.core import (
     Processor,
@@ -23,50 +25,105 @@ from structlog import get_logger
 logger = get_logger()
 
 
-def _get_supported_collections(plugin_class: Type) -> Sequence[str]:
-    """Return the declared supported collections for a plugin class.
-
-    Checks the class attribute first, then falls back to the Pydantic
-    ``supported_collections`` field default.
+def _get_supported_collections(plugin_obj: Any) -> Sequence[str]:
+    """Return the declared supported collections for a plugin (function or class).
 
     Args:
-        plugin_class: Plugin class to inspect.
+        plugin_obj: Plugin object to inspect.
 
     Returns:
         Sequence of supported collection names, or an empty sequence.
     """
-    supported = getattr(plugin_class, "supported_collections", None)
+    import functools
+
+    target = (
+        plugin_obj.func if isinstance(plugin_obj, functools.partial) else plugin_obj
+    )
+    supported = getattr(target, "supported_collections", None)
     if (
         supported is None
-        and hasattr(plugin_class, "model_fields")
-        and "supported_collections" in plugin_class.model_fields
+        and hasattr(target, "model_fields")
+        and "supported_collections" in target.model_fields
     ):
-        supported = plugin_class.model_fields["supported_collections"].default
+        supported = target.model_fields["supported_collections"].default
     return supported or []
 
 
-def _dump_params_pydantic(cls: Type, detailed: bool) -> dict[str, list[dict]]:
-    """Derive parameter dictionary from Pydantic model fields.
+def _dump_params_function(func: Any, detailed: bool) -> dict[str, list[dict]]:
+    """Derive parameter dictionary from function signature.
 
     Args:
-        cls: The plugin class (which inherits from Pydantic BaseModel).
+        func: The plugin function/callable.
         detailed: When ``True``, each param includes all details.
 
     Returns:
         A dict with "required" and "optional" parameter lists.
     """
+    import functools
+
+    if isinstance(func, functools.partial):
+        target_func = func.func
+        bound_keys = set(func.keywords.keys())
+    else:
+        target_func = func
+        bound_keys = set()
+
     required = []
     optional = []
 
-    for name, field in cls.model_fields.items():
-        if name == "supported_collections":
+    # If it is a class (for backward compatibility / raw callable objects)
+    if inspect.isclass(target_func):
+        if hasattr(target_func, "model_fields"):
+            # Pydantic model
+            for name, field in target_func.model_fields.items():
+                if name == "supported_collections" or name in bound_keys:
+                    continue
+                is_required = field.is_required()
+                param_info = {
+                    "name": name,
+                    "default": field.default if not is_required else None,
+                    "type": str(field.annotation),
+                    "description": field.description or "",
+                }
+                if is_required:
+                    required.append(param_info)
+                else:
+                    optional.append(param_info)
+            return {"required": required, "optional": optional}
+        else:
+            # Standard class, inspect __init__
+            target_func = getattr(target_func, "__init__", None)
+            if target_func is None:
+                return {"required": required, "optional": optional}
+
+    try:
+        sig = inspect.signature(target_func)
+    except (ValueError, TypeError):
+        return {"required": required, "optional": optional}
+
+    for name, param in sig.parameters.items():
+        if name in ("ds", "task", "search_results", "job", "self", "cls"):
             continue
-        is_required = field.is_required()
+        if name == "kwargs" or param.kind == inspect.Parameter.VAR_KEYWORD:
+            continue
+        if name == "args" or param.kind == inspect.Parameter.VAR_POSITIONAL:
+            continue
+        if name in bound_keys:
+            continue
+
+        is_required = param.default is inspect.Parameter.empty
+        default_val = param.default if not is_required else None
+        param_type = (
+            str(param.annotation)
+            if param.annotation is not inspect.Parameter.empty
+            else "Any"
+        )
+
         param_info = {
             "name": name,
-            "default": field.default if not is_required else None,
-            "type": str(field.annotation),
-            "description": field.description or "",
+            "default": default_val,
+            "type": param_type,
+            "description": "",
         }
         if is_required:
             required.append(param_info)
@@ -84,14 +141,14 @@ class _TypedRegistry:
     """
 
     def __init__(self) -> None:
-        self.plugins: dict[str, Type] = {}
+        self.plugins: dict[str, type[Any]] = {}
         self.collection_to_plugins: dict[str, list[str]] = {}
         self.collection_mapping: dict[str, dict[str, str]] = {}
 
     def register(
         self,
         plugin_name: str,
-        plugin_class: Type,
+        plugin_class: type[Any],
         original_collections: dict[str, str],
     ) -> None:
         """Register a plugin and index its supported collections.
@@ -203,21 +260,20 @@ class _TypedRegistry:
             raise ValueError(
                 f"{plugin_type} plugin '{plugin_name}' not found or failed to load."
             )
-        return self.plugins[plugin_name](**kwargs)
+        func = self.plugins[plugin_name]
+        if kwargs:
+            return functools.partial(func, **kwargs)
+        return func
 
 
 class AereoRegistry:
-    """Dynamically discovers and manages aereo plugins via Python entry_points.
-
-    The registry is data-driven: adding a new plugin type requires one line in
-    ``PLUGIN_TYPES`` and one new base class.
-    """
+    """Dynamically discovers and manages aereo plugins via Python entry_points."""
 
     ENTRY_POINT_GROUP: str = "aereo.plugins"
     WILDCARD: str = "*"
 
     # prefix -> (type_label, base_class)
-    PLUGIN_TYPES: dict[str, tuple[str, Type]] = {
+    PLUGIN_TYPES: dict[str, tuple[str, Any]] = {
         "search_": ("searcher", SearchProvider),
         "task_builder_": ("task_builder", TaskBuilder),
         "read_": ("reader", Reader),
@@ -242,9 +298,7 @@ class AereoRegistry:
 
         # Expose the internal dicts directly so existing tests and consumers
         # that access ``_searchers`` continue to work.
-        self._searchers: dict[str, Type[SearchProvider]] = self._registries[
-            "searcher"
-        ].plugins  # type: ignore[assignment]
+        self._searchers: dict[str, Any] = self._registries["searcher"].plugins
 
         # Track original case for display in list_supported_collections
         self._original_collections: dict[str, str] = {}
@@ -252,21 +306,58 @@ class AereoRegistry:
         if auto_discover:
             self.discover_plugins()
 
-    def _label_for(self, plugin_class: Type) -> str | None:
-        """Return the registry label for a plugin class based on PLUGIN_TYPES."""
-        for label, base_class in self.PLUGIN_TYPES.values():
-            if issubclass(plugin_class, base_class):
-                return label
+    def _label_for(self, plugin_class: Any, name: str | None = None) -> str | None:
+        """Return the registry label for a plugin class or function."""
+        # 1. Try name prefix first if name is available
+        if name is not None:
+            for prefix, (label, _) in self.PLUGIN_TYPES.items():
+                if name.startswith(prefix):
+                    return label
+
+        # 2. Try subclass check if it is indeed a class
+        target = (
+            plugin_class.func
+            if isinstance(plugin_class, functools.partial)
+            else plugin_class
+        )
+        if inspect.isclass(target):
+            for label, base_class in self.PLUGIN_TYPES.values():
+                try:
+                    if issubclass(target, base_class):
+                        return label
+                except TypeError:
+                    pass
+
+        # 3. Try signature inference fallback
+        try:
+            sig = inspect.signature(target)
+            params = list(sig.parameters.keys())
+            if params:
+                first = params[0]
+                if first == "collections":
+                    return "searcher"
+                if first == "task":
+                    return "reader"
+                if first == "ds":
+                    if "patch" in params:
+                        return "writer"
+                    if "task" in params:
+                        return "reprojector"
+                    return "processor"
+                if first == "search_results":
+                    return "task_builder"
+        except Exception:
+            pass
         return None
 
-    def register_plugins(self, plugins: dict[str, Type]) -> None:
+    def register_plugins(self, plugins: dict[str, Any]) -> None:
         """Register pre-discovered plugins without scanning entry points.
 
         Args:
-            plugins: Mapping of plugin name to plugin class.
+            plugins: Mapping of plugin name to plugin.
         """
         for name, plugin_class in plugins.items():
-            label = self._label_for(plugin_class)
+            label = self._label_for(plugin_class, name)
             if label is not None:
                 self._registries[label].register(
                     name, plugin_class, self._original_collections
@@ -285,7 +376,7 @@ class AereoRegistry:
         for ep in eps:
             try:
                 plugin_class = ep.load()
-                label = self._label_for(plugin_class)
+                label = self._label_for(plugin_class, ep.name)
 
                 if label is not None:
                     self._registries[label].register(
@@ -294,7 +385,7 @@ class AereoRegistry:
                     logger.debug(f"Loaded {label}: {ep.name}")
                 else:
                     logger.warning(
-                        f"Plugin '{ep.name}' does not inherit from any known base class. Skipping."
+                        f"Plugin '{ep.name}' does not inherit from any known base class or signature. Skipping."
                     )
             except Exception as e:
                 logger.error(
@@ -335,21 +426,13 @@ class AereoRegistry:
             for ep in eps:
                 if ep.name == plugin_name:
                     plugin_class = ep.load()
-                    label = self._label_for(plugin_class)
+                    label = self._label_for(plugin_class, ep.name)
                     if label is not None and label == type_label:
                         self._registries[label].register(
                             ep.name, plugin_class, self._original_collections
                         )
                         logger.debug(f"Lazy-loaded {label}: {ep.name}")
                         return True
-                    elif label is not None:
-                        logger.debug(
-                            f"Plugin '{ep.name}' is a {label}, not {type_label}. Skipping."
-                        )
-                    else:
-                        logger.warning(
-                            f"Plugin '{ep.name}' does not inherit from any known base class."
-                        )
                     break
         except Exception as e:
             logger.error(f"Failed to lazy-load plugin '{plugin_name}': {e}")
@@ -445,7 +528,7 @@ class AereoRegistry:
         Returns:
             {"required": [...], "optional": [...]} representing parameters.
         """
-        cls: Type | None = None
+        cls: Any | None = None
         for registry in self._registries.values():
             cls = registry.plugins.get(plugin_name)
             if cls is not None:
@@ -454,7 +537,7 @@ class AereoRegistry:
         if cls is None:
             raise KeyError(f"Unknown plugin: {plugin_name}")
 
-        return _dump_params_pydantic(cls, detailed)
+        return _dump_params_function(cls, detailed)
 
     def list_all_params(self, *, detailed: bool = True) -> dict[str, dict]:
         """JSON-serializable params catalog for all discovered plugins.
@@ -470,7 +553,7 @@ class AereoRegistry:
         result: dict[str, dict] = {}
         for label, registry in self._registries.items():
             for name, cls in registry.plugins.items():
-                params_dict = _dump_params_pydantic(cls, detailed)
+                params_dict = _dump_params_function(cls, detailed)
                 result[name] = {
                     "type": label,
                     "required": params_dict["required"],

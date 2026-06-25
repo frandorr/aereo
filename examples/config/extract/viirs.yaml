@@ -6,4 +6,4 @@ reproject:
   _target_: aereo.reproject_satpy.ReprojectSatpy
   resampling: nearest
 write:
-  _target_: aereo.builtins.WriteGeoTIFF
+  _target_: aereo.builtins.write.write_geotiff

@@ -10,9 +10,9 @@ from aereo.executors._serialization import _TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
 
-from aereo.builtins.read import ReadODCSTAC
-from aereo.builtins.reproject import ReprojectODC
-from aereo.builtins.write import WriteGeoTIFF
+from aereo.builtins.read import read_odc_stac
+from aereo.builtins.reproject import reproject_odc
+from aereo.builtins.write import write_geotiff
 
 
 def _make_task(
@@ -35,9 +35,9 @@ def _make_task(
     )
 
     extract = ExtractConfig(
-        read=ReadODCSTAC(),
-        reproject=ReprojectODC(),
-        write=WriteGeoTIFF(),
+        read=read_odc_stac,
+        reproject=reproject_odc,
+        write=write_geotiff,
     )
     grid_config = GridConfig(target_grid_dist=50_000)
     patch_config = PatchConfig(resolution=100.0, margin=10.0, padding=2)
@@ -182,9 +182,9 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
     ]
 
     extract = ExtractConfig(
-        read=ReadODCSTAC(),
-        reproject=ReprojectODC(),
-        write=WriteGeoTIFF(),
+        read=read_odc_stac,
+        reproject=reproject_odc,
+        write=write_geotiff,
     )
     job = ExtractionJob(
         grid_config=GridConfig(target_grid_dist=10_000),

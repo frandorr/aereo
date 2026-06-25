@@ -21,7 +21,7 @@ from shapely.geometry import Polygon
 
 def test_extraction_task_validation():
     from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import ReadODCSTAC
+    from aereo.builtins.read import read_odc_stac
 
     df = gpd.GeoDataFrame(
         {"collection": ["GOES"], "start_time": ["2023-01-01"]},
@@ -29,7 +29,7 @@ def test_extraction_task_validation():
     )
     grid_config = GridConfig(target_grid_dist=10_000)
     patch_config = PatchConfig(resolution=10.0)
-    extract = ExtractConfig(read=ReadODCSTAC())
+    extract = ExtractConfig(read=read_odc_stac)
     job = ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
@@ -47,7 +47,7 @@ def test_extraction_task_validation():
 
 def test_extraction_task_rejects_mixed_crs():
     from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import ReadODCSTAC
+    from aereo.builtins.read import read_odc_stac
 
     df = gpd.GeoDataFrame(
         {
@@ -62,7 +62,7 @@ def test_extraction_task_rejects_mixed_crs():
     )
     grid_config = GridConfig(target_grid_dist=10_000)
     patch_config = PatchConfig(resolution=10.0)
-    extract = ExtractConfig(read=ReadODCSTAC())
+    extract = ExtractConfig(read=read_odc_stac)
     job = ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
@@ -80,7 +80,7 @@ def test_extraction_task_rejects_mixed_crs():
 
 def test_extraction_task_accepts_single_crs():
     from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import ReadODCSTAC
+    from aereo.builtins.read import read_odc_stac
 
     df = gpd.GeoDataFrame(
         {
@@ -95,7 +95,7 @@ def test_extraction_task_accepts_single_crs():
     )
     grid_config = GridConfig(target_grid_dist=10_000)
     patch_config = PatchConfig(resolution=10.0)
-    extract = ExtractConfig(read=ReadODCSTAC())
+    extract = ExtractConfig(read=read_odc_stac)
     job = ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
@@ -270,14 +270,14 @@ def test_infer_dataset_time_bounds():
 
 def test_extract_config_rejects_non_writer():
     from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import ReadODCSTAC
+    from aereo.builtins.read import read_odc_stac
 
     class _NotAWriter:
         pass
 
     with pytest.raises(ValidationError):
         ExtractConfig(
-            read=ReadODCSTAC(),
+            read=read_odc_stac,
             reproject=None,
             write=_NotAWriter(),  # type: ignore[arg-type]
         )

@@ -1,3 +1,4 @@
+import inspect
 from typing import Any, Sequence, cast
 from unittest.mock import MagicMock
 
@@ -17,13 +18,20 @@ from aereo.interfaces.core import (
     GridConfig,
     PatchConfig,
     Processor,
-    Reader,
     Reprojector,
-    Writer,
 )
 from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
+
+
+def _call_params(plugin: Any) -> set[str]:
+    """Return the parameter names of a callable's __call__ method."""
+    try:
+        sig = inspect.signature(plugin.__call__)
+    except (ValueError, TypeError):
+        return set()
+    return set(sig.parameters.keys())
 
 
 # ---------------------------------------------------------------------------
@@ -44,17 +52,17 @@ def _make_task(
 
     grid_config = GridConfig(target_grid_dist=50_000)
     from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import ReadODCSTAC
-    from aereo.builtins.reproject import ReprojectODC
-    from aereo.builtins.write import WriteGeoTIFF
+    from aereo.builtins.read import read_odc_stac
+    from aereo.builtins.reproject import reproject_odc
+    from aereo.builtins.write import write_geotiff
 
     extract = ExtractConfig(
-        read=ReadODCSTAC(),
-        reproject=ReprojectODC(),
-        write=WriteGeoTIFF(),
+        read=read_odc_stac,
+        reproject=reproject_odc,
+        write=write_geotiff,
     )
     if pipeline:
-        read_plugin = None
+        read_plugin = pipeline[0]
         reproject_plugin = None
         write_plugin = None
         pre_processors: Sequence[Processor] = []
@@ -63,12 +71,19 @@ def _make_task(
         reproject_idx = -1
         writer_idx = -1
         for idx, plugin in enumerate(pipeline):
-            if isinstance(plugin, Reader):
-                read_plugin = plugin
-            elif isinstance(plugin, Reprojector):
+            if idx == 0:
+                continue
+            params = _call_params(plugin)
+            is_magic = isinstance(plugin, MagicMock)
+            is_reprojector = (
+                "ds" in params and "task" in params and "patch" not in params
+            )
+            is_writer = "patch" in params
+
+            if is_reprojector or (is_magic and writer_idx == -1):
                 reproject_plugin = plugin
                 reproject_idx = idx
-            elif isinstance(plugin, Writer):
+            elif is_writer:
                 write_plugin = plugin
                 writer_idx = idx
 
@@ -83,14 +98,13 @@ def _make_task(
                     Sequence[Processor], pipeline[reproject_idx + 1 :]
                 )
 
-        if read_plugin:
-            extract = ExtractConfig(
-                read=read_plugin,
-                preprocess=pre_processors,
-                reproject=reproject_plugin,
-                postprocess=post_processors,
-                write=write_plugin,
-            )
+        extract = ExtractConfig(
+            read=read_plugin,
+            preprocess=pre_processors,
+            reproject=reproject_plugin,
+            postprocess=post_processors,
+            write=write_plugin,
+        )
 
     job = ExtractionJob(
         grid_config=grid_config,
@@ -106,7 +120,7 @@ def _make_task(
     )
 
 
-class _DummyReader(Reader):
+class _DummyReader:
     def __call__(self, task: ExtractionTask) -> xr.Dataset:
         return xr.Dataset(
             {"B04": (["y", "x"], np.ones((4, 4)))},
@@ -114,14 +128,14 @@ class _DummyReader(Reader):
         )
 
 
-class _DummyReprojector(Reprojector):
+class _DummyReprojector:
     def __call__(self, ds: xr.Dataset, task: ExtractionTask) -> dict[str, xr.Dataset]:
         return {patch.id: ds for patch in task.patches}
 
 
-class _DummyWriter(Writer):
+class _DummyWriter:
     def __call__(
-        self, ds: xr.Dataset, task: ExtractionTask, cell: Any
+        self, ds: xr.Dataset, task: ExtractionTask, patch: Any
     ) -> GeoDataFrame[ArtifactSchema]:
         return cast(
             GeoDataFrame[ArtifactSchema],
@@ -131,8 +145,11 @@ class _DummyWriter(Writer):
         )
 
 
-class _DummyProcessor(Processor):
+class _DummyProcessor:
     value: int = 2
+
+    def __init__(self, value: int = 2) -> None:
+        self.value = value
 
     def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         ds = ds.copy()
@@ -140,7 +157,7 @@ class _DummyProcessor(Processor):
         return ds
 
 
-class _FailingReader(Reader):
+class _FailingReader:
     def __call__(self, task: ExtractionTask) -> xr.Dataset:
         raise RuntimeError("read failed")
 
@@ -207,7 +224,7 @@ def test_run_task_calls_reprojector_once_per_task():
 def test_run_task_raises_when_reprojector_misses_patch():
     """ValueError is raised when the reprojector omits a patch id."""
 
-    class _SparseReprojector(Reprojector):
+    class _SparseReprojector:
         def __call__(
             self, ds: xr.Dataset, task: ExtractionTask
         ) -> dict[str, xr.Dataset]:

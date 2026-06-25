@@ -20,7 +20,11 @@ from aereo.interfaces import (
     SearchProvider,
     TaskBuilder,
 )
-from aereo.interfaces.utils import normalize_geometry_input
+from aereo.interfaces.utils import (
+    _prepare_config_for_instantiate,
+    normalize_geometry_input,
+    update_callable,
+)
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from pydantic import BaseModel, Field, field_validator
@@ -142,7 +146,10 @@ class ExtractionJob(BaseModel):
         Returns:
             A validated GeoDataFrame of matched assets.
         """
-        logger.info("search_called", provider=provider.__class__.__name__)
+        logger.info(
+            "search_called",
+            provider=getattr(provider, "__name__", type(provider).__name__),
+        )
 
         resolved_aoi = (
             normalize_geometry_input(aoi)
@@ -152,10 +159,9 @@ class ExtractionJob(BaseModel):
         if resolved_aoi is not None:
             search_kwargs["intersects"] = resolved_aoi
 
-        if search_kwargs:
-            provider = provider.model_copy(update=search_kwargs)
+        bound_provider = update_callable(provider, **search_kwargs)
 
-        return provider()
+        return bound_provider()
 
     def build_tasks(
         self,
@@ -179,12 +185,12 @@ class ExtractionJob(BaseModel):
 
         logger.info(
             "build_tasks_start",
-            builder=task_builder.__class__.__name__,
+            builder=getattr(task_builder, "__name__", type(task_builder).__name__),
             assets=len(assets),
         )
 
         if builder_kwargs:
-            task_builder = task_builder.model_copy(update=builder_kwargs)
+            task_builder = update_callable(task_builder, **builder_kwargs)
 
         return task_builder(assets, self)
 
@@ -273,11 +279,14 @@ class ExtractionJob(BaseModel):
             )
         """
         from hydra import compose, initialize_config_dir
+        from omegaconf import OmegaConf
 
         config_dir = Path(config_dir).resolve()
         with initialize_config_dir(version_base=None, config_dir=str(config_dir)):
             cfg = compose(config_name=config_name, overrides=overrides or [])
-            instantiated = hydra.utils.instantiate(cfg, _convert_="all")
+            plain_cfg = OmegaConf.to_container(cfg, resolve=True)
+            prepared_cfg = _prepare_config_for_instantiate(plain_cfg)
+            instantiated = hydra.utils.instantiate(prepared_cfg, _convert_="all")
 
         return cls._from_instantiated(
             instantiated, f"config at {config_dir}/{config_name}"
@@ -318,5 +327,7 @@ class ExtractionJob(BaseModel):
         path = Path(path)
         cfg = OmegaConf.load(path)
 
-        instantiated = hydra.utils.instantiate(cfg, _convert_="all")
+        plain_cfg = OmegaConf.to_container(cfg, resolve=True)
+        prepared_cfg = _prepare_config_for_instantiate(plain_cfg)
+        instantiated = hydra.utils.instantiate(prepared_cfg, _convert_="all")
         return cls._from_instantiated(instantiated, f"configuration at {path}")

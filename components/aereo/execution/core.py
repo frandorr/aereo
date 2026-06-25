@@ -78,6 +78,7 @@ def run_task(task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
     reprojected_map: dict[str, xr.Dataset] | None = None
     if reprojector is not None:
         reprojected_map = reprojector(ds, task)
+        assert reprojected_map is not None
         if set(reprojected_map) != {p.id for p in task.patches}:
             raise ValueError(
                 "Reprojector did not return a dataset for every patch in the task."

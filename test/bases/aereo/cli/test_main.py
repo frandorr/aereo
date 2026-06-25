@@ -24,12 +24,12 @@ class TestValidate:
 action: validate
 verbose: false
 search:
-  _target_: aereo.builtins.SearchSTAC
+  _target_: aereo.builtins.search_stac
   stac_api_url: "https://stac"
   collections:
     s2: []
 task_builder:
-  _target_: aereo.builtins.task_builder.GroupedTaskBuilder
+  _target_: aereo.builtins.task_builder.build_grouped_tasks
   cells_per_task: 50
 grid_config:
   _target_: aereo.interfaces.GridConfig
@@ -40,11 +40,11 @@ patch_config:
 output_uri: "out"
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read_odc_stac
   reproject:
-    _target_: aereo.builtins.ReprojectODC
+    _target_: aereo.builtins.reproject_odc
   write:
-    _target_: aereo.builtins.WriteGeoTIFF
+    _target_: aereo.builtins.write_geotiff
 """
         )
         run_cli_config(tmp_path, "config", [])
@@ -56,8 +56,8 @@ extract:
 action: validate
 verbose: false
 search:
-  _target_: aereo.builtins.SearchSTAC
-  # missing stac_api_url (required for SearchSTAC)
+  _target_: aereo.builtins.search_stac
+  # missing stac_api_url (required for search_stac)
   collections:
     s2: []
 """

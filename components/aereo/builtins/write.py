@@ -10,10 +10,10 @@ from typing import Any
 
 import xarray as xr
 from aereo.grid import ExtractionPatch
-from aereo.interfaces import ExtractionTask, Writer
+from aereo.interfaces import ExtractionTask
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
-from pydantic import Field
+from pydantic import ConfigDict, validate_call
 
 
 def _dataset_to_raster_bands(ds: xr.Dataset) -> xr.DataArray:
@@ -65,173 +65,154 @@ def _dataset_to_raster_bands(ds: xr.Dataset) -> xr.DataArray:
     return combined
 
 
-class WriteGeoTIFF(Writer):
-    """Default writer that serialises a cell's variables as one GeoTIFF via ``rioxarray``.
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def write_geotiff(
+    ds: xr.Dataset,
+    task: ExtractionTask,
+    patch: ExtractionPatch,
+    rio_params: dict[str, Any] | None = None,
+) -> GeoDataFrame[ArtifactSchema]:
+    """Write *ds* to a GeoTIFF using the standard EOIDS layout under ``task.output_uri``.
 
-    All ``data_vars`` for a single cell are written to **one file** as separate
-    raster bands, following the EOIDS convention of one artifact file per grid
-    cell. When a variable itself contains multiple bands they are stored as
-    additional raster bands inside the same file — the ``variable`` EOIDS key
-    lists the full set of bands (joined by ``+``).
+    All variables are combined into a single multi-band raster per grid cell.
+    If the dataset has a ``time`` dimension, one file is written per time
+    slice. The ``rio_params`` entry is forwarded unchanged to
+    ``da.rio.to_raster()``, giving callers full control over compression,
+    tiling, COG conversion, nodata values, etc.
 
-    All rasterio/rioxarray write options (compression, tiling, COG overviews,
-    nodata, etc.) are forwarded verbatim through the ``rio_params`` parameter.
-    This keeps the writer unopinionated — the full rasterio profile API is
-    available without any intermediate translation layer.
+    Args:
+        ds: The xarray.Dataset to write. Must contain ``start_time`` and
+            ``end_time`` in ``ds.attrs`` when no ``time`` dimension is present.
+        task: The extraction task providing the output URI.
+        patch: The extraction patch being written.
+        rio_params: Extra write parameters forwarded to rioxarray.
 
-    If the parent :class:`~aereo.pipeline.ExtractionJob` declares a
-    ``derivative`` name, outputs are placed under a
-    ``derivatives/<name>/`` subdirectory of ``output_uri``.
+    Returns:
+        GeoDataFrame of written artifacts conforming to ``ArtifactSchema``.
+
+    Raises:
+        ValueError: If temporal metadata is missing and cannot be inferred.
     """
+    import geopandas as gpd
+    import pandas as pd
+    import rioxarray  # noqa: F401
+    from shapely.geometry import box
+    from aereo.eoids import build_eoids_path
 
-    rio_params: dict[str, Any] = Field(default_factory=dict)
+    uri = task.output_uri
+    cell_id = patch.id
 
-    def __call__(
-        self,
-        ds: xr.Dataset,
-        task: ExtractionTask,
-        patch: ExtractionPatch,
-    ) -> GeoDataFrame[ArtifactSchema]:
-        """Write *ds* to a GeoTIFF using the standard EOIDS layout under ``task.output_uri``.
+    start_time = ds.attrs.get("start_time")
+    end_time = ds.attrs.get("end_time")
 
-        All variables are combined into a single multi-band raster per grid cell.
-        If the dataset has a ``time`` dimension, one file is written per time
-        slice. The ``rio_params`` entry is forwarded unchanged to
-        ``da.rio.to_raster()``, giving callers full control over compression,
-        tiling, COG conversion, nodata values, etc.
-
-        Args:
-            ds: The xarray.Dataset to write.  Must contain ``start_time`` and
-                ``end_time`` in ``ds.attrs`` when no ``time`` dimension is present.
-            task: The extraction task providing the output URI.
-            patch: The extraction patch being written.
-
-        Returns:
-            GeoDataFrame of written artifacts conforming to ``ArtifactSchema``.
-
-        Raises:
-            ValueError: If temporal metadata is missing and cannot be inferred.
-        """
-        import geopandas as gpd
-        import pandas as pd
-        import rioxarray  # noqa: F401
-        from shapely.geometry import box
-        from aereo.eoids import build_eoids_path
-
-        uri = task.output_uri
-        cell_id = patch.id
-
-        start_time = ds.attrs.get("start_time")
-        end_time = ds.attrs.get("end_time")
-
-        if "time" not in ds.dims and (start_time is None or end_time is None):
-            raise ValueError(
-                "xarray.Dataset must contain 'start_time' and 'end_time' in ds.attrs "
-                "when no 'time' dimension is present to construct EOIDS compliant paths."
-            )
-
-        rio_params = dict(self.rio_params)
-
-        # Build patch metadata once
-        grid_cell_id = cell_id
-        grid_dist = patch.d
-        resolution = patch.resolution
-        cell_geometry = patch.cell_geometry
-        cell_utm_crs = patch.utm_crs
-        cell_utm_footprint = patch.utm_footprint
-
-        # Derive source IDs from task assets
-        source_ids = (
-            ",".join(sorted({str(aid) for aid in task.assets["id"] if pd.notna(aid)}))
-            if "id" in task.assets.columns
-            else ""
+    if "time" not in ds.dims and (start_time is None or end_time is None):
+        raise ValueError(
+            "xarray.Dataset must contain 'start_time' and 'end_time' in ds.attrs "
+            "when no 'time' dimension is present to construct EOIDS compliant paths."
         )
 
-        # Determine collection
-        collections = (
-            list(task.assets["collection"].unique())
-            if "collection" in task.assets.columns
-            else []
+    params = dict(rio_params) if rio_params is not None else {}
+
+    # Build patch metadata once
+    grid_cell_id = cell_id
+    grid_dist = patch.d
+    resolution = patch.resolution
+    cell_geometry = patch.cell_geometry
+    cell_utm_crs = patch.utm_crs
+    cell_utm_footprint = patch.utm_footprint
+
+    # Derive source IDs from task assets
+    source_ids = (
+        ",".join(sorted({str(aid) for aid in task.assets["id"] if pd.notna(aid)}))
+        if "id" in task.assets.columns
+        else ""
+    )
+
+    # Determine collection
+    collections = (
+        list(task.assets["collection"].unique())
+        if "collection" in task.assets.columns
+        else []
+    )
+    collection = collections[0] if collections else None
+
+    job_name = task.job.name
+    derivative = task.derivative
+
+    # Handle optional time dimension: if present, slice over it.
+    has_time = "time" in ds.dims
+    time_coords = ds.coords["time"].values if has_time else [None]
+
+    records = []
+    for time_idx, time_val in enumerate(time_coords):
+        ds_slice = ds.isel(time=time_idx) if has_time else ds
+
+        # Resolve timestamp for this specific slice
+        slice_time = (
+            pd.to_datetime(time_val).to_pydatetime()
+            if time_val is not None
+            else start_time
         )
-        collection = collections[0] if collections else None
 
-        job_name = task.job.name
-        derivative = task.derivative
+        combined_da = _dataset_to_raster_bands(ds_slice)
 
-        # Handle optional time dimension: if present, slice over it.
-        has_time = "time" in ds.dims
-        time_coords = ds.coords["time"].values if has_time else [None]
+        fpath = build_eoids_path(
+            local_dir=uri,
+            job_name=job_name,
+            resolution=resolution,
+            collections=collections,
+            variables=[str(v) for v in ds.data_vars],
+            cell_id=cell_id,
+            start_time=slice_time,
+            end_time=slice_time if has_time else end_time,
+            derivative=derivative,
+            suffix="tif",
+        )
 
-        records = []
-        for time_idx, time_val in enumerate(time_coords):
-            ds_slice = ds.isel(time=time_idx) if has_time else ds
+        combined_da.rio.to_raster(fpath, **params)
 
-            # Resolve timestamp for this specific slice
-            slice_time = (
-                pd.to_datetime(time_val).to_pydatetime()
-                if time_val is not None
-                else start_time
-            )
+        # Unique artifact ID
+        time_str = slice_time.strftime("%Y%m%dT%H%M%S") if slice_time else ""
+        var_names = "+".join(str(v) for v in ds.data_vars)
+        artifact_id = f"{grid_cell_id}_{var_names}_{time_str}"
 
-            combined_da = _dataset_to_raster_bands(ds_slice)
+        records.append(
+            {
+                "id": artifact_id,
+                "source_ids": source_ids,
+                "start_time": slice_time,
+                "end_time": slice_time if has_time else end_time,
+                "uri": str(fpath),
+                "collection": collection,
+                "geometry": box(*combined_da.rio.bounds()),
+                "grid_cell": grid_cell_id,
+                "grid_dist": grid_dist,
+                "cell_geometry": cell_geometry,
+                "cell_utm_crs": cell_utm_crs,
+                "cell_utm_footprint": cell_utm_footprint,
+            }
+        )
 
-            fpath = build_eoids_path(
-                local_dir=uri,
-                job_name=job_name,
-                resolution=resolution,
-                collections=collections,
-                variables=[str(v) for v in ds.data_vars],
-                cell_id=cell_id,
-                start_time=slice_time,
-                end_time=slice_time if has_time else end_time,
-                derivative=derivative,
-                suffix="tif",
-            )
+    if records:
+        df = pd.DataFrame(records)
+        gdf = gpd.GeoDataFrame(df, geometry="geometry", crs=ds.rio.crs)
+    else:
+        gdf = gpd.GeoDataFrame(
+            columns=[
+                "id",
+                "source_ids",
+                "start_time",
+                "end_time",
+                "uri",
+                "collection",
+                "geometry",
+                "grid_cell",
+                "grid_dist",
+                "cell_geometry",
+                "cell_utm_crs",
+                "cell_utm_footprint",
+            ],
+            geometry="geometry",
+        )
 
-            combined_da.rio.to_raster(fpath, **rio_params)
-
-            # Unique artifact ID
-            time_str = slice_time.strftime("%Y%m%dT%H%M%S") if slice_time else ""
-            var_names = "+".join(str(v) for v in ds.data_vars)
-            artifact_id = f"{grid_cell_id}_{var_names}_{time_str}"
-
-            records.append(
-                {
-                    "id": artifact_id,
-                    "source_ids": source_ids,
-                    "start_time": slice_time,
-                    "end_time": slice_time if has_time else end_time,
-                    "uri": str(fpath),
-                    "collection": collection,
-                    "geometry": box(*combined_da.rio.bounds()),
-                    "grid_cell": grid_cell_id,
-                    "grid_dist": grid_dist,
-                    "cell_geometry": cell_geometry,
-                    "cell_utm_crs": cell_utm_crs,
-                    "cell_utm_footprint": cell_utm_footprint,
-                }
-            )
-
-        if records:
-            df = pd.DataFrame(records)
-            gdf = gpd.GeoDataFrame(df, geometry="geometry", crs=ds.rio.crs)
-        else:
-            gdf = gpd.GeoDataFrame(
-                columns=[
-                    "id",
-                    "source_ids",
-                    "start_time",
-                    "end_time",
-                    "uri",
-                    "collection",
-                    "geometry",
-                    "grid_cell",
-                    "grid_dist",
-                    "cell_geometry",
-                    "cell_utm_crs",
-                    "cell_utm_footprint",
-                ],
-                geometry="geometry",
-            )
-
-        return GeoDataFrame[ArtifactSchema](gdf)
+    return GeoDataFrame[ArtifactSchema](gdf)
