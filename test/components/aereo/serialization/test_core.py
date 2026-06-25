@@ -55,7 +55,6 @@ def _make_task(
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="test_uri",
-        search=None,
         extract=extract,
         target_aoi=aoi,
     )
@@ -191,7 +190,6 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
         grid_config=GridConfig(target_grid_dist=10_000),
         patch_config=PatchConfig(resolution=10.0, margin=5.0, padding=0),
         output_uri="out",
-        search=None,
         extract=extract,
     )
     original = ExtractionTask(
@@ -238,7 +236,6 @@ def test_batch_writer_round_trip(tmp_path: Any) -> None:
         grid_config=original.grid_config,
         patch_config=original.patch_config,
         output_uri=original.output_uri,
-        search=None,
         extract=ExtractConfig(
             read=original.extract.read,
             preprocess=original.extract.preprocess,

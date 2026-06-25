@@ -494,24 +494,21 @@ def _run_prepare_action(cfg: DictConfig) -> None:
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri=cfg.get("output_uri") or str(output_dir),
-        search=None,
-        task_builder=task_builder,
         extract=extract,
         target_aoi=target_aoi,
         overwrite=cfg.overwrite,
     )
 
-    client = AereoClient()
     tasks = _run_with_exit(
         "Prepare",
-        client.build_tasks,
+        task_builder,
         search_results=df,
         job=job,
     )
 
     task_file = Path(cfg.output) if cfg.output else (output_dir / "tasks.pkl")
     task_file.write_bytes(pickle.dumps(tasks))
-    chunk_size = getattr(job.task_builder, "cells_per_task", None)
+    chunk_size = getattr(task_builder, "cells_per_task", None)
     chunk_msg = f" (chunk size: {chunk_size})" if chunk_size is not None else ""
     console.print(f"[green]✓ Prepared {len(tasks)} tasks{chunk_msg}.[/green]")
     console.print(f"[green]Wrote tasks to[/green] {task_file}")
@@ -587,8 +584,6 @@ def _run_run_action(cfg: DictConfig) -> None:
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri=cfg.get("output_uri") or str(output_dir),
-        search=search_provider,
-        task_builder=task_builder,
         extract=extract,
         target_aoi=target_aoi,
         overwrite=cfg.overwrite,
@@ -606,11 +601,11 @@ def _run_run_action(cfg: DictConfig) -> None:
     console.print("[bold blue]📦 Preparing...[/bold blue]")
     tasks = _run_with_exit(
         "Prepare",
-        client.build_tasks,
+        task_builder,
         search_results=results,
         job=job,
     )
-    chunk_size = getattr(job.task_builder, "cells_per_task", None)
+    chunk_size = getattr(task_builder, "cells_per_task", None)
     chunk_msg = f" (chunk size: {chunk_size})" if chunk_size is not None else ""
     console.print(f"[green]✓ Prepared {len(tasks)} tasks{chunk_msg}.[/green]")
 

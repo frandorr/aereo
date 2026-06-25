@@ -75,7 +75,6 @@ def _make_task(
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="test-uri",
-        search=None,
         extract=extract,
     )
     return ExtractionTask(

@@ -244,7 +244,6 @@ class TaskSerializer:
                 "grid_config": meta[self.GRID_CONFIG_KEY],
                 "patch_config": meta[self.PATCH_CONFIG_KEY],
                 "output_uri": meta.get(self.OUTPUT_URI_KEY, meta.get(self.URI_KEY)),
-                "search": None,
                 "extract": extract,
                 "target_aoi": target_aoi,
             }

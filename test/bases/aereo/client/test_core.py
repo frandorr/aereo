@@ -60,15 +60,12 @@ def test_build_tasks_returns_tasks(monkeypatch):
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),
         output_uri="s3://out",
-        search=None,
-        task_builder=GroupedTaskBuilder(cells_per_task=1),
         extract=ExtractConfig(read=ReadODCSTAC()),
     )
 
-    client = AereoClient()
-    tasks = client.build_tasks(
-        search_results=cast(GeoDataFrame, valid_df),
-        job=job,
+    tasks = GroupedTaskBuilder(cells_per_task=1)(
+        cast(GeoDataFrame, valid_df),
+        job,
     )
     assert isinstance(tasks, list)
     assert len(tasks) > 0
@@ -88,16 +85,13 @@ def test_build_tasks_uses_job_target_aoi(monkeypatch, tmp_path):
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),
         output_uri="s3://out",
-        search=None,
-        task_builder=GroupedTaskBuilder(cells_per_task=1),
         extract=ExtractConfig(read=ReadODCSTAC()),
         target_aoi=str(aoi_path),
     )
 
-    client = AereoClient()
-    tasks = client.build_tasks(
-        search_results=cast(GeoDataFrame, valid_df),
-        job=job,
+    tasks = GroupedTaskBuilder(cells_per_task=1)(
+        cast(GeoDataFrame, valid_df),
+        job,
     )
     assert isinstance(tasks, list)
     assert len(tasks) > 0
@@ -114,51 +108,17 @@ def test_build_tasks_preserves_job_derivative(monkeypatch):
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),
         output_uri="s3://out",
-        search=None,
-        task_builder=GroupedTaskBuilder(cells_per_task=1),
         extract=ExtractConfig(read=ReadODCSTAC()),
     )
 
-    client = AereoClient()
-    tasks = client.build_tasks(
-        search_results=cast(GeoDataFrame, valid_df),
-        job=job,
+    tasks = GroupedTaskBuilder(cells_per_task=1)(
+        cast(GeoDataFrame, valid_df),
+        job,
     )
     assert isinstance(tasks, list)
     assert len(tasks) > 0
     assert tasks[0].job.derivative == "ndvi"
     assert tasks[0].job.name == "s2_ndvi"
-
-
-def test_build_tasks_falls_back_to_search_intersects(monkeypatch):
-    """When no target_aoi is set, job.search.intersects is used via effective_target_aoi."""
-    monkeypatch.setattr("aereo.schemas.core.AssetSchema.validate", lambda x: x)
-    valid_df = _make_valid_search_df()
-
-    from aereo.interfaces.core import SearchProvider
-
-    search_aoi = Polygon([[0, 0], [0.3, 0], [0.3, 0.3], [0, 0.3], [0, 0]])
-    mock_searcher = MagicMock(spec=SearchProvider)
-    mock_searcher.intersects = search_aoi
-
-    job = ExtractionJob(
-        name="s2_ndvi",
-        grid_config=GridConfig(target_grid_dist=50_000),
-        patch_config=PatchConfig(resolution=10.0),
-        output_uri="s3://out",
-        search=mock_searcher,
-        task_builder=GroupedTaskBuilder(cells_per_task=1),
-        extract=ExtractConfig(read=ReadODCSTAC()),
-    )
-
-    client = AereoClient()
-    tasks = client.build_tasks(
-        search_results=cast(GeoDataFrame, valid_df),
-        job=job,
-    )
-    assert isinstance(tasks, list)
-    assert len(tasks) > 0
-    assert tasks[0].job.effective_target_aoi is search_aoi
 
 
 # ---------------------------------------------------------------------------
@@ -182,7 +142,6 @@ def test_execute_tasks_failure_mode_strict(monkeypatch):
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),
         output_uri="test",
-        search=None,
         extract=ExtractConfig(read=ReadODCSTAC()),
     )
     task = ExtractionTask(
@@ -207,7 +166,6 @@ def test_execute_tasks_failure_mode_best_effort(monkeypatch):
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),
         output_uri="test",
-        search=None,
         extract=ExtractConfig(read=ReadODCSTAC()),
     )
     task = ExtractionTask(
@@ -237,7 +195,6 @@ def test_execute_tasks_best_effort_partial_results(monkeypatch):
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=10.0),
         output_uri="test",
-        search=None,
         extract=ExtractConfig(read=ReadODCSTAC()),
     )
     task = ExtractionTask(

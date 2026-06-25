@@ -34,7 +34,6 @@ def test_extraction_task_validation():
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="test",
-        search=None,
         extract=extract,
     )
     task = ExtractionTask(
@@ -68,7 +67,6 @@ def test_extraction_task_rejects_mixed_crs():
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="test",
-        search=None,
         extract=extract,
     )
 
@@ -102,7 +100,6 @@ def test_extraction_task_accepts_single_crs():
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="test",
-        search=None,
         extract=extract,
     )
 

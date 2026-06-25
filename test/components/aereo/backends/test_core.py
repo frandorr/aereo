@@ -102,7 +102,6 @@ def _make_task(
         grid_config=grid_config,
         patch_config=PatchConfig(resolution=10.0),
         output_uri="test-uri",
-        search=None,
         extract=extract,
     )
     return ExtractionTask(

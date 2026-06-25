@@ -1,10 +1,28 @@
 from pathlib import Path
 
 import pytest
-from aereo.builtins import SearchSTAC
-from aereo.interfaces import GridConfig, PatchConfig
+from aereo.interfaces import ExtractConfig, GridConfig, PatchConfig
+from aereo.interfaces.core import Reader
 from aereo.pipeline import ExtractionJob
 from shapely.geometry import Polygon
+
+
+class FakeReader(Reader):
+    """Minimal reader for testing ExtractionJob validation."""
+
+    def __call__(self, task):
+        raise NotImplementedError
+
+
+def test_job_no_search_or_task_builder():
+    job = ExtractionJob(
+        grid_config=GridConfig(target_grid_dist=1000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="/tmp/out",
+        extract=ExtractConfig(read=FakeReader()),
+    )
+    assert not hasattr(job, "search")
+    assert not hasattr(job, "task_builder")
 
 
 def test_extraction_job_from_yaml_dict(tmp_path: Path):
@@ -17,11 +35,6 @@ grid_config:
 patch_config:
   resolution: 10.0
 output_uri: "out_dir"
-search:
-  _target_: aereo.builtins.SearchSTAC
-  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
-  collections:
-    sentinel-2-l2a: ["B04"]
 extract:
   read:
     _target_: aereo.builtins.ReadODCSTAC
@@ -39,10 +52,6 @@ extract:
     assert job.extract.read is not None
     assert job.extract.reproject is not None
     assert job.extract.write is not None
-    assert isinstance(job.search, SearchSTAC)
-    assert (
-        job.search.stac_api_url == "https://planetarycomputer.microsoft.com/api/stac/v1"
-    )
 
 
 def test_extraction_job_from_yaml_target(tmp_path: Path):
@@ -57,11 +66,6 @@ patch_config:
   _target_: aereo.interfaces.PatchConfig
   resolution: 10.0
 output_uri: "out_dir"
-search:
-  _target_: aereo.builtins.SearchSTAC
-  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
-  collections:
-    sentinel-2-l2a: ["B04"]
 extract:
   read:
     _target_: aereo.builtins.ReadODCSTAC
@@ -84,9 +88,6 @@ patch_config:
   _target_: aereo.interfaces.PatchConfig
   resolution: 10.0
 output_uri: "out_dir"
-search:
-  _target_: aereo.builtins.SearchSTAC
-  # missing stac_api_url
 extract: {}
 """
     )
@@ -106,11 +107,6 @@ patch_config:
   _target_: aereo.interfaces.PatchConfig
   resolution: 10.0
 output_uri: "out_dir"
-search:
-  _target_: aereo.builtins.SearchSTAC
-  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
-  collections:
-    sentinel-2-l2a: ["B04"]
 extract:
   read:
     _target_: aereo.builtins.ReadODCSTAC
@@ -151,11 +147,6 @@ target_aoi:
   type: Polygon
   coordinates:
     - [[-1.0, -1.0], [1.0, -1.0], [1.0, 1.0], [-1.0, 1.0], [-1.0, -1.0]]
-search:
-  _target_: aereo.builtins.SearchSTAC
-  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
-  collections:
-    sentinel-2-l2a: ["B04"]
 extract:
   read:
     _target_: aereo.builtins.ReadODCSTAC
@@ -179,7 +170,6 @@ extract:
     assert job.grid_config.target_grid_dist == 75_000
     assert job.patch_config.resolution == 20.0
     assert isinstance(job.target_aoi, Polygon)
-    assert isinstance(job.search, SearchSTAC)
 
 
 def test_extraction_job_load_from_config_package_with_override(tmp_path: Path):
@@ -196,11 +186,6 @@ grid_config:
   _target_: aereo.interfaces.GridConfig
   target_grid_dist: 50000
 output_uri: "out_dir"
-search:
-  _target_: aereo.builtins.SearchSTAC
-  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
-  collections:
-    sentinel-2-l2a: ["B04"]
 extract:
   read:
     _target_: aereo.builtins.ReadODCSTAC
@@ -235,11 +220,6 @@ defaults:
   - _self_
 
 output_uri: "out_dir"
-search:
-  _target_: aereo.builtins.SearchSTAC
-  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
-  collections:
-    sentinel-2-l2a: ["B04"]
 extract:
   read:
     _target_: aereo.builtins.ReadODCSTAC
@@ -274,11 +254,6 @@ target_aoi:
   type: Polygon
   coordinates:
     - [[-1.0, -1.0], [1.0, -1.0], [1.0, 1.0], [-1.0, 1.0], [-1.0, -1.0]]
-search:
-  _target_: aereo.builtins.SearchSTAC
-  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
-  collections:
-    sentinel-2-l2a: ["B04"]
 extract:
   read:
     _target_: aereo.builtins.ReadODCSTAC
@@ -304,11 +279,6 @@ patch_config:
   resolution: 10.0
 output_uri: "out_dir"
 target_aoi: {aoi_file}
-search:
-  _target_: aereo.builtins.SearchSTAC
-  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
-  collections:
-    sentinel-2-l2a: ["B04"]
 extract:
   read:
     _target_: aereo.builtins.ReadODCSTAC
@@ -318,13 +288,10 @@ extract:
     assert isinstance(job.target_aoi, Polygon)
 
 
-def test_extraction_job_target_aoi_falls_back_to_search_intersects(tmp_path: Path):
-    aoi_file = tmp_path / "aoi.geojson"
-    aoi_file.write_text(str(_sample_geojson()).replace("'", '"'))
-
+def test_extraction_job_target_aoi_defaults_to_none(tmp_path: Path):
     job_yaml = tmp_path / "job.yaml"
     job_yaml.write_text(
-        f"""
+        """
 grid_config:
   _target_: aereo.interfaces.GridConfig
   target_grid_dist: 50000
@@ -332,12 +299,6 @@ patch_config:
   _target_: aereo.interfaces.PatchConfig
   resolution: 10.0
 output_uri: "out_dir"
-search:
-  _target_: aereo.builtins.SearchSTAC
-  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
-  collections:
-    sentinel-2-l2a: ["B04"]
-  intersects: {aoi_file}
 extract:
   read:
     _target_: aereo.builtins.ReadODCSTAC
@@ -345,5 +306,4 @@ extract:
     )
     job = ExtractionJob.from_yaml(job_yaml)
     assert job.target_aoi is None
-    assert isinstance(job.search.intersects, Polygon)
-    assert job.effective_target_aoi is job.search.intersects
+    assert job.effective_target_aoi is None

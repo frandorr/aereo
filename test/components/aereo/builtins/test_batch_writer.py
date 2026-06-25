@@ -73,7 +73,6 @@ def _make_task(tmp_path):
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri=str(tmp_path),
-        search=None,
         extract=ExtractConfig(
             read=ReadODCSTAC(),
             reproject=ReprojectODC(),
@@ -138,7 +137,6 @@ def test_batch_write_geotiff_multiple_patches(tmp_path):
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri=str(tmp_path),
-        search=None,
         extract=ExtractConfig(
             read=ReadODCSTAC(),
             reproject=ReprojectODC(),
