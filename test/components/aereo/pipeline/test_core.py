@@ -1,9 +1,26 @@
 from pathlib import Path
+from typing import Any, cast
+from unittest.mock import MagicMock
 
+import geopandas as gpd
+import numpy as np
+import pandas as pd
 import pytest
-from aereo.interfaces import ExtractConfig, GridConfig, PatchConfig
-from aereo.interfaces.core import Reader
+import xarray as xr
+from aereo.executors import LocalExecutor
+from aereo.interfaces import (
+    ExtractConfig,
+    GridConfig,
+    PatchConfig,
+    Reprojector,
+    SearchProvider,
+    TaskBuilder,
+    Writer,
+)
+from aereo.interfaces.core import ExtractionTask, Reader
 from aereo.pipeline import ExtractionJob
+from aereo.schemas import ArtifactSchema, AssetSchema
+from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
 
 
@@ -15,14 +32,14 @@ class FakeReader(Reader):
 
 
 def test_job_no_search_or_task_builder():
-    job = ExtractionJob(
+    _ = ExtractionJob(
         grid_config=GridConfig(target_grid_dist=1000),
         patch_config=PatchConfig(resolution=10.0),
         output_uri="/tmp/out",
         extract=ExtractConfig(read=FakeReader()),
     )
-    assert not hasattr(job, "search")
-    assert not hasattr(job, "task_builder")
+    assert "search" not in ExtractionJob.model_fields
+    assert "task_builder" not in ExtractionJob.model_fields
 
 
 def test_extraction_job_from_yaml_dict(tmp_path: Path):
@@ -307,3 +324,228 @@ extract:
     job = ExtractionJob.from_yaml(job_yaml)
     assert job.target_aoi is None
     assert job.effective_target_aoi is None
+
+
+# ---------------------------------------------------------------------------
+# Orchestration methods
+# ---------------------------------------------------------------------------
+
+
+class _DummyReader(Reader):
+    def __call__(self, task: ExtractionTask) -> xr.Dataset:
+        return xr.Dataset(
+            {"B04": (["y", "x"], np.ones((4, 4)))},
+            coords={"y": range(4), "x": range(4)},
+        )
+
+
+class _DummyReprojector(Reprojector):
+    def __call__(self, ds: xr.Dataset, task: ExtractionTask) -> dict[str, xr.Dataset]:
+        return {patch.id: ds for patch in task.patches}
+
+
+class _DummyWriter(Writer):
+    def __call__(
+        self,
+        ds: xr.Dataset,
+        task: ExtractionTask,
+        patch: Any,
+    ) -> GeoDataFrame[ArtifactSchema]:
+        return cast(
+            GeoDataFrame[ArtifactSchema],
+            gpd.GeoDataFrame(
+                {"id": [patch.id]},
+                geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
+            ),
+        )
+
+
+def _make_assets() -> GeoDataFrame[AssetSchema]:
+    """Return a minimal non-empty AssetSchema GeoDataFrame."""
+    df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
+    df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    df["geometry"] = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
+    df["collection"] = "C1"
+    df["start_time"] = pd.Timestamp("2023-01-01")
+    df["end_time"] = pd.Timestamp("2023-01-02")
+    return cast(GeoDataFrame[AssetSchema], df)
+
+
+def _make_task(job: ExtractionJob, patch_id: str = "cell-1") -> ExtractionTask:
+    """Return a minimal ExtractionTask tied to *job*."""
+    valid_df = pd.DataFrame(columns=list(ArtifactSchema.to_schema().columns.keys()))
+    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
+    valid_df["geometry"] = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
+    valid_df["collection"] = "C1"
+
+    patch = MagicMock()
+    patch.id = patch_id
+
+    return ExtractionTask(
+        assets=cast(GeoDataFrame[AssetSchema], valid_df),
+        job=job,
+        patches=[patch],
+    )
+
+
+def test_job_search_calls_provider():
+    job = ExtractionJob(
+        grid_config=GridConfig(target_grid_dist=1000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="/tmp/out",
+        extract=ExtractConfig(read=FakeReader()),
+    )
+    provider = MagicMock(spec=SearchProvider)
+    provider.return_value = SearchProvider.empty_result()
+    assets = job.search(provider)
+    provider.assert_called_once()
+    assert isinstance(assets, gpd.GeoDataFrame)
+
+
+def test_job_search_passes_aoi_to_provider():
+    aoi = Polygon([[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]])
+    job = ExtractionJob(
+        grid_config=GridConfig(target_grid_dist=1000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="/tmp/out",
+        extract=ExtractConfig(read=FakeReader()),
+        target_aoi=aoi,
+    )
+    provider = MagicMock(spec=SearchProvider)
+    provider.model_copy.return_value = provider
+    provider.return_value = SearchProvider.empty_result()
+    job.search(provider)
+    provider.model_copy.assert_called_once()
+    update = provider.model_copy.call_args.kwargs["update"]
+    assert update["intersects"] == aoi
+
+
+def test_job_search_aoi_argument_overrides_target_aoi():
+    target_aoi = Polygon([[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]])
+    search_aoi = Polygon([[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]])
+    job = ExtractionJob(
+        grid_config=GridConfig(target_grid_dist=1000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="/tmp/out",
+        extract=ExtractConfig(read=FakeReader()),
+        target_aoi=target_aoi,
+    )
+    provider = MagicMock(spec=SearchProvider)
+    provider.model_copy.return_value = provider
+    provider.return_value = SearchProvider.empty_result()
+    job.search(provider, aoi=search_aoi)
+    update = provider.model_copy.call_args.kwargs["update"]
+    assert update["intersects"] == search_aoi
+
+
+def test_job_build_tasks_calls_task_builder():
+    job = ExtractionJob(
+        grid_config=GridConfig(target_grid_dist=1000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="/tmp/out",
+        extract=ExtractConfig(read=FakeReader()),
+    )
+    builder = MagicMock(spec=TaskBuilder)
+    builder.return_value = []
+    tasks = job.build_tasks(_make_assets(), builder)
+    builder.assert_called_once()
+    assert tasks == []
+
+
+def test_job_build_tasks_passes_builder_kwargs():
+    job = ExtractionJob(
+        grid_config=GridConfig(target_grid_dist=1000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="/tmp/out",
+        extract=ExtractConfig(read=FakeReader()),
+    )
+    builder = MagicMock(spec=TaskBuilder)
+    builder.model_copy.return_value = builder
+    builder.return_value = []
+    job.build_tasks(_make_assets(), builder, cells_per_task=20)
+    builder.model_copy.assert_called_once()
+    update = builder.model_copy.call_args.kwargs["update"]
+    assert update["cells_per_task"] == 20
+
+
+def test_job_build_tasks_returns_empty_for_empty_assets():
+    job = ExtractionJob(
+        grid_config=GridConfig(target_grid_dist=1000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="/tmp/out",
+        extract=ExtractConfig(read=FakeReader()),
+    )
+    builder = MagicMock(spec=TaskBuilder)
+    empty_assets = gpd.GeoDataFrame(
+        columns=list(AssetSchema.to_schema().columns.keys()),
+        geometry="geometry",
+    )
+    tasks = job.build_tasks(cast(GeoDataFrame[AssetSchema], empty_assets), builder)
+    builder.assert_not_called()
+    assert tasks == []
+
+
+def test_job_execute_uses_default_executor():
+    job = ExtractionJob(
+        grid_config=GridConfig(target_grid_dist=1000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="/tmp/out",
+        extract=ExtractConfig(
+            read=_DummyReader(),
+            reproject=_DummyReprojector(),
+            write=_DummyWriter(),
+        ),
+    )
+    tasks = [_make_task(job)]
+    artifacts = job.execute(tasks)
+    assert isinstance(artifacts, gpd.GeoDataFrame)
+    assert len(artifacts) == 1
+
+
+def test_job_execute_with_custom_executor():
+    job = ExtractionJob(
+        grid_config=GridConfig(target_grid_dist=1000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="/tmp/out",
+        extract=ExtractConfig(
+            read=_DummyReader(),
+            reproject=_DummyReprojector(),
+            write=_DummyWriter(),
+        ),
+    )
+    custom = LocalExecutor(workers=2, use_threads=True)
+    tasks = [_make_task(job, patch_id="a"), _make_task(job, patch_id="b")]
+    artifacts = job.execute(tasks, executor=custom)
+    assert isinstance(artifacts, gpd.GeoDataFrame)
+    assert len(artifacts) == 2
+
+
+def test_job_execute_empty_tasks_returns_empty_catalog():
+    job = ExtractionJob(
+        grid_config=GridConfig(target_grid_dist=1000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri="/tmp/out",
+        extract=ExtractConfig(read=FakeReader()),
+    )
+    artifacts = job.execute([])
+    assert isinstance(artifacts, gpd.GeoDataFrame)
+    assert len(artifacts) == 0
+
+
+def test_job_write_catalog(tmp_path: Path):
+    job = ExtractionJob(
+        grid_config=GridConfig(target_grid_dist=1000),
+        patch_config=PatchConfig(resolution=10.0),
+        output_uri=str(tmp_path / "out"),
+        extract=ExtractConfig(read=FakeReader()),
+    )
+    artifacts = cast(
+        GeoDataFrame[ArtifactSchema],
+        gpd.GeoDataFrame(
+            {"id": ["a1"]},
+            geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
+        ),
+    )
+    uri = job.write_catalog(artifacts)
+    assert uri == str(tmp_path / "out" / "artifacts.parquet")
+    assert Path(uri).exists()
