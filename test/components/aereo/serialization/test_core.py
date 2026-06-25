@@ -224,41 +224,6 @@ def test_assets_crs_preserved(tmp_path: Any) -> None:
     assert reconstructed.assets.crs.to_epsg() == 4326
 
 
-def test_batch_writer_round_trip(tmp_path: Any) -> None:
-    """BatchWriter plugins survive serialization round-trip."""
-    from aereo.builtins.batch_write import BatchWriteGeoTIFF
-
-    serializer = TaskSerializer()
-    original = _make_task()
-    # Replace write with BatchWriteGeoTIFF
-    job = ExtractionJob(
-        name=original.job.name,
-        grid_config=original.grid_config,
-        patch_config=original.patch_config,
-        output_uri=original.output_uri,
-        extract=ExtractConfig(
-            read=original.extract.read,
-            preprocess=original.extract.preprocess,
-            reproject=original.extract.reproject,
-            postprocess=original.extract.postprocess,
-            write=BatchWriteGeoTIFF(),
-        ),
-        target_aoi=original.aoi,
-    )
-    original = ExtractionTask(
-        assets=original.assets,
-        job=job,
-        patches=original.patches,
-        task_context=original.task_context,
-    )
-
-    dest = tmp_path / "task_batch"
-    serializer.serialize(original, dest)
-    reconstructed = serializer.deserialize(dest)
-
-    assert isinstance(reconstructed.extract.write, BatchWriteGeoTIFF)
-
-
 def test_serialize_to_bytes_round_trip() -> None:
     """Task round-trips through a zip byte payload."""
     serializer = TaskSerializer()

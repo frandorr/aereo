@@ -235,50 +235,6 @@ class Writer(AereoPlugin, ABC):
         ...
 
 
-class BatchWriter(AereoPlugin, ABC):
-    """Serialises a dict of lazy patch datasets to disk.
-
-    Unlike the per-patch ``Writer`` which receives one dataset at a time
-    (controlled by ``TaskRunner``), a ``BatchWriter`` receives the full
-    ``{patch_id: xr.Dataset}`` map from the Reprojector.  This enables:
-
-    * **Batch Dask compute** — merge or schedule multiple patches' graphs together.
-    * **Parallel writes** — write patches concurrently using threads/processes.
-    * **Memory management** — explicitly drop each patch after write.
-
-    Configure via ``ExtractConfig.write``::
-
-        ExtractConfig(
-            read=reader,
-            reproject=reprojector,
-            write=BatchWriteGeoTIFF(max_workers=4),
-        )
-
-    ``TaskRunner`` detects ``isinstance(writer, BatchWriter)`` and hands
-    off the full reprojected map instead of iterating per-patch.
-    """
-
-    write_kwargs: dict[str, Any] = Field(default_factory=dict)
-
-    @abstractmethod
-    def __call__(
-        self,
-        patches: Mapping[str, xr.Dataset],
-        task: ExtractionTask,
-    ) -> GeoDataFrame[ArtifactSchema]:
-        """Write *patches* and return artifact metadata for all written outputs.
-
-        Args:
-            patches: Mapping from ``patch.id`` to the (typically lazy) dataset
-                aligned to that patch's geobox.
-            task: Extraction task containing the patches and configuration.
-
-        Returns:
-            GeoDataFrame of written artifacts with ``ArtifactSchema``.
-        """
-        ...
-
-
 class ExtractConfig(BaseModel):
     """Declarative configuration for an extraction pipeline."""
 
@@ -288,7 +244,7 @@ class ExtractConfig(BaseModel):
     preprocess: Sequence[Processor] = Field(default_factory=list)
     reproject: Reprojector | None = None
     postprocess: Sequence[Processor] = Field(default_factory=list)
-    write: Writer | BatchWriter | None = None
+    write: Writer | None = None
 
 
 class PipelineCallback:

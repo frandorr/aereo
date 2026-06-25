@@ -245,7 +245,6 @@ def _pipeline_to_extract(
         return None
 
     from aereo.interfaces import (
-        BatchWriter,
         Processor,
         Reader,
         Reprojector,
@@ -254,7 +253,7 @@ def _pipeline_to_extract(
 
     read: Reader | None = None
     reproject: Reprojector | None = None
-    write: Writer | BatchWriter | None = None
+    write: Writer | None = None
     preprocess: list[Processor] = []
     postprocess: list[Processor] = []
 
@@ -263,7 +262,7 @@ def _pipeline_to_extract(
             read = plugin
         elif isinstance(plugin, Reprojector):
             reproject = plugin
-        elif isinstance(plugin, (Writer, BatchWriter)):
+        elif isinstance(plugin, Writer):
             write = plugin
         elif isinstance(plugin, Processor):
             (postprocess if reproject is not None else preprocess).append(plugin)
@@ -375,7 +374,7 @@ def plugins_cmd(cfg: DictConfig | None = None) -> None:
         registry,
     )
 
-    for label in ("reader", "reprojector", "processor", "writer", "batch_writer"):
+    for label in ("reader", "reprojector", "processor", "writer"):
         _add_plugin_rows(
             table,
             label.replace("_", " ").title(),

@@ -113,7 +113,7 @@ extract: {}
         ExtractionJob.from_yaml(job_yaml)
 
 
-def test_extraction_job_from_yaml_with_batch_writer(tmp_path: Path):
+def test_extraction_job_from_yaml_with_writer(tmp_path: Path):
     job_yaml = tmp_path / "job.yaml"
     job_yaml.write_text(
         """
@@ -130,13 +130,13 @@ extract:
   reproject:
     _target_: aereo.builtins.ReprojectODC
   write:
-    _target_: aereo.builtins.BatchWriteGeoTIFF
+    _target_: aereo.builtins.WriteGeoTIFF
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
-    from aereo.interfaces import BatchWriter
+    from aereo.interfaces import Writer
 
-    assert isinstance(job.extract.write, BatchWriter)
+    assert isinstance(job.extract.write, Writer)
 
 
 def _sample_geojson() -> dict:

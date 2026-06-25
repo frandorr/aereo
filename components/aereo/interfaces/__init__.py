@@ -9,7 +9,6 @@ By defining these interfaces, we ensure that all implementations adhere to a con
 
 from aereo.interfaces.core import (
     AereoPlugin,
-    BatchWriter,
     ExecutionBackend,
     ExtractConfig,
     ExtractionTask,
@@ -39,7 +38,6 @@ from aereo.interfaces.utils import (
 
 __all__ = [
     "AereoPlugin",
-    "BatchWriter",
     "ExecutionBackend",
     "ExtractConfig",
     "ExtractionTask",
