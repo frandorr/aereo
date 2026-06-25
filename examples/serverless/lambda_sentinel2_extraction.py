@@ -31,53 +31,37 @@ Examples:
 from __future__ import annotations
 
 import os
-from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any
 
 import hydra
 from aereo.executors import LambdaExecutor
 from aereo.interfaces import SearchProvider, TaskBuilder
 from aereo.pipeline import ExtractionJob
-from hydra import compose, initialize_config_dir
+from omegaconf import OmegaConf
 
 
-@contextmanager
-def _chdir(path: Path) -> Generator[None, None, None]:
-    """Temporarily change the working directory."""
-    original = Path.cwd()
-    os.chdir(path)
-    try:
-        yield
-    finally:
-        os.chdir(original)
+def _load_job(config_dir: Path, config_name: str = "job_sentinel2") -> ExtractionJob:
+    """Load a validated ``ExtractionJob`` from the Hydra config package."""
+    return ExtractionJob.load_from_config(config_dir, config_name=config_name)
 
 
-def _load_job_and_plugins(
+def _load_plugin(config_dir: Path, group: str, name: str) -> Any:
+    """Load a single plugin from a config group file."""
+    path = config_dir / group / f"{name}.yaml"
+    cfg = OmegaConf.load(path)
+    return hydra.utils.instantiate(cfg, _convert_="all")
+
+
+def _load_plugins(
     config_dir: Path,
-    config_name: str = "job_sentinel2",
-) -> tuple[ExtractionJob, SearchProvider, TaskBuilder]:
-    """Load a validated ``ExtractionJob`` plus search/task-builder plugins."""
-    with initialize_config_dir(version_base=None, config_dir=str(config_dir)):
-        cfg = compose(config_name=config_name)
-        instantiated = hydra.utils.instantiate(cfg, _convert_="all")
-
-    if not isinstance(instantiated, dict):
-        raise ValueError(
-            f"Expected Hydra to produce a dict, got {type(instantiated).__name__}"
-        )
-
-    job_kwargs: dict[str, Any] = dict(instantiated)
-    search_provider = job_kwargs.pop("search", None)
-    task_builder = job_kwargs.pop("task_builder", None)
-
-    if search_provider is None:
-        raise ValueError("Loaded config is missing a search provider.")
-    if task_builder is None:
-        raise ValueError("Loaded config is missing a task builder.")
-
-    job = ExtractionJob(**job_kwargs)
-    return job, search_provider, task_builder
+    search_name: str = "sentinel2_pc",
+    task_builder_name: str = "grouped",
+) -> tuple[SearchProvider, TaskBuilder]:
+    """Load search provider and task builder plugins from the config package."""
+    search_provider = _load_plugin(config_dir, "search", search_name)
+    task_builder = _load_plugin(config_dir, "task_builder", task_builder_name)
+    return search_provider, task_builder
 
 
 def main() -> int:
@@ -85,11 +69,14 @@ def main() -> int:
     # The notebook loads configs relative to the examples/ directory; mirror that
     # so target_aoi and search intersects paths resolve correctly.
     example_dir = Path(__file__).resolve().parent.parent
-    with _chdir(example_dir):
-        job, search_provider, task_builder = _load_job_and_plugins(
-            config_dir=Path("config"),
-            config_name="job_sentinel2",
-        )
+    config_dir = example_dir / "config"
+
+    job = _load_job(config_dir=config_dir, config_name="job_sentinel2")
+    search_provider, task_builder = _load_plugins(
+        config_dir,
+        search_name="sentinel2_pc",
+        task_builder_name="grouped",
+    )
 
     # -----------------------------------------------------------------------
     # Configure the Lambda execution backend

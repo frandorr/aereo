@@ -40,20 +40,12 @@ This starts:
 
 Before invoking the Lambda, you need to stage a serialized extraction task in S3.
 
-You can use the `aereo` client to stage a task programmatically, pointing to MinIO:
-
-```python
-from aereo.client import AereoClient
-from aereo.backends.staging import CloudTaskStaging
-
-# Set up local staging pointing to MinIO
-staging = CloudTaskStaging(bucket="aereo-local", endpoint_url="http://localhost:9000")
-client = AereoClient(staging=staging)
-
-# Stage your tasks...
-```
-
 For a simple manual test, we have pre-packaged a mock event in `sample-event.json`.
+
+To stage tasks programmatically with the new executor model, use
+:class:`~aereo.executors.LambdaExecutor` (see `lambda_sentinel2_extraction.py`
+for a full example). `LambdaExecutor` handles serialization and S3 staging
+internally; the staging classes are no longer part of the public API.
 
 ### 4. Invoke the Lambda Function
 
