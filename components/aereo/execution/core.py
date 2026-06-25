@@ -13,7 +13,7 @@ import geopandas as gpd
 import pandas as pd
 import xarray as xr
 
-from aereo.interfaces import BatchWriter, ExtractionTask
+from aereo.interfaces import ExtractionTask
 from aereo.interfaces.core import ExtractConfig
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -82,14 +82,6 @@ def run_task(task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
             raise ValueError(
                 "Reprojector did not return a dataset for every patch in the task."
             )
-
-    if isinstance(writer, BatchWriter):
-        if reprojector is None or reprojected_map is None:
-            raise ValueError(
-                "BatchWriter requires a Reprojector. "
-                "Configure a reproject stage or use a Writer instead."
-            )
-        return writer(reprojected_map, task)
 
     artifacts: list[GeoDataFrame[ArtifactSchema]] = []
     for patch in task.patches:

@@ -24,7 +24,6 @@ from aereo.grid import ExtractionPatch
 from shapely.geometry.base import BaseGeometry
 from aereo.interfaces import AereoPlugin, ExtractionTask
 from aereo.interfaces.core import (
-    BatchWriter,
     ExtractConfig,
     Processor,
     Reader,
@@ -227,7 +226,7 @@ class TaskSerializer:
                 for p in extract_data[self.POSTPROCESS_KEY]
             ],
             write=cast(
-                Writer | BatchWriter | None,
+                Writer | None,
                 PluginSerializer.loads(extract_data[self.WRITE_KEY]),
             ),
         )

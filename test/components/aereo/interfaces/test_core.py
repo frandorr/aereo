@@ -268,25 +268,16 @@ def test_infer_dataset_time_bounds():
     assert ds.attrs["end_time"] == t2
 
 
-def test_batch_writer_is_aereo_plugin():
-    from aereo.interfaces.core import BatchWriter, AereoPlugin
-
-    assert issubclass(BatchWriter, AereoPlugin)
-
-
-def test_extract_config_accepts_batch_writer():
-    from aereo.interfaces.core import ExtractConfig, BatchWriter
+def test_extract_config_rejects_non_writer():
+    from aereo.interfaces.core import ExtractConfig
     from aereo.builtins.read import ReadODCSTAC
 
-    class _DummyBatchWriter(BatchWriter):
-        def __call__(self, patches, task):
-            from aereo.schemas import ArtifactSchema
+    class _NotAWriter:
+        pass
 
-            return ArtifactSchema.empty_geodataframe()
-
-    cfg = ExtractConfig(
-        read=ReadODCSTAC(),
-        reproject=None,
-        write=_DummyBatchWriter(),
-    )
-    assert isinstance(cfg.write, BatchWriter)
+    with pytest.raises(ValidationError):
+        ExtractConfig(
+            read=ReadODCSTAC(),
+            reproject=None,
+            write=_NotAWriter(),  # type: ignore[arg-type]
+        )
