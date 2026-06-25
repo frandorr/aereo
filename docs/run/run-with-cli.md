@@ -27,7 +27,7 @@ aereo action=plugins
 Inspect a plugin's parameters:
 
 ```bash
-aereo action=plugin_params plugin_name=SearchSTAC
+aereo action=plugin_params plugin_name=search_stac
 ```
 
 ---

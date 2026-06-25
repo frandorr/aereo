@@ -652,7 +652,10 @@ def _run_plugin_params_action(cfg: DictConfig) -> None:
 # ---------------------------------------------------------------------------
 
 
-@hydra.main(version_base=None, config_path="conf", config_name="config")
+_CONF_DIR = str(Path(__file__).parent / "conf")
+
+
+@hydra.main(version_base=None, config_path=_CONF_DIR, config_name="config")
 def main(cfg: DictConfig) -> None:
     """Main execution entry point loaded by Hydra."""
     _configure_verbose_logging(cfg.verbose)

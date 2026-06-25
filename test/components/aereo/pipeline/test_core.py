@@ -547,3 +547,37 @@ def test_job_write_catalog(tmp_path: Path):
     uri = job.write_catalog(artifacts)
     assert uri == str(tmp_path / "out" / "artifacts.parquet")
     assert Path(uri).exists()
+
+
+def test_load_plugin_helper(tmp_path: Path):
+    """load_plugin returns a partial function from a Hydra config group file."""
+    from aereo.pipeline import load_plugin
+
+    search_yaml = tmp_path / "search" / "dummy.yaml"
+    search_yaml.parent.mkdir(parents=True)
+    search_yaml.write_text(
+        """
+_target_: aereo.builtins.search.search_stac
+stac_api_url: "https://example.com/stac"
+collections:
+  s2: ["red"]
+"""
+    )
+
+    provider = load_plugin(tmp_path, "search", "dummy")
+    assert callable(provider)
+    # Bound config values should be present on the partial.
+    assert provider.keywords["stac_api_url"] == "https://example.com/stac"
+
+    task_builder_yaml = tmp_path / "task_builder" / "grouped.yaml"
+    task_builder_yaml.parent.mkdir(parents=True)
+    task_builder_yaml.write_text(
+        """
+_target_: aereo.builtins.task_builder.build_grouped_tasks
+cells_per_task: 7
+"""
+    )
+
+    task_builder = load_plugin(tmp_path, "task_builder", "grouped")
+    assert callable(task_builder)
+    assert task_builder.keywords["cells_per_task"] == 7

@@ -53,20 +53,25 @@ job = ExtractionJob.load_from_config(
 Once you have a job, the pipeline is always the same three calls:
 
 ```python
-from aereo.builtins import GroupedTaskBuilder, SearchSTAC
+from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
 
 # 1. Search
-provider = SearchSTAC(...)  # or load from config
-results = job.search(provider)
+results = job.search(
+    search_stac,
+    stac_api_url="https://earth-search.aws.element84.com/v1",
+    collections={"sentinel-2-l2a": ["red", "nir"]},
+    intersects="examples/config/aoi/chocon.geojson",
+    start_datetime="2024-01-01T00:00:00Z",
+    end_datetime="2024-01-10T23:59:59Z",
+)
 print(f"Found {len(results)} assets")
 
 # 2. Prepare tasks
-task_builder = GroupedTaskBuilder()
-tasks = job.build_tasks(results, task_builder)
+tasks = job.build_tasks(results, build_grouped_tasks, cells_per_task=5)
 print(f"Prepared {len(tasks)} tasks")
 
 # 3. Execute
@@ -81,8 +86,8 @@ Each step returns a typed GeoDataFrame:
 
 | Step | Method | Input | Output |
 |------|--------|-------|--------|
-| Search | `job.search(provider, ...)` | `SearchProvider` | `GeoDataFrame[AssetSchema]` |
-| Prepare | `job.build_tasks(assets, task_builder, ...)` | search results + task builder | `Sequence[ExtractionTask]` |
+| Search | `job.search(search_fn, ...)` | search function | `GeoDataFrame[AssetSchema]` |
+| Prepare | `job.build_tasks(assets, task_builder_fn, ...)` | search results + task builder function | `Sequence[ExtractionTask]` |
 | Execute | `job.execute(tasks, executor=...)` | tasks + executor | `GeoDataFrame[ArtifactSchema]` |
 
 ---
@@ -92,17 +97,21 @@ Each step returns a typed GeoDataFrame:
 Here is a complete, copy-pasteable example using the built-in config package:
 
 ```python
-from aereo.builtins import GroupedTaskBuilder, SearchSTAC
+from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
 
-provider = SearchSTAC(...)
-task_builder = GroupedTaskBuilder()
-
-results = job.search(provider)
-tasks = job.build_tasks(results, task_builder)
+results = job.search(
+    search_stac,
+    stac_api_url="https://earth-search.aws.element84.com/v1",
+    collections={"sentinel-2-l2a": ["red", "nir"]},
+    intersects="examples/config/aoi/chocon.geojson",
+    start_datetime="2024-01-01T00:00:00Z",
+    end_datetime="2024-01-10T23:59:59Z",
+)
+tasks = job.build_tasks(results, build_grouped_tasks, cells_per_task=5)
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 
 print(artifacts[["id", "grid_cell", "uri"]].head())
@@ -116,25 +125,30 @@ If you need dynamic logic, construct the objects directly instead of loading a
 config package.
 
 ```python
-from datetime import datetime
-from aereo.builtins import GroupedTaskBuilder, SearchSTAC, ReadODCSTAC, ReprojectODC, WriteGeoTIFF
-from aereo.grid import GridConfig
-from aereo.interfaces import PatchConfig, ExtractConfig
+from datetime import datetime, timezone
+from aereo.builtins import (
+    build_grouped_tasks,
+    read_odc_stac,
+    reproject_odc,
+    search_stac,
+    write_geotiff,
+)
+from aereo.interfaces import ExtractConfig, GridConfig, PatchConfig
 from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
 
-search = SearchSTAC(
-    stac_api_url="https://planetarycomputer.microsoft.com/api/stac/v1",
-    collections={"sentinel-2-l2a": ["B04", "B08"]},
-    intersects="config/aoi/chocon.geojson",
-    start_datetime=datetime(2024, 1, 1),
-    end_datetime=datetime(2024, 1, 10),
+assets = search_stac(
+    stac_api_url="https://earth-search.aws.element84.com/v1",
+    collections={"sentinel-2-l2a": ["red", "nir"]},
+    intersects="examples/config/aoi/chocon.geojson",
+    start_datetime=datetime(2024, 1, 1, tzinfo=timezone.utc),
+    end_datetime=datetime(2024, 1, 10, tzinfo=timezone.utc),
 )
 
 extract = ExtractConfig(
-    read=ReadODCSTAC(),
-    reproject=ReprojectODC(resampling="nearest"),
-    write=WriteGeoTIFF(),
+    read=read_odc_stac,
+    reproject=reproject_odc,
+    write=write_geotiff,
 )
 
 job = ExtractionJob(
@@ -144,8 +158,7 @@ job = ExtractionJob(
     extract=extract,
 )
 
-results = job.search(search)
-tasks = job.build_tasks(results, GroupedTaskBuilder(), cells_per_task=50)
+tasks = job.build_tasks(assets, build_grouped_tasks, cells_per_task=50)
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 job.write_catalog(artifacts)
 ```

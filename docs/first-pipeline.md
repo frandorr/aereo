@@ -66,14 +66,20 @@ Search providers and task builders are runtime arguments, not part of the job.
 ## 4. Search
 
 ```python
-from aereo.builtins import SearchSTAC
+from aereo.builtins import search_stac
 
-provider = SearchSTAC(...)  # or load from the config package
-results = job.search(provider)
+results = job.search(
+    search_stac,
+    stac_api_url="https://earth-search.aws.element84.com/v1",
+    collections={"sentinel-2-l2a": ["red", "nir"]},
+    intersects="examples/config/aoi/chocon.geojson",
+    start_datetime="2024-01-01T00:00:00Z",
+    end_datetime="2024-01-10T23:59:59Z",
+)
 print(f"Found {len(results)} assets")
 ```
 
-`job.search()` takes a single `SearchProvider` instance and returns a
+`job.search()` takes a search function and keyword arguments, and returns a
 validated `GeoDataFrame[AssetSchema]`.
 
 > [!TIP]
@@ -87,10 +93,9 @@ validated `GeoDataFrame[AssetSchema]`.
 ## 5. Prepare tasks
 
 ```python
-from aereo.builtins import GroupedTaskBuilder
+from aereo.builtins import build_grouped_tasks
 
-task_builder = GroupedTaskBuilder()
-tasks = job.build_tasks(results, task_builder)
+tasks = job.build_tasks(results, build_grouped_tasks, cells_per_task=5)
 print(f"Prepared {len(tasks)} extraction tasks")
 ```
 
