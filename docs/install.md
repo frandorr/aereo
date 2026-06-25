@@ -8,7 +8,7 @@ Pick your sensor and copy-paste the install command.
 pip install aereo
 ```
 
-This gives you the `AereoClient`, the Hydra CLI, the built-in stage plugins
+This gives you the `ExtractionJob` orchestration API, the Hydra CLI, the built-in stage plugins
 (`ReadODCSTAC`, `ReprojectODC`, `WriteGeoTIFF`, `NDVI`, `SelectBands`, ...), and
 grid utilities. You can search public STAC catalogs and extract with ODC-STAC
 using only the core package.
@@ -92,8 +92,8 @@ aereo action=plugin_params plugin_name=SearchSTAC
 ### `PluginNotFoundError: No search plugin found for collection ...`
 
 AEREO is a plugin-based framework. Installing only `aereo` gives you the core
-client and interfaces, but you need at least one search plugin and one reader
-plugin to run a pipeline.
+orchestration API and interfaces, but you need at least one search plugin and
+one reader plugin to run a pipeline.
 
 **Fix:** Install the plugins for your sensor (see commands above) and verify:
 

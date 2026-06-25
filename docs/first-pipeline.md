@@ -54,24 +54,26 @@ A job bundles four things:
 
 | Ingredient | Purpose |
 |------------|---------|
-| `search` | A `SearchProvider` that queries the catalog. |
 | `grid_config` | How the AOI is tiled into Major TOM cells. |
 | `patch_config` | Physical patch dimensions for extraction. |
 | `extract` | The stage pipeline: reader, reprojector, writer, processors. |
+| `output_uri` | Where artifacts and the catalog are written. |
+
+Search providers and task builders are runtime arguments, not part of the job.
 
 ---
 
 ## 4. Search
 
 ```python
-from aereo.client import AereoClient
+from aereo.builtins import SearchSTAC
 
-client = AereoClient()
-results = client.search(job.search)
+provider = SearchSTAC(...)  # or load from the config package
+results = job.search(provider)
 print(f"Found {len(results)} assets")
 ```
 
-`client.search()` takes a single `SearchProvider` instance and returns a
+`job.search()` takes a single `SearchProvider` instance and returns a
 validated `GeoDataFrame[AssetSchema]`.
 
 > [!TIP]
@@ -85,7 +87,10 @@ validated `GeoDataFrame[AssetSchema]`.
 ## 5. Prepare tasks
 
 ```python
-tasks = client.build_tasks(results, job=job)
+from aereo.builtins import GroupedTaskBuilder
+
+task_builder = GroupedTaskBuilder()
+tasks = job.build_tasks(results, task_builder)
 print(f"Prepared {len(tasks)} extraction tasks")
 ```
 
@@ -97,10 +102,9 @@ each carrying the grid cells, assets, and extraction stages it needs.
 ## 6. Extract
 
 ```python
-from aereo.backends import LocalProcessBackend
+from aereo.executors import LocalExecutor
 
-backend = LocalProcessBackend(max_workers=2)
-artifacts = client.execute_tasks(tasks, backend=backend)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 print(f"Extracted {len(artifacts)} artifacts")
 ```
 

@@ -67,23 +67,23 @@ ExtendedAssetSchema = AssetSchema.add_columns(
 
 ---
 
-## Multi-backend extraction
+## Multi-executor extraction
 
-The `AereoClient` abstracts backend selection, but you can also invoke backends
-directly in custom workflows:
+`ExtractionJob.execute()` accepts any object implementing the `Executor`
+protocol. The built-in executors cover the most common cases:
 
 ```python
-from aereo.backends import LocalProcessBackend, ThreadBackend
+from aereo.executors import LocalExecutor
 
 # Single-machine parallel extraction (CPU-bound)
-local = LocalProcessBackend(max_workers=4)
+local = LocalExecutor(workers=4)
 
 # Single-machine parallel extraction (I/O-bound)
-threads = ThreadBackend(max_workers=8)
+threads = LocalExecutor(workers=8, use_threads=True)
 ```
 
 When designing a plugin stage, keep `__call__` stateless and idempotent. The
-backend handles scheduling and retry logic; your plugin should focus on the
+executor handles scheduling and retry logic; your plugin should focus on the
 per-task data transformation.
 
 ---
@@ -112,8 +112,7 @@ mock_results = gpd.GeoDataFrame({
 validated = AssetSchema.validate(mock_results)
 ```
 
-For integration tests, use `pytest` fixtures that spin up a temporary
-`AereoClient` and assert that your plugin is discovered correctly:
+For integration tests, assert that your plugin is discovered correctly:
 
 ```python
 from aereo.registry import AereoRegistry

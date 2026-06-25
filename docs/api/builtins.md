@@ -42,8 +42,3 @@ workflows. These cover search, read, reproject, process, and write stages.
     options:
       members:
         - WriteGeoTIFF
-
-::: aereo.builtins.batch_write
-    options:
-      members:
-        - BatchWriteGeoTIFF

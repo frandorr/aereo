@@ -218,15 +218,13 @@ Or instantiate it in Python:
 
 ```python
 from aereo.pipeline import ExtractionJob
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
+from aereo.executors import LocalExecutor
 
 job = ExtractionJob.load_from_config("configs/acme", config_name="job")
-client = AereoClient()
 
-results = client.search(job.search)
-tasks = client.build_tasks(results, job=job)
-artifacts = client.execute_tasks(tasks, backend=LocalProcessBackend(max_workers=2))
+results = job.search(...)
+tasks = job.build_tasks(results, ...)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 ```
 
 ---
@@ -271,7 +269,7 @@ pip install aereo-plugin-acme
 | `Reader` | Open source assets | `__call__` |
 | `Processor` | Transform data arrays | `__call__` |
 | `Reprojector` | Reproject to target grid | `__call__` |
-| `Writer` / `BatchWriter` | Write artifacts | `__call__` |
+| `Writer` | Write artifacts | `__call__` |
 
 See the `aereo.interfaces` module for detailed documentation.
 
