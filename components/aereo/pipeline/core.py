@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, cast
 
 import hydra
-from aereo.executors import Executor, LocalExecutor
+from aereo.executors.core import Executor, LocalExecutor
 from aereo.interfaces import (
     ExtractConfig,
     ExtractionTask,

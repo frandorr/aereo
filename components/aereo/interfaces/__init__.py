@@ -19,7 +19,6 @@ from aereo.interfaces.core import (
     Reprojector,
     SearchProvider,
     TaskBuilder,
-    TaskStaging,
     Writer,
     build_collection_asset_filters,
 )
@@ -46,7 +45,6 @@ __all__ = [
     "Reprojector",
     "SearchProvider",
     "TaskBuilder",
-    "TaskStaging",
     "Writer",
     "build_collection_asset_filters",
     "infer_dataset_time_bounds",

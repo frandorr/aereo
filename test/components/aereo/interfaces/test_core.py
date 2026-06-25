@@ -281,3 +281,11 @@ def test_extract_config_rejects_non_writer():
             reproject=None,
             write=_NotAWriter(),  # type: ignore[arg-type]
         )
+
+
+def test_task_staging_protocol_removed():
+    """TaskStaging protocol was removed from the public interfaces module."""
+    import importlib
+
+    module = importlib.import_module("aereo.interfaces")
+    assert not hasattr(module, "TaskStaging")

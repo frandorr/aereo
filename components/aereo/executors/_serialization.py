@@ -1,10 +1,13 @@
-"""Serialize / deserialize ``ExtractionTask`` for cross-network transport.
+"""Internal serialization helpers for remote executors.
 
 Each task is written as a pair of files inside a destination directory:
 
 * ``task_assets.parquet`` – GeoParquet of the task's ``assets`` GeoDataFrame.
 * ``task_meta.json``       – JSON with profile, grid config, patches, URI, AOI,
   and task context.
+
+These helpers are implementation details of the remote executors and are not
+part of the public AEREO API.
 """
 
 from __future__ import annotations
@@ -30,7 +33,6 @@ from aereo.interfaces.core import (
     Reprojector,
     Writer,
 )
-from aereo.pipeline import ExtractionJob
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +84,7 @@ class PluginSerializer:
         return plugin_cls.model_validate(config)
 
 
-class TaskSerializer:
+class _TaskSerializer:
     """Serialize / deserialize :class:`ExtractionTask` for cross-network transport."""
 
     ASSETS_NAME = "task_assets.parquet"
@@ -236,6 +238,8 @@ class TaskSerializer:
         target_aoi = (
             shapely.wkt.loads(target_aoi_wkt) if target_aoi_wkt is not None else None
         )
+        from aereo.pipeline import ExtractionJob
+
         job = ExtractionJob.model_validate(
             {
                 "name": meta.get(self.JOB_NAME_KEY, "default"),

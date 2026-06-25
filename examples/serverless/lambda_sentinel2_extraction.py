@@ -2,7 +2,7 @@
 """Sentinel-2 extraction via AWS Lambda — reproduces 01-sentinel2.ipynb serverlessly.
 
 This script mirrors the local Sentinel-2 notebook workflow but routes each
-prepared extraction task through :class:`~aereo.backends.LambdaBackend`.
+prepared extraction task through :class:`~aereo.executors.LambdaExecutor`.
 The Lambda handler executes the task and stores resulting GeoTIFF artifacts
 plus a Parquet metadata catalog in the configured S3 bucket.
 
@@ -35,11 +35,8 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Generator
 
-import geopandas as gpd
 import hydra
-import pandas as pd
-from aereo.backends import LambdaBackend
-from aereo.backends.staging import CloudTaskStaging
+from aereo.executors import LambdaExecutor
 from aereo.interfaces import SearchProvider, TaskBuilder
 from aereo.pipeline import ExtractionJob
 from hydra import compose, initialize_config_dir
@@ -95,24 +92,16 @@ def main() -> int:
         )
 
     # -----------------------------------------------------------------------
-    # Configure S3 staging and the Lambda execution backend
+    # Configure the Lambda execution backend
     # -----------------------------------------------------------------------
     bucket = os.getenv("AEREO_S3_BUCKET", "aereo-tasks")
     function_name = os.getenv("AEREO_LAMBDA_FUNCTION", "aereo-extractor")
     endpoint_url = os.getenv("AWS_ENDPOINT_URL") or None  # e.g. LocalStack / MinIO
-    lambda_url = os.getenv("LAMBDA_URL") or None  # e.g. RIE direct URL
 
-    # The RIE (Lambda Runtime Interface Emulator) used for local testing can only
-    # handle one concurrent invocation; serialise invocations when LAMBDA_URL is set.
-    max_concurrent = 1 if lambda_url else 10
-
-    staging = CloudTaskStaging(bucket=bucket, endpoint_url=endpoint_url)
-    backend = LambdaBackend(
+    executor = LambdaExecutor(
         function_name=function_name,
-        staging=staging,
+        staging_bucket=bucket,
         endpoint_url=endpoint_url,
-        lambda_url=lambda_url,
-        max_concurrent_invokes=max_concurrent,
     )
 
     # -----------------------------------------------------------------------
@@ -141,13 +130,7 @@ def main() -> int:
     # Execute via Lambda (artifacts are stored in S3 by the handler)
     # -----------------------------------------------------------------------
     print(f"\nExecuting {len(tasks)} task(s) via Lambda '{function_name}'...")
-    result_frames = list(backend.run_tasks(tasks))
-    if result_frames:
-        artifacts = gpd.GeoDataFrame(
-            pd.concat(result_frames, ignore_index=True), geometry="geometry"
-        )
-    else:
-        artifacts = gpd.GeoDataFrame()
+    artifacts = job.execute(tasks, executor=executor)
     print(f"Extracted {len(artifacts)} artifact(s)")
 
     # -----------------------------------------------------------------------

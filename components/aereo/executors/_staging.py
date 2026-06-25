@@ -1,11 +1,15 @@
-"""Concrete TaskStaging implementation for S3 and cloud object storage."""
+"""Internal staging helpers for remote executors.
+
+Concrete implementation for staging serialized tasks to S3 and loading the
+resulting artifacts. This is an implementation detail of the remote executors
+and is not part of the public AEREO API.
+"""
 
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
 
-from aereo.interfaces import TaskStaging
 from aereo.schemas import ArtifactSchema
 from aereo.storage import S3Storage
 from pandera.typing.geopandas import GeoDataFrame
@@ -13,7 +17,7 @@ from structlog import get_logger
 
 logger = get_logger()
 
-__all__ = ["CloudTaskStaging"]
+__all__ = ["_CloudTaskStaging"]
 
 _TASK_PREFIX = "aereo-tasks/"
 _RESULTS_PREFIX = "results/"
@@ -39,7 +43,7 @@ def _parse_s3_uri(uri: str) -> tuple[str, str]:
     return bucket, key
 
 
-class CloudTaskStaging(TaskStaging):
+class _CloudTaskStaging:
     """Staging helper that uploads and downloads tasks and artifacts to AWS S3.
 
     GCS support is planned but not yet implemented.
@@ -86,7 +90,7 @@ class CloudTaskStaging(TaskStaging):
             import boto3  # pyright: ignore[reportMissingImports]
         except ImportError as exc:
             raise ImportError(
-                "boto3 is required for S3/CloudTaskStaging. "
+                "boto3 is required for S3/_CloudTaskStaging. "
                 "Install it with: pip install boto3"
             ) from exc
         self._s3 = boto3.client("s3", endpoint_url=self.endpoint_url)

@@ -20,15 +20,15 @@ from urllib.parse import urlparse
 
 import attrs
 from aereo.execution import run_task
+from aereo.executors._serialization import _TaskSerializer
 from aereo.interfaces import ExtractionTask
-from aereo.serialization import TaskSerializer
 from aereo.storage import storage_for_uri
 
 logger = logging.getLogger(__name__)
 
 _S3_PREFIX = "s3://"
 
-_serializer = TaskSerializer()
+_serializer = _TaskSerializer()
 
 
 def _error_response(

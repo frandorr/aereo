@@ -18,17 +18,17 @@ import time
 from pathlib import Path
 from typing import Any
 
-from aereo.backends import CloudTaskStaging
 from aereo.execution import run_task
-from aereo.backends.lambda_backend import _safe_truncate
-from aereo.serialization import TaskSerializer
+from aereo.executors._serialization import _TaskSerializer
+from aereo.executors._staging import _CloudTaskStaging
+from aereo.executors._lambda import _safe_truncate
 
 logger = logging.getLogger(__name__)
 
 _S3_PREFIX = "s3://"
 
 # Initialize once per cold start.
-_serializer = TaskSerializer()
+_serializer = _TaskSerializer()
 
 
 def _parse_s3_uri(uri: str) -> tuple[str, str]:
@@ -155,7 +155,7 @@ def _upload_artifacts_to_s3(
         endpoint_url: Optional S3 endpoint URL (e.g. for LocalStack).
 
     Returns:
-        The manifest URI from CloudTaskStaging.
+        The manifest URI from _CloudTaskStaging.
     """
     t4 = time.time()
     out_bucket, out_prefix = _parse_s3_uri(output_prefix)
@@ -171,7 +171,7 @@ def _upload_artifacts_to_s3(
     timings["geotiff_count"] = geotiff_count
 
     t5 = time.time()
-    staging = CloudTaskStaging(bucket=out_bucket, endpoint_url=endpoint_url)
+    staging = _CloudTaskStaging(bucket=out_bucket, endpoint_url=endpoint_url)
     upload_result = staging.upload_artifacts(artifacts, output_prefix)
     timings["upload_metadata"] = time.time() - t5
 
