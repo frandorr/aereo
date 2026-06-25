@@ -35,7 +35,7 @@ User Query / Config
         ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ 3. EXECUTE TASKS                                                            │
-│    Input:  tasks + ExecutionBackend                                         │
+│    Input:  tasks + Executor                                                 │
 │    Output: GeoDataFrame[ArtifactSchema]                                     │
 │    ──────────────────────────────────────────────────────────────────────── │
 │    Per task: Reader → Pre-processors → Reprojector → Post-processors →      │
@@ -58,35 +58,46 @@ User Query / Config
 
 Find satellite granules across one or more collections that intersect a given
 AOI and time range. The `SearchProvider` is responsible for the catalog query;
-`AereoClient.search()` simply invokes it and validates the result.
+`ExtractionJob.search()` simply invokes it and validates the result.
 
 ### Sequence diagram
 
 ```text
-┌─────────┐          ┌─────────────┐              ┌─────────────────────┐
-│  User   │          │  AereoClient│              │  SearchProvider     │
-│         │          │             │              │  (plugin)           │
-└────┬────┘          └──────┬──────┘              └──────────┬──────────┘
-     │                      │                                │
-     │  search(search_provider)                              │
-     │─────────────────────▶│                                │
-     │                      │─── 1. Invoke provider ────────▶│
-     │                      │                                │
-     │                      │◀── 2. GeoDataFrame results ────│
-     │                      │                                │
-     │                      │─── 3. Validate against         │
-     │                      │     AssetSchema                 │
-     │◀─────────────────────│  GeoDataFrame[AssetSchema]     │
-     │                      │                                │
+┌─────────┐          ┌───────────────┐              ┌─────────────────────┐
+│  User   │          │  ExtractionJob│              │  SearchProvider     │
+│         │          │               │              │  (plugin)           │
+└────┬────┘          └───────┬───────┘              └──────────┬──────────┘
+     │                       │                                 │
+     │  job.search(provider) │                                 │
+     │──────────────────────▶│                                 │
+     │                       │─── 1. Merge AOI / kwargs ──────▶│
+     │                       │                                 │
+     │                       │◀── 2. GeoDataFrame results ─────│
+     │                       │                                 │
+     │                       │─── 3. Validate against          │
+     │                       │     AssetSchema                 │
+     │◀──────────────────────│  GeoDataFrame[AssetSchema]      │
+     │                       │                                 │
 ```
 
 ### API
 
 ```python
-from aereo.client import AereoClient
+from aereo.pipeline import ExtractionJob
 
-client = AereoClient()
-results = client.search(job.search)
+job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
+results = job.search(provider)
+```
+
+Runtime search arguments win over the job's fixed `target_aoi`:
+
+```python
+results = job.search(
+    provider,
+    aoi=geojson_dict,
+    start_datetime=datetime(2024, 1, 1),
+    end_datetime=datetime(2024, 2, 1),
+)
 ```
 
 ### Output schema: `AssetSchema`
@@ -115,37 +126,37 @@ into parallelizable units.
 ### Sequence diagram
 
 ```text
-┌─────────────────┐          ┌─────────────┐              ┌─────────────────────┐
-│  GeoDataFrame   │          │  AereoClient│              │    Task builder     │
-│ [AssetSchema]   │          │             │              │                     │
-└────────┬────────┘          └──────┬──────┘              └──────────┬──────────┘
-         │                          │                                │
-         │  build_tasks(            │                                │
-         │    search_results,       │                                │
-         │    job=job)              │                                │
-         │─────────────────────────▶│                                │
-         │                          │                                │
-         │                          │─── 1. Resolve effective AOI    │
-         │                          │     (target_aoi → search.intersects)
-         │                          │                                │
-         │                          │─── 2. Build grid cells ───────▶│
-         │                          │     (GridDefinition over AOI)  │
-         │                          │                                │
-         │                          │─── 3. Filter cells by swath ──▶│
-         │                          │     (intersection/within/      │
-         │                          │      coverage)                 │
-         │                          │                                │
-         │                          │─── 4. Chunk into tasks ───────▶│
-         │                          │     (cells_per_task)           │
-         │                          │                                │
-         │◀─────────────────────────│  Sequence[ExtractionTask]      │
-         │                          │                                │
+┌─────────────────┐          ┌───────────────┐              ┌─────────────────────┐
+│  GeoDataFrame   │          │  ExtractionJob│              │    Task builder     │
+│ [AssetSchema]   │          │               │              │                     │
+└────────┬────────┘          └───────┬───────┘              └──────────┬──────────┘
+         │                           │                                 │
+         │  job.build_tasks(         │                                 │
+         │    assets,                │                                 │
+         │    task_builder)          │                                 │
+         │──────────────────────────▶│                                 │
+         │                           │                                 │
+         │                           │─── 1. Resolve effective AOI     │
+         │                           │     (target_aoi)                │
+         │                           │                                 │
+         │                           │─── 2. Build grid cells ────────▶│
+         │                           │     (GridDefinition over AOI)   │
+         │                           │                                 │
+         │                           │─── 3. Filter cells by swath ───▶│
+         │                           │     (intersection/within/       │
+         │                           │      coverage)                  │
+         │                           │                                 │
+         │                           │─── 4. Chunk into tasks ────────▶│
+         │                           │     (cells_per_task)            │
+         │                           │                                 │
+         │◀──────────────────────────│  Sequence[ExtractionTask]       │
+         │                           │                                 │
 ```
 
 ### API
 
 ```python
-tasks = client.build_tasks(results, job=job)
+tasks = job.build_tasks(results, task_builder)
 ```
 
 `build_tasks()` always receives a complete ``ExtractionJob``. Construct one
@@ -153,17 +164,20 @@ in Python or load it from a Hydra config package:
 
 ```python
 from aereo.pipeline import ExtractionJob
+from aereo.builtins import GroupedTaskBuilder
 
 job = ExtractionJob(
-    search=search_provider,
-    task_builder=GroupedTaskBuilder(cells_per_task=50),
     grid_config=grid_config,
     patch_config=patch_config,
     output_uri="/tmp/out",
     extract=extract_config,
 )
 
-tasks = client.build_tasks(results, job=job)
+tasks = job.build_tasks(
+    results,
+    GroupedTaskBuilder(),
+    cells_per_task=50,
+)
 ```
 
 ### Output: `Sequence[ExtractionTask]`
@@ -188,7 +202,7 @@ Each `ExtractionTask` contains:
 
 ### Purpose
 
-Run every `ExtractionTask` through a configurable backend. Each task is handed
+Run every `ExtractionTask` through a configurable executor. Each task is handed
 to a stage pipeline that reads data, optionally processes it, reprojects it to
 the target grid, optionally processes it again, and writes the result.
 
@@ -205,16 +219,18 @@ the target grid, optionally processes it again, and writes the result.
 | **Reader** | `Reader` | Open the source asset and return an `xr.DataArray` or similar. |
 | **Processors** | `Processor` | Transform data: select bands, compute NDVI, mask clouds, normalize, composite. |
 | **Reprojector** | `Reprojector` | Reproject to the task's target grid / GeoBox. |
-| **Writer** | `Writer` or `BatchWriter` | Write final artifacts to disk or object store in EOIDS layout. |
+| **Writer** | `Writer` | Write final artifacts to disk or object store in EOIDS layout. |
 
 ### API
 
 ```python
-from aereo.backends import LocalProcessBackend
+from aereo.executors import LocalExecutor
 
-backend = LocalProcessBackend(max_workers=4)
-artifacts = client.execute_tasks(tasks, backend=backend)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=4))
 ```
+
+The default executor is `LocalExecutor()` (sequential). The resulting
+`GeoDataFrame` can be written to a catalog with `job.write_catalog(artifacts)`.
 
 ### Output schema: `ArtifactSchema`
 
@@ -255,25 +271,26 @@ job = ExtractionJob.load_from_config(
 
 Or write the same layout as a single YAML file. `grid_config` and
 `patch_config` are concrete Pydantic models, so they do not need `_target_`;
-only plugin/config groups that select an implementation (`search`,
-`extract.read`, etc.) require it:
+plugin stages inside `extract` do:
 
 ```yaml
+name: sentinel2_demo
+output_uri: /tmp/aereo_extraction
 grid_config:
   target_grid_dist: 10000
 patch_config:
   resolution: 10.0
-output_uri: /tmp/aereo_extraction
-target_aoi: /absolute/path/to/aoi.geojson
-search:
-  _target_: aereo.builtins.SearchSTAC
-  intersects: /absolute/path/to/aoi.geojson
-  ...
 extract:
   read:
     _target_: aereo.builtins.ReadODCSTAC
-  ...
+  reproject:
+    _target_: aereo.builtins.ReprojectODC
+  write:
+    _target_: aereo.builtins.WriteGeoTIFF
 ```
+
+Search providers and task builders are **not** part of the job model; they are
+supplied at runtime to `job.search()` and `job.build_tasks()`.
 
 ---
 

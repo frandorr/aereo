@@ -27,8 +27,8 @@ analysis-ready GeoTIFFs on a shared grid. The pipeline has three logical steps:
 
 <img src="../assets/pipeline-walkthrough/01-step1-search-and-task-preparation.png" alt="Step 1: SearchProvider produces a GeoDataFrame that the TaskBuilder turns into extraction tasks" width="400px">
 
-The first step is orchestrated by `AereoClient.search()` and
-`AereoClient.build_tasks()`:
+The first step is orchestrated by `ExtractionJob.search()` and
+`ExtractionJob.build_tasks()`:
 
 * **`SearchProvider`** queries the chosen catalog (STAC, Earthaccess, etc.) and
   returns a `GeoDataFrame` validated against `AssetSchema`.
@@ -84,8 +84,8 @@ pipeline:
    compute indices, etc.
 3. **Reprojector** warps the data to each target patch's grid/GeoBox.
 
-Because tasks are isolated, you can safely parallelize this step with a backend
-such as `LocalProcessBackend` or `LambdaBackend`.
+Because tasks are isolated, you can safely parallelize this step with an
+executor such as `LocalExecutor` or `LambdaExecutor`.
 
 ### Reader output: raw `xr.Dataset`
 
@@ -131,7 +131,7 @@ The final step runs once per reprojected patch:
 
 <img src="../assets/pipeline-walkthrough/09-artifact-output-geodataframe.png" alt="Final artifact GeoDataFrame with one row per written GeoTIFF" width="700px">
 
-`execute_tasks()` returns a validated `GeoDataFrame` with one row per artifact:
+`job.execute()` returns a validated `GeoDataFrame` with one row per artifact:
 
 | Column | Why it matters |
 |--------|----------------|
@@ -157,8 +157,8 @@ shared grid.
 ## Full code snippet
 
 ```python
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
+from aereo.builtins import GroupedTaskBuilder, SearchSTAC
+from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
 
 # 1. Load the declarative job configuration
@@ -167,16 +167,12 @@ job = ExtractionJob.load_from_config(
     config_name="job_sentinel2",
 )
 
-# 2. Create the client
-client = AereoClient()
+# 2. Step 1: search + prepare tasks
+results = job.search(SearchSTAC(...))
+tasks = job.build_tasks(results, GroupedTaskBuilder())
 
-# 3. Step 1: search + prepare tasks
-results = client.search(job.search)
-tasks = client.build_tasks(results, job=job)
-
-# 4. Steps 2 & 3: extract and write
-backend = LocalProcessBackend(max_workers=4)
-artifacts = client.execute_tasks(tasks, backend=backend)
+# 3. Steps 2 & 3: extract and write
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=4))
 
 print(f"Wrote {len(artifacts)} artifacts to {job.output_uri}")
 ```

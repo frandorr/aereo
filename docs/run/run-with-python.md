@@ -25,11 +25,13 @@ The loaded `job` contains everything the pipeline needs:
 ```python
 print(job.name)          # "sentinel2_sample"
 print(job.output_uri)    # "/tmp/aereo_extraction"
-print(job.search)        # SearchProvider instance
 print(job.grid_config)   # GridConfig instance
 print(job.patch_config)  # PatchConfig instance
 print(job.extract)       # ExtractConfig instance
 ```
+
+Search providers and task builders are **runtime** arguments, not part of the
+job. Load them separately from the config package or instantiate them in code.
 
 You can override any config group at load time:
 
@@ -51,32 +53,37 @@ job = ExtractionJob.load_from_config(
 Once you have a job, the pipeline is always the same three calls:
 
 ```python
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
+from aereo.builtins import GroupedTaskBuilder, SearchSTAC
+from aereo.executors import LocalExecutor
+from aereo.pipeline import ExtractionJob
 
-client = AereoClient()
+job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
 
 # 1. Search
-results = client.search(job.search)
+provider = SearchSTAC(...)  # or load from config
+results = job.search(provider)
 print(f"Found {len(results)} assets")
 
 # 2. Prepare tasks
-tasks = client.build_tasks(results, job=job)
+task_builder = GroupedTaskBuilder()
+tasks = job.build_tasks(results, task_builder)
 print(f"Prepared {len(tasks)} tasks")
 
 # 3. Execute
-backend = LocalProcessBackend(max_workers=2)
-artifacts = client.execute_tasks(tasks, backend=backend)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 print(f"Extracted {len(artifacts)} artifacts")
+
+# 4. Write the catalog
+job.write_catalog(artifacts)
 ```
 
 Each step returns a typed GeoDataFrame:
 
 | Step | Method | Input | Output |
 |------|--------|-------|--------|
-| Search | `client.search(search_provider)` | `SearchProvider` | `GeoDataFrame[AssetSchema]` |
-| Prepare | `client.build_tasks(search_results, job=job)` | search results + job | `Sequence[ExtractionTask]` |
-| Execute | `client.execute_tasks(tasks, backend=backend)` | tasks + backend | `GeoDataFrame[ArtifactSchema]` |
+| Search | `job.search(provider, ...)` | `SearchProvider` | `GeoDataFrame[AssetSchema]` |
+| Prepare | `job.build_tasks(assets, task_builder, ...)` | search results + task builder | `Sequence[ExtractionTask]` |
+| Execute | `job.execute(tasks, executor=...)` | tasks + executor | `GeoDataFrame[ArtifactSchema]` |
 
 ---
 
@@ -85,16 +92,18 @@ Each step returns a typed GeoDataFrame:
 Here is a complete, copy-pasteable example using the built-in config package:
 
 ```python
+from aereo.builtins import GroupedTaskBuilder, SearchSTAC
+from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
-client = AereoClient()
 
-results = client.search(job.search)
-tasks = client.build_tasks(results, job=job)
-artifacts = client.execute_tasks(tasks, backend=LocalProcessBackend(max_workers=2))
+provider = SearchSTAC(...)
+task_builder = GroupedTaskBuilder()
+
+results = job.search(provider)
+tasks = job.build_tasks(results, task_builder)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 
 print(artifacts[["id", "grid_cell", "uri"]].head())
 ```
@@ -108,12 +117,11 @@ config package.
 
 ```python
 from datetime import datetime
-from aereo.client import AereoClient
-from aereo.builtins import SearchSTAC, ReadODCSTAC, ReprojectODC, WriteGeoTIFF
+from aereo.builtins import GroupedTaskBuilder, SearchSTAC, ReadODCSTAC, ReprojectODC, WriteGeoTIFF
 from aereo.grid import GridConfig
 from aereo.interfaces import PatchConfig, ExtractConfig
+from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
-from aereo.builtins import GroupedTaskBuilder
 
 search = SearchSTAC(
     stac_api_url="https://planetarycomputer.microsoft.com/api/stac/v1",
@@ -130,18 +138,35 @@ extract = ExtractConfig(
 )
 
 job = ExtractionJob(
-    search=search,
-    task_builder=GroupedTaskBuilder(cells_per_task=50),
     grid_config=GridConfig(target_grid_dist=10_000),
     patch_config=PatchConfig(resolution=10.0),
     output_uri="/tmp/aereo_python",
     extract=extract,
 )
 
-client = AereoClient()
-results = client.search(job.search)
-tasks = client.build_tasks(results, job=job)
-artifacts = client.execute_tasks(tasks, job=job)
+results = job.search(search)
+tasks = job.build_tasks(results, GroupedTaskBuilder(), cells_per_task=50)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
+job.write_catalog(artifacts)
+```
+
+---
+
+## Writing the catalog
+
+`job.execute()` returns the artifact GeoDataFrame; writing it is a separate,
+optional step. `job.write_catalog()` is a convenience that writes
+`artifacts.parquet` under `job.output_uri`:
+
+```python
+job.write_catalog(artifacts)
+# → <output_uri>/artifacts.parquet
+```
+
+You can also write it yourself:
+
+```python
+artifacts.to_parquet("/tmp/my_catalog.parquet")
 ```
 
 ---

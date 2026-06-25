@@ -16,16 +16,16 @@ The plugin system relies on strongly-typed interfaces defined in
 `aereo.interfaces`. Plugins subclass these base classes, and `AereoRegistry`
 discovers them at runtime from `entry_points`.
 
-### The pipeline (`AereoClient`)
+### The pipeline (`ExtractionJob`)
 
 The data orchestration lifecycle has three core stages:
 
 1. **Search**: `SearchProvider` plugins query satellite data collections and
    return standardized `AssetSchema` GeoDataFrames.
-2. **Prepare**: `AereoClient` turns search results into `ExtractionTask`
-   objects, using the `GridConfig`, `PatchConfig`, and `ExtractConfig` from the
-   job.
-3. **Execute**: An `ExecutionBackend` runs each task through the stage pipeline
+2. **Prepare**: `ExtractionJob.build_tasks()` turns search results into
+   `ExtractionTask` objects, using the `GridConfig`, `PatchConfig`, and
+   `ExtractConfig` from the job.
+3. **Execute**: An `Executor` runs each task through the stage pipeline
    configured in `ExtractConfig`:
    `Reader → Processor → Reprojector → Processor → Writer`.
 
@@ -39,7 +39,7 @@ The `aereo.builtins` package ships with ready-to-use plugins:
 | Reader | `ReadODCSTAC` |
 | Processor | `SelectBands`, `QAMask`, `NDVI`, `Normalize`, `Composite` |
 | Reprojector | `ReprojectODC` |
-| Writer | `WriteGeoTIFF`, `BatchWriteGeoTIFF` |
+| Writer | `WriteGeoTIFF` |
 
 External plugins (installed separately) provide additional readers,
 reprojectors, and search providers, such as `ReadSatpy`, `ReprojectSatpy`,
@@ -110,7 +110,7 @@ class MyReprojector(Reprojector):
         ...
 ```
 
-### `Writer` / `BatchWriter`
+### `Writer`
 
 Writes final artifacts to disk or object store.
 
@@ -199,20 +199,17 @@ catalog = registry.list_all_params()
 
 ## Using the high-level API
 
-The `AereoClient` provides a simple interface that handles plugin discovery and
-execution.
+`ExtractionJob` provides the orchestration methods that drive the pipeline.
 
 ```python
 from aereo.pipeline import ExtractionJob
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
+from aereo.executors import LocalExecutor
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
-client = AereoClient()
 
-results = client.search(job.search)
-tasks = client.build_tasks(results, job=job)
-artifacts = client.execute_tasks(tasks, backend=LocalProcessBackend(max_workers=2))
+results = job.search(...)
+tasks = job.build_tasks(results, ...)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 print(artifacts[["id", "grid_cell", "uri"]].head())
 ```
 

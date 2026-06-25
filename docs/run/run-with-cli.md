@@ -34,8 +34,9 @@ aereo action=plugin_params plugin_name=SearchSTAC
 
 ## One-shot extraction: `action=run`
 
-`aereo action=run` performs search → prepare → extract in a single command. It
-expects the same Hydra config groups used by `ExtractionJob.load_from_config()`:
+`aereo action=run` performs search → build-tasks → extract in a single command.
+It expects a Hydra config package that contains an `ExtractionJob` plus runtime
+`search` and `task_builder` configs:
 
 ```bash
 cd examples/config
@@ -57,9 +58,9 @@ automatically.
 
 | Action | Purpose |
 |--------|---------|
-| `run` | Search → prepare → extract in one command. |
+| `run` | Search → build-tasks → extract in one command. |
 | `search` | Run only the search step and print or save results. |
-| `prepare` | Build `ExtractionTask` objects from saved search results. |
+| `build-tasks` | Build `ExtractionTask` objects from saved search results. |
 | `extract` | Run extraction from saved tasks. |
 | `validate` | Validate a config package without running network calls. |
 | `plugins` | List installed plugins. |
@@ -83,10 +84,10 @@ aereo action=search \
 `results.json` contains a GeoDataFrame of matching assets. Review it before
 proceeding.
 
-### 2. Prepare
+### 2. Build tasks
 
 ```bash
-aereo action=prepare \
+aereo action=build-tasks \
   search_results=results.json \
   grid_config=grid_10km \
   patch_config=patch_10m \
@@ -140,7 +141,7 @@ All actions support these Hydra-style overrides:
 | `extract=` | `extract=sentinel2_ndvi` | Select an extract stage config. |
 | `output_uri=` | `output_uri=/tmp/out` | Base output path. |
 | `output_dir=` | `output_dir=/tmp/out` | Used by `extract` action. |
-| `workers=` | `workers=4` | Max workers for `LocalProcessBackend`. |
+| `workers=` | `workers=4` | Max workers for `LocalExecutor`. |
 | `cells_per_task=` | `cells_per_task=10` | Grid cells per prepared task. |
 | `overwrite=` | `overwrite=true` | Bypass per-task artifact cache. |
 | `verbose=` | `verbose=true` | Enable debug logging. |
