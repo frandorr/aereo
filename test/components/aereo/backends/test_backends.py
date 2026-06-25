@@ -17,9 +17,9 @@ from aereo.executors import LambdaExecutor, RetryableLambdaError
 from aereo.interfaces.core import ExtractionTask, ExtractConfig, GridConfig, PatchConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import ArtifactSchema, AssetSchema
-from aereo.builtins.read import ReadODCSTAC
-from aereo.builtins.reproject import ReprojectODC
-from aereo.builtins.write import WriteGeoTIFF
+from aereo.builtins.read import read_odc_stac
+from aereo.builtins.reproject import reproject_odc
+from aereo.builtins.write import write_geotiff
 from pandera.typing.geopandas import GeoDataFrame
 
 
@@ -56,9 +56,9 @@ def _make_task(
     grid_config = GridConfig(target_grid_dist=50_000)
     patch_config = PatchConfig(resolution=10.0)
     extract = ExtractConfig(
-        read=ReadODCSTAC(),
-        reproject=ReprojectODC(),
-        write=WriteGeoTIFF(),
+        read=read_odc_stac,
+        reproject=reproject_odc,
+        write=write_geotiff,
     )
     job = ExtractionJob(
         grid_config=grid_config,

@@ -10,9 +10,9 @@ from typing import Any
 
 import numpy as np
 import xarray as xr
-from pydantic import Field
+from pydantic import ConfigDict, validate_call
 
-from aereo.interfaces import ExtractionTask, Reader
+from aereo.interfaces import ExtractionTask
 from aereo.interfaces import infer_dataset_time_bounds
 
 try:
@@ -39,118 +39,109 @@ def _to_native(obj: Any) -> Any:
     return obj
 
 
-class ReadODCSTAC(Reader):
-    """Built-in reader that uses ``odc.stac.load`` to fetch STAC asset data.
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def read_odc_stac(
+    task: ExtractionTask,
+    odc_params: dict[str, Any] | None = None,
+) -> xr.Dataset:
+    """Load STAC assets for *task* using ``odc.stac.load``.
 
-    Reconstructs :class:`pystac.Item` objects from the ``stac_item`` column
-    that :class:`~aereo.builtins.search.SearchSTAC` stores in the assets
-    GeoDataFrame, then delegates to ``odc.stac.load`` for lazy, dask-backed
-    raster loading.
+    Reconstructs :class:`pystac.Item` objects from the ``stac_item``
+    column of ``task.assets``, constrains the load to the task's grid-cell
+    bounding box, and returns a dataset tagged with temporal bounds in
+    ``ds.attrs``.
+
+    Args:
+        task: Extraction task carrying assets, grid cells, and AOI.
+        odc_params: Extra keyword arguments passed to odc.stac.load.
+
+    Returns:
+        xr.Dataset (potentially dask-backed) in the native CRS of the
+        STAC items.
+
+    Raises:
+        ImportError: If ``odc-stac`` or ``pystac`` is not installed.
+        ValueError: If no ``stac_item`` column is found in ``task.assets``
+            or no valid STAC items can be reconstructed.
     """
+    import pystac
+    from shapely.ops import unary_union
 
-    odc_params: dict[str, Any] = Field(default_factory=dict)
+    if odc_load is None:  # pragma: no cover
+        raise ImportError(
+            "odc-stac is required for read_odc_stac. "
+            "Install it with: pip install 'aereo[stac]'"
+        )
 
-    def __call__(
-        self,
-        task: ExtractionTask,
-    ) -> xr.Dataset:
-        """Load STAC assets for *task* using ``odc.stac.load``.
+    assets_df = task.assets
 
-        Reconstructs :class:`pystac.Item` objects from the ``stac_item``
-        column of ``task.assets``, constrains the load to the task's grid-cell
-        bounding box, and returns a dataset tagged with temporal bounds in
-        ``ds.attrs``.
+    # ------------------------------------------------------------------
+    # 1. Reconstruct pystac.Item objects from the stac_item dict column.
+    # ------------------------------------------------------------------
+    if "stac_item" not in assets_df.columns:
+        raise ValueError(
+            "read_odc_stac requires a 'stac_item' column in task.assets. "
+            "Ensure the search plugin (e.g. SearchSTAC) stores full STAC "
+            "item dictionaries there."
+        )
 
-        Args:
-            task: Extraction task carrying assets, grid cells, and AOI.
+    # Deduplicate by STAC item ID — one pystac.Item per physical scene.
+    seen_ids: set[str] = set()
+    items: list[pystac.Item] = []
+    for raw in assets_df["stac_item"]:
+        if raw is None:
+            continue
+        item = pystac.Item.from_dict(_to_native(raw))
+        if item.id not in seen_ids:
+            seen_ids.add(item.id)
+            items.append(item)
 
-        Returns:
-            xr.Dataset (potentially dask-backed) in the native CRS of the
-            STAC items.
+    if not items:
+        raise ValueError("No valid STAC items found in task.assets['stac_item'].")
 
-        Raises:
-            ImportError: If ``odc-stac`` or ``pystac`` is not installed.
-            ValueError: If no ``stac_item`` column is found in ``task.assets``
-                or no valid STAC items can be reconstructed.
-        """
-        import pystac
-        from shapely.ops import unary_union
+    # ------------------------------------------------------------------
+    # 2. Build odc_params — start from the caller's dict, then inject
+    #    Aereo-managed values only when absent.
+    # ------------------------------------------------------------------
+    params = dict(odc_params) if odc_params is not None else {}
 
-        if odc_load is None:  # pragma: no cover
-            raise ImportError(
-                "odc-stac is required for ReadODCSTAC. "
-                "Install it with: pip install 'aereo[stac]'"
-            )
+    # Auto-inject bbox from grid cells if not provided.
+    if "bbox" not in params:
+        spatial_extent = unary_union(
+            [
+                patch.cell_geometry
+                for patch in task.patches
+                if patch.cell_geometry is not None
+            ]
+        )
+        aoi = task.aoi
 
-        assets_df = task.assets
+        if not spatial_extent.is_empty:
+            if aoi is not None:
+                spatial_extent = spatial_extent.intersection(aoi)
+        elif aoi is not None:
+            spatial_extent = aoi
+        else:
+            spatial_extent = None
 
-        # ------------------------------------------------------------------
-        # 1. Reconstruct pystac.Item objects from the stac_item dict column.
-        # ------------------------------------------------------------------
-        if "stac_item" not in assets_df.columns:
-            raise ValueError(
-                "ReadODCSTAC requires a 'stac_item' column in task.assets. "
-                "Ensure the search plugin (e.g. SearchSTAC) stores full STAC "
-                "item dictionaries there."
-            )
+        if spatial_extent is not None and not spatial_extent.is_empty:
+            params["bbox"] = spatial_extent.bounds  # (minx, miny, maxx, maxy)
 
-        # Deduplicate by STAC item ID — one pystac.Item per physical scene.
-        seen_ids: set[str] = set()
-        items: list[pystac.Item] = []
-        for raw in assets_df["stac_item"]:
-            if raw is None:
-                continue
-            item = pystac.Item.from_dict(_to_native(raw))
-            if item.id not in seen_ids:
-                seen_ids.add(item.id)
-                items.append(item)
+    if "chunks" not in params:
+        params["chunks"] = {}
 
-        if not items:
-            raise ValueError("No valid STAC items found in task.assets['stac_item'].")
+    # Auto-infer bands from unique channel_ids in assets if not provided.
+    if "bands" not in params and "channel_id" in assets_df.columns:
+        params["bands"] = list(assets_df["channel_id"].unique())
 
-        # ------------------------------------------------------------------
-        # 2. Build odc_params — start from the caller's dict, then inject
-        #    Aereo-managed values only when absent.
-        # ------------------------------------------------------------------
-        odc_params = dict(self.odc_params)
+    # ------------------------------------------------------------------
+    # 3. Load via odc.stac.
+    # ------------------------------------------------------------------
+    ds: xr.Dataset = odc_load(items, **params)
 
-        # Auto-inject bbox from grid cells if not provided.
-        if "bbox" not in odc_params:
-            spatial_extent = unary_union(
-                [
-                    patch.cell_geometry
-                    for patch in task.patches
-                    if patch.cell_geometry is not None
-                ]
-            )
-            aoi = task.aoi
+    # ------------------------------------------------------------------
+    # 4. Tag ds.attrs with temporal bounds so the writer can build paths.
+    # ------------------------------------------------------------------
+    infer_dataset_time_bounds(ds)
 
-            if not spatial_extent.is_empty:
-                if aoi is not None:
-                    spatial_extent = spatial_extent.intersection(aoi)
-            elif aoi is not None:
-                spatial_extent = aoi
-            else:
-                spatial_extent = None
-
-            if spatial_extent is not None and not spatial_extent.is_empty:
-                odc_params["bbox"] = spatial_extent.bounds  # (minx, miny, maxx, maxy)
-
-        if "chunks" not in odc_params:
-            odc_params["chunks"] = {}
-
-        # Auto-infer bands from unique channel_ids in assets if not provided.
-        if "bands" not in odc_params and "channel_id" in assets_df.columns:
-            odc_params["bands"] = list(assets_df["channel_id"].unique())
-
-        # ------------------------------------------------------------------
-        # 3. Load via odc.stac.
-        # ------------------------------------------------------------------
-        ds: xr.Dataset = odc_load(items, **odc_params)
-
-        # ------------------------------------------------------------------
-        # 4. Tag ds.attrs with temporal bounds so the writer can build paths.
-        # ------------------------------------------------------------------
-        infer_dataset_time_bounds(ds)
-
-        return ds
+    return ds

@@ -1,8 +1,8 @@
 read:
-  _target_: aereo.builtins.ReadODCSTAC
+  _target_: aereo.builtins.read.read_odc_stac
 
 reproject:
-  _target_: aereo.builtins.ReprojectODC
+  _target_: aereo.builtins.reproject.reproject_odc
   resampling: nearest
 write:
-  _target_: aereo.builtins.WriteGeoTIFF
+  _target_: aereo.builtins.write.write_geotiff

@@ -7,9 +7,9 @@ from unittest.mock import MagicMock
 
 import geopandas as gpd
 import pandas as pd
-from aereo.builtins.read import ReadODCSTAC
-from aereo.builtins.reproject import ReprojectODC
-from aereo.builtins.write import WriteGeoTIFF
+from aereo.builtins.read import read_odc_stac
+from aereo.builtins.reproject import reproject_odc
+from aereo.builtins.write import write_geotiff
 from aereo.cache import TaskResultCache
 from aereo.interfaces.core import (
     ExtractionTask,
@@ -42,9 +42,9 @@ def _make_task(
 
     grid_config = GridConfig(target_grid_dist=50_000)
     extract = extract or ExtractConfig(
-        read=ReadODCSTAC(),
-        reproject=ReprojectODC(),
-        write=WriteGeoTIFF(),
+        read=read_odc_stac,
+        reproject=reproject_odc,
+        write=write_geotiff,
     )
 
     job = ExtractionJob(
@@ -103,7 +103,7 @@ def test_fingerprint_changes_with_assets(tmp_path):
 
 def test_fingerprint_changes_with_extract_config(tmp_path):
     """Changing the extract pipeline changes the fingerprint."""
-    from aereo.builtins.processor import Normalize
+    from aereo.builtins.processor import normalize
 
     cache = TaskResultCache()
     task1 = _make_task(output_uri=str(tmp_path), patches=[_mock_patch("c1")])
@@ -111,10 +111,10 @@ def test_fingerprint_changes_with_extract_config(tmp_path):
         output_uri=str(tmp_path),
         patches=[_mock_patch("c1")],
         extract=ExtractConfig(
-            read=ReadODCSTAC(),
-            reproject=ReprojectODC(),
-            write=WriteGeoTIFF(),
-            postprocess=[Normalize()],
+            read=read_odc_stac,
+            reproject=reproject_odc,
+            write=write_geotiff,
+            postprocess=[normalize],
         ),
     )
 

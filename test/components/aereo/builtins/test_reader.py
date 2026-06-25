@@ -1,8 +1,9 @@
-"""Tests for the ReadODCSTAC built-in reader."""
+"""Tests for the read_odc_stac built-in reader."""
 
 from __future__ import annotations
 
 from datetime import datetime
+from functools import partial
 from typing import Any
 
 import numpy as np
@@ -11,7 +12,7 @@ import pytest
 import xarray as xr
 from shapely.geometry import box
 
-from aereo.builtins import ReadODCSTAC
+from aereo.builtins import read_odc_stac
 from aereo.grid import ExtractionPatch
 from aereo.interfaces.core import ExtractionTask, GridConfig, PatchConfig
 from aereo.pipeline import ExtractionJob
@@ -80,13 +81,13 @@ def _make_task(stac_item_dict: dict[str, Any] | None = None, aoi=None):
         conform_to=None,
     )
     from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import ReadODCSTAC
+    from aereo.builtins.read import read_odc_stac
 
     job = ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="/tmp/test",
-        extract=ExtractConfig(read=ReadODCSTAC()),
+        extract=ExtractConfig(read=read_odc_stac),
         target_aoi=aoi,
     )
     return ExtractionTask(
@@ -120,14 +121,18 @@ def _make_fake_ds() -> xr.Dataset:
 
 
 def test_read_odcstac_fields():
-    """ReadODCSTAC exposes the odc_params Pydantic field."""
-    assert "odc_params" in ReadODCSTAC.model_fields
+    """read_odc_stac exposes odc_params as a configurable keyword."""
+    import inspect
+
+    sig = inspect.signature(read_odc_stac)
+    assert "odc_params" in sig.parameters
+    assert "task" in sig.parameters
 
 
 def test_read_odcstac_raises_without_stac_item_column():
     """__call__() raises ValueError when stac_item column is absent."""
     task = _make_task(stac_item_dict=None)
-    reader = ReadODCSTAC()
+    reader = read_odc_stac
     with pytest.raises(ValueError, match="stac_item"):
         reader(task)
 
@@ -136,7 +141,7 @@ def test_read_odcstac_raises_with_all_none_stac_items():
     """__call__() raises ValueError when all stac_item values are None."""
     task = _make_task(stac_item_dict=None)
     task.assets["stac_item"] = [None]
-    reader = ReadODCSTAC()
+    reader = read_odc_stac
     with pytest.raises(ValueError, match="No valid STAC items"):
         reader(task)
 
@@ -154,7 +159,7 @@ def test_read_odcstac_calls_odc_load_with_bbox(monkeypatch):
     monkeypatch.setattr("aereo.builtins.read.odc_load", fake_odc_load)
 
     task = _make_task(_make_stac_item_dict())
-    reader = ReadODCSTAC()
+    reader = read_odc_stac
     result = reader(task)
 
     assert "bbox" in captured["kwargs"]
@@ -174,7 +179,7 @@ def test_read_odcstac_explicit_bands_override(monkeypatch):
     monkeypatch.setattr("aereo.builtins.read.odc_load", fake_odc_load)
 
     task = _make_task(_make_stac_item_dict())
-    reader = ReadODCSTAC(odc_params={"bands": ["B04", "B08"]})
+    reader = partial(read_odc_stac, odc_params={"bands": ["B04", "B08"]})
     reader(task)
     assert captured["kwargs"]["bands"] == ["B04", "B08"]
 
@@ -192,7 +197,7 @@ def test_read_odcstac_explicit_bbox_not_overridden(monkeypatch):
 
     custom_bbox = (-71.0, -34.0, -69.0, -32.0)
     task = _make_task(_make_stac_item_dict())
-    reader = ReadODCSTAC(odc_params={"bbox": custom_bbox})
+    reader = partial(read_odc_stac, odc_params={"bbox": custom_bbox})
     reader(task)
     assert captured["kwargs"]["bbox"] == custom_bbox
 
@@ -235,13 +240,13 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
         conform_to=None,
     )
     from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import ReadODCSTAC
+    from aereo.builtins.read import read_odc_stac
 
     job = ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="/tmp/test",
-        extract=ExtractConfig(read=ReadODCSTAC()),
+        extract=ExtractConfig(read=read_odc_stac),
     )
     task = ExtractionTask(
         assets=GeoDataFrame(valid_df),
@@ -249,7 +254,7 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
         patches=[patch],
     )
 
-    reader = ReadODCSTAC()
+    reader = read_odc_stac
     reader(task)
 
     assert len(captured["items"]) == 1
@@ -265,7 +270,7 @@ def test_read_odcstac_infers_time_bounds(monkeypatch):
     monkeypatch.setattr("aereo.builtins.read.odc_load", fake_odc_load)
 
     task = _make_task(_make_stac_item_dict())
-    reader = ReadODCSTAC()
+    reader = read_odc_stac
     result = reader(task)
 
     assert "start_time" in result.attrs
@@ -285,12 +290,13 @@ def test_read_odcstac_forwards_odc_params(monkeypatch):
     monkeypatch.setattr("aereo.builtins.read.odc_load", fake_odc_load)
 
     task = _make_task(_make_stac_item_dict())
-    reader = ReadODCSTAC(
+    reader = partial(
+        read_odc_stac,
         odc_params={
             "resampling": "bilinear",
             "groupby": "solar_day",
             "chunks": {"x": 1024, "y": 1024},
-        }
+        },
     )
     reader(task)
 
@@ -317,7 +323,7 @@ def test_read_odcstac_handles_numpy_arrays_in_stac_item(monkeypatch):
     item_dict["properties"]["numeric"] = np.int64(42)
 
     task = _make_task(item_dict)
-    reader = ReadODCSTAC()
+    reader = read_odc_stac
     reader(task)
 
     assert len(captured["items"]) == 1

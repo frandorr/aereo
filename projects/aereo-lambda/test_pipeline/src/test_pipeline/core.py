@@ -15,18 +15,22 @@ import pandas as pd
 import xarray as xr
 from aereo.eoids import build_eoids_path
 from aereo.grid import ExtractionPatch
-from aereo.interfaces import ExtractionTask, Reader, Reprojector, Writer
+from aereo.interfaces import ExtractionTask
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import box
 
 
-class TestReader(Reader):
+class TestReader:
     """Reader that returns a tiny synthetic xarray.Dataset."""
 
     __test__ = False
     width: int = 8
     height: int = 8
+
+    def __init__(self, width: int = 8, height: int = 8) -> None:
+        self.width = width
+        self.height = height
 
     def __call__(self, task: ExtractionTask) -> xr.Dataset:
         """Return a synthetic dataset for testing.
@@ -53,7 +57,7 @@ class TestReader(Reader):
         return ds
 
 
-class TestReprojector(Reprojector):
+class TestReprojector:
     """Identity reprojector that maps every patch to the source dataset."""
 
     __test__ = False
@@ -75,7 +79,7 @@ class TestReprojector(Reprojector):
         return {patch.id: ds for patch in task.patches}
 
 
-class TestWriter(Writer):
+class TestWriter:
     """Writer that creates an empty GeoTIFF file and returns artifact metadata."""
 
     __test__ = False

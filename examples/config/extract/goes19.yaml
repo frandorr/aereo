@@ -9,4 +9,4 @@ reproject:
   reproject_params:
     resampler: nearest
 write:
-  _target_: aereo.builtins.WriteGeoTIFF
+  _target_: aereo.builtins.write.write_geotiff

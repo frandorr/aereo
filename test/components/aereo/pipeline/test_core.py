@@ -16,6 +16,7 @@ from aereo.interfaces import (
     SearchProvider,
     TaskBuilder,
     Writer,
+    empty_asset_result,
 )
 from aereo.interfaces.core import ExtractionTask, Reader
 from aereo.pipeline import ExtractionJob
@@ -54,12 +55,12 @@ patch_config:
 output_uri: "out_dir"
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read.read_odc_stac
   reproject:
-    _target_: aereo.builtins.ReprojectODC
+    _target_: aereo.builtins.reproject.reproject_odc
     resampling: nearest
   write:
-    _target_: aereo.builtins.WriteGeoTIFF
+    _target_: aereo.builtins.write.write_geotiff
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
@@ -85,7 +86,7 @@ patch_config:
 output_uri: "out_dir"
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read.read_odc_stac
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
@@ -126,11 +127,11 @@ patch_config:
 output_uri: "out_dir"
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read.read_odc_stac
   reproject:
-    _target_: aereo.builtins.ReprojectODC
+    _target_: aereo.builtins.reproject.reproject_odc
   write:
-    _target_: aereo.builtins.WriteGeoTIFF
+    _target_: aereo.builtins.write.write_geotiff
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
@@ -166,7 +167,7 @@ target_aoi:
     - [[-1.0, -1.0], [1.0, -1.0], [1.0, 1.0], [-1.0, 1.0], [-1.0, -1.0]]
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read.read_odc_stac
 """
     )
 
@@ -205,7 +206,7 @@ grid_config:
 output_uri: "out_dir"
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read.read_odc_stac
 """
     )
 
@@ -239,7 +240,7 @@ defaults:
 output_uri: "out_dir"
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read.read_odc_stac
 """
     )
 
@@ -273,7 +274,7 @@ target_aoi:
     - [[-1.0, -1.0], [1.0, -1.0], [1.0, 1.0], [-1.0, 1.0], [-1.0, -1.0]]
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read.read_odc_stac
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
@@ -298,7 +299,7 @@ output_uri: "out_dir"
 target_aoi: {aoi_file}
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read.read_odc_stac
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
@@ -318,7 +319,7 @@ patch_config:
 output_uri: "out_dir"
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read.read_odc_stac
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
@@ -396,7 +397,7 @@ def test_job_search_calls_provider():
         extract=ExtractConfig(read=FakeReader()),
     )
     provider = MagicMock(spec=SearchProvider)
-    provider.return_value = SearchProvider.empty_result()
+    provider.return_value = empty_asset_result()
     assets = job.search(provider)
     provider.assert_called_once()
     assert isinstance(assets, gpd.GeoDataFrame)
@@ -412,12 +413,9 @@ def test_job_search_passes_aoi_to_provider():
         target_aoi=aoi,
     )
     provider = MagicMock(spec=SearchProvider)
-    provider.model_copy.return_value = provider
-    provider.return_value = SearchProvider.empty_result()
+    provider.return_value = empty_asset_result()
     job.search(provider)
-    provider.model_copy.assert_called_once()
-    update = provider.model_copy.call_args.kwargs["update"]
-    assert update["intersects"] == aoi
+    provider.assert_called_once_with(intersects=aoi)
 
 
 def test_job_search_aoi_argument_overrides_target_aoi():
@@ -431,11 +429,9 @@ def test_job_search_aoi_argument_overrides_target_aoi():
         target_aoi=target_aoi,
     )
     provider = MagicMock(spec=SearchProvider)
-    provider.model_copy.return_value = provider
-    provider.return_value = SearchProvider.empty_result()
+    provider.return_value = empty_asset_result()
     job.search(provider, aoi=search_aoi)
-    update = provider.model_copy.call_args.kwargs["update"]
-    assert update["intersects"] == search_aoi
+    provider.assert_called_once_with(intersects=search_aoi)
 
 
 def test_job_build_tasks_calls_task_builder():
@@ -460,12 +456,14 @@ def test_job_build_tasks_passes_builder_kwargs():
         extract=ExtractConfig(read=FakeReader()),
     )
     builder = MagicMock(spec=TaskBuilder)
-    builder.model_copy.return_value = builder
     builder.return_value = []
-    job.build_tasks(_make_assets(), builder, cells_per_task=20)
-    builder.model_copy.assert_called_once()
-    update = builder.model_copy.call_args.kwargs["update"]
-    assert update["cells_per_task"] == 20
+    assets = _make_assets()
+    job.build_tasks(assets, builder, cells_per_task=20)
+    builder.assert_called_once()
+    call_args = builder.call_args
+    assert call_args.args[0] is assets
+    assert call_args.args[1] is job
+    assert call_args.kwargs["cells_per_task"] == 20
 
 
 def test_job_build_tasks_returns_empty_for_empty_assets():

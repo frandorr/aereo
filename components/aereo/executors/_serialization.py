@@ -25,7 +25,7 @@ import geopandas as gpd
 import shapely.wkt
 from aereo.grid import ExtractionPatch
 from shapely.geometry.base import BaseGeometry
-from aereo.interfaces import AereoPlugin, ExtractionTask
+from aereo.interfaces import ExtractionTask
 from aereo.interfaces.core import (
     ExtractConfig,
     Processor,
@@ -38,50 +38,79 @@ logger = logging.getLogger(__name__)
 
 
 class PluginSerializer:
-    """Serialize / deserialize :class:`AereoPlugin` instances for task transport."""
+    """Serialize / deserialize Callable / partial instances for task transport."""
 
     CLASS_KEY = "__plugin_class__"
     CONFIG_KEY = "config"
 
     @classmethod
-    def dumps(cls, plugin: AereoPlugin | None) -> dict[str, Any] | None:
-        """Serialize a plugin to a JSON-safe dict with its import path and config.
+    def dumps(cls, plugin: Any | None) -> dict[str, Any] | None:
+        """Serialize a plugin (Callable or partial) to a JSON-safe dict.
 
         Args:
-            plugin: Plugin instance to serialize, or ``None``.
+            plugin: Callable or partial instance to serialize, or ``None``.
 
         Returns:
             A dict with ``__plugin_class__`` and ``config`` keys, or ``None``.
         """
         if plugin is None:
             return None
+
+        import functools
+
+        if isinstance(plugin, functools.partial):
+            func = plugin.func
+            config = dict(plugin.keywords)
+        else:
+            func = plugin
+            config = {}
+
+        # If it's a class with a __call__, or function
+        if hasattr(func, "__qualname__"):
+            qualname = func.__qualname__
+            module = func.__module__
+        else:
+            qualname = type(func).__name__
+            module = type(func).__module__
+
         return {
-            cls.CLASS_KEY: f"{type(plugin).__module__}.{type(plugin).__name__}",
-            cls.CONFIG_KEY: plugin.model_dump(mode="json"),
+            cls.CLASS_KEY: f"{module}.{qualname}",
+            cls.CONFIG_KEY: config,
         }
 
     @classmethod
-    def loads(cls, plugin_data: dict[str, Any] | None) -> AereoPlugin | None:
-        """Reconstruct a plugin from its serialized dict.
+    def loads(cls, plugin_data: dict[str, Any] | None) -> Any | None:
+        """Reconstruct a plugin Callable from its serialized dict.
 
         Args:
             plugin_data: Serialized plugin dict, or ``None``.
 
         Returns:
-            A validated plugin instance, or ``None``.
-
-        Raises:
-            KeyError: If ``plugin_data`` is missing required keys.
-            ImportError: If the plugin module cannot be imported.
+            A Callable instance, or ``None``.
         """
+        import functools
+        import inspect
+
         if not plugin_data:
             return None
+
         cls_path = plugin_data[cls.CLASS_KEY]
         config = plugin_data[cls.CONFIG_KEY]
         module_name, class_name = cls_path.rsplit(".", 1)
         module = importlib.import_module(module_name)
-        plugin_cls = getattr(module, class_name)
-        return plugin_cls.model_validate(config)
+
+        parts = class_name.split(".")
+        obj = module
+        for part in parts:
+            obj = getattr(obj, part)
+
+        if not callable(obj):
+            raise ImportError(f"Resolved target '{cls_path}' is not callable.")
+        if inspect.isclass(obj):
+            return obj(**config)
+        if config:
+            return functools.partial(obj, **config)
+        return obj
 
 
 class _TaskSerializer:

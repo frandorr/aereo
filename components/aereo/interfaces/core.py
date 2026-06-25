@@ -6,22 +6,27 @@ like SearchProvider, Reader, Writer, and Reprojector.
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
+    Annotated,
     Any,
+    Callable,
     Literal,
     Mapping,
+    Protocol,
     Sequence,
     cast,
+    runtime_checkable,
 )
+
+from pydantic import BeforeValidator
 
 from .utils import (
     _import_yaml,
     _load_json_file,
-    normalize_geometry_input,
+    resolve_callable,
 )
 
 if TYPE_CHECKING:
@@ -33,7 +38,7 @@ import xarray as xr
 from aereo.grid import ExtractionPatch
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from shapely.geometry.base import BaseGeometry
 
 GridFilterMode = Literal["intersection", "within", "coverage"]
@@ -158,18 +163,15 @@ class PatchConfig(BaseModel):
         return cls.model_validate(data)
 
 
-class AereoPlugin(BaseModel, ABC):
-    """Base class for all AEREO plugins, fully configurable via Pydantic/Hydra."""
+AereoPlugin = Any
 
-    model_config = {"extra": "allow", "frozen": True, "arbitrary_types_allowed": True}
+AnyCallable = Annotated[Callable[..., Any], BeforeValidator(resolve_callable)]
 
 
-class Reader(AereoPlugin, ABC):
+@runtime_checkable
+class Reader(Protocol):
     """Reads raw satellite data and returns it in native CRS as an xarray.Dataset."""
 
-    read_kwargs: dict[str, Any] = Field(default_factory=dict)
-
-    @abstractmethod
     def __call__(self, task: ExtractionTask) -> xr.Dataset:
         """Read data for the given task.
 
@@ -181,12 +183,10 @@ class Reader(AereoPlugin, ABC):
         ...
 
 
-class Reprojector(AereoPlugin, ABC):
+@runtime_checkable
+class Reprojector(Protocol):
     """Reprojects/resamples an xarray.Dataset to target grid cell definitions."""
 
-    reproject_kwargs: dict[str, Any] = Field(default_factory=dict)
-
-    @abstractmethod
     def __call__(self, ds: xr.Dataset, task: ExtractionTask) -> dict[str, xr.Dataset]:
         """Reproject *ds* for every patch in *task*.
 
@@ -201,23 +201,19 @@ class Reprojector(AereoPlugin, ABC):
         ...
 
 
-class Processor(AereoPlugin, ABC):
+@runtime_checkable
+class Processor(Protocol):
     """Pure ``xarray.Dataset -> xarray.Dataset`` transform."""
 
-    process_kwargs: dict[str, Any] = Field(default_factory=dict)
-
-    @abstractmethod
     def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         """Transform *ds* and return a new dataset."""
         ...
 
 
-class Writer(AereoPlugin, ABC):
+@runtime_checkable
+class Writer(Protocol):
     """Serialises an xarray.Dataset to disk."""
 
-    write_kwargs: dict[str, Any] = Field(default_factory=dict)
-
-    @abstractmethod
     def __call__(
         self,
         ds: xr.Dataset,
@@ -235,16 +231,17 @@ class Writer(AereoPlugin, ABC):
 class ExtractConfig(BaseModel):
     """Declarative configuration for an extraction pipeline."""
 
-    model_config = {"extra": "forbid", "frozen": True}
+    model_config = {"extra": "forbid", "frozen": True, "arbitrary_types_allowed": True}
 
-    read: Reader
-    preprocess: Sequence[Processor] = Field(default_factory=list)
-    reproject: Reprojector | None = None
-    postprocess: Sequence[Processor] = Field(default_factory=list)
-    write: Writer | None = None
+    read: AnyCallable
+    preprocess: Sequence[AnyCallable] = Field(default_factory=list)
+    reproject: AnyCallable | None = None
+    postprocess: Sequence[AnyCallable] = Field(default_factory=list)
+    write: AnyCallable | None = None
 
 
-class TaskBuilder(AereoPlugin, ABC):
+@runtime_checkable
+class TaskBuilder(Protocol):
     """Builds a sequence of extraction tasks from search results.
 
     Task builders are job-level plugins: they run once per job, grouping and
@@ -252,7 +249,6 @@ class TaskBuilder(AereoPlugin, ABC):
     per-task extraction pipeline can execute.
     """
 
-    @abstractmethod
     def __call__(
         self,
         search_results: GeoDataFrame[AssetSchema],
@@ -271,65 +267,46 @@ class TaskBuilder(AereoPlugin, ABC):
         ...
 
 
-class SearchProvider(AereoPlugin, ABC):
+@runtime_checkable
+class SearchProvider(Protocol):
     """Interface for search providers.
 
-    Common attributes for describing the query:
-
-    collections:
-        - Mapping:
-            Keys are collection IDs.
-            Values are sequences of asset keys to extract.
-        - Sequence:
-            List of collection IDs, each corresponding to the default
-            set of assets for that collection.
-
-    intersects:
-        Geometric AOI for the query, as a Shapely geometry object.
-
-    start_datetime:
-        Optional start of the temporal window (inclusive), in UTC.
-
-    end_datetime:
-        Optional end of the temporal window (inclusive), in UTC.
-
-    search_params:
-        Additional keyword arguments to pass to the underlying search
-        function (e.g. ``pystac_client.search``, ``earthaccess.search_data``).
+    Search providers are callables that receive collection, spatial, and
+    temporal constraints and return a GeoDataFrame of matched assets.
     """
 
-    collections: Mapping[str, Sequence[str]] | Sequence[str] | None = None
-    intersects: BaseGeometry | dict[str, Any] | str | Path | None = Field(
-        default=None,
-        description="AOI geometry as a Shapely object, GeoJSON dict, or path to a GeoJSON file.",
-    )
-    start_datetime: datetime | None = None
-    end_datetime: datetime | None = None
-    search_params: dict[str, Any] = Field(default_factory=dict)
+    def __call__(
+        self,
+        collections: Mapping[str, Sequence[str]] | Sequence[str] | None,
+        intersects: BaseGeometry | None,
+        start_datetime: datetime | None,
+        end_datetime: datetime | None,
+        **kwargs: Any,
+    ) -> GeoDataFrame[AssetSchema]:
+        """Execute search based on the provided constraints.
 
-    @field_validator("intersects", mode="before")
-    @classmethod
-    def _validate_intersects(
-        cls, value: BaseGeometry | dict[str, Any] | str | Path | None
-    ) -> BaseGeometry | None:
-        """Normalize intersects input into a Shapely geometry."""
-        return normalize_geometry_input(value)
+        Args:
+            collections: Mapping of collection -> asset keys, or list of collections.
+            intersects: AOI geometry.
+            start_datetime: Optional start of temporal window.
+            end_datetime: Optional end of temporal window.
+            **kwargs: Implementation-specific parameters (e.g. ``stac_api_url``).
 
-    @staticmethod
-    def empty_result() -> GeoDataFrame[AssetSchema]:
-        """Return an empty GeoDataFrame with AssetSchema columns."""
-        import geopandas as gpd
-
-        columns = list(AssetSchema.to_schema().columns.keys())
-        if "geometry" not in columns:
-            columns.append("geometry")
-        gdf = gpd.GeoDataFrame(columns=columns, geometry="geometry")
-        return cast(GeoDataFrame[AssetSchema], AssetSchema.validate(gdf))
-
-    @abstractmethod
-    def __call__(self) -> GeoDataFrame[AssetSchema]:
-        """Execute search based on internal state and return matched assets."""
+        Returns:
+            GeoDataFrame of matched assets.
+        """
         ...
+
+
+def empty_asset_result() -> GeoDataFrame[AssetSchema]:
+    """Return an empty GeoDataFrame with AssetSchema columns."""
+    import geopandas as gpd
+
+    columns = list(AssetSchema.to_schema().columns.keys())
+    if "geometry" not in columns:
+        columns.append("geometry")
+    gdf = gpd.GeoDataFrame(columns=columns, geometry="geometry")
+    return cast(GeoDataFrame[AssetSchema], AssetSchema.validate(gdf))
 
 
 def build_collection_asset_filters(

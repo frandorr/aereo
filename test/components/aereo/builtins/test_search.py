@@ -1,10 +1,12 @@
 from datetime import datetime, timezone
+from functools import partial
 from unittest.mock import MagicMock, patch
 
 import pytest
 from pydantic import ValidationError
-from aereo.builtins.search import SearchSTAC
 from shapely.geometry import Polygon
+
+from aereo.builtins.search import search_stac
 
 
 @pytest.fixture
@@ -40,15 +42,19 @@ def mock_pystac_item():
 
 def test_search_stac_missing_api_url():
     with pytest.raises(ValidationError):
-        SearchSTAC(collections={"test-collection": []})  # type: ignore[call-arg]
+        search_stac(collections={"test-collection": []})  # type: ignore[call-arg]
 
 
 @patch("aereo.builtins.search.Client")
 def test_search_stac_connection_error(mock_client):
     mock_client.open.side_effect = Exception("Connection timed out")
-    provider = SearchSTAC(
+    provider = partial(
+        search_stac,
         stac_api_url="https://example.com/stac",
         collections={"test-collection": []},
+        intersects=None,
+        start_datetime=None,
+        end_datetime=None,
     )
     with pytest.raises(ValueError, match="Failed to connect to STAC API"):
         provider()
@@ -60,9 +66,13 @@ def test_search_stac_query_error(mock_client):
     mock_client.open.return_value = mock_catalog
     mock_catalog.search.side_effect = Exception("Invalid query parameter")
 
-    provider = SearchSTAC(
+    provider = partial(
+        search_stac,
         stac_api_url="https://example.com/stac",
         collections={"test-collection": []},
+        intersects=None,
+        start_datetime=None,
+        end_datetime=None,
     )
     with pytest.raises(ValueError, match="STAC search query failed"):
         provider()
@@ -76,11 +86,13 @@ def test_search_stac_empty_results(mock_client):
     mock_search_request.items.return_value = []
     mock_catalog.search.return_value = mock_search_request
 
-    provider = SearchSTAC(
+    result = search_stac(
         stac_api_url="https://example.com/stac",
         collections={"test-collection": []},
+        intersects=None,
+        start_datetime=None,
+        end_datetime=None,
     )
-    result = provider()
     assert result.empty
     assert "geometry" in result.columns
 
@@ -94,11 +106,13 @@ def test_search_stac_with_wildcard_assets(mock_client, mock_pystac_item):
     mock_search_request.items.return_value = [mock_pystac_item]
     mock_catalog.search.return_value = mock_search_request
 
-    provider = SearchSTAC(
+    result = search_stac(
         stac_api_url="https://example.com/stac",
         collections={"test-collection": ["*"]},
+        intersects=None,
+        start_datetime=None,
+        end_datetime=None,
     )
-    result = provider()
 
     assert not result.empty
     assert len(result) == 2
@@ -116,11 +130,13 @@ def test_search_stac_with_channel_filter(mock_client, mock_pystac_item):
     mock_search_request.items.return_value = [mock_pystac_item]
     mock_catalog.search.return_value = mock_search_request
 
-    provider = SearchSTAC(
+    result = search_stac(
         stac_api_url="https://example.com/stac",
         collections={"test-collection": ["visual"]},
+        intersects=None,
+        start_datetime=None,
+        end_datetime=None,
     )
-    result = provider()
 
     assert not result.empty
     assert len(result) == 1
@@ -138,11 +154,13 @@ def test_search_stac_empty_variables_all_assets(mock_client, mock_pystac_item):
     mock_search_request.items.return_value = [mock_pystac_item]
     mock_catalog.search.return_value = mock_search_request
 
-    provider = SearchSTAC(
+    result = search_stac(
         stac_api_url="https://example.com/stac",
         collections={"test-collection": []},
+        intersects=None,
+        start_datetime=None,
+        end_datetime=None,
     )
-    result = provider()
 
     assert not result.empty
     assert len(result) == 2
@@ -161,11 +179,13 @@ def test_search_stac_no_crs_when_proj_missing(mock_client, mock_pystac_item):
     mock_search_request.items.return_value = [mock_pystac_item]
     mock_catalog.search.return_value = mock_search_request
 
-    provider = SearchSTAC(
+    result = search_stac(
         stac_api_url="https://example.com/stac",
         collections={"test-collection": ["*"]},
+        intersects=None,
+        start_datetime=None,
+        end_datetime=None,
     )
-    result = provider()
 
     assert not result.empty
     assert "crs" not in result.columns
@@ -179,14 +199,16 @@ def test_search_stac_headers_passing(mock_client, mock_pystac_item):
     mock_search_request.items.return_value = [mock_pystac_item]
     mock_catalog.search.return_value = mock_search_request
 
-    provider = SearchSTAC(
+    search_stac(
         stac_api_url="https://example.com/stac",
         collections={"test-collection": []},
+        intersects=None,
+        start_datetime=None,
+        end_datetime=None,
         pystac_open_params={
             "headers": {"Authorization": "Bearer token", "X-Custom": 123}
         },
     )
-    provider()
 
     mock_client.open.assert_called_once_with(
         "https://example.com/stac",
@@ -208,7 +230,7 @@ def test_search_stac_params_forwarding_and_datetime(mock_client, mock_pystac_ite
         [(10.0, 45.0), (11.0, 45.0), (11.0, 46.0), (10.0, 46.0), (10.0, 45.0)]
     )
 
-    provider = SearchSTAC(
+    search_stac(
         stac_api_url="https://example.com/stac",
         collections=["collection-a", "collection-b"],
         intersects=polygon,
@@ -219,7 +241,6 @@ def test_search_stac_params_forwarding_and_datetime(mock_client, mock_pystac_ite
             "query": {"eo:cloud_cover": {"lt": 10}},
         },
     )
-    provider()
 
     mock_catalog.search.assert_called_once()
     search_kwargs = mock_catalog.search.call_args[1]
@@ -242,24 +263,24 @@ def test_search_stac_partial_datetimes(mock_client, mock_pystac_item):
     start_dt = datetime(2023, 5, 12, 0, 0, 0, tzinfo=timezone.utc)
     end_dt = datetime(2023, 5, 13, 0, 0, 0, tzinfo=timezone.utc)
 
-    # Start date only
-    provider = SearchSTAC(
+    search_stac(
         stac_api_url="https://example.com/stac",
         collections={"test-collection": []},
+        intersects=None,
         start_datetime=start_dt,
+        end_datetime=None,
     )
-    provider()
     assert mock_catalog.search.call_args[1]["datetime"] == "2023-05-12T00:00:00Z/.."
 
     mock_catalog.reset_mock()
 
-    # End date only
-    provider = SearchSTAC(
+    search_stac(
         stac_api_url="https://example.com/stac",
         collections={"test-collection": []},
+        intersects=None,
+        start_datetime=None,
         end_datetime=end_dt,
     )
-    provider()
     assert mock_catalog.search.call_args[1]["datetime"] == "../2023-05-13T00:00:00Z"
 
 
@@ -273,16 +294,18 @@ def test_search_stac_pystac_params_forwarding(mock_client, mock_pystac_item):
 
     mock_modifier = MagicMock()
 
-    provider = SearchSTAC(
+    search_stac(
         stac_api_url="https://example.com/stac",
         collections={"test-collection": []},
+        intersects=None,
+        start_datetime=None,
+        end_datetime=None,
         pystac_open_params={
             "modifier": mock_modifier,
             "ignore_conformance": True,
         },
         search_params={"method": "GET", "max_items": 10},
     )
-    provider()
 
     mock_client.open.assert_called_once_with(
         "https://example.com/stac",
@@ -303,14 +326,24 @@ def test_search_stac_accepts_geojson_path(tmp_path):
         '"properties": {}}'
     )
 
-    provider = SearchSTAC(
-        stac_api_url="https://example.com/stac",
-        collections={"test-collection": []},
-        intersects=str(geojson_path),
-    )
+    with patch("aereo.builtins.search.Client") as mock_client:
+        mock_catalog = MagicMock()
+        mock_client.open.return_value = mock_catalog
+        mock_search_request = MagicMock()
+        mock_search_request.items.return_value = []
+        mock_catalog.search.return_value = mock_search_request
 
-    assert isinstance(provider.intersects, Polygon)
-    assert provider.intersects.is_valid
+        search_stac(
+            stac_api_url="https://example.com/stac",
+            collections={"test-collection": []},
+            intersects=str(geojson_path),
+            start_datetime=None,
+            end_datetime=None,
+        )
+
+        search_kwargs = mock_catalog.search.call_args[1]
+        assert "intersects" in search_kwargs
+        assert search_kwargs["intersects"]["type"] == "Polygon"
 
 
 def test_search_stac_accepts_geojson_dict():
@@ -319,11 +352,21 @@ def test_search_stac_accepts_geojson_dict():
         "coordinates": [[[10, 45], [11, 45], [11, 46], [10, 46], [10, 45]]],
     }
 
-    provider = SearchSTAC(
-        stac_api_url="https://example.com/stac",
-        collections={"test-collection": []},
-        intersects=geojson,
-    )
+    with patch("aereo.builtins.search.Client") as mock_client:
+        mock_catalog = MagicMock()
+        mock_client.open.return_value = mock_catalog
+        mock_search_request = MagicMock()
+        mock_search_request.items.return_value = []
+        mock_catalog.search.return_value = mock_search_request
 
-    assert isinstance(provider.intersects, Polygon)
-    assert provider.intersects.is_valid
+        search_stac(
+            stac_api_url="https://example.com/stac",
+            collections={"test-collection": []},
+            intersects=geojson,
+            start_datetime=None,
+            end_datetime=None,
+        )
+
+        search_kwargs = mock_catalog.search.call_args[1]
+        assert "intersects" in search_kwargs
+        assert search_kwargs["intersects"]["type"] == "Polygon"

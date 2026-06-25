@@ -21,8 +21,12 @@ from shapely.geometry.base import BaseGeometry
 
 from aereo.executors import LocalExecutor
 from aereo.interfaces import ExtractConfig, normalize_geometry_input
+from aereo.interfaces.utils import (
+    _extract_geometry_from_geojson,
+    _prepare_config_for_instantiate,
+    update_callable,
+)
 from aereo.pipeline import ExtractionJob
-from aereo.interfaces.utils import _extract_geometry_from_geojson
 from aereo.schemas import AssetSchema
 from aereo.registry import AereoRegistry
 
@@ -77,9 +81,14 @@ def _build_search_provider(cfg: DictConfig) -> Any:
             ``start``, and ``end`` keys.
 
     Returns:
-        Configured search provider instance.
+        Configured search provider callable.
     """
-    search_provider = hydra.utils.instantiate(cfg.search)
+    from omegaconf import OmegaConf
+
+    search_cfg = OmegaConf.to_container(cfg.search, resolve=True)
+    search_provider = hydra.utils.instantiate(
+        _prepare_config_for_instantiate(search_cfg)
+    )
 
     update_dict: dict[str, Any] = {}
     intersects = _resolve_target_aoi(cfg)
@@ -93,7 +102,7 @@ def _build_search_provider(cfg: DictConfig) -> Any:
         update_dict["end_datetime"] = end_dt
 
     if update_dict:
-        search_provider = search_provider.model_copy(update=update_dict)
+        search_provider = update_callable(search_provider, **update_dict)
 
     return search_provider
 
@@ -249,7 +258,13 @@ def _build_job(
     patch_config = hydra.utils.instantiate(cfg.patch_config)
 
     try:
-        extract_instantiated = hydra.utils.instantiate(cfg.extract, _convert_="all")
+        from omegaconf import OmegaConf
+
+        extract_cfg = OmegaConf.to_container(cfg.extract, resolve=True)
+        extract_prepared = _prepare_config_for_instantiate(extract_cfg)
+        extract_instantiated = hydra.utils.instantiate(
+            extract_prepared, _convert_="all"
+        )
     except Exception as exc:
         console.print(f"[red]Invalid extract configuration:[/red] {exc}")
         sys.exit(1)
@@ -478,7 +493,12 @@ def _run_build_tasks_action(cfg: DictConfig) -> None:
     if not cfg.get("task_builder"):
         console.print("[red]task_builder is required for build-tasks action.[/red]")
         sys.exit(1)
-    task_builder = hydra.utils.instantiate(cfg.task_builder)
+    from omegaconf import OmegaConf
+
+    task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
+    task_builder = hydra.utils.instantiate(
+        _prepare_config_for_instantiate(task_builder_cfg)
+    )
 
     job = _build_job(cfg)
 
@@ -501,7 +521,7 @@ def _run_build_tasks_action(cfg: DictConfig) -> None:
         else (Path(cfg.get("output_dir", ".")) / "tasks.pkl")
     )
     task_file.write_bytes(pickle.dumps(tasks))
-    chunk_size = getattr(task_builder, "cells_per_task", None)
+    chunk_size = cfg.get("cells_per_task")
     chunk_msg = f" (chunk size: {chunk_size})" if chunk_size is not None else ""
     console.print(f"[green]✓ Prepared {len(tasks)} tasks{chunk_msg}.[/green]")
     console.print(f"[green]Wrote tasks to[/green] {task_file}")
@@ -558,9 +578,14 @@ def _run_run_action(cfg: DictConfig) -> None:
     if not cfg.get("task_builder"):
         console.print("[red]task_builder is required for run action.[/red]")
         sys.exit(1)
-    task_builder = hydra.utils.instantiate(cfg.task_builder)
+    from omegaconf import OmegaConf
 
-    job = _build_job(cfg, fallback=search_provider.intersects)
+    task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
+    task_builder = hydra.utils.instantiate(
+        _prepare_config_for_instantiate(task_builder_cfg)
+    )
+
+    job = _build_job(cfg, fallback=_resolve_target_aoi(cfg))
 
     # Search
     console.print("[bold blue]🔍 Searching...[/bold blue]")
@@ -581,7 +606,7 @@ def _run_run_action(cfg: DictConfig) -> None:
         task_builder,
         **build_kwargs,
     )
-    chunk_size = getattr(task_builder, "cells_per_task", None)
+    chunk_size = cfg.get("cells_per_task")
     chunk_msg = f" (chunk size: {chunk_size})" if chunk_size is not None else ""
     console.print(f"[green]✓ Prepared {len(tasks)} tasks{chunk_msg}.[/green]")
 
@@ -598,11 +623,15 @@ def _run_run_action(cfg: DictConfig) -> None:
 
 def _run_validate_action(cfg: DictConfig) -> None:
     """Execute the ``validate`` CLI action."""
+    from omegaconf import OmegaConf
+
     try:
         if cfg.get("search"):
-            hydra.utils.instantiate(cfg.search)
+            search_cfg = OmegaConf.to_container(cfg.search, resolve=True)
+            hydra.utils.instantiate(_prepare_config_for_instantiate(search_cfg))
         if cfg.get("task_builder"):
-            hydra.utils.instantiate(cfg.task_builder)
+            task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
+            hydra.utils.instantiate(_prepare_config_for_instantiate(task_builder_cfg))
         _build_job(cfg, create_output_dir=False)
         console.print("[green]✓ Configuration is valid.[/green]")
     except Exception as exc:

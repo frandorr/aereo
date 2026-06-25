@@ -1,4 +1,4 @@
-_target_: aereo.builtins.SearchEarthaccess
+_target_: aereo.builtins.search.search_earthaccess
 collections:
   VJ202IMG: ["I04"]
   VJ203IMG: []
