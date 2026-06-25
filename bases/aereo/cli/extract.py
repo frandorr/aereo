@@ -119,7 +119,6 @@ def _make_task() -> ExtractionTask:
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=100.0),
         output_uri="/tmp/aereo/output",
-        search=None,
         extract=ExtractConfig(
             read=CustomReader(),
             reproject=ReprojectODC(),

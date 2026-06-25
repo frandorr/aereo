@@ -14,31 +14,19 @@ from aereo.interfaces import (
     ExtractConfig,
     GridConfig,
     PatchConfig,
-    SearchProvider,
-    TaskBuilder,
 )
 from aereo.interfaces.utils import normalize_geometry_input
 from pydantic import BaseModel, Field, field_validator
 from shapely.geometry.base import BaseGeometry
 
 
-def _default_task_builder() -> TaskBuilder:
-    """Return the default grouped task builder.
-
-    Imported lazily to avoid a circular import between ``aereo.pipeline`` and
-    ``aereo.builtins``.
-    """
-    from aereo.builtins.task_builder import GroupedTaskBuilder
-
-    return GroupedTaskBuilder()
-
-
 class ExtractionJob(BaseModel):
     """Declarative configuration tree for a complete extraction job.
 
-    Bundles search configuration, grid/patch settings, an output URI, a task
-    builder, and extraction pipeline stages together into a single validated
-    Hydra-compatible model.
+    Bundles grid/patch settings, an output URI, and extraction pipeline stages
+    together into a single validated Hydra-compatible model. Search providers
+    and task builders are supplied at runtime to the orchestration methods
+    rather than stored on the job.
     """
 
     model_config = {"extra": "forbid", "frozen": True, "arbitrary_types_allowed": True}
@@ -66,11 +54,6 @@ class ExtractionJob(BaseModel):
             "When False, reuse cached per-task artifact catalogs if they exist. "
             "When True, always execute tasks and overwrite existing caches."
         ),
-    )
-    search: SearchProvider | None = None
-    task_builder: TaskBuilder = Field(
-        default_factory=_default_task_builder,
-        description="Plugin that turns search results into extraction tasks.",
     )
     extract: ExtractConfig
     target_aoi: BaseGeometry | dict[str, Any] | str | Path | None = Field(
@@ -124,14 +107,10 @@ class ExtractionJob(BaseModel):
     def effective_target_aoi(self) -> BaseGeometry | None:
         """Return the geometry used to clip prepared tasks.
 
-        Falls back to ``search.intersects`` when ``target_aoi`` is not
-        explicitly provided.
+        Returns the explicitly provided ``target_aoi`` if any, otherwise
+        ``None``.
         """
-        return cast(
-            "BaseGeometry | None",
-            self.target_aoi
-            or (self.search.intersects if self.search is not None else None),
-        )
+        return cast("BaseGeometry | None", self.target_aoi)
 
     @classmethod
     def load_from_config(
@@ -183,9 +162,9 @@ class ExtractionJob(BaseModel):
         target classes using hydra.utils.instantiate, and returns an
         ExtractionJob instance.
 
-        The expected YAML layout places ``grid_config``, ``patch_config`` and
-        ``output_uri`` as top-level keys alongside ``search`` and ``extract``,
-        enabling Hydra config package composition::
+        The expected YAML layout places ``grid_config``, ``patch_config``,
+        ``output_uri`` and ``extract`` as top-level keys, enabling Hydra config
+        package composition::
 
             defaults:
               - grid_config: default

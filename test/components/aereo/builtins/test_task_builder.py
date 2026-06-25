@@ -26,7 +26,6 @@ def _make_job(output_uri: str = "s3://test/output") -> ExtractionJob:
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri=output_uri,
-        search=None,
         extract=extract,
     )
 

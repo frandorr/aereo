@@ -86,7 +86,6 @@ def _make_task(stac_item_dict: dict[str, Any] | None = None, aoi=None):
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="/tmp/test",
-        search=None,
         extract=ExtractConfig(read=ReadODCSTAC()),
         target_aoi=aoi,
     )
@@ -242,7 +241,6 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="/tmp/test",
-        search=None,
         extract=ExtractConfig(read=ReadODCSTAC()),
     )
     task = ExtractionTask(
