@@ -12,6 +12,14 @@ AWS Lambda.
 
 <div class="grid cards" markdown>
 
+-   ## AEREO in 5 minutes
+
+    ---
+
+    Learn the core concepts, what you can build, and why AEREO exists.
+
+    [:octicons-arrow-right-24: Read Now](five-minutes.md)
+
 -   ## Run your first pipeline
 
     ---
@@ -40,8 +48,8 @@ AWS Lambda.
 
     ---
 
-    Add a new search provider, reader, or writer. Like PyTorch modules:
-    implement `__call__` and register via entry points.
+    Add a new search provider, reader, or writer. AEREO plugins are plain
+    Python functions registered via entry points.
 
     [:octicons-arrow-right-24: Learn How](plugins/plugin-overview.md)
 
@@ -60,7 +68,7 @@ AWS Lambda.
 ## 10-line example
 
 ```python
-from aereo.builtins import GroupedTaskBuilder, SearchSTAC
+from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
 
@@ -68,8 +76,8 @@ from aereo.pipeline import ExtractionJob
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
 
 # 1. Search   2. Prepare tasks   3. Execute
-results = job.search(SearchSTAC(...))
-tasks = job.build_tasks(results, GroupedTaskBuilder())
+results = job.search(search_stac, stac_api_url="https://earth-search.aws.element84.com/v1")
+tasks = job.build_tasks(results, build_grouped_tasks)
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 ```
 
@@ -86,12 +94,13 @@ Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid.
 └─────────┘     └──────────────┘     └────────────────────┘     └───────────┘
 ```
 
-1. **Search** — a `SearchProvider` queries a catalog and returns a validated
+1. **Search** — a search function queries a catalog and returns a validated
    `GeoDataFrame[AssetSchema]`.
 2. **Prepare** — AEREO builds grid cells over your AOI, groups assets by time,
    and chunks them into `ExtractionTask` objects.
-3. **Execute** — an executor runs each task through a stage pipeline:
-   `Reader → Processor → Reprojector → Processor → Writer`.
+3. **Execute** — an executor runs each task through the stage pipeline
+   configured in `ExtractConfig`:
+   `read function → preprocess functions → reproject function → postprocess functions → write function`.
 
 All of this is configurable through Hydra YAML files or plain Python objects.
 

@@ -65,30 +65,30 @@ job = ExtractionJob.load_from_config(
 ```
 
 Because search providers and task builders are supplied at runtime, load them
-separately and pass them to the job orchestration methods:
+separately and pass them to the job orchestration methods. Use the
+``aereo.pipeline.load_plugin`` helper for the shortest path:
 
 ```python
-import hydra
-from aereo.builtins import GroupedTaskBuilder, SearchSTAC
+from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
-from aereo.pipeline import ExtractionJob
+from aereo.pipeline import ExtractionJob, load_plugin
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
 
 # Option A: instantiate plugins directly
-search_provider = SearchSTAC(
-    stac_api_url="https://planetarycomputer.microsoft.com/api/stac/v1",
-    collections={"sentinel-2-l2a": ["B04"]},
+assets = job.search(
+    search_stac,
+    stac_api_url="https://earth-search.aws.element84.com/v1",
+    collections={"sentinel-2-l2a": ["red", "nir"]},
     intersects="examples/config/aoi/sample.geojson",
 )
-task_builder = GroupedTaskBuilder(cells_per_task=20)
+tasks = job.build_tasks(assets, build_grouped_tasks, cells_per_task=5)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=4))
 
 # Option B: load them from the same config package
-from omegaconf import OmegaConf
-search_cfg = OmegaConf.load("examples/config/search/sentinel2_pc.yaml")
-search_provider = hydra.utils.instantiate(search_cfg, _convert_="all")
+search_provider = load_plugin("examples/config", "search", "sentinel2_pc")
+task_builder = load_plugin("examples/config", "task_builder", "grouped")
 
-# Run the pipeline
 assets = job.search(search_provider)
 tasks = job.build_tasks(assets, task_builder)
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=4))
@@ -146,19 +146,19 @@ output_uri: /tmp/aereo_extraction
 target_aoi: /absolute/path/to/aoi.geojson
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read:read_odc_stac
     ...
   preprocess:
-    - _target_: aereo.builtins.processor.CloudMask
+    - _target_: aereo.builtins.processor:select_bands
       ...
   reproject:
-    _target_: aereo.builtins.reproject.ReprojectToPatches
+    _target_: aereo.builtins.reproject:reproject_odc
     ...
   postprocess:
-    - _target_: aereo.builtins.processor.NDVI
+    - _target_: aereo.builtins.processor:ndvi
       ...
   write:
-    _target_: aereo.builtins.write.WriteGeoTIFF
+    _target_: aereo.builtins.write:write_geotiff
       ...
 ```
 
@@ -179,7 +179,7 @@ patch_config:
 output_uri: /tmp/aereo_extraction
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read:read_odc_stac
     ...
 ```
 

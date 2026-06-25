@@ -8,8 +8,8 @@ Pick your sensor and copy-paste the install command.
 pip install aereo
 ```
 
-This gives you the `ExtractionJob` orchestration API, the Hydra CLI, the built-in stage plugins
-(`ReadODCSTAC`, `ReprojectODC`, `WriteGeoTIFF`, `NDVI`, `SelectBands`, ...), and
+This gives you the `ExtractionJob` orchestration API, the Hydra CLI, the built-in stage functions
+(`search_stac`, `read_odc_stac`, `reproject_odc`, `write_geotiff`, `ndvi`, `select_bands`, ...), and
 grid utilities. You can search public STAC catalogs and extract with ODC-STAC
 using only the core package.
 
@@ -25,7 +25,7 @@ pip install aereo aereo-search-planetary-computer
 ```
 
 Required credentials: a [Planetary Computer subscription key](https://planetarycomputer.microsoft.com/docs/concepts/sas/)
-is recommended for signed assets. The built-in `SearchSTAC` config in
+is recommended for signed assets. The built-in `search_stac` config in
 `examples/config/search/sentinel2_pc.yaml` shows how to use
 `planetary_computer.sign_inplace`.
 
@@ -78,11 +78,11 @@ List every plugin AEREO can discover:
 aereo action=plugins
 ```
 
-You should see built-in plugins (`SearchSTAC`, `ReadODCSTAC`, ...) plus any
+You should see built-in plugins (`search_stac`, `read_odc_stac`, ...) plus any
 sensor-specific plugins you installed. To inspect a single plugin's parameters:
 
 ```bash
-aereo action=plugin_params plugin_name=SearchSTAC
+aereo action=plugin_params plugin_name=search_stac
 ```
 
 ---

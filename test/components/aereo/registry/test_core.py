@@ -241,3 +241,35 @@ def test_generic_get(mock_entry_points):
 
     with pytest.raises(ValueError, match="not found or failed to load"):
         registry.get("searcher", "missing")
+
+
+# ---------------------------------------------------------------------------
+# Built-in entry points
+# ---------------------------------------------------------------------------
+
+
+def test_builtin_entry_points_load():
+    """All built-in plugin entry points resolve to real functions.
+
+    This is a regression guard against docs/entry points drifting away from
+    the actual API (e.g. old class-based targets pointing at removed classes).
+    """
+    registry = AereoRegistry()
+    params = registry.list_all_params()
+
+    builtins = [
+        "search_stac",
+        "read_odc_stac",
+        "reproject_odc",
+        "write_geotiff",
+        "task_builder_grouped",
+        "process_select_bands",
+        "process_qa_mask",
+        "process_ndvi",
+        "process_normalize",
+        "process_composite",
+    ]
+    for name in builtins:
+        assert name in params, f"built-in plugin {name!r} is not registered"
+        assert params[name]["required"] is not None
+        assert params[name]["optional"] is not None

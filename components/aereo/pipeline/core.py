@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, cast
 
 import hydra
+from omegaconf import OmegaConf
 from aereo.executors.core import Executor, LocalExecutor
 from aereo.interfaces import (
     ExtractConfig,
@@ -32,6 +33,35 @@ from shapely.geometry.base import BaseGeometry
 from structlog import get_logger
 
 logger = get_logger()
+
+
+def load_plugin(config_dir: str | Path, group: str, name: str) -> Any:
+    """Load a single runtime plugin from a Hydra config package.
+
+    This helper removes the boilerplate of manually calling ``OmegaConf.load``
+    and ``hydra.utils.instantiate(..., _convert_="all", _partial_=True)`` for
+    runtime plugin groups such as ``search`` and ``task_builder``.
+
+    Args:
+        config_dir: Directory containing the Hydra config package.
+        group: Config group directory name (e.g. ``search`` or ``task_builder``).
+        name: Config file name (without ``.yaml``).
+
+    Returns:
+        The instantiated plugin (usually a ``functools.partial`` wrapping a
+        function).
+
+    Example::
+
+        from aereo.pipeline import ExtractionJob, load_plugin
+
+        job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
+        search_provider = load_plugin("examples/config", "search", "sentinel2_pc")
+        task_builder = load_plugin("examples/config", "task_builder", "grouped")
+    """
+    path = Path(config_dir).resolve() / group / f"{name}.yaml"
+    cfg = OmegaConf.load(path)
+    return hydra.utils.instantiate(cfg, _convert_="all", _partial_=True)
 
 
 class ExtractionJob(BaseModel):

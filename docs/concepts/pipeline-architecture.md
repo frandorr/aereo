@@ -13,7 +13,7 @@ User Query / Config
         ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ 1. SEARCH                                                                   │
-│    Input:  SearchProvider                                                   │
+│    Input:  search function                                                  │
 │    Output: GeoDataFrame[AssetSchema]                                        │
 │    ──────────────────────────────────────────────────────────────────────── │
 │    id | collection | geometry | start_time | end_time | href                │
@@ -38,8 +38,8 @@ User Query / Config
 │    Input:  tasks + Executor                                                 │
 │    Output: GeoDataFrame[ArtifactSchema]                                     │
 │    ──────────────────────────────────────────────────────────────────────── │
-│    Per task: Reader → Pre-processors → Reprojector → Post-processors →      │
-│    Writer                                                                   │
+│    Per task: read function → Pre-processors → reproject function →          │
+│    Post-processors → write function                                         │
 └─────────────────────────────────────────────────────────────────────────────┘
         │
         ▼
@@ -57,18 +57,18 @@ User Query / Config
 ### Purpose
 
 Find satellite granules across one or more collections that intersect a given
-AOI and time range. The `SearchProvider` is responsible for the catalog query;
+AOI and time range. The search function is responsible for the catalog query;
 `ExtractionJob.search()` simply invokes it and validates the result.
 
 ### Sequence diagram
 
 ```text
 ┌─────────┐          ┌───────────────┐              ┌─────────────────────┐
-│  User   │          │  ExtractionJob│              │  SearchProvider     │
+│  User   │          │  ExtractionJob│              │  search function    │
 │         │          │               │              │  (plugin)           │
 └────┬────┘          └───────┬───────┘              └──────────┬──────────┘
      │                       │                                 │
-     │  job.search(provider) │                                 │
+     │  job.search(search_fn)│                                 │
      │──────────────────────▶│                                 │
      │                       │─── 1. Merge AOI / kwargs ──────▶│
      │                       │                                 │
@@ -83,22 +83,22 @@ AOI and time range. The `SearchProvider` is responsible for the catalog query;
 ### API
 
 ```python
+from datetime import datetime, timezone
+from aereo.builtins import search_stac
 from aereo.pipeline import ExtractionJob
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
-results = job.search(provider)
-```
-
-Runtime search arguments win over the job's fixed `target_aoi`:
-
-```python
 results = job.search(
-    provider,
-    aoi=geojson_dict,
-    start_datetime=datetime(2024, 1, 1),
-    end_datetime=datetime(2024, 2, 1),
+    search_stac,
+    stac_api_url="https://earth-search.aws.element84.com/v1",
+    collections={"sentinel-2-l2a": ["red", "nir"]},
+    intersects="examples/config/aoi/chocon.geojson",
+    start_datetime=datetime(2024, 1, 1, tzinfo=timezone.utc),
+    end_datetime=datetime(2024, 1, 10, tzinfo=timezone.utc),
 )
 ```
+
+Runtime search arguments win over the job's fixed `target_aoi`.
 
 ### Output schema: `AssetSchema`
 
@@ -127,13 +127,13 @@ into parallelizable units.
 
 ```text
 ┌─────────────────┐          ┌───────────────┐              ┌─────────────────────┐
-│  GeoDataFrame   │          │  ExtractionJob│              │    Task builder     │
-│ [AssetSchema]   │          │               │              │                     │
+│  GeoDataFrame   │          │  ExtractionJob│              │  task builder       │
+│ [AssetSchema]   │          │               │              │  function           │
 └────────┬────────┘          └───────┬───────┘              └──────────┬──────────┘
          │                           │                                 │
          │  job.build_tasks(         │                                 │
          │    assets,                │                                 │
-         │    task_builder)          │                                 │
+         │    build_grouped_tasks)   │                                 │
          │──────────────────────────▶│                                 │
          │                           │                                 │
          │                           │─── 1. Resolve effective AOI     │
@@ -156,7 +156,9 @@ into parallelizable units.
 ### API
 
 ```python
-tasks = job.build_tasks(results, task_builder)
+from aereo.builtins import build_grouped_tasks
+
+tasks = job.build_tasks(results, build_grouped_tasks, cells_per_task=50)
 ```
 
 `build_tasks()` always receives a complete ``ExtractionJob``. Construct one
@@ -164,18 +166,22 @@ in Python or load it from a Hydra config package:
 
 ```python
 from aereo.pipeline import ExtractionJob
-from aereo.builtins import GroupedTaskBuilder
+from aereo.builtins import read_odc_stac, reproject_odc, write_geotiff
 
 job = ExtractionJob(
     grid_config=grid_config,
     patch_config=patch_config,
     output_uri="/tmp/out",
-    extract=extract_config,
+    extract=ExtractConfig(
+        read=read_odc_stac,
+        reproject=reproject_odc,
+        write=write_geotiff,
+    ),
 )
 
 tasks = job.build_tasks(
     results,
-    GroupedTaskBuilder(),
+    build_grouped_tasks,
     cells_per_task=50,
 )
 ```
@@ -209,17 +215,20 @@ the target grid, optionally processes it again, and writes the result.
 ### Stage pipeline
 
 ```text
-┌────────┐     ┌─────────────────┐     ┌─────────────┐     ┌──────────────────┐     ┌─────────────┐
-│ Reader │───▶ │ Pre-processors  │───▶ │ Reprojector │───▶ │ Post-processors  │───▶ │ Writer      │
-└────────┘     └─────────────────┘     └─────────────┘     └──────────────────┘     └─────────────┘
+┌─────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│ read fn     │───▶ │ pre-processors  │───▶ │ reproject fn    │───▶ │ post-processors  │───▶ │ write fn        │
+└─────────────┘     └─────────────────┘     └─────────────────┘     └──────────────────┘     └─────────────────┘
 ```
 
-| Stage | Base class | Responsibility |
-|-------|------------|----------------|
-| **Reader** | `Reader` | Open the source asset and return an `xr.DataArray` or similar. |
-| **Processors** | `Processor` | Transform data: select bands, compute NDVI, mask clouds, normalize, composite. |
-| **Reprojector** | `Reprojector` | Reproject to the task's target grid / GeoBox. |
-| **Writer** | `Writer` | Write final artifacts to disk or object store in EOIDS layout. |
+| Stage | Responsibility |
+|-------|----------------|
+| **Reader** | Open the source asset and return an `xr.Dataset`. |
+| **Processors** | Transform data: select bands, compute NDVI, mask clouds, normalize, composite. |
+| **Reprojector** | Reproject to the task's target grid / GeoBox. |
+| **Writer** | Write final artifacts to disk or object store in EOIDS layout. |
+
+Each stage is a plain Python function. Readers, reprojectors, and writers receive
+the `ExtractionTask`; processors receive only the `xr.Dataset`.
 
 ### API
 
@@ -282,11 +291,11 @@ patch_config:
   resolution: 10.0
 extract:
   read:
-    _target_: aereo.builtins.ReadODCSTAC
+    _target_: aereo.builtins.read:read_odc_stac
   reproject:
-    _target_: aereo.builtins.ReprojectODC
+    _target_: aereo.builtins.reproject:reproject_odc
   write:
-    _target_: aereo.builtins.WriteGeoTIFF
+    _target_: aereo.builtins.write:write_geotiff
 ```
 
 Search providers and task builders are **not** part of the job model; they are
@@ -308,16 +317,16 @@ Plugins are discovered automatically via Python `entry_points` in the
         ┌───────────┼───────────┐
         ▼           ▼           ▼
 ┌─────────────┐ ┌───────────┐ ┌─────────────┐
-│ SearchProvider│ │  Reader   │ │ Reprojector │
-│  (abstract) │ │ (abstract)│ │  (abstract) │
+│ Searcher    │ │ Reader    │ │ Reprojector │
+│ function    │ │ function  │ │ function    │
 └──────┬──────┘ └─────┬─────┘ └──────┬──────┘
        │              │              │
-  ┌────┴────┐    ┌────┴────┐    ┌────┴────┐
-  ▼         ▼    ▼         ▼    ▼         ▼
+   ┌───┴───┐     ┌────┴────┐    ┌────┴────┐
+   ▼       ▼     ▼         ▼    ▼         ▼
 ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────────────┐
-│Search │ │Search│ │Read  │ │Read  │ │ReprojectODC  │
-│STAC   │ │Earth-│ │ODC   │ │Satpy │ │ReprojectSatpy│
-│       │ │access│ │STAC  │ │      │ │              │
+│search│ │search│ │read  │ │read  │ │reproject_odc │
+│_stac │ │_earth│ │_odc  │ │_satpy│ │reproject_    │
+│      │ │access│ │_stac │ │      │ │satpy         │
 └──────┘ └──────┘ └──────┘ └──────┘ └──────────────┘
 ```
 
@@ -325,8 +334,8 @@ Declare plugins in `pyproject.toml`:
 
 ```toml
 [project.entry-points."aereo.plugins"]
-my_searcher = "my_package.module:MySearchProvider"
-my_reader = "my_package.module:MyReader"
+my_searcher = "my_package.module:my_search_function"
+my_reader = "my_package.module:my_reader_function"
 ```
 
 ---

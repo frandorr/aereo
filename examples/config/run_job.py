@@ -22,13 +22,10 @@ from __future__ import annotations
 import argparse
 import os
 from pathlib import Path
-from typing import Any
 
-import hydra
 from aereo.executors import LocalExecutor
 from aereo.interfaces import SearchProvider, TaskBuilder
-from aereo.pipeline import ExtractionJob
-from omegaconf import OmegaConf
+from aereo.pipeline import ExtractionJob, load_plugin
 
 
 DRY_RUN = os.environ.get("DRY_RUN", "false").lower() in ("1", "true", "yes")
@@ -45,22 +42,6 @@ def load_job(config_dir: Path, config_name: str = "job_sentinel2") -> Extraction
         A validated ``ExtractionJob`` instance.
     """
     return ExtractionJob.load_from_config(config_dir, config_name=config_name)
-
-
-def load_plugin(config_dir: Path, group: str, name: str) -> Any:
-    """Load a single plugin from a config group file.
-
-    Args:
-        config_dir: Directory containing the Hydra config package.
-        group: Config group directory name (e.g. ``search`` or ``task_builder``).
-        name: Config file name (without ``.yaml``).
-
-    Returns:
-        The instantiated plugin.
-    """
-    path = config_dir / group / f"{name}.yaml"
-    cfg = OmegaConf.load(path)
-    return hydra.utils.instantiate(cfg, _convert_="all")
 
 
 def load_plugins(
