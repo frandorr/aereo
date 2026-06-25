@@ -28,10 +28,9 @@ search:
   stac_api_url: "https://stac"
   collections:
     s2: []
-pipeline:
-  - _target_: aereo.builtins.ReadODCSTAC
-  - _target_: aereo.builtins.ReprojectODC
-  - _target_: aereo.builtins.WriteGeoTIFF
+task_builder:
+  _target_: aereo.builtins.task_builder.GroupedTaskBuilder
+  cells_per_task: 50
 grid_config:
   _target_: aereo.interfaces.GridConfig
   target_grid_dist: 50000
@@ -39,6 +38,13 @@ patch_config:
   _target_: aereo.interfaces.PatchConfig
   resolution: 10.0
 output_uri: "out"
+extract:
+  read:
+    _target_: aereo.builtins.ReadODCSTAC
+  reproject:
+    _target_: aereo.builtins.ReprojectODC
+  write:
+    _target_: aereo.builtins.WriteGeoTIFF
 """
         )
         run_cli_config(tmp_path, "config", [])
@@ -83,12 +89,12 @@ search: null
         assert excinfo.value.code == 1
 
 
-class TestPrepare:
-    def test_prepare_missing_search_results(self, tmp_path: Path):
+class TestBuildTasks:
+    def test_build_tasks_missing_search_results(self, tmp_path: Path):
         config_yaml = tmp_path / "config.yaml"
         config_yaml.write_text(
             """
-action: prepare
+action: build-tasks
 verbose: false
 search_results: null
 """
