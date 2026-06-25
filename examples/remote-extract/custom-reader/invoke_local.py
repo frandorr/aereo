@@ -22,7 +22,7 @@ from aereo.grid import ExtractionPatch
 from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
-from aereo.serialization import TaskSerializer
+from aereo.executors._serialization import _TaskSerializer
 from my_reader import SyntheticReader
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
@@ -59,7 +59,6 @@ def _make_task() -> ExtractionTask:
         grid_config=GridConfig(target_grid_dist=50_000),
         patch_config=PatchConfig(resolution=100.0),
         output_uri="/tmp/aereo/output",
-        search=None,
         extract=ExtractConfig(
             read=SyntheticReader(),
             reproject=ReprojectODC(),
@@ -76,7 +75,7 @@ def _make_task() -> ExtractionTask:
 
 def main() -> int:
     task = _make_task()
-    task_bytes = TaskSerializer().serialize_to_bytes(task)
+    task_bytes = _TaskSerializer().serialize_to_bytes(task)
 
     payload = {
         "mode": "direct",

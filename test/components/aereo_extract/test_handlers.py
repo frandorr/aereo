@@ -15,7 +15,7 @@ from aereo.grid import ExtractionPatch
 from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
-from aereo.serialization import TaskSerializer
+from aereo.executors._serialization import _TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
 
@@ -65,7 +65,7 @@ def _make_task() -> ExtractionTask:
 def test_handle_event_direct_payload(tmp_path: Any) -> None:
     """Direct mode runs a serialized task and writes results locally."""
     task = _make_task()
-    payload = TaskSerializer().serialize_to_bytes(task)
+    payload = _TaskSerializer().serialize_to_bytes(task)
 
     event = {
         "mode": "direct",
@@ -98,7 +98,7 @@ def test_handle_event_staged_payload(tmp_path: Any):
     mock_boto3.client.return_value = fake_s3
 
     # Stage the task in fake S3
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
 
     with tempfile.TemporaryDirectory() as tmpdir:
         serializer.serialize(task, Path(tmpdir))

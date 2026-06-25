@@ -6,7 +6,7 @@ from aereo.grid import ExtractionPatch
 from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
-from aereo.serialization import TaskSerializer
+from aereo.executors._serialization import _TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
 
@@ -70,7 +70,7 @@ def _make_task(
 
 def test_round_trip_basic(tmp_path: Any) -> None:
     """Serialize and deserialize a basic task; assert equality."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     original = _make_task()
 
     dest = tmp_path / "task_dir"
@@ -118,7 +118,7 @@ def test_round_trip_basic(tmp_path: Any) -> None:
 
 def test_round_trip_with_aoi(tmp_path: Any) -> None:
     """AOI geometry survives round-trip via WKT."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     aoi = Polygon([[-1, -1], [2, -1], [2, 2], [-1, 2]])
     original = _make_task(aoi=aoi)
 
@@ -132,7 +132,7 @@ def test_round_trip_with_aoi(tmp_path: Any) -> None:
 
 def test_round_trip_task_context(tmp_path: Any) -> None:
     """Arbitrary task_context metadata is preserved."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     ctx = {"chunk_id": 7, "total_chunks": 42, "extractor_hint": "aereo-extract-dummy"}
     original = _make_task(task_context=ctx)
 
@@ -145,7 +145,7 @@ def test_round_trip_task_context(tmp_path: Any) -> None:
 
 def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
     """Tasks with several patches reconstruct every patch faithfully."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
 
     df = gpd.GeoDataFrame(
         {
@@ -213,7 +213,7 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
 
 def test_assets_crs_preserved(tmp_path: Any) -> None:
     """The assets GeoDataFrame CRS is preserved through GeoParquet round-trip."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     original = _make_task()
 
     dest = tmp_path / "task_crs"
@@ -226,7 +226,7 @@ def test_assets_crs_preserved(tmp_path: Any) -> None:
 
 def test_serialize_to_bytes_round_trip() -> None:
     """Task round-trips through a zip byte payload."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     original = _make_task()
 
     payload = serializer.serialize_to_bytes(original)
@@ -241,7 +241,7 @@ def test_serialize_to_bytes_round_trip() -> None:
 
 def test_serialize_to_bytes_preserved_crs() -> None:
     """Assets CRS survives byte payload round-trip."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     original = _make_task()
 
     payload = serializer.serialize_to_bytes(original)

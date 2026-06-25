@@ -28,7 +28,7 @@ def test_handler_missing_output_prefix():
 
 @patch("aereo.lambda_handler.core._serializer")
 @patch("aereo.lambda_handler.core.run_task")
-@patch("aereo.lambda_handler.core.CloudTaskStaging")
+@patch("aereo.lambda_handler.core._CloudTaskStaging")
 def test_handler_success(
     mock_staging_class: MagicMock,
     mock_run_task: MagicMock,
@@ -102,7 +102,7 @@ def _make_artifact_with_local_file(tmp_path: Path) -> GeoDataFrame[ArtifactSchem
 
 @patch("aereo.lambda_handler.core._serializer")
 @patch("aereo.lambda_handler.core.run_task")
-@patch("aereo.lambda_handler.core.CloudTaskStaging")
+@patch("aereo.lambda_handler.core._CloudTaskStaging")
 def test_handler_uploads_geotiffs_and_updates_uris(
     mock_staging_class: MagicMock,
     mock_run_task: MagicMock,

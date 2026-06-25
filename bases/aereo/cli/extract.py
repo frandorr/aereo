@@ -82,7 +82,7 @@ from aereo.grid import ExtractionPatch
 from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
-from aereo.serialization import TaskSerializer
+from aereo.executors._serialization import _TaskSerializer
 from {package}.custom_reader import CustomReader
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
@@ -135,7 +135,7 @@ def _make_task() -> ExtractionTask:
 
 def main() -> int:
     task = _make_task()
-    task_bytes = TaskSerializer().serialize_to_bytes(task)
+    task_bytes = _TaskSerializer().serialize_to_bytes(task)
     payload = {{
         "mode": "direct",
         "task": base64.b64encode(task_bytes).decode("ascii"),

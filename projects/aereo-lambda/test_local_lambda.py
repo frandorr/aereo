@@ -33,7 +33,7 @@ from aereo.grid import ExtractionPatch  # noqa: E402
 from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig  # noqa: E402
 from aereo.pipeline import ExtractionJob  # noqa: E402
 from aereo.schemas import AssetSchema  # noqa: E402
-from aereo.serialization import TaskSerializer  # noqa: E402
+from aereo.executors._serialization import _TaskSerializer  # noqa: E402
 from pandera.typing.geopandas import GeoDataFrame  # noqa: E402
 from test_pipeline import TestReader, TestReprojector, TestWriter  # noqa: E402
 
@@ -87,7 +87,6 @@ def _make_minimal_task() -> ExtractionTask:
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="/tmp/aereo_lambda_test",
-        search=None,
         extract=ExtractConfig(
             read=TestReader(),
             reproject=TestReprojector(),
@@ -114,7 +113,7 @@ def setup_bucket() -> None:
 
 def stage_task(task: ExtractionTask) -> str:
     s3 = _get_s3_client()
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
 
     with tempfile.TemporaryDirectory() as tmpdir:
         task_dir = Path(tmpdir)
