@@ -1,9 +1,11 @@
 read:
-  _target_: aereo.read_satpy.ReadSatpy
+  _target_: aereo.read_satpy.read_satpy
+  _partial_: true
   reader: viirs_l1b
   wishlist: ["I04"]
 reproject:
-  _target_: aereo.reproject_satpy.ReprojectSatpy
+  _target_: aereo.reproject_satpy.reproject_satpy
+  _partial_: true
   resampling: nearest
 write:
   _target_: aereo.builtins.write.write_geotiff

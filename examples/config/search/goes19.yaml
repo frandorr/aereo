@@ -1,4 +1,5 @@
-_target_: aereo.search_aws_goes.SearchAwsGoes
+_target_: aereo.search_aws_goes.search_aws_goes
+_partial_: true
 collections:
   ABI-L1b-RadF: ["C02"]
 intersects: config/aoi/cordoba.geojson

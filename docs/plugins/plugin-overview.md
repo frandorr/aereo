@@ -31,14 +31,14 @@ The data orchestration lifecycle has three core stages:
 
 The `aereo.builtins` package ships with ready-to-use functions:
 
-| Stage | Built-in functions |
-|-------|--------------------|
-| Search | `search_stac`, `search_earthaccess` |
-| Reader | `read_odc_stac` |
-| Processor | `select_bands`, `qa_mask`, `ndvi`, `normalize`, `composite` |
-| Reprojector | `reproject_odc` |
-| Writer | `write_geotiff` |
-| Task builder | `build_grouped_tasks` |
+| Stage | Built-in functions | Input | Output |
+|-------|--------------------|-------|--------|
+| Search | `search_stac`, `search_earthaccess` | `(collections, intersects, start_datetime, end_datetime, **kwargs)` | `GeoDataFrame[AssetSchema]` |
+| Reader | `read_odc_stac` | `ExtractionTask` | `xr.Dataset` |
+| Processor | `select_bands`, `qa_mask`, `ndvi`, `normalize`, `composite` | `xr.Dataset` | `xr.Dataset` |
+| Reprojector | `reproject_odc` | `(xr.Dataset, ExtractionTask, **kwargs)` | `dict[str, xr.Dataset]` (keyed by patch id) |
+| Writer | `write_geotiff` | `(xr.Dataset, ExtractionTask, ExtractionPatch)` | `GeoDataFrame[ArtifactSchema]` |
+| Task builder | `build_grouped_tasks` | `(GeoDataFrame[AssetSchema], ExtractionJob)` | `Sequence[ExtractionTask]` |
 
 External plugins (installed separately) provide additional readers,
 reprojectors, and search providers, such as `read_satpy`, `reproject_satpy`,
