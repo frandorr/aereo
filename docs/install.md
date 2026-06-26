@@ -59,8 +59,20 @@ pip install aereo-read-satpy
 pip install aereo-read-satpy aereo-reproject-satpy
 ```
 
-Use these when your pipeline stages use `ReadSatpy` or `ReprojectSatpy` instead
-of the built-in ODC-STAC stages.
+Use these when your pipeline stages use ``read_satpy`` or
+``reproject_satpy`` instead of the built-in ODC-STAC stages.
+
+```yaml
+# example extract config snippet
+read:
+  _target_: aereo.read_satpy.core:read_satpy
+  _partial_: true
+  reader: abi_l1b
+  wishlist: ["C02"]
+reproject:
+  _target_: aereo.reproject_satpy.core:reproject_satpy
+  _partial_: true
+```
 
 ### Tessera
 

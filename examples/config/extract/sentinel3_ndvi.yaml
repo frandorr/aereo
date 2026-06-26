@@ -1,13 +1,16 @@
 read:
-  _target_: aereo.read_satpy.ReadSatpy
+  _target_: aereo.read_satpy.read_satpy
+  _partial_: true
   reader: olci_l1b
   wishlist: ["Oa08", "Oa17"]
 preprocess:
   - _target_: aereo.builtins.processor.ndvi
+    _partial_: true
     ndvi_nir_band: Oa08
     ndvi_red_band: Oa17
 reproject:
-  _target_: aereo.reproject_satpy.ReprojectSatpy
+  _target_: aereo.reproject_satpy.reproject_satpy
+  _partial_: true
   resampling: nearest
 write:
   _target_: aereo.builtins.write.write_geotiff
