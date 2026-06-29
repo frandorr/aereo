@@ -8,7 +8,7 @@ extraction framework.
 ```text
 examples/
 ├── *.ipynb                 # Jupyter notebooks (one per sensor / workflow)
-├── config/                 # Hydra config package (search, grid, patch, extract, aoi)
+├── config/                 # Hydra config package (search, grid, patch, read, write, aoi)
 └── serverless/             # AWS Lambda deployment examples
 ```
 
@@ -41,14 +41,15 @@ end_datetime: "2024-01-10T23:59:59Z"
 ```
 
 ```yaml
-# examples/config/extract/sentinel2.yaml
+# examples/config/read/sentinel2.yaml
 read:
-  _target_: aereo.builtins.ReadODCSTAC
-reproject:
-  _target_: aereo.builtins.ReprojectODC
-  resampling: nearest
+  _target_: aereo.builtins.read.read_odc_stac
+```
+
+```yaml
+# examples/config/write/sentinel2.yaml
 write:
-  _target_: aereo.builtins.WriteGeoTIFF
+  _target_: aereo.builtins.write.write_geotiff
 ```
 
 Load the full job from the config package:
@@ -78,9 +79,10 @@ cd examples/config
 # Full pipeline
 aereo action=run \
   search=sentinel2_pc \
-  grid_config=grid_10km \
+  grid_dist=grid_10km \
   patch_config=patch_10m \
-  extract=sentinel2
+  read=sentinel2 \
+  write=sentinel2
 
 # Search only
 aereo action=search search=sentinel2_pc

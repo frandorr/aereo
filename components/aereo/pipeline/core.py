@@ -14,12 +14,11 @@ import hydra
 from omegaconf import OmegaConf
 from aereo.executors.core import Executor, LocalExecutor
 from aereo.interfaces import (
-    ExtractConfig,
     ExtractionTask,
-    GridConfig,
-    PatchConfig,
+    Reader,
     SearchProvider,
     TaskBuilder,
+    Writer,
 )
 from aereo.interfaces.utils import (
     _prepare_config_for_instantiate,
@@ -67,10 +66,10 @@ def load_plugin(config_dir: str | Path, group: str, name: str) -> Any:
 class ExtractionJob(BaseModel):
     """Declarative configuration tree for a complete extraction job.
 
-    Bundles grid/patch settings, an output URI, and extraction pipeline stages
-    together into a single validated Hydra-compatible model. Search providers
-    and task builders are supplied at runtime to the orchestration methods
-    rather than stored on the job.
+    Bundles grid size, output URI, and reader/writer callables together into a
+    single validated Hydra-compatible model. Search providers and task builders
+    are supplied at runtime to the orchestration methods rather than stored on
+    the job.
     """
 
     model_config = {"extra": "forbid", "frozen": True, "arbitrary_types_allowed": True}
@@ -79,16 +78,9 @@ class ExtractionJob(BaseModel):
         default="default",
         description="Human-readable job name used to identify outputs.",
     )
-    derivative: str | None = Field(
-        default=None,
-        description=(
-            "Name of the derivative pipeline. When set, output files are placed "
-            "under a ``derivatives/<name>/`` subdirectory of ``output_uri``, "
-            "following the EOIDS convention for processed/derived products."
-        ),
+    grid_dist: int = Field(
+        description="Grid cell size in metres for partitioning the AOI."
     )
-    grid_config: GridConfig
-    patch_config: PatchConfig
     output_uri: str = Field(
         description="Destination URI for extracted artifacts (local path or object store)."
     )
@@ -99,7 +91,11 @@ class ExtractionJob(BaseModel):
             "When True, always execute tasks and overwrite existing caches."
         ),
     )
-    extract: ExtractConfig
+    read: Reader
+    write: Writer | None = Field(
+        default=None,
+        description="Optional writer callable. When omitted, execution produces no artifacts.",
+    )
     target_aoi: BaseGeometry | dict[str, Any] | str | Path | None = Field(
         default=None,
         description=(
@@ -330,14 +326,14 @@ class ExtractionJob(BaseModel):
         target classes using hydra.utils.instantiate, and returns an
         ExtractionJob instance.
 
-        The expected YAML layout places ``grid_config``, ``patch_config``,
-        ``output_uri`` and ``extract`` as top-level keys, enabling Hydra config
-        package composition::
+        The expected YAML layout places ``grid_dist``, ``output_uri``,
+        ``read`` and ``write`` as top-level keys, enabling Hydra config package
+        composition::
 
             defaults:
-              - grid_config: default
-              - patch_config: base
-              - extract: sentinel2
+              - grid_dist: default
+              - read: sentinel2
+              - write: geotiff
               - _self_
 
             output_uri: /tmp/extraction

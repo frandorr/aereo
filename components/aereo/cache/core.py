@@ -68,23 +68,15 @@ class TaskResultCache:
         any other output-affecting setting invalidate the cache.
         """
         job = task.job
-        extract = job.extract
 
         job_data: dict[str, Any] = {
             "name": job.name,
-            "derivative": job.derivative,
-            "grid_config": job.grid_config.model_dump(mode="json"),
-            "patch_config": job.patch_config.model_dump(mode="json"),
+            "grid_dist": job.grid_dist,
             "output_uri": job.output_uri,
             "target_aoi": _geometry_to_wkt(job.target_aoi),
             # overwrite is a runtime control, not an output characteristic.
-            "extract": {
-                "read": _model_dump(extract.read),
-                "preprocess": [_model_dump(p) for p in extract.preprocess],
-                "reproject": _model_dump(extract.reproject),
-                "postprocess": [_model_dump(p) for p in extract.postprocess],
-                "write": _model_dump(extract.write),
-            },
+            "read": _model_dump(job.read),
+            "write": _model_dump(job.write),
         }
 
         assets_df = task.assets.copy()

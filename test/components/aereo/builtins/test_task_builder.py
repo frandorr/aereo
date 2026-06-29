@@ -12,7 +12,7 @@ from shapely.geometry import box
 
 from aereo.builtins.read import read_odc_stac
 from aereo.builtins.task_builder import build_grouped_tasks
-from aereo.interfaces.core import ExtractConfig, GridConfig, PatchConfig
+from aereo.interfaces.core import PatchConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -20,15 +20,15 @@ from pandera.typing.geopandas import GeoDataFrame
 
 def _make_job(output_uri: str = "s3://test/output") -> ExtractionJob:
     """Return a minimal ExtractionJob for task-builder tests."""
-    grid_config = GridConfig(target_grid_dist=10_000)
-    patch_config = PatchConfig(resolution=10.0)
-    extract = ExtractConfig(read=read_odc_stac)
     return ExtractionJob(
-        grid_config=grid_config,
-        patch_config=patch_config,
+        grid_dist=10_000,
         output_uri=output_uri,
-        extract=extract,
+        read=read_odc_stac,
     )
+
+
+def _make_patch_config() -> PatchConfig:
+    return PatchConfig(resolution=10.0)
 
 
 def _make_assets(
@@ -68,7 +68,7 @@ def test_grouped_task_builder_groups_by_crs():
     )
 
     builder = build_grouped_tasks
-    tasks = list(builder(assets, _make_job()))
+    tasks = list(builder(assets, _make_job(), patch_config=_make_patch_config()))
 
     assert len(tasks) == 2
     task_crs = {t.task_context.get("crs") for t in tasks}
@@ -86,7 +86,7 @@ def test_grouped_task_builder_warns_without_crs():
 
     builder = build_grouped_tasks
     with pytest.warns(UserWarning, match="no 'crs' column"):
-        tasks = list(builder(assets, _make_job()))
+        tasks = list(builder(assets, _make_job(), patch_config=_make_patch_config()))
 
     assert len(tasks) == 1
     assert tasks[0].task_context.get("crs") is None
@@ -104,7 +104,7 @@ def test_grouped_task_builder_rejects_partial_crs():
 
     builder = build_grouped_tasks
     with pytest.raises(ValueError, match="contains null values"):
-        list(builder(assets, _make_job()))
+        list(builder(assets, _make_job(), patch_config=_make_patch_config()))
 
 
 def test_grouped_task_builder_includes_job_id_in_context():
@@ -113,7 +113,7 @@ def test_grouped_task_builder_includes_job_id_in_context():
     job = _make_job()
 
     builder = build_grouped_tasks
-    tasks = list(builder(assets, job))
+    tasks = list(builder(assets, job, patch_config=_make_patch_config()))
 
     assert len(tasks) == 1
     assert tasks[0].task_context.get("job_id") == job.name
@@ -132,7 +132,7 @@ def test_grouped_task_builder_uses_globally_unique_chunk_ids():
     )
 
     builder = partial(build_grouped_tasks, cells_per_task=1)
-    tasks = list(builder(assets, _make_job()))
+    tasks = list(builder(assets, _make_job(), patch_config=_make_patch_config()))
 
     chunk_ids = [t.task_context.get("chunk_id") for t in tasks]
     assert len(chunk_ids) == len(set(chunk_ids))

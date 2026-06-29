@@ -9,7 +9,7 @@ The Lambda handler at `aereo.lambda_handler.core.handler` receives a single `Ext
 ### What it does
 
 1. **Deserialize** — Downloads a serialized `ExtractionTask` from S3 (GeoParquet + JSON)
-2. **Execute** — Runs `TaskRunner` using the task's own `ExtractConfig` (reader, reprojector, writer)
+2. **Execute** — Runs `TaskRunner` using the task's own `read`/`write` callables
 3. **Store** — Uploads any local GeoTIFF artifacts to S3, updates their URIs, and writes the `GeoDataFrame[ArtifactSchema]` metadata as a Parquet file + manifest JSON back to S3
 
 ### What it does NOT do (current limitations)
@@ -122,8 +122,8 @@ docker compose down -v
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Event JSON    │     │  S3 Download     │     │  ExtractConfig  │
-│  (task_uri)     │────▶│  (task_assets    │────▶│  Pipeline       │
+│   Event JSON    │     │  S3 Download     │     │  ExtractionTask │
+│  (task_uri)     │────▶│  (task_assets    │────▶│  read/write     │
 │                 │     │   + task_meta)   │     │  (TaskRunner)   │
 └─────────────────┘     └──────────────────┘     └─────────────────┘
                                                          │
@@ -234,7 +234,7 @@ Copy plugin wheels into the Docker image alongside the main AEREO wheels. See th
 
 ### Plugin Discovery
 
-Pipeline stages are carried inside each `ExtractionTask` as an `ExtractConfig`, so the Lambda handler does not need to discover them at runtime. Search plugins are still discovered via Python entry points (`aereo.plugins` group) when the client constructs a search on the caller side. Verify installed plugins:
+Pipeline stages are carried inside each `ExtractionTask` as the task's own `read`/`write` callables, so the Lambda handler does not need to discover them at runtime. Search plugins are still discovered via Python entry points (`aereo.plugins` group) when the client constructs a search on the caller side. Verify installed plugins:
 
 ```bash
 docker exec aereo-lambda-aereo-lambda-1 python -c "
@@ -299,7 +299,7 @@ return {
 
 ### "No writer configured"
 
-The staged `ExtractionTask` must have a non-null `job.extract.write` stage. The Lambda handler only uploads files produced by the writer. If the writer is `None`, the result will be an empty `GeoDataFrame` and no GeoTIFFs.
+The staged `ExtractionTask` must have a non-null `job.write` callable. The Lambda handler only uploads files produced by the writer. If the writer is `None`, the result will be an empty `GeoDataFrame` and no GeoTIFFs.
 
 ### "Missing optional dependency 'pyarrow.parquet'"
 

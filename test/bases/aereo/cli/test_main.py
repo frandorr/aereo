@@ -31,20 +31,15 @@ search:
 task_builder:
   _target_: aereo.builtins.task_builder.build_grouped_tasks
   cells_per_task: 50
-grid_config:
-  _target_: aereo.interfaces.GridConfig
-  target_grid_dist: 50000
+grid_dist: 50000
 patch_config:
   _target_: aereo.interfaces.PatchConfig
   resolution: 10.0
 output_uri: "out"
-extract:
-  read:
-    _target_: aereo.builtins.read_odc_stac
-  reproject:
-    _target_: aereo.builtins.reproject_odc
-  write:
-    _target_: aereo.builtins.write_geotiff
+read:
+  _target_: aereo.builtins.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
 """
         )
         run_cli_config(tmp_path, "config", [])

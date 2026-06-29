@@ -2,17 +2,15 @@ from datetime import datetime
 from typing import Any, cast
 
 import geopandas as gpd
+from aereo.builtins.read import read_odc_stac
+from aereo.builtins.write import write_geotiff
 from aereo.grid import ExtractionPatch
-from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
+from aereo.interfaces import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from aereo.executors._serialization import _TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
-
-from aereo.builtins.read import read_odc_stac
-from aereo.builtins.reproject import reproject_odc
-from aereo.builtins.write import write_geotiff
 
 
 def _make_task(
@@ -34,13 +32,6 @@ def _make_task(
         crs="EPSG:4326",
     )
 
-    extract = ExtractConfig(
-        read=read_odc_stac,
-        reproject=reproject_odc,
-        write=write_geotiff,
-    )
-    grid_config = GridConfig(target_grid_dist=50_000)
-    patch_config = PatchConfig(resolution=100.0, margin=10.0, padding=2)
     patch = ExtractionPatch(
         id=cell_id,
         d=50_000,
@@ -52,10 +43,10 @@ def _make_task(
 
     job = ExtractionJob(
         name="test-job",
-        grid_config=grid_config,
-        patch_config=patch_config,
+        grid_dist=50_000,
         output_uri="test_uri",
-        extract=extract,
+        read=read_odc_stac,
+        write=write_geotiff,
         target_aoi=aoi,
     )
 
@@ -83,16 +74,12 @@ def test_round_trip_basic(tmp_path: Any) -> None:
     assert list(reconstructed.assets["id"]) == ["asset_1"]
     assert list(reconstructed.assets["collection"]) == ["GOES"]
 
-    # Extract
-    assert type(reconstructed.extract.read) is type(original.extract.read)
-    assert type(reconstructed.extract.reproject) is type(original.extract.reproject)
-    assert type(reconstructed.extract.write) is type(original.extract.write)
+    # Reader / writer
+    assert type(reconstructed.read) is type(original.read)
+    assert type(reconstructed.write) is type(original.write)
 
     # Grid config
-    assert reconstructed.grid_config == original.grid_config
-
-    # Patch config
-    assert reconstructed.patch_config == original.patch_config
+    assert reconstructed.grid_dist == original.grid_dist
 
     # output URI
     assert reconstructed.output_uri == original.output_uri
@@ -181,16 +168,11 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
         ),
     ]
 
-    extract = ExtractConfig(
-        read=read_odc_stac,
-        reproject=reproject_odc,
-        write=write_geotiff,
-    )
     job = ExtractionJob(
-        grid_config=GridConfig(target_grid_dist=10_000),
-        patch_config=PatchConfig(resolution=10.0, margin=5.0, padding=0),
+        grid_dist=10_000,
         output_uri="out",
-        extract=extract,
+        read=read_odc_stac,
+        write=write_geotiff,
     )
     original = ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),
@@ -233,8 +215,8 @@ def test_serialize_to_bytes_round_trip() -> None:
     reconstructed = serializer.deserialize_from_bytes(payload)
 
     assert len(reconstructed.assets) == len(original.assets)
-    assert type(reconstructed.extract.read) is type(original.extract.read)
-    assert reconstructed.grid_config == original.grid_config
+    assert type(reconstructed.read) is type(original.read)
+    assert reconstructed.grid_dist == original.grid_dist
     assert reconstructed.patches[0].id == original.patches[0].id
     assert reconstructed.task_context == original.task_context
 

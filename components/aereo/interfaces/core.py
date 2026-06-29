@@ -1,32 +1,20 @@
 """Core interface definitions, plugin types, and data models for AEREO.
 
-Defines the GridConfig configuration schemas, Base plugin classes, and task structures
+Defines configuration schemas, Base plugin classes, and task structures
 like SearchProvider, Reader, Writer, and Reprojector.
 """
 
 from __future__ import annotations
 
 from datetime import datetime
-from pathlib import Path
 from typing import (
     TYPE_CHECKING,
-    Annotated,
     Any,
-    Callable,
-    Literal,
     Mapping,
     Protocol,
     Sequence,
     cast,
     runtime_checkable,
-)
-
-from pydantic import BeforeValidator
-
-from .utils import (
-    _import_yaml,
-    _load_json_file,
-    resolve_callable,
 )
 
 if TYPE_CHECKING:
@@ -41,89 +29,10 @@ from pandera.typing.geopandas import GeoDataFrame
 from pydantic import BaseModel, Field
 from shapely.geometry.base import BaseGeometry
 
-GridFilterMode = Literal["intersection", "within", "coverage"]
-
 DEFAULT_CELLS_PER_TASK: int = 50
 WGS84_CRS: str = "epsg:4326"
 
 # Default cell parameter for partitioning tasks.
-
-
-class GridConfig(BaseModel):
-    """Configuration for partitioning an AOI into a regular grid of cells.
-
-    ``GridConfig`` controls how the area of interest is diced into
-    mathematical geographic partitions (grid cells): their size, overlap,
-    and which cells are kept after filtering against the AOI.
-    """
-
-    model_config = {"extra": "forbid", "frozen": True}
-
-    target_grid_dist: int | None = Field(
-        default=None,
-        description="Grid cell size in metres. None means the user must choose explicitly (no defaults).",
-    )
-    target_grid_overlap: bool = Field(
-        default=False,
-        description="Whether grid cells overlap.",
-    )
-    grid_filter_mode: GridFilterMode = Field(
-        default="intersection",
-        description="How to filter grid cells against the AOI.",
-    )
-    min_coverage: float = Field(
-        default=0.0,
-        description="Minimum AOI coverage ratio required when grid_filter_mode='coverage'.",
-    )
-
-    @classmethod
-    def from_yaml(cls, path: str | Path) -> "GridConfig":
-        """Load a GridConfig from a YAML file.
-
-        The file may contain either a top-level ``grid_config`` key mapping
-        to a grid config dictionary, or the grid config fields directly.
-        """
-        yaml = _import_yaml()
-        path = Path(path)
-        data = yaml.safe_load(path.read_text())
-        return cls._from_raw(data)
-
-    @classmethod
-    def from_yaml_string(cls, text: str) -> "GridConfig":
-        """Load a GridConfig from a YAML string."""
-        yaml = _import_yaml()
-        data = yaml.safe_load(text)
-        return cls._from_raw(data)
-
-    @classmethod
-    def from_json(cls, path: str | Path) -> "GridConfig":
-        """Load a GridConfig from a JSON file."""
-        data = _load_json_file(path)
-        return cls._from_raw(data)
-
-    @classmethod
-    def _from_raw(cls, data: dict[str, Any]) -> "GridConfig":
-        """Validate and construct a GridConfig from a raw dict.
-
-        Supports the ``grid_config`` nested-key convention used by YAML files.
-
-        Args:
-            data: Raw dictionary, possibly containing a ``grid_config`` key.
-
-        Returns:
-            A validated GridConfig instance.
-
-        Raises:
-            ValueError: If data is not a dict.
-        """
-        if not isinstance(data, dict):
-            raise ValueError("GridConfig data must be a dict.")
-        if "grid_config" in data:
-            data = data["grid_config"]
-        if isinstance(data, dict):
-            data = dict(data)
-            data.pop("_target_", None)
-        return cls.model_validate(data)
 
 
 class PatchConfig(BaseModel):
@@ -164,8 +73,6 @@ class PatchConfig(BaseModel):
 
 
 AereoPlugin = Any
-
-AnyCallable = Annotated[Callable[..., Any], BeforeValidator(resolve_callable)]
 
 
 @runtime_checkable
@@ -228,18 +135,6 @@ class Writer(Protocol):
         ...
 
 
-class ExtractConfig(BaseModel):
-    """Declarative configuration for an extraction pipeline."""
-
-    model_config = {"extra": "forbid", "frozen": True, "arbitrary_types_allowed": True}
-
-    read: AnyCallable
-    preprocess: Sequence[AnyCallable] = Field(default_factory=list)
-    reproject: AnyCallable | None = None
-    postprocess: Sequence[AnyCallable] = Field(default_factory=list)
-    write: AnyCallable | None = None
-
-
 @runtime_checkable
 class TaskBuilder(Protocol):
     """Builds a sequence of extraction tasks from search results.
@@ -258,7 +153,7 @@ class TaskBuilder(Protocol):
 
         Args:
             search_results: GeoDataFrame of assets returned by a search provider.
-            job: Parent extraction job supplying grid, patch, output, and stage
+            job: Parent extraction job supplying grid, output, and reader/writer
                 configuration.
 
         Returns:
@@ -356,9 +251,14 @@ class ExtractionTask:
     task_context: Mapping[str, Any] = attrs.field(factory=dict)
 
     @property
-    def extract(self) -> ExtractConfig:
-        """Declarative configuration of extraction stages (delegated to ``job``)."""
-        return self.job.extract
+    def read(self) -> Reader:
+        """Reader callable delegated to ``job``."""
+        return self.job.read
+
+    @property
+    def write(self) -> Writer | None:
+        """Writer callable delegated to ``job`` (may be ``None``)."""
+        return self.job.write
 
     @property
     def output_uri(self) -> str:
@@ -366,19 +266,9 @@ class ExtractionTask:
         return self.job.output_uri
 
     @property
-    def grid_config(self) -> GridConfig:
-        """Tiling specification shared by all tasks in this run (delegated to ``job``)."""
-        return self.job.grid_config
-
-    @property
-    def patch_config(self) -> PatchConfig:
-        """ML physical dimensions specification (delegated to ``job``)."""
-        return self.job.patch_config
-
-    @property
-    def derivative(self) -> str | None:
-        """Derivative pipeline name, or ``None`` for raw extraction (delegated to ``job``)."""
-        return self.job.derivative
+    def grid_dist(self) -> int:
+        """Grid cell size in metres shared by all tasks in this run (delegated to ``job``)."""
+        return self.job.grid_dist
 
     def __attrs_post_init__(self) -> None:
         """Validate task invariants after construction.
@@ -414,18 +304,11 @@ class ExtractionTask:
         else:
             all_cells_str = "[]"
 
-        extract_len = (
-            1
-            + len(self.extract.preprocess)
-            + len(self.extract.postprocess)
-            + (1 if self.extract.reproject else 0)
-            + (1 if self.extract.write else 0)
-        )
-
         return (
             f"{self.__class__.__name__}("
             f"n_assets={n_assets}, "
-            f"extract_len={extract_len}, "
+            f"read={self.read is not None}, "
+            f"write={self.write is not None}, "
             f"patches={all_cells_str}, "
             f"output_uri='{self.output_uri}'"
             f")"

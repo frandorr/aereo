@@ -1,7 +1,7 @@
 defaults:
-  - grid_config: grid_50km
-  - patch_config: patch_375m
-  - extract: sentinel3
+  - grid_dist@_global_: grid_50km
+  - read@_global_: sentinel3
+  - write@_global_: sentinel3
   - _self_
 
 name: sentinel3_sample

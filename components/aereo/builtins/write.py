@@ -137,7 +137,6 @@ def write_geotiff(
     collection = collections[0] if collections else None
 
     job_name = task.job.name
-    derivative = task.derivative
 
     # Handle optional time dimension: if present, slice over it.
     has_time = "time" in ds.dims
@@ -165,7 +164,6 @@ def write_geotiff(
             cell_id=cell_id,
             start_time=slice_time,
             end_time=slice_time if has_time else end_time,
-            derivative=derivative,
             suffix="tif",
         )
 

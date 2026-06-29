@@ -13,7 +13,7 @@
 <g id="node1" class="node">
 <title>grid</title>
 <path fill="#e6f7e6" stroke="black" d="M149,-144C149,-144 12,-144 12,-144 6,-144 0,-138 0,-132 0,-132 0,-120 0,-120 0,-114 6,-108 12,-108 12,-108 149,-108 149,-108 155,-108 161,-114 161,-120 161,-120 161,-132 161,-132 161,-138 155,-144 149,-144"/>
-<text text-anchor="middle" x="80.5" y="-129.4" font-family="Helvetica,sans-Serif" font-size="12.00">GridConfig</text>
+<text text-anchor="middle" x="80.5" y="-129.4" font-family="Helvetica,sans-Serif" font-size="12.00">grid_dist</text>
 <text text-anchor="middle" x="80.5" y="-116.4" font-family="Helvetica,sans-Serif" font-size="12.00">MajorTOM grid over AOI</text>
 </g>
 <!-- job -->
@@ -46,7 +46,7 @@
 <g id="node3" class="node">
 <title>extract</title>
 <path fill="#e6f7e6" stroke="black" d="M121,-36C121,-36 40,-36 40,-36 34,-36 28,-30 28,-24 28,-24 28,-12 28,-12 28,-6 34,0 40,0 40,0 121,0 121,0 127,0 133,-6 133,-12 133,-12 133,-24 133,-24 133,-30 127,-36 121,-36"/>
-<text text-anchor="middle" x="80.5" y="-21.4" font-family="Helvetica,sans-Serif" font-size="12.00">ExtractConfig</text>
+<text text-anchor="middle" x="80.5" y="-21.4" font-family="Helvetica,sans-Serif" font-size="12.00">read/write</text>
 <text text-anchor="middle" x="80.5" y="-8.4" font-family="Helvetica,sans-Serif" font-size="12.00">Pipeline stages</text>
 </g>
 <!-- extract&#45;&gt;job -->

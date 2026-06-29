@@ -1,0 +1,6 @@
+read:
+  _partial_: true
+  _target_: aereo.read_satpy.read_satpy
+  reader: viirs_l1b
+  wishlist:
+  - I04

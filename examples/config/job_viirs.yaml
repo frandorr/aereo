@@ -1,7 +1,7 @@
 defaults:
-  - grid_config: grid_50km
-  - patch_config: patch_375m
-  - extract: viirs
+  - grid_dist@_global_: grid_50km
+  - read@_global_: viirs
+  - write@_global_: viirs
   - _self_
 
 name: viirs_sample

@@ -13,13 +13,12 @@ import pandas as pd
 import pytest
 from shapely.geometry import Polygon
 
+from aereo.builtins.read import read_odc_stac
+from aereo.builtins.write import write_geotiff
 from aereo.executors import LambdaExecutor, RetryableLambdaError
-from aereo.interfaces.core import ExtractionTask, ExtractConfig, GridConfig, PatchConfig
+from aereo.interfaces.core import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import ArtifactSchema, AssetSchema
-from aereo.builtins.read import read_odc_stac
-from aereo.builtins.reproject import reproject_odc
-from aereo.builtins.write import write_geotiff
 from pandera.typing.geopandas import GeoDataFrame
 
 
@@ -35,7 +34,6 @@ def _mock_botocore():
 
 
 def _make_task(
-    pipeline: list[Any] | None = None,
     task_context: dict[str, Any] | None = None,
 ) -> ExtractionTask:
     """Return a minimal ExtractionTask for testing."""
@@ -53,18 +51,11 @@ def _make_task(
         crs="EPSG:4326",
     )
 
-    grid_config = GridConfig(target_grid_dist=50_000)
-    patch_config = PatchConfig(resolution=10.0)
-    extract = ExtractConfig(
-        read=read_odc_stac,
-        reproject=reproject_odc,
-        write=write_geotiff,
-    )
     job = ExtractionJob(
-        grid_config=grid_config,
-        patch_config=patch_config,
+        grid_dist=50_000,
         output_uri="test-uri",
-        extract=extract,
+        read=read_odc_stac,
+        write=write_geotiff,
     )
     return ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),

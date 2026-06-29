@@ -1,7 +1,7 @@
 defaults:
-  - grid_config: grid_10km
-  - patch_config: patch_10m
-  - extract: tessera
+  - grid_dist@_global_: grid_10km
+  - read@_global_: tessera
+  - write@_global_: tessera
   - _self_
 
 name: tessera_sample

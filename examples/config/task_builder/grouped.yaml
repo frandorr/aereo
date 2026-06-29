@@ -2,3 +2,8 @@ _target_: aereo.builtins.task_builder.build_grouped_tasks
 _partial_: true
 cells_per_task: 5
 init_params: {}
+patch_config:
+  _target_: aereo.interfaces.PatchConfig
+  resolution: 10.0
+  padding: 0
+  margin: 10.0

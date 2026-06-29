@@ -27,10 +27,7 @@ from aereo.grid import ExtractionPatch
 from shapely.geometry.base import BaseGeometry
 from aereo.interfaces import ExtractionTask
 from aereo.interfaces.core import (
-    ExtractConfig,
-    Processor,
     Reader,
-    Reprojector,
     Writer,
 )
 
@@ -128,24 +125,16 @@ class _TaskSerializer:
     PADDING_KEY = "padding"
     CONFORM_TO_KEY = "conform_to"
 
-    EXTRACT_KEY = "extract"
-    GRID_CONFIG_KEY = "grid_config"
-    PATCH_CONFIG_KEY = "patch_config"
+    READ_KEY = "read"
+    WRITE_KEY = "write"
+    GRID_DIST_KEY = "grid_dist"
     PATCHES_KEY = "patches"
     OUTPUT_URI_KEY = "output_uri"
     URI_KEY = "uri"  # legacy key for backward-compatible deserialization
     AOI_WKT_KEY = "aoi_wkt"
     TASK_CONTEXT_KEY = "task_context"
     JOB_NAME_KEY = "job_name"
-    DERIVATIVE_KEY = "derivative"
     TARGET_AOI_WKT_KEY = "target_aoi_wkt"
-
-    # ExtractConfig stage keys (must stay in sync with ExtractConfig fields)
-    READ_KEY = "read"
-    PREPROCESS_KEY = "preprocess"
-    REPROJECT_KEY = "reproject"
-    POSTPROCESS_KEY = "postprocess"
-    WRITE_KEY = "write"
 
     def serialize(self, task: ExtractionTask, dest_dir: Path) -> None:
         """Write *task* into *dest_dir* as GeoParquet + JSON.
@@ -178,30 +167,16 @@ class _TaskSerializer:
             for patch in task.patches
         ]
 
-        # ExtractConfig → dicts with class paths
-        extract_meta = {
-            self.READ_KEY: PluginSerializer.dumps(task.extract.read),
-            self.PREPROCESS_KEY: [
-                PluginSerializer.dumps(p) for p in task.extract.preprocess
-            ],
-            self.REPROJECT_KEY: PluginSerializer.dumps(task.extract.reproject),
-            self.POSTPROCESS_KEY: [
-                PluginSerializer.dumps(p) for p in task.extract.postprocess
-            ],
-            self.WRITE_KEY: PluginSerializer.dumps(task.extract.write),
-        }
-
         # Metadata → JSON
         meta: dict[str, Any] = {
-            self.EXTRACT_KEY: extract_meta,
-            self.GRID_CONFIG_KEY: task.grid_config.model_dump(mode="json"),
-            self.PATCH_CONFIG_KEY: task.patch_config.model_dump(mode="json"),
+            self.READ_KEY: PluginSerializer.dumps(task.read),
+            self.WRITE_KEY: PluginSerializer.dumps(task.write),
+            self.GRID_DIST_KEY: task.grid_dist,
             self.PATCHES_KEY: patches_meta,
             self.OUTPUT_URI_KEY: task.output_uri,
             self.AOI_WKT_KEY: task.aoi.wkt if task.aoi is not None else None,
             self.TASK_CONTEXT_KEY: dict(task.task_context),
             self.JOB_NAME_KEY: task.job.name,
-            self.DERIVATIVE_KEY: task.job.derivative,
             self.TARGET_AOI_WKT_KEY: (
                 cast(BaseGeometry, task.job.target_aoi).wkt
                 if task.job.target_aoi is not None
@@ -239,29 +214,6 @@ class _TaskSerializer:
 
         meta = json.loads((src_dir / self.META_NAME).read_text(encoding="utf-8"))
 
-        # Reconstruct ExtractConfig
-        extract_data = meta[self.EXTRACT_KEY]
-
-        extract = ExtractConfig(
-            read=cast(Reader, PluginSerializer.loads(extract_data[self.READ_KEY])),
-            preprocess=[
-                cast(Processor, PluginSerializer.loads(p))
-                for p in extract_data[self.PREPROCESS_KEY]
-            ],
-            reproject=cast(
-                Reprojector | None,
-                PluginSerializer.loads(extract_data[self.REPROJECT_KEY]),
-            ),
-            postprocess=[
-                cast(Processor, PluginSerializer.loads(p))
-                for p in extract_data[self.POSTPROCESS_KEY]
-            ],
-            write=cast(
-                Writer | None,
-                PluginSerializer.loads(extract_data[self.WRITE_KEY]),
-            ),
-        )
-
         # Reconstruct the parent ExtractionJob from serialized metadata.
         target_aoi_wkt = meta.get(self.TARGET_AOI_WKT_KEY)
         target_aoi = (
@@ -272,11 +224,12 @@ class _TaskSerializer:
         job = ExtractionJob.model_validate(
             {
                 "name": meta.get(self.JOB_NAME_KEY, "default"),
-                "derivative": meta.get(self.DERIVATIVE_KEY),
-                "grid_config": meta[self.GRID_CONFIG_KEY],
-                "patch_config": meta[self.PATCH_CONFIG_KEY],
+                "grid_dist": meta[self.GRID_DIST_KEY],
                 "output_uri": meta.get(self.OUTPUT_URI_KEY, meta.get(self.URI_KEY)),
-                "extract": extract,
+                "read": cast(Reader, PluginSerializer.loads(meta[self.READ_KEY])),
+                "write": cast(
+                    Writer | None, PluginSerializer.loads(meta[self.WRITE_KEY])
+                ),
                 "target_aoi": target_aoi,
             }
         )

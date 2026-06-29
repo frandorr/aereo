@@ -27,18 +27,9 @@ task_builder:
 
 # ExtractionJob configuration
 name: default
-derivative: null
-grid_config:
-  _target_: aereo.interfaces.GridConfig
-  target_grid_dist: 50000
-patch_config:
-  _target_: aereo.interfaces.PatchConfig
-  resolution: 10.0
-  padding: 0
-  margin: 10.0
-extract:
-  read: null
-  preprocess: []
-  reproject: null
-  postprocess: []
-  write: null
+grid_dist: 50000
+read: null
+write: null
+
+# Patch configuration for the task builder
+patch_config: null

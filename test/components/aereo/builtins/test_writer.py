@@ -13,8 +13,9 @@ import xarray as xr
 from shapely.geometry import Polygon, box
 
 from aereo.builtins import write_geotiff
+from aereo.builtins.read import read_odc_stac
 from aereo.grid import ExtractionPatch
-from aereo.interfaces.core import ExtractionTask, GridConfig, PatchConfig
+from aereo.interfaces.core import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -47,11 +48,6 @@ def _make_dataset(data_vars=None, dims=("band", "y", "x"), shape=(1, 8, 8)):
 
 def _make_task(tmp_path):
     """Return a minimal ExtractionTask for writer tests."""
-    from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import read_odc_stac
-    from aereo.builtins.reproject import reproject_odc
-    from aereo.builtins.write import write_geotiff
-
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
     valid_df["geometry"] = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
@@ -59,8 +55,6 @@ def _make_task(tmp_path):
     valid_df["start_time"] = pd.Timestamp("2026-01-01T12:00:00")
     valid_df["end_time"] = pd.Timestamp("2026-01-01T12:10:00")
 
-    grid_config = GridConfig(target_grid_dist=50_000)
-    patch_config = PatchConfig(resolution=10.0)
     patch = ExtractionPatch(
         id="test_cell",
         d=10_000,
@@ -71,14 +65,10 @@ def _make_task(tmp_path):
         conform_to=None,
     )
     job = ExtractionJob(
-        grid_config=grid_config,
-        patch_config=patch_config,
+        grid_dist=50_000,
         output_uri=str(tmp_path),
-        extract=ExtractConfig(
-            read=read_odc_stac,
-            reproject=reproject_odc,
-            write=write_geotiff,
-        ),
+        read=read_odc_stac,
+        write=write_geotiff,
     )
     return ExtractionTask(
         assets=GeoDataFrame(valid_df),
@@ -288,18 +278,3 @@ def test_write_geotiff_missing_time_bounds_raises(tmp_path):
     writer = write_geotiff
     with pytest.raises(ValueError, match="start_time.*end_time"):
         writer(ds, task, task.patches[0])
-
-
-def test_write_geotiff_derivative_folder(tmp_path):
-    """Derivative jobs are placed under derivatives/<name>/."""
-    import attrs
-
-    ds = _make_dataset()
-    task = _make_task(tmp_path)
-    job_with_derivative = task.job.model_copy(update={"derivative": "ndvi"})
-    task = attrs.evolve(task, job=job_with_derivative)
-    writer = write_geotiff
-    result = writer(ds, task, task.patches[0])
-
-    assert len(result) == 1
-    assert "derivatives/ndvi" in str(result.iloc[0]["uri"])

@@ -10,29 +10,33 @@ This directory demonstrates the Hydra config-package layout enabled by the flat
 │   └── sample.geojson
 ├── search/
 │   └── default.yaml
-├── grid_config/
+├── grid_dist/
 │   └── grid_10km.yaml
 ├── patch_config/
 │   ├── base.yaml
 │   └── high_res.yaml
 ├── task_builder/
 │   └── grouped.yaml
-└── extract/
+├── read/
+│   ├── sentinel2.yaml
+│   ├── viirs.yaml
+│   └── goes.yaml
+└── write/
     ├── sentinel2.yaml
     ├── viirs.yaml
     └── goes.yaml
 ```
 
-`grid_config` and `patch_config` are concrete Pydantic models, so their YAML
-files only need the field values; ``_target_`` is optional. ``_target_`` is
+`grid_dist` is an integer cell size in metres and `patch_config` is a concrete
+Pydantic model, so their YAML files only need the field values; ``_target_`` is
+optional. ``_target_`` is
 required for plugin/config groups that select an implementation, such as
-``extract.read``, ``extract.reproject``, ``extract.write``, and the runtime
-``search`` and ``task_builder`` configs.
+``read``, ``write``, and the runtime ``search`` and ``task_builder`` configs.
 
-Top-level keys (``grid_config``, ``patch_config``, ``output_uri``, ``extract``)
-are first-class citizens of the job config, so they can be swapped
-independently via Hydra ``defaults`` composition. ``search`` and
-``task_builder`` are *runtime* plugins and are not stored on ``ExtractionJob``.
+Top-level keys (``grid_dist``, ``output_uri``, ``read``, ``write``) are
+first-class citizens of the job config, so they can be swapped independently
+via Hydra ``defaults`` composition. ``search`` and ``task_builder`` are
+*runtime* plugins and are not stored on ``ExtractionJob``.
 
 ## Usage
 
@@ -49,8 +53,9 @@ job = ExtractionJob.load_from_config(
 )
 
 print(job.output_uri)
-print(job.grid_config.target_grid_dist)
-print(job.patch_config.resolution)
+print(job.grid_dist)
+print(job.read)
+print(job.write)
 print(job.effective_target_aoi)
 ```
 
@@ -60,7 +65,7 @@ Override configuration values with Hydra-style overrides:
 job = ExtractionJob.load_from_config(
     "examples/config",
     config_name="job_sentinel2",
-    overrides=["patch_config=high_res"],
+    overrides=["grid_dist=grid_50km"],
 )
 ```
 
@@ -71,6 +76,7 @@ separately and pass them to the job orchestration methods. Use the
 ```python
 from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
+from aereo.interfaces import PatchConfig
 from aereo.pipeline import ExtractionJob, load_plugin
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
@@ -82,7 +88,10 @@ assets = job.search(
     collections={"sentinel-2-l2a": ["red", "nir"]},
     intersects="examples/config/aoi/sample.geojson",
 )
-tasks = job.build_tasks(assets, build_grouped_tasks, cells_per_task=5)
+patch_config = PatchConfig(resolution=10.0)
+tasks = job.build_tasks(
+    assets, build_grouped_tasks, patch_config=patch_config, cells_per_task=5
+)
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=4))
 
 # Option B: load them from the same config package
@@ -136,29 +145,14 @@ Or in a single-file ``ExtractionJob`` YAML:
 
 ```yaml
 name: sentinel2_demo
-grid_config:
-  target_grid_dist: 10000
-  grid_filter_mode: intersection
-patch_config:
-  resolution: 10.0
-  padding: 0
+grid_dist: 10000
 output_uri: /tmp/aereo_extraction
 target_aoi: /absolute/path/to/aoi.geojson
-extract:
-  read:
-    _target_: aereo.builtins.read:read_odc_stac
+read:
+  _target_: aereo.builtins.read.read_odc_stac
     ...
-  preprocess:
-    - _target_: aereo.builtins.processor:select_bands
-      ...
-  reproject:
-    _target_: aereo.builtins.reproject:reproject_odc
-    ...
-  postprocess:
-    - _target_: aereo.builtins.processor:ndvi
-      ...
-  write:
-    _target_: aereo.builtins.write:write_geotiff
+write:
+  _target_: aereo.builtins.write.write_geotiff
       ...
 ```
 
@@ -172,14 +166,13 @@ that follows the same flat structure:
 
 ```yaml
 name: sentinel2_demo
-grid_config:
-  target_grid_dist: 10000
-patch_config:
-  resolution: 10.0
+grid_dist: 10000
 output_uri: /tmp/aereo_extraction
-extract:
-  read:
-    _target_: aereo.builtins.read:read_odc_stac
+read:
+  _target_: aereo.builtins.read.read_odc_stac
+    ...
+write:
+  _target_: aereo.builtins.write.write_geotiff
     ...
 ```
 
