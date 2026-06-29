@@ -102,6 +102,8 @@ aereo action=plugins
 | `03b-sentinel3-ndvi.ipynb` | Sentinel-3 OLCI | NDVI processing example |
 | `04-tessera.ipynb` | GeoTessera | Tessera tile search and extraction |
 | `05-goes19.ipynb` | GOES-19 ABI | Public AWS S3 search + Satpy read |
+| `06-swath-to-geobox-odc-vs-faiss.ipynb` | Synthetic swath | Reproject a 2-D lat/lon swath to a UTM GeoBox with `odc-geo` and FAISS nearest neighbours |
+| `06b-viirs-swath-odc-vs-faiss.ipynb` | VIIRS I04 | Three-way comparison (`odc-geo`, Satpy `resample`, FAISS) on a real VIIRS L1B swath from NASA Earthdata |
 
 ## Shared data
 
