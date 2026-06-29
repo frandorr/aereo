@@ -1,4 +1,5 @@
 _target_: aereo.builtins.search.search_stac
+_partial_: true
 stac_api_url: "https://earth-search.aws.element84.com/v1" #"https://planetarycomputer.microsoft.com/api/stac/v1"
 # pystac_open_params:
 #   modifier:
