@@ -25,9 +25,9 @@ The loaded `job` contains everything the pipeline needs:
 ```python
 print(job.name)          # "sentinel2_sample"
 print(job.output_uri)    # "/tmp/aereo_extraction"
-print(job.grid_config)   # GridConfig instance
-print(job.patch_config)  # PatchConfig instance
-print(job.extract)       # ExtractConfig instance
+print(job.grid_dist)     # e.g. 10000
+print(job.read)          # Reader callable
+print(job.write)         # Writer callable
 ```
 
 Search providers and task builders are **runtime** arguments, not part of the
@@ -40,8 +40,7 @@ job = ExtractionJob.load_from_config(
     "examples/config",
     config_name="job_sentinel2",
     overrides=[
-        "patch_config=high_res",
-        "grid_config=grid_50km",
+        "grid_dist=grid_50km",
     ],
 )
 ```
@@ -55,6 +54,7 @@ Once you have a job, the pipeline is always the same three calls:
 ```python
 from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
+from aereo.interfaces import PatchConfig
 from aereo.pipeline import ExtractionJob
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
@@ -71,7 +71,10 @@ results = job.search(
 print(f"Found {len(results)} assets")
 
 # 2. Prepare tasks
-tasks = job.build_tasks(results, build_grouped_tasks, cells_per_task=5)
+patch_config = PatchConfig(resolution=10.0)
+tasks = job.build_tasks(
+    results, build_grouped_tasks, patch_config=patch_config, cells_per_task=5
+)
 print(f"Prepared {len(tasks)} tasks")
 
 # 3. Execute
@@ -99,6 +102,7 @@ Here is a complete, copy-pasteable example using the built-in config package:
 ```python
 from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
+from aereo.interfaces import PatchConfig
 from aereo.pipeline import ExtractionJob
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
@@ -111,7 +115,10 @@ results = job.search(
     start_datetime="2024-01-01T00:00:00Z",
     end_datetime="2024-01-10T23:59:59Z",
 )
-tasks = job.build_tasks(results, build_grouped_tasks, cells_per_task=5)
+patch_config = PatchConfig(resolution=10.0)
+tasks = job.build_tasks(
+    results, build_grouped_tasks, patch_config=patch_config, cells_per_task=5
+)
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 
 print(artifacts[["id", "grid_cell", "uri"]].head())
@@ -129,11 +136,10 @@ from datetime import datetime, timezone
 from aereo.builtins import (
     build_grouped_tasks,
     read_odc_stac,
-    reproject_odc,
     search_stac,
     write_geotiff,
 )
-from aereo.interfaces import ExtractConfig, GridConfig, PatchConfig
+from aereo.interfaces import PatchConfig
 from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
 
@@ -145,20 +151,19 @@ assets = search_stac(
     end_datetime=datetime(2024, 1, 10, tzinfo=timezone.utc),
 )
 
-extract = ExtractConfig(
+job = ExtractionJob(
+    grid_dist=10_000,
+    output_uri="/tmp/aereo_python",
     read=read_odc_stac,
-    reproject=reproject_odc,
     write=write_geotiff,
 )
 
-job = ExtractionJob(
-    grid_config=GridConfig(target_grid_dist=10_000),
+tasks = job.build_tasks(
+    assets,
+    build_grouped_tasks,
     patch_config=PatchConfig(resolution=10.0),
-    output_uri="/tmp/aereo_python",
-    extract=extract,
+    cells_per_task=50,
 )
-
-tasks = job.build_tasks(assets, build_grouped_tasks, cells_per_task=50)
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 job.write_catalog(artifacts)
 ```
@@ -191,15 +196,20 @@ artifacts.to_parquet("/tmp/my_catalog.parquet")
 `build_tasks()` receives a complete ``ExtractionJob``. Make sure ``output_uri``
 is set, either in your YAML config or when constructing the job in Python.
 
-### `ValueError: GridConfig.target_grid_dist must be an explicit integer`
+### `ValueError: ExtractionJob.grid_dist must be an explicit integer`
 
-`build_tasks()` needs a ``GridConfig`` with an explicit ``target_grid_dist``.
+`build_tasks()` needs ``ExtractionJob.grid_dist`` to be an explicit integer.
 Set it in your job config or ``ExtractionJob`` constructor.
 
-### `ValueError: extract must be provided`
+### `ValueError: Pipeline must contain a Reader stage`
 
-``ExtractionJob`` needs an ``ExtractConfig``. When loading from a config package,
-make sure the ``extract:`` group is selected in your YAML defaults.
+``ExtractionJob`` needs a ``read`` callable. When loading from a config package,
+make sure the ``read:`` config is selected in your YAML defaults.
+
+### Missing writer
+
+If execution succeeds but produces no artifacts, check that ``job.write`` is set.
+When loading from a config package, select the ``write:`` config as well.
 
 ### Empty search results
 
@@ -209,5 +219,5 @@ make sure the ``extract:`` group is selected in your YAML defaults.
 
 ### Empty task list
 
-The grid was generated but no cells matched the asset geometry. Try a less
-strict grid filter mode in your config, or a larger AOI.
+The grid was generated but no cells matched the asset geometry. Try a larger
+AOI or a smaller ``grid_dist``.

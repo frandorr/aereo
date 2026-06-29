@@ -14,7 +14,7 @@ from shapely.geometry import box
 
 from aereo.builtins import read_odc_stac
 from aereo.grid import ExtractionPatch
-from aereo.interfaces.core import ExtractionTask, GridConfig, PatchConfig
+from aereo.interfaces.core import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -69,8 +69,6 @@ def _make_task(stac_item_dict: dict[str, Any] | None = None, aoi=None):
     if stac_item_dict is not None:
         valid_df["stac_item"] = [stac_item_dict]
 
-    grid_config = GridConfig(target_grid_dist=50_000)
-    patch_config = PatchConfig(resolution=10.0)
     patch = ExtractionPatch(
         id="test_cell",
         d=10_000,
@@ -80,14 +78,11 @@ def _make_task(stac_item_dict: dict[str, Any] | None = None, aoi=None):
         padding=0,
         conform_to=None,
     )
-    from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import read_odc_stac
 
     job = ExtractionJob(
-        grid_config=grid_config,
-        patch_config=patch_config,
+        grid_dist=50_000,
         output_uri="/tmp/test",
-        extract=ExtractConfig(read=read_odc_stac),
+        read=read_odc_stac,
         target_aoi=aoi,
     )
     return ExtractionTask(
@@ -228,8 +223,6 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
     valid_df["end_time"] = pd.Timestamp("2026-01-01T12:10:00")
     valid_df["stac_item"] = [item_dict, item_dict]
 
-    grid_config = GridConfig(target_grid_dist=50_000)
-    patch_config = PatchConfig(resolution=10.0)
     patch = ExtractionPatch(
         id="test_cell",
         d=10_000,
@@ -239,14 +232,11 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
         padding=0,
         conform_to=None,
     )
-    from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import read_odc_stac
 
     job = ExtractionJob(
-        grid_config=grid_config,
-        patch_config=patch_config,
+        grid_dist=50_000,
         output_uri="/tmp/test",
-        extract=ExtractConfig(read=read_odc_stac),
+        read=read_odc_stac,
     )
     task = ExtractionTask(
         assets=GeoDataFrame(valid_df),

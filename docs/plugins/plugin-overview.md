@@ -21,11 +21,10 @@ The data orchestration lifecycle has three core stages:
 1. **Search**: a search function queries a satellite data collection and returns
    a standardized `AssetSchema` GeoDataFrame.
 2. **Prepare**: `ExtractionJob.build_tasks()` turns search results into
-   `ExtractionTask` objects, using the `GridConfig`, `PatchConfig`, and
-   `ExtractConfig` from the job.
-3. **Execute**: an executor runs each task through the stage pipeline
-   configured in `ExtractConfig`:
-   `read function → preprocess functions → reproject function → postprocess functions → write function`.
+   `ExtractionTask` objects, using the `grid_dist`, `PatchConfig`, and
+   `TaskBuilder`.
+3. **Execute**: an executor runs each task: `read function → write function`
+   once per patch.
 
 ### Built-in stages
 
@@ -38,7 +37,7 @@ The `aereo.builtins` package ships with ready-to-use functions:
 | Processor | `select_bands`, `qa_mask`, `ndvi`, `normalize`, `composite` | `xr.Dataset` | `xr.Dataset` |
 | Reprojector | `reproject_odc` | `(xr.Dataset, ExtractionTask, **kwargs)` | `dict[str, xr.Dataset]` (keyed by patch id) |
 | Writer | `write_geotiff` | `(xr.Dataset, ExtractionTask, ExtractionPatch)` | `GeoDataFrame[ArtifactSchema]` |
-| Task builder | `build_grouped_tasks` | `(GeoDataFrame[AssetSchema], ExtractionJob)` | `Sequence[ExtractionTask]` |
+| Task builder | `build_grouped_tasks` | `(GeoDataFrame[AssetSchema], ExtractionJob, PatchConfig)` | `Sequence[ExtractionTask]` |
 
 External plugins (installed separately) provide additional readers,
 reprojectors, and search providers, such as `read_satpy`, `reproject_satpy`,

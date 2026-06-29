@@ -24,12 +24,11 @@ from shapely.geometry import Polygon
 from aereo.builtins import (
     build_grouped_tasks,
     read_odc_stac,
-    reproject_odc,
     search_stac,
     write_geotiff,
 )
 from aereo.executors import LocalExecutor
-from aereo.interfaces import ExtractConfig, GridConfig, PatchConfig
+from aereo.interfaces import PatchConfig
 from aereo.pipeline import ExtractionJob
 
 DRY_RUN = os.environ.get("DRY_RUN", "false").lower() in ("1", "true", "yes")
@@ -48,36 +47,27 @@ def main() -> None:
         ]
     )
 
+    patch_config = PatchConfig(
+        resolution=10.0,
+        padding=0,
+        margin=10.0,
+        conform_to=None,
+    )
+
     job = ExtractionJob(
         name="quickstart",
-        grid_config=GridConfig(
-            target_grid_dist=10_000,
-            target_grid_overlap=False,
-            grid_filter_mode="intersection",
-            min_coverage=0.0,
-        ),
-        patch_config=PatchConfig(
-            resolution=10.0,
-            padding=0,
-            margin=10.0,
-            conform_to=None,
-        ),
+        grid_dist=10_000,
         output_uri="/tmp/aereo_quickstart",
-        extract=ExtractConfig(
-            read=read_odc_stac,
-            preprocess=[],
-            reproject=reproject_odc,
-            postprocess=[],
-            write=write_geotiff,
-        ),
+        read=read_odc_stac,
+        write=write_geotiff,
         target_aoi=aoi,
     )
 
     print("--- ExtractionJob ---")
     print(f"name: {job.name}")
     print(f"output_uri: {job.output_uri}")
-    print(f"grid_config.target_grid_dist: {job.grid_config.target_grid_dist}")
-    print(f"patch_config.resolution: {job.patch_config.resolution}")
+    print(f"grid_dist: {job.grid_dist}")
+    print(f"patch_config.resolution: {patch_config.resolution}")
 
     if DRY_RUN:
         print("\nDRY_RUN enabled: skipping search/build-tasks/extract.")
@@ -99,7 +89,9 @@ def main() -> None:
         return
 
     print("\n--- Build tasks ---")
-    tasks = job.build_tasks(assets, build_grouped_tasks, cells_per_task=5)
+    tasks = job.build_tasks(
+        assets, build_grouped_tasks, patch_config=patch_config, cells_per_task=5
+    )
     print(f"Built {len(tasks)} task(s)")
 
     print("\n--- Extract ---")

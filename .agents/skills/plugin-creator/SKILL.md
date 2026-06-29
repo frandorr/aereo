@@ -39,10 +39,10 @@ Ask the user (or infer from context) what type of plugin they need, interfaces l
 | Type | Base Class | Method(s) to implement | Typical use case |
 |------|-----------|------------------------|------------------|
 | **Search** | `SearchProvider` | `search()` | Discovering datasets/assets (STAC, CMR, API, etc.) |
-| **Extract** | `Extractor` | `extract()` | Processing/searching assets into raster artifacts (GeoTIFF, netCDF, etc.) |
+| **Extract** | `Reader` / `Writer` | `read()` / `write()` | Processing assets into raster artifacts (GeoTIFF, netCDF, etc.) via callables configured on `ExtractionJob` |
 
 - Search plugins implements "search" method and return a `GeoDataFrame[AssetSchema]`
-- Extract plugins implement the pipeline stages in an `ExtractConfig` (reader, reprojector, processor, writer) and produce a `GeoDataFrame[ArtifactSchema]` with raster output paths and grid metadata. Task preparation is handled by a `TaskBuilder` plugin.
+- Extract plugins provide `Reader` and `Writer` callables that are configured directly on an `ExtractionJob` (e.g. `read=my_reader, write=my_writer`). They produce a `GeoDataFrame[ArtifactSchema]` with raster output paths and grid metadata. Task preparation is handled by a `TaskBuilder` plugin.
 
 ### 2. Gather Reference Plugins as Context
 
@@ -71,7 +71,7 @@ Before writing any code, **read existing plugins** to learn patterns, convention
   - Component: `components/aereo/extract_satpy/core.py`
 
 Also read the base classes to understand the exact signatures:
-- `aereo/components/aereo/interfaces/core.py` — `SearchProvider`, `Extractor`, `AereoProfile`, `ExtractionTask`, `GridConfig`
+- `aereo/components/aereo/interfaces/core.py` — `SearchProvider`, `Reader`, `Writer`, `Reprojector`, `Processor`, `TaskBuilder`, `ExtractionTask`, `ExtractionPatch`, `PatchConfig`
 - `aereo/components/aereo/schemas/core.py` — `AssetSchema`, `ArtifactSchema`
 
 ### 3. Bootstrap from the Template
@@ -95,7 +95,7 @@ The script will:
 1. Validate the project name starts with `aereo-`.
 2. Install `uv` (if missing) and sync dependencies.
 3. Create the Polylith **component** and **project**.
-4. Generate `core.py` with the correct base class (`SearchProvider` or `Extractor`).
+4. Generate `core.py` with the correct base class (`SearchProvider` for search plugins; `Reader`/`Writer` for extract plugins).
 5. Register the `[project.entry-points."aereo.plugins"]` entry point.
 
 #### Important: Fix namespace and naming bugs in the template
@@ -119,7 +119,7 @@ Open the generated `components/aereo/<component_name>/core.py` and implement the
 **Key conventions:**
 - For every plugins, always set `supported_collections: Sequence[str] = ["*"]` (or a specific list) and recommend adding params metadata with `required_params` and `optional_params`. Those will be used by the plugin manager to validate and document the plugin's parameters and give helpful hints to the user.
 - For search: return an empty-but-valid GeoDataFrame via `self._empty_result()` when there are no matches.
-- For extract: read tiling params from `extraction_task.grid_config` and `extraction_task.profile`. Do not hard-code defaults.
+- For extract: read tiling params from `extraction_task.grid_dist` and `extraction_task.profile`. Do not hard-code defaults.
 - Use `structlog.get_logger()` for logging.
 - Use `pandera` schemas (`AssetSchema.validate()`, `ArtifactSchema.validate()`) for DataFrame validation.
 
@@ -146,7 +146,7 @@ The project package (not just the workspace root) must be installed as an editab
    "
    ```
 
-You should see your plugin listed (e.g., `extract_lazycogs = aereo.extract_lazycogs.core:ExtractLazycogs`). If it's missing, the `PluginRegistry` will raise `ValueError: Hinted plugin '...' is not a registered Extractor/SearchProvider`.
+You should see your plugin listed (e.g., `read_lazycogs = aereo.lazycogs.core:read_lazycogs`). If it's missing, the `PluginRegistry` will raise `ValueError: Hinted plugin '...' is not a registered reader/writer/search provider`.
 
 ### 6. Verify the Scaffolding
 

@@ -2,11 +2,8 @@ from typing import cast
 
 import geopandas as gpd
 import pytest
-from aereo.interfaces import (
-    ExtractionTask,
-    GridConfig,
-    PatchConfig,
-)
+from aereo.builtins.read import read_odc_stac
+from aereo.interfaces import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.interfaces.utils import (
     infer_dataset_time_bounds,
@@ -15,26 +12,19 @@ from aereo.interfaces.utils import (
     validate_aereo_dataset,
 )
 from pandera.typing.geopandas import GeoDataFrame
-from pydantic import ValidationError
 from shapely.geometry import Polygon
 
 
 def test_extraction_task_validation():
-    from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import read_odc_stac
-
     df = gpd.GeoDataFrame(
         {"collection": ["GOES"], "start_time": ["2023-01-01"]},
         geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
     )
-    grid_config = GridConfig(target_grid_dist=10_000)
-    patch_config = PatchConfig(resolution=10.0)
-    extract = ExtractConfig(read=read_odc_stac)
+    grid_dist = 10_000
     job = ExtractionJob(
-        grid_config=grid_config,
-        patch_config=patch_config,
+        grid_dist=grid_dist,
         output_uri="test",
-        extract=extract,
+        read=read_odc_stac,
     )
     task = ExtractionTask(
         assets=cast(GeoDataFrame, df),
@@ -42,13 +32,10 @@ def test_extraction_task_validation():
         patches=[],
     )
     assert task.output_uri == "test"
-    assert task.extract.read is not None
+    assert task.read is not None
 
 
 def test_extraction_task_rejects_mixed_crs():
-    from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import read_odc_stac
-
     df = gpd.GeoDataFrame(
         {
             "collection": ["S2", "S2"],
@@ -60,14 +47,11 @@ def test_extraction_task_rejects_mixed_crs():
             Polygon([[2, 0], [3, 0], [3, 1], [2, 1]]),
         ],
     )
-    grid_config = GridConfig(target_grid_dist=10_000)
-    patch_config = PatchConfig(resolution=10.0)
-    extract = ExtractConfig(read=read_odc_stac)
+    grid_dist = 10_000
     job = ExtractionJob(
-        grid_config=grid_config,
-        patch_config=patch_config,
+        grid_dist=grid_dist,
         output_uri="test",
-        extract=extract,
+        read=read_odc_stac,
     )
 
     with pytest.raises(ValueError, match="share the same native CRS"):
@@ -79,9 +63,6 @@ def test_extraction_task_rejects_mixed_crs():
 
 
 def test_extraction_task_accepts_single_crs():
-    from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import read_odc_stac
-
     df = gpd.GeoDataFrame(
         {
             "collection": ["S2", "S2"],
@@ -93,14 +74,11 @@ def test_extraction_task_accepts_single_crs():
             Polygon([[2, 0], [3, 0], [3, 1], [2, 1]]),
         ],
     )
-    grid_config = GridConfig(target_grid_dist=10_000)
-    patch_config = PatchConfig(resolution=10.0)
-    extract = ExtractConfig(read=read_odc_stac)
+    grid_dist = 10_000
     job = ExtractionJob(
-        grid_config=grid_config,
-        patch_config=patch_config,
+        grid_dist=grid_dist,
         output_uri="test",
-        extract=extract,
+        read=read_odc_stac,
     )
 
     task = ExtractionTask(
@@ -111,37 +89,14 @@ def test_extraction_task_accepts_single_crs():
     assert task is not None
 
 
-def test_grid_config_defaults_require_explicit_dist():
-    gc = GridConfig(target_grid_dist=50_000)
-    assert gc.target_grid_dist == 50_000
-    assert gc.target_grid_overlap is False
-    assert gc.grid_filter_mode == "intersection"
-
-
-def test_grid_config_literal_validation():
-    with pytest.raises(ValidationError):
-        GridConfig(grid_filter_mode="invalid")  # type: ignore[arg-type]
-
-
-def test_grid_config_from_yaml_string():
-    yaml_text = """
-    target_grid_dist: 100000
-    target_grid_overlap: true
-    """
-    gc = GridConfig.from_yaml_string(yaml_text)
-    assert gc.target_grid_dist == 100_000
-    assert gc.target_grid_overlap is True
-
-
-def test_grid_config_is_frozen():
-    gc = GridConfig(target_grid_dist=50_000)
-    with pytest.raises(ValidationError):
-        gc.target_grid_dist = 100_000  # type: ignore[misc]
-
-
-def test_grid_config_forbids_extra_fields():
-    with pytest.raises(ValidationError):
-        GridConfig(target_grid_dist=50_000, unknown_field=42)  # type: ignore[call-arg]
+def test_grid_dist_is_int():
+    job = ExtractionJob(
+        grid_dist=50_000,
+        output_uri="test",
+        read=read_odc_stac,
+    )
+    assert job.grid_dist == 50_000
+    assert isinstance(job.grid_dist, int)
 
 
 # ---------------------------------------------------------------------------
@@ -266,21 +221,6 @@ def test_infer_dataset_time_bounds():
     ds = infer_dataset_time_bounds(ds)
     assert ds.attrs["start_time"] == t1
     assert ds.attrs["end_time"] == t2
-
-
-def test_extract_config_rejects_non_writer():
-    from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import read_odc_stac
-
-    class _NotAWriter:
-        pass
-
-    with pytest.raises(ValidationError):
-        ExtractConfig(
-            read=read_odc_stac,
-            reproject=None,
-            write=_NotAWriter(),  # type: ignore[arg-type]
-        )
 
 
 def test_task_staging_protocol_removed():

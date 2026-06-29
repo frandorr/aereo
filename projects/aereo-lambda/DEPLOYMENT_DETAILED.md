@@ -52,8 +52,8 @@ The deployment uses the **production Dockerfile** (`projects/aereo-lambda/Docker
                                  │
                                  ▼
                         ┌──────────────────┐
-                        │  ExtractConfig   │
-                        │  Pipeline        │
+                        │  ExtractionTask  │
+                        │  read/write      │
                         │  (TaskRunner)    │
                         └────────┬─────────┘
                                  │

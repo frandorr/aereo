@@ -5,8 +5,8 @@ from S3, executes it through :func:`~aereo.execution.run_task`, and uploads
 the resulting artifacts (GeoTIFFs + metadata) back to S3.
 
 No plugin registry is required at module load time: the task itself carries
-a fully instantiated :class:`~aereo.interfaces.ExtractConfig` (reader,
-reprojector, writer, etc.) so the runner can execute it directly.
+fully instantiated reader and writer callables on its parent
+:class:`~aereo.pipeline.ExtractionJob` so the runner can execute it directly.
 """
 
 from __future__ import annotations

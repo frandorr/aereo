@@ -22,12 +22,12 @@ User Query / Config
         ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ 2. PREPARE TASKS                                                            │
-│    Input:  search_results + ExtractionJob (grid, patch, extract, output)    │
+│    Input:  search_results + ExtractionJob + patch_config                    │
 │    Output: Sequence[ExtractionTask]                                         │
 │    ──────────────────────────────────────────────────────────────────────── │
 │    task.assets      → GeoDataFrame[AssetSchema]                             │
-│    task.extract     → ExtractConfig (reader / processors / reprojector /    │
-│                       postprocessors / writer)                              │
+│    task.read        → reader callable (delegated from job)                  │
+│    task.write       → writer callable (delegated from job)                  │
 │    task.patches     → Sequence[ExtractionPatch] (UTM cells)                 │
 │    task.output_uri  → destination path                                      │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -38,8 +38,7 @@ User Query / Config
 │    Input:  tasks + Executor                                                 │
 │    Output: GeoDataFrame[ArtifactSchema]                                     │
 │    ──────────────────────────────────────────────────────────────────────── │
-│    Per task: read function → Pre-processors → reproject function →          │
-│    Post-processors → write function                                         │
+│    Per task: read function → write function (per patch)                     │
 └─────────────────────────────────────────────────────────────────────────────┘
         │
         ▼
@@ -143,8 +142,8 @@ into parallelizable units.
          │                           │     (GridDefinition over AOI)   │
          │                           │                                 │
          │                           │─── 3. Filter cells by swath ───▶│
-         │                           │     (intersection/within/       │
-         │                           │      coverage)                  │
+         │                           │     (keep cells touching the    │
+         │                           │      asset geometry)            │
          │                           │                                 │
          │                           │─── 4. Chunk into tasks ────────▶│
          │                           │     (cells_per_task)            │
@@ -157,8 +156,14 @@ into parallelizable units.
 
 ```python
 from aereo.builtins import build_grouped_tasks
+from aereo.interfaces import PatchConfig
 
-tasks = job.build_tasks(results, build_grouped_tasks, cells_per_task=50)
+tasks = job.build_tasks(
+    results,
+    build_grouped_tasks,
+    patch_config=PatchConfig(resolution=10.0),
+    cells_per_task=50,
+)
 ```
 
 `build_tasks()` always receives a complete ``ExtractionJob``. Construct one
@@ -166,22 +171,20 @@ in Python or load it from a Hydra config package:
 
 ```python
 from aereo.pipeline import ExtractionJob
-from aereo.builtins import read_odc_stac, reproject_odc, write_geotiff
+from aereo.interfaces import PatchConfig
+from aereo.builtins import read_odc_stac, write_geotiff
 
 job = ExtractionJob(
-    grid_config=grid_config,
-    patch_config=patch_config,
+    grid_dist=10_000,
     output_uri="/tmp/out",
-    extract=ExtractConfig(
-        read=read_odc_stac,
-        reproject=reproject_odc,
-        write=write_geotiff,
-    ),
+    read=read_odc_stac,
+    write=write_geotiff,
 )
 
 tasks = job.build_tasks(
     results,
     build_grouped_tasks,
+    patch_config=PatchConfig(resolution=10.0),
     cells_per_task=50,
 )
 ```
@@ -194,11 +197,11 @@ Each `ExtractionTask` contains:
 |-----------|------|-------------|
 | `assets` | `GeoDataFrame[AssetSchema]` | The granule batch this task will process. |
 | `patches` | `Sequence[ExtractionPatch]` | Spatial patches this task covers. |
-| `job` | `ExtractionJob` | Parent job owning `extract`, `output_uri`, `grid_config`, and `patch_config`. |
-| `extract` | `ExtractConfig` | Declarative configuration of extraction stages. |
+| `job` | `ExtractionJob` | Parent job owning `read`, `write`, `output_uri`, and `grid_dist`. |
+| `read` | `Reader` | Reader callable delegated from `job`. |
+| `write` | `Writer \| None` | Writer callable delegated from `job`. |
 | `output_uri` | `str` | Destination path or URI for artifacts. |
-| `grid_config` | `GridConfig` | Tiling specification for this run. |
-| `patch_config` | `PatchConfig` | ML physical patch dimensions. |
+| `grid_dist` | `int` | Grid cell size in metres for this run. |
 | `aoi` | `BaseGeometry \| None` | Clipping geometry used during preparation. |
 | `task_context` | `Mapping[str, Any]` | Metadata such as `chunk_id`, `total_chunks`, `start_time`. |
 
@@ -208,27 +211,24 @@ Each `ExtractionTask` contains:
 
 ### Purpose
 
-Run every `ExtractionTask` through a configurable executor. Each task is handed
-to a stage pipeline that reads data, optionally processes it, reprojects it to
-the target grid, optionally processes it again, and writes the result.
+Run every `ExtractionTask` through a configurable executor. Each task calls its
+reader once and then calls its writer once per patch.
 
 ### Stage pipeline
 
 ```text
-┌─────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│ read fn     │───▶ │ pre-processors  │───▶ │ reproject fn    │───▶ │ post-processors  │───▶ │ write fn        │
-└─────────────┘     └─────────────────┘     └─────────────────┘     └──────────────────┘     └─────────────────┘
+┌─────────────┐     ┌─────────────────┐
+│ read fn     │───▶ │ write fn        │
+└─────────────┘     └─────────────────┘
 ```
 
 | Stage | Responsibility |
 |-------|----------------|
 | **Reader** | Open the source asset and return an `xr.Dataset`. |
-| **Processors** | Transform data: select bands, compute NDVI, mask clouds, normalize, composite. |
-| **Reprojector** | Reproject to the task's target grid / GeoBox. |
-| **Writer** | Write final artifacts to disk or object store in EOIDS layout. |
+| **Writer** | Write final artifacts to disk or object store in EOIDS layout, once per patch. |
 
-Each stage is a plain Python function. Readers, reprojectors, and writers receive
-the `ExtractionTask`; processors receive only the `xr.Dataset`.
+The reader runs once per task; the writer runs once per patch. Both receive the
+`ExtractionTask`; the writer also receives the dataset and the current patch.
 
 ### API
 
@@ -274,28 +274,21 @@ from aereo.pipeline import ExtractionJob
 job = ExtractionJob.load_from_config(
     "examples/config",
     config_name="job_sentinel2",
-    overrides=["patch_config=high_res"],
+    overrides=["grid_dist=grid_50km"],
 )
 ```
 
-Or write the same layout as a single YAML file. `grid_config` and
-`patch_config` are concrete Pydantic models, so they do not need `_target_`;
-plugin stages inside `extract` do:
+Or write the same layout as a single YAML file. `grid_dist` is a concrete value,
+so it does not need `_target_`; plugin stages selected by `read` and `write` do:
 
 ```yaml
 name: sentinel2_demo
 output_uri: /tmp/aereo_extraction
-grid_config:
-  target_grid_dist: 10000
-patch_config:
-  resolution: 10.0
-extract:
-  read:
-    _target_: aereo.builtins.read:read_odc_stac
-  reproject:
-    _target_: aereo.builtins.reproject:reproject_odc
-  write:
-    _target_: aereo.builtins.write:write_geotiff
+grid_dist: 10000
+read:
+  _target_: aereo.builtins.read.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
 ```
 
 Search providers and task builders are **not** part of the job model; they are

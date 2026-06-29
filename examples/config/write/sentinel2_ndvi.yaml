@@ -1,0 +1,2 @@
+write:
+  _target_: aereo.builtins.write.write_geotiff

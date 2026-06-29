@@ -54,9 +54,10 @@ A job bundles four things:
 
 | Ingredient | Purpose |
 |------------|---------|
-| `grid_config` | How the AOI is tiled into Major TOM cells. |
+| `grid_dist` | How the AOI is tiled into Major TOM cells. |
 | `patch_config` | Physical patch dimensions for extraction. |
-| `extract` | The stage pipeline: reader, reprojector, writer, processors. |
+| `read` | Callable that opens assets into an `xr.Dataset`. |
+| `write` | Callable that writes extracted patches to disk or object store. |
 | `output_uri` | Where artifacts and the catalog are written. |
 
 Search providers and task builders are runtime arguments, not part of the job.
@@ -94,8 +95,12 @@ validated `GeoDataFrame[AssetSchema]`.
 
 ```python
 from aereo.builtins import build_grouped_tasks
+from aereo.interfaces import PatchConfig
 
-tasks = job.build_tasks(results, build_grouped_tasks, cells_per_task=5)
+patch_config = PatchConfig(resolution=10.0)
+tasks = job.build_tasks(
+    results, build_grouped_tasks, patch_config=patch_config, cells_per_task=5
+)
 print(f"Prepared {len(tasks)} extraction tasks")
 ```
 
@@ -113,8 +118,8 @@ artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 print(f"Extracted {len(artifacts)} artifacts")
 ```
 
-Each task is run through the stage pipeline configured in `job.extract`. The
-result is a `GeoDataFrame[ArtifactSchema]` with one row per extracted GeoTIFF.
+Each task reads its assets once and writes one GeoTIFF per patch. The result is
+a `GeoDataFrame[ArtifactSchema]` with one row per extracted file.
 
 ---
 

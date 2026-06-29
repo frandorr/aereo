@@ -20,7 +20,7 @@ from rich.table import Table
 from shapely.geometry.base import BaseGeometry
 
 from aereo.executors import LocalExecutor
-from aereo.interfaces import ExtractConfig, normalize_geometry_input
+from aereo.interfaces import normalize_geometry_input
 from aereo.interfaces.utils import (
     _extract_geometry_from_geojson,
     _prepare_config_for_instantiate,
@@ -254,28 +254,28 @@ def _build_job(
     Returns:
         Validated ``ExtractionJob`` instance.
     """
-    grid_config = hydra.utils.instantiate(cfg.grid_config)
-    patch_config = hydra.utils.instantiate(cfg.patch_config)
+    grid_dist = cfg.grid_dist
 
     try:
         from omegaconf import OmegaConf
 
-        extract_cfg = OmegaConf.to_container(cfg.extract, resolve=True)
-        extract_prepared = _prepare_config_for_instantiate(extract_cfg)
-        extract_instantiated = hydra.utils.instantiate(
-            extract_prepared, _convert_="all"
-        )
+        read_cfg = OmegaConf.to_container(cfg.read, resolve=True)
+        read_prepared = _prepare_config_for_instantiate(read_cfg)
+        read = hydra.utils.instantiate(read_prepared, _convert_="all")
     except Exception as exc:
-        console.print(f"[red]Invalid extract configuration:[/red] {exc}")
+        console.print(f"[red]Invalid read configuration:[/red] {exc}")
         sys.exit(1)
 
-    if isinstance(extract_instantiated, ExtractConfig):
-        extract = extract_instantiated
-    else:
+    write = None
+    if cfg.get("write") is not None:
         try:
-            extract = ExtractConfig.model_validate(extract_instantiated)
+            from omegaconf import OmegaConf
+
+            write_cfg = OmegaConf.to_container(cfg.write, resolve=True)
+            write_prepared = _prepare_config_for_instantiate(write_cfg)
+            write = hydra.utils.instantiate(write_prepared, _convert_="all")
         except Exception as exc:
-            console.print(f"[red]Invalid extract configuration:[/red] {exc}")
+            console.print(f"[red]Invalid write configuration:[/red] {exc}")
             sys.exit(1)
 
     output_dir = Path(cfg.get("output_dir", "."))
@@ -286,13 +286,12 @@ def _build_job(
 
     return ExtractionJob(
         name=cfg.get("name", "default"),
-        derivative=cfg.get("derivative"),
-        grid_config=grid_config,
-        patch_config=patch_config,
+        grid_dist=grid_dist,
         output_uri=cfg.get("output_uri") or str(output_dir),
         overwrite=cfg.get("overwrite", False),
         target_aoi=target_aoi,
-        extract=extract,
+        read=read,
+        write=write,
     )
 
 
@@ -500,6 +499,12 @@ def _run_build_tasks_action(cfg: DictConfig) -> None:
         _prepare_config_for_instantiate(task_builder_cfg)
     )
 
+    if cfg.get("patch_config") is None:
+        console.print("[red]patch_config is required for build-tasks action.[/red]")
+        sys.exit(1)
+    patch_config = hydra.utils.instantiate(cfg.patch_config)
+    task_builder = update_callable(task_builder, patch_config=patch_config)
+
     job = _build_job(cfg)
 
     build_kwargs: dict[str, Any] = {}
@@ -585,6 +590,12 @@ def _run_run_action(cfg: DictConfig) -> None:
         _prepare_config_for_instantiate(task_builder_cfg)
     )
 
+    if cfg.get("patch_config") is None:
+        console.print("[red]patch_config is required for run action.[/red]")
+        sys.exit(1)
+    patch_config = hydra.utils.instantiate(cfg.patch_config)
+    task_builder = update_callable(task_builder, patch_config=patch_config)
+
     job = _build_job(cfg, fallback=_resolve_target_aoi(cfg))
 
     # Search
@@ -632,6 +643,8 @@ def _run_validate_action(cfg: DictConfig) -> None:
         if cfg.get("task_builder"):
             task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
             hydra.utils.instantiate(_prepare_config_for_instantiate(task_builder_cfg))
+        if cfg.get("patch_config") is not None:
+            hydra.utils.instantiate(cfg.patch_config)
         _build_job(cfg, create_output_dir=False)
         console.print("[green]✓ Configuration is valid.[/green]")
     except Exception as exc:

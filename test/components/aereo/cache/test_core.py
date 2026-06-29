@@ -8,15 +8,9 @@ from unittest.mock import MagicMock
 import geopandas as gpd
 import pandas as pd
 from aereo.builtins.read import read_odc_stac
-from aereo.builtins.reproject import reproject_odc
 from aereo.builtins.write import write_geotiff
 from aereo.cache import TaskResultCache
-from aereo.interfaces.core import (
-    ExtractionTask,
-    ExtractConfig,
-    GridConfig,
-    PatchConfig,
-)
+from aereo.interfaces.core import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -27,7 +21,8 @@ def _make_task(
     output_uri: str = "test-uri",
     task_context: dict[str, Any] | None = None,
     patches: list[Any] | None = None,
-    extract: ExtractConfig | None = None,
+    read: Any = read_odc_stac,
+    write: Any = write_geotiff,
     overwrite: bool = False,
 ) -> ExtractionTask:
     """Return a minimal ExtractionTask for testing the cache."""
@@ -40,18 +35,11 @@ def _make_task(
     valid_df["end_time"] = pd.Timestamp("2024-01-02")
     valid_df["href"] = "https://example.com/asset.tif"
 
-    grid_config = GridConfig(target_grid_dist=50_000)
-    extract = extract or ExtractConfig(
-        read=read_odc_stac,
-        reproject=reproject_odc,
-        write=write_geotiff,
-    )
-
     job = ExtractionJob(
-        grid_config=grid_config,
-        patch_config=PatchConfig(resolution=10.0),
+        grid_dist=50_000,
         output_uri=output_uri,
-        extract=extract,
+        read=read,
+        write=write,
         overwrite=overwrite,
     )
     return ExtractionTask(
@@ -101,21 +89,15 @@ def test_fingerprint_changes_with_assets(tmp_path):
     assert cache.fingerprint(task1) != cache.fingerprint(task2)
 
 
-def test_fingerprint_changes_with_extract_config(tmp_path):
-    """Changing the extract pipeline changes the fingerprint."""
-    from aereo.builtins.processor import normalize
-
+def test_fingerprint_changes_with_read_write(tmp_path):
+    """Changing the read/write pipeline changes the fingerprint."""
     cache = TaskResultCache()
     task1 = _make_task(output_uri=str(tmp_path), patches=[_mock_patch("c1")])
     task2 = _make_task(
         output_uri=str(tmp_path),
         patches=[_mock_patch("c1")],
-        extract=ExtractConfig(
-            read=read_odc_stac,
-            reproject=reproject_odc,
-            write=write_geotiff,
-            postprocess=[normalize],
-        ),
+        read=read_odc_stac,
+        write=None,
     )
 
     assert cache.fingerprint(task1) != cache.fingerprint(task2)

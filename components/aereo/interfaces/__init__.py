@@ -9,10 +9,7 @@ By defining these interfaces, we ensure that all implementations adhere to a con
 
 from aereo.interfaces.core import (
     AereoPlugin,
-    ExtractConfig,
     ExtractionTask,
-    GridConfig,
-    GridFilterMode,
     PatchConfig,
     Processor,
     Reader,
@@ -39,10 +36,7 @@ from aereo.interfaces.utils import (
 
 __all__ = [
     "AereoPlugin",
-    "ExtractConfig",
     "ExtractionTask",
-    "GridConfig",
-    "GridFilterMode",
     "PatchConfig",
     "Processor",
     "Reader",

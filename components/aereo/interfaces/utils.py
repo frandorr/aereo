@@ -19,10 +19,6 @@ from shapely.geometry.base import BaseGeometry
 if TYPE_CHECKING:
     import geopandas as gpd
 
-_YAML_INSTALL_MSG = (
-    "YAML support requires PyYAML. Install it with: pip install 'aereo[yaml]'"
-)
-
 _RIOXARRAY_INSTALL_MSG = "rioxarray support requires rioxarray. Install it with: pip install 'aereo[rioxarray]'"
 
 
@@ -112,12 +108,6 @@ def infer_dataset_time_bounds(ds: xr.Dataset) -> xr.Dataset:
 def _skip_empty(geom: BaseGeometry | None) -> bool:
     """Return True if *geom* is None or empty."""
     return geom is None or geom.is_empty
-
-
-def _load_json_file(path: str | Path) -> dict[str, Any]:
-    """Load and parse a JSON file."""
-    path = Path(path)
-    return json.loads(path.read_text())
 
 
 def normalize_geometry_input(
@@ -220,15 +210,6 @@ def _union_all(geom_series: gpd.GeoSeries) -> BaseGeometry:
     if hasattr(geom_series, "union_all"):
         return geom_series.union_all()
     return geom_series.unary_union
-
-
-def _import_yaml() -> Any:
-    """Import yaml with a clear error message if PyYAML is missing."""
-    try:
-        import yaml
-    except ImportError as exc:
-        raise ImportError(_YAML_INSTALL_MSG) from exc
-    return yaml
 
 
 def resolve_callable(val: Any) -> Any:

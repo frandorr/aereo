@@ -34,17 +34,17 @@ print(f"Generated {len(raw_cells)} cells")
 Each cell receives a Major TOM-style ID such as `922U_249R`. Overlapping cells
 append `_OV` (e.g., `922U_249R_OV`).
 
-### `target_grid_dist` vs. `patch_config.resolution`
+### `grid_dist` vs. `patch_config.resolution`
 
 These two parameters are independent and easy to confuse:
 
 | Parameter | Units | What it controls | Example |
 |-----------|-------|------------------|---------|
-| `target_grid_dist` | metres | Size of each **grid cell** | `256000` → 256 km square cell |
+| `grid_dist` | metres | Size of each **grid cell** | `256000` → 256 km square cell |
 | `patch_config.resolution` | metres | Size of each **output pixel** inside the cell | `10` → 10 m pixel |
 
 A 256 km cell at 500 m resolution is roughly a 512 × 512 pixel tile. If you set
-`target_grid_dist=500` by mistake, every cell collapses to a single pixel.
+`grid_dist=500` by mistake, every cell collapses to a single pixel.
 
 ### Overlapping cells
 
@@ -106,40 +106,8 @@ essential for stacking arrays.
 ## Grid filtering modes
 
 During `build_tasks`, AEREO intersects the generated grid with the **asset
-geometry** (the actual satellite swath footprint, not the AOI). You can control
-how strict that intersection is via the grid config or prepare arguments:
-
-| Mode | Parameter | Behaviour | Use case |
-|------|-----------|-----------|----------|
-| **Intersection** | `grid_filter_mode='intersection'` (default) | Keeps any cell touching the asset geometry | Maximise coverage; may include mostly-empty cells |
-| **Within** | `grid_filter_mode='within'` | Keeps only cells fully inside the asset geometry | Conservative; avoids edge effects |
-| **Coverage** | `grid_filter_mode='coverage'` + `min_coverage=0.5` | Keeps cells where overlap fraction ≥ `min_coverage` | Tunable balance |
-
-```python
-from aereo.interfaces import GridConfig
-
-grid_config = GridConfig(
-    target_grid_dist=128000,
-    grid_filter_mode="coverage",
-    min_coverage=0.5,
-)
-```
-
-### Visual summary
-
-Real VIIRS granule over Buenos Aires with a 128 km grid. Green cells are
-selected for extraction; red cells are discarded.
-
-![Grid cell filtering modes comparison](../assets/grid_filter_modes_comparison.png)
-
-- **Intersection** (left, 34 cells selected) — keeps every cell the swath touches, even at a corner. Maximises coverage but may include mostly-empty cells.
-- **Within** (centre, 24 cells selected) — keeps only cells fully inside the asset geometry. Conservative; avoids edge effects.
-- **Coverage ≥ 50 %** (right, 29 cells selected) — keeps cells where at least half the cell area lies inside the swath. Tunable balance.
-
-The coverage heatmap below shows the exact overlap fraction for every cell.
-Green = fully covered, red = barely covered.
-
-![Cell coverage percentages](../assets/grid_filter_coverage_detail.png)
+geometry** (the actual satellite swath footprint, not the AOI). Any cell that
+touches the asset geometry is kept.
 
 ---
 
@@ -147,18 +115,16 @@ Green = fully covered, red = barely covered.
 
 ### Grid cell size looks wrong
 
-The default `target_grid_dist` is 256 km. If your AOI is a small city, a 256 km
-cell will include a lot of surrounding area.
+`grid_dist` is a required integer cell size in metres. If your AOI is a small
+city, a 256 km cell will include a lot of surrounding area.
 
 **Fix:** Use a smaller cell size:
 
 ```python
-from aereo.interfaces import GridConfig
-
-grid_config = GridConfig(target_grid_dist=50_000)  # 50 km cells
+grid_dist = 50_000  # 50 km cells
 ```
 
-Remember: `target_grid_dist` controls the **cell** size in metres, while
+Remember: `grid_dist` controls the **cell** size in metres, while
 `patch_config.resolution` controls the **pixel** size in metres. A 256 km cell at
 500 m resolution is roughly a 512 × 512 pixel tile.
 

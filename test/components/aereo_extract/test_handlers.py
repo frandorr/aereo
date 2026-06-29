@@ -12,7 +12,7 @@ from unittest.mock import MagicMock, patch
 import geopandas as gpd
 from aereo_extract.handlers import handle_event, handle_lambda
 from aereo.grid import ExtractionPatch
-from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
+from aereo.interfaces import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from aereo.executors._serialization import _TaskSerializer
@@ -22,7 +22,7 @@ from shapely.geometry import Polygon
 
 def _make_task() -> ExtractionTask:
     """Return a minimal extraction task with a test pipeline."""
-    from test_pipeline import TestReader, TestReprojector, TestWriter
+    from test_pipeline import TestReader, TestWriter
 
     df = gpd.GeoDataFrame(
         {
@@ -45,14 +45,10 @@ def _make_task() -> ExtractionTask:
     )
     job = ExtractionJob(
         name="test-job",
-        grid_config=GridConfig(target_grid_dist=50_000),
-        patch_config=PatchConfig(resolution=100.0),
+        grid_dist=50_000,
         output_uri="/tmp/aereo_extract_test",
-        extract=ExtractConfig(
-            read=TestReader(),
-            reproject=TestReprojector(),
-            write=TestWriter(),
-        ),
+        read=TestReader(),
+        write=TestWriter(),
     )
     return ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),

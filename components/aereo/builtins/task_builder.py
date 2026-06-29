@@ -16,7 +16,6 @@ from aereo.grid import ExtractionPatch, GridDefinition, generate_extraction_patc
 from aereo.interfaces.core import (
     DEFAULT_CELLS_PER_TASK,
     ExtractionTask,
-    GridConfig,
     PatchConfig,
 )
 from aereo.interfaces.utils import _skip_empty, _union_all
@@ -26,33 +25,17 @@ from pandera.typing.geopandas import GeoDataFrame
 from pydantic import ConfigDict, validate_call
 from shapely.geometry.base import BaseGeometry
 
-_VALID_FILTER_MODES = frozenset({"intersection", "within", "coverage"})
-
-
-def _validate_filter_mode(mode: str) -> str:
-    """Normalize and validate a grid filter mode string."""
-    mode = str(mode).lower()
-    if mode not in _VALID_FILTER_MODES:
-        raise ValueError(
-            f"Unknown grid_filter_mode: {mode}. "
-            f"Use one of {sorted(_VALID_FILTER_MODES)}."
-        )
-    return mode
-
 
 def _generate_patch_groups(
     assets: GeoDataFrame[AssetSchema],
     target_aoi: BaseGeometry | None,
-    grid_def: Any,
-    grid_config: GridConfig,
+    grid_def: GridDefinition,
     patch_config: PatchConfig,
 ) -> list[tuple[Any, Any, GeoDataFrame, list[ExtractionPatch]]]:
-    """Group assets by start_time and native CRS, then generate/filter patches."""
+    """Group assets by start_time and native CRS, then generate patches."""
     profile_patch_groups: list[
         tuple[Any, Any, GeoDataFrame, list[ExtractionPatch]]
     ] = []
-    grid_filter_mode = _validate_filter_mode(grid_config.grid_filter_mode)
-    min_coverage = grid_config.min_coverage
 
     has_crs = "crs" in assets.columns
     if has_crs and bool(assets["crs"].isna().any()):
@@ -86,13 +69,6 @@ def _generate_patch_groups(
         if not all_patches:
             continue
 
-        if grid_filter_mode != "intersection":
-            all_patches = _filter_patches_by_mode(
-                all_patches, aoi_geom, grid_filter_mode, min_coverage
-            )
-            if not all_patches:
-                continue
-
         profile_patch_groups.append(
             (start_time, crs, cast(GeoDataFrame, time_group), all_patches)
         )
@@ -100,35 +76,11 @@ def _generate_patch_groups(
     return profile_patch_groups
 
 
-def _filter_patches_by_mode(
-    patches: list[ExtractionPatch],
-    aoi_geom: BaseGeometry,
-    mode: str,
-    min_coverage: float,
-) -> list[ExtractionPatch]:
-    """Filter patches by AOI coverage mode."""
-    mode = _validate_filter_mode(mode)
-    if mode == "intersection":
-        return list(patches)
-
-    filtered: list[ExtractionPatch] = []
-    for patch in patches:
-        cell_geom = patch.cell_geometry
-        if mode == "within":
-            if aoi_geom.contains(cell_geom):
-                filtered.append(patch)
-        elif mode == "coverage":
-            intersection = cell_geom.intersection(aoi_geom)
-            coverage = intersection.area / cell_geom.area if cell_geom.area > 0 else 0.0
-            if coverage >= min_coverage:
-                filtered.append(patch)
-    return filtered
-
-
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
 def build_grouped_tasks(
     search_results: GeoDataFrame[AssetSchema],
     job: ExtractionJob,
+    patch_config: PatchConfig,
     cells_per_task: int = DEFAULT_CELLS_PER_TASK,
     init_params: dict[str, Any] | None = None,
 ) -> Sequence[ExtractionTask]:
@@ -136,13 +88,13 @@ def build_grouped_tasks(
 
     Assets are grouped by ``start_time`` and native ``crs``. For each group,
     the union of asset geometries is intersected with the effective AOI and
-    diced into grid cells. The resulting patches are filtered according to
-    ``grid_config.grid_filter_mode`` and chunked into tasks of at most
-    ``cells_per_task`` patches.
+    diced into grid cells. The resulting patches are chunked into tasks of at
+    most ``cells_per_task`` patches.
 
     Args:
         search_results: GeoDataFrame of assets from the search phase.
         job: Parent ``ExtractionJob`` supplying extraction configuration.
+        patch_config: Physical patch dimensions used to generate extraction patches.
         cells_per_task: Maximum number of patches per task chunk.
         init_params: Optional parameters added to each task's context.
 
@@ -150,24 +102,17 @@ def build_grouped_tasks(
         A sequence of ``ExtractionTask`` objects ready for execution.
 
     Raises:
-        ValueError: If ``job.output_uri`` is empty or ``grid_dist`` is not set in
-            ``job.grid_config``.
+        ValueError: If ``job.output_uri`` is empty or ``patch_config`` is not
+            provided.
     """
-    grid_config = job.grid_config
-    patch_config = job.patch_config
+    grid_dist = job.grid_dist
     output_uri = job.output_uri
     effective_aoi = job.effective_target_aoi
 
     if not output_uri:
         raise ValueError("ExtractionJob.output_uri must be a non-empty string.")
 
-    grid_dist = grid_config.target_grid_dist
-    if grid_dist is None:
-        raise ValueError(
-            "GridConfig.target_grid_dist must be an explicit integer (e.g. 50_000)."
-        )
-
-    grid_def = GridDefinition(d=grid_dist, overlap=grid_config.target_grid_overlap)
+    grid_def = GridDefinition(d=grid_dist)
 
     if search_results.empty:
         return []
@@ -186,7 +131,6 @@ def build_grouped_tasks(
         assets=search_results,
         target_aoi=effective_aoi,
         grid_def=grid_def,
-        grid_config=grid_config,
         patch_config=patch_config,
     )
     if not patch_groups:

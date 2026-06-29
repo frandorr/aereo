@@ -30,12 +30,12 @@ sys.path.insert(0, str(repo_root))
 sys.path.insert(0, str(Path(__file__).parent / "test_pipeline"))
 
 from aereo.grid import ExtractionPatch  # noqa: E402
-from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig  # noqa: E402
+from aereo.interfaces import ExtractionTask  # noqa: E402
 from aereo.pipeline import ExtractionJob  # noqa: E402
 from aereo.schemas import AssetSchema  # noqa: E402
 from aereo.executors._serialization import _TaskSerializer  # noqa: E402
 from pandera.typing.geopandas import GeoDataFrame  # noqa: E402
-from test_pipeline import TestReader, TestReprojector, TestWriter  # noqa: E402
+from test_pipeline import TestReader, TestWriter  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Config
@@ -72,8 +72,7 @@ def _make_minimal_task() -> ExtractionTask:
         geometry=[Polygon([[0, 0], [0.01, 0], [0.01, 0.01], [0, 0.01]])],
         crs="EPSG:4326",
     )
-    grid_config = GridConfig(target_grid_dist=50_000)
-    patch_config = PatchConfig(resolution=100.0)
+    grid_dist = 50_000
     patch = ExtractionPatch(
         id="0U_0R",
         d=50_000,
@@ -84,14 +83,10 @@ def _make_minimal_task() -> ExtractionTask:
     )
     job = ExtractionJob(
         name="test-job",
-        grid_config=grid_config,
-        patch_config=patch_config,
+        grid_dist=grid_dist,
         output_uri="/tmp/aereo_lambda_test",
-        extract=ExtractConfig(
-            read=TestReader(),
-            reproject=TestReprojector(),
-            write=TestWriter(),
-        ),
+        read=TestReader(),
+        write=TestWriter(),
     )
     return ExtractionTask(
         assets=GeoDataFrame[AssetSchema](df),

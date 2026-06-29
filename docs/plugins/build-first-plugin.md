@@ -204,13 +204,13 @@ search:
   _target_: acme_plugin.search:acme_search_provider
   api_key: ${oc.env:ACME_API_KEY}
 
-extract:
-  read:
-    _target_: acme_plugin.read:acme_reader
-    bands: ["B01", "B02"]
-  write:
-    _target_: acme_plugin.write:acme_writer
-    output_dir: /tmp/acme_out
+read:
+  _target_: acme_plugin.read:acme_reader
+  bands: ["B01", "B02"]
+
+write:
+  _target_: acme_plugin.write:acme_writer
+  output_dir: /tmp/acme_out
 ```
 
 Or instantiate it in Python:

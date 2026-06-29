@@ -75,7 +75,7 @@ Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid.
 |---|---|
 | Every catalog has a different API | One `job.search(...)` call with swappable search functions. |
 | Tiles do not line up across sensors | Built-in Major TOM grid + UTM patch geoboxes. |
-| Reprojection boilerplate | `reproject_odc` warps every patch automatically. |
+| Reprojection boilerplate | Readers/writers can call `reproject_odc` (or any reprojector) as needed. |
 | Mixed-CRS scenes fail | `build_grouped_tasks` groups assets by native CRS. |
 | Notebook → production is hard | Same config package runs in Python, CLI, and AWS Lambda. |
 | Plugin frameworks force inheritance | AEREO plugins are `@validate_call` functions + entry points. |
@@ -84,11 +84,11 @@ Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid.
 
 ## Core concepts
 
-1. **`ExtractionJob`** — a validated bundle of grid, patch, output URI, and extraction stages.
+1. **`ExtractionJob`** — a validated bundle of grid size, output URI, and reader/writer callables.
 2. **Search function** — e.g. `search_stac`. Pass it to `job.search(...)` with kwargs.
 3. **Task builder function** — e.g. `build_grouped_tasks`. Groups assets into `ExtractionTask` objects.
 4. **`ExtractionTask`** — one unit of work: assets + grid patches + stage pipeline.
-5. **Stage functions** — `read_odc_stac`, `reproject_odc`, `ndvi`, `write_geotiff`, etc. Wired into `ExtractConfig`.
+5. **Stage functions** — `read_odc_stac`, `reproject_odc`, `ndvi`, `write_geotiff`, etc. Passed directly to `ExtractionJob(read=..., write=...)`.
 6. **`LocalExecutor`** — runs tasks locally. Swap for Lambda later without changing the pipeline.
 
 ---

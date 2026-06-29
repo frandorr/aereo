@@ -79,7 +79,7 @@ from typing import cast
 import geopandas as gpd
 import requests
 from aereo.grid import ExtractionPatch
-from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
+from aereo.interfaces import ExtractionTask, PatchConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from aereo.executors._serialization import _TaskSerializer
@@ -92,7 +92,6 @@ OUTPUT_PREFIX = "file:///tmp/aereo/output/job/0/"
 
 
 def _make_task() -> ExtractionTask:
-    from aereo.builtins.reproject import reproject_odc
     from aereo.builtins.write import write_geotiff
 
     df = gpd.GeoDataFrame(
@@ -116,14 +115,10 @@ def _make_task() -> ExtractionTask:
     )
     job = ExtractionJob(
         name="custom-job",
-        grid_config=GridConfig(target_grid_dist=50_000),
-        patch_config=PatchConfig(resolution=100.0),
+        grid_dist=50_000,
         output_uri="/tmp/aereo/output",
-        extract=ExtractConfig(
-            read=CustomReader(),
-            reproject=reproject_odc,
-            write=write_geotiff,
-        ),
+        read=CustomReader(),
+        write=write_geotiff,
     )
     return ExtractionTask(
         assets=cast(GeoDataFrame[AssetSchema], df),

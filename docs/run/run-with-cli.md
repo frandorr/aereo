@@ -42,15 +42,17 @@ It expects a Hydra config package that contains an `ExtractionJob` plus runtime
 cd examples/config
 aereo action=run \
   search=sentinel2_pc \
-  grid_config=grid_10km \
+  grid_dist=grid_10km \
   patch_config=patch_10m \
-  extract=sentinel2 \
+  task_builder=grouped \
+  read=sentinel2 \
+  write=sentinel2 \
   output_uri=/tmp/aereo_cli
 ```
 
 Because the config directory is the current working directory, Hydra finds the
-`search/`, `grid_config/`, `patch_config/`, and `extract/` subdirectories
-automatically.
+`search/`, `grid_dist/`, `patch_config/`, `read/`, `write/`, and `task_builder/`
+subdirectories automatically.
 
 ---
 
@@ -89,9 +91,11 @@ proceeding.
 ```bash
 aereo action=build-tasks \
   search_results=results.json \
-  grid_config=grid_10km \
+  grid_dist=grid_10km \
   patch_config=patch_10m \
-  extract=sentinel2 \
+  task_builder=grouped \
+  read=sentinel2 \
+  write=sentinel2 \
   output_uri=/tmp/aereo_cli \
   output=tasks.pkl
 ```
@@ -119,9 +123,11 @@ Catch schema errors before starting a long extraction:
 ```bash
 aereo action=validate \
   search=sentinel2_pc \
-  grid_config=grid_10km \
+  grid_dist=grid_10km \
   patch_config=patch_10m \
-  extract=sentinel2
+  task_builder=grouped \
+  read=sentinel2 \
+  write=sentinel2
 ```
 
 Validation exits with code `0` on success and code `1` on failure, printing the
@@ -136,9 +142,11 @@ All actions support these Hydra-style overrides:
 | Override | Example | Description |
 |----------|---------|-------------|
 | `search=` | `search=sentinel2_pc` | Select a search provider config. |
-| `grid_config=` | `grid_config=grid_50km` | Select a grid config. |
+| `grid_dist=` | `grid_dist=grid_50km` | Select a grid config. |
 | `patch_config=` | `patch_config=high_res` | Select a patch config. |
-| `extract=` | `extract=sentinel2_ndvi` | Select an extract stage config. |
+| `read=` | `read=sentinel2_ndvi` | Select a reader config. |
+| `write=` | `write=sentinel2_ndvi` | Select a writer config. |
+| `task_builder=` | `task_builder=grouped` | Select a task builder config. |
 | `output_uri=` | `output_uri=/tmp/out` | Base output path. |
 | `output_dir=` | `output_dir=/tmp/out` | Used by `extract` action. |
 | `workers=` | `workers=4` | Max workers for `LocalExecutor`. |

@@ -24,7 +24,7 @@ anything.
 
     ---
 
-    `aereo action=run search=... grid_config=... patch_config=... extract=...`
+    `aereo action=run search=... grid_dist=... patch_config=... read=... write=...`
 
     [:octicons-arrow-right-24: Run with CLI](run-with-cli.md)
 

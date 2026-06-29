@@ -70,14 +70,16 @@ AWS Lambda.
 ```python
 from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
+from aereo.interfaces import PatchConfig
 from aereo.pipeline import ExtractionJob
 
-# Load a Hydra config package (grid + patch + extract)
+# Load a Hydra config package (grid + read/write)
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
 
 # 1. Search   2. Prepare tasks   3. Execute
 results = job.search(search_stac, stac_api_url="https://earth-search.aws.element84.com/v1")
-tasks = job.build_tasks(results, build_grouped_tasks)
+patch_config = PatchConfig(resolution=10.0)
+tasks = job.build_tasks(results, build_grouped_tasks, patch_config=patch_config)
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 ```
 
@@ -99,8 +101,8 @@ Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid.
 2. **Prepare** — AEREO builds grid cells over your AOI, groups assets by time,
    and chunks them into `ExtractionTask` objects.
 3. **Execute** — an executor runs each task through the stage pipeline
-   configured in `ExtractConfig`:
-   `read function → preprocess functions → reproject function → postprocess functions → write function`.
+   configured as `read` and `write` callables on the `ExtractionJob`:
+   `read function → write function` once per patch.
 
 All of this is configurable through Hydra YAML files or plain Python objects.
 

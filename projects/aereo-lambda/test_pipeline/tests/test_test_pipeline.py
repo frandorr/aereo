@@ -7,7 +7,7 @@ from pathlib import Path
 
 import geopandas as gpd
 from aereo.grid import ExtractionPatch
-from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
+from aereo.interfaces import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema, ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -37,14 +37,10 @@ def _make_task(tmp_path: Path) -> ExtractionTask:
     )
     job = ExtractionJob(
         name="test-job",
-        grid_config=GridConfig(target_grid_dist=50_000),
-        patch_config=PatchConfig(resolution=100.0),
+        grid_dist=50_000,
         output_uri=str(tmp_path / "output"),
-        extract=ExtractConfig(
-            read=TestReader(),
-            reproject=TestReprojector(),
-            write=TestWriter(),
-        ),
+        read=TestReader(),
+        write=TestWriter(),
     )
     return ExtractionTask(
         assets=GeoDataFrame[AssetSchema](df),
@@ -71,10 +67,9 @@ def test_reprojector_returns_one_dataset_per_patch():
 def test_writer_creates_file_and_valid_artifact(tmp_path: Path):
     task = _make_task(tmp_path)
     ds = TestReader()(task)
-    reprojected = TestReprojector()(ds, task)
     patch = task.patches[0]
 
-    artifacts = TestWriter()(reprojected[patch.id], task, patch)
+    artifacts = TestWriter()(ds, task, patch)
 
     ArtifactSchema.validate(artifacts)
     assert len(artifacts) == 1

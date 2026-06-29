@@ -13,7 +13,7 @@ Every AEREO pipeline follows the same shape:
 
 1. **Search** — find assets in a catalog.
 2. **Prepare** — turn those assets into extraction tasks on a shared grid.
-3. **Execute** — run each task through read → reproject → write.
+3. **Execute** — run each task through read → write (per patch).
 
 ---
 
@@ -25,7 +25,7 @@ Every AEREO pipeline follows the same shape:
 | Search function | A plain function like `search_stac`. | You pass it to `job.search(...)` with keyword arguments. No class boilerplate. |
 | Task builder function | A plain function like `build_grouped_tasks`. | Groups search results into `ExtractionTask` objects by time and native CRS. |
 | `ExtractionTask` | One unit of work: assets + grid patches + stage pipeline. | The executor runs these in parallel. |
-| Stage functions | `read_odc_stac`, `reproject_odc`, `write_geotiff`, `ndvi`, etc. | Wired into `ExtractConfig`. Pure functions, composable, easy to test. |
+| Stage functions | `read_odc_stac`, `reproject_odc`, `write_geotiff`, `ndvi`, etc. | Passed directly to `ExtractionJob(read=..., write=...)`. Pure functions, composable, easy to test. |
 | `LocalExecutor` | Runs tasks locally with threads or processes. | Swap for Lambda later without changing the pipeline. |
 
 ---
@@ -61,7 +61,7 @@ No classes to subclass. No global state. Hydra configs are optional.
 ## What you can do
 
 - Extract Sentinel-2, VIIRS, GOES-19, and more by swapping search/read functions.
-- Compose processing steps (`ndvi`, `qa_mask`, `select_bands`, `composite`) in `ExtractConfig`.
+- Compose processing steps (`ndvi`, `qa_mask`, `select_bands`, `composite`) as `read` and `write` callables on the `ExtractionJob` (per-patch reprojection and pre/post-processing are deferred to the reader/writer implementations).
 - Run the same pipeline from Python, CLI, or AWS Lambda using the same YAML configs.
 - Output standard EOIDS GeoTIFFs on the Major TOM grid — ready for ML and mosaics.
 
@@ -73,7 +73,7 @@ No classes to subclass. No global state. Hydra configs are optional.
 |---|---|
 | Every catalog has a different API | One `job.search(...)` call with swappable search functions. |
 | Tiles do not line up across sensors | Built-in Major TOM grid + UTM patch geoboxes. |
-| Reprojection boilerplate | `reproject_odc` warps every patch automatically. |
+| Reprojection boilerplate | Readers/writers can call `reproject_odc` (or any reprojector) as needed. |
 | Mixed-CRS scenes fail | `build_grouped_tasks` groups assets by native CRS. |
 | Notebook → production is hard | Same config package runs in Python, CLI, and Lambda. |
 | Plugin frameworks force inheritance | AEREO plugins are `@validate_call` functions + entry points. |
@@ -84,7 +84,7 @@ No classes to subclass. No global state. Hydra configs are optional.
 
 Confusing **cell size** with **pixel size**:
 
-- `grid_config.target_grid_dist` = size of the grid cell in metres (e.g. `10_000` for 10 km).
+- `grid_dist` = size of the grid cell in metres (e.g. `10_000` for 10 km).
 - `patch_config.resolution` = size of each output pixel in metres (e.g. `10.0` for 10 m).
 
 A 10 km cell at 10 m resolution is a 1000 × 1000 pixel tile. Swapping them is the

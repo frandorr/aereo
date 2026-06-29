@@ -132,8 +132,7 @@ def main() -> None:
     print("--- Validated ExtractionJob ---")
     print(f"name: {job.name}")
     print(f"output_uri: {job.output_uri}")
-    print(f"grid_config.target_grid_dist: {job.grid_config.target_grid_dist}")
-    print(f"patch_config.resolution: {job.patch_config.resolution}")
+    print(f"grid_dist: {job.grid_dist}")
     print(f"target_aoi type: {type(job.target_aoi).__name__}")
     print(
         "effective_target_aoi is target_aoi: "

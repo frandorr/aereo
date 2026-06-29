@@ -1,7 +1,7 @@
 defaults:
-  - grid_config: grid_50km
-  - patch_config: patch_500m
-  - extract: goes19
+  - grid_dist@_global_: grid_50km
+  - read@_global_: goes19
+  - write@_global_: goes19
   - _self_
 
 name: goes19_sample
