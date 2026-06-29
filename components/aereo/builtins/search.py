@@ -1,7 +1,8 @@
 """Aereo STAC search built-in plugin.
 
-Provides the SearchSTAC provider for executing spatial and temporal queries
-against generic STAC APIs and mapping the results to Aereo Asset representations.
+Provides the ``search_stac`` and ``search_earthaccess`` providers for executing
+spatial and temporal queries against STAC APIs and NASA Earthdata, mapping the
+results to Aereo Asset representations.
 """
 
 from __future__ import annotations
@@ -9,15 +10,17 @@ from __future__ import annotations
 import hashlib
 import warnings
 from datetime import datetime, timezone
-from typing import Any, cast
+from pathlib import Path
+from typing import Any, Mapping, Sequence, cast
 
 import geopandas as gpd
 import pandas as pd
-from aereo.interfaces import SearchProvider, build_collection_asset_filters
+from aereo.interfaces import build_collection_asset_filters, empty_asset_result
+from aereo.interfaces.utils import normalize_geometry_input
 from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
+from pydantic import ConfigDict, validate_call
 from pystac_client import Client
-from pydantic import Field
 from shapely.geometry import MultiPolygon, Polygon, shape
 from shapely.geometry.base import BaseGeometry
 from structlog import get_logger
@@ -50,178 +53,166 @@ def _extract_stac_crs(item: Any) -> str | None:
     return None
 
 
-class SearchSTAC(SearchProvider):
-    """Search provider for generic STAC APIs.
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def search_stac(
+    collections: Mapping[str, Sequence[str]] | Sequence[str] | None,
+    intersects: BaseGeometry | dict[str, Any] | str | Path | None,
+    start_datetime: datetime | None,
+    end_datetime: datetime | None,
+    stac_api_url: str,
+    pystac_open_params: dict[str, Any] | None = None,
+    search_params: dict[str, Any] | None = None,
+) -> GeoDataFrame[AssetSchema]:
+    """Search a generic STAC API and return assets as a GeoDataFrame.
 
-    This plugin queries any generic STAC API catalog using pystac_client
-    and returns assets as a validated GeoDataFrame.
+    Args:
+        collections: Mapping of collection -> asset keys, or list of collections.
+        intersects: AOI geometry as a Shapely object, GeoJSON dict, or path.
+        start_datetime: Optional start of temporal window.
+        end_datetime: Optional end of temporal window.
+        stac_api_url: URL of the STAC API catalog.
+        pystac_open_params: Extra arguments forwarded to ``pystac_client.Client.open``.
+        search_params: Extra arguments forwarded to ``client.search``.
+
+    Returns:
+        A GeoDataFrame of matched assets.
+
+    Raises:
+        ValueError: If connection to the STAC API fails or the search query fails.
     """
+    collections, collection_asset_filters = build_collection_asset_filters(collections)
 
-    stac_api_url: str
-    pystac_open_params: dict[str, Any] = Field(default_factory=dict)
+    time_range = None
+    q_start = None
+    q_end = None
+    if start_datetime and end_datetime:
+        q_start = start_datetime.astimezone(timezone.utc)
+        q_end = end_datetime.astimezone(timezone.utc)
+        time_range = f"{q_start.strftime(TIME_FORMAT)}/{q_end.strftime(TIME_FORMAT)}"
+    elif start_datetime:
+        q_start = start_datetime.astimezone(timezone.utc)
+        time_range = f"{q_start.strftime(TIME_FORMAT)}/.."
+    elif end_datetime:
+        q_end = end_datetime.astimezone(timezone.utc)
+        time_range = f"../{q_end.strftime(TIME_FORMAT)}"
 
-    def __call__(self) -> GeoDataFrame[AssetSchema]:
-        """Execute a STAC search against a generic STAC API.
+    client_kwargs: dict[str, Any] = dict(pystac_open_params or {})
+    client_kwargs.pop("url", None)
+    if "headers" in client_kwargs and isinstance(client_kwargs["headers"], dict):
+        client_kwargs["headers"] = {
+            str(k): str(v) for k, v in client_kwargs["headers"].items()
+        }
 
-        Returns:
-            A GeoDataFrame of matched assets.
+    try:
+        client = Client.open(stac_api_url, **client_kwargs)
+    except Exception as e:
+        logger.error("Failed to connect to STAC API", url=stac_api_url, error=str(e))
+        raise ValueError(f"Failed to connect to STAC API at {stac_api_url}: {e}") from e
 
-        Raises:
-            ValueError: If connection to the STAC API fails or the search query fails.
-        """
-        # 2. Derive collections and per-collection asset filters.
-        collections, collection_asset_filters = build_collection_asset_filters(
-            self.collections
+    searchkwargs: dict[str, Any] = {}
+    if collections:
+        searchkwargs["collections"] = collections
+    if time_range:
+        searchkwargs["datetime"] = time_range
+
+    normalized_intersects = normalize_geometry_input(intersects)
+    if normalized_intersects is not None:
+        searchkwargs["intersects"] = normalized_intersects.__geo_interface__
+
+    searchkwargs.update(search_params or {})
+
+    try:
+        search_req = client.search(**searchkwargs)
+        items = list(search_req.items())
+    except Exception as e:
+        logger.error("STAC search query failed", error=str(e))
+        raise ValueError(f"STAC search query failed: {e}") from e
+
+    if not items:
+        return empty_asset_result()
+
+    return _parse_stac_items_to_assets(
+        items=items,
+        collection_asset_filters=collection_asset_filters,
+        q_start=q_start,
+        q_end=q_end,
+    )
+
+
+def _parse_stac_items_to_assets(
+    items: list[Any],
+    collection_asset_filters: dict[str, Any],
+    q_start: datetime | None,
+    q_end: datetime | None,
+) -> GeoDataFrame[AssetSchema]:
+    """Parse PySTAC items into a GeoDataFrame of Aereo assets.
+
+    Args:
+        items: A list of PySTAC items returned by the search query.
+        collection_asset_filters: Mapping of collections to allowed asset keys.
+        q_start: The fallback start datetime.
+        q_end: The fallback end datetime.
+
+    Returns:
+        A GeoDataFrame of matched assets conforming to AssetSchema.
+    """
+    rows = []
+    for item in items:
+        item_geometry = shape(item.geometry) if item.geometry else None
+        stac_item_dict = item.to_dict()
+
+        allowed = (
+            collection_asset_filters.get(item.collection_id)
+            if item.collection_id is not None
+            else None
         )
-
-        # 4. Temporal constraints
-        time_range = None
-        q_start = None
-        q_end = None
-        if self.start_datetime and self.end_datetime:
-            q_start = self.start_datetime.astimezone(timezone.utc)
-            q_end = self.end_datetime.astimezone(timezone.utc)
-            time_range = (
-                f"{q_start.strftime(TIME_FORMAT)}/{q_end.strftime(TIME_FORMAT)}"
-            )
-        elif self.start_datetime:
-            q_start = self.start_datetime.astimezone(timezone.utc)
-            time_range = f"{q_start.strftime(TIME_FORMAT)}/.."
-        elif self.end_datetime:
-            q_end = self.end_datetime.astimezone(timezone.utc)
-            time_range = f"../{q_end.strftime(TIME_FORMAT)}"
-
-        # 5. Open STAC client
-        client_kwargs: dict[str, Any] = dict(self.pystac_open_params)
-        # Remove 'url' if present — stac_api_url is already passed positionally.
-        client_kwargs.pop("url", None)
-        if "headers" in client_kwargs and isinstance(client_kwargs["headers"], dict):
-            client_kwargs["headers"] = {
-                str(k): str(v) for k, v in client_kwargs["headers"].items()
-            }
-
-        try:
-            client = Client.open(self.stac_api_url, **client_kwargs)
-        except Exception as e:
-            logger.error(
-                "Failed to connect to STAC API", url=self.stac_api_url, error=str(e)
-            )
-            raise ValueError(
-                f"Failed to connect to STAC API at {self.stac_api_url}: {e}"
-            ) from e
-
-        # 6. Build search query keyword arguments
-        searchkwargs: dict[str, Any] = {}
-        if collections:
-            searchkwargs["collections"] = collections
-        if time_range:
-            searchkwargs["datetime"] = time_range
-        if self.intersects is not None:
-            searchkwargs["intersects"] = cast(
-                BaseGeometry, self.intersects
-            ).__geo_interface__
-
-        # Merge in search_params
-        searchkwargs.update(self.search_params)
-
-        # 7. Execute search
-        try:
-            search_req = client.search(**searchkwargs)
-            items = list(search_req.items())
-        except Exception as e:
-            logger.error("STAC search query failed", error=str(e))
-            raise ValueError(f"STAC search query failed: {e}") from e
-
-        if not items:
-            return self.empty_result()
-
-        # 8. Generate one row per requested asset for each matched item
-        return self._parse_stac_items_to_assets(
-            items=items,
-            collection_asset_filters=collection_asset_filters,
-            q_start=q_start,
-            q_end=q_end,
-        )
-
-    def _parse_stac_items_to_assets(
-        self,
-        items: list[Any],
-        collection_asset_filters: dict[str, Any],
-        q_start: datetime | None,
-        q_end: datetime | None,
-    ) -> GeoDataFrame[AssetSchema]:
-        """Parse PySTAC items into a GeoDataFrame of Aereo assets.
-
-        Args:
-            items: A list of PySTAC items returned by the search query.
-            collection_asset_filters: Mapping of collections to allowed asset keys.
-            q_start: The fallback start datetime.
-            q_end: The fallback end datetime.
-
-        Returns:
-            A GeoDataFrame of matched assets conforming to AssetSchema.
-        """
-        rows = []
-        for item in items:
-            item_geometry = shape(item.geometry) if item.geometry else None
-            stac_item_dict = item.to_dict()
-
-            # Determine assets to extract using per-collection filters.
-            allowed = (
-                collection_asset_filters.get(item.collection_id)
-                if item.collection_id is not None
-                else None
-            )
-            if allowed is None:
-                assets_to_use = list(item.assets.keys())
-            elif allowed:
-                assets_to_use = [a for a in allowed if a in item.assets]
+        if allowed is None:
+            assets_to_use = list(item.assets.keys())
+        elif allowed:
+            assets_to_use = [a for a in allowed if a in item.assets]
+        else:
+            if item.assets:
+                assets_to_use = [next(iter(item.assets.keys()))]
             else:
-                # No filter defined for this collection — ultimate fallback.
-                if item.assets:
-                    assets_to_use = [next(iter(item.assets.keys()))]
-                else:
-                    assets_to_use = []
+                assets_to_use = []
 
-            item_start = (
-                item.common_metadata.start_datetime
-                or item.datetime
-                or q_start
-                or datetime.now(timezone.utc)
+        item_start = (
+            item.common_metadata.start_datetime
+            or item.datetime
+            or q_start
+            or datetime.now(timezone.utc)
+        )
+        item_end = (
+            item.common_metadata.end_datetime
+            or item.datetime
+            or q_end
+            or datetime.now(timezone.utc)
+        )
+
+        item_crs = _extract_stac_crs(item)
+        for asset_key in assets_to_use:
+            asset = item.assets[asset_key]
+            rows.append(
+                {
+                    "id": f"{item.id}_{asset_key}",
+                    "collection": item.collection_id,
+                    "geometry": item_geometry,
+                    "start_time": item_start,
+                    "end_time": item_end,
+                    "href": asset.href,
+                    "channel_id": asset_key,
+                    "crs": item_crs,
+                    "stac_item": stac_item_dict,
+                }
             )
-            item_end = (
-                item.common_metadata.end_datetime
-                or item.datetime
-                or q_end
-                or datetime.now(timezone.utc)
-            )
 
-            item_crs = _extract_stac_crs(item)
-            for asset_key in assets_to_use:
-                asset = item.assets[asset_key]
-                rows.append(
-                    {
-                        "id": f"{item.id}_{asset_key}",
-                        "collection": item.collection_id,
-                        "geometry": item_geometry,
-                        "start_time": item_start,
-                        "end_time": item_end,
-                        "href": asset.href,
-                        "channel_id": asset_key,
-                        "crs": item_crs,
-                        "stac_item": stac_item_dict,
-                    }
-                )
+    if not rows:
+        return empty_asset_result()
 
-        if not rows:
-            return self.empty_result()
-
-        gdf = gpd.GeoDataFrame(rows, geometry="geometry")
-        # Only expose crs when at least one item provided it. A column of all
-        # nulls is equivalent to "not provided" for downstream grouping.
-        if "crs" in gdf.columns.tolist() and bool(gdf["crs"].isna().all()):
-            gdf = gdf.drop(columns=["crs"])
-        return cast(GeoDataFrame, AssetSchema.validate(gdf))
+    gdf = gpd.GeoDataFrame(rows, geometry="geometry")
+    if "crs" in gdf.columns.tolist() and bool(gdf["crs"].isna().all()):
+        gdf = gdf.drop(columns=["crs"])
+    return cast(GeoDataFrame, AssetSchema.validate(gdf))
 
 
 class NoSpatialMetadataError(Exception):
@@ -229,42 +220,20 @@ class NoSpatialMetadataError(Exception):
 
 
 def _to_polygon_or_multipolygon(polygons: list[Polygon]) -> BaseGeometry:
-    """Return a single Polygon or a MultiPolygon from a list of polygons.
-
-    Args:
-        polygons: List of polygons to combine.
-
-    Returns:
-        A single ``Polygon`` or a ``MultiPolygon``.
-    """
+    """Return a single Polygon or a MultiPolygon from a list of polygons."""
     if len(polygons) == 1:
         return polygons[0]
     return MultiPolygon(polygons)
 
 
 def _parse_umm_polygon(umm: dict[str, Any]) -> BaseGeometry:
-    """Parse UMM (Unified Metadata Model) spatial extent into a Shapely geometry.
-
-    Tries to find ``GPolygons -> Boundary -> Points`` and constructs ``Polygon``
-    objects. If multiple GPolygons are present, returns a ``MultiPolygon``.
-    Falls back to ``BoundingRectangles`` if no GPolygons are found.
-
-    Args:
-        umm: UMM metadata dict for an earthaccess granule.
-
-    Returns:
-        A Shapely geometry representing the granule footprint.
-
-    Raises:
-        NoSpatialMetadataError: If no GPolygon or BoundingRectangle is found.
-    """
+    """Parse UMM (Unified Metadata Model) spatial extent into a Shapely geometry."""
     spatial = umm.get("SpatialExtent", {})
     horiz = spatial.get("HorizontalSpatialDomain", {})
     geometry = horiz.get("Geometry", {})
 
     polygons: list[Polygon] = []
 
-    # Check for GPolygons
     if "GPolygons" in geometry:
         for p in geometry["GPolygons"]:
             boundary = p.get("Boundary", {})
@@ -276,7 +245,6 @@ def _parse_umm_polygon(umm: dict[str, Any]) -> BaseGeometry:
     if polygons:
         return _to_polygon_or_multipolygon(polygons)
 
-    # Check for BoundingRectangles
     if "BoundingRectangles" in geometry:
         for rect in geometry["BoundingRectangles"]:
             min_x = rect.get("WestBoundingCoordinate")
@@ -306,35 +274,21 @@ def _process_granule(
     collections: list[str],
     intersects: BaseGeometry | None,
 ) -> dict[str, Any] | None:
-    """Extract metadata from a single earthaccess granule into a row dict.
-
-    Args:
-        g: An earthaccess granule object.
-        collections: Collection short names used as a fallback.
-        intersects: Optional AOI geometry used as a fallback for missing UMM
-            spatial metadata.
-
-    Returns:
-        A metadata row dict, or ``None`` if the granule should be skipped.
-    """
+    """Extract metadata from a single earthaccess granule into a row dict."""
     meta = g["meta"]
     umm = g["umm"]
 
-    # The Granule UR or concept-id works as a unique identifier
     cid = meta.get("concept-id") or meta.get("native-id", "unknown")
     unique_id = hashlib.md5(cid.encode("utf-8")).hexdigest()
 
-    # Collection short name
     coll_ref = umm.get("CollectionReference", {})
     collection_name = coll_ref.get("ShortName", collections[0])
 
-    # Parse temporal
     temp_ext = umm.get("TemporalExtent", {})
     range_dt = temp_ext.get("RangeDateTime", {})
     start_str = range_dt.get("BeginningDateTime")
     end_str = range_dt.get("EndingDateTime")
 
-    # Skip granules with missing temporal metadata
     if not start_str or not end_str:
         msg = (
             f"Skipping granule {cid} from collection {collection_name}: "
@@ -353,10 +307,8 @@ def _process_granule(
     try:
         geom = _parse_umm_polygon(umm)
     except NoSpatialMetadataError:
-        # If UMM parsing fails, fallback to the requested intersects geometry
         geom = intersects if intersects is not None else Polygon()
 
-    # Find S3 and HTTPS links independently
     s3_links = g.data_links(access="direct")
     https_links = g.data_links(access="external")
 
@@ -368,10 +320,7 @@ def _process_granule(
     https_url = https_links[0] if https_links else None
     href = s3_url if s3_url else https_url
 
-    # S3 credentials endpoint for NASA Earthdata direct access
     s3_credentials_url = g.get_s3_credentials_endpoint()
-
-    # Estimate size
     size_mb = g.size()
 
     return {
@@ -389,72 +338,79 @@ def _process_granule(
     }
 
 
-class SearchEarthaccess(SearchProvider):
-    """Search provider for NASA Earthdata using the earthaccess library.
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def search_earthaccess(
+    collections: Mapping[str, Sequence[str]] | Sequence[str] | None,
+    intersects: BaseGeometry | dict[str, Any] | str | Path | None,
+    start_datetime: datetime | None,
+    end_datetime: datetime | None,
+    search_params: dict[str, Any] | None = None,
+) -> GeoDataFrame[AssetSchema]:
+    """Search NASA Earthdata using the earthaccess library.
 
-    All search parameters are configurable as Pydantic fields so that the
-    provider can be instantiated via Hydra or directly in code.
-    Requires the `earthaccess` library to be installed.
+    Args:
+        collections: Mapping of collection -> asset keys, or list of collections.
+        intersects: AOI geometry as a Shapely object, GeoJSON dict, or path.
+        start_datetime: Optional start of temporal window.
+        end_datetime: Optional end of temporal window.
+        search_params: Extra arguments forwarded to ``earthaccess.search_data``.
+
+    Returns:
+        A GeoDataFrame of matched assets.
+
+    Raises:
+        ImportError: If the ``earthaccess`` library is not installed.
     """
+    try:
+        import earthaccess  # type: ignore
+    except ImportError as e:
+        raise ImportError(
+            "The 'earthaccess' library is required to use search_earthaccess. "
+            "Please install it (e.g., 'pip install earthaccess')."
+        ) from e
 
-    def __call__(self) -> GeoDataFrame[AssetSchema]:
-        """Search NASA Earthdata using earthaccess.
+    collections, _ = build_collection_asset_filters(collections)
+    if not collections:
+        return empty_asset_result()
 
-        Returns:
-            A GeoDataFrame of matched assets.
+    kwargs: dict[str, Any] = {"short_name": collections}
 
-        Raises:
-            ImportError: If the ``earthaccess`` library is not installed.
-        """
-        try:
-            import earthaccess  # type: ignore
-        except ImportError as e:
-            raise ImportError(
-                "The 'earthaccess' library is required to use SearchEarthaccess. "
-                "Please install it (e.g., 'pip install earthaccess')."
-            ) from e
+    if start_datetime is not None and end_datetime is not None:
+        kwargs["temporal"] = (
+            start_datetime.strftime("%Y-%m-%d %H:%M:%S"),
+            end_datetime.strftime("%Y-%m-%d %H:%M:%S"),
+        )
 
-        collections, _ = build_collection_asset_filters(self.collections)
-        if not collections:
-            return self.empty_result()
+    normalized_intersects = normalize_geometry_input(intersects)
+    if normalized_intersects is not None:
+        bounds = getattr(normalized_intersects, "bounds", None)
+        if bounds is not None:
+            kwargs["bounding_box"] = bounds
 
-        kwargs: dict[str, Any] = {"short_name": collections}
+    kwargs.update(search_params or {})
 
-        if self.start_datetime is not None and self.end_datetime is not None:
-            kwargs["temporal"] = (
-                self.start_datetime.strftime("%Y-%m-%d %H:%M:%S"),
-                self.end_datetime.strftime("%Y-%m-%d %H:%M:%S"),
-            )
+    try:
+        granules = earthaccess.search_data(**kwargs)
+    except Exception as e:
+        logger.error("earthaccess search failed", error=str(e), **kwargs)
+        return empty_asset_result()
 
-        if self.intersects is not None:
-            bounds = getattr(self.intersects, "bounds", None)
-            if bounds is not None:
-                kwargs["bounding_box"] = bounds
+    if not granules:
+        return empty_asset_result()
 
-        kwargs.update(self.search_params)
+    rows = []
+    for g in granules:
+        row = _process_granule(
+            g, collections, cast(BaseGeometry | None, normalized_intersects)
+        )
+        if row is not None:
+            rows.append(row)
 
-        try:
-            granules = earthaccess.search_data(**kwargs)
-        except Exception as e:
-            logger.error("earthaccess search failed", error=str(e), **kwargs)
-            return self.empty_result()
+    if not rows:
+        return empty_asset_result()
 
-        if not granules:
-            return self.empty_result()
+    gdf = gpd.GeoDataFrame(rows, geometry="geometry")
+    gdf["start_time"] = pd.to_datetime(gdf["start_time"])
+    gdf["end_time"] = pd.to_datetime(gdf["end_time"])
 
-        rows = []
-        for g in granules:
-            row = _process_granule(
-                g, collections, cast(BaseGeometry | None, self.intersects)
-            )
-            if row is not None:
-                rows.append(row)
-
-        if not rows:
-            return self.empty_result()
-
-        gdf = gpd.GeoDataFrame(rows, geometry="geometry")
-        gdf["start_time"] = pd.to_datetime(gdf["start_time"])
-        gdf["end_time"] = pd.to_datetime(gdf["end_time"])
-
-        return cast(GeoDataFrame, AssetSchema.validate(gdf))
+    return cast(GeoDataFrame, AssetSchema.validate(gdf))

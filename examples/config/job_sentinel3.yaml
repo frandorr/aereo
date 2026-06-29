@@ -1,5 +1,4 @@
 defaults:
-  - search: sentinel3
   - grid_config: grid_50km
   - patch_config: patch_375m
   - extract: sentinel3

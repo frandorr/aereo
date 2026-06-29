@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
+from functools import partial
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -228,3 +229,103 @@ def _import_yaml() -> Any:
     except ImportError as exc:
         raise ImportError(_YAML_INSTALL_MSG) from exc
     return yaml
+
+
+def resolve_callable(val: Any) -> Any:
+    """Resolve a callable from a string, dict target, or direct callable.
+
+    Args:
+        val: The value to resolve.
+
+    Returns:
+        The resolved callable.
+    """
+    import importlib
+
+    if callable(val):
+        return val
+
+    if isinstance(val, str):
+        if ":" in val:
+            module_name, func_name = val.split(":", 1)
+        else:
+            module_name, func_name = val.rsplit(".", 1)
+        module = importlib.import_module(module_name)
+        func = getattr(module, func_name)
+        return func
+
+    if isinstance(val, dict) or (hasattr(val, "keys") and hasattr(val, "get")):
+        d = dict(val)
+        target = d.pop("_target_", None)
+        if not target:
+            raise ValueError(
+                "Dictionary-based configuration must include a '_target_' key."
+            )
+
+        func = resolve_callable(target)
+        kwargs = {k: v for k, v in d.items() if not k.startswith("_")}
+        if kwargs:
+            return partial(func, **kwargs)
+        return func
+
+    raise ValueError(f"Cannot resolve callable from type: {type(val).__name__}")
+
+
+def update_callable(callable_obj: Any, **kwargs: Any) -> Any:
+    """Update a callable (standard function or partial) with new keywords.
+
+    Args:
+        callable_obj: The callable to update.
+        **kwargs: The keyword arguments to update it with.
+
+    Returns:
+        A new callable with updated keyword arguments.
+    """
+    if isinstance(callable_obj, partial):
+        new_keywords = {**callable_obj.keywords, **kwargs}
+        return partial(callable_obj.func, *callable_obj.args, **new_keywords)
+    if callable(callable_obj):
+        return partial(callable_obj, **kwargs)
+    return partial(resolve_callable(callable_obj), **kwargs)
+
+
+def _is_function_target(target: str) -> bool:
+    """Return True if *target* resolves to a function (not a class).
+
+    Args:
+        target: Import path string.
+
+    Returns:
+        True for functions/methods, False for classes or other callables.
+    """
+    import inspect
+
+    obj = resolve_callable(target)
+    if isinstance(obj, partial):
+        obj = obj.func
+    return inspect.isfunction(obj) or inspect.ismethod(obj) or inspect.isbuiltin(obj)
+
+
+def _prepare_config_for_instantiate(cfg: Any) -> Any:
+    """Recursively mark function targets with ``_partial_: true``.
+
+    Hydra's ``instantiate`` calls functions by default. AEREO's functional
+    plugins are configured as ``_target_`` paths and should be returned as
+    partially-bound callables instead, so users do not need to add the
+    ``_partial_`` key themselves.
+
+    Args:
+        cfg: Configuration container (dict, list, or scalar).
+
+    Returns:
+        The same shape with ``_partial_: true`` injected for function targets.
+    """
+    if isinstance(cfg, dict):
+        d = dict(cfg)
+        target = d.get("_target_")
+        if isinstance(target, str) and _is_function_target(target):
+            d["_partial_"] = True
+        return {k: _prepare_config_for_instantiate(v) for k, v in d.items()}
+    if isinstance(cfg, list):
+        return [_prepare_config_for_instantiate(v) for v in cfg]
+    return cfg

@@ -9,11 +9,11 @@ import xarray as xr
 from pydantic import ValidationError
 
 from aereo.builtins import (
-    Composite,
-    NDVI,
-    Normalize,
-    QAMask,
-    SelectBands,
+    composite,
+    ndvi,
+    normalize,
+    qa_mask,
+    select_bands,
 )
 
 
@@ -45,14 +45,13 @@ def _make_temporal_dataset():
 
 
 # ---------------------------------------------------------------------------
-# SelectBands
+# select_bands
 # ---------------------------------------------------------------------------
 
 
 def test_select_bands_keeps_requested_variables():
     ds = _make_dataset()
-    proc = SelectBands(bands=["B04"])
-    result = proc(ds)
+    result = select_bands(ds, bands=["B04"])
 
     assert "B04" in result.data_vars
     assert "B08" not in result.data_vars
@@ -60,19 +59,17 @@ def test_select_bands_keeps_requested_variables():
 
 def test_select_bands_raises_on_missing_band():
     ds = _make_dataset()
-    proc = SelectBands(bands=["B99"])
-
     with pytest.raises(ValueError, match="requested bands not found"):
-        proc(ds)
+        select_bands(ds, bands=["B99"])
 
 
 def test_select_bands_raises_when_bands_missing_param():
     with pytest.raises(ValidationError):
-        SelectBands()  # type: ignore[reportCallIssue]
+        select_bands()  # type: ignore[reportCallIssue]
 
 
 # ---------------------------------------------------------------------------
-# QAMask
+# qa_mask
 # ---------------------------------------------------------------------------
 
 
@@ -84,8 +81,7 @@ def test_qa_mask_sets_masked_pixels_to_nan():
         coords={"y": range(2), "x": range(2)},
     )
 
-    proc = QAMask(qa_band="QA", qa_mask_bits=[0])
-    result = proc(ds)
+    result = qa_mask(ds, qa_band="QA", qa_mask_bits=[0])
 
     # bit 0 set -> values 1 and 3 should be masked
     assert np.isnan(result["B04"].values[0, 1])
@@ -98,19 +94,17 @@ def test_qa_mask_sets_masked_pixels_to_nan():
 
 def test_qa_mask_raises_on_missing_params():
     with pytest.raises(ValidationError):
-        QAMask()  # type: ignore[reportCallIssue]
+        qa_mask()  # type: ignore[reportCallIssue]
 
 
 def test_qa_mask_raises_on_missing_band():
     ds = _make_dataset()
-    proc = QAMask(qa_band="QA", qa_mask_bits=[0])
-
     with pytest.raises(ValueError, match="not found"):
-        proc(ds)
+        qa_mask(ds, qa_band="QA", qa_mask_bits=[0])
 
 
 # ---------------------------------------------------------------------------
-# NDVI
+# ndvi
 # ---------------------------------------------------------------------------
 
 
@@ -122,8 +116,7 @@ def test_ndvi_computes_correct_values():
         coords={"y": range(2), "x": range(2)},
     )
 
-    proc = NDVI(ndvi_nir_band="B08", ndvi_red_band="B04")
-    result = proc(ds)
+    result = ndvi(ds, ndvi_nir_band="B08", ndvi_red_band="B04")
 
     expected = (nir - red) / (nir + red)
     np.testing.assert_array_almost_equal(result["ndvi"].values, expected)
@@ -139,27 +132,24 @@ def test_ndvi_handles_zero_denominator():
         coords={"y": range(2), "x": range(2)},
     )
 
-    proc = NDVI(ndvi_nir_band="B08", ndvi_red_band="B04")
-    result = proc(ds)
+    result = ndvi(ds, ndvi_nir_band="B08", ndvi_red_band="B04")
 
     assert np.all(np.isnan(result["ndvi"].values))
 
 
 def test_ndvi_raises_on_missing_params():
     with pytest.raises(ValidationError):
-        NDVI()  # type: ignore[reportCallIssue]
+        ndvi()  # type: ignore[reportCallIssue]
 
 
 def test_ndvi_raises_on_missing_band():
     ds = _make_dataset()
-    proc = NDVI(ndvi_nir_band="B08", ndvi_red_band="B99")
-
     with pytest.raises(ValueError, match="not found"):
-        proc(ds)
+        ndvi(ds, ndvi_nir_band="B08", ndvi_red_band="B99")
 
 
 # ---------------------------------------------------------------------------
-# Normalize
+# normalize
 # ---------------------------------------------------------------------------
 
 
@@ -170,8 +160,7 @@ def test_normalize_minmax_scales_to_zero_one():
         coords={"y": range(2), "x": range(2)},
     )
 
-    proc = Normalize(normalize_method="minmax")
-    result = proc(ds)
+    result = normalize(ds, normalize_method="minmax")
 
     np.testing.assert_array_almost_equal(
         result["B04"].values,
@@ -186,8 +175,7 @@ def test_normalize_zscore():
         coords={"y": range(2), "x": range(2)},
     )
 
-    proc = Normalize(normalize_method="zscore")
-    result = proc(ds)
+    result = normalize(ds, normalize_method="zscore")
 
     mean = data.mean()
     std = data.std(ddof=0)
@@ -204,29 +192,25 @@ def test_normalize_handles_constant_band():
         coords={"y": range(2), "x": range(2)},
     )
 
-    proc = Normalize(normalize_method="minmax")
-    result = proc(ds)
+    result = normalize(ds, normalize_method="minmax")
 
     np.testing.assert_array_almost_equal(result["B04"].values, np.zeros((2, 2)))
 
 
 def test_normalize_raises_on_unknown_method():
     ds = _make_dataset()
-    proc = Normalize(normalize_method="foo")
-
     with pytest.raises(ValueError, match="unknown method"):
-        proc(ds)
+        normalize(ds, normalize_method="foo")
 
 
 # ---------------------------------------------------------------------------
-# Composite
+# composite
 # ---------------------------------------------------------------------------
 
 
 def test_composite_median_reduces_time():
     ds = _make_temporal_dataset()
-    proc = Composite(composite_method="median")
-    result = proc(ds)
+    result = composite(ds, composite_method="median")
 
     assert "time" not in result.dims
     np.testing.assert_array_almost_equal(
@@ -237,8 +221,7 @@ def test_composite_median_reduces_time():
 
 def test_composite_mean():
     ds = _make_temporal_dataset()
-    proc = Composite(composite_method="mean")
-    result = proc(ds)
+    result = composite(ds, composite_method="mean")
 
     assert "time" not in result.dims
     np.testing.assert_array_almost_equal(
@@ -249,8 +232,7 @@ def test_composite_mean():
 
 def test_composite_max():
     ds = _make_temporal_dataset()
-    proc = Composite(composite_method="max")
-    result = proc(ds)
+    result = composite(ds, composite_method="max")
 
     assert "time" not in result.dims
     np.testing.assert_array_almost_equal(
@@ -261,15 +243,11 @@ def test_composite_max():
 
 def test_composite_raises_on_missing_time():
     ds = _make_dataset()
-    proc = Composite(composite_method="median")
-
     with pytest.raises(ValueError, match="time"):
-        proc(ds)
+        composite(ds, composite_method="median")
 
 
 def test_composite_raises_on_unknown_method():
     ds = _make_temporal_dataset()
-    proc = Composite(composite_method="foo")
-
     with pytest.raises(ValueError, match="unknown method"):
-        proc(ds)
+        composite(ds, composite_method="foo")

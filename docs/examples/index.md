@@ -2,7 +2,7 @@
 
 AEREO ships with runnable Jupyter notebooks for every supported sensor and
 workflow. Each notebook uses a Hydra config package from `examples/config` and
-the same three-step Python API.
+the `ExtractionJob` orchestration API: `search`, `build_tasks`, and `execute`.
 
 The notebooks are executed during the docs build, so the rendered pages show
 real outputs. You can also run them locally from the repo.
@@ -62,13 +62,29 @@ python 01-sentinel2.py
 
 ---
 
-## Run the same config from the CLI
+## Run the same config from a script
 
-Every notebook config can also be run from the command line:
+Every notebook config can also be run from the example script that loads the
+job, search provider, and task builder from the config package:
 
 ```bash
-cd examples/config
-aereo action=run search=sentinel2_pc grid_config=grid_10km patch_config=patch_10m extract=sentinel2
+cd examples
+uv run python config/run_job.py
+```
+
+Override the job, search provider, or task builder by passing flags:
+
+```bash
+cd examples
+uv run python config/run_job.py --config-name job_goes19 --search goes19 --task-builder grouped
+```
+
+Set ``DRY_RUN=true`` to validate the configuration without performing network
+calls:
+
+```bash
+cd examples
+DRY_RUN=true uv run python config/run_job.py
 ```
 
 See [Run with CLI](../run/run-with-cli.md) for the full CLI reference.

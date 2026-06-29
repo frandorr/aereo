@@ -6,28 +6,30 @@ like SearchProvider, Reader, Writer, and Reprojector.
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
+    Annotated,
     Any,
-    Iterable,
+    Callable,
     Literal,
     Mapping,
     Protocol,
     Sequence,
     cast,
+    runtime_checkable,
 )
+
+from pydantic import BeforeValidator
 
 from .utils import (
     _import_yaml,
     _load_json_file,
-    normalize_geometry_input,
+    resolve_callable,
 )
 
 if TYPE_CHECKING:
-    from aereo.backends import TaskRunner
     from aereo.pipeline import ExtractionJob
 
 
@@ -36,7 +38,7 @@ import xarray as xr
 from aereo.grid import ExtractionPatch
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from shapely.geometry.base import BaseGeometry
 
 GridFilterMode = Literal["intersection", "within", "coverage"]
@@ -161,18 +163,15 @@ class PatchConfig(BaseModel):
         return cls.model_validate(data)
 
 
-class AereoPlugin(BaseModel, ABC):
-    """Base class for all AEREO plugins, fully configurable via Pydantic/Hydra."""
+AereoPlugin = Any
 
-    model_config = {"extra": "allow", "frozen": True, "arbitrary_types_allowed": True}
+AnyCallable = Annotated[Callable[..., Any], BeforeValidator(resolve_callable)]
 
 
-class Reader(AereoPlugin, ABC):
+@runtime_checkable
+class Reader(Protocol):
     """Reads raw satellite data and returns it in native CRS as an xarray.Dataset."""
 
-    read_kwargs: dict[str, Any] = Field(default_factory=dict)
-
-    @abstractmethod
     def __call__(self, task: ExtractionTask) -> xr.Dataset:
         """Read data for the given task.
 
@@ -184,12 +183,10 @@ class Reader(AereoPlugin, ABC):
         ...
 
 
-class Reprojector(AereoPlugin, ABC):
+@runtime_checkable
+class Reprojector(Protocol):
     """Reprojects/resamples an xarray.Dataset to target grid cell definitions."""
 
-    reproject_kwargs: dict[str, Any] = Field(default_factory=dict)
-
-    @abstractmethod
     def __call__(self, ds: xr.Dataset, task: ExtractionTask) -> dict[str, xr.Dataset]:
         """Reproject *ds* for every patch in *task*.
 
@@ -204,23 +201,19 @@ class Reprojector(AereoPlugin, ABC):
         ...
 
 
-class Processor(AereoPlugin, ABC):
+@runtime_checkable
+class Processor(Protocol):
     """Pure ``xarray.Dataset -> xarray.Dataset`` transform."""
 
-    process_kwargs: dict[str, Any] = Field(default_factory=dict)
-
-    @abstractmethod
     def __call__(self, ds: xr.Dataset) -> xr.Dataset:
         """Transform *ds* and return a new dataset."""
         ...
 
 
-class Writer(AereoPlugin, ABC):
+@runtime_checkable
+class Writer(Protocol):
     """Serialises an xarray.Dataset to disk."""
 
-    write_kwargs: dict[str, Any] = Field(default_factory=dict)
-
-    @abstractmethod
     def __call__(
         self,
         ds: xr.Dataset,
@@ -235,188 +228,85 @@ class Writer(AereoPlugin, ABC):
         ...
 
 
-class BatchWriter(AereoPlugin, ABC):
-    """Serialises a dict of lazy patch datasets to disk.
-
-    Unlike the per-patch ``Writer`` which receives one dataset at a time
-    (controlled by ``TaskRunner``), a ``BatchWriter`` receives the full
-    ``{patch_id: xr.Dataset}`` map from the Reprojector.  This enables:
-
-    * **Batch Dask compute** — merge or schedule multiple patches' graphs together.
-    * **Parallel writes** — write patches concurrently using threads/processes.
-    * **Memory management** — explicitly drop each patch after write.
-
-    Configure via ``ExtractConfig.write``::
-
-        ExtractConfig(
-            read=reader,
-            reproject=reprojector,
-            write=BatchWriteGeoTIFF(max_workers=4),
-        )
-
-    ``TaskRunner`` detects ``isinstance(writer, BatchWriter)`` and hands
-    off the full reprojected map instead of iterating per-patch.
-    """
-
-    write_kwargs: dict[str, Any] = Field(default_factory=dict)
-
-    @abstractmethod
-    def __call__(
-        self,
-        patches: Mapping[str, xr.Dataset],
-        task: ExtractionTask,
-    ) -> GeoDataFrame[ArtifactSchema]:
-        """Write *patches* and return artifact metadata for all written outputs.
-
-        Args:
-            patches: Mapping from ``patch.id`` to the (typically lazy) dataset
-                aligned to that patch's geobox.
-            task: Extraction task containing the patches and configuration.
-
-        Returns:
-            GeoDataFrame of written artifacts with ``ArtifactSchema``.
-        """
-        ...
-
-
 class ExtractConfig(BaseModel):
     """Declarative configuration for an extraction pipeline."""
 
-    model_config = {"extra": "forbid", "frozen": True}
+    model_config = {"extra": "forbid", "frozen": True, "arbitrary_types_allowed": True}
 
-    read: Reader
-    preprocess: Sequence[Processor] = Field(default_factory=list)
-    reproject: Reprojector | None = None
-    postprocess: Sequence[Processor] = Field(default_factory=list)
-    write: Writer | BatchWriter | None = None
+    read: AnyCallable
+    preprocess: Sequence[AnyCallable] = Field(default_factory=list)
+    reproject: AnyCallable | None = None
+    postprocess: Sequence[AnyCallable] = Field(default_factory=list)
+    write: AnyCallable | None = None
 
 
-class PipelineCallback:
-    """Lifecycle hooks for pipeline execution.
+@runtime_checkable
+class TaskBuilder(Protocol):
+    """Builds a sequence of extraction tasks from search results.
 
-    Similar to PyTorch Lightning callbacks, these allow external code to
-    observe and react to pipeline stages without modifying the TaskRunner.
+    Task builders are job-level plugins: they run once per job, grouping and
+    chunking search-result assets into ``ExtractionTask`` objects that the
+    per-task extraction pipeline can execute.
     """
 
-    def on_task_start(self, task: ExtractionTask) -> None:
-        """Called before any processing begins."""
-        pass
+    def __call__(
+        self,
+        search_results: GeoDataFrame[AssetSchema],
+        job: ExtractionJob,
+    ) -> Sequence[ExtractionTask]:
+        """Build extraction tasks from *search_results* using *job* configuration.
 
-    def on_task_cache_hit(self, task: ExtractionTask) -> None:
-        """Called when a cached artifact catalog is reused for *task*."""
-        pass
+        Args:
+            search_results: GeoDataFrame of assets returned by a search provider.
+            job: Parent extraction job supplying grid, patch, output, and stage
+                configuration.
 
-    def on_task_cache_miss(self, task: ExtractionTask) -> None:
-        """Called when no cached artifact catalog exists for *task*."""
-        pass
-
-    def on_download_complete(self, task: ExtractionTask) -> None:
-        """Called after assets have been fetched to local storage.
-
-        In AEREO's stage-based pipeline the download step is typically
-        handled inside :meth:`Reader.read`, so this hook fires
-        immediately after the reader returns.
+        Returns:
+            A sequence of prepared extraction tasks.
         """
-        pass
-
-    def on_read_complete(
-        self,
-        task: ExtractionTask,
-        ds: xr.Dataset,
-    ) -> None:
-        """Called after the Reader finishes."""
-        pass
-
-    def on_reproject_complete(
-        self,
-        task: ExtractionTask,
-        patch: ExtractionPatch,
-        ds: xr.Dataset,
-    ) -> None:
-        """Called after a single patch has been reprojected."""
-        pass
-
-    def on_patch_write_complete(
-        self,
-        task: ExtractionTask,
-        patch: ExtractionPatch,
-        artifacts: GeoDataFrame[ArtifactSchema],
-    ) -> None:
-        """Called after each patch is written."""
-        pass
-
-    def on_task_complete(
-        self,
-        task: ExtractionTask,
-        artifacts_gdf: GeoDataFrame[ArtifactSchema],
-    ) -> None:
-        """Called after all cells are processed."""
-        pass
-
-    def on_task_failed(self, task: ExtractionTask, error: Exception) -> None:
-        """Called when a task fails at any stage."""
-        pass
+        ...
 
 
-class SearchProvider(AereoPlugin, ABC):
+@runtime_checkable
+class SearchProvider(Protocol):
     """Interface for search providers.
 
-    Common attributes for describing the query:
-
-    collections:
-        - Mapping:
-            Keys are collection IDs.
-            Values are sequences of asset keys to extract.
-        - Sequence:
-            List of collection IDs, each corresponding to the default
-            set of assets for that collection.
-
-    intersects:
-        Geometric AOI for the query, as a Shapely geometry object.
-
-    start_datetime:
-        Optional start of the temporal window (inclusive), in UTC.
-
-    end_datetime:
-        Optional end of the temporal window (inclusive), in UTC.
-
-    search_params:
-        Additional keyword arguments to pass to the underlying search
-        function (e.g. ``pystac_client.search``, ``earthaccess.search_data``).
+    Search providers are callables that receive collection, spatial, and
+    temporal constraints and return a GeoDataFrame of matched assets.
     """
 
-    collections: Mapping[str, Sequence[str]] | Sequence[str] | None = None
-    intersects: BaseGeometry | dict[str, Any] | str | Path | None = Field(
-        default=None,
-        description="AOI geometry as a Shapely object, GeoJSON dict, or path to a GeoJSON file.",
-    )
-    start_datetime: datetime | None = None
-    end_datetime: datetime | None = None
-    search_params: dict[str, Any] = Field(default_factory=dict)
+    def __call__(
+        self,
+        collections: Mapping[str, Sequence[str]] | Sequence[str] | None,
+        intersects: BaseGeometry | None,
+        start_datetime: datetime | None,
+        end_datetime: datetime | None,
+        **kwargs: Any,
+    ) -> GeoDataFrame[AssetSchema]:
+        """Execute search based on the provided constraints.
 
-    @field_validator("intersects", mode="before")
-    @classmethod
-    def _validate_intersects(
-        cls, value: BaseGeometry | dict[str, Any] | str | Path | None
-    ) -> BaseGeometry | None:
-        """Normalize intersects input into a Shapely geometry."""
-        return normalize_geometry_input(value)
+        Args:
+            collections: Mapping of collection -> asset keys, or list of collections.
+            intersects: AOI geometry.
+            start_datetime: Optional start of temporal window.
+            end_datetime: Optional end of temporal window.
+            **kwargs: Implementation-specific parameters (e.g. ``stac_api_url``).
 
-    @staticmethod
-    def empty_result() -> GeoDataFrame[AssetSchema]:
-        """Return an empty GeoDataFrame with AssetSchema columns."""
-        import geopandas as gpd
-
-        columns = list(AssetSchema.to_schema().columns.keys())
-        if "geometry" not in columns:
-            columns.append("geometry")
-        gdf = gpd.GeoDataFrame(columns=columns, geometry="geometry")
-        return cast(GeoDataFrame[AssetSchema], AssetSchema.validate(gdf))
-
-    @abstractmethod
-    def __call__(self) -> GeoDataFrame[AssetSchema]:
-        """Execute search based on internal state and return matched assets."""
+        Returns:
+            GeoDataFrame of matched assets.
+        """
         ...
+
+
+def empty_asset_result() -> GeoDataFrame[AssetSchema]:
+    """Return an empty GeoDataFrame with AssetSchema columns."""
+    import geopandas as gpd
+
+    columns = list(AssetSchema.to_schema().columns.keys())
+    if "geometry" not in columns:
+        columns.append("geometry")
+    gdf = gpd.GeoDataFrame(columns=columns, geometry="geometry")
+    return cast(GeoDataFrame[AssetSchema], AssetSchema.validate(gdf))
 
 
 def build_collection_asset_filters(
@@ -540,95 +430,3 @@ class ExtractionTask:
             f"output_uri='{self.output_uri}'"
             f")"
         )
-
-
-class TaskStaging(Protocol):
-    """Protocol for staging serialized tasks to remote storage and loading results.
-
-    Concrete implementations handle upload/download for a specific object-store
-    backend (e.g. S3, GCS, Azure Blob).
-    """
-
-    bucket: str
-
-    def stage(self, src_dir: Path, job_id: str, task_idx: int) -> str:
-        """Upload a serialized task directory and return its URI.
-
-        Args:
-            src_dir: Directory containing ``task_assets.parquet`` and
-                ``task_meta.json`` produced by :class:`aereo.serialization.TaskSerializer`.
-            job_id: Logical job identifier for grouping staged tasks.
-            task_idx: Index of the task within the job.
-
-        Returns:
-            A URI (e.g. ``s3://bucket/aereo-tasks/{job_id}/{task_idx}/``) that the
-            remote worker can use to retrieve the task.
-        """
-        ...
-
-    def load_artifacts(self, manifest_uri: str) -> GeoDataFrame[ArtifactSchema]:
-        """Load artifact results from a manifest URI.
-
-        Args:
-            manifest_uri: URI pointing to a manifest produced by the remote worker
-                (e.g. ``s3://bucket/results/{job_id}/{task_idx}/manifest.json``).
-
-        Returns:
-            A validated ``GeoDataFrame[ArtifactSchema]`` with the extracted artifacts.
-        """
-        ...
-
-    def upload_artifacts(
-        self,
-        artifacts: GeoDataFrame[ArtifactSchema],
-        output_prefix: str,
-    ) -> dict[str, str]:
-        """Upload artifacts and a manifest.
-
-        Args:
-            artifacts: GeoDataFrame of extracted artifacts.
-            output_prefix: URI prefix where the results should be written.
-
-        Returns:
-            A dictionary containing the ``manifest_uri`` of the uploaded manifest.
-        """
-        ...
-
-    def result_prefix(self, job_id: str, task_idx: int) -> str:
-        """Return the URI prefix where the remote worker should write results.
-
-        Args:
-            job_id: Logical job identifier.
-            task_idx: Index of the task within the job.
-
-        Returns:
-            A URI prefix (e.g. ``s3://bucket/results/{job_id}/{task_idx}/``).
-        """
-        ...
-
-
-class ExecutionBackend(Protocol):
-    """Protocol for pluggable task execution backends.
-
-    Backends decide **where** and **how** a batch of :class:`ExtractionTask`
-    objects are executed.  Local backends use the supplied *runner* directly;
-    remote backends may serialize tasks and dispatch to external workers.
-    """
-
-    def run_tasks(
-        self,
-        tasks: Sequence[ExtractionTask],
-        runner: TaskRunner | None = None,
-    ) -> Iterable[GeoDataFrame[ArtifactSchema]]:
-        """Execute *tasks* and yield or return their results.
-
-        Because the return type is :class:`Iterable`, implementations are free
-        to process tasks asynchronously and yield results as they arrive,
-        enabling streaming consumption by the caller.
-
-        Args:
-            tasks: The extraction tasks to run.
-            runner: A client-side :class:`TaskRunner` that knows how to execute
-                a single task using the correct local plugin.
-        """
-        ...

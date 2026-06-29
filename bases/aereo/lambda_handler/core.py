@@ -1,8 +1,16 @@
-"""AEREO Lambda handler entrypoint."""
+"""AEREO Lambda handler entrypoint.
+
+The handler receives a serialized :class:`~aereo.interfaces.ExtractionTask`
+from S3, executes it through :func:`~aereo.execution.run_task`, and uploads
+the resulting artifacts (GeoTIFFs + metadata) back to S3.
+
+No plugin registry is required at module load time: the task itself carries
+a fully instantiated :class:`~aereo.interfaces.ExtractConfig` (reader,
+reprojector, writer, etc.) so the runner can execute it directly.
+"""
 
 from __future__ import annotations
 
-import importlib
 import logging
 import os
 import tempfile
@@ -10,47 +18,17 @@ import time
 from pathlib import Path
 from typing import Any
 
-from aereo.backends import CloudTaskStaging, TaskRunner
-from aereo.backends.lambda_backend import _safe_truncate
-from aereo.registry import AereoRegistry
-from aereo.serialization import TaskSerializer
+from aereo.execution import run_task
+from aereo.executors._serialization import _TaskSerializer
+from aereo.executors._staging import _CloudTaskStaging
+from aereo.executors._lambda import _safe_truncate
 
 logger = logging.getLogger(__name__)
 
 _S3_PREFIX = "s3://"
 
-# Initialize once per cold start — eagerly import plugins to avoid
-# the ~20-30s entry-point scanning overhead in Lambda.
-_registry = AereoRegistry(auto_discover=False)
-
-# Eagerly register known plugins (import once, fast path).
-# Use conditional imports so the image stays lean — only plugins
-# that were actually installed in the Dockerfile get registered.
-_plugins_to_register: dict[str, Any] = {}
-
-_search_plugins = [
-    ("search_aws_goes", "aereo.search_aws_goes.core", "AwsGoesSearcher"),
-    ("search_earthaccess", "aereo.search_earthaccess.core", "EarthAccessSearcher"),
-    (
-        "search_planetary_computer",
-        "aereo.search_planetary_computer.core",
-        "PlanetaryComputerSearcher",
-    ),
-    ("search_rustac", "aereo.search_rustac.core", "RustacSearcher"),
-    ("search_tessera", "aereo.search_tessera.core", "SearchTessera"),
-]
-
-for name, module, cls_name in _search_plugins:
-    try:
-        mod = importlib.import_module(module)
-        _plugins_to_register[name] = getattr(mod, cls_name)
-    except (ModuleNotFoundError, ImportError, AttributeError):
-        pass  # Plugin not installed — skip
-
-_registry.register_plugins(_plugins_to_register)
-
-_runner = TaskRunner()
-_serializer = TaskSerializer()
+# Initialize once per cold start.
+_serializer = _TaskSerializer()
 
 
 def _parse_s3_uri(uri: str) -> tuple[str, str]:
@@ -177,7 +155,7 @@ def _upload_artifacts_to_s3(
         endpoint_url: Optional S3 endpoint URL (e.g. for LocalStack).
 
     Returns:
-        The manifest URI from CloudTaskStaging.
+        The manifest URI from _CloudTaskStaging.
     """
     t4 = time.time()
     out_bucket, out_prefix = _parse_s3_uri(output_prefix)
@@ -193,7 +171,7 @@ def _upload_artifacts_to_s3(
     timings["geotiff_count"] = geotiff_count
 
     t5 = time.time()
-    staging = CloudTaskStaging(bucket=out_bucket, endpoint_url=endpoint_url)
+    staging = _CloudTaskStaging(bucket=out_bucket, endpoint_url=endpoint_url)
     upload_result = staging.upload_artifacts(artifacts, output_prefix)
     timings["upload_metadata"] = time.time() - t5
 
@@ -260,8 +238,6 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
 
         s3 = boto3.client("s3", endpoint_url=endpoint_url)
 
-        runner = _runner
-
         timings: dict[str, Any] = {}
         t0 = time.time()
 
@@ -277,7 +253,7 @@ def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             timings["deserialize_task"] = time.time() - t2
 
             t3 = time.time()
-            artifacts = runner.run(task)
+            artifacts = run_task(task)
             timings["extractor_run"] = time.time() - t3
 
             manifest_uri = _upload_artifacts_to_s3(

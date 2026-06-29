@@ -25,11 +25,13 @@ The loaded `job` contains everything the pipeline needs:
 ```python
 print(job.name)          # "sentinel2_sample"
 print(job.output_uri)    # "/tmp/aereo_extraction"
-print(job.search)        # SearchProvider instance
 print(job.grid_config)   # GridConfig instance
 print(job.patch_config)  # PatchConfig instance
 print(job.extract)       # ExtractConfig instance
 ```
+
+Search providers and task builders are **runtime** arguments, not part of the
+job. Load them separately from the config package or instantiate them in code.
 
 You can override any config group at load time:
 
@@ -51,32 +53,42 @@ job = ExtractionJob.load_from_config(
 Once you have a job, the pipeline is always the same three calls:
 
 ```python
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
+from aereo.builtins import build_grouped_tasks, search_stac
+from aereo.executors import LocalExecutor
+from aereo.pipeline import ExtractionJob
 
-client = AereoClient()
+job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
 
 # 1. Search
-results = client.search(job.search)
+results = job.search(
+    search_stac,
+    stac_api_url="https://earth-search.aws.element84.com/v1",
+    collections={"sentinel-2-l2a": ["red", "nir"]},
+    intersects="examples/config/aoi/chocon.geojson",
+    start_datetime="2024-01-01T00:00:00Z",
+    end_datetime="2024-01-10T23:59:59Z",
+)
 print(f"Found {len(results)} assets")
 
 # 2. Prepare tasks
-tasks = client.prepare_tasks(results, job=job)
+tasks = job.build_tasks(results, build_grouped_tasks, cells_per_task=5)
 print(f"Prepared {len(tasks)} tasks")
 
 # 3. Execute
-backend = LocalProcessBackend(max_workers=2)
-artifacts = client.execute_tasks(tasks, backend=backend)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 print(f"Extracted {len(artifacts)} artifacts")
+
+# 4. Write the catalog
+job.write_catalog(artifacts)
 ```
 
 Each step returns a typed GeoDataFrame:
 
 | Step | Method | Input | Output |
 |------|--------|-------|--------|
-| Search | `client.search(search_provider)` | `SearchProvider` | `GeoDataFrame[AssetSchema]` |
-| Prepare | `client.prepare_tasks(search_results, job=job)` | search results + job | `Sequence[ExtractionTask]` |
-| Execute | `client.execute_tasks(tasks, backend=backend)` | tasks + backend | `GeoDataFrame[ArtifactSchema]` |
+| Search | `job.search(search_fn, ...)` | search function | `GeoDataFrame[AssetSchema]` |
+| Prepare | `job.build_tasks(assets, task_builder_fn, ...)` | search results + task builder function | `Sequence[ExtractionTask]` |
+| Execute | `job.execute(tasks, executor=...)` | tasks + executor | `GeoDataFrame[ArtifactSchema]` |
 
 ---
 
@@ -85,16 +97,22 @@ Each step returns a typed GeoDataFrame:
 Here is a complete, copy-pasteable example using the built-in config package:
 
 ```python
+from aereo.builtins import build_grouped_tasks, search_stac
+from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
-client = AereoClient()
 
-results = client.search(job.search)
-tasks = client.prepare_tasks(results, job=job)
-artifacts = client.execute_tasks(tasks, backend=LocalProcessBackend(max_workers=2))
+results = job.search(
+    search_stac,
+    stac_api_url="https://earth-search.aws.element84.com/v1",
+    collections={"sentinel-2-l2a": ["red", "nir"]},
+    intersects="examples/config/aoi/chocon.geojson",
+    start_datetime="2024-01-01T00:00:00Z",
+    end_datetime="2024-01-10T23:59:59Z",
+)
+tasks = job.build_tasks(results, build_grouped_tasks, cells_per_task=5)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 
 print(artifacts[["id", "grid_cell", "uri"]].head())
 ```
@@ -107,55 +125,81 @@ If you need dynamic logic, construct the objects directly instead of loading a
 config package.
 
 ```python
-from datetime import datetime
-from aereo.client import AereoClient
-from aereo.builtins import SearchSTAC, ReadODCSTAC, ReprojectODC, WriteGeoTIFF
-from aereo.grid import UTMGridConfig
-from aereo.interfaces import PatchConfig, ExtractConfig
+from datetime import datetime, timezone
+from aereo.builtins import (
+    build_grouped_tasks,
+    read_odc_stac,
+    reproject_odc,
+    search_stac,
+    write_geotiff,
+)
+from aereo.interfaces import ExtractConfig, GridConfig, PatchConfig
+from aereo.executors import LocalExecutor
+from aereo.pipeline import ExtractionJob
 
-search = SearchSTAC(
-    stac_api_url="https://planetarycomputer.microsoft.com/api/stac/v1",
-    collections={"sentinel-2-l2a": ["B04", "B08"]},
-    intersects="config/aoi/chocon.geojson",
-    start_datetime=datetime(2024, 1, 1),
-    end_datetime=datetime(2024, 1, 10),
+assets = search_stac(
+    stac_api_url="https://earth-search.aws.element84.com/v1",
+    collections={"sentinel-2-l2a": ["red", "nir"]},
+    intersects="examples/config/aoi/chocon.geojson",
+    start_datetime=datetime(2024, 1, 1, tzinfo=timezone.utc),
+    end_datetime=datetime(2024, 1, 10, tzinfo=timezone.utc),
 )
 
 extract = ExtractConfig(
-    read=ReadODCSTAC(),
-    reproject=ReprojectODC(resampling="nearest"),
-    write=WriteGeoTIFF(),
+    read=read_odc_stac,
+    reproject=reproject_odc,
+    write=write_geotiff,
 )
 
-client = AereoClient()
-results = client.search(search)
-tasks = client.prepare_tasks(
-    results,
-    extract=extract,
-    grid_config=UTMGridConfig(target_grid_dist=10_000),
+job = ExtractionJob(
+    grid_config=GridConfig(target_grid_dist=10_000),
     patch_config=PatchConfig(resolution=10.0),
     output_uri="/tmp/aereo_python",
+    extract=extract,
 )
-artifacts = client.execute_tasks(tasks)
+
+tasks = job.build_tasks(assets, build_grouped_tasks, cells_per_task=50)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
+job.write_catalog(artifacts)
+```
+
+---
+
+## Writing the catalog
+
+`job.execute()` returns the artifact GeoDataFrame; writing it is a separate,
+optional step. `job.write_catalog()` is a convenience that writes
+`artifacts.parquet` under `job.output_uri`:
+
+```python
+job.write_catalog(artifacts)
+# → <output_uri>/artifacts.parquet
+```
+
+You can also write it yourself:
+
+```python
+artifacts.to_parquet("/tmp/my_catalog.parquet")
 ```
 
 ---
 
 ## Troubleshooting
 
-### `ValueError: grid_config must be provided`
+### `ValueError: ExtractionJob.output_uri must be a non-empty string`
 
-`prepare_tasks()` needs a `grid_config`. Pass it explicitly, set it as a client
-default, or load the job from a config package.
+`build_tasks()` receives a complete ``ExtractionJob``. Make sure ``output_uri``
+is set, either in your YAML config or when constructing the job in Python.
 
-### `ValueError: patch_config must be provided`
+### `ValueError: GridConfig.target_grid_dist must be an explicit integer`
 
-Same as above: `patch_config` is required.
+`build_tasks()` needs a ``GridConfig`` with an explicit ``target_grid_dist``.
+Set it in your job config or ``ExtractionJob`` constructor.
 
 ### `ValueError: extract must be provided`
 
-`prepare_tasks()` needs an `ExtractConfig`. When loading from a config package,
-make sure the `extract:` group is selected in your YAML defaults.
+``ExtractionJob`` needs an ``ExtractConfig``. When loading from a config package,
+make sure the ``extract:`` group is selected in your YAML defaults.
 
 ### Empty search results
 

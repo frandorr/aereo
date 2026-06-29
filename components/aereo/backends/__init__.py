@@ -1,15 +1,9 @@
-"""Execution backends and task runner for AEREO extraction tasks."""
+"""Legacy execution backends package.
 
-from aereo.backends.core import TaskRunner
-from aereo.backends.lambda_backend import LambdaBackend, RetryableLambdaError
-from aereo.backends.local import LocalProcessBackend, ThreadBackend
-from aereo.backends.staging import CloudTaskStaging
+Remote and local execution now live in :mod:`aereo.executors`. This package is
+kept as an empty compatibility shim and will be removed in a future release.
+"""
 
-__all__ = [
-    "CloudTaskStaging",
-    "LambdaBackend",
-    "LocalProcessBackend",
-    "RetryableLambdaError",
-    "TaskRunner",
-    "ThreadBackend",
-]
+from __future__ import annotations
+
+__all__: list[str] = []

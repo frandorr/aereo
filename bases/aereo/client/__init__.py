@@ -1,17 +1,7 @@
-"""Public API entry-point for the Aereo client.
+"""Public API entry-point for the legacy Aereo client.
 
-This module re-exports the core client classes that consumers interact with:
-
-- :class:`AereoClient`: The main orchestrator for search and extraction pipelines.
-- :class:`FailureMode`: Enum controlling pipeline behavior on plugin failures.
+The ``AereoClient`` orchestrator has been removed. Use
+:class:`aereo.pipeline.ExtractionJob` and :mod:`aereo.executors` directly.
 """
 
-from aereo.client.core import (
-    AereoClient,
-    FailureMode,
-)
-
-__all__ = [
-    "AereoClient",
-    "FailureMode",
-]
+__all__: list[str] = []

@@ -7,7 +7,7 @@ import pickle
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Sequence, cast
+from typing import Any, Callable, cast
 
 import attrs
 
@@ -19,10 +19,14 @@ from rich.console import Console
 from rich.table import Table
 from shapely.geometry.base import BaseGeometry
 
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
+from aereo.executors import LocalExecutor
 from aereo.interfaces import ExtractConfig, normalize_geometry_input
-from aereo.interfaces.utils import _extract_geometry_from_geojson
+from aereo.interfaces.utils import (
+    _extract_geometry_from_geojson,
+    _prepare_config_for_instantiate,
+    update_callable,
+)
+from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from aereo.registry import AereoRegistry
 
@@ -73,27 +77,32 @@ def _build_search_provider(cfg: DictConfig) -> Any:
     """Instantiate and configure a search provider from CLI config.
 
     Args:
-        cfg: Hydra DictConfig containing ``search``, ``geojson``, ``start``, and
-            ``end`` keys.
+        cfg: Hydra DictConfig containing ``search``, ``geojson``, ``target_aoi``,
+            ``start``, and ``end`` keys.
 
     Returns:
-        Configured search provider instance.
+        Configured search provider callable.
     """
-    search_provider = hydra.utils.instantiate(cfg.search)
+    from omegaconf import OmegaConf
+
+    search_cfg = OmegaConf.to_container(cfg.search, resolve=True)
+    search_provider = hydra.utils.instantiate(
+        _prepare_config_for_instantiate(search_cfg)
+    )
 
     update_dict: dict[str, Any] = {}
-    intersects = _load_geometry_safe(Path(cfg.geojson) if cfg.geojson else None)
+    intersects = _resolve_target_aoi(cfg)
     if intersects:
         update_dict["intersects"] = intersects
-    start_dt = _parse_iso_datetime(cfg.start)
+    start_dt = _parse_iso_datetime(cfg.get("start"))
     if start_dt:
         update_dict["start_datetime"] = start_dt
-    end_dt = _parse_iso_datetime(cfg.end)
+    end_dt = _parse_iso_datetime(cfg.get("end"))
     if end_dt:
         update_dict["end_datetime"] = end_dt
 
     if update_dict:
-        search_provider = search_provider.model_copy(update=update_dict)
+        search_provider = update_callable(search_provider, **update_dict)
 
     return search_provider
 
@@ -126,7 +135,7 @@ def _resolve_target_aoi(
             cast("BaseGeometry | dict[str, Any] | str | Path | None", target)
         )
 
-    if cfg.geojson:
+    if cfg.get("geojson"):
         return _load_geometry_safe(Path(cfg.geojson))
 
     return fallback
@@ -230,52 +239,60 @@ def _print_search_table(df: gpd.GeoDataFrame) -> None:
     console.print(table)
 
 
-def _pipeline_to_extract(
-    pipeline: Sequence[Any] | None,
-) -> ExtractConfig | None:
-    """Convert a list of instantiated plugins into an ``ExtractConfig``.
+def _build_job(
+    cfg: DictConfig,
+    fallback: BaseGeometry | None = None,
+    create_output_dir: bool = True,
+) -> ExtractionJob:
+    """Build an ``ExtractionJob`` from the CLI config.
 
-    The CLI ``pipeline`` key is a flat list ordered as
-    ``[reader, preprocess..., reprojector, postprocess..., writer]``.
-    This helper partitions the list into the structured ``ExtractConfig``
-    expected by ``AereoClient.prepare_tasks``.
+    Args:
+        cfg: Hydra DictConfig containing the ``ExtractionJob`` fields.
+        fallback: Optional fallback geometry for ``target_aoi``.
+        create_output_dir: Whether to create ``cfg.output_dir`` on disk.
+
+    Returns:
+        Validated ``ExtractionJob`` instance.
     """
-    if not pipeline:
-        return None
+    grid_config = hydra.utils.instantiate(cfg.grid_config)
+    patch_config = hydra.utils.instantiate(cfg.patch_config)
 
-    from aereo.interfaces import (
-        BatchWriter,
-        Processor,
-        Reader,
-        Reprojector,
-        Writer,
-    )
+    try:
+        from omegaconf import OmegaConf
 
-    read: Reader | None = None
-    reproject: Reprojector | None = None
-    write: Writer | BatchWriter | None = None
-    preprocess: list[Processor] = []
-    postprocess: list[Processor] = []
+        extract_cfg = OmegaConf.to_container(cfg.extract, resolve=True)
+        extract_prepared = _prepare_config_for_instantiate(extract_cfg)
+        extract_instantiated = hydra.utils.instantiate(
+            extract_prepared, _convert_="all"
+        )
+    except Exception as exc:
+        console.print(f"[red]Invalid extract configuration:[/red] {exc}")
+        sys.exit(1)
 
-    for plugin in pipeline:
-        if isinstance(plugin, Reader):
-            read = plugin
-        elif isinstance(plugin, Reprojector):
-            reproject = plugin
-        elif isinstance(plugin, (Writer, BatchWriter)):
-            write = plugin
-        elif isinstance(plugin, Processor):
-            (postprocess if reproject is not None else preprocess).append(plugin)
+    if isinstance(extract_instantiated, ExtractConfig):
+        extract = extract_instantiated
+    else:
+        try:
+            extract = ExtractConfig.model_validate(extract_instantiated)
+        except Exception as exc:
+            console.print(f"[red]Invalid extract configuration:[/red] {exc}")
+            sys.exit(1)
 
-    if read is None:
-        raise ValueError("pipeline must include a Reader plugin as its first element.")
+    output_dir = Path(cfg.get("output_dir", "."))
+    if create_output_dir:
+        output_dir.mkdir(parents=True, exist_ok=True)
 
-    return ExtractConfig(
-        read=read,
-        preprocess=preprocess,
-        reproject=reproject,
-        postprocess=postprocess,
-        write=write,
+    target_aoi = _resolve_target_aoi(cfg, fallback=fallback)
+
+    return ExtractionJob(
+        name=cfg.get("name", "default"),
+        derivative=cfg.get("derivative"),
+        grid_config=grid_config,
+        patch_config=patch_config,
+        output_uri=cfg.get("output_uri") or str(output_dir),
+        overwrite=cfg.get("overwrite", False),
+        target_aoi=target_aoi,
+        extract=extract,
     )
 
 
@@ -303,7 +320,7 @@ def _add_plugin_rows(
         registry: AereoRegistry instance to query metadata.
     """
     for name, cls in plugins.items():
-        reg_key = label.lower()
+        reg_key = label.replace(" ", "_").lower()
         collections = registry._registries[reg_key].get_collections(name)
         cols = ", ".join(collections[:3])
         if len(collections) > 3:
@@ -367,8 +384,14 @@ def plugins_cmd(cfg: DictConfig | None = None) -> None:
     table.add_column("Optional", style="blue")
 
     _add_plugin_rows(table, "Searcher", registry._searchers, registry)
+    _add_plugin_rows(
+        table,
+        "Task Builder",
+        registry._registries["task_builder"].plugins,
+        registry,
+    )
 
-    for label in ("reader", "reprojector", "processor", "writer", "batch_writer"):
+    for label in ("reader", "reprojector", "processor", "writer"):
         _add_plugin_rows(
             table,
             label.replace("_", " ").title(),
@@ -428,34 +451,34 @@ def _run_search_action(cfg: DictConfig) -> None:
         sys.exit(1)
 
     search_provider = _build_search_provider(cfg)
-    client = AereoClient()
-    results = _run_with_exit("Search", client.search, search_provider=search_provider)
+    results = _run_with_exit("Search", search_provider)
     _check_results(results)
 
     fmt = cfg.get("format", "table")
+    output_path = cfg.get("output")
     if fmt == "json":
         records = _search_results_to_json(results)
         json_out = json.dumps(records, indent=2, default=str)
-        if cfg.output:
-            Path(cfg.output).write_text(json_out)
+        if output_path:
+            Path(output_path).write_text(json_out)
             console.print(
-                f"[green]Wrote {len(records)} results to[/green] {cfg.output}"
+                f"[green]Wrote {len(records)} results to[/green] {output_path}"
             )
         else:
             console.print(json_out)
     else:
         _print_search_table(results)
-        if cfg.output:
+        if output_path:
             records = _search_results_to_json(results)
-            Path(cfg.output).write_text(json.dumps(records, indent=2, default=str))
-            console.print(f"[green]Wrote results to[/green] {cfg.output}")
+            Path(output_path).write_text(json.dumps(records, indent=2, default=str))
+            console.print(f"[green]Wrote results to[/green] {output_path}")
 
 
-def _run_prepare_action(cfg: DictConfig) -> None:
-    """Execute the ``prepare`` CLI action."""
+def _run_build_tasks_action(cfg: DictConfig) -> None:
+    """Execute the ``build-tasks`` CLI action."""
     if not cfg.get("search_results"):
         console.print(
-            "[red]search_results file path is required for prepare action.[/red]"
+            "[red]search_results file path is required for build-tasks action.[/red]"
         )
         sys.exit(1)
 
@@ -467,35 +490,40 @@ def _run_prepare_action(cfg: DictConfig) -> None:
     records = json.loads(search_results_path.read_text())
     df = _search_results_from_json(records)
 
-    pipeline = hydra.utils.instantiate(cfg.pipeline)
-    grid_config = hydra.utils.instantiate(cfg.grid_config)
-    patch_config = hydra.utils.instantiate(cfg.patch_config)
-    extract = _pipeline_to_extract(pipeline)
+    if not cfg.get("task_builder"):
+        console.print("[red]task_builder is required for build-tasks action.[/red]")
+        sys.exit(1)
+    from omegaconf import OmegaConf
 
-    output_dir = Path(cfg.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
+    task_builder = hydra.utils.instantiate(
+        _prepare_config_for_instantiate(task_builder_cfg)
+    )
 
-    target_aoi = _resolve_target_aoi(cfg)
+    job = _build_job(cfg)
 
-    client = AereoClient()
+    build_kwargs: dict[str, Any] = {}
+    if cfg.get("cells_per_task") is not None:
+        build_kwargs["cells_per_task"] = cfg.cells_per_task
+
     tasks = _run_with_exit(
-        "Prepare",
-        client.prepare_tasks,
-        search_results=df,
-        grid_config=grid_config,
-        patch_config=patch_config,
-        extract=extract,
-        output_uri=cfg.get("output_uri") or str(output_dir),
-        target_aoi=target_aoi,
-        cells_per_task=cfg.cells_per_task,
-        overwrite=cfg.overwrite,
+        "Build tasks",
+        job.build_tasks,
+        df,
+        task_builder,
+        **build_kwargs,
     )
 
-    task_file = Path(cfg.output) if cfg.output else (output_dir / "tasks.pkl")
-    task_file.write_bytes(pickle.dumps(tasks))
-    console.print(
-        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cfg.cells_per_task}).[/green]"
+    output_path = cfg.get("output")
+    task_file = (
+        Path(output_path)
+        if output_path
+        else (Path(cfg.get("output_dir", ".")) / "tasks.pkl")
     )
+    task_file.write_bytes(pickle.dumps(tasks))
+    chunk_size = cfg.get("cells_per_task")
+    chunk_msg = f" (chunk size: {chunk_size})" if chunk_size is not None else ""
+    console.print(f"[green]✓ Prepared {len(tasks)} tasks{chunk_msg}.[/green]")
     console.print(f"[green]Wrote tasks to[/green] {task_file}")
 
 
@@ -514,6 +542,10 @@ def _run_extract_action(cfg: DictConfig) -> None:
 
     task_list = pickle.loads(tasks_path.read_bytes())
 
+    if not task_list:
+        console.print("[yellow]No tasks to extract.[/yellow]")
+        sys.exit(2)
+
     if cfg.get("overwrite") is not None:
         task_list = [
             attrs.evolve(
@@ -523,20 +555,14 @@ def _run_extract_action(cfg: DictConfig) -> None:
             for task in task_list
         ]
 
-    backend = LocalProcessBackend(max_workers=cfg.workers)
-    client = AereoClient()
-    artifacts = _run_with_exit(
-        "Extraction", client.execute_tasks, task_list, backend=backend
-    )
+    executor = LocalExecutor(workers=cfg.get("workers", 1))
+    job = task_list[0].job
+    artifacts = _run_with_exit("Extraction", job.execute, task_list, executor)
 
-    output_dir = Path(cfg.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    parquet_path = output_dir / "artifacts.parquet"
-    artifacts.to_parquet(parquet_path)
+    catalog_uri = _run_with_exit("Catalog", job.write_catalog, artifacts)
 
     console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
-    console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
-    console.print(f"[green]Output directory:[/green] {output_dir}")
+    console.print(f"[green]Catalog saved to:[/green] {catalog_uri}")
 
 
 def _run_run_action(cfg: DictConfig) -> None:
@@ -549,68 +575,64 @@ def _run_run_action(cfg: DictConfig) -> None:
 
     search_provider = _build_search_provider(cfg)
 
-    pipeline = hydra.utils.instantiate(cfg.pipeline)
-    grid_config = hydra.utils.instantiate(cfg.grid_config)
-    patch_config = hydra.utils.instantiate(cfg.patch_config)
-    extract = _pipeline_to_extract(pipeline)
+    if not cfg.get("task_builder"):
+        console.print("[red]task_builder is required for run action.[/red]")
+        sys.exit(1)
+    from omegaconf import OmegaConf
 
-    output_dir = Path(cfg.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
+    task_builder = hydra.utils.instantiate(
+        _prepare_config_for_instantiate(task_builder_cfg)
+    )
 
-    target_aoi = _resolve_target_aoi(cfg, fallback=search_provider.intersects)
-
-    client = AereoClient()
+    job = _build_job(cfg, fallback=_resolve_target_aoi(cfg))
 
     # Search
     console.print("[bold blue]🔍 Searching...[/bold blue]")
-    results = _run_with_exit("Search", client.search, search_provider=search_provider)
+    results = _run_with_exit("Search", job.search, search_provider)
     _check_results(results)
     console.print(f"[green]✓ Found {len(results)} scenes.[/green]")
 
-    # Prepare
-    console.print("[bold blue]📦 Preparing...[/bold blue]")
+    # Build tasks
+    console.print("[bold blue]📦 Building tasks...[/bold blue]")
+    build_kwargs: dict[str, Any] = {}
+    if cfg.get("cells_per_task") is not None:
+        build_kwargs["cells_per_task"] = cfg.cells_per_task
+
     tasks = _run_with_exit(
-        "Prepare",
-        client.prepare_tasks,
-        search_results=results,
-        extract=extract,
-        grid_config=grid_config,
-        patch_config=patch_config,
-        output_uri=cfg.get("output_uri") or str(output_dir),
-        target_aoi=target_aoi,
-        cells_per_task=cfg.cells_per_task,
-        overwrite=cfg.overwrite,
+        "Build tasks",
+        job.build_tasks,
+        results,
+        task_builder,
+        **build_kwargs,
     )
-    console.print(
-        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cfg.cells_per_task}).[/green]"
-    )
+    chunk_size = cfg.get("cells_per_task")
+    chunk_msg = f" (chunk size: {chunk_size})" if chunk_size is not None else ""
+    console.print(f"[green]✓ Prepared {len(tasks)} tasks{chunk_msg}.[/green]")
 
     # Extract
     console.print("[bold blue]⛏️ Extracting...[/bold blue]")
-    backend = LocalProcessBackend(max_workers=cfg.workers)
-    artifacts = _run_with_exit(
-        "Extraction", client.execute_tasks, tasks, backend=backend
-    )
+    executor = LocalExecutor(workers=cfg.get("workers", 1))
+    artifacts = _run_with_exit("Extraction", job.execute, tasks, executor)
 
-    parquet_path = output_dir / "artifacts.parquet"
-    artifacts.to_parquet(parquet_path)
+    catalog_uri = _run_with_exit("Catalog", job.write_catalog, artifacts)
 
     console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
-    console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
-    console.print(f"[green]Output:[/green] {output_dir}")
+    console.print(f"[green]Catalog saved to:[/green] {catalog_uri}")
 
 
 def _run_validate_action(cfg: DictConfig) -> None:
     """Execute the ``validate`` CLI action."""
+    from omegaconf import OmegaConf
+
     try:
         if cfg.get("search"):
-            hydra.utils.instantiate(cfg.search)
-        if cfg.get("pipeline"):
-            hydra.utils.instantiate(cfg.pipeline)
-        if cfg.get("grid_config"):
-            hydra.utils.instantiate(cfg.grid_config)
-        if cfg.get("patch_config"):
-            hydra.utils.instantiate(cfg.patch_config)
+            search_cfg = OmegaConf.to_container(cfg.search, resolve=True)
+            hydra.utils.instantiate(_prepare_config_for_instantiate(search_cfg))
+        if cfg.get("task_builder"):
+            task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
+            hydra.utils.instantiate(_prepare_config_for_instantiate(task_builder_cfg))
+        _build_job(cfg, create_output_dir=False)
         console.print("[green]✓ Configuration is valid.[/green]")
     except Exception as exc:
         console.print(f"[red]✗ Configuration is invalid:[/red] {exc}")
@@ -630,7 +652,10 @@ def _run_plugin_params_action(cfg: DictConfig) -> None:
 # ---------------------------------------------------------------------------
 
 
-@hydra.main(version_base=None, config_path="conf", config_name="config")
+_CONF_DIR = str(Path(__file__).parent / "conf")
+
+
+@hydra.main(version_base=None, config_path=_CONF_DIR, config_name="config")
 def main(cfg: DictConfig) -> None:
     """Main execution entry point loaded by Hydra."""
     _configure_verbose_logging(cfg.verbose)
@@ -638,7 +663,7 @@ def main(cfg: DictConfig) -> None:
     action = cfg.get("action", "run")
     runners: dict[str, Callable[[DictConfig], None]] = {
         "search": _run_search_action,
-        "prepare": _run_prepare_action,
+        "build-tasks": _run_build_tasks_action,
         "extract": _run_extract_action,
         "run": _run_run_action,
         "validate": _run_validate_action,

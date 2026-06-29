@@ -95,11 +95,15 @@ aereo action=plugins
 |----------|--------|-------------|
 | `01-sentinel2.ipynb` | Sentinel-2 MSI | True-color extraction from Planetary Computer |
 | `01b-sentinel2-ndvi.ipynb` | Sentinel-2 MSI | NDVI processing example |
+| `step_by_step.ipynb` | Sentinel-2 MSI | Same pipeline as `01-sentinel2.ipynb`, but each stage is run and inspected explicitly |
+| `step_by_step_raw.ipynb` | Sentinel-2 MSI | Same pipeline as `step_by_step.ipynb`, but built entirely from raw Python functions and parameters — no config files or Hydra |
 | `02-viirs.ipynb` | VIIRS | Earthaccess search + Satpy read |
 | `03-sentinel3.ipynb` | Sentinel-3 OLCI | Earthaccess search + Satpy read |
 | `03b-sentinel3-ndvi.ipynb` | Sentinel-3 OLCI | NDVI processing example |
 | `04-tessera.ipynb` | GeoTessera | Tessera tile search and extraction |
 | `05-goes19.ipynb` | GOES-19 ABI | Public AWS S3 search + Satpy read |
+| `06-swath-to-geobox-odc-vs-faiss.ipynb` | Synthetic swath | Reproject a 2-D lat/lon swath to a UTM GeoBox with `odc-geo` and FAISS nearest neighbours |
+| `06b-viirs-swath-odc-vs-faiss.ipynb` | VIIRS I04 | Three-way comparison (`odc-geo`, Satpy `resample`, FAISS) on a real VIIRS L1B swath from NASA Earthdata |
 
 ## Shared data
 

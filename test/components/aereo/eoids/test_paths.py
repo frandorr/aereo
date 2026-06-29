@@ -23,8 +23,8 @@ def test_build_eoids_path_basic():
 
     expected_dir = Path("/tmp/dataset/job-goes_c01/loc-36D61L/date-20260101")
     expected_filename = (
-        "loc-36D61L_start-20260101T100022_end-20260101T100932_"
-        "job-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
+        "collection-ABI-L1b-RadF_loc-36D61L_start-20260101T100022_"
+        "end-20260101T100932_variable-C01_res-1000m_job-goes_c01.tif"
     )
 
     assert path.parent == expected_dir
@@ -50,8 +50,8 @@ def test_build_eoids_path_derivatives():
         "/tmp/dataset/derivatives/cloud_mask/job-goes_c01/loc-36D61L/date-20260101"
     )
     expected_filename = (
-        "loc-36D61L_start-20260101T100022_job-goes_c01_"
-        "collection-ABI-L1b-RadF_variable-C01_res-1000m.nc"
+        "collection-ABI-L1b-RadF_loc-36D61L_start-20260101T100022_"
+        "variable-C01_res-1000m_job-goes_c01.nc"
     )
 
     assert path.parent == expected_dir
@@ -60,8 +60,8 @@ def test_build_eoids_path_derivatives():
 
 def test_parse_eoids_filename():
     fname = (
-        "loc-36D61L_start-20260101T100022_end-20260101T100932_"
-        "job-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
+        "collection-ABI-L1b-RadF_loc-36D61L_start-20260101T100022_"
+        "end-20260101T100932_variable-C01_res-1000m_job-goes_c01.tif"
     )
     parsed = parse_eoids_filename(fname)
     assert parsed["loc"] == "36D61L"

@@ -1,4 +1,4 @@
-"""Tests for CloudTaskStaging backend."""
+"""Tests for the internal _CloudTaskStaging helper."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ import pandas as pd
 import pytest
 from shapely.geometry import Polygon
 
-from aereo.backends.staging import CloudTaskStaging, _parse_s3_uri
+from aereo.executors._staging import _CloudTaskStaging, _parse_s3_uri
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
 
@@ -63,10 +63,10 @@ def test_parse_s3_uri():
 
 def test_gcs_provider_raises_not_implemented():
     with pytest.raises(NotImplementedError, match="GCS support coming soon"):
-        CloudTaskStaging(bucket="test-bucket", provider="gcs")
+        _CloudTaskStaging(bucket="test-bucket", provider="gcs")
 
     with pytest.raises(ValueError, match="Unsupported provider"):
-        CloudTaskStaging(bucket="test-bucket", provider="azure")
+        _CloudTaskStaging(bucket="test-bucket", provider="azure")
 
 
 def test_cloud_task_staging_stage():
@@ -75,7 +75,7 @@ def test_cloud_task_staging_stage():
     mock_boto3.client.return_value = mock_s3
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        staging = CloudTaskStaging(
+        staging = _CloudTaskStaging(
             bucket="test-bucket", provider="s3", endpoint_url="http://localhost:4566"
         )
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -109,7 +109,7 @@ def test_cloud_task_staging_upload_and_load_artifacts():
     mock_boto3.client.return_value = fake_s3
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        staging = CloudTaskStaging(bucket="test-bucket", provider="s3")
+        staging = _CloudTaskStaging(bucket="test-bucket", provider="s3")
         manifest = staging.upload_artifacts(
             artifacts, "s3://test-bucket/results/job/0/"
         )
@@ -117,7 +117,7 @@ def test_cloud_task_staging_upload_and_load_artifacts():
     assert manifest["manifest_uri"] == "s3://test-bucket/results/job/0/manifest.json"
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        staging = CloudTaskStaging(bucket="test-bucket", provider="s3")
+        staging = _CloudTaskStaging(bucket="test-bucket", provider="s3")
         loaded = staging.load_artifacts(manifest["manifest_uri"])
 
     assert len(loaded) == 1
@@ -137,7 +137,7 @@ def test_cloud_task_staging_load_artifacts_missing_key():
         fake_s3.upload_file(str(p), "test-bucket", "results/job/0/manifest.json")
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        staging = CloudTaskStaging(bucket="test-bucket", provider="s3")
+        staging = _CloudTaskStaging(bucket="test-bucket", provider="s3")
         with pytest.raises(KeyError):
             staging.load_artifacts("s3://test-bucket/results/job/0/manifest.json")
 
@@ -173,7 +173,7 @@ def test_load_artifacts_cleans_up_temp_on_exception():
             return result
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        staging = CloudTaskStaging(bucket="test-bucket", provider="s3")
+        staging = _CloudTaskStaging(bucket="test-bucket", provider="s3")
         with patch.object(tempfile, "TemporaryDirectory", TrackingTemporaryDirectory):
             with pytest.raises(KeyError):
                 staging.load_artifacts("s3://test-bucket/results/job/0/manifest.json")
@@ -218,7 +218,7 @@ def test_upload_artifacts_cleans_up_temp_on_exception():
     artifacts = _make_artifacts()
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        staging = CloudTaskStaging(bucket="test-bucket", provider="s3")
+        staging = _CloudTaskStaging(bucket="test-bucket", provider="s3")
         with patch.object(tempfile, "TemporaryDirectory", TrackingTemporaryDirectory):
             with pytest.raises(RuntimeError, match="S3 upload failed"):
                 staging.upload_artifacts(artifacts, "s3://test-bucket/results/job/0/")

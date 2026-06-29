@@ -63,15 +63,16 @@ urls.Documentation = "https://frandorr.github.io/aereo"
 urls.Homepage = "https://github.com/frandorr/aereo"
 urls.Issues = "https://github.com/frandorr/aereo/issues"
 urls.Repository = "https://github.com/frandorr/aereo"
-entry-points."aereo.plugins".process_composite = "aereo.builtins.processor:Composite"
-entry-points."aereo.plugins".process_ndvi = "aereo.builtins.processor:NDVI"
-entry-points."aereo.plugins".process_normalize = "aereo.builtins.processor:Normalize"
-entry-points."aereo.plugins".process_qa_mask = "aereo.builtins.processor:QAMask"
-entry-points."aereo.plugins".process_select_bands = "aereo.builtins.processor:SelectBands"
-entry-points."aereo.plugins".read_odc_stac = "aereo.builtins.read:ReadODCSTAC"
-entry-points."aereo.plugins".reproject_odc = "aereo.builtins.reproject:ReprojectODC"
-entry-points."aereo.plugins".search_stac = "aereo.builtins.search:SearchSTAC"
-entry-points."aereo.plugins".write_geotiff = "aereo.builtins.write:WriteGeoTIFF"
+entry-points."aereo.plugins".process_composite = "aereo.builtins.processor:composite"
+entry-points."aereo.plugins".process_ndvi = "aereo.builtins.processor:ndvi"
+entry-points."aereo.plugins".process_normalize = "aereo.builtins.processor:normalize"
+entry-points."aereo.plugins".process_qa_mask = "aereo.builtins.processor:qa_mask"
+entry-points."aereo.plugins".process_select_bands = "aereo.builtins.processor:select_bands"
+entry-points."aereo.plugins".read_odc_stac = "aereo.builtins.read:read_odc_stac"
+entry-points."aereo.plugins".reproject_odc = "aereo.builtins.reproject:reproject_odc"
+entry-points."aereo.plugins".search_stac = "aereo.builtins.search:search_stac"
+entry-points."aereo.plugins".task_builder_grouped = "aereo.builtins.task_builder:build_grouped_tasks"
+entry-points."aereo.plugins".write_geotiff = "aereo.builtins.write:write_geotiff"
 
 [dependency-groups]
 dev = [
@@ -80,9 +81,11 @@ dev = [
   "aereo-reproject-satpy",
   "aereo-search-aws-goes",
   "aereo-search-tessera",
+  "aereo-test-pipeline",
   "basedpyright>=1.38",
   "cartopy>=0.25",
   "earthaccess>=0.18",
+  "faiss-cpu>=1.14.3",
   "graphviz>=0.21",
   "icechunk>=2.0.3",
   "ipykernel>=7.2",
@@ -100,6 +103,7 @@ dev = [
   "python-semantic-release>=10.5.3,<11",
   "rioxarray>=0.22",
   "satpy>=0.59",
+  "scipy>=1.13",
   "tqdm>=4.68.2",
   "types-requests>=2.32.4.20260107,<3",
   "virtualizarr>=2.4",
@@ -117,12 +121,13 @@ build.dev-mode-dirs = [ "components", "bases", "development", "../majortom", "."
 metadata.allow-direct-references = true
 
 [tool.uv]
-sources.aereo = { path = "projects/aereo", editable = true }
+sources.aereo = { workspace = true }
 sources.aereo-read-satpy = { path = "../aereo-read-satpy/projects/aereo-read-satpy" }
 sources.aereo-read-tessera = { path = "../aereo-read-tessera/projects/aereo-read-tessera" }
 sources.aereo-reproject-satpy = { path = "../aereo-reproject-satpy/projects/aereo-reproject-satpy" }
 sources.aereo-search-aws-goes = { path = "../aereo-search-aws-goes/projects/aereo-search-aws-goes" }
 sources.aereo-search-tessera = { path = "../aereo-search-tessera/projects/aereo-search-tessera" }
+sources.aereo-test-pipeline = { path = "projects/aereo-lambda/test_pipeline", editable = true }
 managed = true
 workspace.members = [ "projects/*" ]
 
@@ -202,7 +207,9 @@ bricks."components/aereo/spatial" = "aereo/spatial"
 bricks."components/aereo/asset_downloader" = "aereo/asset_downloader"
 bricks."components/aereo/backends" = "aereo/backends"
 bricks."components/aereo/serialization" = "aereo/serialization"
+bricks."components/aereo/storage" = "aereo/storage"
 bricks."components/aereo/viz" = "aereo/viz"
+bricks."components/aereo_extract" = "aereo_extract"
 bricks."bases/aereo/cli" = "aereo/cli"
 bricks."bases/aereo/client" = "aereo/client"
 bricks."bases/aereo/lambda_handler" = "aereo/lambda_handler"

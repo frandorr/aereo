@@ -1,15 +1,16 @@
 read:
-  _target_: aereo.builtins.ReadODCSTAC
+  _target_: aereo.builtins.read.read_odc_stac
 
 preprocess:
-  - _target_: aereo.builtins.NDVI
-    ndvi_nir_band: B08
-    ndvi_red_band: B04
+  - _target_: aereo.builtins.processor.ndvi
+    # Element 84 Earth Search uses "nir" / "red" asset keys.
+    ndvi_nir_band: nir
+    ndvi_red_band: red
 
 reproject:
-  _target_: aereo.builtins.ReprojectODC
+  _target_: aereo.builtins.reproject.reproject_odc
   resampling: nearest
 
 
 write:
-  _target_: aereo.builtins.WriteGeoTIFF
+  _target_: aereo.builtins.write.write_geotiff
