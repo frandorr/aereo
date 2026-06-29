@@ -113,6 +113,9 @@ def build_eoids_path(
     safe_job = _sanitize_job_name(job_name)
     parts: list[str] = []
 
+    if collections:
+        parts.append(f"collection-{('+').join(collections)}")
+
     safe_cell = _sanitize_cell(cell_id) if cell_id else None
     if safe_cell:
         parts.append(f"loc-{safe_cell}")
@@ -121,15 +124,14 @@ def build_eoids_path(
         parts.append(f"start-{start_time.strftime(_EOIDS_DT_FMT)}")
     if end_time:
         parts.append(f"end-{end_time.strftime(_EOIDS_DT_FMT)}")
-    parts.append(f"job-{safe_job}")
 
-    if collections:
-        parts.append(f"collection-{('+').join(collections)}")
     if variables:
         parts.append(f"variable-{('+').join(variables)}")
 
     res_str = f"{int(resolution)}m"
     parts.append(f"res-{res_str}")
+
+    parts.append(f"job-{safe_job}")
 
     safe_suffix = _normalize_suffix(suffix)
     if not parts:
@@ -181,12 +183,12 @@ def parse_eoids_filename(path: str | Path) -> dict[str, str]:
     Example::
 
         >>> parse_eoids_filename(
-        ...     "loc-0U38L_start-20260101T100022_end-20260101T100953_"
-        ...     "job-goes_east_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
+        ...     "collection-ABI-L1b-RadF_loc-0U38L_start-20260101T100022_"
+        ...     "end-20260101T100953_variable-C01_res-1000m_job-goes_east.tif"
         ... )
-        {'loc': '0U38L', 'start': '20260101T100022', 'end': '20260101T100953',
-         'job': 'goes_east', 'collection': 'ABI-L1b-RadF',
-         'variable': 'C01', 'res': '1000m'}
+        {'collection': 'ABI-L1b-RadF', 'loc': '0U38L',
+         'start': '20260101T100022', 'end': '20260101T100953',
+         'variable': 'C01', 'res': '1000m', 'job': 'goes_east'}
     """
     stem = Path(path).stem
     return dict(_EOIDS_PATTERN.findall(stem))

@@ -46,7 +46,7 @@ User Query / Config
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ EOIDS on disk                                                               │
 │ loc-<cell>/date-<YYYYMMDD>/profile-<name>/collection-<col>/variable-<var>/  │
-│   loc-..._start-..._end-..._profile-..._collection-..._variable-..._res-...m.tif
+│   collection-..._loc-..._start-..._end-..._variable-..._res-...m_job-...tif
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -352,7 +352,7 @@ Structure (EOIDS)** convention:
       profile-<name>/
         collection-<collection>/
           variable-<variable>/
-            loc-<cell_id>_start-<ISO>_end-<ISO>_profile-<name>_collection-<collection>_variable-<variable>_res-<resolution>m.tif
+            collection-<collection>_loc-<cell_id>_start-<ISO>_end-<ISO>_variable-<variable>_res-<resolution>m_job-<job_name>.tif
 ```
 
 This makes it trivial to:
