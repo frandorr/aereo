@@ -29,7 +29,7 @@ can focus on the science instead of the plumbing.
 │                              User-facing layer                               │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐ │
 │  │ Python API   │  │ Hydra CLI    │  │ Jupyter      │  │ AWS Lambda      │ │
-│  │ AereoClient  │  │ aereo        │  │ notebooks    │  │ handler         │ │
+│  │ ExtractionJob│  │ aereo        │  │ notebooks    │  │ handler         │ │
 │  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  └────────┬────────┘ │
 └─────────┼─────────────────┼─────────────────┼───────────────────┼──────────┘
           │                 │                 │                   │
@@ -37,17 +37,17 @@ can focus on the science instead of the plumbing.
                                       │
                           ┌───────────▼────────────┐
                           │    ExtractionJob       │
-│                         │  (search, grid, patch, │
+│                         │  (grid, patch,         │
                           │   extract, output_uri) │
                           └───────────┬────────────┘
                                       │
           ┌───────────────────────────┼───────────────────────────┐
           │                           │                           │
 ┌─────────▼─────────┐     ┌───────────▼───────────┐   ┌───────────▼───────────┐
-│  Search plugins   │     │  Grid / Patch system  │   │  Execution backends   │
-│  SearchProvider   │     │  Major TOM grid       │   │  LocalProcessBackend  │
-│                   │     │  UTMGridConfig        │   │  ThreadBackend        │
-└─────────┬─────────┘     └───────────┬───────────┘   │  LambdaBackend        │
+│  Search plugins   │     │  Grid / Patch system  │   │  Executors            │
+│  SearchProvider   │     │  Major TOM grid       │   │  LocalExecutor        │
+│                   │     │  UTMGridConfig        │   │  LambdaExecutor       │
+└─────────┬─────────┘     └───────────┬───────────┘   └───────────┬───────────┘
           │                           │               └───────────┬───────────┘
           │                           │                           │
 ┌─────────▼───────────────────────────▼───────────────────────────▼───────────┐

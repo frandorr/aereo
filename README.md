@@ -15,7 +15,11 @@
 Satellite data lives in a dozen different catalogs, each with its own API,
 authentication, and file format. **AEREO** unifies them into a single pipeline:
 **search** across catalogs, **prepare** extraction tasks on a shared grid, and
-**execute** them through the backend of your choice.
+**execute** them through the executor of your choice.
+
+AEREO is built around plain Python functions, not classes. Search providers,
+readers, processors, reprojectors, and writers are all functions that you
+compose into an `ExtractionJob`.
 
 ## Install
 
@@ -40,28 +44,62 @@ pip install aereo aereo-search-aws-goes aereo-read-satpy aereo-reproject-satpy
 ## 10-line example
 
 ```python
+from datetime import datetime, timezone
+from aereo.builtins import search_stac, build_grouped_tasks
+from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
 
+# 1. Load the job (grid + patch + extract stages)
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
-client = AereoClient()
 
-results = client.search(job.search)
-tasks = client.prepare_tasks(results, job=job)
-artifacts = client.execute_tasks(tasks, backend=LocalProcessBackend(max_workers=2))
+# 2. Search   3. Prepare tasks   4. Execute
+assets = job.search(
+    search_stac,
+    stac_api_url="https://earth-search.aws.element84.com/v1",
+    collections={"sentinel-2-l2a": ["red", "nir"]},
+    intersects="examples/config/aoi/chocon.geojson",
+    start_datetime=datetime(2024, 1, 1, tzinfo=timezone.utc),
+    end_datetime=datetime(2024, 1, 10, tzinfo=timezone.utc),
+)
+tasks = job.build_tasks(assets, build_grouped_tasks, cells_per_task=5)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 ```
 
 Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid.
 
 ---
 
+## Why AEREO?
+
+| Problem | How AEREO solves it |
+|---|---|
+| Every catalog has a different API | One `job.search(...)` call with swappable search functions. |
+| Tiles do not line up across sensors | Built-in Major TOM grid + UTM patch geoboxes. |
+| Reprojection boilerplate | `reproject_odc` warps every patch automatically. |
+| Mixed-CRS scenes fail | `build_grouped_tasks` groups assets by native CRS. |
+| Notebook → production is hard | Same config package runs in Python, CLI, and AWS Lambda. |
+| Plugin frameworks force inheritance | AEREO plugins are `@validate_call` functions + entry points. |
+
+---
+
+## Core concepts
+
+1. **`ExtractionJob`** — a validated bundle of grid, patch, output URI, and extraction stages.
+2. **Search function** — e.g. `search_stac`. Pass it to `job.search(...)` with kwargs.
+3. **Task builder function** — e.g. `build_grouped_tasks`. Groups assets into `ExtractionTask` objects.
+4. **`ExtractionTask`** — one unit of work: assets + grid patches + stage pipeline.
+5. **Stage functions** — `read_odc_stac`, `reproject_odc`, `ndvi`, `write_geotiff`, etc. Wired into `ExtractConfig`.
+6. **`LocalExecutor`** — runs tasks locally. Swap for Lambda later without changing the pipeline.
+
+---
+
 ## Docs & Examples
 
+- [AEREO in 5 Minutes](https://frandorr.github.io/aereo/five-minutes/) — concepts, wins, and first steps
 - [Your First Pipeline](https://frandorr.github.io/aereo/first-pipeline/) — first extraction in 5 minutes
 - [Examples](https://frandorr.github.io/aereo/examples/) — Sentinel-2, VIIRS, Sentinel-3, Tessera, GOES-19
 - [Run with CLI](https://frandorr.github.io/aereo/run/run-with-cli/) — zero-code `aereo action=run`
-- [Build a Plugin](https://frandorr.github.io/aereo/plugins/build-first-plugin/) — extend AEREO
+- [Build a Plugin](https://frandorr.github.io/aereo/plugins/build-first-plugin/) — extend AEREO with a function
 
 ---
 

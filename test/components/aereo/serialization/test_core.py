@@ -6,13 +6,13 @@ from aereo.grid import ExtractionPatch
 from aereo.interfaces import ExtractConfig, ExtractionTask, GridConfig, PatchConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
-from aereo.serialization import TaskSerializer
+from aereo.executors._serialization import _TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
 
-from aereo.builtins.read import ReadODCSTAC
-from aereo.builtins.reproject import ReprojectODC
-from aereo.builtins.write import WriteGeoTIFF
+from aereo.builtins.read import read_odc_stac
+from aereo.builtins.reproject import reproject_odc
+from aereo.builtins.write import write_geotiff
 
 
 def _make_task(
@@ -35,9 +35,9 @@ def _make_task(
     )
 
     extract = ExtractConfig(
-        read=ReadODCSTAC(),
-        reproject=ReprojectODC(),
-        write=WriteGeoTIFF(),
+        read=read_odc_stac,
+        reproject=reproject_odc,
+        write=write_geotiff,
     )
     grid_config = GridConfig(target_grid_dist=50_000)
     patch_config = PatchConfig(resolution=100.0, margin=10.0, padding=2)
@@ -55,7 +55,6 @@ def _make_task(
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="test_uri",
-        search=None,
         extract=extract,
         target_aoi=aoi,
     )
@@ -71,7 +70,7 @@ def _make_task(
 
 def test_round_trip_basic(tmp_path: Any) -> None:
     """Serialize and deserialize a basic task; assert equality."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     original = _make_task()
 
     dest = tmp_path / "task_dir"
@@ -119,7 +118,7 @@ def test_round_trip_basic(tmp_path: Any) -> None:
 
 def test_round_trip_with_aoi(tmp_path: Any) -> None:
     """AOI geometry survives round-trip via WKT."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     aoi = Polygon([[-1, -1], [2, -1], [2, 2], [-1, 2]])
     original = _make_task(aoi=aoi)
 
@@ -133,7 +132,7 @@ def test_round_trip_with_aoi(tmp_path: Any) -> None:
 
 def test_round_trip_task_context(tmp_path: Any) -> None:
     """Arbitrary task_context metadata is preserved."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     ctx = {"chunk_id": 7, "total_chunks": 42, "extractor_hint": "aereo-extract-dummy"}
     original = _make_task(task_context=ctx)
 
@@ -146,7 +145,7 @@ def test_round_trip_task_context(tmp_path: Any) -> None:
 
 def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
     """Tasks with several patches reconstruct every patch faithfully."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
 
     df = gpd.GeoDataFrame(
         {
@@ -183,15 +182,14 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
     ]
 
     extract = ExtractConfig(
-        read=ReadODCSTAC(),
-        reproject=ReprojectODC(),
-        write=WriteGeoTIFF(),
+        read=read_odc_stac,
+        reproject=reproject_odc,
+        write=write_geotiff,
     )
     job = ExtractionJob(
         grid_config=GridConfig(target_grid_dist=10_000),
         patch_config=PatchConfig(resolution=10.0, margin=5.0, padding=0),
         output_uri="out",
-        search=None,
         extract=extract,
     )
     original = ExtractionTask(
@@ -215,7 +213,7 @@ def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
 
 def test_assets_crs_preserved(tmp_path: Any) -> None:
     """The assets GeoDataFrame CRS is preserved through GeoParquet round-trip."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     original = _make_task()
 
     dest = tmp_path / "task_crs"
@@ -226,37 +224,28 @@ def test_assets_crs_preserved(tmp_path: Any) -> None:
     assert reconstructed.assets.crs.to_epsg() == 4326
 
 
-def test_batch_writer_round_trip(tmp_path: Any) -> None:
-    """BatchWriter plugins survive serialization round-trip."""
-    from aereo.builtins.batch_write import BatchWriteGeoTIFF
-
-    serializer = TaskSerializer()
+def test_serialize_to_bytes_round_trip() -> None:
+    """Task round-trips through a zip byte payload."""
+    serializer = _TaskSerializer()
     original = _make_task()
-    # Replace write with BatchWriteGeoTIFF
-    job = ExtractionJob(
-        name=original.job.name,
-        grid_config=original.grid_config,
-        patch_config=original.patch_config,
-        output_uri=original.output_uri,
-        search=None,
-        extract=ExtractConfig(
-            read=original.extract.read,
-            preprocess=original.extract.preprocess,
-            reproject=original.extract.reproject,
-            postprocess=original.extract.postprocess,
-            write=BatchWriteGeoTIFF(),
-        ),
-        target_aoi=original.aoi,
-    )
-    original = ExtractionTask(
-        assets=original.assets,
-        job=job,
-        patches=original.patches,
-        task_context=original.task_context,
-    )
 
-    dest = tmp_path / "task_batch"
-    serializer.serialize(original, dest)
-    reconstructed = serializer.deserialize(dest)
+    payload = serializer.serialize_to_bytes(original)
+    reconstructed = serializer.deserialize_from_bytes(payload)
 
-    assert isinstance(reconstructed.extract.write, BatchWriteGeoTIFF)
+    assert len(reconstructed.assets) == len(original.assets)
+    assert type(reconstructed.extract.read) is type(original.extract.read)
+    assert reconstructed.grid_config == original.grid_config
+    assert reconstructed.patches[0].id == original.patches[0].id
+    assert reconstructed.task_context == original.task_context
+
+
+def test_serialize_to_bytes_preserved_crs() -> None:
+    """Assets CRS survives byte payload round-trip."""
+    serializer = _TaskSerializer()
+    original = _make_task()
+
+    payload = serializer.serialize_to_bytes(original)
+    reconstructed = serializer.deserialize_from_bytes(payload)
+
+    assert reconstructed.assets.crs is not None
+    assert reconstructed.assets.crs.to_epsg() == 4326

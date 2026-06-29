@@ -25,8 +25,8 @@ dataset/
 │   ├── loc-36D61L/                     <-- 2. Geographic cell
 │   │   ├── date-20260101/              <-- 3. Date of Observation
 │   │   │   ├── job.json                <-- 4. Job metadata sidecar
-│   │   │   ├── loc-36D61L_start-2026...
-│   │   │   ├── loc-36D61L_start-2026...
+│   │   │   ├── collection-S2-L2A_loc-36D61L_start-2026...
+│   │   │   ├── collection-S2-L2A_loc-36D61L_start-2026...
 │   ├── date-20260102/
 ```
 
@@ -43,7 +43,7 @@ dataset/
 │   │   ├── job-sentinel2_b04_sample/
 │   │   │   ├── loc-36D61L/
 │   │   │   │   ├── date-20260101/
-│   │   │   │   │   ├── loc-36D61L_start-20260101T100022_variable-cloud_prob.nc
+│   │   │   │   │   ├── collection-ABI-L1b-RadF_loc-36D61L_start-20260101T100022_variable-cloud_prob_res-1000m_job-goes_c01.nc
 ```
 
 ### `job.json` sidecar
@@ -88,14 +88,14 @@ Filenames consist of strict `key-value` entities.
 * `res`: Spatial resolution (e.g., `1000m`).
 
 **Example:**
-`loc-36D61L_start-20260101T100022_end-20260101T100932_job-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif`
+`collection-ABI-L1b-RadF_loc-36D61L_start-20260101T100022_end-20260101T100932_variable-C01_res-1000m_job-goes_c01.tif`
 
 ### `+` concatenation for multi-collection / multi-variable jobs
 
 When a job extracts more than one collection or variable, the values are joined by `+` in the filename:
 
 ```text
-loc-1U10L_start-20260101T100000_job-viirs_geo_collection-IMG202+IMG203_variable-I04+I05_res-375m.tif
+collection-IMG202+IMG203_loc-1U10L_start-20260101T100000_variable-I04+I05_res-375m_job-viirs_geo.tif
 ```
 
 This preserves the exact extraction configuration in a single filename while remaining machine-parseable.
@@ -107,8 +107,8 @@ Any downstream script can trivially parse the metadata without opening the file:
 from aereo.eoids import parse_eoids_filename
 
 metadata = parse_eoids_filename(
-    "loc-36D61L_start-20260101T100022_end-20260101T100932_"
-    "job-goes_c01_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
+    "collection-ABI-L1b-RadF_loc-36D61L_start-20260101T100022_"
+    "end-20260101T100932_variable-C01_res-1000m_job-goes_c01.tif"
 )
 # {'loc': '36D61L', 'start': '20260101T100022', 'end': '20260101T100932',
 #  'job': 'goes_c01', 'collection': 'ABI-L1b-RadF',

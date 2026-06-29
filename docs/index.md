@@ -7,10 +7,18 @@
 Satellite data lives in a dozen different catalogs, each with its own API,
 authentication, and file format. **AEREO** unifies them into a single pipeline:
 **search** across catalogs, **prepare** extraction tasks on a shared grid, and
-**execute** them through the backend of your choice — from a local notebook to
+**execute** them through the executor of your choice — from a local notebook to
 AWS Lambda.
 
 <div class="grid cards" markdown>
+
+-   ## AEREO in 5 minutes
+
+    ---
+
+    Learn the core concepts, what you can build, and why AEREO exists.
+
+    [:octicons-arrow-right-24: Read Now](five-minutes.md)
 
 -   ## Run your first pipeline
 
@@ -32,7 +40,7 @@ AWS Lambda.
 
     ---
 
-    Use Hydra config packages with `AereoClient` or the `aereo` CLI.
+    Use Hydra config packages with `ExtractionJob` and the `aereo` CLI.
 
     [:octicons-arrow-right-24: Run Aereo](run/index.md)
 
@@ -40,8 +48,8 @@ AWS Lambda.
 
     ---
 
-    Add a new search provider, reader, or writer. Like PyTorch modules:
-    implement `__call__` and register via entry points.
+    Add a new search provider, reader, or writer. AEREO plugins are plain
+    Python functions registered via entry points.
 
     [:octicons-arrow-right-24: Learn How](plugins/plugin-overview.md)
 
@@ -51,7 +59,7 @@ AWS Lambda.
 
     Explore the complete API for power users and plugin developers.
 
-    [:octicons-arrow-right-24: View API](api/client.md)
+    [:octicons-arrow-right-24: View API](api/pipeline.md)
 
 </div>
 
@@ -60,18 +68,17 @@ AWS Lambda.
 ## 10-line example
 
 ```python
+from aereo.builtins import build_grouped_tasks, search_stac
+from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
 
-# Load a Hydra config package (search + grid + patch + extract)
+# Load a Hydra config package (grid + patch + extract)
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
-client = AereoClient()
 
 # 1. Search   2. Prepare tasks   3. Execute
-results = client.search(job.search)
-tasks = client.prepare_tasks(results, job=job)
-artifacts = client.execute_tasks(tasks, backend=LocalProcessBackend(max_workers=2))
+results = job.search(search_stac, stac_api_url="https://earth-search.aws.element84.com/v1")
+tasks = job.build_tasks(results, build_grouped_tasks)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 ```
 
 Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid.
@@ -82,17 +89,18 @@ Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid.
 
 ```text
 ┌─────────┐     ┌──────────────┐     ┌────────────────────┐     ┌───────────┐
-│  Search │ ──▶ │ Prepare tasks│ ──▶ │ Execute on backend │ ──▶ │  EOIDS    │
+│  Search │ ──▶ │ Prepare tasks│ ──▶ │ Execute on executor│ ──▶ │  EOIDS    │
 │ provider│     │ Grid + Patch │     │ Local / Lambda     │     │ GeoTIFFs  │
 └─────────┘     └──────────────┘     └────────────────────┘     └───────────┘
 ```
 
-1. **Search** — a `SearchProvider` queries a catalog and returns a validated
+1. **Search** — a search function queries a catalog and returns a validated
    `GeoDataFrame[AssetSchema]`.
 2. **Prepare** — AEREO builds grid cells over your AOI, groups assets by time,
    and chunks them into `ExtractionTask` objects.
-3. **Execute** — a backend runs each task through a stage pipeline:
-   `Reader → Processor → Reprojector → Processor → Writer`.
+3. **Execute** — an executor runs each task through the stage pipeline
+   configured in `ExtractConfig`:
+   `read function → preprocess functions → reproject function → postprocess functions → write function`.
 
 All of this is configurable through Hydra YAML files or plain Python objects.
 

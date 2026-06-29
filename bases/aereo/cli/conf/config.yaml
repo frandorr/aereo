@@ -18,9 +18,16 @@ tasks: null
 plugin_name: null
 format: table
 
-# ExtractionJob config defaults
+# Runtime plugins (not part of ExtractionJob)
 search: null
-pipeline: []
+task_builder:
+  _target_: aereo.builtins.task_builder.build_grouped_tasks
+  cells_per_task: 50
+  init_params: {}
+
+# ExtractionJob configuration
+name: default
+derivative: null
 grid_config:
   _target_: aereo.interfaces.GridConfig
   target_grid_dist: 50000
@@ -29,3 +36,9 @@ patch_config:
   resolution: 10.0
   padding: 0
   margin: 10.0
+extract:
+  read: null
+  preprocess: []
+  reproject: null
+  postprocess: []
+  write: null

@@ -1,15 +1,16 @@
 # Grid System
 
 AEREO partitions the Earth into analysis-ready cells using the ESA Major TOM
-grid conventions. Every extraction task is tied to a `GridCell`, and the set of
-cells that cover an AOI is produced by a `GridDefinition`.
+grid conventions. Every extraction task is tied to an `ExtractionPatch`, and the
+set of patches that cover an AOI is produced by a `GridDefinition` plus a
+`PatchConfig`.
 
 ---
 
 ## GridDefinition
 
-A `GridDefinition` creates the cells that intersect any polygon. It is the first
-thing built during `prepare_tasks` (unless the extractor provides its own
+A `GridDefinition` creates the raw cells that intersect any polygon. It is the
+first thing built during `build_tasks` (unless the extractor provides its own
 defaults).
 
 ```python
@@ -19,10 +20,10 @@ from shapely.geometry import box
 # Create a grid with 256 km cells and no overlap
 grid_def = GridDefinition(d=256000, overlap=False)
 
-# Build cells over an AOI
+# Build raw cells over an AOI
 aoi = box(-63.5, -41.0, -57.0, -34.0)
-cells = list(grid_def.generate_grid_cells(aoi))
-print(f"Generated {len(cells)} cells")
+raw_cells = list(grid_def.generate_raw_cells(aoi))
+print(f"Generated {len(raw_cells)} cells")
 ```
 
 | Parameter | Description |
@@ -51,9 +52,9 @@ Set `overlap=True` when you want neighbouring cells to share a 50 % border:
 
 ```python
 grid_def = GridDefinition(d=128000, overlap=True)
-cells = list(grid_def.generate_grid_cells(aoi))
-primary = [c for c in cells if c.is_primary]
-overlap = [c for c in cells if not c.is_primary]
+raw_cells = list(grid_def.generate_raw_cells(aoi))
+primary = [c for c in raw_cells if c[2]]
+overlap = [c for c in raw_cells if not c[2]]
 ```
 
 Overlapping cells are generated **in addition to** primary cells. They are
@@ -62,52 +63,49 @@ algorithms that need continuous coverage without edge artifacts.
 
 ---
 
-## GridCell
+## ExtractionPatch
 
-The fundamental unit of extraction. A `GridCell` represents a geographic area
-with a known coordinate reference system, resolution, and pixel alignment.
+The fundamental unit of extraction. An `ExtractionPatch` represents a geographic
+cell with a known coordinate reference system, resolution, and pixel alignment.
+It is created from a `GridDefinition` and a `PatchConfig`:
 
 ```python
-from aereo.grid import GridCell
-from shapely.geometry import Polygon
+from aereo.grid import GridDefinition, generate_extraction_patches
+from aereo.interfaces import PatchConfig
+from shapely.geometry import box
 
-cell = GridCell(
-    d=10000,  # 10 km cell
-    geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-    cell_id="loc-16D20L",
-)
+grid_def = GridDefinition(d=10000)
+patch_config = PatchConfig(resolution=10.0, margin=10.0)
+patches = generate_extraction_patches(box(-63.5, -41.0, -57.0, -34.0), grid_def, patch_config)
+print(f"Generated {len(patches)} patches")
 ```
 
 ---
 
 ## Area definition
 
-Convert a cell to an `odc.geo.GeoBox` for raster operations:
+Convert a patch to an `odc.geo.GeoBox` for raster operations:
 
 ```python
-geobox = cell.area_def(resolution=100, anchor="edge")
+geobox = patch.geobox
 ```
 
-| Parameter | Description |
-|-----------|-------------|
-| `resolution` | Target pixel size in CRS units. |
-| `anchor` | Pixel alignment: `"edge"` (top-left) or `"center"`. |
-| `tight` | Disable pixel snapping for exact extents. |
-| `conform_to` | Force uniform `(width, height)` across a batch. |
+The `geobox` is computed lazily from the patch's UTM footprint, resolution,
+margin, padding, and optional `conform_to` shape.
 
 ---
 
 ## Conform mode
 
-When `conform_to=(w, h)` is provided, `tight=True` is enforced internally so
-every cell in a batch has the exact same pixel dimensions — essential for
-stacking arrays.
+When `patch_config.conform_to=(w, h)` is provided, `tight=True` is enforced
+internally so every patch in a batch has the exact same pixel dimensions —
+essential for stacking arrays.
 
 ---
 
 ## Grid filtering modes
 
-During `prepare_tasks`, AEREO intersects the generated grid with the **asset
+During `build_tasks`, AEREO intersects the generated grid with the **asset
 geometry** (the actual satellite swath footprint, not the AOI). You can control
 how strict that intersection is via the grid config or prepare arguments:
 
@@ -118,9 +116,9 @@ how strict that intersection is via the grid config or prepare arguments:
 | **Coverage** | `grid_filter_mode='coverage'` + `min_coverage=0.5` | Keeps cells where overlap fraction ≥ `min_coverage` | Tunable balance |
 
 ```python
-from aereo.grid import UTMGridConfig
+from aereo.interfaces import GridConfig
 
-grid_config = UTMGridConfig(
+grid_config = GridConfig(
     target_grid_dist=128000,
     grid_filter_mode="coverage",
     min_coverage=0.5,
@@ -155,9 +153,9 @@ cell will include a lot of surrounding area.
 **Fix:** Use a smaller cell size:
 
 ```python
-from aereo.grid import UTMGridConfig
+from aereo.interfaces import GridConfig
 
-grid_config = UTMGridConfig(target_grid_dist=50_000)  # 50 km cells
+grid_config = GridConfig(target_grid_dist=50_000)  # 50 km cells
 ```
 
 Remember: `target_grid_dist` controls the **cell** size in metres, while

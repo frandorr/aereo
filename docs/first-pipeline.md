@@ -54,24 +54,32 @@ A job bundles four things:
 
 | Ingredient | Purpose |
 |------------|---------|
-| `search` | A `SearchProvider` that queries the catalog. |
 | `grid_config` | How the AOI is tiled into Major TOM cells. |
 | `patch_config` | Physical patch dimensions for extraction. |
 | `extract` | The stage pipeline: reader, reprojector, writer, processors. |
+| `output_uri` | Where artifacts and the catalog are written. |
+
+Search providers and task builders are runtime arguments, not part of the job.
 
 ---
 
 ## 4. Search
 
 ```python
-from aereo.client import AereoClient
+from aereo.builtins import search_stac
 
-client = AereoClient()
-results = client.search(job.search)
+results = job.search(
+    search_stac,
+    stac_api_url="https://earth-search.aws.element84.com/v1",
+    collections={"sentinel-2-l2a": ["red", "nir"]},
+    intersects="examples/config/aoi/chocon.geojson",
+    start_datetime="2024-01-01T00:00:00Z",
+    end_datetime="2024-01-10T23:59:59Z",
+)
 print(f"Found {len(results)} assets")
 ```
 
-`client.search()` takes a single `SearchProvider` instance and returns a
+`job.search()` takes a search function and keyword arguments, and returns a
 validated `GeoDataFrame[AssetSchema]`.
 
 > [!TIP]
@@ -85,11 +93,13 @@ validated `GeoDataFrame[AssetSchema]`.
 ## 5. Prepare tasks
 
 ```python
-tasks = client.prepare_tasks(results, job=job)
+from aereo.builtins import build_grouped_tasks
+
+tasks = job.build_tasks(results, build_grouped_tasks, cells_per_task=5)
 print(f"Prepared {len(tasks)} extraction tasks")
 ```
 
-`prepare_tasks()` turns search results into a list of `ExtractionTask` objects,
+`build_tasks()` turns search results into a list of `ExtractionTask` objects,
 each carrying the grid cells, assets, and extraction stages it needs.
 
 ---
@@ -97,10 +107,9 @@ each carrying the grid cells, assets, and extraction stages it needs.
 ## 6. Extract
 
 ```python
-from aereo.backends import LocalProcessBackend
+from aereo.executors import LocalExecutor
 
-backend = LocalProcessBackend(max_workers=2)
-artifacts = client.execute_tasks(tasks, backend=backend)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 print(f"Extracted {len(artifacts)} artifacts")
 ```
 

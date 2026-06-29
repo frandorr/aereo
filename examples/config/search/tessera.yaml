@@ -1,4 +1,5 @@
-_target_: aereo.search_tessera.SearchTessera
+_target_: aereo.search_tessera.search_tessera
+_partial_: true
 collections:
   geotessera: []
 intersects: config/aoi/oxford.geojson

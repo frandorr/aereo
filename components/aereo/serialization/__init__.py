@@ -1,9 +1,9 @@
-"""Task serialization for cross-network transport.
+"""Legacy task serialization package.
 
-Persists :class:`ExtractionTask` as a pair of files (GeoParquet + JSON) so it
-can be shipped to remote workers (e.g. AWS Lambda).
+Serialization helpers are now internal to :mod:`aereo.executors`. This package
+is kept as an empty compatibility shim and will be removed in a future release.
 """
 
-from aereo.serialization.core import TaskSerializer
+from __future__ import annotations
 
-__all__ = ["TaskSerializer"]
+__all__: list[str] = []

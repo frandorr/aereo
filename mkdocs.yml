@@ -161,6 +161,7 @@ nav:
           - AWS Lambda: run/run-on-lambda.md
     - Concepts:
           - Pipeline Architecture: concepts/pipeline-architecture.md
+          - Pipeline Walkthrough: concepts/pipeline-walkthrough.md
           - Working with Grids: concepts/grids.md
           - Output Formats: concepts/output-formats.md
           - How Plugins Work: plugins/plugin-overview.md
@@ -189,7 +190,6 @@ nav:
                 - Interfaces: api/interfaces.md
                 - Registry: api/registry.md
                 - Schemas: api/schemas.md
-                - Task Builder: api/task_builder.md
           - Built-ins:
                 - Built-in Plugins: api/builtins.md
                 - Cache: api/cache.md

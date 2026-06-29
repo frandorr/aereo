@@ -21,7 +21,7 @@ from shapely.geometry import Polygon
 
 def test_extraction_task_validation():
     from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import ReadODCSTAC
+    from aereo.builtins.read import read_odc_stac
 
     df = gpd.GeoDataFrame(
         {"collection": ["GOES"], "start_time": ["2023-01-01"]},
@@ -29,12 +29,11 @@ def test_extraction_task_validation():
     )
     grid_config = GridConfig(target_grid_dist=10_000)
     patch_config = PatchConfig(resolution=10.0)
-    extract = ExtractConfig(read=ReadODCSTAC())
+    extract = ExtractConfig(read=read_odc_stac)
     job = ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="test",
-        search=None,
         extract=extract,
     )
     task = ExtractionTask(
@@ -48,7 +47,7 @@ def test_extraction_task_validation():
 
 def test_extraction_task_rejects_mixed_crs():
     from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import ReadODCSTAC
+    from aereo.builtins.read import read_odc_stac
 
     df = gpd.GeoDataFrame(
         {
@@ -63,12 +62,11 @@ def test_extraction_task_rejects_mixed_crs():
     )
     grid_config = GridConfig(target_grid_dist=10_000)
     patch_config = PatchConfig(resolution=10.0)
-    extract = ExtractConfig(read=ReadODCSTAC())
+    extract = ExtractConfig(read=read_odc_stac)
     job = ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="test",
-        search=None,
         extract=extract,
     )
 
@@ -82,7 +80,7 @@ def test_extraction_task_rejects_mixed_crs():
 
 def test_extraction_task_accepts_single_crs():
     from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import ReadODCSTAC
+    from aereo.builtins.read import read_odc_stac
 
     df = gpd.GeoDataFrame(
         {
@@ -97,12 +95,11 @@ def test_extraction_task_accepts_single_crs():
     )
     grid_config = GridConfig(target_grid_dist=10_000)
     patch_config = PatchConfig(resolution=10.0)
-    extract = ExtractConfig(read=ReadODCSTAC())
+    extract = ExtractConfig(read=read_odc_stac)
     job = ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="test",
-        search=None,
         extract=extract,
     )
 
@@ -271,25 +268,24 @@ def test_infer_dataset_time_bounds():
     assert ds.attrs["end_time"] == t2
 
 
-def test_batch_writer_is_aereo_plugin():
-    from aereo.interfaces.core import BatchWriter, AereoPlugin
+def test_extract_config_rejects_non_writer():
+    from aereo.interfaces.core import ExtractConfig
+    from aereo.builtins.read import read_odc_stac
 
-    assert issubclass(BatchWriter, AereoPlugin)
+    class _NotAWriter:
+        pass
+
+    with pytest.raises(ValidationError):
+        ExtractConfig(
+            read=read_odc_stac,
+            reproject=None,
+            write=_NotAWriter(),  # type: ignore[arg-type]
+        )
 
 
-def test_extract_config_accepts_batch_writer():
-    from aereo.interfaces.core import ExtractConfig, BatchWriter
-    from aereo.builtins.read import ReadODCSTAC
+def test_task_staging_protocol_removed():
+    """TaskStaging protocol was removed from the public interfaces module."""
+    import importlib
 
-    class _DummyBatchWriter(BatchWriter):
-        def __call__(self, patches, task):
-            from aereo.schemas import ArtifactSchema
-
-            return ArtifactSchema.empty_geodataframe()
-
-    cfg = ExtractConfig(
-        read=ReadODCSTAC(),
-        reproject=None,
-        write=_DummyBatchWriter(),
-    )
-    assert isinstance(cfg.write, BatchWriter)
+    module = importlib.import_module("aereo.interfaces")
+    assert not hasattr(module, "TaskStaging")

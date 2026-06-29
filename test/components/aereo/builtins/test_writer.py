@@ -1,7 +1,8 @@
-"""Tests for the WriteGeoTIFF built-in writer."""
+"""Tests for the write_geotiff built-in writer."""
 
 from __future__ import annotations
 
+from functools import partial
 from typing import Any
 
 import numpy as np
@@ -11,7 +12,7 @@ import rioxarray  # noqa: F401 — registers the ``rio`` accessor on xarray obje
 import xarray as xr
 from shapely.geometry import Polygon, box
 
-from aereo.builtins import WriteGeoTIFF
+from aereo.builtins import write_geotiff
 from aereo.grid import ExtractionPatch
 from aereo.interfaces.core import ExtractionTask, GridConfig, PatchConfig
 from aereo.pipeline import ExtractionJob
@@ -47,9 +48,9 @@ def _make_dataset(data_vars=None, dims=("band", "y", "x"), shape=(1, 8, 8)):
 def _make_task(tmp_path):
     """Return a minimal ExtractionTask for writer tests."""
     from aereo.interfaces.core import ExtractConfig
-    from aereo.builtins.read import ReadODCSTAC
-    from aereo.builtins.reproject import ReprojectODC
-    from aereo.builtins.write import WriteGeoTIFF
+    from aereo.builtins.read import read_odc_stac
+    from aereo.builtins.reproject import reproject_odc
+    from aereo.builtins.write import write_geotiff
 
     valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
     valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
@@ -73,11 +74,10 @@ def _make_task(tmp_path):
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri=str(tmp_path),
-        search=None,
         extract=ExtractConfig(
-            read=ReadODCSTAC(),
-            reproject=ReprojectODC(),
-            write=WriteGeoTIFF(),
+            read=read_odc_stac,
+            reproject=reproject_odc,
+            write=write_geotiff,
         ),
     )
     return ExtractionTask(
@@ -96,7 +96,7 @@ def test_write_geotiff_plain_mode_driver(tmp_path):
     """Default path writes a single GTiff containing all variables as bands."""
     ds = _make_dataset()
     task = _make_task(tmp_path)
-    writer = WriteGeoTIFF()
+    writer = write_geotiff
     result = writer(ds, task, task.patches[0])
 
     assert len(result) == 1
@@ -112,7 +112,7 @@ def test_write_geotiff_plain_mode_returns_artifacts(tmp_path):
     """Plain path returns one artifact that groups all variables."""
     ds = _make_dataset()
     task = _make_task(tmp_path)
-    writer = WriteGeoTIFF()
+    writer = write_geotiff
     result = writer(ds, task, task.patches[0])
 
     assert len(result) == 1
@@ -135,7 +135,7 @@ def test_write_geotiff_band_descriptions_match_variables(tmp_path):
     """Each raster band is labelled with its source variable name."""
     ds = _make_dataset()
     task = _make_task(tmp_path)
-    writer = WriteGeoTIFF()
+    writer = write_geotiff
     result = writer(ds, task, task.patches[0])
 
     assert len(result) == 1
@@ -160,8 +160,8 @@ def test_write_geotiff_tiled_via_rio_params(tmp_path):
     """Tiling is applied to the single multi-band output file."""
     ds = _make_dataset(shape=(64, 64))
     task = _make_task(tmp_path)
-    writer = WriteGeoTIFF(
-        rio_params={"tiled": True, "blockxsize": 32, "blockysize": 32}
+    writer = partial(
+        write_geotiff, rio_params={"tiled": True, "blockxsize": 32, "blockysize": 32}
     )
     result = writer(ds, task, task.patches[0])
 
@@ -197,7 +197,7 @@ def test_write_geotiff_multiband_plain(tmp_path):
     ds.attrs["end_time"] = pd.Timestamp("2026-01-01T12:10:00").to_pydatetime()
 
     task = _make_task(tmp_path)
-    writer = WriteGeoTIFF()
+    writer = write_geotiff
     result = writer(ds, task, task.patches[0])
 
     assert len(result) == 1
@@ -222,7 +222,7 @@ def test_write_geotiff_multiband_tiled(tmp_path):
     ds.attrs["end_time"] = pd.Timestamp("2026-01-01T12:10:00").to_pydatetime()
 
     task = _make_task(tmp_path)
-    writer = WriteGeoTIFF(rio_params={"tiled": True})
+    writer = partial(write_geotiff, rio_params={"tiled": True})
     result = writer(ds, task, task.patches[0])
 
     import rasterio
@@ -241,8 +241,14 @@ def test_write_geotiff_multiband_tiled(tmp_path):
 
 
 def test_write_geotiff_fields():
-    """Only rio_params is declared."""
-    assert "rio_params" in WriteGeoTIFF.model_fields
+    """Only rio_params is declared as a configurable keyword."""
+    import inspect
+
+    sig = inspect.signature(write_geotiff)
+    assert "rio_params" in sig.parameters
+    assert "ds" in sig.parameters
+    assert "task" in sig.parameters
+    assert "patch" in sig.parameters
 
 
 # ---------------------------------------------------------------------------
@@ -254,8 +260,9 @@ def test_write_geotiff_rio_params_forwarded(tmp_path):
     """Custom rio_params (tags and compress) are forwarded directly to to_raster."""
     ds = _make_dataset()
     task = _make_task(tmp_path)
-    writer = WriteGeoTIFF(
-        rio_params={"tags": {"custom_key": "custom_val"}, "compress": "lzw"}
+    writer = partial(
+        write_geotiff,
+        rio_params={"tags": {"custom_key": "custom_val"}, "compress": "lzw"},
     )
 
     result = writer(ds, task, task.patches[0])
@@ -278,7 +285,7 @@ def test_write_geotiff_missing_time_bounds_raises(tmp_path):
     ds = ds.rio.write_crs("EPSG:4326")
 
     task = _make_task(tmp_path)
-    writer = WriteGeoTIFF()
+    writer = write_geotiff
     with pytest.raises(ValueError, match="start_time.*end_time"):
         writer(ds, task, task.patches[0])
 
@@ -291,7 +298,7 @@ def test_write_geotiff_derivative_folder(tmp_path):
     task = _make_task(tmp_path)
     job_with_derivative = task.job.model_copy(update={"derivative": "ndvi"})
     task = attrs.evolve(task, job=job_with_derivative)
-    writer = WriteGeoTIFF()
+    writer = write_geotiff
     result = writer(ds, task, task.patches[0])
 
     assert len(result) == 1

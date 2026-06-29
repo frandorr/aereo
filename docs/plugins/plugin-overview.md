@@ -1,183 +1,192 @@
 # AEREO Plugin System
 
-`aereo` uses a modular, object-oriented plugin architecture built around
-standard Python `entry_points`. This lets developers register new search
-providers, readers, processors, reprojectors, and writers without third-party
-hook libraries like `pluggy`.
-
-Plugins feel like PyTorch modules: you subclass a base interface, implement
-`__call__`, and register the class under the `aereo.plugins` entry-point group.
+`aereo` uses a modular plugin architecture built around plain Python functions
+and standard `entry_points`. You do not need to subclass a base class or learn a
+plugin framework: implement a function with the right signature, decorate it with
+Pydantic's `@validate_call`, and register it under the `aereo.plugins` entry-point
+group.
 
 ---
 
 ## How it works
 
 The plugin system relies on strongly-typed interfaces defined in
-`aereo.interfaces`. Plugins subclass these base classes, and `AereoRegistry`
-discovers them at runtime from `entry_points`.
+`aereo.interfaces`. Plugins are functions that match these `Protocol` signatures,
+and `AereoRegistry` discovers them at runtime from `entry_points`.
 
-### The pipeline (`AereoClient`)
+### The pipeline (`ExtractionJob`)
 
 The data orchestration lifecycle has three core stages:
 
-1. **Search**: `SearchProvider` plugins query satellite data collections and
-   return standardized `AssetSchema` GeoDataFrames.
-2. **Prepare**: `AereoClient` turns search results into `ExtractionTask`
-   objects, using the `GridConfig`, `PatchConfig`, and `ExtractConfig` from the
-   job.
-3. **Execute**: An `ExecutionBackend` runs each task through the stage pipeline
+1. **Search**: a search function queries a satellite data collection and returns
+   a standardized `AssetSchema` GeoDataFrame.
+2. **Prepare**: `ExtractionJob.build_tasks()` turns search results into
+   `ExtractionTask` objects, using the `GridConfig`, `PatchConfig`, and
+   `ExtractConfig` from the job.
+3. **Execute**: an executor runs each task through the stage pipeline
    configured in `ExtractConfig`:
-   `Reader → Processor → Reprojector → Processor → Writer`.
+   `read function → preprocess functions → reproject function → postprocess functions → write function`.
 
 ### Built-in stages
 
-The `aereo.builtins` package ships with ready-to-use plugins:
+The `aereo.builtins` package ships with ready-to-use functions:
 
-| Stage | Built-in plugins |
-|-------|------------------|
-| Search | `SearchSTAC`, `SearchEarthaccess` |
-| Reader | `ReadODCSTAC` |
-| Processor | `SelectBands`, `QAMask`, `NDVI`, `Normalize`, `Composite` |
-| Reprojector | `ReprojectODC` |
-| Writer | `WriteGeoTIFF`, `BatchWriteGeoTIFF` |
+| Stage | Built-in functions | Input | Output |
+|-------|--------------------|-------|--------|
+| Search | `search_stac`, `search_earthaccess` | `(collections, intersects, start_datetime, end_datetime, **kwargs)` | `GeoDataFrame[AssetSchema]` |
+| Reader | `read_odc_stac` | `ExtractionTask` | `xr.Dataset` |
+| Processor | `select_bands`, `qa_mask`, `ndvi`, `normalize`, `composite` | `xr.Dataset` | `xr.Dataset` |
+| Reprojector | `reproject_odc` | `(xr.Dataset, ExtractionTask, **kwargs)` | `dict[str, xr.Dataset]` (keyed by patch id) |
+| Writer | `write_geotiff` | `(xr.Dataset, ExtractionTask, ExtractionPatch)` | `GeoDataFrame[ArtifactSchema]` |
+| Task builder | `build_grouped_tasks` | `(GeoDataFrame[AssetSchema], ExtractionJob)` | `Sequence[ExtractionTask]` |
 
 External plugins (installed separately) provide additional readers,
-reprojectors, and search providers, such as `ReadSatpy`, `ReprojectSatpy`,
-`SearchAwsGoes`, and `SearchTessera`.
+reprojectors, and search providers, such as `read_satpy`, `reproject_satpy`,
+`search_aws_goes`, and `search_tessera`.
 
 ---
 
 ## The API surface
 
-`aereo.interfaces` provides the core contracts that plugins implement.
+`aereo.interfaces` provides the core contracts that plugins implement. Each
+contract is a `Protocol`, so plugins can be regular functions.
 
 ### `SearchProvider`
 
 Responsible for querying remote APIs and building the initial asset footprint.
 
 ```python
+from datetime import datetime
+from typing import Any, Mapping, Sequence
+
 from pandera.typing.geopandas import GeoDataFrame
+from pydantic import ConfigDict, validate_call
+from shapely.geometry.base import BaseGeometry
+
 from aereo.interfaces import SearchProvider
 from aereo.schemas import AssetSchema
 
-class MySearchProvider(SearchProvider):
-    def __call__(self) -> GeoDataFrame[AssetSchema]:
-        # Query the catalog, build a GeoDataFrame, validate it.
-        ...
+
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def my_search_provider(
+    collections: Mapping[str, Sequence[str]] | Sequence[str] | None,
+    intersects: BaseGeometry | None,
+    start_datetime: datetime | None,
+    end_datetime: datetime | None,
+    api_key: str,
+) -> GeoDataFrame[AssetSchema]:
+    """Search a catalog and return validated assets."""
+    ...
 ```
 
 ### `Reader`
 
-Opens a source asset and returns an `xr.DataArray` (or similar) for downstream
-stages.
+Opens source assets and returns an `xr.Dataset` for downstream stages.
 
 ```python
-from aereo.interfaces import Reader, ExtractionTask
 import xarray as xr
+from pydantic import ConfigDict, validate_call
 
-class MyReader(Reader):
-    def __call__(self, task: ExtractionTask) -> xr.DataArray:
-        # Open hrefs from task.assets, return a DataArray.
-        ...
+from aereo.interfaces import Reader, ExtractionTask
+
+
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def my_reader(task: ExtractionTask) -> xr.Dataset:
+    """Open hrefs from task.assets and return a Dataset."""
+    ...
 ```
 
 ### `Processor`
 
-Transforms a data array. Processors run before and/or after the reprojector.
+Transforms a dataset. Processors run before and/or after the reprojector.
 
 ```python
-from aereo.interfaces import Processor
 import xarray as xr
+from pydantic import ConfigDict, validate_call
 
-class MyProcessor(Processor):
-    def __call__(self, data: xr.DataArray, task: ExtractionTask) -> xr.DataArray:
-        # Transform data.
-        ...
+from aereo.interfaces import Processor
+
+
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def my_processor(ds: xr.Dataset) -> xr.Dataset:
+    """Transform data."""
+    ...
 ```
 
 ### `Reprojector`
 
-Reprojects data to the task's target grid.
+Reprojects data to the task's target patches.
 
 ```python
-from aereo.interfaces import Reprojector, ExtractionTask
 import xarray as xr
-from odc.geo.geobox import GeoBox
+from pydantic import ConfigDict, validate_call
 
-class MyReprojector(Reprojector):
-    def __call__(self, data: xr.DataArray, geobox: GeoBox, task: ExtractionTask) -> xr.DataArray:
-        # Reproject data to geobox.
-        ...
+from aereo.interfaces import Reprojector, ExtractionTask
+
+
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def my_reprojector(
+    ds: xr.Dataset,
+    task: ExtractionTask,
+    resampling: str = "nearest",
+) -> dict[str, xr.Dataset]:
+    """Reproject ds for every patch in task."""
+    ...
 ```
 
-### `Writer` / `BatchWriter`
+### `Writer`
 
 Writes final artifacts to disk or object store.
 
 ```python
-from aereo.interfaces import Writer, ExtractionTask
 from pandera.typing.geopandas import GeoDataFrame
+from pydantic import ConfigDict, validate_call
+import xarray as xr
+
+from aereo.interfaces import Writer, ExtractionTask, ExtractionPatch
 from aereo.schemas import ArtifactSchema
 
-class MyWriter(Writer):
-    def __call__(self, data, task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
-        # Write files and return artifact rows.
-        ...
+
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def my_writer(
+    ds: xr.Dataset,
+    task: ExtractionTask,
+    patch: ExtractionPatch,
+) -> GeoDataFrame[ArtifactSchema]:
+    """Write data and return artifact rows."""
+    ...
+```
+
+### `TaskBuilder`
+
+Builds extraction tasks from search results.
+
+```python
+from typing import Sequence
+
+from pandera.typing.geopandas import GeoDataFrame
+from pydantic import ConfigDict, validate_call
+
+from aereo.interfaces import TaskBuilder, ExtractionJob, ExtractionTask
+from aereo.schemas import AssetSchema
+
+
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def my_task_builder(
+    search_results: GeoDataFrame[AssetSchema],
+    job: ExtractionJob,
+) -> Sequence[ExtractionTask]:
+    """Group assets into extraction tasks."""
+    ...
 ```
 
 ---
 
-## Plugin parameter metadata
+## Parameter introspection
 
-Plugins can declare typed parameter schemas using `PluginParam`. This enables
-runtime introspection, CLI help generation, and validation before execution.
-
-### `PluginParam`
-
-A frozen Pydantic model that describes a single configuration parameter:
-
-```python
-from aereo.interfaces import PluginParam
-
-param = PluginParam(
-    name="reader",
-    type="choice",
-    description="Rasterio reader driver to use",
-    choices=["abi_l1b", "netcdf", "geotiff"],
-    required=True,
-)
-```
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | `str` | Parameter key |
-| `type` | `Literal["str", "int", "float", "bool", "choice", "path", "list[str]"]` | Expected value type |
-| `description` | `str` | Human-readable help text |
-| `default` | `Any \| None` | Default value when omitted |
-| `choices` | `Sequence[str] \| None` | Allowed values for `"choice"` type |
-| `required` | `bool` | Whether the parameter must be provided |
-
-### Declaring params on a plugin
-
-Set `required_params` and `optional_params` as class attributes on your plugin
-subclass:
-
-```python
-from aereo.interfaces import SearchProvider, PluginParam
-
-class MySearchProvider(SearchProvider):
-    required_params = [
-        PluginParam(name="api_key", type="str", description="API authentication key", required=True),
-    ]
-
-    optional_params = [
-        PluginParam(name="max_cloud_cover", type="float", description="Max cloud cover %", default=20.0),
-    ]
-```
-
-### Introspecting params at runtime
-
-The `AereoRegistry` provides methods to query parameter metadata:
+Because plugins are `@validate_call` functions, their signatures are
+introspectable at runtime. `AereoRegistry` derives parameter metadata from the
+function signature and Pydantic field information:
 
 ```python
 from aereo.registry import AereoRegistry
@@ -191,28 +200,21 @@ params = registry.get_plugin_params("search_stac")
 catalog = registry.list_all_params()
 ```
 
-> [!NOTE]
-> Parameter metadata is optional. Existing plugins that do not declare
-> `required_params` / `optional_params` continue to work unchanged.
-
 ---
 
 ## Using the high-level API
 
-The `AereoClient` provides a simple interface that handles plugin discovery and
-execution.
+`ExtractionJob` provides the orchestration methods that drive the pipeline.
 
 ```python
 from aereo.pipeline import ExtractionJob
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
+from aereo.executors import LocalExecutor
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
-client = AereoClient()
 
-results = client.search(job.search)
-tasks = client.prepare_tasks(results, job=job)
-artifacts = client.execute_tasks(tasks, backend=LocalProcessBackend(max_workers=2))
+results = job.search(...)
+tasks = job.build_tasks(results, ...)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 print(artifacts[["id", "grid_cell", "uri"]].head())
 ```
 
@@ -225,9 +227,9 @@ Plugins are discovered automatically via Python `entry_points`. Declare them in
 
 ```toml
 [project.entry-points."aereo.plugins"]
-my_searcher = "my_package.module:MySearchProvider"
-my_reader = "my_package.module:MyReader"
-my_writer = "my_package.module:MyWriter"
+my_searcher = "my_package.module:my_search_provider"
+my_reader = "my_package.module:my_reader"
+my_writer = "my_package.module:my_writer"
 ```
 
 > [!IMPORTANT]

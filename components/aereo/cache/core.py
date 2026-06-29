@@ -16,6 +16,7 @@ from typing import Any, cast
 
 import filelock
 import geopandas as gpd
+from aereo.executors._serialization import PluginSerializer
 from aereo.interfaces import ExtractionTask
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -29,14 +30,8 @@ def _geometry_to_wkt(geom: Any) -> str | None:
 
 
 def _model_dump(plugin: Any) -> dict[str, Any] | None:
-    """Serialize a Pydantic plugin instance to a JSON-compatible dict.
-
-    Falls back to string representation for fields that are not JSON
-    serializable.
-    """
-    if plugin is None:
-        return None
-    return plugin.model_dump(mode="json", round_trip=False)
+    """Serialize a plugin callable to a JSON-compatible dict."""
+    return PluginSerializer.dumps(plugin)
 
 
 class TaskResultCache:

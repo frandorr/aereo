@@ -1,119 +1,150 @@
 """Example: load an AEREO extraction job from a Hydra config package.
 
 This script shows how to compose an ``ExtractionJob`` from the Hydra config
-package in this directory and run the full search → prepare → extract pipeline
-with ``AereoClient``. It also demonstrates the ``target_aoi`` key and its
-fallback to ``search.intersects``.
+package in this directory and run the full search → build-tasks → extract
+pipeline with ``ExtractionJob`` methods. Search and task-builder plugins are
+loaded separately because they are runtime concerns, not part of the job
+model.
 
 Usage:
-    cd examples/config
-    uv run python run_job.py
+    cd examples
+    uv run python config/run_job.py
 
-The default config performs a real STAC search against the Planetary Computer
+The default config performs a real STAC search against the Earth Search
 endpoint. Set ``DRY_RUN=true`` to skip network calls and only validate the
 loaded configuration:
 
-    DRY_RUN=true uv run python run_job.py
+    DRY_RUN=true uv run python config/run_job.py
 """
 
 from __future__ import annotations
 
+import argparse
 import os
 from pathlib import Path
 
-from aereo.backends import LocalProcessBackend
-from aereo.client import AereoClient
-from aereo.pipeline import ExtractionJob
+from aereo.executors import LocalExecutor
+from aereo.interfaces import SearchProvider, TaskBuilder
+from aereo.pipeline import ExtractionJob, load_plugin
 
 
 DRY_RUN = os.environ.get("DRY_RUN", "false").lower() in ("1", "true", "yes")
 
 
-def load_and_print_job(config_dir: Path) -> ExtractionJob:
-    """Load a validated ``ExtractionJob`` from the config package.
+def load_job(config_dir: Path, config_name: str = "job_sentinel2") -> ExtractionJob:
+    """Load a validated ``ExtractionJob`` from the Hydra config package.
 
     Args:
         config_dir: Directory containing the Hydra config package.
+        config_name: Name of the root config file (without ``.yaml``).
 
     Returns:
         A validated ``ExtractionJob`` instance.
     """
-    # Optional Hydra overrides, e.g.:
-    # overrides = ["patch_config=high_res", "target_aoi=/path/to/aoi.geojson"]
-    overrides: list[str] | None = None
+    return ExtractionJob.load_from_config(config_dir, config_name=config_name)
 
-    job = ExtractionJob.load_from_config(
+
+def load_plugins(
+    config_dir: Path,
+    search_name: str = "sentinel2_pc",
+    task_builder_name: str = "grouped",
+) -> tuple[SearchProvider, TaskBuilder]:
+    """Load search provider and task builder plugins from the config package.
+
+    Args:
+        config_dir: Directory containing the Hydra config package.
+        search_name: Name of the search provider config file.
+        task_builder_name: Name of the task builder config file.
+
+    Returns:
+        A tuple of ``(search_provider, task_builder)``.
+    """
+    search_provider = load_plugin(config_dir, "search", search_name)
+    task_builder = load_plugin(config_dir, "task_builder", task_builder_name)
+    return search_provider, task_builder
+
+
+def run_pipeline(
+    job: ExtractionJob,
+    search_provider: SearchProvider,
+    task_builder: TaskBuilder,
+) -> None:
+    """Run search → build-tasks → extract for a validated job.
+
+    Args:
+        job: The validated ``ExtractionJob`` to execute.
+        search_provider: Search provider to use.
+        task_builder: Task builder to use.
+    """
+    # Search
+    print("\n🔍 Searching...")
+    search_results = job.search(search_provider)
+    print(f"✓ Found {len(search_results)} scenes")
+
+    if search_results.empty:
+        print("No results; skipping build-tasks/extract.")
+        return
+
+    # Build tasks
+    print("\n📦 Building tasks...")
+    tasks = job.build_tasks(search_results, task_builder)
+    print(f"✓ Built {len(tasks)} tasks")
+
+    # Extract
+    print("\n⛏️ Extracting...")
+    executor = LocalExecutor(workers=1)
+    artifacts = job.execute(tasks, executor=executor)
+    print(f"✓ Extracted {len(artifacts)} artifacts")
+
+
+def main() -> None:
+    """Entry point for the example script."""
+    parser = argparse.ArgumentParser(
+        description="Run an AEREO extraction from a Hydra config package."
+    )
+    parser.add_argument(
+        "--config-name",
+        default="job_sentinel2",
+        help="Root job config name (without .yaml).",
+    )
+    parser.add_argument(
+        "--search",
+        default="sentinel2_pc",
+        help="Search provider config name (without .yaml).",
+    )
+    parser.add_argument(
+        "--task-builder",
+        default="grouped",
+        help="Task builder config name (without .yaml).",
+    )
+    args = parser.parse_args()
+
+    config_dir = Path(__file__).parent.resolve()
+    print(f"Loading config package from: {config_dir}\n")
+
+    job = load_job(config_dir, config_name=args.config_name)
+    search_provider, task_builder = load_plugins(
         config_dir,
-        config_name="main_config",
-        overrides=overrides,
+        search_name=args.search,
+        task_builder_name=args.task_builder,
     )
 
-    print("\n--- Validated ExtractionJob ---")
+    print("--- Validated ExtractionJob ---")
     print(f"name: {job.name}")
     print(f"output_uri: {job.output_uri}")
     print(f"grid_config.target_grid_dist: {job.grid_config.target_grid_dist}")
     print(f"patch_config.resolution: {job.patch_config.resolution}")
-    if job.search is None:
-        raise ValueError("Loaded job is missing a search provider.")
-
-    print(f"search.intersects type: {type(job.search.intersects).__name__}")
     print(f"target_aoi type: {type(job.target_aoi).__name__}")
     print(
         "effective_target_aoi is target_aoi: "
         f"{job.effective_target_aoi is job.target_aoi}"
     )
 
-    return job
-
-
-def run_pipeline(job: ExtractionJob) -> None:
-    """Run search → prepare → extract for a validated job.
-
-    Args:
-        job: The validated ``ExtractionJob`` to execute.
-    """
-    if job.search is None:
-        raise ValueError("Loaded job is missing a search provider.")
-
-    client = AereoClient()
-
-    # Search
-    print("\n🔍 Searching...")
-    search_results = client.search(job.search)
-    print(f"✓ Found {len(search_results)} scenes")
-
-    if search_results.empty:
-        print("No results; skipping prepare/extract.")
-        return
-
-    # Prepare
-    print("\n📦 Preparing tasks...")
-    tasks = client.prepare_tasks(
-        search_results=search_results,
-        job=job,
-        cells_per_task=50,
-    )
-    print(f"✓ Prepared {len(tasks)} tasks")
-
-    # Extract
-    print("\n⛏️ Extracting...")
-    backend = LocalProcessBackend(max_workers=1)
-    artifacts = client.execute_tasks(tasks, backend=backend)
-    print(f"✓ Extracted {len(artifacts)} artifacts")
-
-
-def main() -> None:
-    """Entry point for the example script."""
-    config_dir = Path(__file__).parent.resolve()
-    print(f"Loading config package from: {config_dir}\n")
-
-    job = load_and_print_job(config_dir)
-
     if DRY_RUN:
-        print("\nDRY_RUN enabled: skipping search/prepare/extract.")
+        print("\nDRY_RUN enabled: skipping search/build-tasks/extract.")
         return
 
-    run_pipeline(job)
+    run_pipeline(job, search_provider, task_builder)
 
 
 if __name__ == "__main__":

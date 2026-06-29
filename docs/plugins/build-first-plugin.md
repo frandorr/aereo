@@ -51,9 +51,9 @@ uv sync
 
 ## Step 3: Write your plugin logic
 
-Plugins are standard Python classes that inherit from base interfaces defined in
-`aereo.interfaces`. Like PyTorch modules, the interesting work happens in
-`__call__`.
+Plugins are plain Python functions decorated with `@validate_call`. The
+interesting work happens in the function body, and the signature tells AEREO
+which parameters users can pass.
 
 ### Search plugin
 
@@ -63,64 +63,63 @@ Create a search provider (e.g., in `acme_plugin/search.py`).
 """ACME search plugin for aereo."""
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Mapping, Sequence
 
 import geopandas as gpd
 import pandas as pd
 from pandera.typing.geopandas import GeoDataFrame
+from pydantic import ConfigDict, validate_call
 from shapely.geometry import box
+from shapely.geometry.base import BaseGeometry
 
 from aereo.interfaces import SearchProvider
 from aereo.schemas import AssetSchema
 
 
-class AcmeSearchProvider(SearchProvider):
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def acme_search_provider(
+    collections: Mapping[str, Sequence[str]] | Sequence[str] | None,
+    intersects: BaseGeometry | None,
+    start_datetime: datetime | None,
+    end_datetime: datetime | None,
+    api_key: str,
+) -> GeoDataFrame[AssetSchema]:
     """Search plugin for ACME satellite data."""
+    # Your ACME API search logic here
 
-    def __init__(self, api_key: str, intersects: Any = None, **kwargs: Any):
-        self.api_key = api_key
-        self.intersects = intersects
+    df = pd.DataFrame([
+        {
+            "id": "acme_item_001",
+            "collection": "acme-l1",
+            "start_time": datetime.utcnow(),
+            "end_time": datetime.utcnow(),
+            "geometry": box(-1, -1, 1, 1),
+            "href": "https://acme.org/data.tif",
+        }
+    ])
 
-    def __call__(self) -> GeoDataFrame[AssetSchema]:
-        """Search ACME API for satellite data."""
-        # Your ACME API search logic here
-
-        df = pd.DataFrame([
-            {
-                "id": "acme_item_001",
-                "collection": "acme-l1",
-                "start_time": datetime.utcnow(),
-                "end_time": datetime.utcnow(),
-                "geometry": box(-1, -1, 1, 1),
-                "href": "https://acme.org/data.tif",
-            }
-        ])
-
-        gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
-        return AssetSchema.validate(gdf)
+    gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
+    return AssetSchema.validate(gdf)
 ```
 
 ### Reader plugin
 
-Create a reader that opens source assets and returns an `xr.DataArray`:
+Create a reader that opens source assets and returns an `xr.Dataset`:
 
 ```python
 """ACME reader plugin for aereo."""
 
 import xarray as xr
+from pydantic import ConfigDict, validate_call
+
 from aereo.interfaces import Reader, ExtractionTask
 
 
-class AcmeReader(Reader):
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def acme_reader(task: ExtractionTask, bands: list[str] | None = None) -> xr.Dataset:
     """Reader plugin for ACME data."""
-
-    def __init__(self, bands: list[str] | None = None):
-        self.bands = bands or ["B01"]
-
-    def __call__(self, task: ExtractionTask) -> xr.DataArray:
-        """Open ACME assets for this task."""
-        # Open hrefs from task.assets, select bands, return a DataArray.
-        ...
+    # Open hrefs from task.assets, select bands, return a Dataset.
+    ...
 ```
 
 ### Writer plugin
@@ -135,22 +134,23 @@ from pathlib import Path
 import geopandas as gpd
 import xarray as xr
 from pandera.typing.geopandas import GeoDataFrame
+from pydantic import ConfigDict, validate_call
 
-from aereo.interfaces import Writer, ExtractionTask
+from aereo.interfaces import Writer, ExtractionTask, ExtractionPatch
 from aereo.schemas import ArtifactSchema
 
 
-class AcmeWriter(Writer):
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def acme_writer(
+    ds: xr.Dataset,
+    task: ExtractionTask,
+    patch: ExtractionPatch,
+    output_dir: str = ".",
+) -> GeoDataFrame[ArtifactSchema]:
     """Writer plugin for ACME data."""
-
-    def __init__(self, output_dir: str = "."):
-        self.output_dir = Path(output_dir)
-
-    def __call__(self, data: xr.DataArray, task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
-        """Write data and return artifact records."""
-        # Write GeoTIFFs, build artifact GeoDataFrame, validate.
-        ...
-        return ArtifactSchema.empty()
+    # Write GeoTIFFs, build artifact GeoDataFrame, validate.
+    ...
+    return ArtifactSchema.empty()
 ```
 
 ---
@@ -159,23 +159,22 @@ class AcmeWriter(Writer):
 
 `aereo` discovers third-party plugins automatically using Python entry points.
 
-Add the plugin class paths to `pyproject.toml` under the unified `aereo.plugins`
+Add the plugin function paths to `pyproject.toml` under the unified `aereo.plugins`
 group:
 
 ```toml
 [project.entry-points."aereo.plugins"]
-# alias = "module.path:ClassName"
-acme_search = "acme_plugin.search:AcmeSearchProvider"
-acme_read = "acme_plugin.read:AcmeReader"
-acme_write = "acme_plugin.write:AcmeWriter"
+# alias = "module.path:function_name"
+acme_search = "acme_plugin.search:acme_search_provider"
+acme_read = "acme_plugin.read:acme_reader"
+acme_write = "acme_plugin.write:acme_writer"
 ```
 
 ---
 
 ## Step 5: Document your parameters
 
-If you declared `required_params` and `optional_params`, users can introspect
-them at runtime via the `AereoRegistry`:
+Users can introspect parameters at runtime via the `AereoRegistry`:
 
 ```python
 from aereo.registry import AereoRegistry
@@ -202,15 +201,15 @@ Use your plugin in a Hydra config:
 
 ```yaml
 search:
-  _target_: acme_plugin.search:AcmeSearchProvider
+  _target_: acme_plugin.search:acme_search_provider
   api_key: ${oc.env:ACME_API_KEY}
 
 extract:
   read:
-    _target_: acme_plugin.read:AcmeReader
+    _target_: acme_plugin.read:acme_reader
     bands: ["B01", "B02"]
   write:
-    _target_: acme_plugin.write:AcmeWriter
+    _target_: acme_plugin.write:acme_writer
     output_dir: /tmp/acme_out
 ```
 
@@ -218,15 +217,13 @@ Or instantiate it in Python:
 
 ```python
 from aereo.pipeline import ExtractionJob
-from aereo.client import AereoClient
-from aereo.backends import LocalProcessBackend
+from aereo.executors import LocalExecutor
 
 job = ExtractionJob.load_from_config("configs/acme", config_name="job")
-client = AereoClient()
 
-results = client.search(job.search)
-tasks = client.prepare_tasks(results, job=job)
-artifacts = client.execute_tasks(tasks, backend=LocalProcessBackend(max_workers=2))
+results = job.search(...)
+tasks = job.build_tasks(results, ...)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 ```
 
 ---
@@ -236,11 +233,16 @@ artifacts = client.execute_tasks(tasks, backend=LocalProcessBackend(max_workers=
 Test your plugin with a small Hydra config or directly in Python:
 
 ```python
-from acme_plugin.search import AcmeSearchProvider
+from acme_plugin.search import acme_search_provider
 from aereo.schemas import AssetSchema
 
-provider = AcmeSearchProvider(api_key="test")
-results = provider()
+results = acme_search_provider(
+    collections=["acme-l1"],
+    intersects=None,
+    start_datetime=None,
+    end_datetime=None,
+    api_key="test",
+)
 assert isinstance(results, AssetSchema.validate(results).__class__)
 ```
 
@@ -265,13 +267,14 @@ pip install aereo-plugin-acme
 
 ## Interface reference
 
-| Interface | Purpose | Key method |
-|-----------|---------|------------|
-| `SearchProvider` | Query satellite data | `__call__` |
-| `Reader` | Open source assets | `__call__` |
-| `Processor` | Transform data arrays | `__call__` |
-| `Reprojector` | Reproject to target grid | `__call__` |
-| `Writer` / `BatchWriter` | Write artifacts | `__call__` |
+| Interface | Purpose | Callable signature |
+|-----------|---------|--------------------|
+| `SearchProvider` | Query satellite data | `(collections, intersects, start_datetime, end_datetime, **kwargs) -> GeoDataFrame[AssetSchema]` |
+| `Reader` | Open source assets | `(task: ExtractionTask, ...) -> xr.Dataset` |
+| `Processor` | Transform datasets | `(ds: xr.Dataset) -> xr.Dataset` |
+| `Reprojector` | Reproject to target grid | `(ds: xr.Dataset, task: ExtractionTask, ...) -> dict[str, xr.Dataset]` |
+| `Writer` | Write artifacts | `(ds: xr.Dataset, task: ExtractionTask, patch: ExtractionPatch, ...) -> GeoDataFrame[ArtifactSchema]` |
+| `TaskBuilder` | Build extraction tasks | `(search_results, job: ExtractionJob, ...) -> Sequence[ExtractionTask]` |
 
 See the `aereo.interfaces` module for detailed documentation.
 

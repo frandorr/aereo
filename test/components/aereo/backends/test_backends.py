@@ -1,32 +1,26 @@
-"""Tests for remote execution backends."""
+"""Tests for the LambdaExecutor remote executor."""
 
 from __future__ import annotations
 
 import json
 import sys
-import time
 from pathlib import Path
 from typing import Any, cast
 from unittest.mock import MagicMock, patch
 
 import geopandas as gpd
+import pandas as pd
 import pytest
 from shapely.geometry import Polygon
 
-from aereo.backends.lambda_backend import LambdaBackend, RetryableLambdaError
-from aereo.interfaces import AereoPlugin
-from aereo.interfaces.core import ExtractionTask, GridConfig, PatchConfig, ExtractConfig
+from aereo.executors import LambdaExecutor, RetryableLambdaError
+from aereo.interfaces.core import ExtractionTask, ExtractConfig, GridConfig, PatchConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import ArtifactSchema, AssetSchema
+from aereo.builtins.read import read_odc_stac
+from aereo.builtins.reproject import reproject_odc
+from aereo.builtins.write import write_geotiff
 from pandera.typing.geopandas import GeoDataFrame
-from aereo.builtins.read import ReadODCSTAC
-from aereo.builtins.reproject import ReprojectODC
-from aereo.builtins.write import WriteGeoTIFF
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 
 
 @pytest.fixture(autouse=True)
@@ -41,7 +35,7 @@ def _mock_botocore():
 
 
 def _make_task(
-    pipeline: list[AereoPlugin] | None = None,
+    pipeline: list[Any] | None = None,
     task_context: dict[str, Any] | None = None,
 ) -> ExtractionTask:
     """Return a minimal ExtractionTask for testing."""
@@ -62,15 +56,14 @@ def _make_task(
     grid_config = GridConfig(target_grid_dist=50_000)
     patch_config = PatchConfig(resolution=10.0)
     extract = ExtractConfig(
-        read=ReadODCSTAC(),
-        reproject=ReprojectODC(),
-        write=WriteGeoTIFF(),
+        read=read_odc_stac,
+        reproject=reproject_odc,
+        write=write_geotiff,
     )
     job = ExtractionJob(
         grid_config=grid_config,
         patch_config=patch_config,
         output_uri="test-uri",
-        search=None,
         extract=extract,
     )
     return ExtractionTask(
@@ -81,68 +74,94 @@ def _make_task(
     )
 
 
-class _FakeStaging:
-    """Fake TaskStaging for unit tests."""
-
-    bucket = "aer-test-bucket"
-
-    def __init__(self) -> None:
-        self.staged: list[tuple[Path, str, int]] = []
-        self.artifacts_to_return: list[GeoDataFrame[ArtifactSchema]] = []
-        self._call_idx = 0
-
-    def stage(self, src_dir: Path, job_id: str, task_idx: int) -> str:
-        self.staged.append((src_dir, job_id, task_idx))
-        return f"s3://{self.bucket}/tasks/{job_id}/{task_idx}/"
-
-    def load_artifacts(self, manifest_uri: str) -> GeoDataFrame[ArtifactSchema]:
-        gdf = self.artifacts_to_return[self._call_idx]
-        self._call_idx += 1
-        return gdf
-
-    def result_prefix(self, job_id: str, task_idx: int) -> str:
-        return f"s3://{self.bucket}/results/{job_id}/{task_idx}/"
-
-    def upload_artifacts(
-        self,
-        artifacts: GeoDataFrame[ArtifactSchema],
-        output_prefix: str,
-    ) -> dict[str, str]:
-        return {"manifest_uri": f"{output_prefix}manifest.json"}
-
-
 def _make_empty_artifacts() -> GeoDataFrame[ArtifactSchema]:
     return cast(GeoDataFrame, ArtifactSchema.empty())
 
 
-# ---------------------------------------------------------------------------
-# LambdaBackend tests
-# ---------------------------------------------------------------------------
+def _make_artifacts() -> GeoDataFrame[ArtifactSchema]:
+    """Return a non-empty ArtifactSchema GeoDataFrame."""
+    df = gpd.GeoDataFrame(
+        {
+            "grid_cell": ["A"],
+            "grid_dist": [100],
+            "cell_geometry": gpd.GeoSeries(
+                [Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])], crs="EPSG:4326"
+            ),
+            "cell_utm_crs": ["EPSG:32630"],
+            "cell_utm_footprint": gpd.GeoSeries(
+                [Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])], crs="EPSG:4326"
+            ),
+            "id": ["art-1"],
+            "source_ids": ["src-1"],
+            "start_time": [pd.Timestamp("2024-01-01T00:00:00Z")],
+            "end_time": [pd.Timestamp("2024-01-01T00:00:00Z")],
+            "uri": ["file:///tmp/art.tif"],
+            "geometry": gpd.GeoSeries(
+                [Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])], crs="EPSG:4326"
+            ),
+            "collection": ["test"],
+        },
+        geometry="geometry",
+        crs="EPSG:4326",
+    )
+    return cast(GeoDataFrame[ArtifactSchema], df)
 
 
-def test_lambda_backend_raises_without_boto3():
-    """Instantiating LambdaBackend without boto3 installed raises ImportError."""
-    staging = MagicMock()
+class _FakeS3Client:
+    """In-memory S3 client for unit tests."""
+
+    def __init__(self) -> None:
+        self.objects: dict[tuple[str, str], bytes] = {}
+        self.invoke = MagicMock(
+            return_value={"Payload": MagicMock(), "StatusCode": 200}
+        )
+
+    def upload_file(self, filename: str, bucket: str, key: str) -> None:
+        self.objects[(bucket, key)] = Path(filename).read_bytes()
+
+    def download_file(self, bucket: str, key: str, filename: str) -> None:
+        data = self.objects[(bucket, key)]
+        Path(filename).write_bytes(data)
+
+
+def _upload_result_to_fake_s3(
+    s3: _FakeS3Client,
+    bucket: str,
+    prefix: str,
+    artifacts: GeoDataFrame[ArtifactSchema],
+) -> None:
+    """Upload artifacts and manifest to the in-memory fake S3 client."""
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        parquet_path = Path(tmpdir) / "artifacts.parquet"
+        artifacts.to_parquet(parquet_path)
+        s3.upload_file(str(parquet_path), bucket, f"{prefix}artifacts.parquet")
+
+        manifest = {"artifacts_uri": f"s3://{bucket}/{prefix}artifacts.parquet"}
+        manifest_path = Path(tmpdir) / "manifest.json"
+        manifest_path.write_text(json.dumps(manifest))
+        s3.upload_file(str(manifest_path), bucket, f"{prefix}manifest.json")
+
+
+def test_lambda_executor_raises_without_boto3():
+    """Instantiating LambdaExecutor without boto3 installed raises ImportError."""
     with patch.dict(sys.modules, {"boto3": None}):
         with pytest.raises(ImportError, match="boto3 is required"):
-            LambdaBackend(
+            LambdaExecutor(
                 function_name="test-fn",
-                staging=staging,
+                staging_bucket="test-bucket",
             )
 
 
-def test_lambda_backend_invokes_lambda_for_single_task():
-    """LambdaBackend serializes, stages, invokes, and loads one task."""
+def test_lambda_executor_invokes_lambda_for_single_task():
+    """LambdaExecutor serializes, stages, invokes, and loads one task."""
     mock_client = MagicMock()
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    staging = _FakeStaging()
-    staging.artifacts_to_return = [_make_empty_artifacts()]
-
     task = _make_task(task_context={"job_id": "job-42", "chunk_id": 7})
 
-    # Build a mock Lambda response
     mock_payload = MagicMock()
     mock_payload.read.return_value = json.dumps(
         {"manifest_uri": "s3://bucket/results/job-42/7/manifest.json"}
@@ -153,37 +172,29 @@ def test_lambda_backend_invokes_lambda_for_single_task():
     }
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        backend = LambdaBackend(
+        executor = LambdaExecutor(
             function_name="aer-extract",
-            staging=staging,
+            staging_bucket="aer-tasks",
         )
-        results = list(backend.run_tasks([task], runner=MagicMock()))
+        with patch.object(
+            executor, "_load_manifest", return_value=_make_empty_artifacts()
+        ):
+            artifacts = executor([task])
 
-    assert len(results) == 1
-    assert len(staging.staged) == 1
-    _, job_id, task_idx = staging.staged[0]
-    assert job_id == "job-42"
-    assert task_idx == 7
-
+    assert isinstance(artifacts, gpd.GeoDataFrame)
     mock_client.invoke.assert_called_once()
     call_kwargs = mock_client.invoke.call_args.kwargs
     assert call_kwargs["FunctionName"] == "aer-extract"
     payload = json.loads(call_kwargs["Payload"].decode("utf-8"))
-    assert payload["task_uri"] == "s3://aer-test-bucket/tasks/job-42/7/"
-    assert payload["output_prefix"] == "s3://aer-test-bucket/results/job-42/7/"
+    assert payload["task_uri"].startswith("s3://aer-tasks/aereo-tasks/job-42/7/")
+    assert payload["output_prefix"] == "s3://aer-tasks/results/job-42/7/"
 
 
-def test_lambda_backend_invokes_lambda_for_multiple_tasks():
-    """LambdaBackend dispatches each task as a separate Lambda invocation."""
+def test_lambda_executor_invokes_lambda_for_multiple_tasks():
+    """LambdaExecutor dispatches each task as a separate Lambda invocation."""
     mock_client = MagicMock()
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
-
-    staging = _FakeStaging()
-    staging.artifacts_to_return = [
-        _make_empty_artifacts(),
-        _make_empty_artifacts(),
-    ]
 
     tasks = [
         _make_task(task_context={"job_id": "job-99", "chunk_id": 0}),
@@ -203,23 +214,25 @@ def test_lambda_backend_invokes_lambda_for_multiple_tasks():
     ]
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        backend = LambdaBackend(
+        executor = LambdaExecutor(
             function_name="aer-extract",
-            staging=staging,
+            staging_bucket="aer-tasks",
         )
-        results = list(backend.run_tasks(tasks, runner=MagicMock()))
+        with patch.object(
+            executor, "_load_manifest", return_value=_make_empty_artifacts()
+        ):
+            artifacts = executor(tasks)
 
-    assert len(results) == 2
+    assert isinstance(artifacts, gpd.GeoDataFrame)
     assert mock_client.invoke.call_count == 2
 
 
-def test_lambda_backend_propagates_function_error():
+def test_lambda_executor_propagates_function_error():
     """If Lambda returns FunctionError, a RuntimeError is raised."""
     mock_client = MagicMock()
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    staging = _FakeStaging()
     task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
 
     mock_payload = MagicMock()
@@ -231,21 +244,20 @@ def test_lambda_backend_propagates_function_error():
     }
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        backend = LambdaBackend(
+        executor = LambdaExecutor(
             function_name="aer-extract",
-            staging=staging,
+            staging_bucket="aer-tasks",
         )
         with pytest.raises(RuntimeError, match="Lambda function .* returned error"):
-            list(backend.run_tasks([task], runner=MagicMock()))
+            executor([task])
 
 
-def test_lambda_backend_raises_on_missing_manifest_uri():
+def test_lambda_executor_raises_on_missing_manifest_uri():
     """If the Lambda payload lacks manifest_uri, ValueError is raised."""
     mock_client = MagicMock()
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    staging = _FakeStaging()
     task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
 
     mock_payload = MagicMock()
@@ -256,53 +268,20 @@ def test_lambda_backend_raises_on_missing_manifest_uri():
     }
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        backend = LambdaBackend(
+        executor = LambdaExecutor(
             function_name="aer-extract",
-            staging=staging,
+            staging_bucket="aer-tasks",
         )
         with pytest.raises(ValueError, match="missing 'manifest_uri'"):
-            list(backend.run_tasks([task], runner=MagicMock()))
+            executor([task])
 
 
-def test_lambda_backend_uses_custom_serializer():
-    """A custom TaskSerializer can be injected."""
-    mock_client = MagicMock()
-    mock_boto3 = MagicMock()
-    mock_boto3.client.return_value = mock_client
-
-    custom_serializer = MagicMock()
-    staging = _FakeStaging()
-    staging.artifacts_to_return = [_make_empty_artifacts()]
-    task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
-
-    mock_payload = MagicMock()
-    mock_payload.read.return_value = json.dumps(
-        {"manifest_uri": "s3://bucket/m.json"}
-    ).encode("utf-8")
-    mock_client.invoke.return_value = {
-        "Payload": mock_payload,
-        "StatusCode": 200,
-    }
-
-    with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        backend = LambdaBackend(
-            function_name="aer-extract",
-            staging=staging,
-            serializer=custom_serializer,
-        )
-        list(backend.run_tasks([task], runner=MagicMock()))
-
-    custom_serializer.serialize.assert_called_once()
-
-
-def test_lambda_backend_uses_endpoint_url():
+def test_lambda_executor_uses_endpoint_url():
     """The endpoint_url is passed through to boto3.client."""
     mock_client = MagicMock()
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    staging = _FakeStaging()
-    staging.artifacts_to_return = [_make_empty_artifacts()]
     task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
 
     mock_payload = MagicMock()
@@ -315,81 +294,36 @@ def test_lambda_backend_uses_endpoint_url():
     }
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        backend = LambdaBackend(
+        executor = LambdaExecutor(
             function_name="aer-extract",
-            staging=staging,
+            staging_bucket="aer-tasks",
             endpoint_url="http://localhost:4566",
         )
-        list(backend.run_tasks([task], runner=MagicMock()))
+        with patch.object(
+            executor, "_load_manifest", return_value=_make_empty_artifacts()
+        ):
+            executor([task])
 
     call_args = mock_boto3.client.call_args
     assert call_args.kwargs["endpoint_url"] == "http://localhost:4566"
 
 
-def test_lambda_backend_concurrent_invokes_with_thread_pool():
-    """LambdaBackend dispatches multiple tasks concurrently using ThreadPoolExecutor."""
-    mock_client = MagicMock()
-    mock_boto3 = MagicMock()
-    mock_boto3.client.return_value = mock_client
-
-    staging = _FakeStaging()
-    staging.artifacts_to_return = [
-        _make_empty_artifacts(),
-        _make_empty_artifacts(),
-        _make_empty_artifacts(),
-    ]
-
-    tasks = [
-        _make_task(task_context={"job_id": "job-99", "chunk_id": 0}),
-        _make_task(task_context={"job_id": "job-99", "chunk_id": 1}),
-        _make_task(task_context={"job_id": "job-99", "chunk_id": 2}),
-    ]
-
-    invoke_timestamps: list[float] = []
-
-    def _tracked_invoke(*args, **kwargs):
-        invoke_timestamps.append(time.monotonic())
-        payload = MagicMock()
-        payload.read.return_value = json.dumps(
-            {"manifest_uri": "s3://bucket/results/manifest.json"}
-        ).encode("utf-8")
-        return {"Payload": payload, "StatusCode": 200}
-
-    mock_client.invoke.side_effect = _tracked_invoke
-
-    with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        backend = LambdaBackend(
-            function_name="aer-extract",
-            staging=staging,
-            max_concurrent_invokes=3,
-        )
-        results = list(backend.run_tasks(tasks, runner=MagicMock()))
-
-    assert len(results) == 3
-    assert mock_client.invoke.call_count == 3
-    # Concurrent dispatch means timestamps should be very close
-    if len(invoke_timestamps) >= 2:
-        assert max(invoke_timestamps) - min(invoke_timestamps) < 1.0
-
-
-def test_lambda_backend_respects_max_concurrent_invokes():
+def test_lambda_executor_respects_max_concurrent_invokes():
     """max_concurrent_invokes parameter is stored and used."""
     mock_client = MagicMock()
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    staging = _FakeStaging()
-
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        backend = LambdaBackend(
+        executor = LambdaExecutor(
             function_name="aer-extract",
-            staging=staging,
+            staging_bucket="aer-tasks",
             max_concurrent_invokes=5,
         )
-        assert backend.max_concurrent_invokes == 5
+        assert executor.max_concurrent_invokes == 5
 
 
-def test_lambda_backend_boto3_config_with_timeout_and_retries():
+def test_lambda_executor_boto3_config_with_timeout_and_retries():
     """boto3 client is created with Config containing read_timeout and retries."""
     mock_client = MagicMock()
     mock_boto3 = MagicMock()
@@ -398,15 +332,13 @@ def test_lambda_backend_boto3_config_with_timeout_and_retries():
     mock_botocore_config = MagicMock()
     mock_botocore_config.Config = mock_config_class
 
-    staging = _FakeStaging()
-
     with patch.dict(
         sys.modules,
         {"boto3": mock_boto3, "botocore.config": mock_botocore_config},
     ):
-        LambdaBackend(
+        LambdaExecutor(
             function_name="aer-extract",
-            staging=staging,
+            staging_bucket="aer-tasks",
             invoke_timeout=600,
         )
 
@@ -416,13 +348,12 @@ def test_lambda_backend_boto3_config_with_timeout_and_retries():
     )
 
 
-def test_lambda_backend_retryable_error_raises_retryable_lambda_error():
+def test_lambda_executor_retryable_error_raises_retryable_lambda_error():
     """Structured retryable errors from Lambda raise RetryableLambdaError."""
     mock_client = MagicMock()
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    staging = _FakeStaging()
     task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
 
     mock_payload = MagicMock()
@@ -439,21 +370,20 @@ def test_lambda_backend_retryable_error_raises_retryable_lambda_error():
     }
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        backend = LambdaBackend(
+        executor = LambdaExecutor(
             function_name="aer-extract",
-            staging=staging,
+            staging_bucket="aer-tasks",
         )
         with pytest.raises(RetryableLambdaError, match="Connection timed out"):
-            list(backend.run_tasks([task], runner=MagicMock()))
+            executor([task])
 
 
-def test_lambda_backend_structured_error_not_retryable_raises_runtime_error():
+def test_lambda_executor_structured_error_not_retryable_raises_runtime_error():
     """Structured non-retryable errors from Lambda raise RuntimeError."""
     mock_client = MagicMock()
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    staging = _FakeStaging()
     task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
 
     mock_payload = MagicMock()
@@ -470,63 +400,105 @@ def test_lambda_backend_structured_error_not_retryable_raises_runtime_error():
     }
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        backend = LambdaBackend(
+        executor = LambdaExecutor(
             function_name="aer-extract",
-            staging=staging,
+            staging_bucket="aer-tasks",
         )
         with pytest.raises(RuntimeError, match="Lambda returned error"):
-            list(backend.run_tasks([task], runner=MagicMock()))
+            executor([task])
 
 
-def test_safe_truncate_redacts_credentials():
-    """_safe_truncate redacts AWS credentials and presigned URLs."""
-    from aereo.backends.lambda_backend import _safe_truncate
+def test_lambda_executor_stages_to_s3():
+    """LambdaExecutor stages tasks to S3 and invokes Lambda."""
+    task = _make_task(task_context={"job_id": "stage", "chunk_id": 0})
 
-    text = (
-        "Error accessing https://bucket.s3.amazonaws.com/key?X-Amz-Credential=abc123 "
-        "with key AKIAIOSFODNN7EXAMPLE and more text"
-    )
-    result = _safe_truncate(text)
-    assert "[REDACTED-PRESIGNED-URL]" in result
-    assert "[REDACTED-AWS-KEY]" in result
-    assert "abc123" not in result
-    assert "AKIAIOSFODNN7EXAMPLE" not in result
+    fake_s3 = _FakeS3Client()
+    mock_boto3 = MagicMock()
+    mock_boto3.client.return_value = fake_s3
+
+    result_prefix = "results/stage/0/"
+    _upload_result_to_fake_s3(fake_s3, "aer-tasks", result_prefix, _make_artifacts())
+
+    mock_payload = MagicMock()
+    mock_payload.read.return_value = json.dumps(
+        {"manifest_uri": f"s3://aer-tasks/{result_prefix}manifest.json"}
+    ).encode("utf-8")
+
+    with patch.dict(sys.modules, {"boto3": mock_boto3}):
+        executor = LambdaExecutor(
+            function_name="aer-extract",
+            staging_bucket="aer-tasks",
+        )
+        mock_client: Any = executor._lambda_client
+        mock_client.invoke.return_value = {
+            "Payload": mock_payload,
+            "StatusCode": 200,
+        }
+        with patch.object(executor, "_load_manifest", return_value=_make_artifacts()):
+            artifacts = executor([task])
+
+    assert isinstance(artifacts, gpd.GeoDataFrame)
+    assert len(artifacts) == 1
+    payload = json.loads(mock_client.invoke.call_args.kwargs["Payload"].decode("utf-8"))
+    assert payload["mode"] == "staged"
+    assert payload["task_uri"].startswith("s3://aer-tasks/aereo-tasks/stage/0/")
 
 
-def test_lambda_backend_run_tasks_with_no_runner():
-    """LambdaBackend accepts runner=None (default) since it ignores the runner."""
+def test_lambda_executor_best_effort_skips_failed_tasks():
+    """Best-effort mode returns successful tasks and skips failures."""
     mock_client = MagicMock()
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    staging = _FakeStaging()
-    staging.artifacts_to_return = [_make_empty_artifacts()]
-    task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
+    tasks = [
+        _make_task(task_context={"job_id": "be", "chunk_id": 0}),
+        _make_task(task_context={"job_id": "be", "chunk_id": 1}),
+    ]
 
-    mock_payload = MagicMock()
-    mock_payload.read.return_value = json.dumps(
-        {"manifest_uri": "s3://bucket/m.json"}
-    ).encode("utf-8")
-    mock_client.invoke.return_value = {
-        "Payload": mock_payload,
-        "StatusCode": 200,
-    }
+    def _side_effect(*args, **kwargs):
+        payload = json.loads(kwargs["Payload"].decode("utf-8"))
+        chunk_id = payload["chunk_id"]
+        response_payload = MagicMock()
+        if chunk_id == 0:
+            response_payload.read.return_value = json.dumps(
+                {"statusCode": 500, "error": "boom", "retryable": False}
+            ).encode("utf-8")
+        else:
+            response_payload.read.return_value = json.dumps(
+                {"manifest_uri": "s3://bucket/results/be/1/manifest.json"}
+            ).encode("utf-8")
+        return {"Payload": response_payload, "StatusCode": 200}
+
+    mock_client.invoke.side_effect = _side_effect
 
     with patch.dict(sys.modules, {"boto3": mock_boto3}):
-        backend = LambdaBackend(
+        executor = LambdaExecutor(
             function_name="aer-extract",
-            staging=staging,
+            staging_bucket="aer-tasks",
+            failure_mode="best_effort",
         )
-        results = list(backend.run_tasks([task]))
+        with patch.object(
+            executor, "_load_manifest", return_value=_make_empty_artifacts()
+        ):
+            artifacts = executor(tasks)
 
-    assert len(results) == 1
+    assert isinstance(artifacts, gpd.GeoDataFrame)
+    assert mock_client.invoke.call_count == 2
 
 
-def test_safe_truncate_truncates_long_text():
-    """_safe_truncate truncates text exceeding max_len."""
-    from aereo.backends.lambda_backend import _safe_truncate
+def test_lambda_executor_empty_tasks_returns_empty():
+    """Calling LambdaExecutor with no tasks returns an empty GeoDataFrame."""
+    mock_client = MagicMock()
+    mock_boto3 = MagicMock()
+    mock_boto3.client.return_value = mock_client
 
-    text = "x" * 3000
-    result = _safe_truncate(text, max_len=2048)
-    assert len(result) < 3000
-    assert "truncated" in result
+    with patch.dict(sys.modules, {"boto3": mock_boto3}):
+        executor = LambdaExecutor(
+            function_name="aer-extract",
+            staging_bucket="aer-tasks",
+        )
+        artifacts = executor([])
+
+    assert isinstance(artifacts, gpd.GeoDataFrame)
+    assert len(artifacts) == 0
+    mock_client.invoke.assert_not_called()

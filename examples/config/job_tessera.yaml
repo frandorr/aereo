@@ -1,5 +1,4 @@
 defaults:
-  - search: tessera
   - grid_config: grid_10km
   - patch_config: patch_10m
   - extract: tessera

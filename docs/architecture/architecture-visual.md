@@ -22,7 +22,7 @@ flowchart TB
         LAM["Lambda"]:::entry
     end
 
-    CORE["AereoClient"]:::core
+    CORE["ExtractionJob"]:::core
     OUT["GeoTIFFs"]:::output
 
     CLI --> CORE
@@ -67,7 +67,7 @@ flowchart LR
     classDef data fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
 
     A["Entry"]:::entry
-    B["AereoClient"]:::core
+    B["ExtractionJob"]:::core
     C["Plugins"]:::plugin
     D["Building Blocks"]:::data
 
@@ -91,7 +91,7 @@ flowchart LR
     PIP["pip install"]:::entry
     EP["entry-points"]:::data
     REG["Registry"]:::core
-    USE["AereoClient"]:::core
+    USE["ExtractionJob"]:::core
 
     PIP --> EP
     EP --> REG
@@ -128,14 +128,14 @@ flowchart TB
 | Layer | Component | What it does |
 |-------|-----------|--------------|
 | **Entry** | `aereo.cli` | Terminal commands (`search`, `run`, `plugins`) |
-| **Entry** | `aereo.client` | Python API — `AereoClient` class |
+| **Entry** | `aereo.pipeline` | Python API — `ExtractionJob` class |
 | **Entry** | `aereo.lambda_handler` | AWS Lambda entrypoint |
 | **Core** | `aereo.interfaces` | Contracts — `SearchProvider`, `Reader`, `Processor`, `Reprojector`, `Writer`, `GridConfig`, `ExtractConfig` |
 | **Core** | `aereo.registry` | Plugin discovery via `entry_points` |
 | **Data** | `aereo.schemas` | Pandera validation — `AssetSchema`, `ArtifactSchema`, `GridSchema` |
 | **Data** | `aereo.grid` | MajorTOM tiling — `GridDefinition`, `GridCell` |
 | **Data** | `aereo.spatial` | CRS helpers — UTM EPSG lookup, reprojection |
-| **Run** | `aereo.backends` | Backends — `LocalProcessBackend`, `ThreadBackend`, `TaskRunner` |
+| **Run** | `aereo.executors` | Executors — `LocalExecutor`, `LambdaExecutor` |
 | **Run** | `aereo.serialization` | Task serialization for remote transport |
 | **Run** | `aereo.asset_downloader` | Safe multi-process downloading (S3/HTTP/local) |
 | **Output** | `aereo.eoids` | File naming & folder conventions |
