@@ -54,19 +54,16 @@ def test_build_grid_cells():
     cells = core.build_grid_cells(aoi=polygon, grid_dist=10_000)
     assert len(cells) > 0
     assert isinstance(cells[0], core.GridCell)
-    assert not isinstance(cells[0], core.ExtractPatch)
     assert cells[0].d == 10000
 
-    patch = cells[0].to_extract_patch(resolution=50.0)
-    assert isinstance(patch, core.ExtractPatch)
-    assert patch.resolution == 50.0
+    gb = cells[0].to_geobox(resolution=50.0)
+    assert isinstance(gb, GeoBox)
 
 
-def test_extraction_patch_to_geodataframe():
+def test_grid_cell_to_geodataframe():
     polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
     cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
-    patch = cell.to_extract_patch(resolution=10.0, margin=0.0, padding=0)
-    gdf = patch.to_geodataframe()
+    gdf = cell.to_geodataframe()
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert len(gdf) == 1
     assert gdf["grid_cell"].iloc[0] == "0U_0R"
@@ -89,13 +86,12 @@ def test_get_cell_name():
     assert "OV" in name_ov
 
 
-def test_extraction_patch_area_name_and_geobox():
+def test_grid_cell_area_name_and_geobox():
     polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
     cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
-    patch = cell.to_extract_patch(resolution=50.0, margin=0.0, padding=0)
 
-    assert patch.area_name() == "0U_0R_dist-10000m_res-50m"
-    area = patch.geobox
+    assert cell.area_name(resolution=50.0) == "0U_0R_dist-10000m_res-50m"
+    area = cell.to_geobox(resolution=50.0, margin=0.0, padding=0)
     # With margin=0 the box is D x D metres (≈200 px at 50 m)
     assert area.shape.x == pytest.approx(10000 / 50, abs=1)
     assert area.shape.y == pytest.approx(10000 / 50, abs=1)
@@ -114,30 +110,27 @@ def test_geobox_returns_geobox():
     cell = core.GridCell(
         id="test", d=10000, cell_geometry=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
     )
-    patch = cell.to_extract_patch(resolution=100.0, margin=0.0, padding=0)
-    gb = patch.geobox
+    gb = cell.to_geobox(resolution=100.0, margin=0.0, padding=0)
     assert isinstance(gb, GeoBox)
     assert gb.crs is not None
-    assert gb.crs.to_epsg() == int(patch.utm_crs.split(":")[-1])
+    assert gb.crs.to_epsg() == int(cell.utm_crs.split(":")[-1])
 
 
 def test_geobox_fixed_shape_matches_d():
     polygon = Point(-64.0, -31.4).buffer(0.1)
     cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
-    patch = cells[0].to_extract_patch(resolution=2000.0)
-    gb = patch.geobox
+    gb = cells[0].to_geobox(resolution=2000.0)
     # GeoBox rounds to whole pixels; shape must be ≈ D / resolution
     assert gb.shape.x == pytest.approx(100_000 / 2000, abs=1)
     assert gb.shape.y == pytest.approx(100_000 / 2000, abs=1)
 
 
-def test_geobox_from_generated_patch():
-    """GeoBox from a real grid-generated patch should have valid extent and CRS."""
+def test_geobox_from_generated_cell():
+    """GeoBox from a real grid-generated cell should have valid extent and CRS."""
     polygon = Point(-64.0, -31.4).buffer(0.1)
     cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
     assert len(cells) > 0
-    patch = cells[0].to_extract_patch(resolution=2000.0)
-    ad = patch.geobox
+    ad = cells[0].to_geobox(resolution=2000.0)
     assert isinstance(ad, GeoBox)
     # With margin=0 the box is D x D metres (≈50 px at 2000 m)
     assert ad.shape.x == pytest.approx(100_000 / 2000, abs=1)
@@ -148,11 +141,10 @@ def test_geobox_from_generated_patch():
 
 
 def test_geobox_uses_fixed_size():
-    """A patch's geobox extent should be a fixed D x D square, not natural bounds."""
+    """A cell's geobox extent should be a fixed D x D square, not natural bounds."""
     polygon = Point(-64.0, -31.4).buffer(0.1)
     cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
-    patch = cells[0].to_extract_patch(resolution=2000.0)
-    area = patch.geobox
+    area = cells[0].to_geobox(resolution=2000.0)
     # The extent should be D x D metres (≈50 px), not derived from utm_footprint.bounds
     assert area.shape.x == pytest.approx(100_000 / 2000, abs=1)
     assert area.shape.y == pytest.approx(100_000 / 2000, abs=1)
@@ -163,10 +155,7 @@ def test_geobox_conform_to():
     cell = core.GridCell(
         id="test", d=10000, cell_geometry=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
     )
-    patch = cell.to_extract_patch(
-        resolution=100.0, margin=0.0, padding=1, conform_to=(50, 60)
-    )
-    area = patch.geobox
+    area = cell.to_geobox(resolution=100.0, margin=0.0, padding=1, conform_to=(50, 60))
     assert area.shape.x == 52  # 50 + 2*1
     assert area.shape.y == 62  # 60 + 2*1
 
@@ -177,12 +166,13 @@ def test_geobox_centered_on_grid_point():
 
     polygon = Point(-64.0, -31.4).buffer(0.1)
     cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
-    patch = cells[0].to_extract_patch(resolution=2000.0)
-    gb = patch.geobox
+    gb = cells[0].to_geobox(resolution=2000.0)
     utm_centroid = cast(
         Point,
         reproject_geom(
-            patch.cell_geometry.centroid, src_epsg="epsg:4326", dst_epsg=patch.utm_crs
+            cells[0].cell_geometry.centroid,
+            src_epsg="epsg:4326",
+            dst_epsg=cells[0].utm_crs,
         ),
     )
     bbox = gb.boundingbox
@@ -196,9 +186,7 @@ def test_geobox_with_margin():
     """margin should expand the box beyond D x D."""
     polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
     cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
-    patch_no_margin = cell.to_extract_patch(resolution=50.0, margin=0.0, padding=0)
-    patch_with_margin = cell.to_extract_patch(resolution=50.0, margin=6.8, padding=0)
-    gb_no_margin = patch_no_margin.geobox
-    gb_with_margin = patch_with_margin.geobox
+    gb_no_margin = cell.to_geobox(resolution=50.0, margin=0.0, padding=0)
+    gb_with_margin = cell.to_geobox(resolution=50.0, margin=6.8, padding=0)
     assert gb_with_margin.shape.x > gb_no_margin.shape.x
     assert gb_with_margin.shape.y > gb_no_margin.shape.y

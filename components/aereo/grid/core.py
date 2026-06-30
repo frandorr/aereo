@@ -6,7 +6,6 @@ for processing, alignment, and coordinate system projection.
 
 from __future__ import annotations
 
-from functools import cached_property
 from typing import Callable, Sequence, cast
 
 import attrs
@@ -93,8 +92,8 @@ class GridCell:
 
     A ``GridCell`` only describes the grid geometry: its identifier, size, and
     WGS84 footprint. Extraction-specific parameters such as resolution, margin,
-    padding, and conform_to shape are provided later through
-    :meth:`to_extract_patch`.
+    padding, and conform_to shape are provided when building a GeoBox through
+    :meth:`to_geobox`.
     """
 
     id: str
@@ -130,14 +129,22 @@ class GridCell:
             self.cell_geometry, src_epsg=_WGS84_CRS, dst_epsg=self.utm_crs
         )
 
-    def to_extract_patch(
+    def area_name(self, resolution: float) -> str:
+        """Get the area name based on grid cell and *resolution* in metres."""
+        if isinstance(resolution, float) and resolution.is_integer():
+            res_str = str(int(resolution))
+        else:
+            res_str = str(resolution)
+        return f"{self.id}_dist-{self.d}m_res-{res_str}m"
+
+    def to_geobox(
         self,
         resolution: float,
         margin: float = 0.0,
         padding: int = 0,
         conform_to: tuple[int, int] | None = None,
-    ) -> "ExtractPatch":
-        """Create an extraction patch from this raw cell.
+    ) -> GeoBox:
+        """Return an odc-geo GeoBox for this cell's UTM footprint.
 
         Args:
             resolution: Target pixel resolution in metres.
@@ -147,107 +154,38 @@ class GridCell:
             conform_to: Force the output tensor to this exact shape (H, W).
 
         Returns:
-            An ``ExtractPatch`` carrying the extraction geometry and geobox.
+            A GeoBox aligned to the cell's UTM grid point.
         """
-        return ExtractPatch(
-            grid_cell=self,
-            resolution=resolution,
-            margin=margin,
-            padding=padding,
-            conform_to=conform_to,
-        )
-
-
-@attrs.frozen
-class ExtractPatch:
-    """An extraction-ready view of a ``GridCell``.
-
-    Adds extraction parameters (resolution, margin, padding, conform_to) to a
-    raw grid cell and exposes the resulting GeoBox and area name.
-    """
-
-    grid_cell: GridCell
-    resolution: float
-    margin: float = 0.0
-    padding: int = 0
-    conform_to: tuple[int, int] | None = None
-
-    @property
-    def id(self) -> str:
-        """Delegate to the underlying grid cell."""
-        return self.grid_cell.id
-
-    @property
-    def d(self) -> int:
-        """Delegate to the underlying grid cell."""
-        return self.grid_cell.d
-
-    @property
-    def cell_geometry(self) -> Polygon:
-        """Delegate to the underlying grid cell."""
-        return self.grid_cell.cell_geometry
-
-    @property
-    def utm_crs(self) -> str:
-        """Delegate to the underlying grid cell."""
-        return self.grid_cell.utm_crs
-
-    @property
-    def utm_footprint(self) -> BaseGeometry:
-        """Delegate to the underlying grid cell."""
-        return self.grid_cell.utm_footprint
-
-    def to_geodataframe(self) -> GeoDataFrame[GridSchema]:
-        """Delegate to the underlying grid cell."""
-        return self.grid_cell.to_geodataframe()
-
-    def area_name(self) -> str:
-        """Get the area name based on grid cell and resolution in metres."""
-        if isinstance(self.resolution, float) and self.resolution.is_integer():
-            res_str = str(int(self.resolution))
-        else:
-            res_str = str(self.resolution)
-        return f"{self.id}_dist-{self.d}m_res-{res_str}m"
-
-    @cached_property
-    def geobox(self) -> GeoBox:
-        """Return an odc-geo GeoBox for this patch's UTM footprint."""
         utm_centroid = cast(
             Point,
             reproject_geom(
                 self.cell_geometry.centroid, src_epsg=_WGS84_CRS, dst_epsg=self.utm_crs
             ),
         )
-        cx = round(utm_centroid.x / self.resolution) * self.resolution
-        cy = round(utm_centroid.y / self.resolution) * self.resolution
+        cx = round(utm_centroid.x / resolution) * resolution
+        cy = round(utm_centroid.y / resolution) * resolution
         crs = self.utm_crs
 
-        if self.conform_to is not None:
-            target_w, target_h = self.conform_to
-            half_w = (target_w * self.resolution) / 2
-            half_h = (target_h * self.resolution) / 2
+        if conform_to is not None:
+            target_w, target_h = conform_to
+            half_w = (target_w * resolution) / 2
+            half_h = (target_h * resolution) / 2
             bbox = (cx - half_w, cy - half_h, cx + half_w, cy + half_h)
             geobox = GeoBox.from_bbox(
                 bbox,
                 crs,
-                resolution=self.resolution,
+                resolution=resolution,
                 tight=True,
             )
         else:
-            half = (self.d * (1 + self.margin / 100)) / 2
+            half = (self.d * (1 + margin / 100)) / 2
             bbox = (cx - half, cy - half, cx + half, cy + half)
-            geobox = GeoBox.from_bbox(
-                bbox, crs, resolution=self.resolution, anchor="edge"
-            )
+            geobox = GeoBox.from_bbox(bbox, crs, resolution=resolution, anchor="edge")
 
-        if self.padding:
-            geobox = geobox.pad(self.padding)
+        if padding:
+            geobox = geobox.pad(padding)
 
         return geobox
-
-    def to_geobox(self) -> GeoBox:
-        """Alias for :attr:`geobox`."""
-        return self.geobox
 
 
 class GridDefinition(MajorTomGrid):
@@ -490,7 +428,3 @@ def intersect_cells(
         if geom.intersects(query_box):
             result.append(cell)
     return result
-
-
-# Backwards-compatible alias for code that has not yet migrated.
-ExtractionPatch = ExtractPatch
