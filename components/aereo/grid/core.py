@@ -1,6 +1,6 @@
 """Core implementation of Major TOM and ESA-compatible grid cells and definitions.
 
-Provides ExtractionPatch and GridDefinition classes to partition geometries into cell areas
+Provides GridCell and GridDefinition classes to partition geometries into cell areas
 for processing, alignment, and coordinate system projection.
 """
 
@@ -90,23 +90,24 @@ def _make_cell_polygon(
 
 
 @attrs.frozen
-class ExtractionPatch:
-    """A unified physical representation of a grid cell and its ML patch boundary.
+class GridCell:
+    """A single MajorTOM grid cell with its UTM footprint and geobox.
 
-    Captures the WGS84 cell geometry, target resolution, margin, padding, and
-    UTM footprint used to build an ``odc-geo`` GeoBox for extraction.
+    This is a pure grid utility: it is not tied to an ``ExtractionTask`` and is
+    only used by the orchestrator when iterating over grid cells or building
+    artifact catalogs.
     """
 
     id: str
     d: int
     cell_geometry: Polygon
     resolution: float
-    margin: float
-    padding: int
+    margin: float = 0.0
+    padding: int = 0
     conform_to: tuple[int, int] | None = None
 
     def to_geodataframe(self) -> GeoDataFrame[GridSchema]:
-        """Convert the ExtractionPatch to a GeoDataFrame."""
+        """Convert the GridCell to a GeoDataFrame."""
         gdf = gpd.GeoDataFrame(
             {
                 "grid_cell": [self.id],
@@ -178,13 +179,17 @@ class ExtractionPatch:
 
         return geobox
 
+    def to_geobox(self) -> GeoBox:
+        """Alias for :attr:`geobox`."""
+        return self.geobox
+
 
 class GridDefinition(MajorTomGrid):
     """A grid definition that generates cells intersecting a given polygon.
 
     Wraps ``MajorTomGrid`` to produce raw geographic cells and IDs, and is
-    consumed by ``generate_extraction_patches`` to create ``ExtractionPatch``
-    instances aligned to a ``PatchConfig``.
+    consumed by ``generate_grid_cells`` to create ``GridCell`` instances
+    aligned to a ``PatchConfig``.
     """
 
     def __init__(self, d: int = 10000, overlap: bool = False) -> None:
@@ -368,12 +373,12 @@ class GridDefinition(MajorTomGrid):
         return cells
 
 
-def generate_extraction_patches(
+def generate_grid_cells(
     polygon: BaseGeometry,
     grid_def: GridDefinition,
     patch_config: PatchConfig,
-) -> Sequence[ExtractionPatch]:
-    """Generate ``ExtractionPatch`` objects intersecting ``polygon``.
+) -> Sequence[GridCell]:
+    """Generate ``GridCell`` objects intersecting ``polygon``.
 
     Args:
         polygon: Geometry to tile.
@@ -381,10 +386,10 @@ def generate_extraction_patches(
         patch_config: Physical constraints (resolution, margin, padding).
 
     Returns:
-        Sequence of constructed ``ExtractionPatch`` objects.
+        Sequence of constructed ``GridCell`` objects.
     """
     return [
-        ExtractionPatch(
+        GridCell(
             id=cell_id,
             d=grid_def.D,
             cell_geometry=geom,
@@ -395,3 +400,74 @@ def generate_extraction_patches(
         )
         for geom, cell_id, _ in grid_def.generate_raw_cells(polygon)
     ]
+
+
+def build_grid_cells(
+    aoi: BaseGeometry,
+    grid_dist: int,
+    resolution: float,
+    margin: float | None = None,
+) -> Sequence[GridCell]:
+    """Build ``GridCell`` objects intersecting an AOI.
+
+    Args:
+        aoi: Area of interest geometry in WGS84.
+        grid_dist: MajorTOM cell size in metres.
+        resolution: Target pixel resolution in metres.
+        margin: Optional buffer in metres to add around *aoi* before tiling.
+
+    Returns:
+        Sequence of ``GridCell`` objects, one per intersecting cell.
+    """
+    from aereo.spatial import get_utm_epsg_from_geometry, reproject_geom
+
+    grid_def = GridDefinition(d=grid_dist)
+    if margin:
+        utm_epsg = get_utm_epsg_from_geometry(aoi)
+        aoi_utm = reproject_geom(aoi, src_epsg=_WGS84_CRS, dst_epsg=utm_epsg)
+        aoi_utm = aoi_utm.buffer(margin)
+        aoi = reproject_geom(aoi_utm, src_epsg=utm_epsg, dst_epsg=_WGS84_CRS)
+    return [
+        GridCell(
+            id=cell_id,
+            d=grid_dist,
+            cell_geometry=geom,
+            resolution=resolution,
+        )
+        for geom, cell_id, _ in grid_def.generate_raw_cells(aoi)
+    ]
+
+
+def intersect_cells(
+    bounds: tuple[float, float, float, float],
+    grid_cells: Sequence[GridCell],
+    crs: str | None = None,
+) -> Sequence[GridCell]:
+    """Return the grid cells from *grid_cells* that intersect *bounds*.
+
+    Args:
+        bounds: ``(minx, miny, maxx, maxy)`` bounding box.
+        grid_cells: Candidate grid cells.
+        crs: CRS of *bounds*. If provided, cell geometries are reprojected from
+            their native WGS84 CRS to this CRS before intersection. If ``None``,
+            intersection is done in WGS84.
+
+    Returns:
+        Sequence of intersecting ``GridCell`` objects.
+    """
+    from shapely.geometry import box as _box
+
+    query_box = _box(*bounds)
+    result: list[GridCell] = []
+    for cell in grid_cells:
+        geom = cell.cell_geometry
+        if crs is not None:
+            geom = reproject_geom(geom, src_epsg=_WGS84_CRS, dst_epsg=crs)
+        if geom.intersects(query_box):
+            result.append(cell)
+    return result
+
+
+# Backwards-compatible aliases for code that has not yet migrated.
+ExtractionPatch = GridCell
+generate_extraction_patches = generate_grid_cells

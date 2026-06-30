@@ -41,15 +41,16 @@ _READER = """\
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import xarray as xr
-from aereo.interfaces import ExtractionTask
 
 
 class CustomReader:
     \"\"\"A minimal example reader.\"\"\"
 
-    def __call__(self, task: ExtractionTask) -> xr.Dataset:
+    def __call__(self, files: list[str], **kwargs: Any) -> xr.Dataset:
         shape = (64, 64)
         data = np.random.default_rng(42).random(shape)
         return xr.Dataset(
@@ -78,8 +79,7 @@ from typing import cast
 
 import geopandas as gpd
 import requests
-from aereo.grid import ExtractionPatch
-from aereo.interfaces import ExtractionTask, PatchConfig
+from aereo.interfaces import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from aereo.executors._serialization import _TaskSerializer
@@ -105,26 +105,18 @@ def _make_task() -> ExtractionTask:
         geometry=[Polygon([[0, 0], [0.01, 0], [0.01, 0.01], [0, 0.01]])],
         crs="EPSG:4326",
     )
-    patch = ExtractionPatch(
-        id="0U_0R",
-        d=50_000,
-        cell_geometry=Polygon([[0, 0], [0.005, 0], [0.005, 0.005], [0, 0.005]]),
-        resolution=100.0,
-        margin=0.0,
-        padding=0,
-    )
     job = ExtractionJob(
         name="custom-job",
         grid_dist=50_000,
+        resolution=100.0,
         output_uri="/tmp/aereo/output",
         read=CustomReader(),
         write=write_geotiff,
     )
     return ExtractionTask(
+        id="custom-job_0",
         assets=cast(GeoDataFrame[AssetSchema], df),
         job=job,
-        patches=[patch],
-        task_context={{"job_id": "custom-job", "chunk_id": 0}},
     )
 
 
@@ -135,8 +127,8 @@ def main() -> int:
         "mode": "direct",
         "task": base64.b64encode(task_bytes).decode("ascii"),
         "output_prefix": OUTPUT_PREFIX,
-        "job_id": task.task_context["job_id"],
-        "chunk_id": task.task_context["chunk_id"],
+        "job_id": task.job.name,
+        "task_id": task.id,
     }}
     resp = requests.post(URL, json=payload, timeout=60)
     print(json.dumps(resp.json(), indent=2))

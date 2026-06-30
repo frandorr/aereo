@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from functools import partial
 from typing import cast
 
 import geopandas as gpd
@@ -12,7 +11,6 @@ from shapely.geometry import box
 
 from aereo.builtins.read import read_odc_stac
 from aereo.builtins.task_builder import build_grouped_tasks
-from aereo.interfaces.core import PatchConfig
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -21,14 +19,12 @@ from pandera.typing.geopandas import GeoDataFrame
 def _make_job(output_uri: str = "s3://test/output") -> ExtractionJob:
     """Return a minimal ExtractionJob for task-builder tests."""
     return ExtractionJob(
+        name="test-job",
         grid_dist=10_000,
         output_uri=output_uri,
         read=read_odc_stac,
+        write=lambda ds, path, **kwargs: str(path),
     )
-
-
-def _make_patch_config() -> PatchConfig:
-    return PatchConfig(resolution=10.0)
 
 
 def _make_assets(
@@ -68,11 +64,9 @@ def test_grouped_task_builder_groups_by_crs():
     )
 
     builder = build_grouped_tasks
-    tasks = list(builder(assets, _make_job(), patch_config=_make_patch_config()))
+    tasks = list(builder(assets, _make_job()))
 
     assert len(tasks) == 2
-    task_crs = {t.task_context.get("crs") for t in tasks}
-    assert task_crs == {"EPSG:32631", "EPSG:32632"}
     for task in tasks:
         assert task.assets["crs"].nunique() == 1
 
@@ -86,10 +80,9 @@ def test_grouped_task_builder_warns_without_crs():
 
     builder = build_grouped_tasks
     with pytest.warns(UserWarning, match="no 'crs' column"):
-        tasks = list(builder(assets, _make_job(), patch_config=_make_patch_config()))
+        tasks = list(builder(assets, _make_job()))
 
     assert len(tasks) == 1
-    assert tasks[0].task_context.get("crs") is None
 
 
 def test_grouped_task_builder_rejects_partial_crs():
@@ -104,24 +97,24 @@ def test_grouped_task_builder_rejects_partial_crs():
 
     builder = build_grouped_tasks
     with pytest.raises(ValueError, match="contains null values"):
-        list(builder(assets, _make_job(), patch_config=_make_patch_config()))
+        list(builder(assets, _make_job()))
 
 
-def test_grouped_task_builder_includes_job_id_in_context():
-    """Each task's context carries the parent job's name as job_id."""
+def test_grouped_task_builder_includes_job_name():
+    """Each task carries a reference to the parent job."""
     assets = _make_assets(geometries=[box(2.0, 45.0, 2.1, 45.1)])
     job = _make_job()
 
     builder = build_grouped_tasks
-    tasks = list(builder(assets, job, patch_config=_make_patch_config()))
+    tasks = list(builder(assets, job))
 
     assert len(tasks) == 1
-    assert tasks[0].task_context.get("job_id") == job.name
-    assert tasks[0].task_context.get("chunk_id") == 0
+    assert tasks[0].job is job
+    assert tasks[0].id.startswith(job.name)
 
 
-def test_grouped_task_builder_uses_globally_unique_chunk_ids():
-    """chunk_id is unique across all tasks and total_chunks matches task count."""
+def test_grouped_task_builder_generates_unique_task_ids():
+    """Task ids are unique across all tasks."""
     geometries = [
         box(2.0, 45.0, 2.1, 45.1),
         box(8.0, 45.0, 8.1, 45.1),
@@ -131,9 +124,8 @@ def test_grouped_task_builder_uses_globally_unique_chunk_ids():
         crs_values=["EPSG:32631", "EPSG:32632"],
     )
 
-    builder = partial(build_grouped_tasks, cells_per_task=1)
-    tasks = list(builder(assets, _make_job(), patch_config=_make_patch_config()))
+    builder = build_grouped_tasks
+    tasks = list(builder(assets, _make_job()))
 
-    chunk_ids = [t.task_context.get("chunk_id") for t in tasks]
-    assert len(chunk_ids) == len(set(chunk_ids))
-    assert all(t.task_context.get("total_chunks") == len(tasks) for t in tasks)
+    ids = [t.id for t in tasks]
+    assert len(ids) == len(set(ids))

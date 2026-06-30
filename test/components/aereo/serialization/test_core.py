@@ -4,18 +4,17 @@ from typing import Any, cast
 import geopandas as gpd
 from aereo.builtins.read import read_odc_stac
 from aereo.builtins.write import write_geotiff
-from aereo.grid import ExtractionPatch
 from aereo.interfaces import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from aereo.executors._serialization import _TaskSerializer
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
+from shapely.geometry.base import BaseGeometry
 
 
 def _make_task(
     *,
-    cell_id: str = "0U_0R",
     aoi: Polygon | None = None,
     task_context: dict[str, Any] | None = None,
 ) -> ExtractionTask:
@@ -32,15 +31,6 @@ def _make_task(
         crs="EPSG:4326",
     )
 
-    patch = ExtractionPatch(
-        id=cell_id,
-        d=50_000,
-        cell_geometry=Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]]),
-        resolution=100.0,
-        margin=10.0,
-        padding=2,
-    )
-
     job = ExtractionJob(
         name="test-job",
         grid_dist=50_000,
@@ -51,10 +41,9 @@ def _make_task(
     )
 
     return ExtractionTask(
+        id="task-1",
         assets=cast(GeoDataFrame[AssetSchema], df),
         job=job,
-        patches=[patch],
-        aoi=aoi,
         task_context=task_context or {},
     )
 
@@ -68,6 +57,9 @@ def test_round_trip_basic(tmp_path: Any) -> None:
     serializer.serialize(original, dest)
 
     reconstructed = serializer.deserialize(dest)
+
+    # Task id
+    assert reconstructed.id == original.id
 
     # Assets
     assert len(reconstructed.assets) == len(original.assets)
@@ -84,27 +76,12 @@ def test_round_trip_basic(tmp_path: Any) -> None:
     # output URI
     assert reconstructed.output_uri == original.output_uri
 
-    # Patches
-    assert len(reconstructed.patches) == 1
-    assert reconstructed.patches[0].id == original.patches[0].id
-    assert reconstructed.patches[0].d == original.patches[0].d
-    assert reconstructed.patches[0].resolution == original.patches[0].resolution
-    assert reconstructed.patches[0].margin == original.patches[0].margin
-    assert reconstructed.patches[0].padding == original.patches[0].padding
-    assert reconstructed.patches[0].conform_to == original.patches[0].conform_to
-    assert reconstructed.patches[0].cell_geometry.equals_exact(
-        original.patches[0].cell_geometry, tolerance=1e-9
-    )
-
-    # AOI
-    assert reconstructed.aoi is None
-
     # Task context
     assert reconstructed.task_context == original.task_context
 
 
 def test_round_trip_with_aoi(tmp_path: Any) -> None:
-    """AOI geometry survives round-trip via WKT."""
+    """AOI geometry survives round-trip via WKT stored on the job."""
     serializer = _TaskSerializer()
     aoi = Polygon([[-1, -1], [2, -1], [2, 2], [-1, 2]])
     original = _make_task(aoi=aoi)
@@ -113,8 +90,8 @@ def test_round_trip_with_aoi(tmp_path: Any) -> None:
     serializer.serialize(original, dest)
     reconstructed = serializer.deserialize(dest)
 
-    assert reconstructed.aoi is not None
-    assert reconstructed.aoi.equals_exact(aoi, tolerance=1e-9)
+    assert isinstance(reconstructed.job.target_aoi, BaseGeometry)
+    assert reconstructed.job.target_aoi.equals_exact(aoi, tolerance=1e-9)
 
 
 def test_round_trip_task_context(tmp_path: Any) -> None:
@@ -128,69 +105,6 @@ def test_round_trip_task_context(tmp_path: Any) -> None:
     reconstructed = serializer.deserialize(dest)
 
     assert reconstructed.task_context == ctx
-
-
-def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
-    """Tasks with several patches reconstruct every patch faithfully."""
-    serializer = _TaskSerializer()
-
-    df = gpd.GeoDataFrame(
-        {
-            "id": ["a", "b"],
-            "collection": ["S2", "S2"],
-            "start_time": [datetime(2023, 6, 1), datetime(2023, 6, 1)],
-            "end_time": [datetime(2023, 6, 1, 0, 15), datetime(2023, 6, 1, 0, 15)],
-            "href": ["http://a", "http://b"],
-        },
-        geometry=[
-            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-            Polygon([[1, 1], [2, 1], [2, 2], [1, 2]]),
-        ],
-        crs="EPSG:4326",
-    )
-
-    patches = [
-        ExtractionPatch(
-            id="1U_1R",
-            d=10_000,
-            cell_geometry=Polygon([[0, 0], [0.1, 0], [0.1, 0.1], [0, 0.1]]),
-            resolution=10.0,
-            margin=5.0,
-            padding=0,
-        ),
-        ExtractionPatch(
-            id="1U_1R_OV",
-            d=10_000,
-            cell_geometry=Polygon([[0.1, 0.1], [0.2, 0.1], [0.2, 0.2], [0.1, 0.2]]),
-            resolution=10.0,
-            margin=5.0,
-            padding=0,
-        ),
-    ]
-
-    job = ExtractionJob(
-        grid_dist=10_000,
-        output_uri="out",
-        read=read_odc_stac,
-        write=write_geotiff,
-    )
-    original = ExtractionTask(
-        assets=cast(GeoDataFrame[AssetSchema], df),
-        job=job,
-        patches=patches,
-    )
-
-    dest = tmp_path / "task_multi"
-    serializer.serialize(original, dest)
-    reconstructed = serializer.deserialize(dest)
-
-    assert len(reconstructed.patches) == 2
-    for orig, recon in zip(patches, reconstructed.patches):
-        assert recon.id == orig.id
-        assert recon.d == orig.d
-        assert recon.resolution == orig.resolution
-        assert recon.margin == orig.margin
-        assert recon.cell_geometry.equals_exact(orig.cell_geometry, tolerance=1e-9)
 
 
 def test_assets_crs_preserved(tmp_path: Any) -> None:
@@ -214,10 +128,10 @@ def test_serialize_to_bytes_round_trip() -> None:
     payload = serializer.serialize_to_bytes(original)
     reconstructed = serializer.deserialize_from_bytes(payload)
 
+    assert reconstructed.id == original.id
     assert len(reconstructed.assets) == len(original.assets)
     assert type(reconstructed.read) is type(original.read)
     assert reconstructed.grid_dist == original.grid_dist
-    assert reconstructed.patches[0].id == original.patches[0].id
     assert reconstructed.task_context == original.task_context
 
 

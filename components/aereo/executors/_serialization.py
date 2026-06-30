@@ -3,8 +3,8 @@
 Each task is written as a pair of files inside a destination directory:
 
 * ``task_assets.parquet`` – GeoParquet of the task's ``assets`` GeoDataFrame.
-* ``task_meta.json``       – JSON with profile, grid config, patches, URI, AOI,
-  and task context.
+* ``task_meta.json``       – JSON with job configuration, including reader,
+  writer, and optional step callables and kwargs.
 
 These helpers are implementation details of the remote executors and are not
 part of the public AEREO API.
@@ -23,7 +23,6 @@ from typing import Any, cast
 
 import geopandas as gpd
 import shapely.wkt
-from aereo.grid import ExtractionPatch
 from shapely.geometry.base import BaseGeometry
 from aereo.interfaces import ExtractionTask
 from aereo.interfaces.core import (
@@ -62,7 +61,6 @@ class PluginSerializer:
             func = plugin
             config = {}
 
-        # If it's a class with a __call__, or function
         if hasattr(func, "__qualname__"):
             qualname = func.__qualname__
             module = func.__module__
@@ -116,26 +114,6 @@ class _TaskSerializer:
     ASSETS_NAME = "task_assets.parquet"
     META_NAME = "task_meta.json"
 
-    # JSON field keys for serialize / deserialize parity
-    CELL_ID_KEY = "cell_id"
-    D_KEY = "d"
-    GEOM_WKT_KEY = "geom_wkt"
-    RESOLUTION_KEY = "resolution"
-    MARGIN_KEY = "margin"
-    PADDING_KEY = "padding"
-    CONFORM_TO_KEY = "conform_to"
-
-    READ_KEY = "read"
-    WRITE_KEY = "write"
-    GRID_DIST_KEY = "grid_dist"
-    PATCHES_KEY = "patches"
-    OUTPUT_URI_KEY = "output_uri"
-    URI_KEY = "uri"  # legacy key for backward-compatible deserialization
-    AOI_WKT_KEY = "aoi_wkt"
-    TASK_CONTEXT_KEY = "task_context"
-    JOB_NAME_KEY = "job_name"
-    TARGET_AOI_WKT_KEY = "target_aoi_wkt"
-
     def serialize(self, task: ExtractionTask, dest_dir: Path) -> None:
         """Write *task* into *dest_dir* as GeoParquet + JSON.
 
@@ -150,48 +128,45 @@ class _TaskSerializer:
         dest_dir = Path(dest_dir)
         dest_dir.mkdir(parents=True, exist_ok=True)
 
-        # Assets → GeoParquet
         task.assets.to_parquet(dest_dir / self.ASSETS_NAME)
 
-        # Patches → lightweight dicts
-        patches_meta: list[dict[str, Any]] = [
-            {
-                self.CELL_ID_KEY: patch.id,
-                self.D_KEY: patch.d,
-                self.GEOM_WKT_KEY: patch.cell_geometry.wkt,
-                self.RESOLUTION_KEY: patch.resolution,
-                self.MARGIN_KEY: patch.margin,
-                self.PADDING_KEY: patch.padding,
-                self.CONFORM_TO_KEY: patch.conform_to,
-            }
-            for patch in task.patches
-        ]
-
-        # Metadata → JSON
+        job = task.job
         meta: dict[str, Any] = {
-            self.READ_KEY: PluginSerializer.dumps(task.read),
-            self.WRITE_KEY: PluginSerializer.dumps(task.write),
-            self.GRID_DIST_KEY: task.grid_dist,
-            self.PATCHES_KEY: patches_meta,
-            self.OUTPUT_URI_KEY: task.output_uri,
-            self.AOI_WKT_KEY: task.aoi.wkt if task.aoi is not None else None,
-            self.TASK_CONTEXT_KEY: dict(task.task_context),
-            self.JOB_NAME_KEY: task.job.name,
-            self.TARGET_AOI_WKT_KEY: (
-                cast(BaseGeometry, task.job.target_aoi).wkt
-                if task.job.target_aoi is not None
-                else None
-            ),
+            "id": task.id,
+            "task_context": task.task_context,
+            "job": {
+                "name": job.name,
+                "grid_dist": job.grid_dist,
+                "output_uri": job.output_uri,
+                "overwrite": job.overwrite,
+                "target_aoi_wkt": (
+                    cast(BaseGeometry, job.target_aoi).wkt
+                    if job.target_aoi is not None
+                    else None
+                ),
+                "resolution": job.resolution,
+                "margin": job.margin,
+                "read": PluginSerializer.dumps(job.read),
+                "read_kwargs": job.read_kwargs,
+                "preprocess": PluginSerializer.dumps(job.preprocess),
+                "preprocess_kwargs": job.preprocess_kwargs,
+                "reproject": PluginSerializer.dumps(job.reproject),
+                "reproject_kwargs": job.reproject_kwargs,
+                "reproject_mode": job.reproject_mode,
+                "postprocess": PluginSerializer.dumps(job.postprocess),
+                "postprocess_kwargs": job.postprocess_kwargs,
+                "write": PluginSerializer.dumps(job.write),
+                "write_kwargs": job.write_kwargs,
+            },
         }
         (dest_dir / self.META_NAME).write_text(
             json.dumps(meta, default=str), encoding="utf-8"
         )
 
         logger.debug(
-            "task_serialized dest_dir=%s n_assets=%d n_patches=%d",
+            "task_serialized dest_dir=%s n_assets=%d",
             dest_dir,
             len(task.assets),
-            len(task.patches),
         )
 
     def deserialize(self, src_dir: Path) -> ExtractionTask:
@@ -211,11 +186,10 @@ class _TaskSerializer:
         src_dir = Path(src_dir)
 
         assets = gpd.read_parquet(src_dir / self.ASSETS_NAME)
-
         meta = json.loads((src_dir / self.META_NAME).read_text(encoding="utf-8"))
 
-        # Reconstruct the parent ExtractionJob from serialized metadata.
-        target_aoi_wkt = meta.get(self.TARGET_AOI_WKT_KEY)
+        job_meta = meta["job"]
+        target_aoi_wkt = job_meta.get("target_aoi_wkt")
         target_aoi = (
             shapely.wkt.loads(target_aoi_wkt) if target_aoi_wkt is not None else None
         )
@@ -223,46 +197,32 @@ class _TaskSerializer:
 
         job = ExtractionJob.model_validate(
             {
-                "name": meta.get(self.JOB_NAME_KEY, "default"),
-                "grid_dist": meta[self.GRID_DIST_KEY],
-                "output_uri": meta.get(self.OUTPUT_URI_KEY, meta.get(self.URI_KEY)),
-                "read": cast(Reader, PluginSerializer.loads(meta[self.READ_KEY])),
-                "write": cast(
-                    Writer | None, PluginSerializer.loads(meta[self.WRITE_KEY])
-                ),
+                "name": job_meta.get("name", "default"),
+                "grid_dist": job_meta["grid_dist"],
+                "output_uri": job_meta["output_uri"],
+                "overwrite": job_meta.get("overwrite", False),
                 "target_aoi": target_aoi,
+                "resolution": job_meta.get("resolution"),
+                "margin": job_meta.get("margin"),
+                "read": cast(Reader, PluginSerializer.loads(job_meta["read"])),
+                "read_kwargs": job_meta.get("read_kwargs"),
+                "preprocess": PluginSerializer.loads(job_meta.get("preprocess")),
+                "preprocess_kwargs": job_meta.get("preprocess_kwargs"),
+                "reproject": PluginSerializer.loads(job_meta.get("reproject")),
+                "reproject_kwargs": job_meta.get("reproject_kwargs"),
+                "reproject_mode": job_meta.get("reproject_mode"),
+                "postprocess": PluginSerializer.loads(job_meta.get("postprocess")),
+                "postprocess_kwargs": job_meta.get("postprocess_kwargs"),
+                "write": cast(Writer, PluginSerializer.loads(job_meta["write"])),
+                "write_kwargs": job_meta.get("write_kwargs"),
             }
         )
 
-        # Reconstruct ExtractionPatch instances
-        patches: list[ExtractionPatch] = []
-        for patch_meta in meta[self.PATCHES_KEY]:
-            geom = shapely.wkt.loads(patch_meta[self.GEOM_WKT_KEY])
-            patches.append(
-                ExtractionPatch(
-                    id=patch_meta[self.CELL_ID_KEY],
-                    d=patch_meta[self.D_KEY],
-                    cell_geometry=geom,  # type: ignore[arg-type]
-                    resolution=patch_meta[self.RESOLUTION_KEY],
-                    margin=patch_meta[self.MARGIN_KEY],
-                    padding=patch_meta[self.PADDING_KEY],
-                    conform_to=patch_meta.get(self.CONFORM_TO_KEY),
-                )
-            )
-
-        # Reconstruct optional AOI
-        aoi = (
-            shapely.wkt.loads(meta[self.AOI_WKT_KEY])
-            if meta[self.AOI_WKT_KEY] is not None
-            else None
-        )
-
         return ExtractionTask(
+            id=meta.get("id", "remote-task"),
             assets=assets,  # type: ignore[arg-type]
             job=job,
-            patches=patches,
-            aoi=aoi,
-            task_context=meta[self.TASK_CONTEXT_KEY],
+            task_context=meta.get("task_context", {}),
         )
 
     def serialize_to_bytes(self, task: ExtractionTask) -> bytes:

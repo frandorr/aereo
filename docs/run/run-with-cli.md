@@ -43,7 +43,6 @@ cd examples/config
 aereo action=run \
   search=sentinel2_pc \
   grid_dist=grid_10km \
-  patch_config=patch_10m \
   task_builder=grouped \
   read=sentinel2 \
   write=sentinel2 \
@@ -51,7 +50,7 @@ aereo action=run \
 ```
 
 Because the config directory is the current working directory, Hydra finds the
-`search/`, `grid_dist/`, `patch_config/`, `read/`, `write/`, and `task_builder/`
+`search/`, `grid_dist/`, `read/`, `write/`, and `task_builder/`
 subdirectories automatically.
 
 ---
@@ -92,7 +91,6 @@ proceeding.
 aereo action=build-tasks \
   search_results=results.json \
   grid_dist=grid_10km \
-  patch_config=patch_10m \
   task_builder=grouped \
   read=sentinel2 \
   write=sentinel2 \
@@ -124,7 +122,6 @@ Catch schema errors before starting a long extraction:
 aereo action=validate \
   search=sentinel2_pc \
   grid_dist=grid_10km \
-  patch_config=patch_10m \
   task_builder=grouped \
   read=sentinel2 \
   write=sentinel2
@@ -143,14 +140,14 @@ All actions support these Hydra-style overrides:
 |----------|---------|-------------|
 | `search=` | `search=sentinel2_pc` | Select a search provider config. |
 | `grid_dist=` | `grid_dist=grid_50km` | Select a grid config. |
-| `patch_config=` | `patch_config=high_res` | Select a patch config. |
+| `resolution=` | `resolution=10.0` | Target pixel resolution in metres. |
 | `read=` | `read=sentinel2_ndvi` | Select a reader config. |
 | `write=` | `write=sentinel2_ndvi` | Select a writer config. |
 | `task_builder=` | `task_builder=grouped` | Select a task builder config. |
 | `output_uri=` | `output_uri=/tmp/out` | Base output path. |
 | `output_dir=` | `output_dir=/tmp/out` | Used by `extract` action. |
 | `workers=` | `workers=4` | Max workers for `LocalExecutor`. |
-| `cells_per_task=` | `cells_per_task=10` | Grid cells per prepared task. |
+| `reproject_mode=` | `reproject_mode=grid` | Reprojection mode (`raw` or `grid`). |
 | `overwrite=` | `overwrite=true` | Bypass per-task artifact cache. |
 | `verbose=` | `verbose=true` | Enable debug logging. |
 | `geojson=` | `geojson=aoi/chocon.geojson` | Path to AOI GeoJSON. |

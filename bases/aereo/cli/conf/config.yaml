@@ -31,5 +31,6 @@ grid_dist: 50000
 read: null
 write: null
 
-# Patch configuration for the task builder
-patch_config: null
+# Optional reprojection / grid parameters
+resolution: null
+margin: null

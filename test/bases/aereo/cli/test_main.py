@@ -32,9 +32,6 @@ task_builder:
   _target_: aereo.builtins.task_builder.build_grouped_tasks
   cells_per_task: 50
 grid_dist: 50000
-patch_config:
-  _target_: aereo.interfaces.PatchConfig
-  resolution: 10.0
 output_uri: "out"
 read:
   _target_: aereo.builtins.read_odc_stac

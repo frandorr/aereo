@@ -10,14 +10,14 @@ same flow applies to any sensor plugin.
 ## What we are building
 
 AEREO turns a **user query** (AOI + time range + collections) into
-analysis-ready GeoTIFFs on a shared grid. The pipeline has three logical steps:
+analysis-ready GeoTIFFs. The pipeline has three logical steps:
 
 1. **Search and task preparation** — find the satellite assets and turn them
    into parallel `ExtractionTask`s.
-2. **Extraction pipeline** — for every task, read the raw data, optionally
-   preprocess it, and reproject each patch to the target grid.
-3. **Per-patch write to MajorTOM grid** — post-process and write one GeoTIFF per
-   grid cell.
+2. **Extraction pipeline** — for every task, read the raw data and optionally
+   preprocess, reproject, and postprocess it.
+3. **Write and catalog** — the orchestrator writes files, intersects each file
+   with the MajorTOM grid, and returns a validated artifact catalog.
 
 ---
 
@@ -32,9 +32,9 @@ The first step is orchestrated by `ExtractionJob.search()` and
 
 * **`SearchProvider`** queries the chosen catalog (STAC, Earthaccess, etc.) and
   returns a `GeoDataFrame` validated against `AssetSchema`.
-* **`TaskBuilder`** takes that `GeoDataFrame`, builds the MajorTOM grid over the
-  AOI, keeps only the cells touched by the asset footprints, and groups them
-  into `ExtractionTask` objects.
+* **`TaskBuilder`** takes that `GeoDataFrame` and groups assets into
+  `ExtractionTask` objects. The default builder groups by `start_time` and
+  native CRS.
 
 The result is a sequence of isolated tasks that can later be executed in
 parallel.
@@ -59,9 +59,9 @@ Each row is one discovered asset. The key columns are:
 
 `build_tasks()` returns `ExtractionTask` objects. Each task carries:
 
+* `id` — a stable identifier,
 * `assets` — the subset of the search results this task will read,
-* `patches` — the grid cells (`ExtractionPatch`) it is responsible for,
-* `extract` — the configured reader, processors, reprojector and writer,
+* `job` — the configured reader, processors, reprojector, and writer,
 * `output_uri` — where the artifacts should land.
 
 Because each task is self-contained, the next step can run them in parallel
@@ -73,16 +73,17 @@ without shared state.
 
 ### Architecture
 
-![Step 2: each ExtractionTask runs Reader -> Preprocessor -> Reprojector in isolation](../assets/pipeline-walkthrough/05-step2-extraction-pipeline.png)
+![Step 2: each ExtractionTask runs Reader -> Preprocessor -> Reprojector -> Postprocessor -> Writer](../assets/pipeline-walkthrough/05-step2-extraction-pipeline.png)
 
 Every `ExtractionTask` is executed independently through the same stage
 pipeline:
 
-1. **Reader** opens the source asset and returns an `xr.Dataset` or
-   `xr.DataArray`.
+1. **Reader** opens the source assets and returns an `xr.Dataset`.
 2. **Preprocessors** (optional) transform the data — select bands, mask clouds,
    compute indices, etc.
-3. **Reprojector** warps the data to each target patch's grid/GeoBox.
+3. **Reprojector** (optional) warps the data to a target CRS/resolution or to
+   each grid cell's GeoBox.
+4. **Postprocessors** (optional) apply final transformations.
 
 Because tasks are isolated, you can safely parallelize this step with an
 executor such as `LocalExecutor` or `LambdaExecutor`.
@@ -100,48 +101,46 @@ The reader loads the requested variables (`red`, `nir`) into a single
   acquisition timestamps.
 * Data are loaded lazily as Dask arrays when the reader supports it.
 
-### Reprojector output: one `xr.Dataset` per grid cell
+### Reprojector output
 
-<img src="../assets/pipeline-walkthrough/07-reprojected-per-cell-datasets.png" alt="Dictionary of reprojected xarray.Datasets keyed by MajorTOM cell ID" width="450px">
-
-After reprojection, the single scene is split into one `xr.Dataset` per target
-cell. Here the keys are MajorTOM cell IDs such as `439D_593L` and
-`439D_592L`. Each dataset now has:
-
-* The same `time` coordinate (the original acquisition time),
-* `y` and `x` dimensions aligned to the cell's local UTM grid,
-* Consistent resolution and extent, so outputs from different sensors can be
-  stacked later.
+With `reproject_mode="raw"`, the whole scene is warped to a single target
+CRS/resolution. With `reproject_mode="grid"`, the orchestrator loops over the
+MajorTOM cells that intersect the dataset footprint and reprojects each cell to
+its local UTM geobox. In both cases the result is an `xr.Dataset` ready for the
+writer.
 
 ---
 
-## Step 3: Per-patch write to MajorTOM grid
+## Step 3: Write and catalog
 
 ### Architecture
 
-<img src="../assets/pipeline-walkthrough/08-step3-write-to-grid.png" alt="Step 3: each reprojected patch passes through a Postprocessor and is written by the Writer" width="400px">
+<img src="../assets/pipeline-walkthrough/08-step3-write-to-grid.png" alt="Step 3: the orchestrator writes files and builds the artifact catalog" width="400px">
 
-The final step runs once per reprojected patch:
+The final step is handled by the orchestrator:
 
-1. **Postprocessors** (optional) apply final transformations — scaling,
-   rounding, renaming variables, creating composites.
-2. **Writer** persists the result as a GeoTIFF following the EOIDS layout.
+1. **Time splitting** — if the dataset has a `time` dimension, one file is
+   written per time step.
+2. **Writer** — persists each slice as a GeoTIFF following the EOIDS layout.
+3. **Artifact catalog** — reads the written file's footprint, intersects it
+   with the MajorTOM grid, and emits one `ArtifactSchema` row per cell.
 
 ### Artifact output: `GeoDataFrame[ArtifactSchema]`
 
-<img src="../assets/pipeline-walkthrough/09-artifact-output-geodataframe.png" alt="Final artifact GeoDataFrame with one row per written GeoTIFF" width="700px">
+<img src="../assets/pipeline-walkthrough/09-artifact-output-geodataframe.png" alt="Final artifact GeoDataFrame with one row per intersecting grid cell" width="700px">
 
-`job.execute()` returns a validated `GeoDataFrame` with one row per artifact:
+`job.execute()` returns a validated `GeoDataFrame` with one row per
+intersecting grid cell:
 
 | Column | Why it matters |
 |--------|----------------|
 | `id` | Unique artifact ID, often combining cell, variable and timestamp. |
 | `uri` | Absolute path to the written GeoTIFF. |
-| `grid_cell` | MajorTOM cell ID, e.g. `439D_593L`. |
+| `grid_cell` | MajorTOM cell ID, e.g., `439D_593L`. |
 | `start_time` / `end_time` | Acquisition window carried over from the source asset. |
 
-These artifacts are now ready for downstream ML workflows, mosaicking, or
-further analysis.
+For raw extractions that cover many cells, multiple rows point to the same
+output file URI.
 
 ### Visual check: resulting artifacts on the grid
 
@@ -157,7 +156,7 @@ shared grid.
 ## Full code snippet
 
 ```python
-from aereo.builtins import GroupedTaskBuilder, SearchSTAC
+from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
 
@@ -168,10 +167,10 @@ job = ExtractionJob.load_from_config(
 )
 
 # 2. Step 1: search + prepare tasks
-results = job.search(SearchSTAC(...))
-tasks = job.build_tasks(results, GroupedTaskBuilder())
+results = job.search(search_stac(...))
+tasks = job.build_tasks(results, build_grouped_tasks)
 
-# 3. Steps 2 & 3: extract and write
+# 3. Steps 2 & 3: extract, write, and catalog
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=4))
 
 print(f"Wrote {len(artifacts)} artifacts to {job.output_uri}")

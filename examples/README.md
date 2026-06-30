@@ -80,7 +80,6 @@ cd examples/config
 aereo action=run \
   search=sentinel2_pc \
   grid_dist=grid_10km \
-  patch_config=patch_10m \
   read=sentinel2 \
   write=sentinel2
 

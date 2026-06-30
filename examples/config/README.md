@@ -5,16 +5,13 @@ This directory demonstrates the Hydra config-package layout enabled by the flat
 
 ```
 .
-├── main_config.yaml
+├── job_<name>.yaml
 ├── aoi/
 │   └── sample.geojson
 ├── search/
 │   └── default.yaml
 ├── grid_dist/
 │   └── grid_10km.yaml
-├── patch_config/
-│   ├── base.yaml
-│   └── high_res.yaml
 ├── task_builder/
 │   └── grouped.yaml
 ├── read/
@@ -27,11 +24,10 @@ This directory demonstrates the Hydra config-package layout enabled by the flat
     └── goes.yaml
 ```
 
-`grid_dist` is an integer cell size in metres and `patch_config` is a concrete
-Pydantic model, so their YAML files only need the field values; ``_target_`` is
-optional. ``_target_`` is
-required for plugin/config groups that select an implementation, such as
-``read``, ``write``, and the runtime ``search`` and ``task_builder`` configs.
+`grid_dist` is an integer cell size in metres, so its YAML files only need the
+field value; ``_target_`` is optional. ``_target_`` is required for plugin/config
+groups that select an implementation, such as ``read``, ``write``, and the
+runtime ``search`` and ``task_builder`` configs.
 
 Top-level keys (``grid_dist``, ``output_uri``, ``read``, ``write``) are
 first-class citizens of the job config, so they can be swapped independently
@@ -76,7 +72,6 @@ separately and pass them to the job orchestration methods. Use the
 ```python
 from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
-from aereo.interfaces import PatchConfig
 from aereo.pipeline import ExtractionJob, load_plugin
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
@@ -88,10 +83,7 @@ assets = job.search(
     collections={"sentinel-2-l2a": ["red", "nir"]},
     intersects="examples/config/aoi/sample.geojson",
 )
-patch_config = PatchConfig(resolution=10.0)
-tasks = job.build_tasks(
-    assets, build_grouped_tasks, patch_config=patch_config, cells_per_task=5
-)
+tasks = job.build_tasks(assets, build_grouped_tasks, cells_per_task=5)
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=4))
 
 # Option B: load them from the same config package
@@ -127,8 +119,8 @@ with initialize_config_dir(version_base=None, config_dir=config_dir):
 ## Passing an AOI geometry
 
 The top-level ``target_aoi`` key accepts a Shapely geometry, a GeoJSON dict,
-or a path to a GeoJSON file. ``target_aoi`` is the AOI used to clip prepared
-extraction tasks.
+or a path to a GeoJSON file. ``target_aoi`` is the AOI used to build the MajorTOM
+grid for artifact indexing.
 
 In a config package you can point to an AOI file with an override:
 
@@ -150,14 +142,40 @@ output_uri: /tmp/aereo_extraction
 target_aoi: /absolute/path/to/aoi.geojson
 read:
   _target_: aereo.builtins.read.read_odc_stac
-    ...
 write:
   _target_: aereo.builtins.write.write_geotiff
-      ...
 ```
 
 Relative paths are resolved against the current working directory of the
 process, so absolute paths are recommended in composed configs.
+
+## Reprojection modes
+
+The optional ``reproject`` stage is controlled by ``reproject_mode``:
+
+```yaml
+name: sentinel2_reproject_demo
+grid_dist: 10000
+output_uri: /tmp/aereo_extraction
+resolution: 10.0
+margin: 0.0
+reproject:
+  _target_: aereo.builtins.reproject.reproject_odc
+reproject_mode: raw
+reproject_kwargs:
+  crs: EPSG:32633
+  resolution: 10.0
+read:
+  _target_: aereo.builtins.read.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
+```
+
+- ``reproject_mode: raw`` reprojects the whole dataset once and writes one file.
+- ``reproject_mode: grid`` iterates over MajorTOM grid cells, reprojects each
+  cell to its local UTM geobox, and writes one file per cell.
+- When ``reproject`` is omitted, the dataset is written in its native projection
+  and the artifact catalog is still intersected with the grid.
 
 ## Direct load
 
@@ -170,10 +188,8 @@ grid_dist: 10000
 output_uri: /tmp/aereo_extraction
 read:
   _target_: aereo.builtins.read.read_odc_stac
-    ...
 write:
   _target_: aereo.builtins.write.write_geotiff
-    ...
 ```
 
 The ``output_uri`` can be a local path or an object-store URI such as

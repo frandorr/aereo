@@ -7,18 +7,14 @@ end-to-end without relying on external data sources.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
-import geopandas as gpd
 import numpy as np
 import pandas as pd
+import rasterio
+from rasterio.transform import Affine
 import xarray as xr
-from aereo.eoids import build_eoids_path
-from aereo.grid import ExtractionPatch
-from aereo.interfaces import ExtractionTask
-from aereo.schemas import ArtifactSchema
-from pandera.typing.geopandas import GeoDataFrame
-from shapely.geometry import box
 
 
 class TestReader:
@@ -32,16 +28,23 @@ class TestReader:
         self.width = width
         self.height = height
 
-    def __call__(self, task: ExtractionTask) -> xr.Dataset:
+    def __call__(
+        self,
+        files: list[str],
+        assets: Any | None = None,
+        **kwargs: Any,
+    ) -> xr.Dataset:
         """Return a synthetic dataset for testing.
 
         Args:
-            task: Extraction task (unused, but required by the interface).
+            files: Source filenames (ignored).
+            assets: Optional asset metadata (ignored).
+            **kwargs: Additional reader kwargs (ignored).
 
         Returns:
             A small xarray.Dataset tagged with start/end time attributes.
         """
-        del task  # unused
+        del files, assets, kwargs  # unused
         data = np.arange(self.width * self.height, dtype=np.float32).reshape(
             self.height, self.width
         )
@@ -58,76 +61,62 @@ class TestReader:
 
 
 class TestReprojector:
-    """Identity reprojector that maps every patch to the source dataset."""
+    """Identity reprojector compatible with the new Reprojector protocol."""
 
     __test__ = False
 
-    def __call__(
-        self,
-        ds: xr.Dataset,
-        task: ExtractionTask,
-    ) -> dict[str, xr.Dataset]:
-        """Return the input dataset unchanged for every patch.
+    def __call__(self, ds: xr.Dataset, **kwargs: Any) -> xr.Dataset:
+        """Return the input dataset unchanged.
 
         Args:
             ds: Source dataset.
-            task: Task containing the patches to reproject.
+            **kwargs: Additional reproject kwargs (ignored).
 
         Returns:
-            Mapping from patch ID to the source dataset.
+            The same dataset.
         """
-        return {patch.id: ds for patch in task.patches}
+        del kwargs  # unused
+        return ds
 
 
 class TestWriter:
-    """Writer that creates an empty GeoTIFF file and returns artifact metadata."""
+    """Writer that creates a tiny valid GeoTIFF file and returns its path."""
 
     __test__ = False
+    width: int = 8
+    height: int = 8
 
     def __call__(
         self,
         ds: xr.Dataset,
-        task: ExtractionTask,
-        patch: ExtractionPatch,
-    ) -> GeoDataFrame[ArtifactSchema]:
-        """Write a placeholder GeoTIFF and return artifact metadata.
+        path: str | Path,
+        **kwargs: Any,
+    ) -> str:
+        """Write a tiny valid GeoTIFF and return the written path.
 
         Args:
-            ds: Dataset for the patch.
-            task: Task providing the output URI and job metadata.
-            patch: Patch being written.
+            ds: Dataset to write (used for time attributes only).
+            path: Destination path.
+            **kwargs: Additional writer kwargs (ignored).
 
         Returns:
-            GeoDataFrame with one artifact row pointing at the written file.
+            The path that was written.
         """
-        start_time = ds.attrs.get("start_time")
-        end_time = ds.attrs.get("end_time")
-        out_path = build_eoids_path(
-            local_dir=task.output_uri,
-            job_name=task.job.name,
-            resolution=patch.resolution,
-            collections=["test"],
-            variables=["band1"],
-            cell_id=patch.id,
-            start_time=start_time,
-            end_time=end_time,
-            suffix="tif",
-        )
-        out_path.write_bytes(b"")  # placeholder bytes; upload path only needs a file
-
-        record: dict[str, Any] = {
-            "id": f"{patch.id}_band1",
-            "source_ids": ",".join(sorted({str(aid) for aid in task.assets["id"]})),
-            "start_time": start_time,
-            "end_time": end_time,
-            "uri": str(out_path),
-            "collection": "test",
-            "geometry": box(*patch.cell_geometry.bounds),
-            "grid_cell": patch.id,
-            "grid_dist": patch.d,
-            "cell_geometry": patch.cell_geometry,
-            "cell_utm_crs": patch.utm_crs,
-            "cell_utm_footprint": patch.utm_footprint,
-        }
-        gdf = gpd.GeoDataFrame([record], geometry="geometry", crs="EPSG:4326")
-        return GeoDataFrame[ArtifactSchema](gdf)
+        del ds, kwargs  # unused
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        data = np.zeros((self.height, self.width), dtype=np.float32)
+        transform = Affine.identity() * Affine.scale(1, -1)
+        with rasterio.open(
+            path,
+            "w",
+            driver="GTiff",
+            height=data.shape[0],
+            width=data.shape[1],
+            count=1,
+            dtype=data.dtype,
+            crs="EPSG:4326",
+            transform=transform,
+        ) as dst:
+            dst.write(data, 1)
+        return str(path)

@@ -1,17 +1,16 @@
 # Grid System
 
 AEREO partitions the Earth into analysis-ready cells using the ESA Major TOM
-grid conventions. Every extraction task is tied to an `ExtractionPatch`, and the
-set of patches that cover an AOI is produced by a `GridDefinition` plus a
-`PatchConfig`.
+grid conventions. Grid cells are an indexing concern of the orchestrator: they
+are used to build artifact catalogs and to drive `reproject_mode="grid"`, but
+they are no longer attached to individual `ExtractionTask` objects.
 
 ---
 
 ## GridDefinition
 
-A `GridDefinition` creates the raw cells that intersect any polygon. It is the
-first thing built during `build_tasks` (unless the extractor provides its own
-defaults).
+A `GridDefinition` creates the raw cells that intersect any polygon. It is used
+internally when the orchestrator builds the grid over the effective AOI.
 
 ```python
 from aereo.grid import GridDefinition
@@ -34,14 +33,14 @@ print(f"Generated {len(raw_cells)} cells")
 Each cell receives a Major TOM-style ID such as `922U_249R`. Overlapping cells
 append `_OV` (e.g., `922U_249R_OV`).
 
-### `grid_dist` vs. `patch_config.resolution`
+### `grid_dist` vs. `resolution`
 
 These two parameters are independent and easy to confuse:
 
 | Parameter | Units | What it controls | Example |
 |-----------|-------|------------------|---------|
 | `grid_dist` | metres | Size of each **grid cell** | `256000` → 256 km square cell |
-| `patch_config.resolution` | metres | Size of each **output pixel** inside the cell | `10` → 10 m pixel |
+| `resolution` | metres | Size of each **output pixel** | `10` → 10 m pixel |
 
 A 256 km cell at 500 m resolution is roughly a 512 × 512 pixel tile. If you set
 `grid_dist=500` by mistake, every cell collapses to a single pixel.
@@ -63,51 +62,64 @@ algorithms that need continuous coverage without edge artifacts.
 
 ---
 
-## ExtractionPatch
+## GridCell
 
-The fundamental unit of extraction. An `ExtractionPatch` represents a geographic
-cell with a known coordinate reference system, resolution, and pixel alignment.
-It is created from a `GridDefinition` and a `PatchConfig`:
+`GridCell` is the orchestrator's view of a geographic cell: a WGS84 polygon,
+a target pixel resolution, and helpers for UTM projection and `odc-geo`
+`GeoBox` creation.
 
 ```python
-from aereo.grid import GridDefinition, generate_extraction_patches
-from aereo.interfaces import PatchConfig
+from aereo.grid import build_grid_cells
 from shapely.geometry import box
 
-grid_def = GridDefinition(d=10000)
-patch_config = PatchConfig(resolution=10.0, margin=10.0)
-patches = generate_extraction_patches(box(-63.5, -41.0, -57.0, -34.0), grid_def, patch_config)
-print(f"Generated {len(patches)} patches")
+cells = build_grid_cells(
+    aoi=box(-63.5, -41.0, -57.0, -34.0),
+    grid_dist=10000,
+    resolution=10.0,
+    margin=0.0,
+)
+print(f"Generated {len(cells)} cells")
 ```
+
+| Attribute | Description |
+|-----------|-------------|
+| `id` | Major TOM-style cell identifier. |
+| `d` | Cell size in metres (`grid_dist`). |
+| `cell_geometry` | Cell polygon in WGS84. |
+| `resolution` | Target pixel resolution in metres. |
+| `margin` | Optional buffer applied when the cell was built. |
+| `padding` | Optional pixel padding for tensor alignment. |
+| `conform_to` | Optional fixed output shape `(height, width)`. |
 
 ---
 
 ## Area definition
 
-Convert a patch to an `odc.geo.GeoBox` for raster operations:
+Convert a cell to an `odc.geo.GeoBox` for raster operations:
 
 ```python
-geobox = patch.geobox
+geobox = cell.geobox
 ```
 
-The `geobox` is computed lazily from the patch's UTM footprint, resolution,
-margin, padding, and optional `conform_to` shape.
+The `geobox` is computed lazily from the cell's UTM footprint, resolution,
+margin, padding, and optional `conform_to` shape. In `reproject_mode="grid"`,
+the orchestrator passes this geobox to the reprojector for each cell.
 
 ---
 
 ## Conform mode
 
-When `patch_config.conform_to=(w, h)` is provided, `tight=True` is enforced
-internally so every patch in a batch has the exact same pixel dimensions —
-essential for stacking arrays.
+When `conform_to=(height, width)` is provided, every cell in a batch is padded
+to the same pixel dimensions — essential for stacking arrays in ML pipelines.
 
 ---
 
 ## Grid filtering modes
 
-During `build_tasks`, AEREO intersects the generated grid with the **asset
-geometry** (the actual satellite swath footprint, not the AOI). Any cell that
-touches the asset geometry is kept.
+During execution, AEREO intersects the generated grid with the **written file
+footprint** (or with the asset geometry when building the grid for
+`reproject_mode="grid"`). Any cell that touches the footprint is kept, producing
+one artifact row per cell.
 
 ---
 
@@ -125,7 +137,7 @@ grid_dist = 50_000  # 50 km cells
 ```
 
 Remember: `grid_dist` controls the **cell** size in metres, while
-`patch_config.resolution` controls the **pixel** size in metres. A 256 km cell at
+`resolution` controls the **pixel** size in metres. A 256 km cell at
 500 m resolution is roughly a 512 × 512 pixel tile.
 
 ### CRS mismatch between adjacent cells
@@ -140,7 +152,7 @@ values.
 By default, each cell's output matches its natural UTM footprint, so adjacent
 cells tile edge-to-edge with no gaps.
 
-When you set `conform_to=(W, H)`, every cell is padded to the same pixel
+When you set `conform_to=(H, W)`, every cell is padded to the same pixel
 dimensions with `NaN` fill. This is essential for ML pipelines but creates
 padding borders that do not exist in natural-shape mode.
 
@@ -149,5 +161,5 @@ padding borders that do not exist in natural-shape mode.
 | Natural (default) | Visualization, mosaics | Seamless tiling |
 | `conform_to` | ML training, fixed tensors | `NaN` padding where data is missing |
 
-Remember: `conform_to` is `(width, height)`, matching rasterio's
+Remember: `conform_to` is `(height, width)`, matching rasterio's
 `(bands, height, width)` convention.

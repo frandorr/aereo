@@ -18,7 +18,6 @@ from typing import cast
 
 import geopandas as gpd
 import requests
-from aereo.grid import ExtractionPatch
 from aereo.interfaces import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
@@ -45,25 +44,18 @@ def _make_task() -> ExtractionTask:
         geometry=[Polygon([[0, 0], [0.01, 0], [0.01, 0.01], [0, 0.01]])],
         crs="EPSG:4326",
     )
-    patch = ExtractionPatch(
-        id="0U_0R",
-        d=50_000,
-        cell_geometry=Polygon([[0, 0], [0.005, 0], [0.005, 0.005], [0, 0.005]]),
-        resolution=100.0,
-        margin=0.0,
-        padding=0,
-    )
     job = ExtractionJob(
         name="custom-reader-job",
         grid_dist=50_000,
         output_uri="/tmp/aereo/output",
+        resolution=100.0,
         read=SyntheticReader(),
         write=write_geotiff,
     )
     return ExtractionTask(
+        id="task-0",
         assets=cast(GeoDataFrame[AssetSchema], df),
         job=job,
-        patches=[patch],
         task_context={"job_id": "custom-reader-job", "chunk_id": 0},
     )
 

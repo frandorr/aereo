@@ -34,7 +34,8 @@ def _mock_botocore():
 
 
 def _make_task(
-    task_context: dict[str, Any] | None = None,
+    job_name: str = "default",
+    task_id: str = "task-0",
 ) -> ExtractionTask:
     """Return a minimal ExtractionTask for testing."""
     from datetime import datetime
@@ -52,16 +53,16 @@ def _make_task(
     )
 
     job = ExtractionJob(
+        name=job_name,
         grid_dist=50_000,
         output_uri="test-uri",
         read=read_odc_stac,
         write=write_geotiff,
     )
     return ExtractionTask(
+        id=task_id,
         assets=cast(GeoDataFrame[AssetSchema], df),
         job=job,
-        patches=[],
-        task_context=task_context or {},
     )
 
 
@@ -151,11 +152,11 @@ def test_lambda_executor_invokes_lambda_for_single_task():
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    task = _make_task(task_context={"job_id": "job-42", "chunk_id": 7})
+    task = _make_task(job_name="job-42")
 
     mock_payload = MagicMock()
     mock_payload.read.return_value = json.dumps(
-        {"manifest_uri": "s3://bucket/results/job-42/7/manifest.json"}
+        {"manifest_uri": "s3://bucket/results/job-42/0/manifest.json"}
     ).encode("utf-8")
     mock_client.invoke.return_value = {
         "Payload": mock_payload,
@@ -177,8 +178,8 @@ def test_lambda_executor_invokes_lambda_for_single_task():
     call_kwargs = mock_client.invoke.call_args.kwargs
     assert call_kwargs["FunctionName"] == "aer-extract"
     payload = json.loads(call_kwargs["Payload"].decode("utf-8"))
-    assert payload["task_uri"].startswith("s3://aer-tasks/aereo-tasks/job-42/7/")
-    assert payload["output_prefix"] == "s3://aer-tasks/results/job-42/7/"
+    assert payload["task_uri"].startswith("s3://aer-tasks/aereo-tasks/job-42/0/")
+    assert payload["output_prefix"] == "s3://aer-tasks/results/job-42/0/"
 
 
 def test_lambda_executor_invokes_lambda_for_multiple_tasks():
@@ -188,8 +189,8 @@ def test_lambda_executor_invokes_lambda_for_multiple_tasks():
     mock_boto3.client.return_value = mock_client
 
     tasks = [
-        _make_task(task_context={"job_id": "job-99", "chunk_id": 0}),
-        _make_task(task_context={"job_id": "job-99", "chunk_id": 1}),
+        _make_task(job_name="job-99", task_id="task-0"),
+        _make_task(job_name="job-99", task_id="task-1"),
     ]
 
     def _make_response(manifest_uri: str):
@@ -224,7 +225,7 @@ def test_lambda_executor_propagates_function_error():
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
+    task = _make_task(job_name="job-1")
 
     mock_payload = MagicMock()
     mock_payload.read.return_value = b"Unhandled error"
@@ -249,7 +250,7 @@ def test_lambda_executor_raises_on_missing_manifest_uri():
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
+    task = _make_task(job_name="job-1")
 
     mock_payload = MagicMock()
     mock_payload.read.return_value = json.dumps({"status": "ok"}).encode("utf-8")
@@ -273,7 +274,7 @@ def test_lambda_executor_uses_endpoint_url():
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
+    task = _make_task(job_name="job-1")
 
     mock_payload = MagicMock()
     mock_payload.read.return_value = json.dumps(
@@ -345,7 +346,7 @@ def test_lambda_executor_retryable_error_raises_retryable_lambda_error():
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
+    task = _make_task(job_name="job-1")
 
     mock_payload = MagicMock()
     mock_payload.read.return_value = json.dumps(
@@ -375,7 +376,7 @@ def test_lambda_executor_structured_error_not_retryable_raises_runtime_error():
     mock_boto3 = MagicMock()
     mock_boto3.client.return_value = mock_client
 
-    task = _make_task(task_context={"job_id": "job-1", "chunk_id": 0})
+    task = _make_task(job_name="job-1")
 
     mock_payload = MagicMock()
     mock_payload.read.return_value = json.dumps(
@@ -401,7 +402,7 @@ def test_lambda_executor_structured_error_not_retryable_raises_runtime_error():
 
 def test_lambda_executor_stages_to_s3():
     """LambdaExecutor stages tasks to S3 and invokes Lambda."""
-    task = _make_task(task_context={"job_id": "stage", "chunk_id": 0})
+    task = _make_task(job_name="stage")
 
     fake_s3 = _FakeS3Client()
     mock_boto3 = MagicMock()
@@ -442,15 +443,15 @@ def test_lambda_executor_best_effort_skips_failed_tasks():
     mock_boto3.client.return_value = mock_client
 
     tasks = [
-        _make_task(task_context={"job_id": "be", "chunk_id": 0}),
-        _make_task(task_context={"job_id": "be", "chunk_id": 1}),
+        _make_task(job_name="be", task_id="task-0"),
+        _make_task(job_name="be", task_id="task-1"),
     ]
 
     def _side_effect(*args, **kwargs):
         payload = json.loads(kwargs["Payload"].decode("utf-8"))
-        chunk_id = payload["chunk_id"]
+        task_id = payload["task_id"]
         response_payload = MagicMock()
-        if chunk_id == 0:
+        if task_id == "task-0":
             response_payload.read.return_value = json.dumps(
                 {"statusCode": 500, "error": "boom", "retryable": False}
             ).encode("utf-8")

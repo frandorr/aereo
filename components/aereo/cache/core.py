@@ -40,8 +40,7 @@ class TaskResultCache:
     The cache is stored under ``<task.output_uri>/.aereo_cache/tasks/`` as
     ``<fingerprint>.parquet``. The fingerprint is a SHA-256 hash of a
     deterministic, JSON-serializable representation of everything that affects
-    the task's output: job configuration, assets, patches, AOI, and task
-    context.
+    the task's output: job configuration and assets.
     """
 
     _CACHE_DIR_NAME = ".aereo_cache"
@@ -62,21 +61,32 @@ class TaskResultCache:
     def fingerprint(self, task: ExtractionTask) -> str:
         """Compute a stable SHA-256 fingerprint for *task*.
 
-        The fingerprint includes the full job configuration (including the
-        extract pipeline), the assets, the patches, the AOI, and the task
-        context. This ensures that changes to postprocessors, variables, or
-        any other output-affecting setting invalidate the cache.
+        The fingerprint includes the full job configuration and the assets.
+        This ensures that changes to readers, writers, reprojectors,
+        processors, or any other output-affecting setting invalidates the cache.
         """
         job = task.job
 
         job_data: dict[str, Any] = {
+            "id": task.id,
             "name": job.name,
             "grid_dist": job.grid_dist,
             "output_uri": job.output_uri,
             "target_aoi": _geometry_to_wkt(job.target_aoi),
+            "resolution": job.resolution,
+            "margin": job.margin,
             # overwrite is a runtime control, not an output characteristic.
             "read": _model_dump(job.read),
+            "read_kwargs": job.read_kwargs,
+            "preprocess": _model_dump(job.preprocess),
+            "preprocess_kwargs": job.preprocess_kwargs,
+            "reproject": _model_dump(job.reproject),
+            "reproject_kwargs": job.reproject_kwargs,
+            "reproject_mode": job.reproject_mode,
+            "postprocess": _model_dump(job.postprocess),
+            "postprocess_kwargs": job.postprocess_kwargs,
             "write": _model_dump(job.write),
+            "write_kwargs": job.write_kwargs,
         }
 
         assets_df = task.assets.copy()
@@ -95,28 +105,9 @@ class TaskResultCache:
             assets_df[asset_cols].to_dict(orient="records"),  # pyright: ignore[reportCallIssue]
         )
 
-        patches_data = [
-            {
-                "id": patch.id,
-                "cell_geometry": _geometry_to_wkt(patch.cell_geometry),
-                "resolution": patch.resolution,
-                "margin": patch.margin,
-                "padding": patch.padding,
-                "conform_to": patch.conform_to,
-            }
-            for patch in sorted(task.patches, key=lambda p: p.id)
-        ]
-
-        task_context = dict(task.task_context)
-        # Callbacks are injected at runtime and do not affect output.
-        task_context.pop("callbacks", None)
-
         payload: dict[str, Any] = {
             "job": job_data,
             "assets": assets_data,
-            "patches": patches_data,
-            "aoi": _geometry_to_wkt(task.aoi),
-            "task_context": task_context,
         }
 
         json_bytes = json.dumps(payload, sort_keys=True, default=str).encode("utf-8")

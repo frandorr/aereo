@@ -109,48 +109,51 @@ Create a reader that opens source assets and returns an `xr.Dataset`:
 ```python
 """ACME reader plugin for aereo."""
 
+from typing import Any
+
 import xarray as xr
 from pydantic import ConfigDict, validate_call
 
-from aereo.interfaces import Reader, ExtractionTask
+from aereo.interfaces import Reader
 
 
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
-def acme_reader(task: ExtractionTask, bands: list[str] | None = None) -> xr.Dataset:
+def acme_reader(
+    files: list[str],
+    bands: list[str] | None = None,
+    **kwargs: Any,
+) -> xr.Dataset:
     """Reader plugin for ACME data."""
-    # Open hrefs from task.assets, select bands, return a Dataset.
+    # Open filenames, select bands, return a Dataset.
     ...
 ```
 
 ### Writer plugin
 
-Create a writer that persists the final data and returns artifact rows:
+Create a writer that persists the final data to a path supplied by the
+orchestrator:
 
 ```python
 """ACME writer plugin for aereo."""
 
 from pathlib import Path
+from typing import Any
 
-import geopandas as gpd
 import xarray as xr
-from pandera.typing.geopandas import GeoDataFrame
 from pydantic import ConfigDict, validate_call
 
-from aereo.interfaces import Writer, ExtractionTask, ExtractionPatch
-from aereo.schemas import ArtifactSchema
+from aereo.interfaces import Writer
 
 
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
 def acme_writer(
     ds: xr.Dataset,
-    task: ExtractionTask,
-    patch: ExtractionPatch,
-    output_dir: str = ".",
-) -> GeoDataFrame[ArtifactSchema]:
+    path: str | Path,
+    **kwargs: Any,
+) -> str:
     """Writer plugin for ACME data."""
-    # Write GeoTIFFs, build artifact GeoDataFrame, validate.
+    # Write GeoTIFF to path and return the written path.
     ...
-    return ArtifactSchema.empty()
 ```
 
 ---
@@ -210,7 +213,6 @@ read:
 
 write:
   _target_: acme_plugin.write:acme_writer
-  output_dir: /tmp/acme_out
 ```
 
 Or instantiate it in Python:
@@ -270,11 +272,11 @@ pip install aereo-plugin-acme
 | Interface | Purpose | Callable signature |
 |-----------|---------|--------------------|
 | `SearchProvider` | Query satellite data | `(collections, intersects, start_datetime, end_datetime, **kwargs) -> GeoDataFrame[AssetSchema]` |
-| `Reader` | Open source assets | `(task: ExtractionTask, ...) -> xr.Dataset` |
-| `Processor` | Transform datasets | `(ds: xr.Dataset) -> xr.Dataset` |
-| `Reprojector` | Reproject to target grid | `(ds: xr.Dataset, task: ExtractionTask, ...) -> dict[str, xr.Dataset]` |
-| `Writer` | Write artifacts | `(ds: xr.Dataset, task: ExtractionTask, patch: ExtractionPatch, ...) -> GeoDataFrame[ArtifactSchema]` |
-| `TaskBuilder` | Build extraction tasks | `(search_results, job: ExtractionJob, ...) -> Sequence[ExtractionTask]` |
+| `Reader` | Open source assets | `(files: list[str], **kwargs) -> xr.Dataset` |
+| `Processor` | Transform datasets | `(ds: xr.Dataset, **kwargs) -> xr.Dataset` |
+| `Reprojector` | Reproject/resample | `(ds: xr.Dataset, **kwargs) -> xr.Dataset` |
+| `Writer` | Write artifacts | `(ds: xr.Dataset, path: str \| Path, **kwargs) -> str` |
+| `TaskBuilder` | Build extraction tasks | `(search_results, job: ExtractionJob, **kwargs) -> Sequence[ExtractionTask]` |
 
 See the `aereo.interfaces` module for detailed documentation.
 

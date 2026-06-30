@@ -6,20 +6,27 @@ into the published ``aereo-extract-base`` image.
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import xarray as xr
-from aereo.interfaces import ExtractionTask, Reader
 
 
-class SyntheticReader(Reader):
+class SyntheticReader:
     """Reader that returns a synthetic dataset for any task.
 
     Useful for testing and as a template for custom readers that fetch data
     from private sources.
     """
 
-    def __call__(self, task: ExtractionTask) -> xr.Dataset:
+    def __call__(
+        self,
+        files: list[str],
+        assets: Any | None = None,
+        **kwargs: Any,
+    ) -> xr.Dataset:
         """Return a small synthetic raster dataset."""
+        del files, assets, kwargs  # unused
         shape = (64, 64)
         data = np.random.default_rng(42).random(shape)
         return xr.Dataset(
