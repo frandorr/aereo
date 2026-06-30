@@ -51,23 +51,21 @@ def test_raw_cell_from_id():
 def test_build_grid_cells():
     polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
 
-    patches = core.build_grid_cells(aoi=polygon, grid_dist=10_000, resolution=50.0)
-    assert len(patches) > 0
-    assert isinstance(patches[0], core.ExtractionPatch)
-    assert patches[0].resolution == 50.0
-    assert patches[0].d == 10000
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=10_000)
+    assert len(cells) > 0
+    assert isinstance(cells[0], core.GridCell)
+    assert not isinstance(cells[0], core.ExtractPatch)
+    assert cells[0].d == 10000
+
+    patch = cells[0].to_extract_patch(resolution=50.0)
+    assert isinstance(patch, core.ExtractPatch)
+    assert patch.resolution == 50.0
 
 
 def test_extraction_patch_to_geodataframe():
     polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
-    patch = core.ExtractionPatch(
-        id="0U_0R",
-        d=10000,
-        cell_geometry=polygon,
-        resolution=10.0,
-        margin=0.0,
-        padding=0,
-    )
+    cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
+    patch = cell.to_extract_patch(resolution=10.0, margin=0.0, padding=0)
     gdf = patch.to_geodataframe()
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert len(gdf) == 1
@@ -93,14 +91,8 @@ def test_get_cell_name():
 
 def test_extraction_patch_area_name_and_geobox():
     polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
-    patch = core.ExtractionPatch(
-        id="0U_0R",
-        d=10000,
-        cell_geometry=polygon,
-        resolution=50.0,
-        margin=0.0,
-        padding=0,
-    )
+    cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
+    patch = cell.to_extract_patch(resolution=50.0, margin=0.0, padding=0)
 
     assert patch.area_name() == "0U_0R_dist-10000m_res-50m"
     area = patch.geobox
@@ -119,14 +111,10 @@ def test_area_def_removed():
 
 
 def test_geobox_returns_geobox():
-    patch = core.ExtractionPatch(
-        id="test",
-        d=10000,
-        cell_geometry=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-        resolution=100.0,
-        margin=0.0,
-        padding=0,
+    cell = core.GridCell(
+        id="test", d=10000, cell_geometry=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
     )
+    patch = cell.to_extract_patch(resolution=100.0, margin=0.0, padding=0)
     gb = patch.geobox
     assert isinstance(gb, GeoBox)
     assert gb.crs is not None
@@ -135,8 +123,8 @@ def test_geobox_returns_geobox():
 
 def test_geobox_fixed_shape_matches_d():
     polygon = Point(-64.0, -31.4).buffer(0.1)
-    patches = core.build_grid_cells(aoi=polygon, grid_dist=100_000, resolution=2000.0)
-    patch = patches[0]
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
+    patch = cells[0].to_extract_patch(resolution=2000.0)
     gb = patch.geobox
     # GeoBox rounds to whole pixels; shape must be ≈ D / resolution
     assert gb.shape.x == pytest.approx(100_000 / 2000, abs=1)
@@ -146,9 +134,10 @@ def test_geobox_fixed_shape_matches_d():
 def test_geobox_from_generated_patch():
     """GeoBox from a real grid-generated patch should have valid extent and CRS."""
     polygon = Point(-64.0, -31.4).buffer(0.1)
-    patches = core.build_grid_cells(aoi=polygon, grid_dist=100_000, resolution=2000.0)
-    assert len(patches) > 0
-    ad = patches[0].geobox
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
+    assert len(cells) > 0
+    patch = cells[0].to_extract_patch(resolution=2000.0)
+    ad = patch.geobox
     assert isinstance(ad, GeoBox)
     # With margin=0 the box is D x D metres (≈50 px at 2000 m)
     assert ad.shape.x == pytest.approx(100_000 / 2000, abs=1)
@@ -161,8 +150,8 @@ def test_geobox_from_generated_patch():
 def test_geobox_uses_fixed_size():
     """A patch's geobox extent should be a fixed D x D square, not natural bounds."""
     polygon = Point(-64.0, -31.4).buffer(0.1)
-    patches = core.build_grid_cells(aoi=polygon, grid_dist=100_000, resolution=2000.0)
-    patch = patches[0]
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
+    patch = cells[0].to_extract_patch(resolution=2000.0)
     area = patch.geobox
     # The extent should be D x D metres (≈50 px), not derived from utm_footprint.bounds
     assert area.shape.x == pytest.approx(100_000 / 2000, abs=1)
@@ -171,14 +160,11 @@ def test_geobox_uses_fixed_size():
 
 def test_geobox_conform_to():
     """When conform_to is given, width/height should match target + padding."""
-    patch = core.ExtractionPatch(
-        id="test",
-        d=10000,
-        cell_geometry=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-        resolution=100.0,
-        margin=0.0,
-        padding=1,
-        conform_to=(50, 60),
+    cell = core.GridCell(
+        id="test", d=10000, cell_geometry=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
+    )
+    patch = cell.to_extract_patch(
+        resolution=100.0, margin=0.0, padding=1, conform_to=(50, 60)
     )
     area = patch.geobox
     assert area.shape.x == 52  # 50 + 2*1
@@ -190,8 +176,8 @@ def test_geobox_centered_on_grid_point():
     from aereo.spatial import reproject_geom
 
     polygon = Point(-64.0, -31.4).buffer(0.1)
-    patches = core.build_grid_cells(aoi=polygon, grid_dist=100_000, resolution=2000.0)
-    patch = patches[0]
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
+    patch = cells[0].to_extract_patch(resolution=2000.0)
     gb = patch.geobox
     utm_centroid = cast(
         Point,
@@ -209,22 +195,9 @@ def test_geobox_centered_on_grid_point():
 def test_geobox_with_margin():
     """margin should expand the box beyond D x D."""
     polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
-    patch_no_margin = core.ExtractionPatch(
-        id="0U_0R",
-        d=10000,
-        cell_geometry=polygon,
-        resolution=50.0,
-        margin=0.0,
-        padding=0,
-    )
-    patch_with_margin = core.ExtractionPatch(
-        id="0U_0R",
-        d=10000,
-        cell_geometry=polygon,
-        resolution=50.0,
-        margin=6.8,
-        padding=0,
-    )
+    cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
+    patch_no_margin = cell.to_extract_patch(resolution=50.0, margin=0.0, padding=0)
+    patch_with_margin = cell.to_extract_patch(resolution=50.0, margin=6.8, padding=0)
     gb_no_margin = patch_no_margin.geobox
     gb_with_margin = patch_with_margin.geobox
     assert gb_with_margin.shape.x > gb_no_margin.shape.x

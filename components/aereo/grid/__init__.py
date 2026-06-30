@@ -1,12 +1,14 @@
 """
 Grid module built on the Major TOM grid (via ``majortom_eg``).
 
-``GridCell.geobox`` returns an :class:`odc.geo.geobox.GeoBox` centred on the
-cell's grid point with a fixed size of ``D * (1 + margin/100)`` metres.
+``GridCell`` represents a raw MajorTOM grid cell. Use
+``cell.to_extract_patch(resolution=..., ...)`` to obtain an extraction-ready
+patch with a GeoBox.
 """
 
 from aereo.grid.core import (
     ExtractionPatch,
+    ExtractPatch,
     GridCell,
     GridDefinition,
     build_grid_cells,
@@ -18,5 +20,6 @@ __all__ = [
     "GridDefinition",
     "build_grid_cells",
     "intersect_cells",
+    "ExtractPatch",
     "ExtractionPatch",
 ]
