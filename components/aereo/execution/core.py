@@ -238,7 +238,7 @@ def _run_grid_reproject(
         raise ValueError("resolution is required when using reproject_mode='grid'.")
     for cell in cells:
         kwargs = dict(job.reproject_kwargs or {})
-        kwargs["geobox"] = cell.to_extract_patch(resolution=job.resolution).to_geobox()
+        kwargs["geobox"] = cell.to_geobox(resolution=job.resolution)
         cell_ds = reproject(ds, **kwargs)
 
         if job.postprocess:
