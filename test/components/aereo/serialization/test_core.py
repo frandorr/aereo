@@ -16,6 +16,7 @@ from shapely.geometry.base import BaseGeometry
 def _make_task(
     *,
     aoi: Polygon | None = None,
+    job_target_aoi: Polygon | None = None,
     task_context: dict[str, Any] | None = None,
 ) -> ExtractionTask:
     """Build a minimal but realistic ExtractionTask for serializer tests."""
@@ -37,13 +38,14 @@ def _make_task(
         output_uri="test_uri",
         read=read_odc_stac,
         write=write_geotiff,
-        target_aoi=aoi,
+        target_aoi=job_target_aoi,
     )
 
     return ExtractionTask(
         id="task-1",
         assets=cast(GeoDataFrame[AssetSchema], df),
         job=job,
+        aoi=aoi,
         task_context=task_context or {},
     )
 
@@ -80,13 +82,27 @@ def test_round_trip_basic(tmp_path: Any) -> None:
     assert reconstructed.task_context == original.task_context
 
 
-def test_round_trip_with_aoi(tmp_path: Any) -> None:
-    """AOI geometry survives round-trip via WKT stored on the job."""
+def test_round_trip_with_task_aoi(tmp_path: Any) -> None:
+    """Task-level AOI geometry survives round-trip via WKT."""
     serializer = _TaskSerializer()
     aoi = Polygon([[-1, -1], [2, -1], [2, 2], [-1, 2]])
     original = _make_task(aoi=aoi)
 
     dest = tmp_path / "task_aoi"
+    serializer.serialize(original, dest)
+    reconstructed = serializer.deserialize(dest)
+
+    assert isinstance(reconstructed.aoi, BaseGeometry)
+    assert reconstructed.aoi.equals_exact(aoi, tolerance=1e-9)
+
+
+def test_round_trip_with_job_aoi(tmp_path: Any) -> None:
+    """Job-level target AOI geometry survives round-trip via WKT stored on the job."""
+    serializer = _TaskSerializer()
+    aoi = Polygon([[-1, -1], [2, -1], [2, 2], [-1, 2]])
+    original = _make_task(job_target_aoi=aoi)
+
+    dest = tmp_path / "job_aoi"
     serializer.serialize(original, dest)
     reconstructed = serializer.deserialize(dest)
 

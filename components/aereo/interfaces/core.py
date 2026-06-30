@@ -230,6 +230,10 @@ class ExtractionTask:
         assets: GeoDataFrame of source assets to read. The orchestrator derives
             filenames from ``assets["href"]``.
         job: Parent ``ExtractionJob`` that owns this task's extraction configuration.
+        aoi: Optional task-specific AOI. When provided, the orchestrator uses this
+            geometry instead of ``job.target_aoi`` to build the MajorTOM grid and
+            index artifacts. This keeps the parent job immutable while allowing a
+            task builder to split a job into smaller spatial chunks.
         task_context: Optional metadata (e.g. ``chunk_id``, ``total_chunks``)
             carried with the task for tracing and logging.
     """
@@ -237,6 +241,7 @@ class ExtractionTask:
     id: str
     assets: GeoDataFrame[AssetSchema]
     job: ExtractionJob
+    aoi: BaseGeometry | None = None
     task_context: dict[str, Any] = attrs.field(factory=dict)
 
     @property
