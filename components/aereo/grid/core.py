@@ -7,7 +7,7 @@ for processing, alignment, and coordinate system projection.
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Callable, Sequence, cast
+from typing import Callable, Sequence, cast
 
 import attrs
 import geopandas as gpd
@@ -21,8 +21,6 @@ from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Point, Polygon
 from shapely.geometry.base import BaseGeometry
 
-if TYPE_CHECKING:
-    from aereo.interfaces.core import PatchConfig
 
 _WGS84_CRS = "epsg:4326"
 _GEOM_TOLERANCE = 1e-10
@@ -188,8 +186,7 @@ class GridDefinition(MajorTomGrid):
     """A grid definition that generates cells intersecting a given polygon.
 
     Wraps ``MajorTomGrid`` to produce raw geographic cells and IDs, and is
-    consumed by ``generate_grid_cells`` to create ``GridCell`` instances
-    aligned to a ``PatchConfig``.
+    consumed by ``build_grid_cells`` to create ``GridCell`` instances.
     """
 
     def __init__(self, d: int = 10000, overlap: bool = False) -> None:
@@ -373,40 +370,13 @@ class GridDefinition(MajorTomGrid):
         return cells
 
 
-def generate_grid_cells(
-    polygon: BaseGeometry,
-    grid_def: GridDefinition,
-    patch_config: PatchConfig,
-) -> Sequence[GridCell]:
-    """Generate ``GridCell`` objects intersecting ``polygon``.
-
-    Args:
-        polygon: Geometry to tile.
-        grid_def: Grid definition used to generate raw cells.
-        patch_config: Physical constraints (resolution, margin, padding).
-
-    Returns:
-        Sequence of constructed ``GridCell`` objects.
-    """
-    return [
-        GridCell(
-            id=cell_id,
-            d=grid_def.D,
-            cell_geometry=geom,
-            resolution=patch_config.resolution,
-            margin=patch_config.margin,
-            padding=patch_config.padding,
-            conform_to=patch_config.conform_to,
-        )
-        for geom, cell_id, _ in grid_def.generate_raw_cells(polygon)
-    ]
-
-
 def build_grid_cells(
     aoi: BaseGeometry,
     grid_dist: int,
     resolution: float,
     margin: float | None = None,
+    padding: int = 0,
+    conform_to: tuple[int, int] | None = None,
 ) -> Sequence[GridCell]:
     """Build ``GridCell`` objects intersecting an AOI.
 
@@ -415,6 +385,8 @@ def build_grid_cells(
         grid_dist: MajorTOM cell size in metres.
         resolution: Target pixel resolution in metres.
         margin: Optional buffer in metres to add around *aoi* before tiling.
+        padding: Additional padding pixels added to the extracted bounding box.
+        conform_to: Force the output tensor to this exact shape (H, W).
 
     Returns:
         Sequence of ``GridCell`` objects, one per intersecting cell.
@@ -433,6 +405,8 @@ def build_grid_cells(
             d=grid_dist,
             cell_geometry=geom,
             resolution=resolution,
+            padding=padding,
+            conform_to=conform_to,
         )
         for geom, cell_id, _ in grid_def.generate_raw_cells(aoi)
     ]
@@ -468,6 +442,5 @@ def intersect_cells(
     return result
 
 
-# Backwards-compatible aliases for code that has not yet migrated.
+# Backwards-compatible alias for code that has not yet migrated.
 ExtractionPatch = GridCell
-generate_extraction_patches = generate_grid_cells

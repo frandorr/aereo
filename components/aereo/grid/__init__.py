@@ -10,8 +10,6 @@ from aereo.grid.core import (
     GridCell,
     GridDefinition,
     build_grid_cells,
-    generate_extraction_patches,
-    generate_grid_cells,
     intersect_cells,
 )
 
@@ -19,8 +17,6 @@ __all__ = [
     "GridCell",
     "GridDefinition",
     "build_grid_cells",
-    "generate_grid_cells",
-    "generate_extraction_patches",
     "intersect_cells",
     "ExtractionPatch",
 ]

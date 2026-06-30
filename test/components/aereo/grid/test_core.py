@@ -3,7 +3,6 @@ from typing import cast
 import geopandas as gpd
 import pytest
 from aereo.grid import core
-from aereo.interfaces.core import PatchConfig
 from odc.geo.geobox import GeoBox
 from shapely.geometry import Polygon, Point
 
@@ -49,12 +48,10 @@ def test_raw_cell_from_id():
     assert recon_poly.intersection(first_poly).area > 0.99 * first_poly.area
 
 
-def test_generate_extraction_patches():
-    grid = core.GridDefinition(d=10000)
+def test_build_grid_cells():
     polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
-    patch_config = PatchConfig(resolution=50.0)
 
-    patches = core.generate_extraction_patches(polygon, grid, patch_config)
+    patches = core.build_grid_cells(aoi=polygon, grid_dist=10_000, resolution=50.0)
     assert len(patches) > 0
     assert isinstance(patches[0], core.ExtractionPatch)
     assert patches[0].resolution == 50.0
@@ -137,11 +134,8 @@ def test_geobox_returns_geobox():
 
 
 def test_geobox_fixed_shape_matches_d():
-    grid = core.GridDefinition(d=100_000)
-    patch_config = PatchConfig(resolution=2000.0)
-    patches = core.generate_extraction_patches(
-        Point(-64.0, -31.4).buffer(0.1), grid, patch_config
-    )
+    polygon = Point(-64.0, -31.4).buffer(0.1)
+    patches = core.build_grid_cells(aoi=polygon, grid_dist=100_000, resolution=2000.0)
     patch = patches[0]
     gb = patch.geobox
     # GeoBox rounds to whole pixels; shape must be ≈ D / resolution
@@ -151,11 +145,8 @@ def test_geobox_fixed_shape_matches_d():
 
 def test_geobox_from_generated_patch():
     """GeoBox from a real grid-generated patch should have valid extent and CRS."""
-    grid = core.GridDefinition(d=100000)
-    patch_config = PatchConfig(resolution=2000.0)
-    patches = core.generate_extraction_patches(
-        Point(-64.0, -31.4).buffer(0.1), grid, patch_config
-    )
+    polygon = Point(-64.0, -31.4).buffer(0.1)
+    patches = core.build_grid_cells(aoi=polygon, grid_dist=100_000, resolution=2000.0)
     assert len(patches) > 0
     ad = patches[0].geobox
     assert isinstance(ad, GeoBox)
@@ -169,11 +160,8 @@ def test_geobox_from_generated_patch():
 
 def test_geobox_uses_fixed_size():
     """A patch's geobox extent should be a fixed D x D square, not natural bounds."""
-    grid = core.GridDefinition(d=100_000)
-    patch_config = PatchConfig(resolution=2000.0)
-    patches = core.generate_extraction_patches(
-        Point(-64.0, -31.4).buffer(0.1), grid, patch_config
-    )
+    polygon = Point(-64.0, -31.4).buffer(0.1)
+    patches = core.build_grid_cells(aoi=polygon, grid_dist=100_000, resolution=2000.0)
     patch = patches[0]
     area = patch.geobox
     # The extent should be D x D metres (≈50 px), not derived from utm_footprint.bounds
@@ -201,11 +189,8 @@ def test_geobox_centered_on_grid_point():
     """geobox should be centred on the reprojected WGS84 centroid."""
     from aereo.spatial import reproject_geom
 
-    grid = core.GridDefinition(d=100_000)
-    patch_config = PatchConfig(resolution=2000.0)
-    patches = core.generate_extraction_patches(
-        Point(-64.0, -31.4).buffer(0.1), grid, patch_config
-    )
+    polygon = Point(-64.0, -31.4).buffer(0.1)
+    patches = core.build_grid_cells(aoi=polygon, grid_dist=100_000, resolution=2000.0)
     patch = patches[0]
     gb = patch.geobox
     utm_centroid = cast(
