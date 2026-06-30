@@ -21,10 +21,10 @@ The data orchestration lifecycle has three core stages:
 1. **Search**: a search function queries a satellite data collection and returns
    a standardized `AssetSchema` GeoDataFrame.
 2. **Prepare**: `ExtractionJob.build_tasks()` turns search results into
-   `ExtractionTask` objects, using the `grid_dist`, `PatchConfig`, and
-   `TaskBuilder`.
-3. **Execute**: an executor runs each task: `read function → write function`
-   once per patch.
+   `ExtractionTask` objects using a `TaskBuilder`.
+3. **Execute**: an executor runs the orchestrator `run_task` for each task:
+   `read → preprocess → reproject → postprocess → write`. Grid intersection and
+   artifact catalog generation happen inside the orchestrator.
 
 ### Built-in stages
 
@@ -33,11 +33,11 @@ The `aereo.builtins` package ships with ready-to-use functions:
 | Stage | Built-in functions | Input | Output |
 |-------|--------------------|-------|--------|
 | Search | `search_stac`, `search_earthaccess` | `(collections, intersects, start_datetime, end_datetime, **kwargs)` | `GeoDataFrame[AssetSchema]` |
-| Reader | `read_odc_stac` | `ExtractionTask` | `xr.Dataset` |
-| Processor | `select_bands`, `qa_mask`, `ndvi`, `normalize`, `composite` | `xr.Dataset` | `xr.Dataset` |
-| Reprojector | `reproject_odc` | `(xr.Dataset, ExtractionTask, **kwargs)` | `dict[str, xr.Dataset]` (keyed by patch id) |
-| Writer | `write_geotiff` | `(xr.Dataset, ExtractionTask, ExtractionPatch)` | `GeoDataFrame[ArtifactSchema]` |
-| Task builder | `build_grouped_tasks` | `(GeoDataFrame[AssetSchema], ExtractionJob, PatchConfig)` | `Sequence[ExtractionTask]` |
+| Reader | `read_odc_stac` | `(files: list[str], **kwargs)` | `xr.Dataset` |
+| Processor | `select_bands`, `qa_mask`, `ndvi`, `normalize`, `composite` | `(ds: xr.Dataset, **kwargs)` | `xr.Dataset` |
+| Reprojector | `reproject_odc` | `(ds: xr.Dataset, **kwargs)` | `xr.Dataset` |
+| Writer | `write_geotiff` | `(ds: xr.Dataset, path: str, **kwargs)` | `str` |
+| Task builder | `build_grouped_tasks` | `(GeoDataFrame[AssetSchema], ExtractionJob, **kwargs)` | `Sequence[ExtractionTask]` |
 
 External plugins (installed separately) provide additional readers,
 reprojectors, and search providers, such as `read_satpy`, `reproject_satpy`,
@@ -80,18 +80,18 @@ def my_search_provider(
 
 ### `Reader`
 
-Opens source assets and returns an `xr.Dataset` for downstream stages.
+Opens source assets and returns an `xr.Dataset`.
 
 ```python
 import xarray as xr
 from pydantic import ConfigDict, validate_call
 
-from aereo.interfaces import Reader, ExtractionTask
+from aereo.interfaces import Reader
 
 
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
-def my_reader(task: ExtractionTask) -> xr.Dataset:
-    """Open hrefs from task.assets and return a Dataset."""
+def my_reader(files: list[str], bands: list[str] | None = None) -> xr.Dataset:
+    """Open filenames and return a Dataset."""
     ...
 ```
 
@@ -107,52 +107,53 @@ from aereo.interfaces import Processor
 
 
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
-def my_processor(ds: xr.Dataset) -> xr.Dataset:
+def my_processor(ds: xr.Dataset, **kwargs: Any) -> xr.Dataset:
     """Transform data."""
     ...
 ```
 
 ### `Reprojector`
 
-Reprojects data to the task's target patches.
+Reprojects/resamples a dataset. The orchestrator injects `geobox` when
+`reproject_mode="grid"`.
 
 ```python
 import xarray as xr
 from pydantic import ConfigDict, validate_call
 
-from aereo.interfaces import Reprojector, ExtractionTask
+from aereo.interfaces import Reprojector
 
 
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
 def my_reprojector(
     ds: xr.Dataset,
-    task: ExtractionTask,
     resampling: str = "nearest",
-) -> dict[str, xr.Dataset]:
-    """Reproject ds for every patch in task."""
+    **kwargs: Any,
+) -> xr.Dataset:
+    """Reproject ds and return a new Dataset."""
     ...
 ```
 
 ### `Writer`
 
-Writes final artifacts to disk or object store.
+Writes a single dataset to a path constructed by the orchestrator.
 
 ```python
-from pandera.typing.geopandas import GeoDataFrame
-from pydantic import ConfigDict, validate_call
-import xarray as xr
+from pathlib import Path
 
-from aereo.interfaces import Writer, ExtractionTask, ExtractionPatch
-from aereo.schemas import ArtifactSchema
+import xarray as xr
+from pydantic import ConfigDict, validate_call
+
+from aereo.interfaces import Writer
 
 
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
 def my_writer(
     ds: xr.Dataset,
-    task: ExtractionTask,
-    patch: ExtractionPatch,
-) -> GeoDataFrame[ArtifactSchema]:
-    """Write data and return artifact rows."""
+    path: str | Path,
+    **kwargs: Any,
+) -> str:
+    """Write ds to path and return the written path."""
     ...
 ```
 
@@ -174,6 +175,7 @@ from aereo.schemas import AssetSchema
 def my_task_builder(
     search_results: GeoDataFrame[AssetSchema],
     job: ExtractionJob,
+    **kwargs: Any,
 ) -> Sequence[ExtractionTask]:
     """Group assets into extraction tasks."""
     ...
@@ -227,8 +229,8 @@ Plugins are discovered automatically via Python `entry_points`. Declare them in
 ```toml
 [project.entry-points."aereo.plugins"]
 my_searcher = "my_package.module:my_search_provider"
-my_reader = "my_package.module:my_reader"
-my_writer = "my_package.module:my_writer"
+my_reader = "my_package.module:my_reader_function"
+my_writer = "my_package.module:my_writer_function"
 ```
 
 > [!IMPORTANT]

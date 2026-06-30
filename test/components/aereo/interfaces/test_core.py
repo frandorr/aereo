@@ -15,6 +15,10 @@ from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
 
 
+def _dummy_writer(ds, path, **kwargs):
+    return str(path)
+
+
 def test_extraction_task_validation():
     df = gpd.GeoDataFrame(
         {"collection": ["GOES"], "start_time": ["2023-01-01"]},
@@ -25,14 +29,16 @@ def test_extraction_task_validation():
         grid_dist=grid_dist,
         output_uri="test",
         read=read_odc_stac,
+        write=_dummy_writer,
     )
     task = ExtractionTask(
+        id="task-1",
         assets=cast(GeoDataFrame, df),
         job=job,
-        patches=[],
     )
     assert task.output_uri == "test"
     assert task.read is not None
+    assert task.write is not None
 
 
 def test_extraction_task_rejects_mixed_crs():
@@ -52,13 +58,14 @@ def test_extraction_task_rejects_mixed_crs():
         grid_dist=grid_dist,
         output_uri="test",
         read=read_odc_stac,
+        write=_dummy_writer,
     )
 
     with pytest.raises(ValueError, match="share the same native CRS"):
         ExtractionTask(
+            id="task-mixed",
             assets=cast(GeoDataFrame, df),
             job=job,
-            patches=[],
         )
 
 
@@ -79,12 +86,13 @@ def test_extraction_task_accepts_single_crs():
         grid_dist=grid_dist,
         output_uri="test",
         read=read_odc_stac,
+        write=_dummy_writer,
     )
 
     task = ExtractionTask(
+        id="task-single",
         assets=cast(GeoDataFrame, df),
         job=job,
-        patches=[],
     )
     assert task is not None
 
@@ -94,6 +102,7 @@ def test_grid_dist_is_int():
         grid_dist=50_000,
         output_uri="test",
         read=read_odc_stac,
+        write=_dummy_writer,
     )
     assert job.grid_dist == 50_000
     assert isinstance(job.grid_dist, int)

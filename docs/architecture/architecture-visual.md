@@ -130,7 +130,7 @@ flowchart TB
 | **Entry** | `aereo.cli` | Terminal commands (`search`, `run`, `plugins`) |
 | **Entry** | `aereo.pipeline` | Python API — `ExtractionJob` class |
 | **Entry** | `aereo.lambda_handler` | AWS Lambda entrypoint |
-| **Core** | `aereo.interfaces` | Contracts — `SearchProvider`, `Reader`, `Processor`, `Reprojector`, `Writer`, `ExtractionTask`, `PatchConfig`, `grid_dist` |
+| **Core** | `aereo.interfaces` | Contracts — `SearchProvider`, `Reader`, `Processor`, `Reprojector`, `Writer`, `TaskBuilder`, `ExtractionTask`, `GridCell` |
 | **Core** | `aereo.registry` | Plugin discovery via `entry_points` |
 | **Data** | `aereo.schemas` | Pandera validation — `AssetSchema`, `ArtifactSchema`, `GridSchema` |
 | **Data** | `aereo.grid` | MajorTOM tiling — `GridDefinition`, `GridCell` |

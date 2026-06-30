@@ -125,7 +125,7 @@ class LambdaExecutor:
         results_map: dict[int, GeoDataFrame[ArtifactSchema]] = {}
         with ThreadPoolExecutor(max_workers=self.max_concurrent_invokes) as executor:
             futures = {
-                executor.submit(self._invoke_single, task): i
+                executor.submit(self._invoke_single, task, i): i
                 for i, task in enumerate(tasks)
             }
             for future in as_completed(futures):
@@ -156,10 +156,11 @@ class LambdaExecutor:
             ),
         )
 
-    def _invoke_single(self, task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
+    def _invoke_single(
+        self, task: ExtractionTask, task_idx: int
+    ) -> GeoDataFrame[ArtifactSchema]:
         """Serialize, stage, invoke Lambda, and load artifacts for one task."""
-        job_id = task.task_context.get("job_id", "default")
-        task_idx = task.task_context.get("chunk_id", 0)
+        job_id = task.job.name or "default"
 
         payload_dict = self._prepare_payload(task, job_id, task_idx)
         payload_bytes = self._invoke_payload(payload_dict, job_id, task_idx)
@@ -196,8 +197,7 @@ class LambdaExecutor:
             "task_uri": task_uri,
             "output_prefix": output_prefix,
             "job_id": job_id,
-            "chunk_id": task_idx,
-            "init_params": task.task_context.get("init_params"),
+            "task_id": task.id,
             "bucket": self._staging.bucket,
         }
 

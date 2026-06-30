@@ -278,6 +278,10 @@ def _build_job(
             console.print(f"[red]Invalid write configuration:[/red] {exc}")
             sys.exit(1)
 
+    if write is None:
+        console.print("[red]write is required in the job configuration.[/red]")
+        sys.exit(1)
+
     output_dir = Path(cfg.get("output_dir", "."))
     if create_output_dir:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -499,12 +503,6 @@ def _run_build_tasks_action(cfg: DictConfig) -> None:
         _prepare_config_for_instantiate(task_builder_cfg)
     )
 
-    if cfg.get("patch_config") is None:
-        console.print("[red]patch_config is required for build-tasks action.[/red]")
-        sys.exit(1)
-    patch_config = hydra.utils.instantiate(cfg.patch_config)
-    task_builder = update_callable(task_builder, patch_config=patch_config)
-
     job = _build_job(cfg)
 
     build_kwargs: dict[str, Any] = {}
@@ -590,12 +588,6 @@ def _run_run_action(cfg: DictConfig) -> None:
         _prepare_config_for_instantiate(task_builder_cfg)
     )
 
-    if cfg.get("patch_config") is None:
-        console.print("[red]patch_config is required for run action.[/red]")
-        sys.exit(1)
-    patch_config = hydra.utils.instantiate(cfg.patch_config)
-    task_builder = update_callable(task_builder, patch_config=patch_config)
-
     job = _build_job(cfg, fallback=_resolve_target_aoi(cfg))
 
     # Search
@@ -643,8 +635,7 @@ def _run_validate_action(cfg: DictConfig) -> None:
         if cfg.get("task_builder"):
             task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
             hydra.utils.instantiate(_prepare_config_for_instantiate(task_builder_cfg))
-        if cfg.get("patch_config") is not None:
-            hydra.utils.instantiate(cfg.patch_config)
+
         _build_job(cfg, create_output_dir=False)
         console.print("[green]✓ Configuration is valid.[/green]")
     except Exception as exc:

@@ -70,7 +70,6 @@ AWS Lambda.
 ```python
 from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
-from aereo.interfaces import PatchConfig
 from aereo.pipeline import ExtractionJob
 
 # Load a Hydra config package (grid + read/write)
@@ -78,8 +77,7 @@ job = ExtractionJob.load_from_config("examples/config", config_name="job_sentine
 
 # 1. Search   2. Prepare tasks   3. Execute
 results = job.search(search_stac, stac_api_url="https://earth-search.aws.element84.com/v1")
-patch_config = PatchConfig(resolution=10.0)
-tasks = job.build_tasks(results, build_grouped_tasks, patch_config=patch_config)
+tasks = job.build_tasks(results, build_grouped_tasks)
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 ```
 
@@ -92,17 +90,18 @@ Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid.
 ```text
 ┌─────────┐     ┌──────────────┐     ┌────────────────────┐     ┌───────────┐
 │  Search │ ──▶ │ Prepare tasks│ ──▶ │ Execute on executor│ ──▶ │  EOIDS    │
-│ provider│     │ Grid + Patch │     │ Local / Lambda     │     │ GeoTIFFs  │
+│ provider│     │ Grid         │     │ Local / Lambda     │     │ GeoTIFFs  │
 └─────────┘     └──────────────┘     └────────────────────┘     └───────────┘
 ```
 
 1. **Search** — a search function queries a catalog and returns a validated
    `GeoDataFrame[AssetSchema]`.
-2. **Prepare** — AEREO builds grid cells over your AOI, groups assets by time,
-   and chunks them into `ExtractionTask` objects.
-3. **Execute** — an executor runs each task through the stage pipeline
-   configured as `read` and `write` callables on the `ExtractionJob`:
-   `read function → write function` once per patch.
+2. **Prepare** — a task builder groups assets by time and native CRS into
+   `ExtractionTask` objects.
+3. **Execute** — an executor runs each task through the orchestrator's fixed
+   pipeline: `read → preprocess → reproject → postprocess → write`. The
+   orchestrator writes files and emits one artifact row per intersecting grid
+   cell.
 
 All of this is configurable through Hydra YAML files or plain Python objects.
 

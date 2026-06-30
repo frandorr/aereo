@@ -55,7 +55,7 @@ A job bundles four things:
 | Ingredient | Purpose |
 |------------|---------|
 | `grid_dist` | How the AOI is tiled into Major TOM cells. |
-| `patch_config` | Physical patch dimensions for extraction. |
+| `resolution` | Target pixel resolution in metres (used by reprojection / grid indexing). |
 | `read` | Callable that opens assets into an `xr.Dataset`. |
 | `write` | Callable that writes extracted patches to disk or object store. |
 | `output_uri` | Where artifacts and the catalog are written. |
@@ -95,17 +95,16 @@ validated `GeoDataFrame[AssetSchema]`.
 
 ```python
 from aereo.builtins import build_grouped_tasks
-from aereo.interfaces import PatchConfig
 
-patch_config = PatchConfig(resolution=10.0)
 tasks = job.build_tasks(
-    results, build_grouped_tasks, patch_config=patch_config, cells_per_task=5
+    results, build_grouped_tasks, cells_per_task=5
 )
 print(f"Prepared {len(tasks)} extraction tasks")
 ```
 
 `build_tasks()` turns search results into a list of `ExtractionTask` objects,
-each carrying the grid cells, assets, and extraction stages it needs.
+each carrying the assets and the parent job that defines the extraction
+pipeline.
 
 ---
 
@@ -118,8 +117,10 @@ artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 print(f"Extracted {len(artifacts)} artifacts")
 ```
 
-Each task reads its assets once and writes one GeoTIFF per patch. The result is
-a `GeoDataFrame[ArtifactSchema]` with one row per extracted file.
+The orchestrator reads each task's assets once, runs the optional processing
+and reprojection stages, writes files, and intersects each file with the
+MajorTOM grid. The result is a `GeoDataFrame[ArtifactSchema]` with one row per
+intersecting grid cell.
 
 ---
 

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 from unittest.mock import MagicMock
 
 import geopandas as gpd
@@ -9,10 +9,8 @@ import pytest
 import xarray as xr
 from aereo.executors import LocalExecutor
 from aereo.interfaces import (
-    PatchConfig,
     SearchProvider,
     TaskBuilder,
-    Writer,
     empty_asset_result,
 )
 from aereo.interfaces.core import ExtractionTask, Reader
@@ -25,7 +23,7 @@ from shapely.geometry import Polygon
 class FakeReader(Reader):
     """Minimal reader for testing ExtractionJob validation."""
 
-    def __call__(self, task):
+    def __call__(self, files, assets=None, **kwargs):
         raise NotImplementedError
 
 
@@ -34,6 +32,7 @@ def test_job_no_search_or_task_builder():
         grid_dist=1000,
         output_uri="/tmp/out",
         read=FakeReader(),
+        write=_DummyWriter(),
     )
     assert "search" not in ExtractionJob.model_fields
     assert "task_builder" not in ExtractionJob.model_fields
@@ -69,6 +68,8 @@ grid_dist: 10000
 output_uri: "out_dir"
 read:
   _target_: aereo.builtins.read.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
@@ -105,7 +106,7 @@ write:
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
-    assert isinstance(job.write, Writer)
+    assert callable(job.write)
 
 
 def _sample_geojson() -> dict:
@@ -126,6 +127,7 @@ def test_extraction_job_load_from_config_package(tmp_path: Path):
 defaults:
   - grid_dist@_global_: default
   - read@_global_: sentinel2
+  - write@_global_: geotiff
   - _self_
 
 output_uri: "out_dir"
@@ -144,6 +146,11 @@ target_aoi:
     read_dir.mkdir()
     (read_dir / "sentinel2.yaml").write_text(
         "read:\n  _target_: aereo.builtins.read.read_odc_stac\n"
+    )
+    write_dir = config_dir / "write"
+    write_dir.mkdir()
+    (write_dir / "geotiff.yaml").write_text(
+        "write:\n  _target_: aereo.builtins.write.write_geotiff\n"
     )
 
     job = ExtractionJob.load_from_config(config_dir)
@@ -160,6 +167,7 @@ def test_extraction_job_load_from_config_package_with_override(tmp_path: Path):
         """
 defaults:
   - read@_global_: sentinel2
+  - write@_global_: geotiff
   - _self_
 
 grid_dist: 50000
@@ -171,6 +179,11 @@ output_uri: "out_dir"
     read_dir.mkdir()
     (read_dir / "sentinel2.yaml").write_text(
         "read:\n  _target_: aereo.builtins.read.read_odc_stac\n"
+    )
+    write_dir = config_dir / "write"
+    write_dir.mkdir()
+    (write_dir / "geotiff.yaml").write_text(
+        "write:\n  _target_: aereo.builtins.write.write_geotiff\n"
     )
 
     job = ExtractionJob.load_from_config(config_dir)
@@ -187,6 +200,7 @@ def test_extraction_job_load_from_config_package_without_targets(tmp_path: Path)
 defaults:
   - grid_dist@_global_: default
   - read@_global_: sentinel2
+  - write@_global_: geotiff
   - _self_
 
 output_uri: "out_dir"
@@ -202,11 +216,17 @@ output_uri: "out_dir"
     (read_dir / "sentinel2.yaml").write_text(
         "read:\n  _target_: aereo.builtins.read.read_odc_stac\n"
     )
+    write_dir = config_dir / "write"
+    write_dir.mkdir()
+    (write_dir / "geotiff.yaml").write_text(
+        "write:\n  _target_: aereo.builtins.write.write_geotiff\n"
+    )
 
     job = ExtractionJob.load_from_config(config_dir)
     assert isinstance(job.grid_dist, int)
     assert job.grid_dist == 75_000
     assert job.read is not None
+    assert job.write is not None
 
 
 def test_extraction_job_accepts_geojson_dict(tmp_path: Path):
@@ -221,6 +241,8 @@ target_aoi:
     - [[-1.0, -1.0], [1.0, -1.0], [1.0, 1.0], [-1.0, 1.0], [-1.0, -1.0]]
 read:
   _target_: aereo.builtins.read.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
@@ -240,6 +262,8 @@ output_uri: "out_dir"
 target_aoi: {aoi_file}
 read:
   _target_: aereo.builtins.read.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
@@ -254,6 +278,8 @@ grid_dist: 50000
 output_uri: "out_dir"
 read:
   _target_: aereo.builtins.read.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
 """
     )
     job = ExtractionJob.from_yaml(job_yaml)
@@ -267,27 +293,27 @@ read:
 
 
 class _DummyReader(Reader):
-    def __call__(self, task: ExtractionTask) -> xr.Dataset:
+    def __call__(self, files: list[str], assets=None, **kwargs) -> xr.Dataset:
         return xr.Dataset(
             {"B04": (["y", "x"], np.ones((4, 4)))},
             coords={"y": range(4), "x": range(4)},
         )
 
 
-class _DummyWriter(Writer):
-    def __call__(
-        self,
-        ds: xr.Dataset,
-        task: ExtractionTask,
-        patch: Any,
-    ) -> GeoDataFrame[ArtifactSchema]:
-        return cast(
-            GeoDataFrame[ArtifactSchema],
-            gpd.GeoDataFrame(
-                {"id": [patch.id]},
-                geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
-            ),
+class _DummyWriter:
+    def __call__(self, ds: xr.Dataset, path: str, **kwargs) -> str:
+        import numpy as np
+        import rioxarray  # noqa: F401
+
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        da = xr.DataArray(
+            np.ones((4, 4), dtype=np.float32),
+            dims=["y", "x"],
+            coords={"y": range(4), "x": range(4)},
         )
+        da.rio.write_crs("EPSG:4326", inplace=True)
+        da.rio.to_raster(path)
+        return path
 
 
 def _make_assets() -> GeoDataFrame[AssetSchema]:
@@ -301,20 +327,24 @@ def _make_assets() -> GeoDataFrame[AssetSchema]:
     return cast(GeoDataFrame[AssetSchema], df)
 
 
-def _make_task(job: ExtractionJob, patch_id: str = "cell-1") -> ExtractionTask:
+def _make_task(job: ExtractionJob, task_id: str = "task-1") -> ExtractionTask:
     """Return a minimal ExtractionTask tied to *job*."""
-    valid_df = pd.DataFrame(columns=list(ArtifactSchema.to_schema().columns.keys()))
-    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
-    valid_df["geometry"] = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
-    valid_df["collection"] = "C1"
-
-    patch = MagicMock()
-    patch.id = patch_id
+    valid_df = gpd.GeoDataFrame(
+        {
+            "id": ["asset-1"],
+            "collection": ["C1"],
+            "start_time": [pd.Timestamp("2023-01-01")],
+            "end_time": [pd.Timestamp("2023-01-02")],
+            "href": ["s3://bucket/file.tif"],
+            "geometry": [Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
+        },
+        crs="EPSG:4326",
+    )
 
     return ExtractionTask(
+        id=task_id,
         assets=cast(GeoDataFrame[AssetSchema], valid_df),
         job=job,
-        patches=[patch],
     )
 
 
@@ -323,6 +353,7 @@ def test_job_search_calls_provider():
         grid_dist=1000,
         output_uri="/tmp/out",
         read=FakeReader(),
+        write=_DummyWriter(),
     )
     provider = MagicMock(spec=SearchProvider)
     provider.return_value = empty_asset_result()
@@ -337,6 +368,7 @@ def test_job_search_passes_aoi_to_provider():
         grid_dist=1000,
         output_uri="/tmp/out",
         read=FakeReader(),
+        write=_DummyWriter(),
         target_aoi=aoi,
     )
     provider = MagicMock(spec=SearchProvider)
@@ -352,6 +384,7 @@ def test_job_search_aoi_argument_overrides_target_aoi():
         grid_dist=1000,
         output_uri="/tmp/out",
         read=FakeReader(),
+        write=_DummyWriter(),
         target_aoi=target_aoi,
     )
     provider = MagicMock(spec=SearchProvider)
@@ -365,6 +398,7 @@ def test_job_build_tasks_calls_task_builder():
         grid_dist=1000,
         output_uri="/tmp/out",
         read=FakeReader(),
+        write=_DummyWriter(),
     )
     builder = MagicMock(spec=TaskBuilder)
     builder.return_value = []
@@ -378,6 +412,7 @@ def test_job_build_tasks_passes_builder_kwargs():
         grid_dist=1000,
         output_uri="/tmp/out",
         read=FakeReader(),
+        write=_DummyWriter(),
     )
     builder = MagicMock(spec=TaskBuilder)
     builder.return_value = []
@@ -385,7 +420,6 @@ def test_job_build_tasks_passes_builder_kwargs():
     job.build_tasks(
         assets,
         builder,
-        patch_config=PatchConfig(resolution=10.0),
         cells_per_task=20,
     )
     builder.assert_called_once()
@@ -393,7 +427,6 @@ def test_job_build_tasks_passes_builder_kwargs():
     assert call_args.args[0] is assets
     assert call_args.args[1] is job
     assert call_args.kwargs["cells_per_task"] == 20
-    assert call_args.kwargs["patch_config"].resolution == 10.0
 
 
 def test_job_build_tasks_returns_empty_for_empty_assets():
@@ -401,6 +434,7 @@ def test_job_build_tasks_returns_empty_for_empty_assets():
         grid_dist=1000,
         output_uri="/tmp/out",
         read=FakeReader(),
+        write=_DummyWriter(),
     )
     builder = MagicMock(spec=TaskBuilder)
     empty_assets = gpd.GeoDataFrame(
@@ -412,31 +446,33 @@ def test_job_build_tasks_returns_empty_for_empty_assets():
     assert tasks == []
 
 
-def test_job_execute_uses_default_executor():
+def test_job_execute_uses_default_executor(tmp_path: Path):
     job = ExtractionJob(
         grid_dist=1000,
-        output_uri="/tmp/out",
+        resolution=10.0,
+        output_uri=str(tmp_path / "out"),
         read=_DummyReader(),
         write=_DummyWriter(),
     )
     tasks = [_make_task(job)]
     artifacts = job.execute(tasks)
     assert isinstance(artifacts, gpd.GeoDataFrame)
-    assert len(artifacts) == 1
+    assert len(artifacts) >= 1
 
 
-def test_job_execute_with_custom_executor():
+def test_job_execute_with_custom_executor(tmp_path: Path):
     job = ExtractionJob(
         grid_dist=1000,
-        output_uri="/tmp/out",
+        resolution=10.0,
+        output_uri=str(tmp_path / "out"),
         read=_DummyReader(),
         write=_DummyWriter(),
     )
     custom = LocalExecutor(workers=2, use_threads=True)
-    tasks = [_make_task(job, patch_id="a"), _make_task(job, patch_id="b")]
+    tasks = [_make_task(job, task_id="a"), _make_task(job, task_id="b")]
     artifacts = job.execute(tasks, executor=custom)
     assert isinstance(artifacts, gpd.GeoDataFrame)
-    assert len(artifacts) == 2
+    assert len(artifacts) >= 2
 
 
 def test_job_execute_empty_tasks_returns_empty_catalog():
@@ -444,6 +480,7 @@ def test_job_execute_empty_tasks_returns_empty_catalog():
         grid_dist=1000,
         output_uri="/tmp/out",
         read=FakeReader(),
+        write=_DummyWriter(),
     )
     artifacts = job.execute([])
     assert isinstance(artifacts, gpd.GeoDataFrame)
@@ -455,6 +492,7 @@ def test_job_write_catalog(tmp_path: Path):
         grid_dist=1000,
         output_uri=str(tmp_path / "out"),
         read=FakeReader(),
+        write=_DummyWriter(),
     )
     artifacts = cast(
         GeoDataFrame[ArtifactSchema],

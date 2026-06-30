@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from datetime import datetime
 from functools import partial
-from typing import Any
+from typing import Any, cast
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pytest
@@ -13,7 +14,6 @@ import xarray as xr
 from shapely.geometry import box
 
 from aereo.builtins import read_odc_stac
-from aereo.grid import ExtractionPatch
 from aereo.interfaces.core import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas.core import AssetSchema
@@ -57,39 +57,42 @@ def _make_stac_item_dict(item_id: str = "item-001") -> dict[str, Any]:
     }
 
 
-def _make_task(stac_item_dict: dict[str, Any] | None = None, aoi=None):
-    """Return a minimal ExtractionTask with optional stac_item column."""
-    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
-    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
-    valid_df["geometry"] = box(-70.5, -33.5, -70.0, -33.0)
-    valid_df["collection"] = "sentinel-2-l2a"
-    valid_df["channel_id"] = "B04"
-    valid_df["start_time"] = pd.Timestamp("2026-01-01T12:00:00")
-    valid_df["end_time"] = pd.Timestamp("2026-01-01T12:10:00")
+def _make_assets(
+    stac_item_dict: dict[str, Any] | None = None,
+) -> GeoDataFrame[AssetSchema]:
+    """Return a minimal AssetSchema GeoDataFrame with optional stac_item column."""
+    data: dict[str, Any] = {
+        "id": ["asset-1"],
+        "collection": ["sentinel-2-l2a"],
+        "start_time": [pd.Timestamp("2026-01-01T12:00:00")],
+        "end_time": [pd.Timestamp("2026-01-01T12:10:00")],
+        "href": ["https://example.com/B04.tif"],
+        "geometry": [box(-70.5, -33.5, -70.0, -33.0)],
+        "channel_id": ["B04"],
+    }
     if stac_item_dict is not None:
-        valid_df["stac_item"] = [stac_item_dict]
+        data["stac_item"] = [stac_item_dict]
 
-    patch = ExtractionPatch(
-        id="test_cell",
-        d=10_000,
-        cell_geometry=box(-70.5, -33.5, -70.0, -33.0),
-        resolution=10.0,
-        margin=0.0,
-        padding=0,
-        conform_to=None,
+    return cast(
+        GeoDataFrame[AssetSchema],
+        gpd.GeoDataFrame(data, crs="EPSG:4326"),
     )
 
+
+def _make_task(stac_item_dict: dict[str, Any] | None = None) -> ExtractionTask:
+    """Return a minimal ExtractionTask with optional stac_item column."""
+    assets = _make_assets(stac_item_dict)
     job = ExtractionJob(
+        name="test-job",
         grid_dist=50_000,
         output_uri="/tmp/test",
         read=read_odc_stac,
-        target_aoi=aoi,
+        write=lambda ds, path, **kwargs: str(path),
     )
     return ExtractionTask(
-        assets=GeoDataFrame(valid_df),
+        id="task-0",
+        assets=assets,
         job=job,
-        patches=[patch],
-        aoi=aoi,
     )
 
 
@@ -116,12 +119,20 @@ def _make_fake_ds() -> xr.Dataset:
 
 
 def test_read_odcstac_fields():
-    """read_odc_stac exposes odc_params as a configurable keyword."""
+    """read_odc_stac exposes files, assets, and odc_params as configurable keywords."""
     import inspect
 
     sig = inspect.signature(read_odc_stac)
     assert "odc_params" in sig.parameters
-    assert "task" in sig.parameters
+    assert "files" in sig.parameters
+    assert "assets" in sig.parameters
+
+
+def test_read_odcstac_raises_without_assets():
+    """__call__() raises ValueError when assets is None."""
+    reader = read_odc_stac
+    with pytest.raises(ValueError, match="assets"):
+        reader(["file.tif"], assets=None)
 
 
 def test_read_odcstac_raises_without_stac_item_column():
@@ -129,7 +140,7 @@ def test_read_odcstac_raises_without_stac_item_column():
     task = _make_task(stac_item_dict=None)
     reader = read_odc_stac
     with pytest.raises(ValueError, match="stac_item"):
-        reader(task)
+        reader(task.assets["href"].tolist(), assets=task.assets)
 
 
 def test_read_odcstac_raises_with_all_none_stac_items():
@@ -138,11 +149,11 @@ def test_read_odcstac_raises_with_all_none_stac_items():
     task.assets["stac_item"] = [None]
     reader = read_odc_stac
     with pytest.raises(ValueError, match="No valid STAC items"):
-        reader(task)
+        reader(task.assets["href"].tolist(), assets=task.assets)
 
 
-def test_read_odcstac_calls_odc_load_with_bbox(monkeypatch):
-    """__call__() auto-injects bbox from grid cells and passes it to odc.stac.load."""
+def test_read_odcstac_forwards_bands(monkeypatch):
+    """__call__() passes bands inferred from assets to odc.stac.load."""
     fake_ds = _make_fake_ds()
     captured: dict[str, Any] = {}
 
@@ -155,9 +166,8 @@ def test_read_odcstac_calls_odc_load_with_bbox(monkeypatch):
 
     task = _make_task(_make_stac_item_dict())
     reader = read_odc_stac
-    result = reader(task)
+    result = reader(task.assets["href"].tolist(), assets=task.assets)
 
-    assert "bbox" in captured["kwargs"]
     assert captured["kwargs"]["bands"] == ["B04"]
     assert result is fake_ds
 
@@ -175,12 +185,12 @@ def test_read_odcstac_explicit_bands_override(monkeypatch):
 
     task = _make_task(_make_stac_item_dict())
     reader = partial(read_odc_stac, odc_params={"bands": ["B04", "B08"]})
-    reader(task)
+    reader(task.assets["href"].tolist(), assets=task.assets)
     assert captured["kwargs"]["bands"] == ["B04", "B08"]
 
 
 def test_read_odcstac_explicit_bbox_not_overridden(monkeypatch):
-    """User-provided bbox in odc_params is not overridden by grid cells."""
+    """User-provided bbox in odc_params is preserved."""
     fake_ds = _make_fake_ds()
     captured: dict[str, Any] = {}
 
@@ -193,7 +203,7 @@ def test_read_odcstac_explicit_bbox_not_overridden(monkeypatch):
     custom_bbox = (-71.0, -34.0, -69.0, -32.0)
     task = _make_task(_make_stac_item_dict())
     reader = partial(read_odc_stac, odc_params={"bbox": custom_bbox})
-    reader(task)
+    reader(task.assets["href"].tolist(), assets=task.assets)
     assert captured["kwargs"]["bbox"] == custom_bbox
 
 
@@ -210,42 +220,22 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
 
     item_dict = _make_stac_item_dict("dup-id")
 
-    # Build a two-row asset DataFrame manually.
-    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
-    for i in range(2):
-        valid_df.loc[i] = {
-            col: "test" for col in AssetSchema.to_schema().columns.keys()
-        }
-    valid_df["geometry"] = box(-70.5, -33.5, -70.0, -33.0)
-    valid_df["collection"] = "sentinel-2-l2a"
-    valid_df["channel_id"] = "B04"
-    valid_df["start_time"] = pd.Timestamp("2026-01-01T12:00:00")
-    valid_df["end_time"] = pd.Timestamp("2026-01-01T12:10:00")
-    valid_df["stac_item"] = [item_dict, item_dict]
-
-    patch = ExtractionPatch(
-        id="test_cell",
-        d=10_000,
-        cell_geometry=box(-70.5, -33.5, -70.0, -33.0),
-        resolution=10.0,
-        margin=0.0,
-        padding=0,
-        conform_to=None,
-    )
-
-    job = ExtractionJob(
-        grid_dist=50_000,
-        output_uri="/tmp/test",
-        read=read_odc_stac,
-    )
-    task = ExtractionTask(
-        assets=GeoDataFrame(valid_df),
-        job=job,
-        patches=[patch],
+    assets = gpd.GeoDataFrame(
+        {
+            "id": ["asset-1", "asset-2"],
+            "collection": ["sentinel-2-l2a", "sentinel-2-l2a"],
+            "start_time": [pd.Timestamp("2026-01-01T12:00:00")] * 2,
+            "end_time": [pd.Timestamp("2026-01-01T12:10:00")] * 2,
+            "href": ["https://example.com/B04.tif", "https://example.com/B08.tif"],
+            "geometry": [box(-70.5, -33.5, -70.0, -33.0)] * 2,
+            "channel_id": ["B04", "B04"],
+            "stac_item": [item_dict, item_dict],
+        },
+        crs="EPSG:4326",
     )
 
     reader = read_odc_stac
-    reader(task)
+    reader(assets["href"].tolist(), assets=cast(GeoDataFrame[AssetSchema], assets))
 
     assert len(captured["items"]) == 1
 
@@ -261,7 +251,7 @@ def test_read_odcstac_infers_time_bounds(monkeypatch):
 
     task = _make_task(_make_stac_item_dict())
     reader = read_odc_stac
-    result = reader(task)
+    result = reader(task.assets["href"].tolist(), assets=task.assets)
 
     assert "start_time" in result.attrs
     assert "end_time" in result.attrs
@@ -288,7 +278,7 @@ def test_read_odcstac_forwards_odc_params(monkeypatch):
             "chunks": {"x": 1024, "y": 1024},
         },
     )
-    reader(task)
+    reader(task.assets["href"].tolist(), assets=task.assets)
 
     assert captured["kwargs"]["resampling"] == "bilinear"
     assert captured["kwargs"]["groupby"] == "solar_day"
@@ -314,7 +304,7 @@ def test_read_odcstac_handles_numpy_arrays_in_stac_item(monkeypatch):
 
     task = _make_task(item_dict)
     reader = read_odc_stac
-    reader(task)
+    reader(task.assets["href"].tolist(), assets=task.assets)
 
     assert len(captured["items"]) == 1
     assert captured["items"][0].id == "np-item"

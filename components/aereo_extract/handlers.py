@@ -34,7 +34,7 @@ _serializer = _TaskSerializer()
 def _error_response(
     error: Exception,
     job_id: str = "unknown",
-    chunk_id: int = -1,
+    task_id: str = "unknown",
     status_code: int = 500,
 ) -> dict[str, Any]:
     """Build a standardized error response dict."""
@@ -43,7 +43,7 @@ def _error_response(
         "error": str(error),
         "error_type": type(error).__name__,
         "job_id": job_id,
-        "chunk_id": chunk_id,
+        "task_id": task_id,
         "manifest_uri": None,
     }
 
@@ -119,18 +119,18 @@ def handle_event(event: dict[str, Any]) -> dict[str, Any]:
     """
     output_prefix = event.get("output_prefix", "")
     job_id = event.get("job_id", "unknown")
-    chunk_id = event.get("chunk_id", -1)
+    task_id = event.get("task_id", "unknown")
 
     logger.info(
         "aereo_extract_request",
-        extra={"job_id": job_id, "chunk_id": chunk_id, "mode": event.get("mode")},
+        extra={"job_id": job_id, "task_id": task_id, "mode": event.get("mode")},
     )
 
     if not output_prefix:
         return _error_response(
             ValueError("Missing required field: output_prefix"),
             job_id,
-            chunk_id,
+            task_id,
             status_code=400,
         )
 
@@ -138,13 +138,17 @@ def handle_event(event: dict[str, Any]) -> dict[str, Any]:
         task = _load_task(event)
     except Exception as exc:
         logger.exception("failed_to_load_task")
-        return _error_response(exc, job_id, chunk_id, status_code=400)
+        return _error_response(exc, job_id, task_id, status_code=400)
 
     try:
-        # Ensure results are written to the requested output prefix.
+        # Ensure results are written to the requested output prefix.  For local
+        # file:// URIs we strip the scheme so the orchestrator sees a plain path.
+        output_uri = output_prefix
+        if output_uri.startswith("file://"):
+            output_uri = output_uri[len("file://") :]
         task = attrs.evolve(
             task,
-            job=task.job.model_copy(update={"output_uri": output_prefix}),
+            job=task.job.model_copy(update={"output_uri": output_uri}),
         )
 
         artifacts = run_task(task)
@@ -155,11 +159,11 @@ def handle_event(event: dict[str, Any]) -> dict[str, Any]:
             "statusCode": 200,
             "manifest_uri": result["manifest_uri"],
             "job_id": job_id,
-            "chunk_id": chunk_id,
+            "task_id": task_id,
         }
     except Exception as exc:
         logger.exception("extraction_failed")
-        return _error_response(exc, job_id, chunk_id, status_code=500)
+        return _error_response(exc, job_id, task_id, status_code=500)
 
 
 def handle_lambda(event: dict[str, Any], context: Any) -> dict[str, Any]:

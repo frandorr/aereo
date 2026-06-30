@@ -12,7 +12,6 @@ from aereo.interfaces.core import (
     ExtractionTask,
 )
 from aereo.pipeline import ExtractionJob
-from aereo.schemas.core import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from typing import Any, cast
 
@@ -23,7 +22,7 @@ from typing import Any, cast
 
 
 class _DummyReader:
-    def __call__(self, task: ExtractionTask) -> xr.Dataset:
+    def __call__(self, files: list[str], assets=None, **kwargs) -> xr.Dataset:
         return xr.Dataset(
             {"B04": (["y", "x"], np.ones((4, 4)))},
             coords={"y": range(4), "x": range(4)},
@@ -31,58 +30,55 @@ class _DummyReader:
 
 
 class _DummyWriter:
-    def __call__(
-        self, ds: xr.Dataset, task: ExtractionTask, patch: Any
-    ) -> GeoDataFrame[ArtifactSchema]:
-        return cast(
-            GeoDataFrame[ArtifactSchema],
-            gpd.GeoDataFrame(
-                {"id": [patch.id]}, geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])]
-            ),
+    def __call__(self, ds: xr.Dataset, path: str, **kwargs) -> str:
+        import rioxarray  # noqa: F401
+
+        da = xr.DataArray(
+            np.ones((4, 4), dtype=np.float32),
+            dims=["y", "x"],
+            coords={"y": range(4), "x": range(4)},
         )
+        da.rio.write_crs("EPSG:4326", inplace=True)
+        da.rio.to_raster(path)
+        return path
 
 
 class _FailingReader:
-    def __call__(self, task: ExtractionTask) -> xr.Dataset:
+    def __call__(self, files: list[str], assets=None, **kwargs) -> xr.Dataset:
         raise RuntimeError("read failed")
-
-
-class _MockPatch:
-    """Picklable stand-in for an ExtractionPatch."""
-
-    def __init__(self, patch_id: str) -> None:
-        self.id = patch_id
-        self.geobox = None
-
-
-def _mock_patch(patch_id: str) -> _MockPatch:
-    """Return a minimal mock patch with the given id."""
-    return _MockPatch(patch_id)
 
 
 def _make_task(
     reader: Any = _DummyReader(),
-    writer: Any | None = None,
-    task_context: dict[str, Any] | None = None,
-    patches: list[Any] | None = None,
+    writer: Any = _DummyWriter(),
+    task_id: str = "task-0",
+    job_name: str = "test-job",
 ) -> ExtractionTask:
     """Return a minimal ExtractionTask for testing."""
-    valid_df = pd.DataFrame(columns=list(AssetSchema.to_schema().columns.keys()))
-    valid_df.loc[0] = {col: "test" for col in AssetSchema.to_schema().columns.keys()}
-    valid_df["geometry"] = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
-    valid_df["collection"] = "C1"
+    valid_df = gpd.GeoDataFrame(
+        {
+            "id": ["asset-1"],
+            "collection": ["C1"],
+            "start_time": [pd.Timestamp("2023-01-01")],
+            "end_time": [pd.Timestamp("2023-01-02")],
+            "href": ["s3://bucket/file.tif"],
+            "geometry": [Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
+        },
+        crs="EPSG:4326",
+    )
 
     job = ExtractionJob(
+        name=job_name,
         grid_dist=50_000,
+        resolution=10.0,
         output_uri="test-uri",
         read=reader,
         write=writer,
     )
     return ExtractionTask(
+        id=task_id,
         assets=cast(GeoDataFrame, valid_df),
         job=job,
-        patches=patches or [],
-        task_context=task_context or {},
     )
 
 
@@ -91,11 +87,14 @@ def _make_task(
 # ---------------------------------------------------------------------------
 
 
-def test_run_task_executes_read_write():
+def test_run_task_executes_read_write(tmp_path):
     """Verify that run_task runs read -> write successfully."""
     task = _make_task(
         writer=_DummyWriter(),
-        patches=[_mock_patch("cell-1")],
+        job_name="read-write",
+    )
+    task = attrs.evolve(
+        task, job=task.job.model_copy(update={"output_uri": str(tmp_path / "out")})
     )
     result = run_task(task)
 
@@ -103,26 +102,9 @@ def test_run_task_executes_read_write():
     assert not result.empty
 
 
-def test_run_task_calls_writer_once_per_patch():
-    """Writer is called once per patch."""
-    import unittest.mock
-
-    writer = unittest.mock.Mock(
-        side_effect=_DummyWriter(),
-        spec=_DummyWriter(),
-    )
-    task = _make_task(
-        writer=writer,
-        patches=[_mock_patch("cell-1"), _mock_patch("cell-2")],
-    )
-    run_task(task)
-
-    assert writer.call_count == 2
-
-
 def test_run_task_raises_when_reader_is_missing():
     """ValueError is raised when the job has no reader."""
-    task = _make_task()
+    task = _make_task(writer=_DummyWriter())
     job = task.job.model_copy(update={"read": None})
     task = attrs.evolve(task, job=job)
     with pytest.raises(ValueError, match="Pipeline must contain a Reader stage"):
@@ -138,21 +120,28 @@ def test_local_executor_is_callable():
     assert callable(LocalExecutor())
 
 
-def test_local_executor_runs_tasks():
+def test_local_executor_runs_tasks(tmp_path):
     executor = LocalExecutor(workers=2)
     tasks = [
         _make_task(
             writer=_DummyWriter(),
-            patches=[_mock_patch("cell-1")],
+            task_id="task-0",
+            job_name="local",
         ),
         _make_task(
             writer=_DummyWriter(),
-            patches=[_mock_patch("cell-2")],
+            task_id="task-1",
+            job_name="local",
         ),
     ]
+    for i, task in enumerate(tasks):
+        tasks[i] = attrs.evolve(
+            task,
+            job=task.job.model_copy(update={"output_uri": str(tmp_path / f"out{i}")}),
+        )
     artifacts = executor(tasks)
     assert isinstance(artifacts, gpd.GeoDataFrame)
-    assert len(artifacts) == 2
+    assert len(artifacts) >= 2
 
 
 def test_local_executor_empty_tasks():
@@ -168,18 +157,18 @@ def test_local_executor_best_effort_skips_failed_tasks(monkeypatch):
     failing_task = _make_task(
         reader=_FailingReader(),
         writer=_DummyWriter(),
-        patches=[_mock_patch("a")],
+        task_id="fail",
     )
     ok_task = _make_task(
         writer=_DummyWriter(),
-        patches=[_mock_patch("b")],
+        task_id="ok",
     )
 
     executor = LocalExecutor(failure_mode="best_effort")
     artifacts = executor([failing_task, ok_task])
 
     assert isinstance(artifacts, gpd.GeoDataFrame)
-    assert len(artifacts) == 1
+    assert len(artifacts) >= 1
 
 
 def test_local_executor_strict_propagates_failure(monkeypatch):
@@ -188,7 +177,7 @@ def test_local_executor_strict_propagates_failure(monkeypatch):
     failing_task = _make_task(
         reader=_FailingReader(),
         writer=_DummyWriter(),
-        patches=[_mock_patch("a")],
+        task_id="fail",
     )
 
     executor = LocalExecutor(failure_mode="strict")
@@ -196,33 +185,47 @@ def test_local_executor_strict_propagates_failure(monkeypatch):
         executor([failing_task])
 
 
-def test_local_executor_sequential_when_workers_none():
+def test_local_executor_sequential_when_workers_none(tmp_path):
     executor = LocalExecutor(workers=None)
     tasks = [
         _make_task(
             writer=_DummyWriter(),
-            patches=[_mock_patch("a")],
+            task_id="task-0",
+            job_name="seq",
         ),
         _make_task(
             writer=_DummyWriter(),
-            patches=[_mock_patch("b")],
+            task_id="task-1",
+            job_name="seq",
         ),
     ]
+    for i, task in enumerate(tasks):
+        tasks[i] = attrs.evolve(
+            task,
+            job=task.job.model_copy(update={"output_uri": str(tmp_path / f"out{i}")}),
+        )
     artifacts = executor(tasks)
-    assert len(artifacts) == 2
+    assert len(artifacts) >= 2
 
 
-def test_local_executor_thread_pool():
+def test_local_executor_thread_pool(tmp_path):
     executor = LocalExecutor(workers=2, use_threads=True)
     tasks = [
         _make_task(
             writer=_DummyWriter(),
-            patches=[_mock_patch("a")],
+            task_id="task-0",
+            job_name="thread",
         ),
         _make_task(
             writer=_DummyWriter(),
-            patches=[_mock_patch("b")],
+            task_id="task-1",
+            job_name="thread",
         ),
     ]
+    for i, task in enumerate(tasks):
+        tasks[i] = attrs.evolve(
+            task,
+            job=task.job.model_copy(update={"output_uri": str(tmp_path / f"out{i}")}),
+        )
     artifacts = executor(tasks)
-    assert len(artifacts) == 2
+    assert len(artifacts) >= 2

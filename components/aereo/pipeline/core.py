@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import hydra
 from omegaconf import OmegaConf
@@ -16,6 +16,8 @@ from aereo.executors.core import Executor, LocalExecutor
 from aereo.interfaces import (
     ExtractionTask,
     Reader,
+    Reprojector,
+    Processor,
     SearchProvider,
     TaskBuilder,
     Writer,
@@ -66,10 +68,19 @@ def load_plugin(config_dir: str | Path, group: str, name: str) -> Any:
 class ExtractionJob(BaseModel):
     """Declarative configuration tree for a complete extraction job.
 
-    Bundles grid size, output URI, and reader/writer callables together into a
+    Bundles grid size, output URI, and pipeline step callables together into a
     single validated Hydra-compatible model. Search providers and task builders
     are supplied at runtime to the orchestration methods rather than stored on
     the job.
+
+    Pipeline execution order is fixed::
+
+        read -> preprocess -> reproject -> postprocess -> write
+
+    ``preprocess``, ``reproject``, and ``postprocess`` are optional. When
+    ``reproject`` is provided, ``reproject_mode`` must be set to either
+    ``"raw"`` (reproject the whole dataset once) or ``"grid"`` (reproject each
+    grid cell separately).
     """
 
     model_config = {"extra": "forbid", "frozen": True, "arbitrary_types_allowed": True}
@@ -79,7 +90,7 @@ class ExtractionJob(BaseModel):
         description="Human-readable job name used to identify outputs.",
     )
     grid_dist: int = Field(
-        description="Grid cell size in metres for partitioning the AOI."
+        description="Grid cell size in metres for the MajorTOM artifact index."
     )
     output_uri: str = Field(
         description="Destination URI for extracted artifacts (local path or object store)."
@@ -91,18 +102,73 @@ class ExtractionJob(BaseModel):
             "When True, always execute tasks and overwrite existing caches."
         ),
     )
-    read: Reader
-    write: Writer | None = Field(
-        default=None,
-        description="Optional writer callable. When omitted, execution produces no artifacts.",
-    )
     target_aoi: BaseGeometry | dict[str, Any] | str | Path | None = Field(
         default=None,
         description=(
-            "AOI geometry used to clip prepared extraction tasks. "
+            "AOI geometry used to clip prepared extraction tasks and to build "
+            "the MajorTOM artifact index. "
             "Accepts a Shapely object, GeoJSON dict, or path to a GeoJSON file. "
             "When omitted, the search provider's ``intersects`` geometry is used."
         ),
+    )
+
+    # Optional grid/reprojection parameters
+    resolution: float | None = Field(
+        default=None,
+        description="Target pixel resolution in metres for reprojection and artifact indexing.",
+    )
+    margin: float | None = Field(
+        default=None,
+        description="Buffer in metres added around the AOI when building the grid.",
+    )
+
+    # Pipeline steps
+    read: Reader = Field(
+        description="Callable that reads a list of filenames and returns an xr.Dataset."
+    )
+    read_kwargs: dict[str, Any] | None = Field(
+        default=None,
+        description="Additional keyword arguments passed to ``read``.",
+    )
+
+    preprocess: Processor | None = Field(
+        default=None,
+        description="Optional callable applied after read.",
+    )
+    preprocess_kwargs: dict[str, Any] | None = Field(
+        default=None,
+        description="Additional keyword arguments passed to ``preprocess``.",
+    )
+
+    reproject: Reprojector | None = Field(
+        default=None,
+        description="Optional reprojection callable.",
+    )
+    reproject_kwargs: dict[str, Any] | None = Field(
+        default=None,
+        description="Additional keyword arguments passed to ``reproject``. "
+        "In ``grid`` mode the orchestrator injects ``geobox`` per cell.",
+    )
+    reproject_mode: Literal["raw", "grid"] | None = Field(
+        default=None,
+        description="Reprojection mode: 'raw' for one mosaic, 'grid' for one file per cell.",
+    )
+
+    postprocess: Processor | None = Field(
+        default=None,
+        description="Optional callable applied after reprojection.",
+    )
+    postprocess_kwargs: dict[str, Any] | None = Field(
+        default=None,
+        description="Additional keyword arguments passed to ``postprocess``.",
+    )
+
+    write: Writer = Field(
+        description="Callable that writes an xr.Dataset to a single path and returns it."
+    )
+    write_kwargs: dict[str, Any] | None = Field(
+        default=None,
+        description="Additional keyword arguments passed to ``write``.",
     )
 
     @field_validator("target_aoi", mode="before")
@@ -117,6 +183,24 @@ class ExtractionJob(BaseModel):
             A normalized geometry or ``None``.
         """
         return normalize_geometry_input(value)
+
+    @field_validator("reproject_mode")
+    @classmethod
+    def _validate_reproject_mode(
+        cls,
+        value: Literal["raw", "grid"] | None,
+        info: Any,
+    ) -> Literal["raw", "grid"] | None:
+        """Ensure reproject_mode is consistent with reproject presence."""
+        data = info.data
+        reproject = data.get("reproject")
+        if reproject is not None and value is None:
+            raise ValueError("reproject_mode must be set when reproject is provided")
+        if reproject is None and value is not None:
+            raise ValueError(
+                "reproject_mode must be None when reproject is not provided"
+            )
+        return value
 
     @classmethod
     def _from_instantiated(cls, instantiated: Any, source: str) -> ExtractionJob:
@@ -290,7 +374,7 @@ class ExtractionJob(BaseModel):
             config_dir: Directory containing the Hydra config package.
             config_name: Name of the root config file (without ``.yaml``).
             overrides: Optional Hydra command-line style overrides, e.g.
-                ``["patch_config=high_res"]``.
+                ``["grid_dist=grid_50km"]``.
 
         Returns:
             A validated ``ExtractionJob`` instance.
@@ -301,7 +385,7 @@ class ExtractionJob(BaseModel):
 
             job = ExtractionJob.load_from_config(
                 "examples/config_package",
-                overrides=["patch_config=high_res"],
+                overrides=["grid_dist=grid_50km"],
             )
         """
         from hydra import compose, initialize_config_dir

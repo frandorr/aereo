@@ -54,7 +54,6 @@ Once you have a job, the pipeline is always the same three calls:
 ```python
 from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
-from aereo.interfaces import PatchConfig
 from aereo.pipeline import ExtractionJob
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
@@ -71,9 +70,8 @@ results = job.search(
 print(f"Found {len(results)} assets")
 
 # 2. Prepare tasks
-patch_config = PatchConfig(resolution=10.0)
 tasks = job.build_tasks(
-    results, build_grouped_tasks, patch_config=patch_config, cells_per_task=5
+    results, build_grouped_tasks, cells_per_task=5
 )
 print(f"Prepared {len(tasks)} tasks")
 
@@ -102,7 +100,6 @@ Here is a complete, copy-pasteable example using the built-in config package:
 ```python
 from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
-from aereo.interfaces import PatchConfig
 from aereo.pipeline import ExtractionJob
 
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
@@ -115,9 +112,8 @@ results = job.search(
     start_datetime="2024-01-01T00:00:00Z",
     end_datetime="2024-01-10T23:59:59Z",
 )
-patch_config = PatchConfig(resolution=10.0)
 tasks = job.build_tasks(
-    results, build_grouped_tasks, patch_config=patch_config, cells_per_task=5
+    results, build_grouped_tasks, cells_per_task=5
 )
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 
@@ -139,7 +135,6 @@ from aereo.builtins import (
     search_stac,
     write_geotiff,
 )
-from aereo.interfaces import PatchConfig
 from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
 
@@ -161,7 +156,6 @@ job = ExtractionJob(
 tasks = job.build_tasks(
     assets,
     build_grouped_tasks,
-    patch_config=PatchConfig(resolution=10.0),
     cells_per_task=50,
 )
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))

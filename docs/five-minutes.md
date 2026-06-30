@@ -12,8 +12,8 @@ Every AEREO pipeline follows the same shape:
 ![Search → Prepare → Execute](assets/pipeline-walkthrough/01-step1-search-and-task-preparation.png)
 
 1. **Search** — find assets in a catalog.
-2. **Prepare** — turn those assets into extraction tasks on a shared grid.
-3. **Execute** — run each task through read → write (per patch).
+2. **Prepare** — turn those assets into extraction tasks.
+3. **Execute** — run each task through read → preprocess → reproject → postprocess → write; the orchestrator writes files and builds the artifact catalog.
 
 ---
 
@@ -21,10 +21,10 @@ Every AEREO pipeline follows the same shape:
 
 | Concept | What it is | Why it matters |
 |---|---|---|
-| `ExtractionJob` | A validated config bundle: grid, patch size, output URI, and stage pipeline. | One object carries everything except the search and task-builder choices. |
+| `ExtractionJob` | A validated config bundle: grid, output URI, and pipeline stages. | One object carries everything except the search and task-builder choices. |
 | Search function | A plain function like `search_stac`. | You pass it to `job.search(...)` with keyword arguments. No class boilerplate. |
 | Task builder function | A plain function like `build_grouped_tasks`. | Groups search results into `ExtractionTask` objects by time and native CRS. |
-| `ExtractionTask` | One unit of work: assets + grid patches + stage pipeline. | The executor runs these in parallel. |
+| `ExtractionTask` | One unit of work: assets + parent job + task context. | The executor runs these in parallel. |
 | Stage functions | `read_odc_stac`, `reproject_odc`, `write_geotiff`, `ndvi`, etc. | Passed directly to `ExtractionJob(read=..., write=...)`. Pure functions, composable, easy to test. |
 | `LocalExecutor` | Runs tasks locally with threads or processes. | Swap for Lambda later without changing the pipeline. |
 
@@ -38,7 +38,7 @@ from aereo.builtins import build_grouped_tasks, search_stac
 from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
 
-# Load the job (grid + patch + extract stages)
+# Load the job (grid + read/write stages)
 job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
 
 # Search → Prepare tasks → Execute
@@ -61,7 +61,7 @@ No classes to subclass. No global state. Hydra configs are optional.
 ## What you can do
 
 - Extract Sentinel-2, VIIRS, GOES-19, and more by swapping search/read functions.
-- Compose processing steps (`ndvi`, `qa_mask`, `select_bands`, `composite`) as `read` and `write` callables on the `ExtractionJob` (per-patch reprojection and pre/post-processing are deferred to the reader/writer implementations).
+- Compose optional processing steps (`ndvi`, `qa_mask`, `select_bands`, `composite`) as `preprocess` and `postprocess` callables on the `ExtractionJob`. Add a `reproject` callable and set `reproject_mode="raw"` or `"grid"` when needed.
 - Run the same pipeline from Python, CLI, or AWS Lambda using the same YAML configs.
 - Output standard EOIDS GeoTIFFs on the Major TOM grid — ready for ML and mosaics.
 
@@ -85,7 +85,7 @@ No classes to subclass. No global state. Hydra configs are optional.
 Confusing **cell size** with **pixel size**:
 
 - `grid_dist` = size of the grid cell in metres (e.g. `10_000` for 10 km).
-- `patch_config.resolution` = size of each output pixel in metres (e.g. `10.0` for 10 m).
+- `resolution` = size of each output pixel in metres (e.g. `10.0` for 10 m), used when reprojection or grid indexing is enabled.
 
 A 10 km cell at 10 m resolution is a 1000 × 1000 pixel tile. Swapping them is the
 fastest way to get nonsense outputs.
