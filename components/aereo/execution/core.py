@@ -26,8 +26,11 @@ from shapely.geometry import box
 def _resolve_aoi(task: ExtractionTask) -> Any:
     """Return the AOI geometry used to build the MajorTOM grid.
 
-    Prefers ``job.target_aoi``. Falls back to the union of task asset geometries.
+    Prefers the task-specific ``task.aoi``, then ``job.target_aoi``, and finally
+    falls back to the union of task asset geometries.
     """
+    if task.aoi is not None:
+        return task.aoi
     job = task.job
     if job.target_aoi is not None:
         return job.target_aoi

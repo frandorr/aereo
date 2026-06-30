@@ -134,6 +134,9 @@ class _TaskSerializer:
         meta: dict[str, Any] = {
             "id": task.id,
             "task_context": task.task_context,
+            "aoi_wkt": (
+                cast(BaseGeometry, task.aoi).wkt if task.aoi is not None else None
+            ),
             "job": {
                 "name": job.name,
                 "grid_dist": job.grid_dist,
@@ -193,6 +196,10 @@ class _TaskSerializer:
         target_aoi = (
             shapely.wkt.loads(target_aoi_wkt) if target_aoi_wkt is not None else None
         )
+
+        aoi_wkt = meta.get("aoi_wkt")
+        aoi = shapely.wkt.loads(aoi_wkt) if aoi_wkt is not None else None
+
         from aereo.pipeline import ExtractionJob
 
         job = ExtractionJob.model_validate(
@@ -222,6 +229,7 @@ class _TaskSerializer:
             id=meta.get("id", "remote-task"),
             assets=assets,  # type: ignore[arg-type]
             job=job,
+            aoi=aoi,
             task_context=meta.get("task_context", {}),
         )
 
