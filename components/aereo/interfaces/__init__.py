@@ -10,7 +10,6 @@ By defining these interfaces, we ensure that all implementations adhere to a con
 from aereo.interfaces.core import (
     AereoPlugin,
     ExtractionTask,
-    PatchConfig,
     Processor,
     Reader,
     Reprojector,
@@ -37,7 +36,6 @@ from aereo.interfaces.utils import (
 __all__ = [
     "AereoPlugin",
     "ExtractionTask",
-    "PatchConfig",
     "Processor",
     "Reader",
     "Reprojector",

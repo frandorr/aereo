@@ -24,48 +24,10 @@ import attrs
 import xarray as xr
 from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
-from pydantic import BaseModel, Field
 from shapely.geometry.base import BaseGeometry
 
 DEFAULT_CELLS_PER_TASK: int = 50
 WGS84_CRS: str = "epsg:4326"
-
-
-class PatchConfig(BaseModel):
-    """Configuration for physical ML patch extraction dimensions.
-
-    This governs the physical map-math to transform a geographic grid
-    cell into a rigid bounding box suitable for tensor extraction.
-    """
-
-    model_config = {"extra": "forbid", "frozen": True}
-
-    resolution: float = Field(
-        description="Spatial resolution of the extracted patch in metres."
-    )
-    padding: int = Field(
-        default=0,
-        description="Additional padding pixels added to the extracted bounding box.",
-    )
-    margin: float = Field(
-        default=0.0,
-        description="Percentage margin added to the patch's nominal size (e.g. 5.0 for 5%).",
-    )
-    conform_to: tuple[int, int] | None = Field(
-        default=None,
-        description="Force the output tensor to this exact shape (H, W).",
-    )
-
-    @classmethod
-    def _from_raw(cls, data: dict[str, Any]) -> "PatchConfig":
-        if not isinstance(data, dict):
-            raise ValueError("PatchConfig data must be a dict.")
-        if "patch_config" in data:
-            data = data["patch_config"]
-        if isinstance(data, dict):
-            data = dict(data)
-            data.pop("_target_", None)
-        return cls.model_validate(data)
 
 
 AereoPlugin = Any
