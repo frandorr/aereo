@@ -89,20 +89,17 @@ def _make_cell_polygon(
 
 @attrs.frozen
 class GridCell:
-    """A single MajorTOM grid cell with its UTM footprint and geobox.
+    """A single raw MajorTOM grid cell.
 
-    This is a pure grid utility: it is not tied to an ``ExtractionTask`` and is
-    only used by the orchestrator when iterating over grid cells or building
-    artifact catalogs.
+    A ``GridCell`` only describes the grid geometry: its identifier, size, and
+    WGS84 footprint. Extraction-specific parameters such as resolution, margin,
+    padding, and conform_to shape are provided later through
+    :meth:`to_extract_patch`.
     """
 
     id: str
     d: int
     cell_geometry: Polygon
-    resolution: float
-    margin: float = 0.0
-    padding: int = 0
-    conform_to: tuple[int, int] | None = None
 
     def to_geodataframe(self) -> GeoDataFrame[GridSchema]:
         """Convert the GridCell to a GeoDataFrame."""
@@ -133,8 +130,79 @@ class GridCell:
             self.cell_geometry, src_epsg=_WGS84_CRS, dst_epsg=self.utm_crs
         )
 
+    def to_extract_patch(
+        self,
+        resolution: float,
+        margin: float = 0.0,
+        padding: int = 0,
+        conform_to: tuple[int, int] | None = None,
+    ) -> "ExtractPatch":
+        """Create an extraction patch from this raw cell.
+
+        Args:
+            resolution: Target pixel resolution in metres.
+            margin: Percentage margin added to the patch's nominal size
+                (e.g. 5.0 for 5%).
+            padding: Additional padding pixels added to the extracted bounding box.
+            conform_to: Force the output tensor to this exact shape (H, W).
+
+        Returns:
+            An ``ExtractPatch`` carrying the extraction geometry and geobox.
+        """
+        return ExtractPatch(
+            grid_cell=self,
+            resolution=resolution,
+            margin=margin,
+            padding=padding,
+            conform_to=conform_to,
+        )
+
+
+@attrs.frozen
+class ExtractPatch:
+    """An extraction-ready view of a ``GridCell``.
+
+    Adds extraction parameters (resolution, margin, padding, conform_to) to a
+    raw grid cell and exposes the resulting GeoBox and area name.
+    """
+
+    grid_cell: GridCell
+    resolution: float
+    margin: float = 0.0
+    padding: int = 0
+    conform_to: tuple[int, int] | None = None
+
+    @property
+    def id(self) -> str:
+        """Delegate to the underlying grid cell."""
+        return self.grid_cell.id
+
+    @property
+    def d(self) -> int:
+        """Delegate to the underlying grid cell."""
+        return self.grid_cell.d
+
+    @property
+    def cell_geometry(self) -> Polygon:
+        """Delegate to the underlying grid cell."""
+        return self.grid_cell.cell_geometry
+
+    @property
+    def utm_crs(self) -> str:
+        """Delegate to the underlying grid cell."""
+        return self.grid_cell.utm_crs
+
+    @property
+    def utm_footprint(self) -> BaseGeometry:
+        """Delegate to the underlying grid cell."""
+        return self.grid_cell.utm_footprint
+
+    def to_geodataframe(self) -> GeoDataFrame[GridSchema]:
+        """Delegate to the underlying grid cell."""
+        return self.grid_cell.to_geodataframe()
+
     def area_name(self) -> str:
-        """Get the area name based on grid cell and a resolution in meters."""
+        """Get the area name based on grid cell and resolution in metres."""
         if isinstance(self.resolution, float) and self.resolution.is_integer():
             res_str = str(int(self.resolution))
         else:
@@ -143,7 +211,7 @@ class GridCell:
 
     @cached_property
     def geobox(self) -> GeoBox:
-        """Return an odc-geo GeoBox for this cell's UTM footprint."""
+        """Return an odc-geo GeoBox for this patch's UTM footprint."""
         utm_centroid = cast(
             Point,
             reproject_geom(
@@ -373,40 +441,22 @@ class GridDefinition(MajorTomGrid):
 def build_grid_cells(
     aoi: BaseGeometry,
     grid_dist: int,
-    resolution: float,
-    margin: float | None = None,
-    padding: int = 0,
-    conform_to: tuple[int, int] | None = None,
 ) -> Sequence[GridCell]:
-    """Build ``GridCell`` objects intersecting an AOI.
+    """Build raw ``GridCell`` objects intersecting an AOI.
 
     Args:
         aoi: Area of interest geometry in WGS84.
         grid_dist: MajorTOM cell size in metres.
-        resolution: Target pixel resolution in metres.
-        margin: Optional buffer in metres to add around *aoi* before tiling.
-        padding: Additional padding pixels added to the extracted bounding box.
-        conform_to: Force the output tensor to this exact shape (H, W).
 
     Returns:
-        Sequence of ``GridCell`` objects, one per intersecting cell.
+        Sequence of raw ``GridCell`` objects, one per intersecting cell.
     """
-    from aereo.spatial import get_utm_epsg_from_geometry, reproject_geom
-
     grid_def = GridDefinition(d=grid_dist)
-    if margin:
-        utm_epsg = get_utm_epsg_from_geometry(aoi)
-        aoi_utm = reproject_geom(aoi, src_epsg=_WGS84_CRS, dst_epsg=utm_epsg)
-        aoi_utm = aoi_utm.buffer(margin)
-        aoi = reproject_geom(aoi_utm, src_epsg=utm_epsg, dst_epsg=_WGS84_CRS)
     return [
         GridCell(
             id=cell_id,
             d=grid_dist,
             cell_geometry=geom,
-            resolution=resolution,
-            padding=padding,
-            conform_to=conform_to,
         )
         for geom, cell_id, _ in grid_def.generate_raw_cells(aoi)
     ]
@@ -443,4 +493,4 @@ def intersect_cells(
 
 
 # Backwards-compatible alias for code that has not yet migrated.
-ExtractionPatch = GridCell
+ExtractionPatch = ExtractPatch

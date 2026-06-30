@@ -18,6 +18,7 @@ import xarray as xr
 from aereo.eoids import build_eoids_path
 from aereo.grid import GridCell, build_grid_cells, intersect_cells
 from aereo.interfaces import ExtractionTask
+from aereo.spatial import get_utm_epsg_from_geometry, reproject_geom
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import box
@@ -40,21 +41,19 @@ def _resolve_aoi(task: ExtractionTask) -> Any:
 
 
 def _build_grid_cells(task: ExtractionTask) -> Sequence[GridCell]:
-    """Build grid cells for the task's AOI and grid parameters."""
+    """Build raw grid cells for the task's AOI and grid parameters."""
     job = task.job
     aoi = _resolve_aoi(task)
     if aoi is None:
         return []
-    if job.resolution is None:
-        raise ValueError(
-            "resolution is required when building grid cells for reprojection or "
-            "artifact indexing."
-        )
+    if job.margin:
+        utm_epsg = get_utm_epsg_from_geometry(aoi)
+        aoi_utm = reproject_geom(aoi, src_epsg="epsg:4326", dst_epsg=utm_epsg)
+        aoi_utm = aoi_utm.buffer(job.margin)
+        aoi = reproject_geom(aoi_utm, src_epsg=utm_epsg, dst_epsg="epsg:4326")
     return build_grid_cells(
         aoi=aoi,
         grid_dist=job.grid_dist,
-        resolution=job.resolution,
-        margin=job.margin,
     )
 
 
@@ -235,9 +234,11 @@ def _run_grid_reproject(
     cells = intersect_cells(bounds, grid_cells, crs=file_crs)
 
     artifacts: list[GeoDataFrame[ArtifactSchema]] = []
+    if job.resolution is None:
+        raise ValueError("resolution is required when using reproject_mode='grid'.")
     for cell in cells:
         kwargs = dict(job.reproject_kwargs or {})
-        kwargs["geobox"] = cell.to_geobox()
+        kwargs["geobox"] = cell.to_extract_patch(resolution=job.resolution).to_geobox()
         cell_ds = reproject(ds, **kwargs)
 
         if job.postprocess:
