@@ -538,3 +538,73 @@ cells_per_task: 7
     task_builder = load_plugin(tmp_path, "task_builder", "grouped")
     assert callable(task_builder)
     assert task_builder.keywords["cells_per_task"] == 7
+
+
+# ---------------------------------------------------------------------------
+# Processor list normalization
+# ---------------------------------------------------------------------------
+
+
+def _noop_processor(ds: xr.Dataset, **kwargs) -> xr.Dataset:
+    return ds
+
+
+def _another_processor(ds: xr.Dataset, **kwargs) -> xr.Dataset:
+    return ds
+
+
+def test_job_accepts_single_preprocessor():
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+        preprocess=_noop_processor,
+    )
+    assert job.preprocess == [_noop_processor]
+
+
+def test_job_accepts_list_of_preprocessors():
+    processors = [_noop_processor, _another_processor]
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+        preprocess=processors,
+    )
+    assert job.preprocess == processors
+
+
+def test_job_accepts_single_postprocessor():
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+        postprocess=_noop_processor,
+    )
+    assert job.postprocess == [_noop_processor]
+
+
+def test_job_accepts_list_of_postprocessors():
+    processors = [_noop_processor, _another_processor]
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+        postprocess=processors,
+    )
+    assert job.postprocess == processors
+
+
+def test_job_processors_default_to_none():
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+    )
+    assert job.preprocess is None
+    assert job.postprocess is None

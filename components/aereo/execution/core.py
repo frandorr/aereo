@@ -17,7 +17,7 @@ import rioxarray  # noqa: F401
 import xarray as xr
 from aereo.eoids import build_eoids_path
 from aereo.grid import GridCell, build_grid_cells, intersect_cells
-from aereo.interfaces import ExtractionTask
+from aereo.interfaces import ExtractionTask, Processor
 from aereo.spatial import get_utm_epsg_from_geometry, reproject_geom
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -122,7 +122,7 @@ def _write_single_timestep(
     """Write a single time-slice dataset and return the written path."""
     path = _build_output_path(ds, task, cell_id=cell_id)
     path.parent.mkdir(parents=True, exist_ok=True)
-    written = task.job.write(ds, str(path), **(task.job.write_kwargs or {}))
+    written = task.job.write(ds, str(path))
     return str(written)
 
 
@@ -219,6 +219,19 @@ def _concat_artifacts(
     return cast(GeoDataFrame[ArtifactSchema], ArtifactSchema.validate(gdf))
 
 
+def _run_processors(
+    ds: xr.Dataset,
+    processors: Processor | Sequence[Processor] | None,
+) -> xr.Dataset:
+    """Apply a single processor or sequence of processors to a dataset."""
+    if processors is None:
+        return ds
+    processor_list = processors if isinstance(processors, Sequence) else [processors]
+    for processor in processor_list:
+        ds = processor(ds)
+    return ds
+
+
 def _run_grid_reproject(
     ds: xr.Dataset,
     task: ExtractionTask,
@@ -237,12 +250,9 @@ def _run_grid_reproject(
     if job.resolution is None:
         raise ValueError("resolution is required when using reproject_mode='grid'.")
     for cell in cells:
-        kwargs = dict(job.reproject_kwargs or {})
-        kwargs["geobox"] = cell.to_geobox(resolution=job.resolution)
-        cell_ds = reproject(ds, **kwargs)
+        cell_ds = reproject(ds, geobox=cell.to_geobox(resolution=job.resolution))
 
-        if job.postprocess:
-            cell_ds = job.postprocess(cell_ds, **(job.postprocess_kwargs or {}))
+        cell_ds = _run_processors(cell_ds, job.postprocess)
 
         artifacts.append(_write_dataset(cell_ds, task, grid_cells, cell_id=cell.id))
 
@@ -270,11 +280,9 @@ def run_task(task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
     if job.read is None:
         raise ValueError("Pipeline must contain a Reader stage.")
 
-    read_kwargs = dict(job.read_kwargs or {})
-    ds = job.read(task, **read_kwargs)
+    ds = job.read(task)
 
-    if job.preprocess:
-        ds = job.preprocess(ds, **(job.preprocess_kwargs or {}))
+    ds = _run_processors(ds, job.preprocess)
 
     grid_cells: Sequence[GridCell] = []
     if job.reproject is not None or job.write is not None:
@@ -285,14 +293,13 @@ def run_task(task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
         if job.reproject_mode == "grid":
             return _run_grid_reproject(ds, task, grid_cells)
         if job.reproject_mode == "raw":
-            ds = reproject(ds, **(job.reproject_kwargs or {}))
+            ds = reproject(ds)
         else:
             raise ValueError(
                 "reproject is set but reproject_mode must be 'raw' or 'grid'"
             )
 
-    if job.postprocess:
-        ds = job.postprocess(ds, **(job.postprocess_kwargs or {}))
+    ds = _run_processors(ds, job.postprocess)
 
     if job.write is None:
         return ArtifactSchema.empty_geodataframe()
