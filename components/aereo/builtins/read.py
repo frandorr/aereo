@@ -8,13 +8,10 @@ from __future__ import annotations
 
 from typing import Any
 
-import numpy as np
 import xarray as xr
 from pydantic import ConfigDict, validate_call
 
-from aereo.interfaces import infer_dataset_time_bounds
-from aereo.schemas import AssetSchema
-from pandera.typing.geopandas import GeoDataFrame
+from aereo.interfaces import ExtractionTask, infer_dataset_time_bounds
 
 try:
     from odc.stac import load as odc_load
@@ -22,97 +19,56 @@ except ImportError:  # pragma: no cover
     odc_load = None  # type: ignore[assignment]
 
 
-def _to_native(obj: Any) -> Any:
-    """Recursively convert numpy containers in *obj* to plain Python types.
-
-    Parquet round-trips can leave list fields as ``np.ndarray`` instances.
-    ``pystac.Item.from_dict`` expects JSON-like structures, so this helper
-    normalises arrays/scalars before reconstruction.
-    """
-    if isinstance(obj, np.ndarray):
-        return [_to_native(v) for v in obj.tolist()]
-    if isinstance(obj, np.generic):
-        return obj.item()
-    if isinstance(obj, dict):
-        return {k: _to_native(v) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [_to_native(v) for v in obj]
-    return obj
-
-
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
 def read_odc_stac(
-    files: list[str],
-    assets: GeoDataFrame[AssetSchema] | None = None,
-    aoi: tuple[float, float, float, float] | None = None,
-    odc_params: dict[str, Any] | None = None,
+    task: ExtractionTask,
+    **kwargs: Any,
 ) -> xr.Dataset:
     """Load STAC assets using ``odc.stac.load``.
 
-    Reconstructs :class:`pystac.Item` objects from the ``stac_item`` column of
-    *assets* and returns a dataset tagged with temporal bounds in ``ds.attrs``.
+    Reconstructs :class:`pystac.Item` objects from ``task.stac_items`` and
+    returns a dataset tagged with temporal bounds in ``ds.attrs``.
 
     Args:
-        files: List of source filenames/URLs. Not used directly by this reader,
-            but accepted to conform to the reader contract.
-        assets: GeoDataFrame of source assets. Must contain a ``stac_item``
-            column with serialised STAC item dictionaries.
-        aoi: Optional WGS84 bounding box ``(minx, miny, maxx, maxy)`` to crop
-            the loaded data. Forwarded to ``odc.stac.load`` as ``bbox``.
-        odc_params: Extra keyword arguments passed to ``odc.stac.load``.
+        task: The extraction task containing STAC items and read context.
+        **kwargs: Extra keyword arguments passed to ``odc.stac.load``.
+            Use ``odc_params`` to forward a dict of options. User-provided
+            ``bbox`` and ``bands`` take precedence over values inferred from
+            ``task``.
 
     Returns:
         xr.Dataset (potentially dask-backed) in the native CRS of the
         STAC items.
 
     Raises:
-        ImportError: If ``odc-stac`` or ``pystac`` is not installed.
-        ValueError: If *assets* is None, no ``stac_item`` column is found, or
-            no valid STAC items can be reconstructed.
+        ImportError: If ``odc-stac`` is not installed.
+        ValueError: If ``task.stac_items`` is empty.
     """
-    import pystac
-
     if odc_load is None:  # pragma: no cover
         raise ImportError(
             "odc-stac is required for read_odc_stac. "
             "Install it with: pip install 'aereo[stac]'"
         )
 
-    if assets is None:
-        raise ValueError(
-            "read_odc_stac requires the 'assets' GeoDataFrame passed by the orchestrator."
-        )
-
-    if "stac_item" not in assets.columns:
-        raise ValueError(
-            "read_odc_stac requires a 'stac_item' column in assets. "
-            "Ensure the search plugin (e.g. SearchSTAC) stores full STAC "
-            "item dictionaries there."
-        )
-
-    seen_ids: set[str] = set()
-    items: list[pystac.Item] = []
-    for raw in assets["stac_item"]:
-        if raw is None:
-            continue
-        item = pystac.Item.from_dict(_to_native(raw))
-        if item.id not in seen_ids:
-            seen_ids.add(item.id)
-            items.append(item)
-
+    items = task.stac_items
     if not items:
-        raise ValueError("No valid STAC items found in assets['stac_item'].")
+        raise ValueError(
+            "read_odc_stac requires at least one STAC item in task.stac_items. "
+            "Ensure the search plugin (e.g. search_stac) stores full STAC "
+            "item dictionaries in the assets."
+        )
 
+    odc_params = kwargs.get("odc_params")
     params = dict(odc_params) if odc_params is not None else {}
 
     if "chunks" not in params:
         params["chunks"] = {}
 
-    if "bands" not in params and "channel_id" in assets.columns:
-        params["bands"] = list(assets["channel_id"].unique())
+    if "bands" not in params and "channel_id" in task.assets.columns:
+        params["bands"] = list(task.assets["channel_id"].unique())
 
-    if aoi is not None and "bbox" not in params:
-        params["bbox"] = aoi
+    if task.bbox is not None and "bbox" not in params:
+        params["bbox"] = task.bbox
 
     ds: xr.Dataset = odc_load(items, **params)
 
