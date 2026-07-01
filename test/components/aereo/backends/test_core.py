@@ -29,6 +29,22 @@ class _DummyReader:
         )
 
 
+class _CapturingReader:
+    """Reader that records the kwargs it receives."""
+
+    captured: dict[str, Any]
+
+    def __init__(self) -> None:
+        self.captured = {}
+
+    def __call__(self, files: list[str], assets=None, **kwargs) -> xr.Dataset:
+        self.captured = {"files": files, **kwargs}
+        return xr.Dataset(
+            {"B04": (["y", "x"], np.ones((4, 4)))},
+            coords={"y": range(4), "x": range(4)},
+        )
+
+
 class _DummyWriter:
     def __call__(self, ds: xr.Dataset, path: str, **kwargs) -> str:
         import rioxarray  # noqa: F401
@@ -109,6 +125,39 @@ def test_run_task_raises_when_reader_is_missing():
     task = attrs.evolve(task, job=job)
     with pytest.raises(ValueError, match="Pipeline must contain a Reader stage"):
         run_task(task)
+
+
+def test_run_task_passes_aoi_to_reader():
+    """run_task forwards task.aoi.bounds to the reader when an AOI is set."""
+    reader = _CapturingReader()
+    task = _make_task(reader=reader, writer=_DummyWriter())
+    task = attrs.evolve(
+        task,
+        aoi=Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]]),
+    )
+
+    run_task(task)
+
+    assert "aoi" in reader.captured
+    assert task.aoi is not None
+    assert reader.captured["aoi"] == task.aoi.bounds
+
+
+def test_run_task_reader_kwargs_aoi_takes_precedence():
+    """User-provided read_kwargs aoi overrides task.aoi.bounds."""
+    reader = _CapturingReader()
+    custom_aoi = (-1.0, -1.0, 2.0, 2.0)
+    base_task = _make_task(reader=reader, writer=_DummyWriter())
+    job = base_task.job.model_copy(update={"read_kwargs": {"aoi": custom_aoi}})
+    task = attrs.evolve(
+        base_task,
+        job=job,
+        aoi=Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]]),
+    )
+
+    run_task(task)
+
+    assert reader.captured["aoi"] == custom_aoi
 
 
 # ---------------------------------------------------------------------------

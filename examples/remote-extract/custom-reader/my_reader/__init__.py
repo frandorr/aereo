@@ -23,10 +23,18 @@ class SyntheticReader:
         self,
         files: list[str],
         assets: Any | None = None,
+        aoi: tuple[float, float, float, float] | None = None,
         **kwargs: Any,
     ) -> xr.Dataset:
-        """Return a small synthetic raster dataset."""
-        del files, assets, kwargs  # unused
+        """Return a small synthetic raster dataset.
+
+        Args:
+            files: Source filenames/URLs for the reader.
+            assets: Optional asset metadata GeoDataFrame.
+            aoi: Optional WGS84 bounding box ``(minx, miny, maxx, maxy)``
+                supplied by the orchestrator when the task has a spatial AOI.
+        """
+        del files, assets, aoi, kwargs  # unused
         shape = (64, 64)
         data = np.random.default_rng(42).random(shape)
         return xr.Dataset(

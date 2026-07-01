@@ -119,13 +119,14 @@ def _make_fake_ds() -> xr.Dataset:
 
 
 def test_read_odcstac_fields():
-    """read_odc_stac exposes files, assets, and odc_params as configurable keywords."""
+    """read_odc_stac exposes files, assets, aoi and odc_params as configurable keywords."""
     import inspect
 
     sig = inspect.signature(read_odc_stac)
     assert "odc_params" in sig.parameters
     assert "files" in sig.parameters
     assert "assets" in sig.parameters
+    assert "aoi" in sig.parameters
 
 
 def test_read_odcstac_raises_without_assets():
@@ -204,6 +205,45 @@ def test_read_odcstac_explicit_bbox_not_overridden(monkeypatch):
     task = _make_task(_make_stac_item_dict())
     reader = partial(read_odc_stac, odc_params={"bbox": custom_bbox})
     reader(task.assets["href"].tolist(), assets=task.assets)
+    assert captured["kwargs"]["bbox"] == custom_bbox
+
+
+def test_read_odcstac_forwards_aoi_as_bbox(monkeypatch):
+    """aoi is forwarded to odc.stac.load as bbox."""
+    fake_ds = _make_fake_ds()
+    captured: dict[str, Any] = {}
+
+    def fake_odc_load(items, **kwargs):
+        captured["kwargs"] = kwargs
+        return fake_ds
+
+    monkeypatch.setattr("aereo.builtins.read.odc_load", fake_odc_load)
+
+    aoi = (-70.5, -33.5, -70.0, -33.0)
+    task = _make_task(_make_stac_item_dict())
+    reader = read_odc_stac
+    reader(task.assets["href"].tolist(), assets=task.assets, aoi=aoi)
+
+    assert captured["kwargs"]["bbox"] == aoi
+
+
+def test_read_odcstac_aoi_overridden_by_odc_params_bbox(monkeypatch):
+    """User-provided bbox in odc_params takes precedence over aoi."""
+    fake_ds = _make_fake_ds()
+    captured: dict[str, Any] = {}
+
+    def fake_odc_load(items, **kwargs):
+        captured["kwargs"] = kwargs
+        return fake_ds
+
+    monkeypatch.setattr("aereo.builtins.read.odc_load", fake_odc_load)
+
+    aoi = (-70.5, -33.5, -70.0, -33.0)
+    custom_bbox = (-71.0, -34.0, -69.0, -32.0)
+    task = _make_task(_make_stac_item_dict())
+    reader = partial(read_odc_stac, odc_params={"bbox": custom_bbox})
+    reader(task.assets["href"].tolist(), assets=task.assets, aoi=aoi)
+
     assert captured["kwargs"]["bbox"] == custom_bbox
 
 

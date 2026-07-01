@@ -44,6 +44,11 @@ class Reader(Protocol):
         ``task.assets["href"]`` and any bound kwargs. Additional configuration
         (bands, CRS, resolution, STAC items, etc.) is supplied through
         ``**kwargs`` or via ``functools.partial``.
+
+        When a task has a spatial chunk AOI, the orchestrator also passes an
+        ``aoi`` keyword argument containing a WGS84 bounding box as
+        ``(minx, miny, maxx, maxy)``. Readers should accept this argument and
+        crop the loaded data accordingly when it is provided.
         """
         ...
 

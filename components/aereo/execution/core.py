@@ -271,7 +271,10 @@ def run_task(task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
         raise ValueError("Pipeline must contain a Reader stage.")
 
     files = task.assets["href"].tolist()
-    ds = job.read(files, assets=task.assets, **(job.read_kwargs or {}))
+    read_kwargs = dict(job.read_kwargs or {})
+    if task.aoi is not None and "aoi" not in read_kwargs:
+        read_kwargs["aoi"] = task.aoi.bounds
+    ds = job.read(files, assets=task.assets, **read_kwargs)
 
     if job.preprocess:
         ds = job.preprocess(ds, **(job.preprocess_kwargs or {}))

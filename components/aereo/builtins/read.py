@@ -44,6 +44,7 @@ def _to_native(obj: Any) -> Any:
 def read_odc_stac(
     files: list[str],
     assets: GeoDataFrame[AssetSchema] | None = None,
+    aoi: tuple[float, float, float, float] | None = None,
     odc_params: dict[str, Any] | None = None,
 ) -> xr.Dataset:
     """Load STAC assets using ``odc.stac.load``.
@@ -56,6 +57,8 @@ def read_odc_stac(
             but accepted to conform to the reader contract.
         assets: GeoDataFrame of source assets. Must contain a ``stac_item``
             column with serialised STAC item dictionaries.
+        aoi: Optional WGS84 bounding box ``(minx, miny, maxx, maxy)`` to crop
+            the loaded data. Forwarded to ``odc.stac.load`` as ``bbox``.
         odc_params: Extra keyword arguments passed to ``odc.stac.load``.
 
     Returns:
@@ -107,6 +110,9 @@ def read_odc_stac(
 
     if "bands" not in params and "channel_id" in assets.columns:
         params["bands"] = list(assets["channel_id"].unique())
+
+    if aoi is not None and "bbox" not in params:
+        params["bbox"] = aoi
 
     ds: xr.Dataset = odc_load(items, **params)
 
