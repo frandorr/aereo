@@ -12,7 +12,7 @@ from collections.abc import Sequence
 from typing import Any, cast
 from warnings import warn
 
-from aereo.grid import GridDefinition
+from aereo.grid import build_grid_cells, cells_bounds
 from aereo.interfaces.core import DEFAULT_CELLS_PER_TASK, ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
@@ -26,6 +26,7 @@ def build_grouped_tasks(
     search_results: GeoDataFrame[AssetSchema],
     job: ExtractionJob,
     cells_per_task: int = DEFAULT_CELLS_PER_TASK,
+    buffer_m: float = 0.0,
 ) -> Sequence[ExtractionTask]:
     """Build extraction tasks from *search_results* using *job* configuration.
 
@@ -40,6 +41,9 @@ def build_grouped_tasks(
         search_results: GeoDataFrame of assets from the search phase.
         job: Parent ``ExtractionJob`` supplying extraction configuration.
         cells_per_task: Maximum number of MajorTOM grid cells per task.
+        buffer_m: Optional padding in metres around each chunk of grid cells.
+            A value such as ``job.grid_dist * 0.1`` is useful when cropping
+            assets to ensure edge pixels are included.
 
     Returns:
         A sequence of ``ExtractionTask`` objects ready for execution.
@@ -86,9 +90,8 @@ def build_grouped_tasks(
 
         group = cast(GeoDataFrame[AssetSchema], group.copy())
         group_aoi = _resolve_group_aoi(group, target_aoi)
-        cells = _raw_cells_for_aoi(group_aoi, job.grid_dist)
 
-        if not cells:
+        if group_aoi is None or group_aoi.is_empty:
             # No usable geometry/aoi to tile; keep the original job so the task
             # can still be executed with the full asset set.
             task_id = _task_id(job.name, start_time, crs, len(tasks))
@@ -101,9 +104,11 @@ def build_grouped_tasks(
             )
             continue
 
+        cells = build_grid_cells(aoi=group_aoi, grid_dist=job.grid_dist)
+
         for chunk_index, chunk in enumerate(_chunks(cells, cells_per_task)):
-            chunk_geoms = [geom for geom, _cell_id, _ in chunk]
-            chunk_aoi = shapely.unary_union(chunk_geoms)
+            chunk_bounds = cells_bounds(chunk, buffer_m=buffer_m)
+            chunk_aoi = shapely.geometry.box(*chunk_bounds)
 
             task_id = _task_id(
                 job.name,
@@ -119,7 +124,7 @@ def build_grouped_tasks(
                     aoi=chunk_aoi,
                     task_context={
                         "chunk_index": chunk_index,
-                        "grid_cells": [cell_id for _, cell_id, _ in chunk],
+                        "grid_cells": [cell.id for cell in chunk],
                     },
                 )
             )
@@ -147,16 +152,6 @@ def _resolve_group_aoi(
                     return intersection
             return asset_union
     return target_aoi
-
-
-def _raw_cells_for_aoi(
-    aoi: BaseGeometry | None,
-    grid_dist: int,
-) -> list[tuple[BaseGeometry, str, bool]]:
-    """Return raw MajorTOM grid cells intersecting *aoi*."""
-    if aoi is None or aoi.is_empty:
-        return []
-    return list(GridDefinition(d=grid_dist).generate_raw_cells(aoi))
 
 
 def _chunks(
