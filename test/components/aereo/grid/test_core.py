@@ -91,7 +91,7 @@ def test_grid_cell_area_name_and_geobox():
     cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
 
     assert cell.area_name(resolution=50.0) == "0U_0R_dist-10000m_res-50m"
-    area = cell.to_geobox(resolution=50.0, margin=0.0, padding=0)
+    area = cell.to_geobox(resolution=50.0, margin=0.0)
     # With margin=0 the box is D x D metres (≈200 px at 50 m)
     assert area.shape.x == pytest.approx(10000 / 50, abs=1)
     assert area.shape.y == pytest.approx(10000 / 50, abs=1)
@@ -110,7 +110,7 @@ def test_geobox_returns_geobox():
     cell = core.GridCell(
         id="test", d=10000, cell_geometry=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
     )
-    gb = cell.to_geobox(resolution=100.0, margin=0.0, padding=0)
+    gb = cell.to_geobox(resolution=100.0, margin=0.0)
     assert isinstance(gb, GeoBox)
     assert gb.crs is not None
     assert gb.crs.to_epsg() == int(cell.utm_crs.split(":")[-1])
@@ -150,16 +150,6 @@ def test_geobox_uses_fixed_size():
     assert area.shape.y == pytest.approx(100_000 / 2000, abs=1)
 
 
-def test_geobox_conform_to():
-    """When conform_to is given, width/height should match target + padding."""
-    cell = core.GridCell(
-        id="test", d=10000, cell_geometry=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
-    )
-    area = cell.to_geobox(resolution=100.0, margin=0.0, padding=1, conform_to=(50, 60))
-    assert area.shape.x == 52  # 50 + 2*1
-    assert area.shape.y == 62  # 60 + 2*1
-
-
 def test_geobox_centered_on_grid_point():
     """geobox should be centred on the reprojected WGS84 centroid."""
     from aereo.spatial import reproject_geom
@@ -186,7 +176,86 @@ def test_geobox_with_margin():
     """margin should expand the box beyond D x D."""
     polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
     cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
-    gb_no_margin = cell.to_geobox(resolution=50.0, margin=0.0, padding=0)
-    gb_with_margin = cell.to_geobox(resolution=50.0, margin=6.8, padding=0)
+    gb_no_margin = cell.to_geobox(resolution=50.0, margin=0.0)
+    gb_with_margin = cell.to_geobox(resolution=50.0, margin=6.8)
     assert gb_with_margin.shape.x > gb_no_margin.shape.x
     assert gb_with_margin.shape.y > gb_no_margin.shape.y
+
+
+# --- cells_bounds tests ---
+
+
+def test_cells_bounds_empty_raises():
+    with pytest.raises(ValueError, match="At least one GridCell is required"):
+        core.cells_bounds([])
+
+
+def test_cells_bounds_single_cell():
+    polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
+    cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
+
+    bounds = core.cells_bounds([cell])
+    assert bounds == pytest.approx(polygon.bounds, abs=1e-9)
+
+
+def test_cells_bounds_multiple_cells():
+    polygon = Polygon([[0.0, 0.0], [0.2, 0.0], [0.2, 0.2], [0.0, 0.2]])
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=10_000)
+    assert len(cells) > 1
+
+    bounds = core.cells_bounds(cells)
+    minx, miny, maxx, maxy = bounds
+
+    # Bounds should exactly match the union of all cell bounds.
+    expected_minx = min(cell.cell_geometry.bounds[0] for cell in cells)
+    expected_miny = min(cell.cell_geometry.bounds[1] for cell in cells)
+    expected_maxx = max(cell.cell_geometry.bounds[2] for cell in cells)
+    expected_maxy = max(cell.cell_geometry.bounds[3] for cell in cells)
+    assert minx == pytest.approx(expected_minx, abs=1e-9)
+    assert miny == pytest.approx(expected_miny, abs=1e-9)
+    assert maxx == pytest.approx(expected_maxx, abs=1e-9)
+    assert maxy == pytest.approx(expected_maxy, abs=1e-9)
+
+
+def test_cells_bounds_with_buffer_expands():
+    polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=10_000)
+    assert len(cells) > 0
+
+    base_bounds = core.cells_bounds(cells)
+    buffered_bounds = core.cells_bounds(cells, buffer_m=1000.0)
+
+    assert buffered_bounds[0] < base_bounds[0]
+    assert buffered_bounds[1] < base_bounds[1]
+    assert buffered_bounds[2] > base_bounds[2]
+    assert buffered_bounds[3] > base_bounds[3]
+
+
+def test_cells_bounds_buffer_approximate_size():
+    """Buffer expansion near the equator should be close to the requested metres."""
+    polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=10_000)
+    assert len(cells) > 0
+
+    buffer_m = 1000.0
+    base_bounds = core.cells_bounds(cells)
+    buffered_bounds = core.cells_bounds(cells, buffer_m=buffer_m)
+
+    # At the equator 1 degree ≈ 111,320 m, so 1000 m ≈ 0.009 degrees.
+    # Allow generous tolerance because buffering is done in UTM and reprojected.
+    expansion_x = (buffered_bounds[2] - buffered_bounds[0]) - (
+        base_bounds[2] - base_bounds[0]
+    )
+    expansion_y = (buffered_bounds[3] - buffered_bounds[1]) - (
+        base_bounds[3] - base_bounds[1]
+    )
+
+    expected_deg = buffer_m / 111_320
+    assert expansion_x == pytest.approx(2 * expected_deg, abs=0.01)
+    assert expansion_y == pytest.approx(2 * expected_deg, abs=0.01)
+
+
+def test_cells_bounds_exported_from_module():
+    from aereo.grid import cells_bounds
+
+    assert callable(cells_bounds)

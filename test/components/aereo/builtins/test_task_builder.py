@@ -192,6 +192,30 @@ def test_grouped_task_builder_uses_asset_target_aoi_intersection():
     assert tasks[0].aoi.within(box(0.0, 0.0, 0.3, 0.3))
 
 
+def test_grouped_task_builder_buffer_expands_aoi():
+    """A positive buffer_m expands the task AOI beyond the cell union."""
+    assets = _make_assets(geometries=[box(0.0, 0.0, 0.2, 0.2)])
+    job = _make_job(target_aoi=box(0.0, 0.0, 0.2, 0.2))
+
+    tasks_no_buffer = list(build_grouped_tasks(assets, job, cells_per_task=100))
+    tasks_buffered = list(
+        build_grouped_tasks(assets, job, cells_per_task=100, buffer_m=1000.0)
+    )
+
+    assert len(tasks_no_buffer) == 1
+    assert len(tasks_buffered) == 1
+
+    aoi_no_buffer = tasks_no_buffer[0].aoi
+    aoi_buffered = tasks_buffered[0].aoi
+    assert aoi_no_buffer is not None
+    assert aoi_buffered is not None
+
+    assert aoi_buffered.bounds[0] < aoi_no_buffer.bounds[0]
+    assert aoi_buffered.bounds[1] < aoi_no_buffer.bounds[1]
+    assert aoi_buffered.bounds[2] > aoi_no_buffer.bounds[2]
+    assert aoi_buffered.bounds[3] > aoi_no_buffer.bounds[3]
+
+
 def test_grouped_task_builder_rejects_non_positive_cells_per_task():
     """A non-positive cells_per_task raises ValueError."""
     assets = _make_assets(geometries=[box(0.0, 0.0, 0.2, 0.2)])

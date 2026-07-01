@@ -6,6 +6,7 @@ for processing, alignment, and coordinate system projection.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import Callable, Sequence, cast
 
 import attrs
@@ -91,9 +92,8 @@ class GridCell:
     """A single raw MajorTOM grid cell.
 
     A ``GridCell`` only describes the grid geometry: its identifier, size, and
-    WGS84 footprint. Extraction-specific parameters such as resolution, margin,
-    padding, and conform_to shape are provided when building a GeoBox through
-    :meth:`to_geobox`.
+    WGS84 footprint. Extraction-specific parameters such as resolution and
+    margin are provided when building a GeoBox through :meth:`to_geobox`.
     """
 
     id: str
@@ -141,8 +141,6 @@ class GridCell:
         self,
         resolution: float,
         margin: float = 0.0,
-        padding: int = 0,
-        conform_to: tuple[int, int] | None = None,
     ) -> GeoBox:
         """Return an odc-geo GeoBox for this cell's UTM footprint.
 
@@ -150,8 +148,6 @@ class GridCell:
             resolution: Target pixel resolution in metres.
             margin: Percentage margin added to the patch's nominal size
                 (e.g. 5.0 for 5%).
-            padding: Additional padding pixels added to the extracted bounding box.
-            conform_to: Force the output tensor to this exact shape (H, W).
 
         Returns:
             A GeoBox aligned to the cell's UTM grid point.
@@ -166,26 +162,9 @@ class GridCell:
         cy = round(utm_centroid.y / resolution) * resolution
         crs = self.utm_crs
 
-        if conform_to is not None:
-            target_w, target_h = conform_to
-            half_w = (target_w * resolution) / 2
-            half_h = (target_h * resolution) / 2
-            bbox = (cx - half_w, cy - half_h, cx + half_w, cy + half_h)
-            geobox = GeoBox.from_bbox(
-                bbox,
-                crs,
-                resolution=resolution,
-                tight=True,
-            )
-        else:
-            half = (self.d * (1 + margin / 100)) / 2
-            bbox = (cx - half, cy - half, cx + half, cy + half)
-            geobox = GeoBox.from_bbox(bbox, crs, resolution=resolution, anchor="edge")
-
-        if padding:
-            geobox = geobox.pad(padding)
-
-        return geobox
+        half = (self.d * (1 + margin / 100)) / 2
+        bbox = (cx - half, cy - half, cx + half, cy + half)
+        return GeoBox.from_bbox(bbox, crs, resolution=resolution, anchor="edge")
 
 
 class GridDefinition(MajorTomGrid):
@@ -428,3 +407,41 @@ def intersect_cells(
         if geom.intersects(query_box):
             result.append(cell)
     return result
+
+
+def cells_bounds(
+    cells: Iterable[GridCell],
+    *,
+    buffer_m: float = 0.0,
+) -> tuple[float, float, float, float]:
+    """Return the WGS84 bounding box of a set of grid cells.
+
+    Args:
+        cells: Grid cells to bound.
+        buffer_m: Optional padding in metres around each cell. Each cell's
+            UTM footprint is expanded by this amount before computing the
+            overall WGS84 bounding box, so the result remains accurate even
+            when cells fall in different UTM zones.
+
+    Returns:
+        A WGS84 bounding box as ``(minx, miny, maxx, maxy)``.
+
+    Raises:
+        ValueError: If *cells* is empty.
+    """
+    cells = list(cells)
+    if not cells:
+        raise ValueError("At least one GridCell is required")
+
+    if buffer_m == 0:
+        geoms = [cell.cell_geometry for cell in cells]
+        return shapely.unary_union(geoms).bounds
+
+    buffered: list[BaseGeometry] = []
+    for cell in cells:
+        expanded = cell.utm_footprint.buffer(buffer_m)
+        buffered.append(
+            reproject_geom(expanded, src_epsg=cell.utm_crs, dst_epsg=_WGS84_CRS)
+        )
+
+    return shapely.unary_union(buffered).bounds

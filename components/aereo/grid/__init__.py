@@ -9,6 +9,7 @@ from aereo.grid.core import (
     GridCell,
     GridDefinition,
     build_grid_cells,
+    cells_bounds,
     intersect_cells,
 )
 
@@ -16,5 +17,6 @@ __all__ = [
     "GridCell",
     "GridDefinition",
     "build_grid_cells",
+    "cells_bounds",
     "intersect_cells",
 ]
