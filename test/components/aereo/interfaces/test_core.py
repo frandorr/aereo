@@ -109,6 +109,128 @@ def test_grid_dist_is_int():
 
 
 # ---------------------------------------------------------------------------
+# ExtractionTask read-oriented properties
+# ---------------------------------------------------------------------------
+
+
+def _make_task_with_assets(**asset_overrides):
+    df = gpd.GeoDataFrame(
+        {
+            "id": ["asset-1"],
+            "collection": ["C1"],
+            "start_time": ["2023-01-01"],
+            "end_time": ["2023-01-02"],
+            "href": ["s3://bucket/file.tif"],
+            **asset_overrides,
+        },
+        geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
+    )
+    job = ExtractionJob(
+        grid_dist=10_000,
+        output_uri="test",
+        read=read_odc_stac,
+        write=_dummy_writer,
+    )
+    return ExtractionTask(
+        id="task-1",
+        assets=cast(GeoDataFrame, df),
+        job=job,
+    )
+
+
+def test_task_uris_returns_hrefs():
+    task = _make_task_with_assets()
+    assert task.uris == ["s3://bucket/file.tif"]
+
+
+def test_task_bbox_prefers_task_aoi():
+    from shapely.geometry import box
+
+    task = _make_task_with_assets()
+    task = ExtractionTask(
+        id=task.id,
+        assets=task.assets,
+        job=task.job,
+        aoi=box(0, 1, 2, 3),
+    )
+    assert task.bbox == (0.0, 1.0, 2.0, 3.0)
+
+
+def test_task_bbox_falls_back_to_job_target_aoi():
+    from shapely.geometry import box
+
+    job = ExtractionJob(
+        grid_dist=10_000,
+        output_uri="test",
+        read=read_odc_stac,
+        write=_dummy_writer,
+        target_aoi=box(10, 11, 12, 13),
+    )
+    task = ExtractionTask(
+        id="task-1",
+        assets=_make_task_with_assets().assets,
+        job=job,
+    )
+    assert task.bbox == (10.0, 11.0, 12.0, 13.0)
+
+
+def test_task_bbox_returns_none_without_aoi():
+    task = _make_task_with_assets()
+    assert task.bbox is None
+
+
+def test_task_collections_returns_unique_sorted_collections():
+    task = _make_task_with_assets()
+    assert task.collections == ["C1"]
+
+
+def test_task_datetime_range_derived_from_assets():
+    from datetime import datetime
+
+    task = _make_task_with_assets()
+    datetime_range = task.datetime_range
+    assert datetime_range is not None
+    start, end = datetime_range
+    assert start == datetime(2023, 1, 1)
+    assert end == datetime(2023, 1, 2)
+
+
+def test_task_stac_items_reconstructs_unique_items():
+    item_dict = {
+        "type": "Feature",
+        "stac_version": "1.0.0",
+        "stac_extensions": [],
+        "id": "item-001",
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [-70.5, -33.5],
+                    [-70.0, -33.5],
+                    [-70.0, -33.0],
+                    [-70.5, -33.0],
+                    [-70.5, -33.5],
+                ]
+            ],
+        },
+        "bbox": [-70.5, -33.5, -70.0, -33.0],
+        "properties": {"datetime": "2026-01-01T12:00:00Z"},
+        "links": [],
+        "assets": {},
+        "collection": "sentinel-2-l2a",
+    }
+    task = _make_task_with_assets(stac_item=[item_dict])
+    items = task.stac_items
+    assert len(items) == 1
+    assert items[0].id == "item-001"
+
+
+def test_task_stac_items_empty_when_column_missing():
+    task = _make_task_with_assets()
+    assert task.stac_items == []
+
+
+# ---------------------------------------------------------------------------
 # normalize_geometry_input
 # ---------------------------------------------------------------------------
 

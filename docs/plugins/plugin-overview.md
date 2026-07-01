@@ -33,7 +33,7 @@ The `aereo.builtins` package ships with ready-to-use functions:
 | Stage | Built-in functions | Input | Output |
 |-------|--------------------|-------|--------|
 | Search | `search_stac`, `search_earthaccess` | `(collections, intersects, start_datetime, end_datetime, **kwargs)` | `GeoDataFrame[AssetSchema]` |
-| Reader | `read_odc_stac` | `(files: list[str], **kwargs)` | `xr.Dataset` |
+| Reader | `read_odc_stac` | `(task: ExtractionTask, **kwargs)` | `xr.Dataset` |
 | Processor | `select_bands`, `qa_mask`, `ndvi`, `normalize`, `composite` | `(ds: xr.Dataset, **kwargs)` | `xr.Dataset` |
 | Reprojector | `reproject_odc` | `(ds: xr.Dataset, **kwargs)` | `xr.Dataset` |
 | Writer | `write_geotiff` | `(ds: xr.Dataset, path: str, **kwargs)` | `str` |
@@ -80,18 +80,21 @@ def my_search_provider(
 
 ### `Reader`
 
-Opens source assets and returns an `xr.Dataset`.
+Opens source assets and returns an `xr.Dataset`. The orchestrator passes the
+full `ExtractionTask`, so readers can choose what they need: `task.uris` for
+the source URLs, `task.bbox` for the crop bounding box, `task.stac_items` for
+STAC-backed readers, or the raw `task.assets` GeoDataFrame.
 
 ```python
 import xarray as xr
 from pydantic import ConfigDict, validate_call
 
-from aereo.interfaces import Reader
+from aereo.interfaces import ExtractionTask, Reader
 
 
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
-def my_reader(files: list[str], bands: list[str] | None = None) -> xr.Dataset:
-    """Open filenames and return a Dataset."""
+def my_reader(task: ExtractionTask, bands: list[str] | None = None) -> xr.Dataset:
+    """Open source URIs and return a Dataset."""
     ...
 ```
 

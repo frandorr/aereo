@@ -114,17 +114,17 @@ from typing import Any
 import xarray as xr
 from pydantic import ConfigDict, validate_call
 
-from aereo.interfaces import Reader
+from aereo.interfaces import ExtractionTask, Reader
 
 
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
 def acme_reader(
-    files: list[str],
+    task: ExtractionTask,
     bands: list[str] | None = None,
     **kwargs: Any,
 ) -> xr.Dataset:
     """Reader plugin for ACME data."""
-    # Open filenames, select bands, return a Dataset.
+    # Open task.uris, select bands, return a Dataset.
     ...
 ```
 
@@ -272,7 +272,7 @@ pip install aereo-plugin-acme
 | Interface | Purpose | Callable signature |
 |-----------|---------|--------------------|
 | `SearchProvider` | Query satellite data | `(collections, intersects, start_datetime, end_datetime, **kwargs) -> GeoDataFrame[AssetSchema]` |
-| `Reader` | Open source assets | `(files: list[str], **kwargs) -> xr.Dataset` |
+| `Reader` | Open source assets | `(task: ExtractionTask, **kwargs) -> xr.Dataset` |
 | `Processor` | Transform datasets | `(ds: xr.Dataset, **kwargs) -> xr.Dataset` |
 | `Reprojector` | Reproject/resample | `(ds: xr.Dataset, **kwargs) -> xr.Dataset` |
 | `Writer` | Write artifacts | `(ds: xr.Dataset, path: str \| Path, **kwargs) -> str` |

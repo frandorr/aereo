@@ -45,12 +45,13 @@ from typing import Any
 
 import numpy as np
 import xarray as xr
+from aereo.interfaces import ExtractionTask
 
 
 class CustomReader:
     \"\"\"A minimal example reader.\"\"\"
 
-    def __call__(self, files: list[str], **kwargs: Any) -> xr.Dataset:
+    def __call__(self, task: ExtractionTask, **kwargs: Any) -> xr.Dataset:
         shape = (64, 64)
         data = np.random.default_rng(42).random(shape)
         return xr.Dataset(

@@ -23,7 +23,7 @@ from shapely.geometry import Polygon
 class FakeReader(Reader):
     """Minimal reader for testing ExtractionJob validation."""
 
-    def __call__(self, files, assets=None, **kwargs):
+    def __call__(self, task: ExtractionTask, **kwargs):
         raise NotImplementedError
 
 
@@ -293,7 +293,7 @@ write:
 
 
 class _DummyReader(Reader):
-    def __call__(self, files: list[str], assets=None, **kwargs) -> xr.Dataset:
+    def __call__(self, task: ExtractionTask, **kwargs) -> xr.Dataset:
         return xr.Dataset(
             {"B04": (["y", "x"], np.ones((4, 4)))},
             coords={"y": range(4), "x": range(4)},

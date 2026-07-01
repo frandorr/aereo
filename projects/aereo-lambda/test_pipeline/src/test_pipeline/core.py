@@ -16,6 +16,8 @@ import rasterio
 from rasterio.transform import Affine
 import xarray as xr
 
+from aereo.interfaces import ExtractionTask
+
 
 class TestReader:
     """Reader that returns a tiny synthetic xarray.Dataset."""
@@ -28,23 +30,17 @@ class TestReader:
         self.width = width
         self.height = height
 
-    def __call__(
-        self,
-        files: list[str],
-        assets: Any | None = None,
-        **kwargs: Any,
-    ) -> xr.Dataset:
+    def __call__(self, task: ExtractionTask, **kwargs: Any) -> xr.Dataset:
         """Return a synthetic dataset for testing.
 
         Args:
-            files: Source filenames (ignored).
-            assets: Optional asset metadata (ignored).
+            task: Extraction task supplied by the orchestrator (ignored).
             **kwargs: Additional reader kwargs (ignored).
 
         Returns:
             A small xarray.Dataset tagged with start/end time attributes.
         """
-        del files, assets, kwargs  # unused
+        del task, kwargs  # unused
         data = np.arange(self.width * self.height, dtype=np.float32).reshape(
             self.height, self.width
         )

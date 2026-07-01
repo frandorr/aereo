@@ -22,7 +22,7 @@ from typing import Any, cast
 
 
 class _DummyReader:
-    def __call__(self, files: list[str], assets=None, **kwargs) -> xr.Dataset:
+    def __call__(self, task: ExtractionTask, **kwargs) -> xr.Dataset:
         return xr.Dataset(
             {"B04": (["y", "x"], np.ones((4, 4)))},
             coords={"y": range(4), "x": range(4)},
@@ -37,8 +37,8 @@ class _CapturingReader:
     def __init__(self) -> None:
         self.captured = {}
 
-    def __call__(self, files: list[str], assets=None, **kwargs) -> xr.Dataset:
-        self.captured = {"files": files, **kwargs}
+    def __call__(self, task: ExtractionTask, **kwargs) -> xr.Dataset:
+        self.captured = {"task": task, **kwargs}
         return xr.Dataset(
             {"B04": (["y", "x"], np.ones((4, 4)))},
             coords={"y": range(4), "x": range(4)},
@@ -60,7 +60,7 @@ class _DummyWriter:
 
 
 class _FailingReader:
-    def __call__(self, files: list[str], assets=None, **kwargs) -> xr.Dataset:
+    def __call__(self, task: ExtractionTask, **kwargs) -> xr.Dataset:
         raise RuntimeError("read failed")
 
 
@@ -138,13 +138,13 @@ def test_run_task_passes_aoi_to_reader():
 
     run_task(task)
 
-    assert "aoi" in reader.captured
-    assert task.aoi is not None
-    assert reader.captured["aoi"] == task.aoi.bounds
+    assert "task" in reader.captured
+    assert reader.captured["task"] is task
+    assert task.bbox == (0.0, 0.0, 1.0, 1.0)
 
 
-def test_run_task_reader_kwargs_aoi_takes_precedence():
-    """User-provided read_kwargs aoi overrides task.aoi.bounds."""
+def test_run_task_passes_read_kwargs_to_reader():
+    """User-provided read_kwargs are forwarded to the reader as keyword args."""
     reader = _CapturingReader()
     custom_aoi = (-1.0, -1.0, 2.0, 2.0)
     base_task = _make_task(reader=reader, writer=_DummyWriter())
@@ -157,6 +157,7 @@ def test_run_task_reader_kwargs_aoi_takes_precedence():
 
     run_task(task)
 
+    assert reader.captured["task"] is task
     assert reader.captured["aoi"] == custom_aoi
 
 

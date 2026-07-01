@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import attrs
 from datetime import datetime
 from functools import partial
 from typing import Any, cast
@@ -119,29 +120,31 @@ def _make_fake_ds() -> xr.Dataset:
 
 
 def test_read_odcstac_fields():
-    """read_odc_stac exposes files, assets, aoi and odc_params as configurable keywords."""
+    """read_odc_stac exposes task and **kwargs, not files/assets/aoi."""
     import inspect
 
     sig = inspect.signature(read_odc_stac)
-    assert "odc_params" in sig.parameters
-    assert "files" in sig.parameters
-    assert "assets" in sig.parameters
-    assert "aoi" in sig.parameters
+    assert "task" in sig.parameters
+    assert "kwargs" in sig.parameters
+    assert "files" not in sig.parameters
+    assert "assets" not in sig.parameters
+    assert "aoi" not in sig.parameters
 
 
-def test_read_odcstac_raises_without_assets():
-    """__call__() raises ValueError when assets is None."""
+def test_read_odcstac_raises_without_stac_items():
+    """__call__() raises ValueError when task.stac_items is empty."""
+    task = _make_task(stac_item_dict=None)
     reader = read_odc_stac
-    with pytest.raises(ValueError, match="assets"):
-        reader(["file.tif"], assets=None)
+    with pytest.raises(ValueError, match="STAC item"):
+        reader(task)
 
 
 def test_read_odcstac_raises_without_stac_item_column():
-    """__call__() raises ValueError when stac_item column is absent."""
+    """__call__() raises ValueError when task.stac_items is empty."""
     task = _make_task(stac_item_dict=None)
     reader = read_odc_stac
-    with pytest.raises(ValueError, match="stac_item"):
-        reader(task.assets["href"].tolist(), assets=task.assets)
+    with pytest.raises(ValueError, match="STAC item"):
+        reader(task)
 
 
 def test_read_odcstac_raises_with_all_none_stac_items():
@@ -149,8 +152,8 @@ def test_read_odcstac_raises_with_all_none_stac_items():
     task = _make_task(stac_item_dict=None)
     task.assets["stac_item"] = [None]
     reader = read_odc_stac
-    with pytest.raises(ValueError, match="No valid STAC items"):
-        reader(task.assets["href"].tolist(), assets=task.assets)
+    with pytest.raises(ValueError, match="STAC item"):
+        reader(task)
 
 
 def test_read_odcstac_forwards_bands(monkeypatch):
@@ -167,7 +170,7 @@ def test_read_odcstac_forwards_bands(monkeypatch):
 
     task = _make_task(_make_stac_item_dict())
     reader = read_odc_stac
-    result = reader(task.assets["href"].tolist(), assets=task.assets)
+    result = reader(task)
 
     assert captured["kwargs"]["bands"] == ["B04"]
     assert result is fake_ds
@@ -186,7 +189,7 @@ def test_read_odcstac_explicit_bands_override(monkeypatch):
 
     task = _make_task(_make_stac_item_dict())
     reader = partial(read_odc_stac, odc_params={"bands": ["B04", "B08"]})
-    reader(task.assets["href"].tolist(), assets=task.assets)
+    reader(task)
     assert captured["kwargs"]["bands"] == ["B04", "B08"]
 
 
@@ -204,7 +207,7 @@ def test_read_odcstac_explicit_bbox_not_overridden(monkeypatch):
     custom_bbox = (-71.0, -34.0, -69.0, -32.0)
     task = _make_task(_make_stac_item_dict())
     reader = partial(read_odc_stac, odc_params={"bbox": custom_bbox})
-    reader(task.assets["href"].tolist(), assets=task.assets)
+    reader(task)
     assert captured["kwargs"]["bbox"] == custom_bbox
 
 
@@ -221,8 +224,9 @@ def test_read_odcstac_forwards_aoi_as_bbox(monkeypatch):
 
     aoi = (-70.5, -33.5, -70.0, -33.0)
     task = _make_task(_make_stac_item_dict())
+    task = attrs.evolve(task, aoi=box(-70.5, -33.5, -70.0, -33.0))
     reader = read_odc_stac
-    reader(task.assets["href"].tolist(), assets=task.assets, aoi=aoi)
+    reader(task)
 
     assert captured["kwargs"]["bbox"] == aoi
 
@@ -238,11 +242,10 @@ def test_read_odcstac_aoi_overridden_by_odc_params_bbox(monkeypatch):
 
     monkeypatch.setattr("aereo.builtins.read.odc_load", fake_odc_load)
 
-    aoi = (-70.5, -33.5, -70.0, -33.0)
     custom_bbox = (-71.0, -34.0, -69.0, -32.0)
     task = _make_task(_make_stac_item_dict())
     reader = partial(read_odc_stac, odc_params={"bbox": custom_bbox})
-    reader(task.assets["href"].tolist(), assets=task.assets, aoi=aoi)
+    reader(task)
 
     assert captured["kwargs"]["bbox"] == custom_bbox
 
@@ -274,8 +277,22 @@ def test_read_odcstac_deduplicates_items(monkeypatch):
         crs="EPSG:4326",
     )
 
+    from aereo.pipeline import ExtractionJob
+
+    job = ExtractionJob(
+        name="test-job",
+        grid_dist=50_000,
+        output_uri="/tmp/test",
+        read=read_odc_stac,
+        write=lambda ds, path, **kwargs: str(path),
+    )
+    task = ExtractionTask(
+        id="task-0",
+        assets=cast(GeoDataFrame[AssetSchema], assets),
+        job=job,
+    )
     reader = read_odc_stac
-    reader(assets["href"].tolist(), assets=cast(GeoDataFrame[AssetSchema], assets))
+    reader(task)
 
     assert len(captured["items"]) == 1
 
@@ -291,7 +308,7 @@ def test_read_odcstac_infers_time_bounds(monkeypatch):
 
     task = _make_task(_make_stac_item_dict())
     reader = read_odc_stac
-    result = reader(task.assets["href"].tolist(), assets=task.assets)
+    result = reader(task)
 
     assert "start_time" in result.attrs
     assert "end_time" in result.attrs
@@ -318,7 +335,7 @@ def test_read_odcstac_forwards_odc_params(monkeypatch):
             "chunks": {"x": 1024, "y": 1024},
         },
     )
-    reader(task.assets["href"].tolist(), assets=task.assets)
+    reader(task)
 
     assert captured["kwargs"]["resampling"] == "bilinear"
     assert captured["kwargs"]["groupby"] == "solar_day"
@@ -344,7 +361,7 @@ def test_read_odcstac_handles_numpy_arrays_in_stac_item(monkeypatch):
 
     task = _make_task(item_dict)
     reader = read_odc_stac
-    reader(task.assets["href"].tolist(), assets=task.assets)
+    reader(task)
 
     assert len(captured["items"]) == 1
     assert captured["items"][0].id == "np-item"
