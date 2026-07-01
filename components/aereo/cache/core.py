@@ -77,16 +77,11 @@ class TaskResultCache:
             "margin": job.margin,
             # overwrite is a runtime control, not an output characteristic.
             "read": _model_dump(job.read),
-            "read_kwargs": job.read_kwargs,
             "preprocess": _model_dump(job.preprocess),
-            "preprocess_kwargs": job.preprocess_kwargs,
             "reproject": _model_dump(job.reproject),
-            "reproject_kwargs": job.reproject_kwargs,
             "reproject_mode": job.reproject_mode,
             "postprocess": _model_dump(job.postprocess),
-            "postprocess_kwargs": job.postprocess_kwargs,
             "write": _model_dump(job.write),
-            "write_kwargs": job.write_kwargs,
         }
 
         assets_df = task.assets.copy()

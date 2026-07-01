@@ -18,6 +18,8 @@ def _make_task(
     aoi: Polygon | None = None,
     job_target_aoi: Polygon | None = None,
     task_context: dict[str, Any] | None = None,
+    preprocess: Any = None,
+    postprocess: Any = None,
 ) -> ExtractionTask:
     """Build a minimal but realistic ExtractionTask for serializer tests."""
     df = gpd.GeoDataFrame(
@@ -39,6 +41,8 @@ def _make_task(
         read=read_odc_stac,
         write=write_geotiff,
         target_aoi=job_target_aoi,
+        preprocess=preprocess,
+        postprocess=postprocess,
     )
 
     return ExtractionTask(
@@ -161,3 +165,71 @@ def test_serialize_to_bytes_preserved_crs() -> None:
 
     assert reconstructed.assets.crs is not None
     assert reconstructed.assets.crs.to_epsg() == 4326
+
+
+# ---------------------------------------------------------------------------
+# Processor list serialization
+# ---------------------------------------------------------------------------
+
+
+def _noop_processor(ds, **kwargs):
+    return ds
+
+
+def _another_processor(ds, **kwargs):
+    return ds
+
+
+def test_round_trip_with_multiple_preprocessors(tmp_path: Any) -> None:
+    """A list of preprocessors survives serialization round-trip."""
+    serializer = _TaskSerializer()
+    original = _make_task(preprocess=[_noop_processor, _another_processor])
+
+    dest = tmp_path / "task_preprocess"
+    serializer.serialize(original, dest)
+    reconstructed = serializer.deserialize(dest)
+
+    preprocess = reconstructed.job.preprocess
+    assert isinstance(preprocess, list)
+    assert len(preprocess) == 2
+    assert preprocess[0] is _noop_processor
+    assert preprocess[1] is _another_processor
+
+
+def test_round_trip_with_multiple_postprocessors(tmp_path: Any) -> None:
+    """A list of postprocessors survives serialization round-trip."""
+    serializer = _TaskSerializer()
+    original = _make_task(postprocess=[_noop_processor, _another_processor])
+
+    dest = tmp_path / "task_postprocess"
+    serializer.serialize(original, dest)
+    reconstructed = serializer.deserialize(dest)
+
+    postprocess = reconstructed.job.postprocess
+    assert isinstance(postprocess, list)
+    assert len(postprocess) == 2
+    assert postprocess[0] is _noop_processor
+    assert postprocess[1] is _another_processor
+
+
+def test_deserialize_legacy_single_processor(tmp_path: Any) -> None:
+    """Legacy tasks with a single serialized processor dict still load."""
+    serializer = _TaskSerializer()
+    original = _make_task(preprocess=[_noop_processor])
+
+    dest = tmp_path / "task_legacy"
+    serializer.serialize(original, dest)
+
+    # Simulate a legacy payload where preprocess was a single dict.
+    import json
+
+    meta_path = dest / serializer.META_NAME
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    meta["job"]["preprocess"] = meta["job"]["preprocess"][0]
+    meta_path.write_text(json.dumps(meta, default=str), encoding="utf-8")
+
+    reconstructed = serializer.deserialize(dest)
+    preprocess = reconstructed.job.preprocess
+    assert isinstance(preprocess, list)
+    assert len(preprocess) == 1
+    assert preprocess[0] is _noop_processor

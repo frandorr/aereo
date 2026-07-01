@@ -143,15 +143,17 @@ def test_run_task_passes_aoi_to_reader():
     assert task.bbox == (0.0, 0.0, 1.0, 1.0)
 
 
-def test_run_task_passes_read_kwargs_to_reader():
-    """User-provided read_kwargs are forwarded to the reader as keyword args."""
+def test_run_task_passes_partial_kwargs_to_reader():
+    """Reader kwargs bound via functools.partial are forwarded as keyword args."""
+    from functools import partial
+
     reader = _CapturingReader()
     custom_aoi = (-1.0, -1.0, 2.0, 2.0)
-    base_task = _make_task(reader=reader, writer=_DummyWriter())
-    job = base_task.job.model_copy(update={"read_kwargs": {"aoi": custom_aoi}})
+    base_task = _make_task(
+        reader=partial(reader, aoi=custom_aoi), writer=_DummyWriter()
+    )
     task = attrs.evolve(
         base_task,
-        job=job,
         aoi=Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]]),
     )
 

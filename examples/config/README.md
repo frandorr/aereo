@@ -161,10 +161,9 @@ resolution: 10.0
 margin: 0.0
 reproject:
   _target_: aereo.builtins.reproject.reproject_odc
-reproject_mode: raw
-reproject_kwargs:
   crs: EPSG:32633
   resolution: 10.0
+reproject_mode: raw
 read:
   _target_: aereo.builtins.read.read_odc_stac
 write:

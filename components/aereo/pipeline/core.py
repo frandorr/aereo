@@ -77,10 +77,14 @@ class ExtractionJob(BaseModel):
 
         read -> preprocess -> reproject -> postprocess -> write
 
+    ``preprocess`` and ``postprocess`` accept either a single processor or a
+    list of processors; each processor is applied in order. All pipeline steps
+    are callables, typically ``functools.partial`` values loaded from Hydra,
+    so any step-specific keyword arguments are bound directly to the callable.
     ``preprocess``, ``reproject``, and ``postprocess`` are optional. When
     ``reproject`` is provided, ``reproject_mode`` must be set to either
-    ``"raw"`` (reproject the whole dataset once) or ``"grid"`` (reproject each
-    grid cell separately).
+    ``"raw"`` (reproject the whole dataset once) or ``"grid"`` (reproject
+    each grid cell separately).
     """
 
     model_config = {"extra": "forbid", "frozen": True, "arbitrary_types_allowed": True}
@@ -124,52 +128,44 @@ class ExtractionJob(BaseModel):
 
     # Pipeline steps
     read: Reader = Field(
-        description="Callable that reads a list of filenames and returns an xr.Dataset."
-    )
-    read_kwargs: dict[str, Any] | None = Field(
-        default=None,
-        description="Additional keyword arguments passed to ``read``.",
+        description="Callable that reads source data and returns an xr.Dataset."
     )
 
-    preprocess: Processor | None = Field(
+    preprocess: Processor | list[Processor] | None = Field(
         default=None,
-        description="Optional callable applied after read.",
-    )
-    preprocess_kwargs: dict[str, Any] | None = Field(
-        default=None,
-        description="Additional keyword arguments passed to ``preprocess``.",
+        description="Optional processor or list of processors applied after read.",
     )
 
     reproject: Reprojector | None = Field(
         default=None,
         description="Optional reprojection callable.",
     )
-    reproject_kwargs: dict[str, Any] | None = Field(
-        default=None,
-        description="Additional keyword arguments passed to ``reproject``. "
-        "In ``grid`` mode the orchestrator injects ``geobox`` per cell.",
-    )
     reproject_mode: Literal["raw", "grid"] | None = Field(
         default=None,
         description="Reprojection mode: 'raw' for one mosaic, 'grid' for one file per cell.",
     )
 
-    postprocess: Processor | None = Field(
+    postprocess: Processor | list[Processor] | None = Field(
         default=None,
-        description="Optional callable applied after reprojection.",
-    )
-    postprocess_kwargs: dict[str, Any] | None = Field(
-        default=None,
-        description="Additional keyword arguments passed to ``postprocess``.",
+        description="Optional processor or list of processors applied after reprojection.",
     )
 
     write: Writer = Field(
         description="Callable that writes an xr.Dataset to a single path and returns it."
     )
-    write_kwargs: dict[str, Any] | None = Field(
-        default=None,
-        description="Additional keyword arguments passed to ``write``.",
-    )
+
+    @field_validator("preprocess", "postprocess", mode="before")
+    @classmethod
+    def _normalize_processors(
+        cls,
+        value: Processor | list[Processor] | None,
+    ) -> list[Processor] | None:
+        """Normalize a single processor to a list for uniform execution."""
+        if value is None:
+            return None
+        if isinstance(value, list):
+            return value
+        return [value]
 
     @field_validator("target_aoi", mode="before")
     @classmethod

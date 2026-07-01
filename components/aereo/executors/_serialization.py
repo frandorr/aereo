@@ -108,6 +108,18 @@ class PluginSerializer:
         return obj
 
 
+def _load_processors(data: Any) -> list[Any] | None:
+    """Deserialize a single processor or a list of processors.
+
+    Supports legacy serialized tasks that stored a single processor dict.
+    """
+    if data is None:
+        return None
+    if isinstance(data, list):
+        return [PluginSerializer.loads(d) for d in data]
+    return [PluginSerializer.loads(data)]
+
+
 class _TaskSerializer:
     """Serialize / deserialize :class:`ExtractionTask` for cross-network transport."""
 
@@ -150,16 +162,22 @@ class _TaskSerializer:
                 "resolution": job.resolution,
                 "margin": job.margin,
                 "read": PluginSerializer.dumps(job.read),
-                "read_kwargs": job.read_kwargs,
-                "preprocess": PluginSerializer.dumps(job.preprocess),
-                "preprocess_kwargs": job.preprocess_kwargs,
+                "preprocess": (
+                    [PluginSerializer.dumps(p) for p in cast(list[Any], job.preprocess)]
+                    if job.preprocess is not None
+                    else None
+                ),
                 "reproject": PluginSerializer.dumps(job.reproject),
-                "reproject_kwargs": job.reproject_kwargs,
                 "reproject_mode": job.reproject_mode,
-                "postprocess": PluginSerializer.dumps(job.postprocess),
-                "postprocess_kwargs": job.postprocess_kwargs,
+                "postprocess": (
+                    [
+                        PluginSerializer.dumps(p)
+                        for p in cast(list[Any], job.postprocess)
+                    ]
+                    if job.postprocess is not None
+                    else None
+                ),
                 "write": PluginSerializer.dumps(job.write),
-                "write_kwargs": job.write_kwargs,
             },
         }
         (dest_dir / self.META_NAME).write_text(
@@ -212,16 +230,11 @@ class _TaskSerializer:
                 "resolution": job_meta.get("resolution"),
                 "margin": job_meta.get("margin"),
                 "read": cast(Reader, PluginSerializer.loads(job_meta["read"])),
-                "read_kwargs": job_meta.get("read_kwargs"),
-                "preprocess": PluginSerializer.loads(job_meta.get("preprocess")),
-                "preprocess_kwargs": job_meta.get("preprocess_kwargs"),
+                "preprocess": _load_processors(job_meta.get("preprocess")),
                 "reproject": PluginSerializer.loads(job_meta.get("reproject")),
-                "reproject_kwargs": job_meta.get("reproject_kwargs"),
                 "reproject_mode": job_meta.get("reproject_mode"),
-                "postprocess": PluginSerializer.loads(job_meta.get("postprocess")),
-                "postprocess_kwargs": job_meta.get("postprocess_kwargs"),
+                "postprocess": _load_processors(job_meta.get("postprocess")),
                 "write": cast(Writer, PluginSerializer.loads(job_meta["write"])),
-                "write_kwargs": job_meta.get("write_kwargs"),
             }
         )
 
