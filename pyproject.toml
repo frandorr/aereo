@@ -71,6 +71,7 @@ entry-points."aereo.plugins".process_qa_mask = "aereo.builtins.processor:qa_mask
 entry-points."aereo.plugins".process_select_bands = "aereo.builtins.processor:select_bands"
 entry-points."aereo.plugins".read_odc_stac = "aereo.builtins.read:read_odc_stac"
 entry-points."aereo.plugins".reproject_odc = "aereo.builtins.reproject:reproject_odc"
+entry-points."aereo.plugins".reproject_swath = "aereo.builtins.reproject:reproject_swath"
 entry-points."aereo.plugins".search_stac = "aereo.builtins.search:search_stac"
 entry-points."aereo.plugins".task_builder_grouped = "aereo.builtins.task_builder:build_grouped_tasks"
 entry-points."aereo.plugins".write_geotiff = "aereo.builtins.write:write_geotiff"

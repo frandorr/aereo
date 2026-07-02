@@ -261,6 +261,7 @@ def test_builtin_entry_points_load():
         "search_stac",
         "read_odc_stac",
         "reproject_odc",
+        "reproject_swath",
         "write_geotiff",
         "task_builder_grouped",
         "process_select_bands",
