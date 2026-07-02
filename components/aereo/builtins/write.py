@@ -52,7 +52,14 @@ def _dataset_to_raster_bands(ds: xr.Dataset) -> xr.DataArray:
 
     combined = xr.concat(band_arrays, dim="band")
     combined = combined.transpose("band", ...)
-    combined.attrs["long_name"] = list(combined.coords["band"].values)
+    # Preserve dataset-level attributes (e.g. start_time/end_time set by the
+    # orchestrator) as raster metadata tags. DataArray attrs are kept as a
+    # fallback, but dataset attrs take precedence except for long_name, which
+    # is derived from the band coordinate.
+    attrs = dict(combined.attrs)
+    attrs.update(ds.attrs)
+    attrs["long_name"] = list(combined.coords["band"].values)
+    combined.attrs = attrs
     return combined
 
 
