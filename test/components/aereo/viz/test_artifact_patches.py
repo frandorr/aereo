@@ -424,7 +424,7 @@ def test_plot_artifact_patches_reuses_shared_uri(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Multiple artifact rows pointing at the same URI are loaded only once."""
+    """Multiple artifact rows pointing at the same URI are loaded and drawn only once."""
     bounds_a = (300000.0, 5000000.0, 301000.0, 5001000.0)
     bounds_b = (301000.0, 5000000.0, 302000.0, 5001000.0)
     shared_path = tmp_path / "shared.tif"
@@ -451,5 +451,5 @@ def test_plot_artifact_patches_reuses_shared_uri(
 
     fig, ax = plot_artifact_patches(gdf)
     assert len(open_calls) == 1
-    assert len(ax.images) == 2
+    assert len(ax.images) == 1
     fig.clf()
