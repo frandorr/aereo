@@ -73,5 +73,8 @@ def read_odc_stac(
     ds: xr.Dataset = odc_load(items, **params)
 
     infer_dataset_time_bounds(ds)
+    # remove time dimension, we are working only with a single time slice per task
+    if "time" in ds.dims:
+        ds = ds.isel(time=0).drop_vars("time", errors="ignore")
 
     return ds
