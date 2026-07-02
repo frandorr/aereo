@@ -514,7 +514,6 @@ def plot_artifact_patches(
     # First pass: load every patch (downsampled) and collect all valid pixel
     # values per band so normalization is computed across the whole AOI.
     # Nodata and NaN/Inf are converted to NaN so gaps/overlaps stay transparent.
-    patch_infos: list[tuple[np.ndarray, Any] | None] = []
     band_values: list[list[np.ndarray]] = [[] for _ in range(n_bands)]
 
     import rasterio.errors
@@ -555,8 +554,6 @@ def plot_artifact_patches(
         except (rasterio.errors.RasterioError, OSError) as exc:
             logger.warning("patch_read_failed", uri=uri, error=str(exc))
             uri_to_patch[uri] = None
-
-    patch_infos = [uri_to_patch.get(str(row["uri"])) for _, row in artifacts.iterrows()]
 
     band_params = [
         _compute_stretch_params(np.concatenate(v) if v else np.array([]))
@@ -599,53 +596,51 @@ def plot_artifact_patches(
         plot_vmax = vmax if vmax is not None else plot_hi
 
     im = None
-    for idx, (_, row) in enumerate(artifacts.iterrows()):
+    drawn_uris: set[str] = set()
+    footprints: list[BaseGeometry] = []
+
+    for _, row in artifacts.iterrows():
         footprint = cast(BaseGeometry, row["cell_utm_footprint"])
+        footprints.append(footprint)
 
-        patch_info = patch_infos[idx]
+        patch_info = uri_to_patch.get(str(row["uri"]))
         if patch_info is not None:
-            data, bounds = patch_info
-            extent = (bounds.left, bounds.right, bounds.bottom, bounds.top)
-            if is_rgb:
-                rgb = np.zeros(
-                    (data.shape[1], data.shape[2], n_bands), dtype=np.float32
-                )
-                for b in range(n_bands):
-                    lo = band_lo[b]
-                    hi = band_hi[b]
-                    if np.isfinite(lo) and np.isfinite(hi) and hi > lo:
-                        rgb[:, :, b] = np.clip((data[b] - lo) / (hi - lo), 0.0, 1.0)
-                    else:
-                        rgb[:, :, b] = np.where(np.isfinite(data[b]), 0.5, np.nan)
-                im = ax.imshow(
-                    rgb,
-                    extent=extent,
-                    origin="upper",
-                )
-            else:
-                data = data[0]
-                if stretch == "zscore":
-                    if np.isfinite(std) and std > 0:
-                        data = (data - mean) / std
-                    else:
-                        data = np.where(np.isfinite(data), 0.0, np.nan)
-                im = ax.imshow(
-                    data,
-                    cmap=cmap,
-                    extent=extent,
-                    origin="upper",
-                    vmin=plot_vmin,
-                    vmax=plot_vmax,
-                )
-
-        # Overlay the grid-cell footprint.
-        gpd.GeoSeries([footprint]).plot(
-            ax=ax,
-            facecolor="none",
-            edgecolor=footprint_edgecolor,
-            linestyle="--",
-            linewidth=footprint_linewidth,
-        )
+            uri = str(row["uri"])
+            if uri not in drawn_uris:
+                drawn_uris.add(uri)
+                data, bounds = patch_info
+                extent = (bounds.left, bounds.right, bounds.bottom, bounds.top)
+                if is_rgb:
+                    rgb = np.zeros(
+                        (data.shape[1], data.shape[2], n_bands), dtype=np.float32
+                    )
+                    for b in range(n_bands):
+                        lo = band_lo[b]
+                        hi = band_hi[b]
+                        if np.isfinite(lo) and np.isfinite(hi) and hi > lo:
+                            rgb[:, :, b] = np.clip((data[b] - lo) / (hi - lo), 0.0, 1.0)
+                        else:
+                            rgb[:, :, b] = np.where(np.isfinite(data[b]), 0.5, np.nan)
+                    im = ax.imshow(
+                        rgb,
+                        extent=extent,
+                        origin="upper",
+                    )
+                else:
+                    data = data[0]
+                    if stretch == "zscore":
+                        if np.isfinite(std) and std > 0:
+                            data = (data - mean) / std
+                        else:
+                            data = np.where(np.isfinite(data), 0.0, np.nan)
+                    im = ax.imshow(
+                        data,
+                        cmap=cmap,
+                        extent=extent,
+                        origin="upper",
+                        vmin=plot_vmin,
+                        vmax=plot_vmax,
+                    )
 
         # Annotate the grid cell ID at the footprint centre.
         if annotate_cells:
@@ -666,6 +661,16 @@ def plot_artifact_patches(
                     "edgecolor": "none",
                 },
             )
+
+    # Overlay all grid-cell footprints in one call.
+    if footprints:
+        gpd.GeoSeries(footprints).plot(
+            ax=ax,
+            facecolor="none",
+            edgecolor=footprint_edgecolor,
+            linestyle="--",
+            linewidth=footprint_linewidth,
+        )
 
     ax.set_title(title, fontsize=16)
     ax.set_xlabel("UTM X")
