@@ -418,3 +418,38 @@ def test_plot_artifact_patches_rgb_zscore_stretch(
     assert rgb_array is not None
     assert rgb_array.shape[-1] == 3
     fig.clf()
+
+
+def test_plot_artifact_patches_reuses_shared_uri(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Multiple artifact rows pointing at the same URI are loaded only once."""
+    bounds_a = (300000.0, 5000000.0, 301000.0, 5001000.0)
+    bounds_b = (301000.0, 5000000.0, 302000.0, 5001000.0)
+    shared_path = tmp_path / "shared.tif"
+    _make_test_tiff(shared_path, bounds_a)
+
+    open_calls: list[Any] = []
+    original_open = rasterio.open
+
+    def counting_open(*args: Any, **kwargs: Any) -> Any:
+        open_calls.append(args)
+        return original_open(*args, **kwargs)
+
+    monkeypatch.setattr(rasterio, "open", counting_open)
+
+    gdf = gpd.GeoDataFrame(
+        {
+            "uri": [str(shared_path), str(shared_path)],
+            "grid_cell": ["cell_a", "cell_b"],
+            "cell_utm_footprint": [box(*bounds_a), box(*bounds_b)],
+        },
+        geometry="cell_utm_footprint",
+        crs="EPSG:32633",
+    )
+
+    fig, ax = plot_artifact_patches(gdf)
+    assert len(open_calls) == 1
+    assert len(ax.images) == 2
+    fig.clf()

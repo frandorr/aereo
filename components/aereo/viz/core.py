@@ -519,9 +519,15 @@ def plot_artifact_patches(
 
     import rasterio.errors
 
-    for _, row in artifacts.iterrows():
+    # Load each distinct URI once.  The MajorTOM artifact index may contain
+    # multiple rows that point at the same file (e.g. raw read -> write with
+    # no reprojection), so caching the loaded patch avoids redundant I/O and
+    # keeps normalization from double-counting identical rasters.
+    uri_to_patch: dict[str, tuple[np.ndarray, Any] | None] = {}
+
+    for uri in artifacts["uri"].unique():
         try:
-            with rasterio.open(row["uri"]) as src:
+            with rasterio.open(uri) as src:
                 out_shape = (int(src.height / ds_factor), int(src.width / ds_factor))
                 bounds = src.bounds
                 src_nodata = src.nodata
@@ -544,12 +550,13 @@ def plot_artifact_patches(
                     valid = band_data[np.isfinite(band_data)]
                     if valid.size:
                         band_values[b].append(valid.ravel())
-        except (rasterio.errors.RasterioError, OSError) as exc:
-            logger.warning("patch_read_failed", uri=row["uri"], error=str(exc))
-            patch_infos.append(None)
-            continue
 
-        patch_infos.append((data, bounds))
+                uri_to_patch[uri] = (data, bounds)
+        except (rasterio.errors.RasterioError, OSError) as exc:
+            logger.warning("patch_read_failed", uri=uri, error=str(exc))
+            uri_to_patch[uri] = None
+
+    patch_infos = [uri_to_patch.get(str(row["uri"])) for _, row in artifacts.iterrows()]
 
     band_params = [
         _compute_stretch_params(np.concatenate(v) if v else np.array([]))
