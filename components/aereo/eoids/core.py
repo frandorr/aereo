@@ -70,7 +70,7 @@ def _write_job_meta(
 def build_eoids_path(
     local_dir: str | Path,
     job_name: str,
-    resolution: float,
+    resolution: float | None = None,
     *,
     collections: Sequence[str] | None = None,
     variables: Sequence[str] | None = None,
@@ -98,7 +98,9 @@ def build_eoids_path(
     Args:
         local_dir: Root directory for the dataset.
         job_name: Human-readable name of the extraction job.
-        resolution: Target resolution.
+        resolution: Target resolution in metres, or *None* when the data is
+            kept at its native resolution (e.g. ``reproject_mode="raw"``).
+            When *None*, the ``res-`` segment is omitted from the filename.
         collections: Sequence of collection identifiers.
         variables: Sequence of variables/bands.
         cell_id: Geographic cell identifier (e.g., '36D61L').
@@ -128,8 +130,9 @@ def build_eoids_path(
     if variables:
         parts.append(f"variable-{('+').join(variables)}")
 
-    res_str = f"{int(resolution)}m"
-    parts.append(f"res-{res_str}")
+    if resolution is not None:
+        res_str = f"{int(resolution)}m"
+        parts.append(f"res-{res_str}")
 
     parts.append(f"job-{safe_job}")
 

@@ -31,6 +31,30 @@ def test_build_eoids_path_basic():
     assert path.name == expected_filename
 
 
+def test_build_eoids_path_no_resolution():
+    st = datetime.datetime(2026, 1, 1, 10, 0, 22)
+    et = datetime.datetime(2026, 1, 1, 10, 9, 32)
+
+    path = build_eoids_path(
+        local_dir="/tmp/dataset",
+        job_name="goes_c01",
+        resolution=None,
+        collections=["ABI-L1b-RadF"],
+        variables=["C01"],
+        cell_id="36D_61L",
+        start_time=st,
+        end_time=et,
+    )
+
+    expected_filename = (
+        "collection-ABI-L1b-RadF_loc-36D61L_start-20260101T100022_"
+        "end-20260101T100932_variable-C01_job-goes_c01.tif"
+    )
+
+    assert path.name == expected_filename
+    assert "res" not in parse_eoids_filename(path.name)
+
+
 def test_build_eoids_path_derivatives():
     st = datetime.datetime(2026, 1, 1, 10, 0, 22)
 
