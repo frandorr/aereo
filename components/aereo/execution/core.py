@@ -104,7 +104,7 @@ def _build_output_path(
     return build_eoids_path(
         local_dir=job.output_uri,
         job_name=job.name,
-        resolution=job.resolution or 0.0,
+        resolution=job.resolution,
         collections=collections,
         variables=[str(v) for v in ds.data_vars],
         cell_id=cell_id,
