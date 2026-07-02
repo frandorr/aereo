@@ -173,11 +173,12 @@ def test_read_odcstac_forwards_bands(monkeypatch):
     result = reader(task)
 
     assert captured["kwargs"]["bands"] == ["B04"]
-    assert result is fake_ds
+    assert isinstance(result, xr.Dataset)
+    assert "time" not in result.dims
 
 
 def test_read_odcstac_explicit_bands_override(monkeypatch):
-    """odc_params bands override profile-derived bands."""
+    """Explicit bands override profile-derived bands."""
     fake_ds = _make_fake_ds()
     captured: dict[str, Any] = {}
 
@@ -188,13 +189,13 @@ def test_read_odcstac_explicit_bands_override(monkeypatch):
     monkeypatch.setattr("aereo.builtins.read.odc_load", fake_odc_load)
 
     task = _make_task(_make_stac_item_dict())
-    reader = partial(read_odc_stac, odc_params={"bands": ["B04", "B08"]})
+    reader = partial(read_odc_stac, bands=["B04", "B08"])
     reader(task)
     assert captured["kwargs"]["bands"] == ["B04", "B08"]
 
 
 def test_read_odcstac_explicit_bbox_not_overridden(monkeypatch):
-    """User-provided bbox in odc_params is preserved."""
+    """User-provided bbox is preserved."""
     fake_ds = _make_fake_ds()
     captured: dict[str, Any] = {}
 
@@ -206,7 +207,7 @@ def test_read_odcstac_explicit_bbox_not_overridden(monkeypatch):
 
     custom_bbox = (-71.0, -34.0, -69.0, -32.0)
     task = _make_task(_make_stac_item_dict())
-    reader = partial(read_odc_stac, odc_params={"bbox": custom_bbox})
+    reader = partial(read_odc_stac, bbox=custom_bbox)
     reader(task)
     assert captured["kwargs"]["bbox"] == custom_bbox
 
@@ -231,8 +232,8 @@ def test_read_odcstac_forwards_aoi_as_bbox(monkeypatch):
     assert captured["kwargs"]["bbox"] == aoi
 
 
-def test_read_odcstac_aoi_overridden_by_odc_params_bbox(monkeypatch):
-    """User-provided bbox in odc_params takes precedence over aoi."""
+def test_read_odcstac_aoi_overridden_by_user_bbox(monkeypatch):
+    """User-provided bbox takes precedence over aoi."""
     fake_ds = _make_fake_ds()
     captured: dict[str, Any] = {}
 
@@ -244,7 +245,7 @@ def test_read_odcstac_aoi_overridden_by_odc_params_bbox(monkeypatch):
 
     custom_bbox = (-71.0, -34.0, -69.0, -32.0)
     task = _make_task(_make_stac_item_dict())
-    reader = partial(read_odc_stac, odc_params={"bbox": custom_bbox})
+    reader = partial(read_odc_stac, bbox=custom_bbox)
     reader(task)
 
     assert captured["kwargs"]["bbox"] == custom_bbox
@@ -315,8 +316,8 @@ def test_read_odcstac_infers_time_bounds(monkeypatch):
     assert result.attrs["start_time"] == datetime(2026, 1, 1, 12, 0, 0)
 
 
-def test_read_odcstac_forwards_odc_params(monkeypatch):
-    """odc_params are merged verbatim into odc.stac.load kwargs."""
+def test_read_odcstac_forwards_kwargs(monkeypatch):
+    """Extra keyword arguments are forwarded verbatim to odc.stac.load."""
     fake_ds = _make_fake_ds()
     captured: dict[str, Any] = {}
 
@@ -329,11 +330,9 @@ def test_read_odcstac_forwards_odc_params(monkeypatch):
     task = _make_task(_make_stac_item_dict())
     reader = partial(
         read_odc_stac,
-        odc_params={
-            "resampling": "bilinear",
-            "groupby": "solar_day",
-            "chunks": {"x": 1024, "y": 1024},
-        },
+        resampling="bilinear",
+        groupby="solar_day",
+        chunks={"x": 1024, "y": 1024},
     )
     reader(task)
 

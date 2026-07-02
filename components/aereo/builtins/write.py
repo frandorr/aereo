@@ -67,7 +67,7 @@ def _dataset_to_raster_bands(ds: xr.Dataset) -> xr.DataArray:
 def write_geotiff(
     ds: xr.Dataset,
     path: str | Path,
-    rio_params: dict[str, Any] | None = None,
+    **kwargs: Any,
 ) -> str:
     """Write *ds* to a GeoTIFF at *path*.
 
@@ -79,7 +79,7 @@ def write_geotiff(
         ds: The xarray.Dataset to write. Must not contain a ``time`` dimension;
             the orchestrator calls this function once per time slice.
         path: Destination path to write.
-        rio_params: Extra write parameters forwarded to ``da.rio.to_raster()``.
+        **kwargs: Keyword arguments forwarded to ``da.rio.to_raster()``.
 
     Returns:
         The path that was written.
@@ -97,7 +97,6 @@ def write_geotiff(
             "the orchestrator must split time slices before calling the writer."
         )
 
-    params = dict(rio_params) if rio_params is not None else {}
     combined_da = _dataset_to_raster_bands(ds)
-    combined_da.rio.to_raster(str(path), **params)
+    combined_da.rio.to_raster(str(path), **kwargs)
     return str(path)
