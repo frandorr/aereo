@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -211,3 +211,21 @@ def test_write_geotiff_rejects_time_dimension(tmp_path):
     path = _write_path(tmp_path)
     with pytest.raises(ValueError, match="time"):
         write_geotiff(ds, path)
+
+
+def test_write_geotiff_preserves_dataset_attrs(tmp_path):
+    """Dataset attributes are written as raster metadata tags and read back."""
+    ds = _make_dataset()
+    ds.attrs["custom_key"] = "custom_val"
+    path = _write_path(tmp_path)
+    write_geotiff(ds, path)
+
+    da = cast(xr.DataArray, rioxarray.open_rasterio(path))
+    assert da.attrs.get("custom_key") == "custom_val"
+    # long_name should still be derived from band coordinates, not clobbered.
+    assert da.attrs.get("long_name") in [("B04", "B08"), ["B04", "B08"]]
+
+    import rasterio
+
+    with rasterio.open(path) as src:
+        assert src.tags().get("custom_key") == "custom_val"
