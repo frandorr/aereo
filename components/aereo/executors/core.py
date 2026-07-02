@@ -88,6 +88,7 @@ class LocalExecutor:
             workers: Maximum number of parallel workers. ``None`` or ``1`` runs
                 tasks sequentially in the current process. ``>1`` dispatches
                 tasks through a process or thread pool.
+                If -1 is passed, the number of workers will be set to the number of CPUs in the system.
             failure_mode: ``"strict"`` aborts on the first failed task;
                 ``"best_effort"`` skips failed tasks and returns successful ones.
             cache: Optional per-task artifact catalog cache.
@@ -96,6 +97,10 @@ class LocalExecutor:
                 :class:`ProcessPoolExecutor`.
         """
         self.workers = workers
+        if self.workers == -1:
+            import multiprocessing
+
+            self.workers = multiprocessing.cpu_count()
         self.failure_mode = failure_mode
         self.cache = cache
         self.use_threads = use_threads
