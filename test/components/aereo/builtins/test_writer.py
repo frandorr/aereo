@@ -45,7 +45,7 @@ def _write_path(tmp_path) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Plain write (no rio_params)
+# Plain write (no extra kwargs)
 # ---------------------------------------------------------------------------
 
 
@@ -82,17 +82,15 @@ def test_write_geotiff_band_descriptions_match_variables(tmp_path):
 
 
 # ---------------------------------------------------------------------------
-# Tiled / COG via rio_params
+# Tiled / COG via kwargs
 # ---------------------------------------------------------------------------
 
 
-def test_write_geotiff_tiled_via_rio_params(tmp_path):
+def test_write_geotiff_tiled_via_kwargs(tmp_path):
     """Tiling is applied to the single multi-band output file."""
     ds = _make_dataset(shape=(64, 64))
     path = _write_path(tmp_path)
-    writer = partial(
-        write_geotiff, rio_params={"tiled": True, "blockxsize": 32, "blockysize": 32}
-    )
+    writer = partial(write_geotiff, tiled=True, blockxsize=32, blockysize=32)
     writer(ds, path)
 
     import rasterio
@@ -134,7 +132,7 @@ def test_write_geotiff_multiband_plain(tmp_path):
 
 
 def test_write_geotiff_multiband_tiled(tmp_path):
-    """Multi-band variables are written as a single multi-band file with tiling via rio_params."""
+    """Multi-band variables are written as a single multi-band file with tiling via kwargs."""
     ds = xr.Dataset(
         {
             "RGB": (
@@ -149,7 +147,7 @@ def test_write_geotiff_multiband_tiled(tmp_path):
     ds.attrs["end_time"] = pd.Timestamp("2026-01-01T12:10:00").to_pydatetime()
 
     path = _write_path(tmp_path)
-    writer = partial(write_geotiff, rio_params={"tiled": True})
+    writer = partial(write_geotiff, tiled=True)
     writer(ds, path)
 
     import rasterio
@@ -166,29 +164,30 @@ def test_write_geotiff_multiband_tiled(tmp_path):
 
 
 def test_write_geotiff_fields():
-    """Only ds, path, and rio_params are declared as parameters."""
+    """Only ds, path, and catch-all **kwargs are declared as parameters."""
     import inspect
 
     sig = inspect.signature(write_geotiff)
-    assert "rio_params" in sig.parameters
     assert "ds" in sig.parameters
     assert "path" in sig.parameters
+    assert any(p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values())
     assert "task" not in sig.parameters
     assert "patch" not in sig.parameters
 
 
 # ---------------------------------------------------------------------------
-# rio_params forwarding
+# kwargs forwarding
 # ---------------------------------------------------------------------------
 
 
-def test_write_geotiff_rio_params_forwarded(tmp_path):
-    """Custom rio_params (tags and compress) are forwarded directly to to_raster."""
+def test_write_geotiff_kwargs_forwarded(tmp_path):
+    """Custom kwargs (tags and compress) are forwarded directly to to_raster."""
     ds = _make_dataset()
     path = _write_path(tmp_path)
     writer = partial(
         write_geotiff,
-        rio_params={"tags": {"custom_key": "custom_val"}, "compress": "lzw"},
+        tags={"custom_key": "custom_val"},
+        compress="lzw",
     )
 
     writer(ds, path)

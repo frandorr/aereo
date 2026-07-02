@@ -31,10 +31,9 @@ def read_odc_stac(
 
     Args:
         task: The extraction task containing STAC items and read context.
-        **kwargs: Extra keyword arguments passed to ``odc.stac.load``.
-            Use ``odc_params`` to forward a dict of options. User-provided
-            ``bbox`` and ``bands`` take precedence over values inferred from
-            ``task``.
+        **kwargs: Keyword arguments forwarded to ``odc.stac.load``. AEREO
+            injects sensible defaults for ``chunks``, ``bands``, and ``bbox``
+            only when they are not already provided.
 
     Returns:
         xr.Dataset (potentially dask-backed) in the native CRS of the
@@ -58,8 +57,7 @@ def read_odc_stac(
             "item dictionaries in the assets."
         )
 
-    odc_params = kwargs.get("odc_params")
-    params = dict(odc_params) if odc_params is not None else {}
+    params = dict(kwargs)
 
     if "chunks" not in params:
         params["chunks"] = {}
