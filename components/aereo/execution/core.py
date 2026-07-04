@@ -41,7 +41,16 @@ def _resolve_aoi(task: ExtractionTask) -> Any:
 
 
 def _build_grid_cells(task: ExtractionTask) -> Sequence[GridCell]:
-    """Build raw grid cells for the task's AOI and grid parameters."""
+    """Build raw grid cells for the task's AOI and grid parameters.
+
+    If the task carries an explicit ``grid_cells`` list (the normal case for
+    tasks produced by ``build_grouped_tasks``), those cells are returned
+    directly. This avoids rediscovering neighbouring cells when the task AOI
+    is a WGS84 bounding box of UTM-aligned cells.
+    """
+    if task.grid_cells is not None:
+        return task.grid_cells
+
     job = task.job
     aoi = _resolve_aoi(task)
     if aoi is None:
@@ -242,14 +251,10 @@ def _run_grid_reproject(
     reproject = job.reproject
     assert reproject is not None
 
-    bounds = ds.rio.bounds()
-    file_crs = ds.rio.crs.to_string()
-    cells = intersect_cells(bounds, grid_cells, crs=file_crs)
-
     artifacts: list[GeoDataFrame[ArtifactSchema]] = []
     if job.resolution is None:
         raise ValueError("resolution is required when using reproject_mode='grid'.")
-    for cell in cells:
+    for cell in grid_cells:
         cell_ds = reproject(ds, geobox=cell.to_geobox(resolution=job.resolution))
 
         cell_ds = _run_processors(cell_ds, job.postprocess)

@@ -151,8 +151,8 @@ def test_grouped_task_builder_chunks_by_cells_per_task():
     assert len(tasks) == 3
     for task in tasks:
         assert task.aoi is not None
-        assert task.task_context["grid_cells"]
-        assert len(task.task_context["grid_cells"]) <= 4
+        assert task.grid_cells
+        assert len(task.grid_cells) <= 4
 
 
 def test_grouped_task_builder_one_task_when_cells_fit():
@@ -163,7 +163,8 @@ def test_grouped_task_builder_one_task_when_cells_fit():
     tasks = list(build_grouped_tasks(assets, job, cells_per_task=100))
 
     assert len(tasks) == 1
-    assert len(tasks[0].task_context["grid_cells"]) == 9
+    assert tasks[0].grid_cells is not None
+    assert len(tasks[0].grid_cells) == 9
 
 
 def test_grouped_task_builder_cells_per_task_one():
@@ -175,7 +176,8 @@ def test_grouped_task_builder_cells_per_task_one():
 
     assert len(tasks) == 9
     for task in tasks:
-        assert len(task.task_context["grid_cells"]) == 1
+        assert task.grid_cells is not None
+        assert len(task.grid_cells) == 1
 
 
 def test_grouped_task_builder_uses_asset_target_aoi_intersection():

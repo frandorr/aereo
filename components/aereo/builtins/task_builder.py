@@ -122,9 +122,9 @@ def build_grouped_tasks(
                     assets=group,
                     job=job,
                     aoi=chunk_aoi,
+                    grid_cells=chunk,
                     task_context={
                         "chunk_index": chunk_index,
-                        "grid_cells": [cell.id for cell in chunk],
                     },
                 )
             )

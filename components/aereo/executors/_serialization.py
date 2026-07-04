@@ -22,8 +22,11 @@ from pathlib import Path
 from typing import Any, cast
 
 import geopandas as gpd
+import shapely.wkb
 import shapely.wkt
+from shapely.geometry import Polygon
 from shapely.geometry.base import BaseGeometry
+from aereo.grid import GridCell
 from aereo.interfaces import ExtractionTask
 from aereo.interfaces.core import (
     Reader,
@@ -143,9 +146,23 @@ class _TaskSerializer:
         task.assets.to_parquet(dest_dir / self.ASSETS_NAME)
 
         job = task.job
+        grid_cells_data: list[dict[str, Any]] | None = None
+        if task.grid_cells is not None:
+            grid_cells_data = [
+                {
+                    "id": cell.id,
+                    "d": cell.d,
+                    "cell_geometry_wkb_hex": shapely.wkb.dumps(
+                        cell.cell_geometry, hex=True
+                    ),
+                }
+                for cell in task.grid_cells
+            ]
+
         meta: dict[str, Any] = {
             "id": task.id,
             "task_context": task.task_context,
+            "grid_cells": grid_cells_data,
             "aoi_wkt": (
                 cast(BaseGeometry, task.aoi).wkt if task.aoi is not None else None
             ),
@@ -218,6 +235,21 @@ class _TaskSerializer:
         aoi_wkt = meta.get("aoi_wkt")
         aoi = shapely.wkt.loads(aoi_wkt) if aoi_wkt is not None else None
 
+        grid_cells_data = meta.get("grid_cells")
+        grid_cells: list[GridCell] | None = None
+        if grid_cells_data is not None:
+            grid_cells = [
+                GridCell(
+                    id=cell_data["id"],
+                    d=cell_data["d"],
+                    cell_geometry=cast(
+                        Polygon,
+                        shapely.wkb.loads(cell_data["cell_geometry_wkb_hex"], hex=True),
+                    ),
+                )
+                for cell_data in grid_cells_data
+            ]
+
         from aereo.pipeline import ExtractionJob
 
         job = ExtractionJob.model_validate(
@@ -243,6 +275,7 @@ class _TaskSerializer:
             assets=assets,  # type: ignore[arg-type]
             job=job,
             aoi=aoi,
+            grid_cells=grid_cells,
             task_context=meta.get("task_context", {}),
         )
 

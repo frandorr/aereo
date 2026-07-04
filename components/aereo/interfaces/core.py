@@ -25,6 +25,7 @@ import numpy as np
 import pandas as pd
 import pystac
 import xarray as xr
+from aereo.grid import GridCell
 from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
@@ -217,14 +218,20 @@ class ExtractionTask:
             geometry instead of ``job.target_aoi`` to build the MajorTOM grid and
             index artifacts. This keeps the parent job immutable while allowing a
             task builder to split a job into smaller spatial chunks.
+        grid_cells: Optional explicit list of MajorTOM grid cells this task is
+            responsible for. When provided, the executor uses these cells directly
+            instead of rediscovering them from the AOI. This is the normal case for
+            tasks produced by ``build_grouped_tasks``.
         task_context: Optional metadata (e.g. ``chunk_id``, ``total_chunks``)
-            carried with the task for tracing and logging.
+            carried with the task for tracing and logging. Grid cells are no longer
+            stored here; use ``grid_cells`` instead.
     """
 
     id: str
     assets: GeoDataFrame[AssetSchema]
     job: ExtractionJob
     aoi: BaseGeometry | None = None
+    grid_cells: Sequence[GridCell] | None = None
     task_context: dict[str, Any] = attrs.field(factory=dict)
 
     @property
@@ -331,10 +338,12 @@ class ExtractionTask:
 
     def __repr__(self) -> str:
         n_assets = len(self.assets) if self.assets is not None else 0
+        n_grid_cells = len(self.grid_cells) if self.grid_cells is not None else None
         return (
             f"{self.__class__.__name__}("
             f"id={self.id!r}, "
             f"n_assets={n_assets}, "
+            f"n_grid_cells={n_grid_cells}, "
             f"read={self.read is not None}, "
             f"write={self.write is not None}, "
             f"output_uri='{self.output_uri}'"

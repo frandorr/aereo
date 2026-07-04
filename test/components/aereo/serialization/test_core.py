@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, cast
+from typing import Any, Sequence, cast
 
 import geopandas as gpd
 from aereo.builtins.read import read_odc_stac
@@ -8,6 +8,7 @@ from aereo.interfaces import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from aereo.executors._serialization import _TaskSerializer
+from aereo.grid import GridCell
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
 from shapely.geometry.base import BaseGeometry
@@ -17,6 +18,7 @@ def _make_task(
     *,
     aoi: Polygon | None = None,
     job_target_aoi: Polygon | None = None,
+    grid_cells: Sequence[GridCell] | None = None,
     task_context: dict[str, Any] | None = None,
     preprocess: Any = None,
     postprocess: Any = None,
@@ -50,6 +52,7 @@ def _make_task(
         assets=cast(GeoDataFrame[AssetSchema], df),
         job=job,
         aoi=aoi,
+        grid_cells=grid_cells,
         task_context=task_context or {},
     )
 
@@ -125,6 +128,52 @@ def test_round_trip_task_context(tmp_path: Any) -> None:
     reconstructed = serializer.deserialize(dest)
 
     assert reconstructed.task_context == ctx
+
+
+def test_round_trip_grid_cells(tmp_path: Any) -> None:
+    """GridCell objects survive round-trip via WKB hex."""
+    serializer = _TaskSerializer()
+    grid_cells = [
+        GridCell(
+            id="0U_0R",
+            d=50_000,
+            cell_geometry=Polygon([[-1, -1], [2, -1], [2, 2], [-1, 2], [-1, -1]]),
+        ),
+    ]
+    original = _make_task(grid_cells=grid_cells)
+
+    dest = tmp_path / "task_grid_cells"
+    serializer.serialize(original, dest)
+    reconstructed = serializer.deserialize(dest)
+
+    assert reconstructed.grid_cells is not None
+    assert len(reconstructed.grid_cells) == len(grid_cells)
+    assert [c.id for c in reconstructed.grid_cells] == [c.id for c in grid_cells]
+    assert [c.d for c in reconstructed.grid_cells] == [c.d for c in grid_cells]
+    for orig_cell, recon_cell in zip(grid_cells, reconstructed.grid_cells):
+        assert recon_cell.cell_geometry.equals_exact(
+            orig_cell.cell_geometry, tolerance=1e-9
+        )
+
+
+def test_serialize_to_bytes_grid_cells() -> None:
+    """GridCell objects survive byte payload round-trip."""
+    serializer = _TaskSerializer()
+    grid_cells = [
+        GridCell(
+            id="0U_0R",
+            d=50_000,
+            cell_geometry=Polygon([[-1, -1], [2, -1], [2, 2], [-1, 2], [-1, -1]]),
+        ),
+    ]
+    original = _make_task(grid_cells=grid_cells)
+
+    payload = serializer.serialize_to_bytes(original)
+    reconstructed = serializer.deserialize_from_bytes(payload)
+
+    assert reconstructed.grid_cells is not None
+    assert len(reconstructed.grid_cells) == len(grid_cells)
+    assert [c.id for c in reconstructed.grid_cells] == [c.id for c in grid_cells]
 
 
 def test_assets_crs_preserved(tmp_path: Any) -> None:
