@@ -1,9 +1,27 @@
-defaults:
-  - grid_dist@_global_: grid_50km
-  - read@_global_: viirs
-  - write@_global_: viirs
-  - _self_
-
 name: viirs_sample
+grid_dist: 50_000
 output_uri: /tmp/aereo_extraction
+target_aoi: config/aoi/chocon.geojson
+read:
+  # we are using aereo-read-satpy plugin
+  _partial_: true
+  _target_: aereo.read_satpy.read_satpy
+  reader: viirs_l1b
+  wishlist: [I04]
+  # Use earthaccess directly for downloads. Because this environment is in a
+  # different AWS region than the NASA data, obstore's S3 direct access fails
+  # and falls back through HTTPS before finally using earthaccess. Going
+  # straight to earthaccess avoids those retries.
+  downloader:
+    _target_: aereo.asset_downloader.core._download_with_earthaccess
+    _partial_: true
+
+reproject:
+  _target_: aereo.builtins.reproject_swath
+  _partial_: true
+reproject_mode: grid
+resolution: 375
+
+write:
+  _target_: aereo.builtins.write.write_geotiff
 overwrite: false
