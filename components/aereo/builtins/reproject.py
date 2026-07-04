@@ -7,20 +7,13 @@ native-resolution spatial datasets to a target geobox, CRS, or resolution.
 from __future__ import annotations
 
 import hashlib
-import threading
+import weakref
+from functools import lru_cache
 from typing import Any
 
 import numpy as np
 import xarray as xr
 from pydantic import ConfigDict, validate_call
-
-
-# Process-level cache for swath KDTree objects. The same swath is often reused
-# across multiple ExtractionTasks that only differ by target geobox; caching the
-# tree avoids rebuilding it for every task/cell.
-_MAX_SWATH_KDTREE_CACHE_SIZE: int = 4
-_swath_kdtree_cache: dict[tuple[str, str], Any] = {}
-_swath_kdtree_cache_lock = threading.Lock()
 
 
 _R_EARTH: float = 6_371_000.0
@@ -122,10 +115,51 @@ def _array_hash(arr: np.ndarray) -> str:
     return hashlib.sha1(arr).hexdigest()
 
 
-def _build_swath_kdtree(lons: np.ndarray, lats: np.ndarray) -> Any:
-    """Build a pykdtree KDTree on the valid pixels of a full swath."""
+class _SwathKey:
+    """Hashable, equality-comparable key for caching a swath KDTree.
+
+    Holds weak references to the source arrays so the cache does not keep the
+    original lons/lats alive once the caller drops them. The KDTree itself
+    retains the ECEF points it needs.
+    """
+
+    __slots__ = ("lons_hash", "lats_hash", "_lons_ref", "_lats_ref", "_hash")
+
+    def __init__(self, lons: np.ndarray, lats: np.ndarray) -> None:
+        self.lons_hash = _array_hash(lons)
+        self.lats_hash = _array_hash(lats)
+        self._lons_ref = weakref.ref(lons)
+        self._lats_ref = weakref.ref(lats)
+        self._hash = hash((self.lons_hash, self.lats_hash))
+
+    def __hash__(self) -> int:
+        return self._hash
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, _SwathKey):
+            return NotImplemented
+        return (self.lons_hash, self.lats_hash) == (other.lons_hash, other.lats_hash)
+
+    def resolve(self) -> tuple[np.ndarray, np.ndarray]:
+        """Return the source arrays, raising if they have been garbage collected."""
+        lons = self._lons_ref()
+        lats = self._lats_ref()
+        if lons is None or lats is None:
+            raise RuntimeError("Swath coordinate arrays were garbage collected")
+        return lons, lats
+
+
+@lru_cache(maxsize=4)
+def _build_cached_swath_kdtree(key: _SwathKey) -> Any:
+    """Build a pykdtree KDTree on the valid pixels of a full swath.
+
+    ``functools.lru_cache`` provides the thread-safe cache and guarantees that
+    concurrent callers with the same key wait for a single build instead of
+    duplicating work.
+    """
     import pykdtree.kdtree
 
+    lons, lats = key.resolve()
     valid = np.isfinite(lons) & np.isfinite(lats)
     swath_xyz = _lonlat_to_xyz(lons[valid], lats[valid])
     return pykdtree.kdtree.KDTree(swath_xyz)
@@ -133,21 +167,8 @@ def _build_swath_kdtree(lons: np.ndarray, lats: np.ndarray) -> Any:
 
 def _get_cached_swath_kdtree(lons: np.ndarray, lats: np.ndarray) -> Any:
     """Return a cached KDTree for the given swath coordinates, building if needed."""
-    key = (_array_hash(lons), _array_hash(lats))
-
-    with _swath_kdtree_cache_lock:
-        tree = _swath_kdtree_cache.get(key)
-        if tree is not None:
-            return tree
-
-    tree = _build_swath_kdtree(lons, lats)
-
-    with _swath_kdtree_cache_lock:
-        if len(_swath_kdtree_cache) >= _MAX_SWATH_KDTREE_CACHE_SIZE:
-            _swath_kdtree_cache.pop(next(iter(_swath_kdtree_cache)))
-        _swath_kdtree_cache[key] = tree
-
-    return tree
+    key = _SwathKey(lons, lats)
+    return _build_cached_swath_kdtree(key)
 
 
 def _target_grid_from_geobox(
