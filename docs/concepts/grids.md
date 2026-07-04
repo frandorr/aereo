@@ -2,8 +2,10 @@
 
 AEREO partitions the Earth into analysis-ready cells using the ESA Major TOM
 grid conventions. Grid cells are an indexing concern of the orchestrator: they
-are used to build artifact catalogs and to drive `reproject_mode="grid"`, but
-they are no longer attached to individual `ExtractionTask` objects.
+are used to build artifact catalogs and to drive `reproject_mode="grid"`. Tasks
+produced by `build_grouped_tasks` carry their explicit grid cells in
+`ExtractionTask.grid_cells`; when that attribute is set, the executor uses it
+directly instead of rediscovering cells from the task AOI.
 
 ---
 
