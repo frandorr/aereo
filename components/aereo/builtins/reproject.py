@@ -6,11 +6,21 @@ native-resolution spatial datasets to a target geobox, CRS, or resolution.
 
 from __future__ import annotations
 
+import hashlib
+import threading
 from typing import Any
 
 import numpy as np
 import xarray as xr
 from pydantic import ConfigDict, validate_call
+
+
+# Process-level cache for swath KDTree objects. The same swath is often reused
+# across multiple ExtractionTasks that only differ by target geobox; caching the
+# tree avoids rebuilding it for every task/cell.
+_MAX_SWATH_KDTREE_CACHE_SIZE: int = 4
+_swath_kdtree_cache: dict[tuple[str, str], Any] = {}
+_swath_kdtree_cache_lock = threading.Lock()
 
 
 _R_EARTH: float = 6_371_000.0
@@ -103,32 +113,41 @@ def _swath_bounds(
     )
 
 
-def _crop_swath(
-    lons: np.ndarray,
-    lats: np.ndarray,
-    bounds: tuple[float, float, float, float],
-    buffer: float,
-) -> tuple[np.ndarray, np.ndarray, slice, slice]:
-    """Crop swath lons/lats to a bounding rectangle covering *bounds* + *buffer*.
+def _array_hash(arr: np.ndarray) -> str:
+    """Return a stable hash string for a numpy array.
 
-    Returns the cropped arrays plus the row/column slices so matching data
-    arrays can be cropped the same way.
+    Uses SHA-1 over the array buffer; this avoids copying the array to bytes and
+    is fast enough to use as a cache key for large swath coordinate arrays.
     """
-    min_lon, min_lat, max_lon, max_lat = bounds
-    mask = (
-        np.isfinite(lons)
-        & np.isfinite(lats)
-        & (lons >= min_lon - buffer)
-        & (lons <= max_lon + buffer)
-        & (lats >= min_lat - buffer)
-        & (lats <= max_lat + buffer)
-    )
-    rows, cols = np.where(mask)
-    if rows.size == 0 or cols.size == 0:
-        raise ValueError("No swath pixels overlap the target bounds.")
-    row_slice = slice(int(rows.min()), int(rows.max()) + 1)
-    col_slice = slice(int(cols.min()), int(cols.max()) + 1)
-    return lons[row_slice, col_slice], lats[row_slice, col_slice], row_slice, col_slice
+    return hashlib.sha1(arr).hexdigest()
+
+
+def _build_swath_kdtree(lons: np.ndarray, lats: np.ndarray) -> Any:
+    """Build a pykdtree KDTree on the valid pixels of a full swath."""
+    import pykdtree.kdtree
+
+    valid = np.isfinite(lons) & np.isfinite(lats)
+    swath_xyz = _lonlat_to_xyz(lons[valid], lats[valid])
+    return pykdtree.kdtree.KDTree(swath_xyz)
+
+
+def _get_cached_swath_kdtree(lons: np.ndarray, lats: np.ndarray) -> Any:
+    """Return a cached KDTree for the given swath coordinates, building if needed."""
+    key = (_array_hash(lons), _array_hash(lats))
+
+    with _swath_kdtree_cache_lock:
+        tree = _swath_kdtree_cache.get(key)
+        if tree is not None:
+            return tree
+
+    tree = _build_swath_kdtree(lons, lats)
+
+    with _swath_kdtree_cache_lock:
+        if len(_swath_kdtree_cache) >= _MAX_SWATH_KDTREE_CACHE_SIZE:
+            _swath_kdtree_cache.pop(next(iter(_swath_kdtree_cache)))
+        _swath_kdtree_cache[key] = tree
+
+    return tree
 
 
 def _target_grid_from_geobox(
@@ -195,7 +214,7 @@ def reproject_swath(
     max_distance: float = 3_000.0,
     fill_value: Any = np.nan,
 ) -> xr.Dataset:
-    """Reproject a swath dataset using a cropped pykdtree nearest-neighbour search.
+    """Reproject a swath dataset using a pykdtree nearest-neighbour search.
 
     The input dataset must contain ``lons`` and ``lats`` variables (or
     coordinates) that define the swath geometry for every pixel.
@@ -203,18 +222,22 @@ def reproject_swath(
     This is the AEREO builtins equivalent of the manual pykdtree reprojection
     shown in ``examples/viirs_pykdtree_reproject.py``:
 
-    1. Crop the swath to the target bounds plus a small buffer.
-    2. Build a ``pykdtree.KDTree`` on the cropped swath in ECEF space.
-    3. Query the tree with target grid points to obtain nearest neighbours.
-    4. Remap each data variable and mask distant matches.
+    1. Build a ``pykdtree.KDTree`` on the full swath in ECEF space.
+    2. Query the tree with target grid points to obtain nearest neighbours.
+    3. Remap each data variable and mask distant matches.
+
+    The KDTree is cached in a process-level cache keyed by a hash of the swath
+    ``lons``/``lats`` arrays, so the same swath reused across multiple
+    ``ExtractionTask`` objects (e.g., different target grid cells) only pays the
+    tree construction cost once.
 
     Args:
         ds: Input swath dataset with ``lons`` and ``lats``.
         geobox: Target ``odc.geo.GeoBox`` (optional). Used in grid mode.
         crs: Target CRS string (optional). Used in raw mode with ``resolution``.
         resolution: Target resolution in metres (optional). Used in raw mode.
-        buffer: Degrees of padding around the target bounds when cropping the
-            swath before building the KDTree.
+        buffer: Deprecated. Kept for backward compatibility; no longer used
+            because the tree is built on the full swath and cached.
         max_distance: Maximum swath-to-target distance in metres before a
             target pixel is filled with ``fill_value``.
         fill_value: Value for out-of-bounds / distant pixels.
@@ -222,13 +245,21 @@ def reproject_swath(
     Returns:
         Reprojected ``xr.Dataset`` on a regular ``y``/``x`` grid.
     """
-    import pykdtree.kdtree
+    _ = buffer  # noqa: F841
 
-    if "lons" not in ds or "lats" not in ds:
-        raise ValueError("reproject_swath requires 'lons' and 'lats' in the dataset.")
+    # check if lons or longitudes and lats or latitudes exist in the dataset
+    if not (
+        ("lons" in ds and "lats" in ds) or ("longitude" in ds and "latitude" in ds)
+    ):
+        raise ValueError(
+            "Input dataset must contain 'lons' and 'lats' variables or coordinates."
+        )
 
-    lons = _as_numpy(ds["lons"])
-    lats = _as_numpy(ds["lats"])
+    lons_var = "lons" if "lons" in ds else "longitude"
+    lats_var = "lats" if "lats" in ds else "latitude"
+    lons = _as_numpy(ds[lons_var])
+    lats = _as_numpy(ds[lats_var])
+
     if lons.ndim != 2 or lats.ndim != 2:
         raise ValueError("reproject_swath expects 2-D 'lons' and 'lats' arrays.")
 
@@ -237,21 +268,10 @@ def reproject_swath(
         target_geobox
     )
 
-    target_bounds = (
-        float(np.nanmin(target_lons)),
-        float(np.nanmin(target_lats)),
-        float(np.nanmax(target_lons)),
-        float(np.nanmax(target_lats)),
-    )
-    lons_crop, lats_crop, row_slice, col_slice = _crop_swath(
-        lons, lats, bounds=target_bounds, buffer=buffer
-    )
-
-    valid = np.isfinite(lons_crop) & np.isfinite(lats_crop)
-    swath_xyz = _lonlat_to_xyz(lons_crop[valid], lats_crop[valid])
+    valid = np.isfinite(lons) & np.isfinite(lats)
     target_xyz = _lonlat_to_xyz(target_lons.ravel(), target_lats.ravel())
 
-    tree = pykdtree.kdtree.KDTree(swath_xyz)
+    tree = _get_cached_swath_kdtree(lons, lats)
     distances, indices = tree.query(target_xyz, k=1, sqr_dists=True)
 
     swath_shape = lons.shape
@@ -259,7 +279,7 @@ def reproject_swath(
     distance_mask = distances.reshape(target_shape) > (max_distance**2)
 
     data_vars: dict[str, xr.DataArray] = {}
-    skip_vars = {"lons", "lats"}
+    skip_vars = {lons_var, lats_var}
 
     for name, da in ds.data_vars.items():
         var_name = str(name)
@@ -275,8 +295,7 @@ def reproject_swath(
         extra_shape = arr.shape[:-2]
         n_extra = int(np.prod(extra_shape, dtype=np.int64)) if extra_shape else 1
         flat = arr.reshape((n_extra, *swath_shape))
-        flat_crop = flat[..., row_slice, col_slice]
-        valid_values = flat_crop[..., valid]
+        valid_values = flat[..., valid]
 
         remapped = np.full((n_extra, *target_shape), fill_value, dtype=arr.dtype)
         remapped_flat = remapped.reshape((n_extra, -1))
