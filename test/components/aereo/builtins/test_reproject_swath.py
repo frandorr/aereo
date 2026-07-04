@@ -7,7 +7,7 @@ import pytest
 import xarray as xr
 from odc.geo.geobox import GeoBox
 
-from aereo.builtins.reproject import _swath_kdtree_cache, reproject_swath
+from aereo.builtins.reproject import _build_cached_swath_kdtree, reproject_swath
 
 
 def _synthetic_swath(
@@ -135,7 +135,7 @@ def test_reproject_swath_fill_value_and_mask():
 
 def test_reproject_swath_caches_kdtree_across_geoboxes():
     """The same swath reused with different geoboxes only builds one KDTree."""
-    _swath_kdtree_cache.clear()
+    _build_cached_swath_kdtree.cache_clear()
     ds = _synthetic_swath((20, 20))
 
     geobox_a = GeoBox.from_bbox(
@@ -150,13 +150,13 @@ def test_reproject_swath_caches_kdtree_across_geoboxes():
     )
 
     out_a = reproject_swath(ds, geobox=geobox_a, max_distance=10_000.0)
-    cache_after_first = len(_swath_kdtree_cache)
+    cache_after_first = _build_cached_swath_kdtree.cache_info().currsize
     out_b = reproject_swath(ds, geobox=geobox_b, max_distance=10_000.0)
-    cache_after_second = len(_swath_kdtree_cache)
+    cache_after_second = _build_cached_swath_kdtree.cache_info().currsize
 
     assert cache_after_first == 1
     assert cache_after_second == 1
     assert isinstance(out_a, xr.Dataset)
     assert isinstance(out_b, xr.Dataset)
 
-    _swath_kdtree_cache.clear()
+    _build_cached_swath_kdtree.cache_clear()
