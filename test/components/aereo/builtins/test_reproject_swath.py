@@ -7,7 +7,7 @@ import pytest
 import xarray as xr
 from odc.geo.geobox import GeoBox
 
-from aereo.builtins.reproject import reproject_swath
+from aereo.builtins.reproject import _swath_kdtree_cache, reproject_swath
 
 
 def _synthetic_swath(
@@ -103,7 +103,9 @@ def test_reproject_swath_with_time_dim():
 def test_reproject_swath_missing_lons_lats():
     """Raise when the dataset lacks lons/lats."""
     ds = xr.Dataset({"band": (["y", "x"], np.ones((5, 5)))})
-    with pytest.raises(ValueError, match="requires 'lons' and 'lats'"):
+    with pytest.raises(
+        ValueError, match="Input dataset must contain 'lons' and 'lats'"
+    ):
         reproject_swath(ds, crs="EPSG:4326", resolution=0.01)
 
 
@@ -129,3 +131,32 @@ def test_reproject_swath_fill_value_and_mask():
     )
 
     assert np.any(out["band"].values == -999.0)
+
+
+def test_reproject_swath_caches_kdtree_across_geoboxes():
+    """The same swath reused with different geoboxes only builds one KDTree."""
+    _swath_kdtree_cache.clear()
+    ds = _synthetic_swath((20, 20))
+
+    geobox_a = GeoBox.from_bbox(
+        (-70.05, -40.05, -69.55, -39.55),
+        crs="EPSG:4326",
+        resolution=0.01,
+    )
+    geobox_b = GeoBox.from_bbox(
+        (-69.55, -40.05, -69.05, -39.55),
+        crs="EPSG:4326",
+        resolution=0.01,
+    )
+
+    out_a = reproject_swath(ds, geobox=geobox_a, max_distance=10_000.0)
+    cache_after_first = len(_swath_kdtree_cache)
+    out_b = reproject_swath(ds, geobox=geobox_b, max_distance=10_000.0)
+    cache_after_second = len(_swath_kdtree_cache)
+
+    assert cache_after_first == 1
+    assert cache_after_second == 1
+    assert isinstance(out_a, xr.Dataset)
+    assert isinstance(out_b, xr.Dataset)
+
+    _swath_kdtree_cache.clear()
