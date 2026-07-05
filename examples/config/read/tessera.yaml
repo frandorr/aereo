@@ -1,7 +1,0 @@
-read:
-  _partial_: true
-  _target_: aereo.read_tessera.read_tessera
-  bands:
-  - 0
-  - 1
-  - 2

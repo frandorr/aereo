@@ -31,8 +31,10 @@ runtime ``search`` and ``task_builder`` configs.
 
 Top-level keys (``grid_dist``, ``output_uri``, ``read``, ``write``) are
 first-class citizens of the job config, so they can be swapped independently
-via Hydra ``defaults`` composition. ``search`` and ``task_builder`` are
-*runtime* plugins and are not stored on ``ExtractionJob``.
+via Hydra ``defaults`` composition. ``search`` and ``task_builder`` may also
+appear at the top level of the job config; they are stored on ``ExtractionJob``
+and used by ``job.search()`` and ``job.build_tasks()`` when no provider or
+builder is passed explicitly.
 
 ## Usage
 
@@ -65,8 +67,23 @@ job = ExtractionJob.load_from_config(
 )
 ```
 
-Because search providers and task builders are supplied at runtime, load them
-separately and pass them to the job orchestration methods. Use the
+When ``search`` and ``task_builder`` are defined in the job config, you can run
+the pipeline without extra imports:
+
+```python
+from aereo.executors import LocalExecutor
+from aereo.pipeline import ExtractionJob
+
+job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
+
+assets = job.search()
+tasks = job.build_tasks(assets)
+artifacts = job.execute(tasks, executor=LocalExecutor(workers=4))
+job.write_catalog(artifacts)
+```
+
+You can still pass providers and builders explicitly, which is useful for
+sharing them across jobs or overriding config values at runtime. Use the
 ``aereo.pipeline.load_plugin`` helper for the shortest path:
 
 ```python
@@ -97,8 +114,8 @@ job.write_catalog(artifacts)
 ```
 
 If you need full control over Hydra, you can still compose and instantiate
-manually. Just make sure the dict you pass to ``ExtractionJob`` contains only
-job fields:
+manually. ``ExtractionJob`` accepts ``search`` and ``task_builder`` alongside
+the other job fields:
 
 ```python
 from hydra import initialize_config_dir, compose
@@ -110,9 +127,6 @@ config_dir = str(Path("examples/config").resolve())
 with initialize_config_dir(version_base=None, config_dir=config_dir):
     cfg = compose(config_name="job_sentinel2")
     instantiated = hydra.utils.instantiate(cfg, _convert_="all")
-    # Remove runtime plugin keys before validating the job model
-    instantiated.pop("search", None)
-    instantiated.pop("task_builder", None)
     job = ExtractionJob.model_validate(instantiated)
 ```
 
