@@ -1,9 +1,0 @@
-_target_: aereo.search_aws_goes.search_aws_goes
-_partial_: true
-collections:
-  ABI-L1b-RadF: ["C02"]
-intersects: config/aoi/cordoba.geojson
-start_datetime: "2024-01-01T15:00:00Z"
-end_datetime:  "2024-01-01T15:05:00Z"
-satellites:
-  - GOES-16

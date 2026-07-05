@@ -4,6 +4,7 @@ output_uri: /tmp/aereo_extraction
 target_aoi: config/aoi/chocon.geojson
 read:
   # we are using aereo-read-satpy plugin
+
   _partial_: true
   _target_: aereo.read_satpy.read_satpy
   reader: viirs_l1b

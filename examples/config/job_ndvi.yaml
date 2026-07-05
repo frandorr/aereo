@@ -1,9 +1,10 @@
 defaults:
-  - grid_dist@_global_: grid_10km
-  - read@_global_: sentinel2_ndvi
-  - write@_global_: sentinel2_ndvi
+  - job_sentinel2
   - _self_
 
-name: sentinel2_sample
-output_uri: /tmp/aereo_extraction
-overwrite: false
+name: sentinel2_nvdi
+preprocess:
+  - _target_: aereo.builtins.ndvi
+    _partial_: true
+    ndvi_nir_band: nir
+    ndvi_red_band: red

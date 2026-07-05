@@ -113,8 +113,9 @@ def ndvi(ds: xr.Dataset, ndvi_nir_band: str, ndvi_red_band: str) -> xr.Dataset:
             f"ndvi: red band '{ndvi_red_band}' not found. Available: {list(ds.data_vars)}"
         )
 
-    nir = ds[ndvi_nir_band]
-    red = ds[ndvi_red_band]
+    # Cast to float32 to prevent uint16 underflow and allow decimal division
+    nir = ds[ndvi_nir_band].astype("float32")
+    red = ds[ndvi_red_band].astype("float32")
     denom = nir + red
     ndvi_val = (nir - red) / denom
     ndvi_val = ndvi_val.where(denom != 0)
