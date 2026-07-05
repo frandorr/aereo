@@ -36,6 +36,36 @@ from structlog import get_logger
 logger = get_logger()
 
 
+def _valid_job_keys(cls: type[ExtractionJob]) -> set[str]:
+    """Return all field names and aliases accepted by ``ExtractionJob``.
+
+    This lets Hydra configs define helper variables (e.g. ``target_bands``,
+    ``aoi_path``) that are used for interpolation but are not part of the job
+    schema.
+    """
+    keys = set(cls.model_fields.keys())
+    for field_info in cls.model_fields.values():
+        if field_info.alias:
+            keys.add(field_info.alias)
+    return keys
+
+
+def _strip_unknown_job_keys(cfg: Any, cls: type[ExtractionJob]) -> Any:
+    """Remove top-level keys that are not ``ExtractionJob`` fields or aliases.
+
+    Args:
+        cfg: Configuration container (dict, list, or scalar).
+        cls: The ``ExtractionJob`` class whose schema defines valid keys.
+
+    Returns:
+        The same shape with unknown top-level keys removed.
+    """
+    if isinstance(cfg, dict):
+        valid = _valid_job_keys(cls)
+        return {k: v for k, v in cfg.items() if k in valid}
+    return cfg
+
+
 def load_plugin(config_dir: str | Path, group: str, name: str) -> Any:
     """Load a single runtime plugin from a Hydra config package.
 
@@ -68,10 +98,11 @@ def load_plugin(config_dir: str | Path, group: str, name: str) -> Any:
 class ExtractionJob(BaseModel):
     """Declarative configuration tree for a complete extraction job.
 
-    Bundles grid size, output URI, and pipeline step callables together into a
-    single validated Hydra-compatible model. Search providers and task builders
-    are supplied at runtime to the orchestration methods rather than stored on
-    the job.
+    Bundles grid size, output URI, pipeline step callables, and optional
+    runtime plugins (search provider and task builder) into a single validated
+    Hydra-compatible model. When ``search_provider`` and/or ``task_builder``
+    are configured, ``job.search()`` and ``job.build_tasks()`` can be called
+    without passing a provider or builder explicitly.
 
     Pipeline execution order is fixed::
 
@@ -87,7 +118,12 @@ class ExtractionJob(BaseModel):
     each grid cell separately).
     """
 
-    model_config = {"extra": "forbid", "frozen": True, "arbitrary_types_allowed": True}
+    model_config = {
+        "extra": "forbid",
+        "frozen": True,
+        "arbitrary_types_allowed": True,
+        "populate_by_name": True,
+    }
 
     name: str = Field(
         default="default",
@@ -152,6 +188,19 @@ class ExtractionJob(BaseModel):
 
     write: Writer = Field(
         description="Callable that writes an xr.Dataset to a single path and returns it."
+    )
+
+    # Optional runtime plugins. The config keys ``search`` and ``task_builder``
+    # are accepted for readability; internally they are stored as
+    # ``search_provider`` and ``task_builder``.
+    search_provider: SearchProvider | None = Field(
+        default=None,
+        alias="search",
+        description="Optional search provider used by ``job.search()`` when no provider is passed.",
+    )
+    task_builder: TaskBuilder | None = Field(
+        default=None,
+        description="Optional task builder used by ``job.build_tasks()`` when no builder is passed.",
     )
 
     @field_validator("preprocess", "postprocess", mode="before")
@@ -234,24 +283,36 @@ class ExtractionJob(BaseModel):
 
     def search(
         self,
-        provider: SearchProvider,
+        provider: SearchProvider | None = None,
         aoi: BaseGeometry | dict[str, Any] | str | Path | None = None,
         **search_kwargs: Any,
     ) -> GeoDataFrame[AssetSchema]:
-        """Execute a search using *provider*.
+        """Execute a search.
 
-        Runtime search parameters win over the job's fixed ``target_aoi``.
-        The resolved AOI is passed to the provider as ``intersects``.
+        Uses *provider* when given; otherwise falls back to the job's configured
+        ``search_provider``. Runtime search parameters win over the job's fixed
+        ``target_aoi``. The resolved AOI is passed to the provider as
+        ``intersects``.
 
         Args:
-            provider: Search provider to execute.
+            provider: Optional search provider to execute. Defaults to the
+                provider configured on the job.
             aoi: Optional AOI geometry overriding ``job.target_aoi``.
             **search_kwargs: Additional arguments used to update the provider
                 before execution (e.g. ``start_datetime``, ``end_datetime``).
 
         Returns:
             A validated GeoDataFrame of matched assets.
+
+        Raises:
+            ValueError: If no provider is given and none is configured on the job.
         """
+        provider = provider or self.search_provider
+        if provider is None:
+            raise ValueError(
+                "No search provider configured. Pass one or set it in the job config."
+            )
+
         logger.info(
             "search_called",
             provider=getattr(provider, "__name__", type(provider).__name__),
@@ -272,20 +333,30 @@ class ExtractionJob(BaseModel):
     def build_tasks(
         self,
         assets: GeoDataFrame[AssetSchema],
-        task_builder: TaskBuilder,
+        task_builder: TaskBuilder | None = None,
         **builder_kwargs: Any,
     ) -> Sequence[ExtractionTask]:
         """Build extraction tasks from search results.
 
         Args:
             assets: GeoDataFrame of assets returned by a search provider.
-            task_builder: Task builder used to group assets into tasks.
+            task_builder: Optional task builder used to group assets into tasks.
+                Defaults to the builder configured on the job.
             **builder_kwargs: Additional arguments used to update the task
                 builder before execution (e.g. ``cells_per_task``).
 
         Returns:
             A sequence of prepared ``ExtractionTask`` objects.
+
+        Raises:
+            ValueError: If no builder is given and none is configured on the job.
         """
+        task_builder = task_builder or self.task_builder
+        if task_builder is None:
+            raise ValueError(
+                "No task builder configured. Pass one or set it in the job config."
+            )
+
         if assets.empty:
             return []
 
@@ -298,6 +369,7 @@ class ExtractionJob(BaseModel):
         if builder_kwargs:
             task_builder = update_callable(task_builder, **builder_kwargs)
 
+        assert task_builder is not None
         return task_builder(assets, self)
 
     def execute(
@@ -391,6 +463,7 @@ class ExtractionJob(BaseModel):
         with initialize_config_dir(version_base=None, config_dir=str(config_dir)):
             cfg = compose(config_name=config_name, overrides=overrides or [])
             plain_cfg = OmegaConf.to_container(cfg, resolve=True)
+            plain_cfg = _strip_unknown_job_keys(plain_cfg, cls)
             prepared_cfg = _prepare_config_for_instantiate(plain_cfg)
             instantiated = hydra.utils.instantiate(prepared_cfg, _convert_="all")
 
@@ -434,6 +507,7 @@ class ExtractionJob(BaseModel):
         cfg = OmegaConf.load(path)
 
         plain_cfg = OmegaConf.to_container(cfg, resolve=True)
+        plain_cfg = _strip_unknown_job_keys(plain_cfg, cls)
         prepared_cfg = _prepare_config_for_instantiate(plain_cfg)
         instantiated = hydra.utils.instantiate(prepared_cfg, _convert_="all")
         return cls._from_instantiated(instantiated, f"configuration at {path}")

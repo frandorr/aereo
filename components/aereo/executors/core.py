@@ -9,17 +9,19 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
-from typing import Literal, Protocol, cast
+from typing import TYPE_CHECKING, Literal, Protocol, cast
 
 import geopandas as gpd
 import pandas as pd
 from structlog import get_logger
 
-from aereo.cache import TaskResultCache
 from aereo.execution import run_task
 from aereo.interfaces import ExtractionTask
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
+
+if TYPE_CHECKING:
+    from aereo.cache import TaskResultCache
 
 logger = get_logger()
 
