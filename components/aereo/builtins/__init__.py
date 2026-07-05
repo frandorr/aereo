@@ -12,7 +12,11 @@ from aereo.builtins.processor import (
     select_bands,
 )
 from aereo.builtins.read import read_odc_stac
-from aereo.builtins.reproject import reproject_odc, reproject_swath
+from aereo.builtins.reproject import (
+    reproject_odc,
+    reproject_pyresample,
+    reproject_swath,
+)
 from aereo.builtins.search import search_earthaccess, search_stac
 from aereo.builtins.task_builder import build_grouped_tasks
 from aereo.builtins.write import write_geotiff
@@ -25,6 +29,7 @@ __all__ = [
     "qa_mask",
     "read_odc_stac",
     "reproject_odc",
+    "reproject_pyresample",
     "reproject_swath",
     "search_earthaccess",
     "search_stac",

@@ -423,3 +423,134 @@ def reproject_swath(
         for name in out.data_vars:
             out[str(name)].rio.write_nodata(fill_value, inplace=True)
     return out
+
+
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def reproject_pyresample(
+    ds: xr.Dataset,
+    geobox: Any | None = None,
+    crs: str | None = None,
+    resolution: float | None = None,
+    max_distance: float = 3_000.0,
+    fill_value: Any = np.nan,
+    nprocs: int = 1,
+) -> xr.Dataset:
+    """Reproject a swath dataset using pyresample's nearest-neighbour resampler.
+
+    This is a reference implementation intended for benchmarking and comparison
+    with ``reproject_swath``. It builds a ``pyresample.SwathDefinition`` from
+    the source lon/lat arrays and a ``pyresample.AreaDefinition`` from the
+    target geobox, then calls ``pyresample.kd_tree.resample_nearest``.
+
+    Unlike ``reproject_swath``, pyresample's nearest-neighbour resampler does
+    not explicitly exclude NaN source pixels from the search; a target pixel
+    whose nearest neighbour happens to be NaN will receive NaN.
+
+    Args:
+        ds: Input swath dataset with ``lons`` and ``lats`` (or ``longitude``
+            and ``latitude``).
+        geobox: Target ``odc.geo.GeoBox`` (optional). Used in grid mode.
+        crs: Target CRS string (optional). Used in raw mode with ``resolution``.
+        resolution: Target resolution in metres (optional). Used in raw mode.
+        max_distance: Maximum source-to-target distance in metres before a
+            target pixel is filled with ``fill_value`` (passed as
+            ``radius_of_influence`` to pyresample).
+        fill_value: Value for out-of-bounds / distant pixels.
+        nprocs: Number of processor cores for pyresample (default 1).
+
+    Returns:
+        Reprojected ``xr.Dataset`` on a regular ``y``/``x`` grid.
+    """
+    from pyresample import AreaDefinition, SwathDefinition  # type: ignore[reportMissingTypeStubs]
+    from pyresample.kd_tree import resample_nearest  # type: ignore[reportMissingTypeStubs]
+
+    if not (
+        ("lons" in ds and "lats" in ds) or ("longitude" in ds and "latitude" in ds)
+    ):
+        raise ValueError(
+            "Input dataset must contain 'lons' and 'lats' variables or coordinates."
+        )
+
+    lons_var = "lons" if "lons" in ds else "longitude"
+    lats_var = "lats" if "lats" in ds else "latitude"
+    lons = _as_numpy(ds[lons_var])
+    lats = _as_numpy(ds[lats_var])
+
+    if lons.ndim != 2 or lats.ndim != 2:
+        raise ValueError("reproject_pyresample expects 2-D 'lons' and 'lats' arrays.")
+
+    target_geobox = _resolve_target_geobox(lons, lats, geobox, crs, resolution)
+    x_coords, y_coords, target_lons, target_lats = _target_grid_from_geobox(
+        target_geobox
+    )
+
+    swath_def = SwathDefinition(lons=lons.ravel(), lats=lats.ravel())
+    area_def = AreaDefinition(
+        area_id="aereo_pyresample_target",
+        description="AEREO pyresample target grid",
+        proj_id="aereo",
+        projection=str(target_geobox.crs),
+        width=target_geobox.shape.x,
+        height=target_geobox.shape.y,
+        area_extent=(
+            float(target_geobox.boundingbox.left),
+            float(target_geobox.boundingbox.bottom),
+            float(target_geobox.boundingbox.right),
+            float(target_geobox.boundingbox.top),
+        ),
+    )
+
+    swath_shape = lons.shape
+    target_shape = (target_geobox.shape.y, target_geobox.shape.x)
+
+    data_vars: dict[str, xr.DataArray] = {}
+    skip_vars = {lons_var, lats_var}
+
+    for name, da in ds.data_vars.items():
+        var_name = str(name)
+        if var_name in skip_vars:
+            continue
+        if da.shape[-2:] != swath_shape:
+            continue
+
+        arr = _as_numpy(da)
+        if np.isnan(fill_value) and not np.issubdtype(arr.dtype, np.floating):
+            arr = arr.astype(np.float64)
+
+        extra_shape = arr.shape[:-2]
+        n_extra = int(np.prod(extra_shape, dtype=np.int64)) if extra_shape else 1
+
+        # pyresample expects (n_pixels, n_channels) and returns (y, x, n_channels).
+        flat = arr.reshape((n_extra, -1)).T
+        resampled = resample_nearest(
+            swath_def,
+            flat,
+            area_def,
+            radius_of_influence=max_distance,
+            fill_value=fill_value,
+            nprocs=nprocs,
+        )
+
+        resampled_arr = np.asarray(resampled)
+        remapped = np.moveaxis(resampled_arr.reshape((*target_shape, n_extra)), -1, 0)
+        remapped = remapped.reshape((*extra_shape, *target_shape))
+
+        data_vars[var_name] = xr.DataArray(
+            remapped,
+            dims=tuple(str(d) for d in da.dims[:-2]) + ("y", "x"),
+            coords={"y": y_coords, "x": x_coords},
+            attrs=da.attrs,
+            name=var_name,
+        )
+
+    if not data_vars:
+        raise ValueError("No data variables found matching the swath shape.")
+
+    out = xr.Dataset(data_vars, attrs=ds.attrs)
+    out = out.rio.write_crs(str(target_geobox.crs))
+    if fill_value is not None and not (
+        isinstance(fill_value, float) and np.isnan(fill_value)
+    ):
+        for name in out.data_vars:
+            out[str(name)].rio.write_nodata(fill_value, inplace=True)
+    return out
