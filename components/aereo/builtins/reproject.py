@@ -488,7 +488,6 @@ def reproject_pyresample(
         target_geobox
     )
 
-    swath_def = SwathDefinition(lons=lons.ravel(), lats=lats.ravel())
     area_def = AreaDefinition(
         area_id="aereo_pyresample_target",
         description="AEREO pyresample target grid",
@@ -506,6 +505,7 @@ def reproject_pyresample(
 
     swath_shape = lons.shape
     target_shape = (target_geobox.shape.y, target_geobox.shape.x)
+    valid_coords = np.isfinite(lons) & np.isfinite(lats)
 
     data_vars: dict[str, xr.DataArray] = {}
     skip_vars = {lons_var, lats_var}
@@ -526,8 +526,37 @@ def reproject_pyresample(
 
         # pyresample expects (n_pixels, n_channels) and returns (y, x, n_channels).
         flat = arr.reshape((n_extra, -1)).T
+
         if mask_invalid and np.issubdtype(arr.dtype, np.floating):
-            flat = np.ma.masked_invalid(flat)
+            data_valid = np.isfinite(arr)
+            if data_valid.ndim > 2:
+                data_valid = data_valid.all(axis=tuple(range(data_valid.ndim - 2)))
+            combined_valid = valid_coords & data_valid
+        else:
+            combined_valid = None
+
+        if combined_valid is not None:
+            if not combined_valid.any():
+                # No valid pixels for this variable; emit a filled grid.
+                remapped = np.full(
+                    (*extra_shape, *target_shape), fill_value, dtype=arr.dtype
+                )
+                data_vars[var_name] = xr.DataArray(
+                    remapped,
+                    dims=tuple(str(d) for d in da.dims[:-2]) + ("y", "x"),
+                    coords={"y": y_coords, "x": x_coords},
+                    attrs=da.attrs,
+                    name=var_name,
+                )
+                continue
+
+            flat = flat[combined_valid.ravel(), :]
+            swath_def = SwathDefinition(
+                lons=lons.ravel()[combined_valid.ravel()],
+                lats=lats.ravel()[combined_valid.ravel()],
+            )
+        else:
+            swath_def = SwathDefinition(lons=lons.ravel(), lats=lats.ravel())
 
         resampled = resample_nearest(
             swath_def,
@@ -538,7 +567,7 @@ def reproject_pyresample(
             nprocs=nprocs,
         )
 
-        resampled_arr = np.ma.filled(resampled, fill_value=fill_value)
+        resampled_arr = np.asarray(resampled)
         remapped = np.moveaxis(resampled_arr.reshape((*target_shape, n_extra)), -1, 0)
         remapped = remapped.reshape((*extra_shape, *target_shape))
 
