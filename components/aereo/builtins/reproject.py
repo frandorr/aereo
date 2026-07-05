@@ -121,16 +121,36 @@ class _SwathKey:
     Holds weak references to the source arrays so the cache does not keep the
     original lons/lats alive once the caller drops them. The KDTree itself
     retains the ECEF points it needs.
+
+    An optional boolean *mask* can be included in the key so that a separate
+    tree is built for data variables with different valid-pixel patterns
+    (e.g. VIIRS bow-tie NaNs). Variables that share the same mask reuse the
+    same cached tree.
     """
 
-    __slots__ = ("lons_hash", "lats_hash", "_lons_ref", "_lats_ref", "_hash")
+    __slots__ = (
+        "lons_hash",
+        "lats_hash",
+        "mask_hash",
+        "_lons_ref",
+        "_lats_ref",
+        "_mask_ref",
+        "_hash",
+    )
 
-    def __init__(self, lons: np.ndarray, lats: np.ndarray) -> None:
+    def __init__(
+        self,
+        lons: np.ndarray,
+        lats: np.ndarray,
+        mask: np.ndarray | None = None,
+    ) -> None:
         self.lons_hash = _array_hash(lons)
         self.lats_hash = _array_hash(lats)
+        self.mask_hash = _array_hash(mask) if mask is not None else ""
         self._lons_ref = weakref.ref(lons)
         self._lats_ref = weakref.ref(lats)
-        self._hash = hash((self.lons_hash, self.lats_hash))
+        self._mask_ref = weakref.ref(mask) if mask is not None else None
+        self._hash = hash((self.lons_hash, self.lats_hash, self.mask_hash))
 
     def __hash__(self) -> int:
         return self._hash
@@ -138,20 +158,34 @@ class _SwathKey:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, _SwathKey):
             return NotImplemented
-        return (self.lons_hash, self.lats_hash) == (other.lons_hash, other.lats_hash)
+        return (self.lons_hash, self.lats_hash, self.mask_hash) == (
+            other.lons_hash,
+            other.lats_hash,
+            other.mask_hash,
+        )
 
-    def resolve(self) -> tuple[np.ndarray, np.ndarray]:
-        """Return the source arrays, raising if they have been garbage collected."""
+    def resolve(self) -> tuple[np.ndarray, np.ndarray, np.ndarray | None]:
+        """Return the source arrays and mask, raising if they were collected."""
         lons = self._lons_ref()
         lats = self._lats_ref()
-        if lons is None or lats is None:
+        mask = self._mask_ref() if self._mask_ref is not None else None
+        if (
+            lons is None
+            or lats is None
+            or (self._mask_ref is not None and mask is None)
+        ):
             raise RuntimeError("Swath coordinate arrays were garbage collected")
-        return lons, lats
+        return lons, lats, mask
 
 
-@lru_cache(maxsize=4)
+@lru_cache(maxsize=8)
 def _build_cached_swath_kdtree(key: _SwathKey) -> Any:
     """Build a pykdtree KDTree on the valid pixels of a full swath.
+
+    When the key contains a boolean *mask*, only pixels where the mask is True
+    are inserted into the tree. This lets us exclude NaN data pixels (e.g.
+    VIIRS bow-tie gaps) from the nearest-neighbour search, matching the
+    behaviour of pyresample's nearest-neighbour resampler.
 
     ``functools.lru_cache`` provides the thread-safe cache and guarantees that
     concurrent callers with the same key wait for a single build instead of
@@ -159,15 +193,23 @@ def _build_cached_swath_kdtree(key: _SwathKey) -> Any:
     """
     import pykdtree.kdtree
 
-    lons, lats = key.resolve()
+    lons, lats, mask = key.resolve()
     valid = np.isfinite(lons) & np.isfinite(lats)
+    if mask is not None:
+        valid = valid & mask
+    if not valid.any():
+        raise ValueError("No valid swath pixels available for KDTree construction.")
     swath_xyz = _lonlat_to_xyz(lons[valid], lats[valid])
     return pykdtree.kdtree.KDTree(swath_xyz)
 
 
-def _get_cached_swath_kdtree(lons: np.ndarray, lats: np.ndarray) -> Any:
+def _get_cached_swath_kdtree(
+    lons: np.ndarray,
+    lats: np.ndarray,
+    mask: np.ndarray | None = None,
+) -> Any:
     """Return a cached KDTree for the given swath coordinates, building if needed."""
-    key = _SwathKey(lons, lats)
+    key = _SwathKey(lons, lats, mask)
     return _build_cached_swath_kdtree(key)
 
 
@@ -243,14 +285,19 @@ def reproject_swath(
     This is the AEREO builtins equivalent of the manual pykdtree reprojection
     shown in ``examples/viirs_pykdtree_reproject.py``:
 
-    1. Build a ``pykdtree.KDTree`` on the full swath in ECEF space.
+    1. Build a ``pykdtree.KDTree`` on the valid swath pixels in ECEF space.
+       Pixels whose data value is NaN are excluded from the tree, so a target
+       pixel maps to the nearest *valid* source pixel rather than the nearest
+       NaN. This matches the behaviour of pyresample's nearest-neighbour
+       resampler and avoids propagating VIIRS bow-tie gaps into the output.
     2. Query the tree with target grid points to obtain nearest neighbours.
     3. Remap each data variable and mask distant matches.
 
     The KDTree is cached in a process-level cache keyed by a hash of the swath
-    ``lons``/``lats`` arrays, so the same swath reused across multiple
-    ``ExtractionTask`` objects (e.g., different target grid cells) only pays the
-    tree construction cost once.
+    ``lons``/``lats`` arrays and the per-variable valid-data mask. Variables
+    that share the same mask reuse the same tree, so the same swath reused
+    across multiple ``ExtractionTask`` objects only pays the tree construction
+    cost once per unique mask.
 
     Args:
         ds: Input swath dataset with ``lons`` and ``lats``.
@@ -292,12 +339,8 @@ def reproject_swath(
     valid = np.isfinite(lons) & np.isfinite(lats)
     target_xyz = _lonlat_to_xyz(target_lons.ravel(), target_lats.ravel())
 
-    tree = _get_cached_swath_kdtree(lons, lats)
-    distances, indices = tree.query(target_xyz, k=1, sqr_dists=True)
-
     swath_shape = lons.shape
     target_shape = target_lons.shape
-    distance_mask = distances.reshape(target_shape) > (max_distance**2)
 
     data_vars: dict[str, xr.DataArray] = {}
     skip_vars = {lons_var, lats_var}
@@ -313,10 +356,45 @@ def reproject_swath(
         if np.isnan(fill_value) and not np.issubdtype(arr.dtype, np.floating):
             arr = arr.astype(np.float64)
 
+        # Exclude NaN data pixels from the NN search so bow-tie gaps do not
+        # pollute the output. Integer arrays are treated as fully valid.
         extra_shape = arr.shape[:-2]
+
+        if np.issubdtype(arr.dtype, np.floating):
+            data_valid = np.isfinite(arr)
+        else:
+            data_valid = np.ones(arr.shape, dtype=bool)
+        # Reduce any leading dimensions to a single 2-D spatial mask. If a
+        # spatial pixel is invalid in any extra dimension, it is excluded from
+        # the tree for this variable.
+        if data_valid.ndim > 2:
+            data_valid = data_valid.all(axis=tuple(range(data_valid.ndim - 2)))
+        combined_valid = valid & data_valid
+
+        if not combined_valid.any():
+            # No valid data pixels for this variable in the cropped region.
+            # Emit a filled output grid rather than skipping the variable, so
+            # that grid cells which only contain bow-tie gaps do not abort the
+            # whole reprojection.
+            remapped = np.full(
+                (*extra_shape, *target_shape), fill_value, dtype=arr.dtype
+            )
+            data_vars[var_name] = xr.DataArray(
+                remapped,
+                dims=tuple(str(d) for d in da.dims[:-2]) + ("y", "x"),
+                coords={"y": y_coords, "x": x_coords},
+                attrs=da.attrs,
+                name=var_name,
+            )
+            continue
+
+        tree = _get_cached_swath_kdtree(lons, lats, combined_valid)
+        distances, indices = tree.query(target_xyz, k=1, sqr_dists=True)
+        distance_mask = distances.reshape(target_shape) > (max_distance**2)
+
         n_extra = int(np.prod(extra_shape, dtype=np.int64)) if extra_shape else 1
         flat = arr.reshape((n_extra, *swath_shape))
-        valid_values = flat[..., valid]
+        valid_values = flat[..., combined_valid]
 
         remapped = np.full((n_extra, *target_shape), fill_value, dtype=arr.dtype)
         remapped_flat = remapped.reshape((n_extra, -1))
