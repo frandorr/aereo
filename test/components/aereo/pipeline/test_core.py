@@ -1,3 +1,4 @@
+from functools import partial
 from pathlib import Path
 from typing import cast
 from unittest.mock import MagicMock
@@ -27,15 +28,17 @@ class FakeReader(Reader):
         raise NotImplementedError
 
 
-def test_job_no_search_or_task_builder():
-    _ = ExtractionJob(
+def test_job_search_and_task_builder_fields_are_optional():
+    job = ExtractionJob(
         grid_dist=1000,
         output_uri="/tmp/out",
         read=FakeReader(),
         write=_DummyWriter(),
     )
-    assert "search" not in ExtractionJob.model_fields
-    assert "task_builder" not in ExtractionJob.model_fields
+    assert "search_provider" in ExtractionJob.model_fields
+    assert "task_builder" in ExtractionJob.model_fields
+    assert job.search_provider is None
+    assert job.task_builder is None
 
 
 def test_extraction_job_from_yaml_dict(tmp_path: Path):
@@ -287,6 +290,102 @@ write:
     assert job.effective_target_aoi is None
 
 
+def test_extraction_job_from_yaml_accepts_runtime_plugins(tmp_path: Path):
+    """Runtime plugin keys (search, task_builder) can be defined inline."""
+    job_yaml = tmp_path / "job.yaml"
+    job_yaml.write_text(
+        """
+grid_dist: 50000
+output_uri: "out_dir"
+search:
+  _target_: aereo.builtins.search.search_stac
+  _partial_: true
+  stac_api_url: "https://example.com/stac"
+task_builder:
+  _target_: aereo.builtins.task_builder.build_grouped_tasks
+  _partial_: true
+  cells_per_task: 5
+read:
+  _target_: aereo.builtins.read.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
+"""
+    )
+    job = ExtractionJob.from_yaml(job_yaml)
+    assert job.grid_dist == 50000
+    assert job.output_uri == "out_dir"
+    assert job.search_provider is not None
+    assert job.task_builder is not None
+    assert cast(partial, job.task_builder).keywords["cells_per_task"] == 5
+
+
+def test_extraction_job_load_from_config_accepts_runtime_plugins(tmp_path: Path):
+    """Config packages may include runtime plugin keys inline."""
+    config_dir = tmp_path / "conf"
+    config_dir.mkdir()
+
+    (config_dir / "main_config.yaml").write_text(
+        """
+defaults:
+  - read@_global_: sentinel2
+  - write@_global_: geotiff
+  - _self_
+
+grid_dist: 50000
+output_uri: "out_dir"
+search:
+  _target_: aereo.builtins.search.search_stac
+  _partial_: true
+  stac_api_url: "https://example.com/stac"
+"""
+    )
+
+    read_dir = config_dir / "read"
+    read_dir.mkdir()
+    (read_dir / "sentinel2.yaml").write_text(
+        "read:\n  _target_: aereo.builtins.read.read_odc_stac\n"
+    )
+    write_dir = config_dir / "write"
+    write_dir.mkdir()
+    (write_dir / "geotiff.yaml").write_text(
+        "write:\n  _target_: aereo.builtins.write.write_geotiff\n"
+    )
+
+    job = ExtractionJob.load_from_config(config_dir)
+    assert job.grid_dist == 50000
+    assert job.output_uri == "out_dir"
+    assert job.search_provider is not None
+
+
+def test_extraction_job_from_yaml_ignores_helper_variables(tmp_path: Path):
+    """Hydra interpolation variables that are not job fields are ignored."""
+    aoi_file = tmp_path / "aoi.geojson"
+    aoi_file.write_text(str(_sample_geojson()).replace("'", '"'))
+
+    job_yaml = tmp_path / "job.yaml"
+    job_yaml.write_text(
+        f"""
+target_bands: [red, nir]
+aoi_path: {aoi_file}
+
+grid_dist: 50000
+output_uri: "out_dir"
+target_aoi: ${{aoi_path}}
+read:
+  _partial_: true
+  _target_: aereo.builtins.read_odc_stac
+  reader: sentinel2_l1c
+  wishlist: ${{target_bands}}
+write:
+  _target_: aereo.builtins.write.write_geotiff
+"""
+    )
+    job = ExtractionJob.from_yaml(job_yaml)
+    assert job.grid_dist == 50000
+    assert job.output_uri == "out_dir"
+    assert cast(partial, job.read).keywords["wishlist"] == ["red", "nir"]
+
+
 # ---------------------------------------------------------------------------
 # Orchestration methods
 # ---------------------------------------------------------------------------
@@ -362,6 +461,32 @@ def test_job_search_calls_provider():
     assert isinstance(assets, gpd.GeoDataFrame)
 
 
+def test_job_search_uses_configured_provider():
+    provider = MagicMock(spec=SearchProvider)
+    provider.return_value = empty_asset_result()
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+        search=provider,
+    )
+    assets = job.search()
+    provider.assert_called_once()
+    assert isinstance(assets, gpd.GeoDataFrame)
+
+
+def test_job_search_raises_when_no_provider_given_or_configured():
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+    )
+    with pytest.raises(ValueError, match="No search provider configured"):
+        job.search()
+
+
 def test_job_search_passes_aoi_to_provider():
     aoi = Polygon([[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]])
     job = ExtractionJob(
@@ -405,6 +530,32 @@ def test_job_build_tasks_calls_task_builder():
     tasks = job.build_tasks(_make_assets(), builder)
     builder.assert_called_once()
     assert tasks == []
+
+
+def test_job_build_tasks_uses_configured_builder():
+    builder = MagicMock(spec=TaskBuilder)
+    builder.return_value = []
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+        task_builder=builder,
+    )
+    tasks = job.build_tasks(_make_assets())
+    builder.assert_called_once()
+    assert tasks == []
+
+
+def test_job_build_tasks_raises_when_no_builder_given_or_configured():
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+    )
+    with pytest.raises(ValueError, match="No task builder configured"):
+        job.build_tasks(_make_assets())
 
 
 def test_job_build_tasks_passes_builder_kwargs():

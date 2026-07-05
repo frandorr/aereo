@@ -11,9 +11,35 @@ from pyproj import Transformer
 from shapely.geometry import LineString, MultiPolygon, Point, Polygon
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import transform
+from shapely import from_geojson
+from pathlib import Path
 
 _NORTH_EPSG_BASE = 326
 _SOUTH_EPSG_BASE = 327
+
+
+def load_geometry(geojson_path: Path | str) -> BaseGeometry | None:
+    """Load a GeoJSON file and return the geometry.
+
+    Args:
+        geojson_path: Path to the GeoJSON file.
+
+    Returns:
+        The parsed geometry, or None if the path does not exist.
+
+    Raises:
+        ValueError: If the GeoJSON has no extractable geometry.
+    """
+    if isinstance(geojson_path, str):
+        geojson_path = Path(geojson_path)
+    if not geojson_path.exists():
+        return None
+
+    geometry = from_geojson(geojson_path.read_text())
+    if geometry is None:
+        raise ValueError("Could not extract geometry from GeoJSON.")
+
+    return geometry
 
 
 def reproject_geom(geom: BaseGeometry, src_epsg: str, dst_epsg: str) -> BaseGeometry:
