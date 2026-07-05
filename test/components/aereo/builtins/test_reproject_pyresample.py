@@ -125,10 +125,11 @@ def test_reproject_pyresample_matches_swath_on_valid_data():
     )
 
 
-def test_reproject_pyresample_nan_propagation():
-    """pyresample nearest propagates NaN when the nearest source pixel is NaN."""
+def test_reproject_pyresample_masks_nan_source_pixels():
+    """By default NaN source pixels are excluded from the pyresample search."""
     ds = _synthetic_swath((20, 20))
     values = ds["band"].values.copy()
+    # Create a bow-tie-like gap across the middle rows.
     values[8:12, :] = np.nan
     ds["band"] = (["y", "x"], values)
 
@@ -139,6 +140,55 @@ def test_reproject_pyresample_nan_propagation():
         max_distance=10_000.0,
     )
 
-    # pyresample does not exclude NaN source pixels, so the output may contain
-    # NaN wherever a target pixel's nearest source pixel was NaN.
+    # With mask_invalid=True, valid neighbours should fill the gap.
+    finite_output = out["band"].values[np.isfinite(out["band"].values)]
+    valid_input = values[np.isfinite(values)]
+    assert set(np.unique(finite_output)).issubset(set(np.unique(valid_input)))
+
+
+def test_reproject_pyresample_unmasked_nan_propagation():
+    """With mask_invalid=False, pyresample propagates NaN like plain pyresample."""
+    ds = _synthetic_swath((20, 20))
+    values = ds["band"].values.copy()
+    values[8:12, :] = np.nan
+    ds["band"] = (["y", "x"], values)
+
+    out = reproject_pyresample(
+        ds,
+        crs="EPSG:4326",
+        resolution=0.01,
+        max_distance=10_000.0,
+        mask_invalid=False,
+    )
+
+    # Plain pyresample nearest does not exclude NaN source pixels.
     assert np.isnan(out["band"].values).any()
+
+
+def test_reproject_pyresample_matches_swath_with_nan_data():
+    """Masked pyresample and reproject_swath both avoid bow-tie NaN gaps."""
+    ds = _synthetic_swath((30, 30))
+    values = ds["band"].values.copy()
+    # Create a bow-tie-like gap across the middle rows.
+    values[12:18, :] = np.nan
+    ds["band"] = (["y", "x"], values)
+
+    out_pyresample = reproject_pyresample(
+        ds,
+        crs="EPSG:4326",
+        resolution=0.01,
+        max_distance=10_000.0,
+    )
+    out_swath = reproject_swath(
+        ds,
+        crs="EPSG:4326",
+        resolution=0.01,
+        max_distance=10_000.0,
+    )
+
+    # Both methods should fill the interior of the swath with valid values.
+    assert np.isfinite(out_pyresample["band"].values).sum() > 0
+    assert np.isfinite(out_swath["band"].values).sum() > 0
+    # Neither should leave the full bow-tie gap as NaN.
+    assert not np.all(np.isnan(out_pyresample["band"].values[30:70, 30:70]))
+    assert not np.all(np.isnan(out_swath["band"].values[30:70, 30:70]))

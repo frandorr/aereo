@@ -433,6 +433,7 @@ def reproject_pyresample(
     resolution: float | None = None,
     max_distance: float = 3_000.0,
     fill_value: Any = np.nan,
+    mask_invalid: bool = True,
     nprocs: int = 1,
 ) -> xr.Dataset:
     """Reproject a swath dataset using pyresample's nearest-neighbour resampler.
@@ -442,9 +443,11 @@ def reproject_pyresample(
     the source lon/lat arrays and a ``pyresample.AreaDefinition`` from the
     target geobox, then calls ``pyresample.kd_tree.resample_nearest``.
 
-    Unlike ``reproject_swath``, pyresample's nearest-neighbour resampler does
-    not explicitly exclude NaN source pixels from the search; a target pixel
-    whose nearest neighbour happens to be NaN will receive NaN.
+    By default, NaN and infinite source pixels are masked before resampling so
+    that bow-tie gaps do not pollute the output. This matches the behaviour of
+    ``reproject_swath``. Set ``mask_invalid=False`` to get plain pyresample
+    nearest-neighbour behaviour, where a target pixel whose nearest source is
+    NaN receives NaN.
 
     Args:
         ds: Input swath dataset with ``lons`` and ``lats`` (or ``longitude``
@@ -456,6 +459,7 @@ def reproject_pyresample(
             target pixel is filled with ``fill_value`` (passed as
             ``radius_of_influence`` to pyresample).
         fill_value: Value for out-of-bounds / distant pixels.
+        mask_invalid: If True, mask NaN/inf source pixels before resampling.
         nprocs: Number of processor cores for pyresample (default 1).
 
     Returns:
@@ -522,6 +526,9 @@ def reproject_pyresample(
 
         # pyresample expects (n_pixels, n_channels) and returns (y, x, n_channels).
         flat = arr.reshape((n_extra, -1)).T
+        if mask_invalid and np.issubdtype(arr.dtype, np.floating):
+            flat = np.ma.masked_invalid(flat)
+
         resampled = resample_nearest(
             swath_def,
             flat,
@@ -531,7 +538,7 @@ def reproject_pyresample(
             nprocs=nprocs,
         )
 
-        resampled_arr = np.asarray(resampled)
+        resampled_arr = np.ma.filled(resampled, fill_value=fill_value)
         remapped = np.moveaxis(resampled_arr.reshape((*target_shape, n_extra)), -1, 0)
         remapped = remapped.reshape((*extra_shape, *target_shape))
 
