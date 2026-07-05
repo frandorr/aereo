@@ -160,3 +160,72 @@ def test_reproject_swath_caches_kdtree_across_geoboxes():
     assert isinstance(out_b, xr.Dataset)
 
     _build_cached_swath_kdtree.cache_clear()
+
+
+def test_reproject_swath_skips_nan_data_pixels():
+    """NaN data pixels are excluded from the nearest-neighbour search.
+
+    This reproduces the VIIRS bow-tie situation: some source pixels are NaN,
+    but valid neighbours exist nearby. The output should pick the nearest valid
+    neighbour rather than propagating the NaN.
+    """
+    ds = _synthetic_swath((20, 20))
+    values = ds["band"].values.copy()
+    # Create a bow-tie-like gap across the middle rows.
+    values[8:12, :] = np.nan
+    ds["band"] = (["y", "x"], values)
+
+    out = reproject_swath(
+        ds,
+        crs="EPSG:4326",
+        resolution=0.01,
+        max_distance=10_000.0,
+    )
+
+    output = out["band"].values
+    # The interior of the output should contain finite values from valid neighbours.
+    assert np.isfinite(output).sum() > 0
+    # Every finite output value must come from a finite input value.
+    finite_output = output[np.isfinite(output)]
+    valid_input = values[np.isfinite(values)]
+    assert set(np.unique(finite_output)).issubset(set(np.unique(valid_input)))
+
+
+def test_reproject_swath_caches_kdtree_per_mask():
+    """Variables with different NaN masks get separate cached trees."""
+    _build_cached_swath_kdtree.cache_clear()
+    ds = _synthetic_swath((10, 10))
+    ds["band_a"] = ds["band"]
+    ds["band_b"] = ds["band"].copy()
+    ds["band_b"].values[0:5, :] = np.nan
+
+    out = reproject_swath(
+        ds,
+        crs="EPSG:4326",
+        resolution=0.01,
+        max_distance=10_000.0,
+    )
+
+    # band and band_a share the all-valid mask; band_b has its own masked tree.
+    assert _build_cached_swath_kdtree.cache_info().currsize == 2
+    assert "band_a" in out.data_vars
+    assert "band_b" in out.data_vars
+
+    _build_cached_swath_kdtree.cache_clear()
+
+
+def test_reproject_swath_all_nan_data_emits_fill_value():
+    """A variable whose data is entirely NaN is remapped to fill_value."""
+    ds = _synthetic_swath((10, 10))
+    ds["band"] = (["y", "x"], np.full((10, 10), np.nan))
+
+    out = reproject_swath(
+        ds,
+        crs="EPSG:4326",
+        resolution=0.01,
+        max_distance=10_000.0,
+        fill_value=-999.0,
+    )
+
+    assert "band" in out.data_vars
+    assert np.all(out["band"].values == -999.0)
