@@ -12,9 +12,6 @@ hooks:
 
 theme:
   name: material
-  variant: classic
-  custom_dir: docs/overrides
-
   palette:
     - media: (prefers-color-scheme)
       toggle:
@@ -36,8 +33,11 @@ theme:
         name: Switch to system preference
 
   features:
+    - content.action.edit
+    - content.action.view
     - content.code.annotate
     - content.code.copy
+    - content.code.select
     - content.footnote.tooltips
     - content.tabs.link
     - content.tooltips
@@ -59,27 +59,33 @@ theme:
   icon:
     repo: octicons/mark-github-24
 
+extra_css:
+  - stylesheets/extra.css
+
 plugins:
   - search:
-      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?=\w)'
+      separator: '[\s\-,:!=[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?=\w)'
       lang: en
   - mknotebooks:
-      execute: true
+      execute: false
       timeout: 600
       allow_errors: true
+  - mermaid2
   - exclude:
       glob:
         - "hooks/*"
         - "includes/*"
         - "examples/config/*"
         - "examples/config/**/*"
+  - minify:
+      minify_html: true
   - mkdocstrings:
       handlers:
         python:
           paths: [components, bases]
           options:
             show_root_heading: true
-            show_if_no_docstring: true
+            show_if_no_docstring: false
             inherited_members: true
             members_order: source
             separate_signature: true
@@ -115,7 +121,7 @@ markdown_extensions:
       custom_fences:
         - name: mermaid
           class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format ''
+          format: !!python/name:mermaid2.fence_mermaid_custom
   - pymdownx.tilde
   - pymdownx.blocks.admonition:
       types:
@@ -146,62 +152,46 @@ validation:
     absolute_links: warn
 
 not_in_nav: |
-  includes/abbreviations.md
   examples/config/README.md
 
 nav:
-    - Home: index.md
-    - Get Started:
-          - Install: install.md
-          - Your First Pipeline: first-pipeline.md
-    - Run Aereo:
-          - run/index.md
-          - Python API: run/run-with-python.md
-          - CLI: run/run-with-cli.md
-          - AWS Lambda: run/run-on-lambda.md
-    - Concepts:
-          - Pipeline Architecture: concepts/pipeline-architecture.md
-          - Pipeline Walkthrough: concepts/pipeline-walkthrough.md
-          - Working with Grids: concepts/grids.md
-          - Output Formats: concepts/output-formats.md
-          - How Plugins Work: plugins/plugin-overview.md
-    - Examples:
-          - examples/index.md
-          - 01 — Sentinel-2 true-color: examples/01-sentinel2.ipynb
-          - 01b — Sentinel-2 NDVI: examples/01b-sentinel2-ndvi.ipynb
-          - 02 — VIIRS: examples/02-viirs.ipynb
-          - 03 — Sentinel-3 OLCI: examples/03-sentinel3.ipynb
-          - 03b — Sentinel-3 NDVI: examples/03b-sentinel3-ndvi.ipynb
-          - 04 — Tessera: examples/04-tessera.ipynb
-          - 05 — GOES-19 ABI: examples/05-goes19.ipynb
-    - Build Plugins:
-          - Build Your First Plugin: plugins/build-first-plugin.md
-          - Advanced Patterns: plugins/plugin-advanced.md
-    - Architecture:
-          - architecture/index.md
-          - Overview: architecture/architecture-overview.md
-          - Pipeline Architecture: concepts/pipeline-architecture.md
-          - Execution Backends: execution-backends.md
-          - Visual Architecture Guide: architecture/architecture-visual.md
-    - API Reference:
-          - Core:
-                - Client: api/client.md
-                - Pipeline: api/pipeline.md
-                - Interfaces: api/interfaces.md
-                - Registry: api/registry.md
-                - Schemas: api/schemas.md
-          - Built-ins:
-                - Built-in Plugins: api/builtins.md
-                - Cache: api/cache.md
-          - Data and Grid:
-                - Grid: api/grid.md
-                - Spatial: api/spatial.md
-                - EOIDS: api/eoids.md
-          - Execution:
-                - Backends: api/backends.md
-                - Asset Downloader: api/asset_downloader.md
-          - Utilities:
-                - CLI: api/cli.md
-                - Lambda Handler: api/lambda_handler.md
-                - Viz: api/viz.md
-                - Serialization: api/serialization.md
+  - Home: index.md
+  - Get Started:
+      - Install: install.md
+      - Your First Pipeline: getting-started/first-pipeline.md
+      - Pure Python Quickstart: getting-started/pure-python.md
+      - Core Concepts: getting-started/concepts.md
+  - Tutorials:
+      - Overview: examples/index.md
+      - Sentinel-2 true-color: examples/01-sentinel2.ipynb
+      - Sentinel-2 NDVI: examples/01b-sentinel2-ndvi.ipynb
+      - Sentinel-2 NDWI: examples/01c-sentinel2-ndwi.ipynb
+      - Sentinel-2 step-by-step: examples/step_by_step.ipynb
+      - Sentinel-2 raw Python: examples/step_by_step_raw.ipynb
+      - VIIRS: examples/02-viirs.ipynb
+      - Sentinel-3 OLCI: examples/03-sentinel3.ipynb
+      - Sentinel-3 NDVI: examples/03b-sentinel3-ndvi.ipynb
+      - GeoTessera: examples/04-tessera.ipynb
+      - GOES-19 ABI: examples/05-goes19.ipynb
+      - Multiple constellations: examples/06-multiple-constellation.ipynb
+  - User Guide:
+      - Choosing a Sensor: user-guide/choosing-a-sensor.md
+      - Search: user-guide/search.md
+      - Grids: user-guide/grids.md
+      - Reprojection: user-guide/reprojection.md
+      - Processing: user-guide/processing.md
+      - Outputs & Catalog: user-guide/outputs.md
+      - CLI: user-guide/cli.md
+      - AWS Lambda: user-guide/lambda.md
+  - Plugins:
+      - Overview: plugins/overview.md
+      - Build a Plugin: plugins/build-a-plugin.md
+  - API Reference:
+      - Pipeline: api/pipeline.md
+      - Built-ins: api/builtins.md
+      - Executors: api/executors.md
+      - Interfaces: api/interfaces.md
+      - Grid: api/grid.md
+      - Schemas: api/schemas.md
+      - Registry: api/registry.md
+  - Contributing: contributing.md

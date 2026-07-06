@@ -1,131 +1,85 @@
 # Install
 
-Pick your sensor and copy-paste the install command.
+AEREO is a Python 3.12+ framework. The core package is small; sensor-specific
+search and I/O plugins are installed separately.
 
-## Core
+## Requirements
 
-```bash
-pip install aereo
-```
+- Python **3.12** or newer
+- `pip` or `uv`
+- Credentials for any catalog that requires them (see below)
 
-This gives you the `ExtractionJob` orchestration API, the Hydra CLI, the built-in stage functions
-(`search_stac`, `read_odc_stac`, `reproject_odc`, `write_geotiff`, `ndvi`, `select_bands`, ...), and
-grid utilities. You can search public STAC catalogs and extract with ODC-STAC
-using only the core package.
+## Quick install
 
-## Sensor-specific setups
+=== "Sentinel-2 (Planetary Computer)"
 
-Most search and I/O plugins live in separate packages. Install the ones that
-match your data source.
+    ```bash
+    pip install aereo aereo-search-planetary-computer
+    ```
 
-### Sentinel-2 (Planetary Computer)
+    You will need a [Planetary Computer subscription key](https://planetarycomputer.microsoft.com/docs/concepts/sas/)
+    for signed assets. Set it as an environment variable or in your notebook.
 
-```bash
-pip install aereo aereo-search-planetary-computer
-```
+=== "MODIS / VIIRS / Sentinel-3 (NASA Earthdata)"
 
-Required credentials: a [Planetary Computer subscription key](https://planetarycomputer.microsoft.com/docs/concepts/sas/)
-is recommended for signed assets. The built-in `search_stac` config in
-`examples/config/search/sentinel2_pc.yaml` shows how to use
-`planetary_computer.sign_inplace`.
+    ```bash
+    pip install aereo aereo-search-earthaccess
+    ```
 
-### MODIS / VIIRS / Sentinel-3 (NASA Earthdata)
+    Register for a free [NASA Earthdata Login](https://urs.earthdata.nasa.gov/)
+    and store your credentials with `earthaccess.login()` or environment
+    variables.
 
-```bash
-pip install aereo aereo-search-earthaccess
-```
+=== "GOES ABI (public S3)"
 
-Required credentials: NASA Earthdata login. Set them via environment variables
-(`EARTHDATA_USERNAME`, `EARTHDATA_PASSWORD`) or a `~/.netrc` file. See
-[Earthdata Login](https://urs.earthdata.nasa.gov/) and the
-[earthaccess docs](https://earthaccess.readthedocs.io/en/latest/howto/authenticate/).
+    ```bash
+    pip install aereo aereo-search-aws-goes aereo-read-satpy aereo-reproject-satpy
+    ```
 
-### GOES ABI (public AWS S3, no auth)
+    GOES data on AWS is public, so no authentication is required.
 
-```bash
-pip install aereo aereo-search-aws-goes
-```
+=== "GeoTessera"
 
-No credentials needed for search. If you also want to read GOES with Satpy,
-install the corresponding reader plugin:
+    ```bash
+    pip install aereo aereo-search-tessera aereo-read-tessera
+    ```
 
-```bash
-pip install aereo-read-satpy
-```
-
-### Satpy-based readers / reprojectors
-
-```bash
-pip install aereo-read-satpy aereo-reproject-satpy
-```
-
-Use these when your pipeline stages use ``read_satpy`` or
-``reproject_satpy`` instead of the built-in ODC-STAC stages.
-
-```yaml
-# example extract config snippet
-read:
-  _target_: aereo.read_satpy.core:read_satpy
-  _partial_: true
-  reader: abi_l1b
-  wishlist: ["C02"]
-reproject:
-  _target_: aereo.reproject_satpy.core:reproject_satpy
-  _partial_: true
-```
-
-### Tessera
-
-```bash
-pip install aereo aereo-search-tessera aereo-read-tessera
-```
-
----
+    Check your Tessera catalog documentation for authentication.
 
 ## Verify the installation
 
-List every plugin AEREO can discover:
+```python
+from aereo.pipeline import ExtractionJob
+from aereo.builtins import search_stac, build_grouped_tasks
+from aereo.executors import LocalExecutor
+
+print("AEREO imported successfully")
+```
+
+You can also list installed plugins:
 
 ```bash
 aereo action=plugins
 ```
 
-You should see built-in plugins (`search_stac`, `read_odc_stac`, ...) plus any
-sensor-specific plugins you installed. To inspect a single plugin's parameters:
+## Development install
+
+If you are contributing to AEREO or running the example notebooks from the
+repo:
 
 ```bash
-aereo action=plugin_params plugin_name=search_stac
+git clone https://github.com/frandorr/aereo.git
+cd aereo
+uv sync --extra docs
 ```
 
----
-
-## Troubleshooting
-
-### `PluginNotFoundError: No search plugin found for collection ...`
-
-AEREO is a plugin-based framework. Installing only `aereo` gives you the core
-orchestration API and interfaces, but you need at least one search plugin and
-one reader plugin to run a pipeline.
-
-**Fix:** Install the plugins for your sensor (see commands above) and verify:
+Then build the docs locally:
 
 ```bash
-aereo action=plugins
+uv run mkdocs serve
 ```
 
-If a plugin is missing, install the corresponding pip package and run the
-command again. The package must be installed in the same environment as `aereo`:
+## Next step
 
-```bash
-python -c "import aereo_search_aws_goes"
-```
-
-If this raises `ModuleNotFoundError`, install the package.
-
-### Old docs mention `aereo-extract-satpy` or `aereo-extract-odc-stac`
-
-Those package names are outdated. The current plugin packages are named
-`aereo-search-*`, `aereo-read-*`, and `aereo-reproject-*`. If you are following
-an old blog post or notebook, replace `aereo-extract-satpy` with
-`aereo-read-satpy` (and add `aereo-reproject-satpy` if the pipeline reprojects
-with Satpy).
+Head to [Your First Pipeline](getting-started/first-pipeline.md) to extract
+your first Sentinel-2 GeoTIFF.

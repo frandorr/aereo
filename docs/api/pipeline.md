@@ -1,6 +1,8 @@
-# Pipeline
-
-`aereo.pipeline` defines the declarative `ExtractionJob` model and helpers for
-loading jobs from Hydra config packages or single YAML files.
+# Pipeline API
 
 ::: aereo.pipeline
+    options:
+      show_if_no_docstring: false
+      members:
+        - ExtractionJob
+        - load_plugin

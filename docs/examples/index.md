@@ -1,52 +1,45 @@
-# Examples Gallery
+# Examples
 
 AEREO ships with runnable Jupyter notebooks for every supported sensor and
-workflow. Each notebook uses a Hydra config package from `examples/config` and
-the `ExtractionJob` orchestration API: `search`, `build_tasks`, and `execute`.
-
-The notebooks are executed during the docs build, so the rendered pages show
-real outputs. You can also run them locally from the repo.
-
----
+workflow. Each notebook uses the Hydra config package in `examples/config` and
+the `ExtractionJob` API: `search`, `build_tasks`, and `execute`.
 
 ## Before you run
 
 Most examples perform live catalog searches and data downloads. Make sure you
 have:
 
-1. **The core package and any sensor-specific plugins** listed in the table
-   below.
-2. **Credentials** for the catalog that requires them (Earthdata,
-   Planetary Computer subscription key).
-3. **A few minutes of runtime** for the extraction step.
-
----
+1. The **core package and any sensor-specific plugins** listed below.
+2. **Credentials** for the catalog that requires them.
+3. A few minutes of runtime for the extraction step.
 
 ## Beginner
 
 | Notebook | Sensor | Plugins | Auth | What it teaches |
-|----------|--------|---------|------|-----------------|
-| [01 — Sentinel-2 true-color](01-sentinel2.ipynb) | Sentinel-2 MSI | `aereo` built-ins + `aereo-search-planetary-computer` | Planetary Computer key (recommended) | Load a Hydra job, search STAC, extract a GeoTIFF on the Major TOM grid. |
-| [05 — GOES-19 ABI preview](05-goes19.ipynb) | GOES-19 ABI | `aereo-search-aws-goes` + `aereo-read-satpy` + `aereo-reproject-satpy` | None | Public S3 search and Satpy-based reading/reprojection. |
+|---|---|---|---|---|
+| [01 — Sentinel-2 true-color](01-sentinel2.ipynb) | Sentinel-2 MSI | `aereo` + `aereo-search-planetary-computer` | Planetary Computer key (recommended) | Load a Hydra job, search STAC, extract a GeoTIFF on the Major TOM grid. |
+| [05 — GOES-19 ABI preview](05-goes19.ipynb) | GOES-19 ABI | `aereo` + `aereo-search-aws-goes` + `aereo-read-satpy` + `aereo-reproject-satpy` | None | Public S3 search and Satpy-based reading/reprojection. |
+| [step_by_step](step_by_step.ipynb) | Sentinel-2 MSI | `aereo` + `aereo-search-planetary-computer` | Planetary Computer key (recommended) | Same as `01`, but each stage is run and inspected explicitly. |
+| [step_by_step_raw](step_by_step_raw.ipynb) | Sentinel-2 MSI | `aereo` + `aereo-search-planetary-computer` | Planetary Computer key (recommended) | Same pipeline built entirely from raw Python — no config files or Hydra. |
 
 ## Processing
 
 | Notebook | Sensor | Plugins | Auth | What it teaches |
-|----------|--------|---------|------|-----------------|
-| [01b — Sentinel-2 NDVI](01b-sentinel2-ndvi.ipynb) | Sentinel-2 MSI | `aereo` built-ins + `aereo-search-planetary-computer` | Planetary Computer key (recommended) | Add a processor stage (`NDVI`) before reprojection. |
-| [03b — Sentinel-3 NDVI](03b-sentinel3-ndvi.ipynb) | Sentinel-3 OLCI | `aereo-search-earthaccess` + `aereo-read-satpy` | NASA Earthdata | Processor stage with Satpy-based reading. |
+|---|---|---|---|---|
+| [01b — Sentinel-2 NDVI](01b-sentinel2-ndvi.ipynb) | Sentinel-2 MSI | `aereo` + `aereo-search-planetary-computer` | Planetary Computer key (recommended) | Add a processor stage (`NDVI`) before reprojection. |
+| [01c — Sentinel-2 NDWI](01c-sentinel2-ndwi.ipynb) | Sentinel-2 MSI | `aereo` + `aereo-search-planetary-computer` | Planetary Computer key (recommended) | Add a processor stage (`NDWI`) before reprojection. |
+| [03b — Sentinel-3 NDVI](03b-sentinel3-ndvi.ipynb) | Sentinel-3 OLCI | `aereo` + `aereo-search-earthaccess` + `aereo-read-satpy` + `aereo-reproject-satpy` | NASA Earthdata | Processor stage with Satpy-based reading. |
 
 ## Sensors
 
 | Notebook | Sensor | Plugins | Auth | What it teaches |
-|----------|--------|---------|------|-----------------|
-| [02 — VIIRS](02-viirs.ipynb) | VIIRS | `aereo-search-earthaccess` + `aereo-read-satpy` + `aereo-reproject-satpy` | NASA Earthdata | Search Earthaccess and read with Satpy. |
-| [03 — Sentinel-3 OLCI](03-sentinel3.ipynb) | Sentinel-3 OLCI | `aereo-search-earthaccess` + `aereo-read-satpy` + `aereo-reproject-satpy` | NASA Earthdata | Sentinel-3 extraction workflow. |
-| [04 — Tessera](04-tessera.ipynb) | GeoTessera | `aereo-search-tessera` + `aereo-read-tessera` | Depends on catalog | Tessera tile search and extraction. |
+|---|---|---|---|---|
+| [02 — VIIRS](02-viirs.ipynb) | VIIRS | `aereo` + `aereo-search-earthaccess` + `aereo-read-satpy` + `aereo-reproject-satpy` | NASA Earthdata | Search Earthaccess and read with Satpy. |
+| [03 — Sentinel-3 OLCI](03-sentinel3.ipynb) | Sentinel-3 OLCI | `aereo` + `aereo-search-earthaccess` + `aereo-read-satpy` + `aereo-reproject-satpy` | NASA Earthdata | Sentinel-3 extraction workflow. |
+| [04 — Tessera](04-tessera.ipynb) | GeoTessera | `aereo` + `aereo-search-tessera` + `aereo-read-tessera` | Depends on catalog | Tessera tile search and extraction. |
+| [06 — Multiple constellations](06-multiple-constellation.ipynb) | Sentinel-2 + VIIRS | `aereo` + `aereo-search-earthaccess` + `aereo-read-satpy` + `aereo-reproject-satpy` | NASA Earthdata | Search and extract multiple sensors with a shared cache. |
 
----
-
-## Run a notebook
+## Run a notebook locally
 
 ```bash
 cd examples
@@ -60,31 +53,33 @@ jupyter nbconvert --to script 01-sentinel2.ipynb
 python 01-sentinel2.py
 ```
 
----
+## Run the same config from the CLI
 
-## Run the same config from a script
-
-Every notebook config can also be run from the example script that loads the
-job, search provider, and task builder from the config package:
+Every notebook config can also be run with the `aereo` CLI:
 
 ```bash
-cd examples
-uv run python config/run_job.py
+cd examples/config
+aereo action=run \
+  search=sentinel2_pc \
+  grid_dist=grid_10km \
+  read=sentinel2 \
+  write=sentinel2
 ```
 
-Override the job, search provider, or task builder by passing flags:
+See [CLI](../user-guide/cli.md) for the full command reference.
 
-```bash
-cd examples
-uv run python config/run_job.py --config-name job_goes19 --search goes19 --task-builder grouped
-```
+## Download notebooks
 
-Set ``DRY_RUN=true`` to validate the configuration without performing network
-calls:
+You can also download the raw notebooks directly from GitHub:
 
-```bash
-cd examples
-DRY_RUN=true uv run python config/run_job.py
-```
-
-See [Run with CLI](../run/run-with-cli.md) for the full CLI reference.
+- [01-sentinel2.ipynb](https://github.com/frandorr/aereo/blob/main/examples/01-sentinel2.ipynb)
+- [01b-sentinel2-ndvi.ipynb](https://github.com/frandorr/aereo/blob/main/examples/01b-sentinel2-ndvi.ipynb)
+- [01c-sentinel2-ndwi.ipynb](https://github.com/frandorr/aereo/blob/main/examples/01c-sentinel2-ndwi.ipynb)
+- [02-viirs.ipynb](https://github.com/frandorr/aereo/blob/main/examples/02-viirs.ipynb)
+- [03-sentinel3.ipynb](https://github.com/frandorr/aereo/blob/main/examples/03-sentinel3.ipynb)
+- [03b-sentinel3-ndvi.ipynb](https://github.com/frandorr/aereo/blob/main/examples/03b-sentinel3-ndvi.ipynb)
+- [04-tessera.ipynb](https://github.com/frandorr/aereo/blob/main/examples/04-tessera.ipynb)
+- [05-goes19.ipynb](https://github.com/frandorr/aereo/blob/main/examples/05-goes19.ipynb)
+- [06-multiple-constellation.ipynb](https://github.com/frandorr/aereo/blob/main/examples/06-multiple-constellation.ipynb)
+- [step_by_step.ipynb](https://github.com/frandorr/aereo/blob/main/examples/step_by_step.ipynb)
+- [step_by_step_raw.ipynb](https://github.com/frandorr/aereo/blob/main/examples/step_by_step_raw.ipynb)

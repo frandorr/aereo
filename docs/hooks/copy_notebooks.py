@@ -28,11 +28,11 @@ def on_config(config: dict, **kwargs: object) -> dict:
 
     dst_dir.mkdir(parents=True, exist_ok=True)
 
-    # Copy notebooks
+    # Copy all notebooks, including step-by-step and any new ones.
     for notebook in sorted(src_dir.glob("*.ipynb")):
         shutil.copy(notebook, dst_dir / notebook.name)
 
-    # Copy the Hydra config package so relative paths in YAML resolve
+    # Copy the Hydra config package so relative paths in YAML resolve.
     src_config = src_dir / "config"
     dst_config = dst_dir / "config"
     if src_config.is_dir():
