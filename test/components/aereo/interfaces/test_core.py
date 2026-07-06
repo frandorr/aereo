@@ -3,6 +3,7 @@ from typing import cast
 import geopandas as gpd
 import pytest
 from aereo.builtins.read import read_odc_stac
+from aereo.grid import GridCell
 from aereo.interfaces import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.interfaces.utils import (
@@ -177,6 +178,46 @@ def test_task_bbox_falls_back_to_job_target_aoi():
 def test_task_bbox_returns_none_without_aoi():
     task = _make_task_with_assets()
     assert task.bbox is None
+
+
+def test_task_bbox_expands_with_grid_cells_margin():
+    """bbox grows when grid_cells_margin increases."""
+    from shapely.geometry import box
+
+    cell_geometry = box(-69.7, -39.7, -69.3, -39.3)
+
+    def _bbox_for_margin(margin: float) -> tuple[float, float, float, float]:
+        job = ExtractionJob(
+            grid_dist=10_000,
+            output_uri="test",
+            read=read_odc_stac,
+            write=_dummy_writer,
+            resolution=10.0,
+            grid_cells_margin=margin,
+        )
+        task = ExtractionTask(
+            id="task-1",
+            assets=_make_task_with_assets().assets,
+            job=job,
+            grid_cells=[GridCell(id="0U_0R", d=10_000, cell_geometry=cell_geometry)],
+        )
+        bbox = task.bbox
+        assert bbox is not None
+        return bbox
+
+    bbox_no_margin = _bbox_for_margin(0.0)
+    bbox_with_margin = _bbox_for_margin(50.0)
+    assert bbox_with_margin[0] <= bbox_no_margin[0]
+    assert bbox_with_margin[1] <= bbox_no_margin[1]
+    assert bbox_with_margin[2] >= bbox_no_margin[2]
+    assert bbox_with_margin[3] >= bbox_no_margin[3]
+    # At least one side must be strictly larger.
+    assert (
+        bbox_with_margin[0] < bbox_no_margin[0]
+        or bbox_with_margin[1] < bbox_no_margin[1]
+        or bbox_with_margin[2] > bbox_no_margin[2]
+        or bbox_with_margin[3] > bbox_no_margin[3]
+    )
 
 
 def test_task_collections_returns_unique_sorted_collections():

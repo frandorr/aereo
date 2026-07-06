@@ -24,10 +24,12 @@ import attrs
 import numpy as np
 import pandas as pd
 import pystac
+import shapely
 import xarray as xr
 from aereo.grid import GridCell
 from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
+from shapely.geometry import box
 from shapely.geometry.base import BaseGeometry
 
 WGS84_CRS: str = "epsg:4326"
@@ -242,11 +244,37 @@ class ExtractionTask:
     def bbox(self) -> tuple[float, float, float, float] | None:
         """WGS84 bounding box the reader should crop to, if any.
 
+        When the task has explicit grid cells and ``job.grid_cells_margin`` is
+        set, the returned bounds cover the expanded GeoBox of every cell so
+        readers fetch enough source data to avoid cutting edge cells.
+
         Precedence:
-            1. ``task.aoi.bounds`` when ``task.aoi`` is set.
-            2. ``job.target_aoi.bounds`` when ``job.target_aoi`` is set.
-            3. ``None``.
+            1. Expanded grid-cell GeoBoxes when ``grid_cells`` and
+               ``grid_cells_margin`` are set.
+            2. ``task.aoi.bounds`` when ``task.aoi`` is set.
+            3. ``job.target_aoi.bounds`` when ``job.target_aoi`` is set.
+            4. ``None``.
         """
+        if self.grid_cells and self.job.resolution is not None:
+            from aereo.spatial import reproject_geom
+
+            expanded_boxes: list[BaseGeometry] = []
+            for cell in self.grid_cells:
+                gb = cell.to_geobox(
+                    resolution=self.job.resolution,
+                    margin=self.job.grid_cells_margin,
+                )
+                bb = gb.boundingbox
+                utm_box = box(bb.left, bb.bottom, bb.right, bb.top)
+                expanded_boxes.append(
+                    reproject_geom(
+                        utm_box,
+                        src_epsg=str(gb.crs).lower(),
+                        dst_epsg=WGS84_CRS,
+                    )
+                )
+            return shapely.unary_union(expanded_boxes).bounds
+
         if self.aoi is not None:
             return self.aoi.bounds
         if self.job.effective_target_aoi is not None:
