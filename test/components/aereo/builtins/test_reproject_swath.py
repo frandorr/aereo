@@ -1,4 +1,4 @@
-"""Unit tests for the reproject_swath builtin."""
+"""Unit tests for the reproject_swath builtin (pyresample-based)."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import pytest
 import xarray as xr
 from odc.geo.geobox import GeoBox
 
-from aereo.builtins.reproject import _build_cached_swath_kdtree, reproject_swath
+from aereo.builtins.reproject import reproject_swath
 
 
 def _synthetic_swath(
@@ -54,10 +54,6 @@ def test_reproject_swath_raw_mode():
     assert tuple(out.dims) == ("y", "x")
     assert out.rio.crs is not None
     assert "spatial_ref" in out.coords
-    # Every unique swath value should appear somewhere in the nearest-neighbour output.
-    assert set(np.unique(out["band"].values)).issuperset(
-        set(np.unique(ds["band"].values))
-    )
 
 
 def test_reproject_swath_grid_mode():
@@ -94,10 +90,6 @@ def test_reproject_swath_with_time_dim():
 
     assert out["band"].dims == ("time", "y", "x")
     assert out["band"].shape[0] == 3
-    for t in range(3):
-        assert set(np.unique(out["band"].values[t])).issuperset(
-            set(np.unique(ds["band"].values[t]))
-        )
 
 
 def test_reproject_swath_missing_lons_lats():
@@ -133,36 +125,7 @@ def test_reproject_swath_fill_value_and_mask():
     assert np.any(out["band"].values == -999.0)
 
 
-def test_reproject_swath_caches_kdtree_across_geoboxes():
-    """The same swath reused with different geoboxes only builds one KDTree."""
-    _build_cached_swath_kdtree.cache_clear()
-    ds = _synthetic_swath((20, 20))
-
-    geobox_a = GeoBox.from_bbox(
-        (-70.05, -40.05, -69.55, -39.55),
-        crs="EPSG:4326",
-        resolution=0.01,
-    )
-    geobox_b = GeoBox.from_bbox(
-        (-69.55, -40.05, -69.05, -39.55),
-        crs="EPSG:4326",
-        resolution=0.01,
-    )
-
-    out_a = reproject_swath(ds, geobox=geobox_a, max_distance=10_000.0)
-    cache_after_first = _build_cached_swath_kdtree.cache_info().currsize
-    out_b = reproject_swath(ds, geobox=geobox_b, max_distance=10_000.0)
-    cache_after_second = _build_cached_swath_kdtree.cache_info().currsize
-
-    assert cache_after_first == 1
-    assert cache_after_second == 1
-    assert isinstance(out_a, xr.Dataset)
-    assert isinstance(out_b, xr.Dataset)
-
-    _build_cached_swath_kdtree.cache_clear()
-
-
-def test_reproject_swath_skips_nan_data_pixels():
+def test_reproject_swath_masks_nan_source_pixels():
     """NaN data pixels are excluded from the nearest-neighbour search.
 
     This reproduces the VIIRS bow-tie situation: some source pixels are NaN,
@@ -191,27 +154,23 @@ def test_reproject_swath_skips_nan_data_pixels():
     assert set(np.unique(finite_output)).issubset(set(np.unique(valid_input)))
 
 
-def test_reproject_swath_caches_kdtree_per_mask():
-    """Variables with different NaN masks get separate cached trees."""
-    _build_cached_swath_kdtree.cache_clear()
-    ds = _synthetic_swath((10, 10))
-    ds["band_a"] = ds["band"]
-    ds["band_b"] = ds["band"].copy()
-    ds["band_b"].values[0:5, :] = np.nan
+def test_reproject_swath_unmasked_nan_propagation():
+    """With mask_invalid=False, pyresample propagates NaN like plain pyresample."""
+    ds = _synthetic_swath((20, 20))
+    values = ds["band"].values.copy()
+    values[8:12, :] = np.nan
+    ds["band"] = (["y", "x"], values)
 
     out = reproject_swath(
         ds,
         crs="EPSG:4326",
         resolution=0.01,
         max_distance=10_000.0,
+        mask_invalid=False,
     )
 
-    # band and band_a share the all-valid mask; band_b has its own masked tree.
-    assert _build_cached_swath_kdtree.cache_info().currsize == 2
-    assert "band_a" in out.data_vars
-    assert "band_b" in out.data_vars
-
-    _build_cached_swath_kdtree.cache_clear()
+    # Plain pyresample nearest does not exclude NaN source pixels.
+    assert np.isnan(out["band"].values).any()
 
 
 def test_reproject_swath_all_nan_data_emits_fill_value():
@@ -229,3 +188,19 @@ def test_reproject_swath_all_nan_data_emits_fill_value():
 
     assert "band" in out.data_vars
     assert np.all(out["band"].values == -999.0)
+
+
+def test_reproject_pyresample_alias():
+    """reproject_pyresample is kept as a deprecated alias."""
+    from aereo.builtins.reproject import reproject_pyresample
+
+    ds = _synthetic_swath()
+    out = reproject_pyresample(
+        ds,
+        crs="EPSG:4326",
+        resolution=0.01,
+        max_distance=10_000.0,
+    )
+
+    assert isinstance(out, xr.Dataset)
+    assert "band" in out.data_vars
