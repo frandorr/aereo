@@ -1,3 +1,0 @@
-# aereo.spatial
-
-::: aereo.spatial

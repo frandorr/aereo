@@ -1,3 +1,0 @@
-# aereo.eoids
-
-::: aereo.eoids
