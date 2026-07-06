@@ -36,6 +36,13 @@ from structlog import get_logger
 logger = get_logger()
 
 
+def _default_task_builder() -> TaskBuilder:
+    """Return the default task builder used when none is configured."""
+    from aereo.builtins.task_builder import build_grouped_tasks
+
+    return build_grouped_tasks
+
+
 def _valid_job_keys(cls: type[ExtractionJob]) -> set[str]:
     """Return all field names and aliases accepted by ``ExtractionJob``.
 
@@ -207,8 +214,8 @@ class ExtractionJob(BaseModel):
         description="Optional search provider used by ``job.search()`` when no provider is passed.",
     )
     task_builder: TaskBuilder | None = Field(
-        default=None,
-        description="Optional task builder used by ``job.build_tasks()`` when no builder is passed.",
+        default_factory=_default_task_builder,
+        description="Optional task builder used by ``job.build_tasks()`` when no builder is passed. Defaults to ``build_grouped_tasks``.",
     )
 
     @field_validator("preprocess", "postprocess", mode="before")

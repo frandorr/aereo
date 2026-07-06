@@ -11,7 +11,6 @@ output: null
 output_dir: ./out
 output_uri: ${output_dir}
 workers: 1
-cells_per_task: 50
 overwrite: false
 search_results: null
 tasks: null
@@ -20,9 +19,6 @@ format: table
 
 # Runtime plugins (not part of ExtractionJob)
 search: null
-task_builder:
-  _target_: aereo.builtins.task_builder.build_grouped_tasks
-  cells_per_task: 50
 
 # ExtractionJob configuration
 name: default

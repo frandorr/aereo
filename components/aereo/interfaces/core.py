@@ -30,7 +30,6 @@ from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
 
-DEFAULT_CELLS_PER_TASK: int = 50
 WGS84_CRS: str = "epsg:4326"
 
 

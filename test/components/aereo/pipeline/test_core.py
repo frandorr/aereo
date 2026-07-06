@@ -28,7 +28,7 @@ class FakeReader(Reader):
         raise NotImplementedError
 
 
-def test_job_search_and_task_builder_fields_are_optional():
+def test_job_search_provider_is_optional_and_task_builder_defaults():
     job = ExtractionJob(
         grid_dist=1000,
         output_uri="/tmp/out",
@@ -38,7 +38,8 @@ def test_job_search_and_task_builder_fields_are_optional():
     assert "search_provider" in ExtractionJob.model_fields
     assert "task_builder" in ExtractionJob.model_fields
     assert job.search_provider is None
-    assert job.task_builder is None
+    assert job.task_builder is not None
+    assert getattr(job.task_builder, "__name__", None) == "build_grouped_tasks"
 
 
 def test_extraction_job_from_yaml_dict(tmp_path: Path):
@@ -547,15 +548,26 @@ def test_job_build_tasks_uses_configured_builder():
     assert tasks == []
 
 
-def test_job_build_tasks_raises_when_no_builder_given_or_configured():
+def test_job_build_tasks_uses_default_task_builder(monkeypatch):
     job = ExtractionJob(
         grid_dist=1000,
         output_uri="/tmp/out",
         read=FakeReader(),
         write=_DummyWriter(),
     )
-    with pytest.raises(ValueError, match="No task builder configured"):
-        job.build_tasks(_make_assets())
+    mock_builder = MagicMock(return_value=[])
+    monkeypatch.setattr("aereo.builtins.task_builder.build_grouped_tasks", mock_builder)
+    # Re-create the job so the default factory picks up the patched builder.
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+    )
+    assets = _make_assets()
+    tasks = job.build_tasks(assets)
+    mock_builder.assert_called_once_with(assets, job)
+    assert tasks == []
 
 
 def test_job_build_tasks_passes_builder_kwargs():
