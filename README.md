@@ -95,11 +95,11 @@ Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid.
 
 ## Docs & Examples
 
-- [AEREO in 5 Minutes](https://frandorr.github.io/aereo/five-minutes/) — concepts, wins, and first steps
-- [Your First Pipeline](https://frandorr.github.io/aereo/first-pipeline/) — first extraction in 5 minutes
+- [Install](https://frandorr.github.io/aereo/install/) — per-sensor install and credentials
+- [Your First Pipeline](https://frandorr.github.io/aereo/getting-started/first-pipeline/) — first extraction in 5 minutes
 - [Examples](https://frandorr.github.io/aereo/examples/) — Sentinel-2, VIIRS, Sentinel-3, Tessera, GOES-19
-- [Run with CLI](https://frandorr.github.io/aereo/run/run-with-cli/) — zero-code `aereo action=run`
-- [Build a Plugin](https://frandorr.github.io/aereo/plugins/build-first-plugin/) — extend AEREO with a function
+- [Run with CLI](https://frandorr.github.io/aereo/user-guide/cli/) — zero-code `aereo action=run`
+- [Build a Plugin](https://frandorr.github.io/aereo/plugins/build-a-plugin/) — extend AEREO with a function
 
 ---
 

@@ -1,1 +1,38 @@
 /* AEREO docs — minimal custom styles */
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.hero-grid .card {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.hero-grid .card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.hero-grid .card h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.hero-grid .card p {
+  margin-bottom: 0;
+}
+
+.hero-banner {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.hero-banner img {
+  max-width: 280px;
+  width: 100%;
+}

@@ -55,9 +55,11 @@ dependencies = [
 optional-dependencies.docs = [
   "mkdocs-exclude>=1.0.2",
   "mkdocs-material>=9",
+  "mkdocs-mermaid2-plugin>=1",
   "mkdocs-minify-plugin>=0.8",
   "mkdocstrings[python]>=0.24",
   "mknotebooks>=0.8",
+  "ruff>=0.11",
 ]
 optional-dependencies.serverless = [ "boto3>=1.34" ]
 urls.Documentation = "https://frandorr.github.io/aereo"
@@ -66,6 +68,7 @@ urls.Issues = "https://github.com/frandorr/aereo/issues"
 urls.Repository = "https://github.com/frandorr/aereo"
 entry-points."aereo.plugins".process_composite = "aereo.builtins.processor:composite"
 entry-points."aereo.plugins".process_ndvi = "aereo.builtins.processor:ndvi"
+entry-points."aereo.plugins".process_ndwi = "aereo.builtins.processor:ndwi"
 entry-points."aereo.plugins".process_normalize = "aereo.builtins.processor:normalize"
 entry-points."aereo.plugins".process_qa_mask = "aereo.builtins.processor:qa_mask"
 entry-points."aereo.plugins".process_select_bands = "aereo.builtins.processor:select_bands"
