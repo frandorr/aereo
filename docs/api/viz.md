@@ -1,3 +1,0 @@
-# aereo.viz
-
-::: aereo.viz
