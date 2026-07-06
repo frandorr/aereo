@@ -16,6 +16,7 @@ from aereo.interfaces import (
 )
 from aereo.interfaces.core import ExtractionTask, Reader
 from aereo.pipeline import ExtractionJob
+from aereo.pipeline.core import _callable_name
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
@@ -26,6 +27,29 @@ class FakeReader(Reader):
 
     def __call__(self, task: ExtractionTask, **kwargs):
         raise NotImplementedError
+
+
+def test_callable_name_returns_function_name():
+    def my_func():
+        pass
+
+    assert _callable_name(my_func) == "my_func"
+
+
+def test_callable_name_unwraps_partial():
+    def my_func(x: int = 0) -> None:
+        pass
+
+    partial_func = partial(my_func, x=1)
+    assert _callable_name(partial_func) == "my_func"
+
+
+def test_callable_name_falls_back_to_type_name():
+    class CallableClass:
+        def __call__(self):
+            pass
+
+    assert _callable_name(CallableClass()) == "CallableClass"
 
 
 def test_job_search_provider_is_optional_and_task_builder_defaults():

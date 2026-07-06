@@ -7,6 +7,7 @@ extraction pipeline configuration.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from functools import partial
 from pathlib import Path
 from typing import Any, Literal, cast
 
@@ -34,6 +35,16 @@ from shapely.geometry.base import BaseGeometry
 from structlog import get_logger
 
 logger = get_logger()
+
+
+def _callable_name(obj: Any) -> str:
+    """Return a readable name for a callable, unwrapping ``functools.partial``."""
+    if isinstance(obj, partial):
+        return _callable_name(obj.func)
+    name = getattr(obj, "__name__", None)
+    if name:
+        return name
+    return type(obj).__name__
 
 
 def _default_task_builder() -> TaskBuilder:
@@ -330,7 +341,7 @@ class ExtractionJob(BaseModel):
 
         logger.info(
             "search_called",
-            provider=getattr(provider, "__name__", type(provider).__name__),
+            provider=_callable_name(provider),
         )
 
         resolved_aoi = (
@@ -377,7 +388,7 @@ class ExtractionJob(BaseModel):
 
         logger.info(
             "build_tasks_start",
-            builder=getattr(task_builder, "__name__", type(task_builder).__name__),
+            builder=_callable_name(task_builder),
             assets=len(assets),
         )
 
