@@ -13,7 +13,7 @@ from typing import Any, cast
 from warnings import warn
 
 from aereo.grid import build_grid_cells, cells_bounds
-from aereo.interfaces.core import DEFAULT_CELLS_PER_TASK, ExtractionTask
+from aereo.interfaces.core import ExtractionTask
 from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
@@ -25,7 +25,7 @@ from shapely.geometry.base import BaseGeometry
 def build_grouped_tasks(
     search_results: GeoDataFrame[AssetSchema],
     job: ExtractionJob,
-    cells_per_task: int = DEFAULT_CELLS_PER_TASK,
+    cells_per_task: int | None = None,
     buffer_m: float = 0.0,
 ) -> Sequence[ExtractionTask]:
     """Build extraction tasks from *search_results* using *job* configuration.
@@ -41,6 +41,8 @@ def build_grouped_tasks(
         search_results: GeoDataFrame of assets from the search phase.
         job: Parent ``ExtractionJob`` supplying extraction configuration.
         cells_per_task: Maximum number of MajorTOM grid cells per task.
+            Defaults to ``None``, which places all grid cells for a group into
+            a single task.
         buffer_m: Optional padding in metres around each chunk of grid cells.
             A value such as ``job.grid_dist * 0.1`` is useful when cropping
             assets to ensure edge pixels are included.
@@ -49,15 +51,17 @@ def build_grouped_tasks(
         A sequence of ``ExtractionTask`` objects ready for execution.
 
     Raises:
-        ValueError: If ``job.output_uri`` is empty or ``cells_per_task`` is not
-            a positive integer.
+        ValueError: If ``job.output_uri`` is empty or ``cells_per_task`` is
+            zero.
     """
     output_uri = job.output_uri
     if not output_uri:
         raise ValueError("ExtractionJob.output_uri must be a non-empty string.")
 
-    if cells_per_task <= 0:
-        raise ValueError("cells_per_task must be a positive integer.")
+    if cells_per_task == 0:
+        raise ValueError(
+            "cells_per_task must be a positive integer, None, or negative to use all cells."
+        )
 
     if search_results.empty:
         return []
@@ -105,8 +109,13 @@ def build_grouped_tasks(
             continue
 
         cells = build_grid_cells(aoi=group_aoi, grid_dist=job.grid_dist)
+        chunk_size = (
+            len(cells)
+            if cells_per_task is None or cells_per_task < 0
+            else cells_per_task
+        )
 
-        for chunk_index, chunk in enumerate(_chunks(cells, cells_per_task)):
+        for chunk_index, chunk in enumerate(_chunks(cells, chunk_size)):
             chunk_bounds = cells_bounds(chunk, buffer_m=buffer_m)
             chunk_aoi = shapely.geometry.box(*chunk_bounds)
 

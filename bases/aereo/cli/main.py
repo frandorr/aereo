@@ -107,6 +107,28 @@ def _build_search_provider(cfg: DictConfig) -> Any:
     return search_provider
 
 
+def _build_task_builder(cfg: DictConfig) -> Any:
+    """Instantiate a task builder from CLI config.
+
+    Defaults to ``aereo.builtins.build_grouped_tasks`` when ``task_builder`` is
+    not provided.
+
+    Args:
+        cfg: Hydra DictConfig optionally containing a ``task_builder`` block.
+
+    Returns:
+        Configured task builder callable.
+    """
+    from omegaconf import OmegaConf
+
+    if cfg.get("task_builder") is None:
+        task_builder_cfg = {"_target_": "aereo.builtins.build_grouped_tasks"}
+    else:
+        task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
+
+    return hydra.utils.instantiate(_prepare_config_for_instantiate(task_builder_cfg))
+
+
 def _resolve_target_aoi(
     cfg: DictConfig,
     fallback: BaseGeometry | None = None,
@@ -493,15 +515,7 @@ def _run_build_tasks_action(cfg: DictConfig) -> None:
     records = json.loads(search_results_path.read_text())
     df = _search_results_from_json(records)
 
-    if not cfg.get("task_builder"):
-        console.print("[red]task_builder is required for build-tasks action.[/red]")
-        sys.exit(1)
-    from omegaconf import OmegaConf
-
-    task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
-    task_builder = hydra.utils.instantiate(
-        _prepare_config_for_instantiate(task_builder_cfg)
-    )
+    task_builder = _build_task_builder(cfg)
 
     job = _build_job(cfg)
 
@@ -525,7 +539,12 @@ def _run_build_tasks_action(cfg: DictConfig) -> None:
     )
     task_file.write_bytes(pickle.dumps(tasks))
     chunk_size = cfg.get("cells_per_task")
-    chunk_msg = f" (chunk size: {chunk_size})" if chunk_size is not None else ""
+    if chunk_size is None:
+        chunk_msg = ""
+    elif chunk_size < 0:
+        chunk_msg = " (chunk size: all cells)"
+    else:
+        chunk_msg = f" (chunk size: {chunk_size})"
     console.print(f"[green]✓ Prepared {len(tasks)} tasks{chunk_msg}.[/green]")
     console.print(f"[green]Wrote tasks to[/green] {task_file}")
 
@@ -578,15 +597,7 @@ def _run_run_action(cfg: DictConfig) -> None:
 
     search_provider = _build_search_provider(cfg)
 
-    if not cfg.get("task_builder"):
-        console.print("[red]task_builder is required for run action.[/red]")
-        sys.exit(1)
-    from omegaconf import OmegaConf
-
-    task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
-    task_builder = hydra.utils.instantiate(
-        _prepare_config_for_instantiate(task_builder_cfg)
-    )
+    task_builder = _build_task_builder(cfg)
 
     job = _build_job(cfg, fallback=_resolve_target_aoi(cfg))
 
@@ -610,7 +621,12 @@ def _run_run_action(cfg: DictConfig) -> None:
         **build_kwargs,
     )
     chunk_size = cfg.get("cells_per_task")
-    chunk_msg = f" (chunk size: {chunk_size})" if chunk_size is not None else ""
+    if chunk_size is None:
+        chunk_msg = ""
+    elif chunk_size < 0:
+        chunk_msg = " (chunk size: all cells)"
+    else:
+        chunk_msg = f" (chunk size: {chunk_size})"
     console.print(f"[green]✓ Prepared {len(tasks)} tasks{chunk_msg}.[/green]")
 
     # Extract

@@ -19,9 +19,6 @@ from aereo.interfaces.core import (
     build_collection_asset_filters,
     empty_asset_result,
 )
-from aereo.interfaces.core import (
-    DEFAULT_CELLS_PER_TASK as DEFAULT_CELLS_PER_TASK,
-)
 from aereo.interfaces.utils import (
     _prepare_config_for_instantiate,
     infer_dataset_time_bounds,
@@ -51,5 +48,4 @@ __all__ = [
     "set_dataset_time_bounds",
     "update_callable",
     "validate_aereo_dataset",
-    "DEFAULT_CELLS_PER_TASK",
 ]

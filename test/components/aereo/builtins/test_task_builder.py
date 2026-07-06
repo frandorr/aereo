@@ -218,13 +218,37 @@ def test_grouped_task_builder_buffer_expands_aoi():
     assert aoi_buffered.bounds[3] > aoi_no_buffer.bounds[3]
 
 
-def test_grouped_task_builder_rejects_non_positive_cells_per_task():
-    """A non-positive cells_per_task raises ValueError."""
+def test_grouped_task_builder_rejects_zero_cells_per_task():
+    """A zero cells_per_task raises ValueError."""
     assets = _make_assets(geometries=[box(0.0, 0.0, 0.2, 0.2)])
     job = _make_job()
 
     with pytest.raises(ValueError, match="cells_per_task must be a positive integer"):
         list(build_grouped_tasks(assets, job, cells_per_task=0))
+
+
+def test_grouped_task_builder_negative_cells_per_task_uses_all_cells():
+    """A negative cells_per_task places all cells into one task."""
+    assets = _make_assets(geometries=[box(0.0, 0.0, 0.2, 0.2)])
+    job = _make_job(target_aoi=box(0.0, 0.0, 0.2, 0.2))
+
+    tasks = list(build_grouped_tasks(assets, job, cells_per_task=-1))
+
+    assert len(tasks) == 1
+    assert tasks[0].grid_cells is not None
+    assert len(tasks[0].grid_cells) == 9
+
+
+def test_grouped_task_builder_none_cells_per_task_uses_all_cells():
+    """cells_per_task=None places all cells into one task."""
+    assets = _make_assets(geometries=[box(0.0, 0.0, 0.2, 0.2)])
+    job = _make_job(target_aoi=box(0.0, 0.0, 0.2, 0.2))
+
+    tasks = list(build_grouped_tasks(assets, job, cells_per_task=None))
+
+    assert len(tasks) == 1
+    assert tasks[0].grid_cells is not None
+    assert len(tasks[0].grid_cells) == 9
 
 
 def test_grouped_task_builder_no_init_params():
