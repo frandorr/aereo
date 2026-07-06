@@ -29,3 +29,4 @@ write: null
 # Optional reprojection / grid parameters
 resolution: null
 margin: null
+grid_cells_margin: 0.0

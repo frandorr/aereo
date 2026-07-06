@@ -187,6 +187,15 @@ class ExtractionJob(BaseModel):
             "source pixels for edge cells but increase memory use."
         ),
     )
+    grid_cells_margin: float = Field(
+        default=0.0,
+        description=(
+            "Percentage margin added to each grid cell's GeoBox during grid-mode "
+            "reprojection (e.g. 10.0 for 10%%). This expands the output patch "
+            "beyond the nominal cell size to avoid gaps between adjacent cells. "
+            "Distinct from ``margin``, which is a metre buffer around the full AOI."
+        ),
+    )
 
     # Pipeline steps
     read: Reader = Field(

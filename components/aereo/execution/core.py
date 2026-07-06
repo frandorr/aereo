@@ -292,7 +292,12 @@ def _run_grid_reproject(
             cell_ds = _crop_dataset_to_cell(ds, cell, buffer=job.crop_buffer)
         else:
             cell_ds = ds
-        cell_ds = reproject(cell_ds, geobox=cell.to_geobox(resolution=job.resolution))
+        cell_ds = reproject(
+            cell_ds,
+            geobox=cell.to_geobox(
+                resolution=job.resolution, margin=job.grid_cells_margin
+            ),
+        )
 
         cell_ds = _run_processors(cell_ds, job.postprocess)
 

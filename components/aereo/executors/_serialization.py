@@ -178,6 +178,7 @@ class _TaskSerializer:
                 ),
                 "resolution": job.resolution,
                 "margin": job.margin,
+                "grid_cells_margin": job.grid_cells_margin,
                 "read": PluginSerializer.dumps(job.read),
                 "preprocess": (
                     [PluginSerializer.dumps(p) for p in cast(list[Any], job.preprocess)]
@@ -261,6 +262,7 @@ class _TaskSerializer:
                 "target_aoi": target_aoi,
                 "resolution": job_meta.get("resolution"),
                 "margin": job_meta.get("margin"),
+                "grid_cells_margin": job_meta.get("grid_cells_margin", 0.0),
                 "read": cast(Reader, PluginSerializer.loads(job_meta["read"])),
                 "preprocess": _load_processors(job_meta.get("preprocess")),
                 "reproject": PluginSerializer.loads(job_meta.get("reproject")),
