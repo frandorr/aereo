@@ -241,12 +241,45 @@ def _run_processors(
     return ds
 
 
+def _has_lonlat_coords(ds: xr.Dataset) -> bool:
+    """Return True if *ds* has longitude/latitude or lons/lats coordinates."""
+    return ("longitude" in ds or "lons" in ds) and ("latitude" in ds or "lats" in ds)
+
+
+def _crop_dataset_to_cell(
+    ds: xr.Dataset,
+    cell: GridCell,
+    buffer: float,
+) -> xr.Dataset:
+    """Return *ds* cropped to *cell* WGS84 bounds plus a degree buffer.
+
+    Pixels outside the buffered bounds are masked and dropped. This reduces the
+    amount of data passed to the per-cell reprojector and avoids spending time
+    on source pixels that cannot contribute to the target cell.
+    """
+    if "longitude" in ds:
+        lons = ds["longitude"]
+        lats = ds["latitude"]
+    else:
+        lons = ds["lons"]
+        lats = ds["lats"]
+
+    min_lon, min_lat, max_lon, max_lat = cell.cell_geometry.buffer(buffer).bounds
+    mask = (lons >= min_lon) & (lons <= max_lon) & (lats >= min_lat) & (lats <= max_lat)
+    return ds.where(mask, drop=True)
+
+
 def _run_grid_reproject(
     ds: xr.Dataset,
     task: ExtractionTask,
     grid_cells: Sequence[GridCell],
 ) -> GeoDataFrame[ArtifactSchema]:
-    """Run reprojection in grid mode: one file per cell."""
+    """Run reprojection in grid mode: one file per cell.
+
+    The full source dataset is read once, then each cell is cropped to its
+    buffered WGS84 bounds before reprojection. This matches the optimised
+    workflow for VIIRS-style swath data.
+    """
     job = task.job
     reproject = job.reproject
     assert reproject is not None
@@ -255,7 +288,11 @@ def _run_grid_reproject(
     if job.resolution is None:
         raise ValueError("resolution is required when using reproject_mode='grid'.")
     for cell in grid_cells:
-        cell_ds = reproject(ds, geobox=cell.to_geobox(resolution=job.resolution))
+        if _has_lonlat_coords(ds):
+            cell_ds = _crop_dataset_to_cell(ds, cell, buffer=job.crop_buffer)
+        else:
+            cell_ds = ds
+        cell_ds = reproject(cell_ds, geobox=cell.to_geobox(resolution=job.resolution))
 
         cell_ds = _run_processors(cell_ds, job.postprocess)
 
@@ -285,7 +322,7 @@ def run_task(task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
     if job.read is None:
         raise ValueError("Pipeline must contain a Reader stage.")
 
-    ds = job.read(task)
+    ds = job.read(task).compute()
 
     ds = _run_processors(ds, job.preprocess)
 

@@ -161,6 +161,14 @@ class ExtractionJob(BaseModel):
         default=None,
         description="Buffer in metres added around the AOI when building the grid.",
     )
+    crop_buffer: float = Field(
+        default=0.1,
+        description=(
+            "Buffer in degrees added around each grid cell before cropping the "
+            "source dataset in grid-mode reprojection. Larger buffers keep more "
+            "source pixels for edge cells but increase memory use."
+        ),
+    )
 
     # Pipeline steps
     read: Reader = Field(
