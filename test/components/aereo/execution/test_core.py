@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Any, cast
 
 import geopandas as gpd
 import numpy as np
@@ -274,3 +274,67 @@ def test_run_task_grid_mode_crops_before_reproject(tmp_path):
     assert len(seen_shapes) == 1
     # The reprojector should receive a cropped dataset, not the full 20x20 swath.
     assert seen_shapes[0] != (20, 20)
+
+
+def test_run_task_grid_mode_uses_grid_cells_margin(tmp_path):
+    """grid_cells_margin expands the GeoBox passed to the reprojector."""
+    seen_geoboxes: list[Any] = []
+
+    class _GeoboxRecordingReprojector:
+        def __call__(self, ds: xr.Dataset, geobox=None, **kwargs) -> xr.Dataset:
+            seen_geoboxes.append(geobox)
+            out = xr.Dataset(
+                {"band": (["y", "x"], np.ones((2, 2), dtype=np.float32))},
+                coords={"y": [0, 1], "x": [0, 1]},
+            )
+            import rioxarray  # noqa: F401
+
+            out = out.rio.write_crs("EPSG:4326")
+            return out
+
+    def _run(margin: float) -> Any:
+        job = ExtractionJob(
+            grid_dist=10_000,
+            output_uri=str(tmp_path / f"out_{margin}"),
+            read=_swath_reader((20, 20)),
+            write=_DummyWriter(),
+            reproject=_GeoboxRecordingReprojector(),
+            reproject_mode="grid",
+            resolution=1000,
+            crop_buffer=0.05,
+            grid_cells_margin=margin,
+        )
+        task = ExtractionTask(
+            id="task-1",
+            assets=cast(
+                GeoDataFrame[AssetSchema],
+                gpd.GeoDataFrame(
+                    {
+                        "id": ["asset-1"],
+                        "collection": ["C1"],
+                        "start_time": [pd.Timestamp("2023-01-01")],
+                        "end_time": [pd.Timestamp("2023-01-02")],
+                        "href": ["s3://bucket/file.tif"],
+                        "geometry": [
+                            Polygon([[-70, -40], [-69, -40], [-69, -39], [-70, -39]])
+                        ],
+                    },
+                    crs="EPSG:4326",
+                ),
+            ),
+            job=job,
+            grid_cells=[
+                GridCell(
+                    id="0U_0R",
+                    d=10_000,
+                    cell_geometry=box(-69.7, -39.7, -69.3, -39.3),
+                )
+            ],
+        )
+        run_task(task)
+        return seen_geoboxes[-1]
+
+    gb_no_margin = _run(0.0)
+    gb_with_margin = _run(50.0)
+    assert gb_with_margin.shape[1] > gb_no_margin.shape[1]
+    assert gb_with_margin.shape[0] > gb_no_margin.shape[0]
