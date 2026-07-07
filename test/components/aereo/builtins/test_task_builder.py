@@ -180,8 +180,8 @@ def test_grouped_task_builder_cells_per_task_one():
         assert len(task.grid_cells) == 1
 
 
-def test_grouped_task_builder_uses_asset_target_aoi_intersection():
-    """Cells are selected from the intersection of asset footprints and target AOI."""
+def test_grouped_task_builder_prefers_target_aoi():
+    """When a target AOI is configured, tasks are scoped to it."""
     assets = _make_assets(geometries=[box(0.0, 0.0, 1.0, 1.0)])
     job = _make_job(target_aoi=box(0.0, 0.0, 0.2, 0.2))
 
@@ -192,6 +192,37 @@ def test_grouped_task_builder_uses_asset_target_aoi_intersection():
     # The task AOI should be within / aligned with the target AOI cells, not the
     # full asset footprint.
     assert tasks[0].aoi.within(box(0.0, 0.0, 0.3, 0.3))
+
+
+def test_grouped_task_builder_clips_target_aoi_to_asset_envelope():
+    """Swath-like footprints that do not contain the AOI still use the target AOI.
+
+    The asset footprint is a coarse shape whose envelope contains the target
+    AOI but whose polygon does not. The builder must not fall back to the full
+    footprint; it should clip the target AOI to the asset envelope instead.
+    """
+    from shapely.geometry import MultiPolygon, Polygon
+
+    left = Polygon([(0.0, 0.0), (0.4, 0.0), (0.0, 1.0), (0.0, 0.0)])
+    right = Polygon([(0.6, 0.0), (1.0, 0.0), (1.0, 1.0), (0.6, 0.0)])
+    swath_footprint = MultiPolygon([left, right])
+    target_aoi = box(0.45, 0.4, 0.55, 0.6)
+
+    # Sanity check: the footprint envelope covers the AOI, but the footprint
+    # polygon itself does not intersect it.
+    assert target_aoi.intersection(swath_footprint).is_empty
+    assert not target_aoi.intersection(swath_footprint.envelope).is_empty
+
+    assets = _make_assets(geometries=[swath_footprint])
+    job = _make_job(target_aoi=target_aoi)
+
+    tasks = list(build_grouped_tasks(assets, job, cells_per_task=100))
+
+    assert len(tasks) == 1
+    assert tasks[0].aoi is not None
+    # The AOI must be scoped to the target AOI, not expanded to the full swath.
+    assert tasks[0].aoi.within(swath_footprint.envelope)
+    assert tasks[0].aoi.area < swath_footprint.envelope.area * 0.5
 
 
 def test_grouped_task_builder_buffer_expands_aoi():
