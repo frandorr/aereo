@@ -147,20 +147,34 @@ def _resolve_group_aoi(
 ) -> BaseGeometry | None:
     """Return the effective AOI for a group of assets.
 
-    The AOI is the intersection of the group's asset footprints with the job's
-    ``target_aoi``. If the job has no target AOI, the union of the asset
-    footprints is used. When asset footprints are unavailable, the job's target
-    AOI is returned unchanged.
+    The configured ``target_aoi`` is used when available. When asset geometries
+    are present, the target AOI is clipped to the assets' bounding box so grid
+    cells are not generated outside the approximate data coverage. If the job
+    has no target AOI, the union of the asset footprints is used.
+
+    Clipping to the bounding box rather than the exact footprint is important
+    for swath sensors (e.g. VIIRS, OLCI) whose coarse bow-tie polygons may not
+    contain the target AOI even though the data covers it. Falling back to the
+    raw footprint in that case would create tasks for the entire swath.
     """
-    if "geometry" in group.columns and not group.geometry.isna().all():
-        asset_union = group.geometry.union_all()
-        if not asset_union.is_empty:
-            if target_aoi is not None:
-                intersection = target_aoi.intersection(asset_union)
-                if not intersection.is_empty:
-                    return intersection
-            return asset_union
-    return target_aoi
+    if "geometry" not in group.columns or group.geometry.isna().all():
+        return target_aoi
+
+    asset_union = group.geometry.union_all()
+    if asset_union.is_empty:
+        return target_aoi
+
+    if target_aoi is not None:
+        # Clip to the asset envelope to keep cells within approximate coverage
+        # while avoiding the coarse-polygon problem described above.
+        clipped = target_aoi.intersection(asset_union.envelope)
+        if not clipped.is_empty:
+            return clipped
+        # Asset envelope does not overlap the configured AOI, but the user's
+        # intent is still to extract the target AOI.
+        return target_aoi
+
+    return asset_union
 
 
 def _chunks(
