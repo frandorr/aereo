@@ -18,7 +18,7 @@ grid](https://github.com/majortom-eg), ready for ML or downstream analysis.
 
 - **Plugin-based** — every stage (search, read, reproject, process, write) is a plain Python function you can swap.
 - **Grid-aligned** — outputs are indexed on the [Major TOM grid](https://github.com/majortom-eg), so Sentinel-2, VIIRS, Sentinel-3, GOES, and custom sources stack together.
-- **One config, two runtimes** — the same Hydra config runs in a notebook and serverless with `LambdaExecutor`.
+- **One config, multiple runtimes** — the same Hydra config runs in a notebook and serverless with `LambdaExecutor`.
 
 ## Install
 
