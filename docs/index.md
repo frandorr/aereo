@@ -115,7 +115,11 @@ grid-aligned patches on the Major TOM grid, with the target AOI overlaid.
 
 -   ### [Multiple constellations](examples/06-multiple-constellation.ipynb)
 
-    ![GOES-19 and VIIRS overlaid on the same Major TOM grid](assets/images/06-multiple-constellation-523c4a3f.png)
+    GOES-19 ABI and VIIRS extracted for the same grid cells:
+
+    ![GOES-19 ABI on the shared grid](assets/images/06-multiple-constellation-f6d7b8aa.png)
+
+    ![VIIRS on the shared grid](assets/images/06-multiple-constellation-7790c104.png)
 
 </div>
 
