@@ -12,6 +12,7 @@ import rasterio
 from rasterio.transform import from_bounds
 from shapely.geometry import box
 
+from aereo.spatial import reproject_geom
 from aereo.viz import plot_artifact_patches
 
 
@@ -453,6 +454,80 @@ def test_plot_artifact_patches_reuses_shared_uri(
     assert len(open_calls) == 1
     assert len(ax.images) == 1
     fig.clf()
+
+
+def test_plot_artifact_patches_aoi_overlay(
+    tmp_path: Path,
+) -> None:
+    """An AOI geometry in EPSG:4326 can be overlaid on the patches."""
+    import matplotlib.colors as mcolors
+
+    bounds = (300000.0, 5000000.0, 301000.0, 5001000.0)
+    path = tmp_path / "cell.tif"
+    _make_test_tiff(path, bounds)
+
+    gdf = gpd.GeoDataFrame(
+        {
+            "uri": [str(path)],
+            "grid_cell": ["cell"],
+            "cell_utm_footprint": [box(*bounds)],
+            "cell_utm_crs": ["EPSG:32633"],
+        },
+        geometry="cell_utm_footprint",
+        crs="EPSG:32633",
+    )
+
+    aoi_utm = box(bounds[0] + 100, bounds[1] + 100, bounds[2] - 100, bounds[3] - 100)
+    aoi_wgs84 = reproject_geom(aoi_utm, src_epsg="EPSG:32633", dst_epsg="EPSG:4326")
+
+    fig, ax = plot_artifact_patches(gdf, aoi=aoi_wgs84, aoi_edgecolor="lime")
+    aoi_collections = [
+        c
+        for c in ax.collections
+        if np.allclose(
+            c.get_edgecolor(),
+            mcolors.to_rgba("lime"),
+        )
+    ]
+    assert len(aoi_collections) > 0
+    fig.clf()
+
+
+def test_plot_artifact_patches_aoi_geodataframe(
+    tmp_path: Path,
+) -> None:
+    """An AOI GeoDataFrame is overlaid using its own CRS."""
+    bounds = (300000.0, 5000000.0, 301000.0, 5001000.0)
+    path = tmp_path / "cell.tif"
+    _make_test_tiff(path, bounds)
+
+    gdf = gpd.GeoDataFrame(
+        {
+            "uri": [str(path)],
+            "grid_cell": ["cell"],
+            "cell_utm_footprint": [box(*bounds)],
+            "cell_utm_crs": ["EPSG:32633"],
+        },
+        geometry="cell_utm_footprint",
+        crs="EPSG:32633",
+    )
+
+    aoi_utm = box(bounds[0] + 100, bounds[1] + 100, bounds[2] - 100, bounds[3] - 100)
+    aoi_gdf = gpd.GeoDataFrame(geometry=[aoi_utm], crs="EPSG:32633")
+
+    fig, ax = plot_artifact_patches(gdf, aoi=aoi_gdf, aoi_edgecolor="lime")
+    assert fig is not None
+    assert ax is not None
+    fig.clf()
+
+
+def test_plot_artifact_patches_aoi_missing_crs_raises(
+    sample_artifacts: gpd.GeoDataFrame,
+) -> None:
+    """Passing aoi without cell_utm_crs raises a clear error."""
+    aoi = box(8.0, 45.0, 9.0, 46.0)
+    with pytest.raises(ValueError, match="cell_utm_crs"):
+        plot_artifact_patches(sample_artifacts, aoi=aoi)
 
 
 def test_plot_artifact_patches_overlay_on_existing_ax(
