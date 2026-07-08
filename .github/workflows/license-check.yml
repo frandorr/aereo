@@ -14,21 +14,22 @@ jobs:
       matrix:
         extras:
           - ""
-          - "earthaccess"
-          - "aws-goes"
           - "serverless"
+          - "swath"
+          - "viz"
+          - "all"
     name: license-check (extras=${{ matrix.extras || 'none' }})
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.13"
-      - name: Install project (extras=${{ matrix.extras || 'none' }})
+      - name: Install aereo (extras=${{ matrix.extras || 'none' }})
         run: |
           if [ -z "${{ matrix.extras }}" ]; then
-            uv pip install --system .
+            uv pip install --system projects/aereo
           else
-            uv pip install --system ".[${{ matrix.extras }}]"
+            uv pip install --system "projects/aereo[${{ matrix.extras }}]"
           fi
       - name: Install pip-licenses
         run: uv pip install --system pip-licenses
