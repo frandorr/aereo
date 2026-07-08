@@ -27,11 +27,11 @@ jobs:
       - name: Install aereo (extras=${{ matrix.extras || 'none' }})
         run: |
           if [ -z "${{ matrix.extras }}" ]; then
-            uv pip install --system projects/aereo
+            uv pip install projects/aereo
           else
-            uv pip install --system "projects/aereo[${{ matrix.extras }}]"
+            uv pip install "projects/aereo[${{ matrix.extras }}]"
           fi
       - name: Install pip-licenses
-        run: uv pip install --system pip-licenses
+        run: uv pip install pip-licenses
       - name: Run license-compat check
         run: python scripts/check_licenses.py
