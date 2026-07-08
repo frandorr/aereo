@@ -20,17 +20,17 @@ have:
 
 | Notebook | Sensor | Plugins | Auth | What it teaches | Preview |
 |---|---|---|---|---|---|
-| [01 — Sentinel-2 true-color](01-sentinel2.ipynb) | Sentinel-2 MSI | `aereo` | Planetary Computer key (recommended) | Load a Hydra job, search STAC, extract a GeoTIFF on the Major TOM grid. | ![Sentinel-2](../assets/images/01-sentinel2-plot-patches.png) |
+| [01 — Sentinel-2 (nir, red)](01-sentinel2.ipynb) | Sentinel-2 MSI | `aereo` | None (Earth Search is public) | Load a Hydra job, search STAC, extract a GeoTIFF on the Major TOM grid. | ![Sentinel-2](../assets/images/01-sentinel2-plot-patches.png) |
 | [05 — GOES-19 ABI preview](05-goes19.ipynb) | GOES-19 ABI | `aereo` + `aereo-search-aws-goes` + `aereo-read-satpy` | None | Public S3 search and Satpy-based reading/reprojection. | ![GOES-19](../assets/images/05-goes19-bed3cf89.png) |
-| [step_by_step](step_by_step.ipynb) | Sentinel-2 MSI | `aereo` | Planetary Computer key (recommended) | Same as `01`, but each stage is run and inspected explicitly. | |
-| [step_by_step_raw](step_by_step_raw.ipynb) | Sentinel-2 MSI | `aereo` | Planetary Computer key (recommended) | Same pipeline built entirely from raw Python — no config files or Hydra. | |
+| [step_by_step](step_by_step.ipynb) | Sentinel-2 MSI | `aereo` | None (Earth Search is public) | Same as `01`, but each stage is run and inspected explicitly. | |
+| [step_by_step_raw](step_by_step_raw.ipynb) | Sentinel-2 MSI | `aereo` | None (Earth Search is public) | Same pipeline built entirely from raw Python — no config files or Hydra. | |
 
 ## Processing
 
 | Notebook | Sensor | Plugins | Auth | What it teaches | Preview |
 |---|---|---|---|---|---|
-| [01b — Sentinel-2 NDVI](01b-sentinel2-ndvi.ipynb) | Sentinel-2 MSI | `aereo` | Planetary Computer key (recommended) | Add a processor stage (`NDVI`) before reprojection. | ![Sentinel-2 NDVI](../assets/images/01b-sentinel2-ndvi-plot-patches.png) |
-| [01c — Sentinel-2 NDWI](01c-sentinel2-ndwi.ipynb) | Sentinel-2 MSI | `aereo` | Planetary Computer key (recommended) | Add a processor stage (`NDWI`) before reprojection. | ![Sentinel-2 NDWI](../assets/images/01c-sentinel2-ndwi-search-sentinel2.png) |
+| [01b — Sentinel-2 NDVI](01b-sentinel2-ndvi.ipynb) | Sentinel-2 MSI | `aereo` | None (Earth Search is public) | Add a processor stage (`NDVI`) before reprojection. | ![Sentinel-2 NDVI](../assets/images/01b-sentinel2-ndvi-plot-patches.png) |
+| [01c — Sentinel-2 NDWI](01c-sentinel2-ndwi.ipynb) | Sentinel-2 MSI | `aereo` | None (Earth Search is public) | Add a processor stage (`NDWI`) before reprojection. | ![Sentinel-2 NDWI](../assets/images/01c-sentinel2-ndwi-search-sentinel2.png) |
 | [03b — Sentinel-3 NDVI](03b-sentinel3-ndvi.ipynb) | Sentinel-3 OLCI | `aereo` + `aereo-read-satpy` | NASA Earthdata | Processor stage with Satpy-based reading. | ![Sentinel-3 NDVI](../assets/images/03b-sentinel3-ndvi-2d4730ca.png) |
 
 ## Sensors

@@ -5,16 +5,23 @@ package, you can run the same pipeline from the terminal without writing extra
 Python. See the [Configuration](../configuration/config-package.md) section for
 how the config package is laid out.
 
+The CLI config has `search`, `read`, and `write` defaulting to `null`, so you
+must use `+` to add them via Hydra overrides.
+
 ## Run the full pipeline
 
 ```bash
-cd examples/config
+cd examples
 
-aereo action=run \
-  search=sentinel2_pc \
-  grid_dist=grid_10km \
-  read=sentinel2 \
-  write=sentinel2
+uv run aereo action=run \
+  +search._target_=aereo.builtins.search.search_stac \
+  +search.stac_api_url="https://earth-search.aws.element84.com/v1" \
+  +search.collections.sentinel-2-l2a="[red, nir]" \
+  geojson=config/aoi/chocon.geojson \
+  start="2024-01-01T00:00:00Z" \
+  end="2024-01-10T23:59:59Z" \
+  +read._target_=aereo.builtins.read.read_odc_stac \
+  +write._target_=aereo.builtins.write.write_geotiff
 ```
 
 `action=run` performs search, build-tasks, and execute in one command.
@@ -23,26 +30,41 @@ aereo action=run \
 
 ```bash
 # Search only
-aereo action=search search=sentinel2_pc
+uv run aereo action=search \
+  +search._target_=aereo.builtins.search.search_stac \
+  +search.stac_api_url="https://earth-search.aws.element84.com/v1" \
+  +search.collections.sentinel-2-l2a="[red, nir]" \
+  geojson=config/aoi/chocon.geojson \
+  start="2024-01-01T00:00:00Z" \
+  end="2024-01-10T23:59:59Z"
 
-# Build tasks from saved assets
-aereo action=build-tasks search=sentinel2_pc
+# Build tasks from saved search results
+uv run aereo action=build-tasks \
+  search_results=out/search_results.json \
+  +read._target_=aereo.builtins.read.read_odc_stac \
+  +write._target_=aereo.builtins.write.write_geotiff
 
 # Extract from saved tasks
-aereo action=extract search=sentinel2_pc
+uv run aereo action=extract \
+  tasks=out/tasks.pkl \
+  +read._target_=aereo.builtins.read.read_odc_stac \
+  +write._target_=aereo.builtins.write.write_geotiff
 
-# Validate a config package without network calls
-aereo action=validate search=sentinel2_pc
+# Validate a config without network calls
+uv run aereo action=validate \
+  +search._target_=aereo.builtins.search.search_stac \
+  +read._target_=aereo.builtins.read.read_odc_stac \
+  +write._target_=aereo.builtins.write.write_geotiff
 ```
 
 ## Discover plugins
 
 ```bash
 # List installed plugins
-aereo action=plugins
+uv run aereo action=plugins
 
 # Show parameters for a plugin
-aereo action=plugin_params plugin=search_stac
+uv run aereo action=plugin_params plugin=search_stac
 ```
 
 ## Override config values
@@ -50,19 +72,12 @@ aereo action=plugin_params plugin=search_stac
 Hydra-style overrides work on the command line:
 
 ```bash
-aereo action=run \
-  search=sentinel2_pc \
-  grid_dist=grid_50km \
-  read=sentinel2 \
-  write=sentinel2 \
-  target_aoi=aoi/cordoba.geojson
+uv run aereo action=run \
+  +search._target_=aereo.builtins.search.search_stac \
+  grid_dist=10000 \
+  target_aoi=config/aoi/cordoba.geojson \
+  +read._target_=aereo.builtins.read.read_odc_stac \
+  +write._target_=aereo.builtins.write.write_geotiff
 ```
 
-## Dry run
-
-Set `DRY_RUN=true` to validate the configuration and task graph without making
-network calls or writing files:
-
-```bash
-DRY_RUN=true aereo action=run search=sentinel2_pc read=sentinel2 write=sentinel2
-```
+Use `+` when the key does not already exist in the default CLI config.

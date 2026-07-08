@@ -101,7 +101,7 @@ grid-aligned patches on the Major TOM grid, with the target AOI overlaid.
 
 <div class="hero-grid" markdown>
 
--   ### [Sentinel-2 true-color](examples/01-sentinel2.ipynb)
+-   ### [Sentinel-2 (nir, red)](examples/01-sentinel2.ipynb)
 
     ![Sentinel-2 extracted patches](assets/images/01-sentinel2-plot-patches.png)
 

@@ -8,8 +8,8 @@ supports many more through plugins.
 
 | Function | Best for | Typical catalogs |
 |---|---|---|
-| `search_stac` | Analysis-ready STAC collections | Planetary Computer, Earth Search, Element84 |
-| `search_earthaccess` | NASA Earthdata holdings | VIIRS, MODIS, Sentinel-3 |
+| `search_stac` | Analysis-ready STAC collections | Earth Search / Element84, custom STAC catalogs |
+| `search_earthaccess` | NASA Earthdata holdings | MODIS, VIIRS, Sentinel-3, etc. |
 
 External plugins include `search_aws_goes` and `search_tessera`.
 
@@ -58,10 +58,12 @@ assets.plot()
 
 ## Authentication
 
-- **Planetary Computer** — set a subscription key via environment variable or
-  pass it to the search provider.
+- **Public STAC catalogs** (Earth Search / Element84) — usually no key is
+  required.
 - **NASA Earthdata** — use `earthaccess.login()` or set `EARTHDATA_USERNAME`
   and `EARTHDATA_PASSWORD`.
+- **Private / signed catalogs** — pass the required token or credential to the
+  search provider.
 
 See [Install](../install.md) for links and setup details, and the
 [Configuration](../configuration/config-package.md) section for how search

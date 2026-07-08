@@ -24,7 +24,7 @@ box can be replaced by a function you write:
 ```mermaid
 flowchart LR
     subgraph Catalogs["Catalogs"]
-        STAC[STAC / Planetary Computer]
+        STAC[STAC / Earth Search / Element84]
         EARTH[Earthaccess]
         S3[Public S3]
     end

@@ -8,8 +8,7 @@ extraction framework.
 ```text
 examples/
 ├── *.ipynb                 # Jupyter notebooks (one per sensor / workflow)
-├── config/                 # Hydra config package (search, grid, patch, read, write, aoi)
-└── serverless/             # AWS Lambda deployment examples
+└── config/                 # Hydra config package (job YAMLs and AOI GeoJSON)
 ```
 
 ## Quickstart
@@ -30,24 +29,14 @@ All pipeline configurations live under `examples/config` and use the Hydra
 `_target_` convention for declarative instantiation:
 
 ```yaml
-# examples/config/search/sentinel2_pc.yaml
-_target_: aereo.builtins.SearchSTAC
-stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
-collections:
-  sentinel-2-l2a: ["B04", "B08"]
-intersects: config/aoi/chocon.geojson
-start_datetime: "2024-01-01T00:00:00Z"
-end_datetime: "2024-01-10T23:59:59Z"
-```
-
-```yaml
-# examples/config/read/sentinel2.yaml
+# examples/config/job_sentinel2.yaml
+name: sentinel2_demo
+grid_dist: 10000
+output_uri: ./out
+resolution: 10.0
+margin: 0.0
 read:
   _target_: aereo.builtins.read.read_odc_stac
-```
-
-```yaml
-# examples/config/write/sentinel2.yaml
 write:
   _target_: aereo.builtins.write.write_geotiff
 ```
@@ -71,31 +60,25 @@ job = ExtractionJob.from_yaml("my_job.yaml")
 
 ## CLI
 
-Run the same configs from the command line:
+Run the same pipeline from the command line with the `aereo` CLI. See the
+[CLI guide](https://frandorr.github.io/aereo/user-guide/cli/) for the full
+command reference and current Hydra override syntax.
 
 ```bash
-cd examples/config
-
-# Full pipeline
-aereo action=run \
-  search=sentinel2_pc \
-  grid_dist=grid_10km \
-  read=sentinel2 \
-  write=sentinel2
-
-# Search only
-aereo action=search search=sentinel2_pc
-
 # List installed plugins
 aereo action=plugins
+
+# Show parameters for a plugin
+aereo action=plugin_params plugin=search_stac
 ```
 
 ## Notebooks
 
 | Notebook | Sensor | Description |
 |----------|--------|-------------|
-| `01-sentinel2.ipynb` | Sentinel-2 MSI | True-color extraction from Planetary Computer |
+| `01-sentinel2.ipynb` | Sentinel-2 MSI | `red` and `nir` extraction from Earth Search |
 | `01b-sentinel2-ndvi.ipynb` | Sentinel-2 MSI | NDVI processing example |
+| `01c-sentinel2-ndwi.ipynb` | Sentinel-2 MSI | NDWI processing example |
 | `step_by_step.ipynb` | Sentinel-2 MSI | Same pipeline as `01-sentinel2.ipynb`, but each stage is run and inspected explicitly |
 | `step_by_step_raw.ipynb` | Sentinel-2 MSI | Same pipeline as `step_by_step.ipynb`, but built entirely from raw Python functions and parameters — no config files or Hydra |
 | `02-viirs.ipynb` | VIIRS | Earthaccess search + Satpy read |
@@ -103,8 +86,7 @@ aereo action=plugins
 | `03b-sentinel3-ndvi.ipynb` | Sentinel-3 OLCI | NDVI processing example |
 | `04-tessera.ipynb` | GeoTessera | Tessera tile search and extraction |
 | `05-goes19.ipynb` | GOES-19 ABI | Public AWS S3 search + Satpy read |
-| `06-swath-to-geobox-odc-vs-faiss.ipynb` | Synthetic swath | Reproject a 2-D lat/lon swath to a UTM GeoBox with `odc-geo` and FAISS nearest neighbours |
-| `06b-viirs-swath-odc-vs-faiss.ipynb` | VIIRS I04 | Three-way comparison (`odc-geo`, Satpy `resample`, FAISS) on a real VIIRS L1B swath from NASA Earthdata |
+| `06-multiple-constellation.ipynb` | Sentinel-2 + VIIRS | Search and extract multiple sensors with a shared cache |
 
 ## Shared data
 
