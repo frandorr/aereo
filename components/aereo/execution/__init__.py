@@ -1,20 +1,5 @@
-"""Execution backends and task runner for AEREO extraction tasks."""
+"""Core per-task extraction pipeline execution."""
 
-from aereo.execution.backends import LambdaBackend, RetryableLambdaError
-from aereo.execution.core import (
-    ExecutionBackend,
-    LocalProcessBackend,
-    TaskRunner,
-    TaskStaging,
-    ThreadBackend,
-)
+from aereo.execution.core import run_task
 
-__all__ = [
-    "ExecutionBackend",
-    "LambdaBackend",
-    "LocalProcessBackend",
-    "RetryableLambdaError",
-    "TaskRunner",
-    "TaskStaging",
-    "ThreadBackend",
-]
+__all__ = ["run_task"]

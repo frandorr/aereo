@@ -1,0 +1,27 @@
+# Common vars to reuse in the config
+target_bands: [red, nir]
+aoi_path: config/aoi/chocon.geojson
+# Common Job config, like name, MajorTOM grid distance, etc
+
+name: sentinel2_sample
+grid_dist: 10_000
+grid_cells_margin: 10
+target_aoi: ${aoi_path}
+output_uri: /tmp/aereo_extraction
+overwrite: false
+
+search:
+  _target_: aereo.builtins.search_stac
+  _partial_: true
+  stac_api_url: "https://earth-search.aws.element84.com/v1"
+  collections:
+    sentinel-2-l2a: ${target_bands}
+  intersects: ${aoi_path}
+  start_datetime: "2024-01-01T00:00:00Z"
+  end_datetime: "2024-01-10T23:59:59Z"
+
+read:
+  _partial_: true
+  _target_: aereo.builtins.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff

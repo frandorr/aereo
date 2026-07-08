@@ -12,13 +12,19 @@ repos:
     rev: v1.13.0
     hooks:
       - id: basedpyright
-        exclude: ^examples/
+        exclude: ^(examples/|docs/examples/|build/|development/local/)
 
   # --- pyproject formatting ---
   - repo: https://github.com/tox-dev/pyproject-fmt
     rev: v2.16.2
     hooks:
       - id: pyproject-fmt
+
+  # --- Secret scanning ---
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.2
+    hooks:
+      - id: gitleaks
 
   # --- Basic hygiene ---
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -27,5 +33,6 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+        exclude: '(infrastructure\.yaml|template\.yaml|mkdocs\.yml)$'
       - id: check-toml
       - id: check-merge-conflict

@@ -1,683 +1,403 @@
-from pathlib import Path
-from typing import Any, Sequence, cast
+from typing import cast
 
 import geopandas as gpd
 import pytest
-from aereo.interfaces import (
-    AereoPlugin,
-    ExtractionTask,
-    Extractor,
-    GridConfig,
-    SearchProvider,
-    merge_params,
+from aereo.builtins.read import read_odc_stac
+from aereo.grid import GridCell
+from aereo.interfaces import ExtractionTask
+from aereo.pipeline import ExtractionJob
+from aereo.interfaces.utils import (
+    infer_dataset_time_bounds,
+    normalize_geometry_input,
+    set_dataset_time_bounds,
+    validate_aereo_dataset,
 )
-from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
-from pydantic import ValidationError
 from shapely.geometry import Polygon
 
 
-def _module_level_downloader(url: str, path: Path) -> None:
-    """Module-level callable used for pickling tests."""
-    pass
+def _dummy_writer(ds, path, **kwargs):
+    return str(path)
 
 
-def test_plugin_missing_supported_collections():
-    with pytest.raises(
-        TypeError, match="must define the 'supported_collections' attribute"
-    ):
-
-        class InvalidPlugin(AereoPlugin):
-            pass
-
-
-def test_plugin_supported_collections_is_string():
-    with pytest.raises(
-        TypeError, match="must be a Sequence of strings .* got a single string"
-    ):
-
-        class InvalidPlugin(AereoPlugin):
-            supported_collections = "GOES-16"
-
-
-def test_plugin_supported_collections_is_not_sequence():
-    with pytest.raises(TypeError, match="must be a Sequence .* got int"):
-
-        class InvalidPlugin(AereoPlugin):
-            supported_collections = 123  # pyright: ignore[reportAssignmentType]
-
-
-def test_plugin_supported_collections_is_empty():
-    class InvalidPlugin(AereoPlugin):
-        supported_collections = []
-
-    assert InvalidPlugin.supported_collections == []
-
-
-def test_plugin_valid_supported_collections():
-    class ValidPlugin(AereoPlugin):
-        supported_collections = ["GOES-16", "GOES-17"]
-
-    assert ValidPlugin.supported_collections == ["GOES-16", "GOES-17"]
-
-
-def test_search_provider_abstract():
-    class DummySearcher(SearchProvider):
-        supported_collections = ["GOES"]
-
-    with pytest.raises(
-        TypeError, match="Can't instantiate abstract class DummySearcher"
-    ):
-        DummySearcher()  # pyright: ignore[reportAbstractUsage]
-
-
-def test_search_provider_signature_has_profiles():
-    """The abstract search() signature must accept profiles parameter."""
-    import inspect
-
-    sig = inspect.signature(SearchProvider.search)
-    assert "profiles" in sig.parameters
-    assert "collections" not in sig.parameters
-
-
-def test_search_provider_accepts_profiles_signature():
-    """A concrete searcher using the new profiles signature can be instantiated."""
-    from aereo.interfaces.core import AereoProfile
-
-    class GoodSearcher(SearchProvider):
-        supported_collections = ["X"]
-
-        def search(
-            self,
-            profiles: Sequence[AereoProfile],
-            intersects: Any,
-            start_datetime: Any,
-            end_datetime: Any,
-            search_params: Any,
-        ) -> Any: ...
-
-    # Should instantiate without error
-    searcher = GoodSearcher()
-    assert searcher is not None
-
-
-def test_extractor_abstract():
-    class DummyExtractor(Extractor):
-        supported_collections = ["GOES"]
-
-    with pytest.raises(
-        TypeError, match="Can't instantiate abstract class DummyExtractor"
-    ):
-        DummyExtractor()  # pyright: ignore[reportAbstractUsage]
-
-
-def test_extractor_no_longer_requires_target_grid_d():
-    """Instantiating an extractor should not require target_grid_d."""
-    import pandas as pd
-
-    class DummyExtractor(Extractor, plugin_abstract=False):
-        supported_collections = ["test"]
-
-        def extract(
-            self,
-            extraction_task: ExtractionTask,
-            extract_params: dict[str, Any] | None,
-        ) -> GeoDataFrame[ArtifactSchema]:
-            return cast(GeoDataFrame[ArtifactSchema], pd.DataFrame())
-
-    extractor = DummyExtractor()
-    assert hasattr(extractor, "extract")
-
-
-def test_extractor_prepare_for_extraction():
-    class LargeGridExtractor(Extractor):
-        supported_collections = ["GOES"]
-
-        def extract(
-            self,
-            extraction_task: ExtractionTask,
-            extract_params: dict[str, Any] | None,
-        ) -> GeoDataFrame[ArtifactSchema]:
-            return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
-
-    extractor = LargeGridExtractor()
-
-    from datetime import datetime
-
-    from aereo.interfaces.core import AereoProfile
-
-    # Needs a GeoDataFrame with collection and start_time
-    df = gpd.GeoDataFrame(
-        {
-            "id": [1, 2],
-            "collection": ["GOES", "GOES"],
-            "start_time": [datetime(2023, 1, 1, 12, 0), datetime(2023, 1, 1, 12, 0)],
-        },
-        geometry=[
-            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-            Polygon([[1, 1], [2, 1], [2, 2], [1, 2]]),
-        ],
-    )
-
-    grid_config = GridConfig(target_grid_dist=1_000_000)
-    profile = AereoProfile(name="test_profile", resolution=10.0)
-
-    # Should raise error if uri not provided
-    with pytest.raises(
-        ValueError, match="Default prepare_for_extraction requires uri to be defined"
-    ):
-        extractor.prepare_for_extraction(cast(Any, df), grid_config=grid_config)
-
-    # Should raise error if profiles not provided
-    with pytest.raises(
-        ValueError,
-        match="Default prepare_for_extraction requires at least one profile to be defined",
-    ):
-        extractor.prepare_for_extraction(
-            cast(Any, df), grid_config=grid_config, uri="test_uri"
-        )
-
-    tasks = extractor.prepare_for_extraction(
-        cast(Any, df),
-        grid_config=grid_config,
-        profiles=[profile],
-        uri="test_uri",
-        cells_per_chunk=1,
-    )
-
-    assert len(tasks) > 0
-    assert tasks[0].profile.resolution == 10.0
-    assert tasks[0].profile.name == "test_profile"
-    assert tasks[0].uri == "test_uri"
-    assert tasks[0].grid_config == grid_config
-    assert tasks[0].aoi is None
-    assert len(tasks[0].assets) == 2  # Both assets have same start_time and collection
-    assert "start_time" in tasks[0].task_context
-    assert "extractor_hint" in tasks[0].task_context
-    assert tasks[0].task_context["extractor_hint"] is None
-
-
-def test_aer_profile_has_all_fields():
-    from aereo.interfaces.core import AereoProfile
-
-    profile = AereoProfile(
-        name="goes_16_abi",
-        resolution=1000.0,
-        collections={"ABI-L1b-RadC": ["C01", "C02"]},
-        plugin_hints={
-            "search": "aereo-search-aws-goes",
-            "extract": "aereo-extract-aws-goes",
-        },
-    )
-    assert profile.collections == {"ABI-L1b-RadC": ["C01", "C02"]}
-    assert profile.plugin_hints["search"] == "aereo-search-aws-goes"
-
-
-def test_aer_profile_accepts_downloader():
-    from pathlib import Path
-
-    from aereo.interfaces.core import AereoProfile
-
-    def my_dl(url: str, local_path: Path) -> None:
-        pass
-
-    profile = AereoProfile(name="test", resolution=100.0, downloader=my_dl)
-    assert profile.downloader is my_dl
-
-
-def test_aer_profile_downloader_defaults_to_none():
-    from aereo.interfaces.core import AereoProfile
-
-    profile = AereoProfile(name="test", resolution=100.0)
-    assert profile.downloader is None
-
-
-def test_aer_profile_defaults():
-    from aereo.interfaces.core import AereoProfile
-
-    profile = AereoProfile(name="minimal", resolution=100.0)
-    assert profile.collections == {}
-    assert profile.plugin_hints == {}
-    assert profile.conform_to is None
-
-
-def test_aer_profile_accepts_conform_to():
-    from aereo.interfaces.core import AereoProfile
-
-    profile = AereoProfile(name="test", resolution=100.0, conform_to=(256, 256))
-    assert profile.conform_to == (256, 256)
-
-
-def test_extraction_task_accepts_aer_profile():
-    import geopandas as gpd
-    from shapely.geometry import Polygon
-
-    from aereo.interfaces.core import AereoProfile, ExtractionTask
-    from pandera.typing.geopandas import GeoDataFrame
-
+def test_extraction_task_validation():
     df = gpd.GeoDataFrame(
         {"collection": ["GOES"], "start_time": ["2023-01-01"]},
         geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
     )
-    profile = AereoProfile(name="test", resolution=10.0, collections={"GOES": ["var1"]})
-    grid_config = GridConfig(target_grid_dist=10_000)
+    grid_dist = 10_000
+    job = ExtractionJob(
+        grid_dist=grid_dist,
+        output_uri="test",
+        read=read_odc_stac,
+        write=_dummy_writer,
+    )
     task = ExtractionTask(
+        id="task-1",
         assets=cast(GeoDataFrame, df),
-        profile=profile,
-        uri="test",
-        grid_cells=[],
-        grid_config=grid_config,
+        job=job,
     )
-    assert task.profile.name == "test"
+    assert task.output_uri == "test"
+    assert task.read is not None
+    assert task.write is not None
 
 
-def test_aer_profile_is_frozen():
-    from aereo.interfaces.core import AereoProfile
-
-    profile = AereoProfile(name="test", resolution=100.0)
-    with pytest.raises(ValidationError):
-        profile.resolution = 200.0
-
-
-def test_aer_profile_forbids_extra_fields():
-    from aereo.interfaces.core import AereoProfile
-
-    with pytest.raises(ValidationError):
-        AereoProfile(name="test", resolution=100.0, unknown_field=42)  # pyright: ignore[reportCallIssue]
-
-
-def test_aer_profile_import_string_downloader():
-    from aereo.interfaces.core import AereoProfile
-
-    # Use a stdlib callable as a stand-in for a real downloader
-    profile = AereoProfile(
-        name="test",
-        resolution=100.0,
-        downloader="os.path.join",  # pyright: ignore[reportArgumentType]
+def test_extraction_task_rejects_mixed_crs():
+    df = gpd.GeoDataFrame(
+        {
+            "collection": ["S2", "S2"],
+            "start_time": ["2023-01-01", "2023-01-01"],
+            "crs": ["EPSG:32631", "EPSG:32632"],
+        },
+        geometry=[
+            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
+            Polygon([[2, 0], [3, 0], [3, 1], [2, 1]]),
+        ],
     )
-    assert callable(profile.downloader)
+    grid_dist = 10_000
+    job = ExtractionJob(
+        grid_dist=grid_dist,
+        output_uri="test",
+        read=read_odc_stac,
+        write=_dummy_writer,
+    )
 
-
-def test_aer_profile_invalid_import_string():
-    from aereo.interfaces.core import AereoProfile
-
-    with pytest.raises(ValidationError):
-        AereoProfile(
-            name="test",
-            resolution=100.0,
-            downloader="this.does.not.exist",  # pyright: ignore[reportArgumentType]
+    with pytest.raises(ValueError, match="share the same native CRS"):
+        ExtractionTask(
+            id="task-mixed",
+            assets=cast(GeoDataFrame, df),
+            job=job,
         )
 
 
-# ---------------------------------------------------------------------------
-# Pickling
-# ---------------------------------------------------------------------------
-
-
-def test_aer_profile_pickle_module_level_callable_downloader():
-    """A module-level callable downloader round-trips through pickle."""
-    import os
-    import pickle
-
-    from aereo.interfaces.core import AereoProfile
-
-    profile = AereoProfile(
-        name="test",
-        resolution=100.0,
-        downloader="os.path.join",  # pyright: ignore[reportArgumentType]
-    )
-    roundtripped = pickle.loads(pickle.dumps(profile))
-    assert roundtripped.downloader is os.path.join
-
-
-def test_aer_profile_pickle_lambda_downloader_becomes_none():
-    """A lambda downloader pickles without crashing and becomes None."""
-    import pickle
-
-    from aereo.interfaces.core import AereoProfile
-
-    profile = AereoProfile(
-        name="test",
-        resolution=100.0,
-        downloader=lambda url, path: None,  # pyright: ignore[reportArgumentType]
-    )
-    roundtripped = pickle.loads(pickle.dumps(profile))
-    assert roundtripped.downloader is None
-
-
-def test_extraction_task_pickle_with_callable_downloader():
-    """An ExtractionTask containing a live callable downloader pickles correctly."""
-    import pickle
-
-    import geopandas as gpd
-    from shapely.geometry import Polygon
-
-    from aereo.interfaces.core import AereoProfile, ExtractionTask
-    from pandera.typing.geopandas import GeoDataFrame
-
+def test_extraction_task_accepts_single_crs():
     df = gpd.GeoDataFrame(
-        {"collection": ["GOES"], "start_time": ["2023-01-01"]},
+        {
+            "collection": ["S2", "S2"],
+            "start_time": ["2023-01-01", "2023-01-01"],
+            "crs": ["EPSG:32631", "EPSG:32631"],
+        },
+        geometry=[
+            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
+            Polygon([[2, 0], [3, 0], [3, 1], [2, 1]]),
+        ],
+    )
+    grid_dist = 10_000
+    job = ExtractionJob(
+        grid_dist=grid_dist,
+        output_uri="test",
+        read=read_odc_stac,
+        write=_dummy_writer,
+    )
+
+    task = ExtractionTask(
+        id="task-single",
+        assets=cast(GeoDataFrame, df),
+        job=job,
+    )
+    assert task is not None
+
+
+def test_grid_dist_is_int():
+    job = ExtractionJob(
+        grid_dist=50_000,
+        output_uri="test",
+        read=read_odc_stac,
+        write=_dummy_writer,
+    )
+    assert job.grid_dist == 50_000
+    assert isinstance(job.grid_dist, int)
+
+
+# ---------------------------------------------------------------------------
+# ExtractionTask read-oriented properties
+# ---------------------------------------------------------------------------
+
+
+def _make_task_with_assets(**asset_overrides):
+    df = gpd.GeoDataFrame(
+        {
+            "id": ["asset-1"],
+            "collection": ["C1"],
+            "start_time": ["2023-01-01"],
+            "end_time": ["2023-01-02"],
+            "href": ["s3://bucket/file.tif"],
+            **asset_overrides,
+        },
         geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
     )
-    profile = AereoProfile(
-        name="test",
-        resolution=10.0,
-        collections={"GOES": ["var1"]},
-        downloader=_module_level_downloader,  # pyright: ignore[reportArgumentType]
+    job = ExtractionJob(
+        grid_dist=10_000,
+        output_uri="test",
+        read=read_odc_stac,
+        write=_dummy_writer,
     )
-    grid_config = GridConfig(target_grid_dist=10_000)
-    task = ExtractionTask(
+    return ExtractionTask(
+        id="task-1",
         assets=cast(GeoDataFrame, df),
-        profile=profile,
-        uri="test",
-        grid_cells=[],
-        grid_config=grid_config,
+        job=job,
     )
-    roundtripped = pickle.loads(pickle.dumps(task))
-    assert roundtripped.profile.name == "test"
-    assert roundtripped.profile.downloader is _module_level_downloader
 
 
-def test_aer_profile_has_search_and_extract_params():
-    from aereo.interfaces.core import AereoProfile
+def test_task_uris_returns_hrefs():
+    task = _make_task_with_assets()
+    assert task.uris == ["s3://bucket/file.tif"]
 
-    profile = AereoProfile(
-        name="test",
-        resolution=100.0,
-        search_params={"version": "061"},
-        extract_params={"calibration": "reflectance"},
+
+def test_task_bbox_prefers_task_aoi():
+    from shapely.geometry import box
+
+    task = _make_task_with_assets()
+    task = ExtractionTask(
+        id=task.id,
+        assets=task.assets,
+        job=task.job,
+        aoi=box(0, 1, 2, 3),
     )
-    assert profile.search_params["version"] == "061"
-    assert profile.extract_params["calibration"] == "reflectance"
+    assert task.bbox == (0.0, 1.0, 2.0, 3.0)
 
 
-def test_aer_profile_rejects_extra_params():
-    from aereo.interfaces.core import AereoProfile
+def test_task_bbox_falls_back_to_job_target_aoi():
+    from shapely.geometry import box
 
-    with pytest.raises(ValidationError):
-        AereoProfile(name="test", resolution=100.0, extra_params={"foo": "bar"})  # pyright: ignore[reportCallIssue]
-
-
-def test_merge_params_batch_only():
-    assert merge_params({"a": 1}, {}) == {"a": 1}
-
-
-def test_merge_params_profile_overrides():
-    assert merge_params({"a": 1}, {"a": 2}) == {"a": 2}
-
-
-def test_merge_params_combined():
-    assert merge_params({"a": 1}, {"b": 2}) == {"a": 1, "b": 2}
-
-
-def test_merge_params_none_batch():
-    assert merge_params(None, {"a": 1}) == {"a": 1}
+    job = ExtractionJob(
+        grid_dist=10_000,
+        output_uri="test",
+        read=read_odc_stac,
+        write=_dummy_writer,
+        target_aoi=box(10, 11, 12, 13),
+    )
+    task = ExtractionTask(
+        id="task-1",
+        assets=_make_task_with_assets().assets,
+        job=job,
+    )
+    assert task.bbox == (10.0, 11.0, 12.0, 13.0)
 
 
-def test_prepare_computes_common_shape_when_conform_enabled():
-    """When profile has conform_to set, conform_to is read from profile, not task_context."""
+def test_task_bbox_returns_none_without_aoi():
+    task = _make_task_with_assets()
+    assert task.bbox is None
+
+
+def test_task_bbox_expands_with_grid_cells_margin():
+    """bbox grows when grid_cells_margin increases."""
+    from shapely.geometry import box
+
+    cell_geometry = box(-69.7, -39.7, -69.3, -39.3)
+
+    def _bbox_for_margin(margin: float) -> tuple[float, float, float, float]:
+        job = ExtractionJob(
+            grid_dist=10_000,
+            output_uri="test",
+            read=read_odc_stac,
+            write=_dummy_writer,
+            resolution=10.0,
+            grid_cells_margin=margin,
+        )
+        task = ExtractionTask(
+            id="task-1",
+            assets=_make_task_with_assets().assets,
+            job=job,
+            grid_cells=[GridCell(id="0U_0R", d=10_000, cell_geometry=cell_geometry)],
+        )
+        bbox = task.bbox
+        assert bbox is not None
+        return bbox
+
+    bbox_no_margin = _bbox_for_margin(0.0)
+    bbox_with_margin = _bbox_for_margin(50.0)
+    assert bbox_with_margin[0] <= bbox_no_margin[0]
+    assert bbox_with_margin[1] <= bbox_no_margin[1]
+    assert bbox_with_margin[2] >= bbox_no_margin[2]
+    assert bbox_with_margin[3] >= bbox_no_margin[3]
+    # At least one side must be strictly larger.
+    assert (
+        bbox_with_margin[0] < bbox_no_margin[0]
+        or bbox_with_margin[1] < bbox_no_margin[1]
+        or bbox_with_margin[2] > bbox_no_margin[2]
+        or bbox_with_margin[3] > bbox_no_margin[3]
+    )
+
+
+def test_task_collections_returns_unique_sorted_collections():
+    task = _make_task_with_assets()
+    assert task.collections == ["C1"]
+
+
+def test_task_datetime_range_derived_from_assets():
     from datetime import datetime
 
-    from aereo.interfaces.core import AereoProfile
+    task = _make_task_with_assets()
+    datetime_range = task.datetime_range
+    assert datetime_range is not None
+    start, end = datetime_range
+    assert start == datetime(2023, 1, 1)
+    assert end == datetime(2023, 1, 2)
 
-    class ConformExtractor(Extractor):
-        supported_collections = ["C1"]
 
-        def extract(
-            self,
-            extraction_task: ExtractionTask,
-            extract_params: dict[str, Any] | None,
-        ) -> GeoDataFrame[ArtifactSchema]:
-            return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
-
-    extractor = ConformExtractor()
-
-    df = gpd.GeoDataFrame(
-        {
-            "id": [1],
-            "collection": ["C1"],
-            "start_time": [datetime(2023, 1, 1, 12, 0)],
+def test_task_stac_items_reconstructs_unique_items():
+    item_dict = {
+        "type": "Feature",
+        "stac_version": "1.0.0",
+        "stac_extensions": [],
+        "id": "item-001",
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [-70.5, -33.5],
+                    [-70.0, -33.5],
+                    [-70.0, -33.0],
+                    [-70.5, -33.0],
+                    [-70.5, -33.5],
+                ]
+            ],
         },
-        geometry=[
-            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-        ],
+        "bbox": [-70.5, -33.5, -70.0, -33.0],
+        "properties": {"datetime": "2026-01-01T12:00:00Z"},
+        "links": [],
+        "assets": {},
+        "collection": "sentinel-2-l2a",
+    }
+    task = _make_task_with_assets(stac_item=[item_dict])
+    items = task.stac_items
+    assert len(items) == 1
+    assert items[0].id == "item-001"
+
+
+def test_task_stac_items_empty_when_column_missing():
+    task = _make_task_with_assets()
+    assert task.stac_items == []
+
+
+# ---------------------------------------------------------------------------
+# normalize_geometry_input
+# ---------------------------------------------------------------------------
+
+
+def test_normalize_geometry_input_passes_through_base_geometry():
+    geom = Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
+    assert normalize_geometry_input(geom) is geom
+
+
+def test_normalize_geometry_input_accepts_geojson_dict():
+    geojson = {
+        "type": "Polygon",
+        "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
+    }
+    geom = normalize_geometry_input(geojson)
+    assert isinstance(geom, Polygon)
+    assert geom.is_valid
+
+
+def test_normalize_geometry_input_accepts_geojson_path(tmp_path):
+    geojson_path = tmp_path / "aoi.geojson"
+    geojson_path.write_text(
+        '{"type": "Feature", "geometry": {"type": "Polygon", '
+        '"coordinates": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]}, '
+        '"properties": {}}'
     )
+    geom = normalize_geometry_input(str(geojson_path))
+    assert isinstance(geom, Polygon)
+    assert geom.is_valid
 
-    profile = AereoProfile(
-        name="test",
-        resolution=100.0,
-        collections={"C1": ["var1"]},
-        conform_to=(256, 256),
+
+def test_normalize_geometry_input_returns_none_for_none():
+    assert normalize_geometry_input(None) is None
+
+
+def test_normalize_geometry_input_rejects_unknown_type():
+    with pytest.raises(ValueError, match="Invalid geometry input type"):
+        normalize_geometry_input(12345)  # type: ignore[arg-type]
+
+
+# ---------------------------------------------------------------------------
+# validate_aereo_dataset
+# ---------------------------------------------------------------------------
+
+
+def test_validate_aereo_dataset_accepts_valid():
+    import numpy as np
+    import xarray as xr
+
+    ds = xr.Dataset(
+        {"B04": (["band", "y", "x"], np.ones((1, 4, 4)))},
+        coords={"band": [1], "y": range(4), "x": range(4)},
     )
+    # rioxarray crs is None by default, so we set require_crs=False
+    validate_aereo_dataset(ds, require_crs=False)
 
-    grid_config = GridConfig(target_grid_dist=100_000)
-    tasks = extractor.prepare_for_extraction(
-        cast(Any, df),
-        grid_config=grid_config,
-        profiles=[profile],
-        uri="test_uri",
+
+def test_validate_aereo_dataset_rejects_non_dataset():
+    with pytest.raises(ValueError, match="Expected xarray.Dataset"):
+        validate_aereo_dataset("not a dataset", require_crs=False)
+
+
+def test_validate_aereo_dataset_checks_required_dims():
+    import numpy as np
+    import xarray as xr
+
+    ds = xr.Dataset(
+        {"B04": (["y", "x"], np.ones((4, 4)))},
+        coords={"y": range(4), "x": range(4)},
     )
+    validate_aereo_dataset(ds, require_crs=False, require_dims=["y", "x"])
 
-    assert len(tasks) > 0
-    assert tasks[0].profile.conform_to == (256, 256)
+    with pytest.raises(ValueError, match="missing required dimensions"):
+        validate_aereo_dataset(ds, require_crs=False, require_dims=["time"])
 
 
-def test_prepare_does_not_compute_common_shape_when_conform_disabled():
-    """When profile has conform_to=None, profile.conform_to is None."""
+def test_validate_aereo_dataset_checks_crs_when_required():
+    import numpy as np
+    import xarray as xr
+
+    ds = xr.Dataset(
+        {"B04": (["band", "y", "x"], np.ones((1, 4, 4)))},
+        coords={"band": [1], "y": range(4), "x": range(4)},
+    )
+    # Without rioxarray crs, require_crs=True should fail
+    with pytest.raises(ValueError, match="must have a CRS"):
+        validate_aereo_dataset(ds, require_crs=True)
+
+
+def test_set_dataset_time_bounds():
+    import xarray as xr
     from datetime import datetime
 
-    from aereo.interfaces.core import AereoProfile
+    ds = xr.Dataset()
+    t1 = datetime(2026, 1, 1, 12, 0, 0)
+    t2 = datetime(2026, 1, 1, 12, 10, 0)
+    ds = set_dataset_time_bounds(ds, t1, t2)
 
-    class NoConformExtractor(Extractor):
-        supported_collections = ["C1"]
-
-        def extract(
-            self,
-            extraction_task: ExtractionTask,
-            extract_params: dict[str, Any] | None,
-        ) -> GeoDataFrame[ArtifactSchema]:
-            return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
-
-    extractor = NoConformExtractor()
-
-    df = gpd.GeoDataFrame(
-        {
-            "id": [1],
-            "collection": ["C1"],
-            "start_time": [datetime(2023, 1, 1, 12, 0)],
-        },
-        geometry=[
-            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-        ],
-    )
-
-    profile = AereoProfile(
-        name="test",
-        resolution=100.0,
-        collections={"C1": ["var1"]},
-        conform_to=None,
-    )
-
-    grid_config = GridConfig(target_grid_dist=100_000)
-    tasks = extractor.prepare_for_extraction(
-        cast(Any, df),
-        grid_config=grid_config,
-        profiles=[profile],
-        uri="test_uri",
-    )
-
-    assert len(tasks) > 0
-    assert tasks[0].profile.conform_to is None
+    assert ds.attrs["start_time"] == t1
+    assert ds.attrs["end_time"] == t2
 
 
-def test_prepare_for_extraction_includes_extractor_hint():
-    class HintExtractor(Extractor):
-        supported_collections = ["C1"]
-
-        def extract(
-            self,
-            extraction_task: ExtractionTask,
-            extract_params: dict[str, Any] | None,
-        ) -> GeoDataFrame[ArtifactSchema]:
-            return cast(GeoDataFrame[ArtifactSchema], extraction_task.assets)
-
-    extractor = HintExtractor()
-
+def test_infer_dataset_time_bounds():
+    import numpy as np
+    import xarray as xr
     from datetime import datetime
-    from aereo.interfaces.core import AereoProfile
 
-    df = gpd.GeoDataFrame(
-        {
-            "id": [1],
-            "collection": ["C1"],
-            "start_time": [datetime(2023, 1, 1, 12, 0)],
+    t1 = datetime(2026, 1, 1, 12, 0, 0)
+    t2 = datetime(2026, 1, 1, 12, 10, 0)
+    ds = xr.Dataset(
+        {"B04": (["time", "y", "x"], np.ones((2, 4, 4)))},
+        coords={
+            "time": [t1, t2],
+            "y": range(4),
+            "x": range(4),
         },
-        geometry=[
-            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-        ],
     )
 
-    grid_config = GridConfig(target_grid_dist=1_000_000)
-    profile = AereoProfile(name="test_profile", resolution=10.0)
-
-    tasks = extractor.prepare_for_extraction(
-        cast(Any, df),
-        grid_config=grid_config,
-        profiles=[profile],
-        uri="test_uri",
-        extractor_hint="aereo-extract-dummy",
-    )
-
-    assert len(tasks) > 0
-    assert tasks[0].task_context["extractor_hint"] == "aereo-extract-dummy"
+    ds = infer_dataset_time_bounds(ds)
+    assert ds.attrs["start_time"] == t1
+    assert ds.attrs["end_time"] == t2
 
 
-def test_grid_config_defaults_require_explicit_dist():
-    gc = GridConfig(target_grid_dist=50_000)
-    assert gc.target_grid_dist == 50_000
-    assert gc.target_grid_overlap is False
-    assert gc.target_grid_margin == 0.0
-    assert gc.grid_filter_mode == "intersection"
+def test_task_staging_protocol_removed():
+    """TaskStaging protocol was removed from the public interfaces module."""
+    import importlib
 
-
-def test_grid_config_literal_validation():
-    with pytest.raises(ValidationError):
-        GridConfig(grid_filter_mode="invalid")  # pyright: ignore[reportArgumentType]
-
-
-def test_grid_config_from_yaml_string():
-    yaml_text = """
-    target_grid_dist: 100000
-    target_grid_margin: 6.8
-    """
-    gc = GridConfig.from_yaml_string(yaml_text)
-    assert gc.target_grid_dist == 100_000
-    assert gc.target_grid_margin == 6.8
-
-
-def test_grid_config_is_frozen():
-    gc = GridConfig(target_grid_dist=50_000)
-    with pytest.raises(ValidationError):
-        gc.target_grid_dist = 100_000
-
-
-def test_grid_config_forbids_extra_fields():
-    with pytest.raises(ValidationError):
-        GridConfig(target_grid_dist=50_000, unknown_field=42)  # pyright: ignore[reportCallIssue]
-
-
-def test_grid_config_from_yaml_with_wrapper():
-    yaml_text = """
-    grid_config:
-      target_grid_dist: 50000
-      target_grid_overlap: false
-      target_grid_margin: 6.8
-      grid_filter_mode: intersection
-      min_coverage: 0.0
-    """
-    gc = GridConfig.from_yaml_string(yaml_text)
-    assert gc.target_grid_dist == 50_000
-    assert gc.target_grid_overlap is False
-    assert gc.target_grid_margin == 6.8
-    assert gc.grid_filter_mode == "intersection"
-    assert gc.min_coverage == 0.0
-
-
-def test_grid_config_from_json(tmp_path):
-    import json
-
-    path = tmp_path / "grid.json"
-    path.write_text(json.dumps({"target_grid_dist": 25000, "min_coverage": 0.5}))
-    gc = GridConfig.from_json(path)
-    assert gc.target_grid_dist == 25_000
-    assert gc.min_coverage == 0.5
-
-
-@pytest.mark.parametrize(
-    "config_file",
-    [
-        "goes_512km.json",
-        "goes_256km.json",
-        "sentinel2_50km.json",
-        "ml_patch_2_56km.json",
-    ],
-)
-def test_example_grid_configs_load(config_file):
-    from pathlib import Path
-
-    grid_configs_dir = Path(__file__).parents[4] / "examples" / "grid_configs"
-    path = grid_configs_dir / config_file
-    assert path.exists(), f"Example grid config not found: {path}"
-    gc = GridConfig.from_json(path)
-    assert gc.target_grid_dist is not None
-    assert isinstance(gc.target_grid_overlap, bool)
-
-
-def test_prepare_for_extraction_spatial_filtering():
-    """Verify that prepare_for_extraction filters assets to only those intersecting chunk grid cells."""
-    from datetime import datetime
-    from aereo.interfaces.core import AereoProfile
-    from shapely.geometry import Polygon
-
-    class DummyExtractor(Extractor):
-        supported_collections = ["C1"]
-
-        def extract(self, extraction_task, extract_params):
-            return cast(Any, extraction_task.assets)
-
-    # Asset 1 at coordinates (0, 0)
-    # Asset 2 at coordinates (10, 10) - very far away
-    df = gpd.GeoDataFrame(
-        {
-            "id": ["asset_1", "asset_2"],
-            "collection": ["C1", "C1"],
-            "start_time": [datetime(2023, 1, 1, 12, 0), datetime(2023, 1, 1, 12, 0)],
-        },
-        geometry=[
-            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-            Polygon([[10, 10], [11, 10], [11, 11], [10, 11]]),
-        ],
-    )
-
-    profile = AereoProfile(name="test", resolution=1000.0, collections={"C1": ["var1"]})
-    grid_config = GridConfig(target_grid_dist=100_000)
-    extractor = DummyExtractor()
-
-    tasks = extractor.prepare_for_extraction(
-        cast(Any, df),
-        grid_config=grid_config,
-        profiles=[profile],
-        uri="test_uri",
-        cells_per_chunk=1,
-    )
-
-    # Check that every task only contains 1 asset (either asset_1 or asset_2) because
-    # the cells in each chunk only intersect one of the two far-apart assets.
-    for task in tasks:
-        assert len(task.assets) == 1
-
-    # Check that both assets are represented across all tasks
-    all_assigned = set()
-    for task in tasks:
-        all_assigned.update(task.assets["id"])
-    assert all_assigned == {"asset_1", "asset_2"}
+    module = importlib.import_module("aereo.interfaces")
+    assert not hasattr(module, "TaskStaging")

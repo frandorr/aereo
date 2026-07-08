@@ -1,0 +1,37 @@
+name: License Compatibility
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  license-check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        extras:
+          - ""
+          - "serverless"
+          - "swath"
+          - "viz"
+          - "all"
+    name: license-check (extras=${{ matrix.extras || 'none' }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - name: Install aereo (extras=${{ matrix.extras || 'none' }})
+        run: |
+          if [ -z "${{ matrix.extras }}" ]; then
+            uv pip install projects/aereo
+          else
+            uv pip install "projects/aereo[${{ matrix.extras }}]"
+          fi
+      - name: Install pip-licenses
+        run: uv pip install pip-licenses
+      - name: Run license-compat check
+        run: python scripts/check_licenses.py

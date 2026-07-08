@@ -1,9 +1,7 @@
-from aereo.client.core import (
-    AereoClient,
-    FailureMode,
-)
+"""Public API entry-point for the legacy Aereo client.
 
-__all__ = [
-    "AereoClient",
-    "FailureMode",
-]
+The ``AereoClient`` orchestrator has been removed. Use
+:class:`aereo.pipeline.ExtractionJob` and :mod:`aereo.executors` directly.
+"""
+
+__all__: list[str] = []

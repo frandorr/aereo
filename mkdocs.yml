@@ -1,208 +1,202 @@
-site_name: ""
+site_name: AerEO
+site_description: AerEO — Plugin-based satellite data extraction framework. From search to analysis-ready GeoTIFF in minutes.
+site_author: Francisco Dorr
+copyright: Copyright &copy; 2026 Francisco Dorr
 site_url: https://frandorr.github.io/aereo
+repo_name: frandorr/aereo
 repo_url: https://github.com/frandorr/aereo
 edit_uri: edit/main/docs/
 
-# SEO & Social
-site_description: >-
-    AER.EO — Plugin-based satellite data extraction framework.
-    From search to analysis-ready GeoTIFF in minutes.
-site_author: Francisco Dorr
-copyright: Copyright &copy; 2026 Francisco Dorr
+hooks:
+  - docs/hooks/copy_notebooks.py
 
-# Theme — Material with deep UX polish
 theme:
-    name: material
+  name: material
+  palette:
+    - media: (prefers-color-scheme)
+      toggle:
+        icon: material/lightbulb-auto
+        name: Switch to light mode
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to system preference
 
-    # Typography
-    font:
-        text: Roboto
-        code: Roboto Mono
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - content.footnote.tooltips
+    - content.tabs.link
+    - content.tooltips
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.path
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
 
-    # Iconography
-    icon:
-        logo: material/satellite-variant
-        repo: fontawesome/brands/github
-        edit: material/pencil
-        view: material/eye
+  icon:
+    repo: octicons/mark-github-24
 
-    # Color system — day/night with accessible contrast
-    palette:
-        - media: "(prefers-color-scheme: light)"
-          scheme: default
-          primary: cyan
-          toggle:
-              icon: material/weather-night
-              name: Switch to dark mode
-        - media: "(prefers-color-scheme: dark)"
-          scheme: slate
-          primary: custom
-          toggle:
-              icon: material/weather-sunny
-              name: Switch to light mode
+extra_css:
+  - stylesheets/extra.css
 
-    # UX Features
-    features:
-        # Navigation
-        - navigation.instant
-        - navigation.instant.progress
-        - navigation.tracking
-        - navigation.tabs
-        - navigation.tabs.sticky
-        - navigation.sections
-        - navigation.expand
-        - navigation.path
-        - navigation.top
-        - toc.follow
-        - toc.integrate
-
-        # Content actions
-        - content.action.edit
-        - content.action.view
-        - content.code.copy
-        - content.code.annotate
-        - content.code.select
-        - content.tooltips
-
-        # Search
-        - search.suggest
-        - search.highlight
-        - search.share
-
-        # Header
-        - header.autohide
-
-# Plugins
 plugins:
-    - search:
-          separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?=\w)'
-          lang: en
-    - minify:
-          minify_html: true
-    - mkdocstrings:
-          handlers:
-              python:
-                  paths: [components, bases]
-                  options:
-                      docstring_style: google
-                      show_source: true
-                      show_root_heading: true
-                      show_root_full_path: true
-                      show_category_heading: true
-                      show_symbol_type_heading: true
-                      show_symbol_type_toc: true
-                      show_signature: true
-                      show_signature_annotations: true
-                      separate_signature: true
-                      line_length: 80
-                      merge_init_into_class: true
-                      members_order: source
-                      filters: ["!^_"]
+  - search:
+      separator: '[\s\-,:!=[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?=\w)'
+      lang: en
+  - mknotebooks:
+      execute: false
+      timeout: 600
+      allow_errors: true
+  - mermaid2
+  - exclude:
+      glob:
+        - "hooks/*"
+        - "includes/*"
+        - "examples/config/*"
+        - "examples/config/**/*"
+        - "examples/06b-viirs-swath-odc-vs-faiss.ipynb"
+  - minify:
+      minify_html: true
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [components, bases]
+          options:
+            show_root_heading: true
+            show_if_no_docstring: false
+            inherited_members: true
+            members_order: source
+            separate_signature: true
+            unwrap_annotated: true
+            filters:
+              - '!^_'
+            merge_init_into_class: true
+            docstring_section_style: spacy
+            signature_crossrefs: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
 
-                  import:
-                      - https://docs.python.org/3/objects.inv
-
-# Markdown processing
 markdown_extensions:
-    # Python-Markdown core
-    - abbr
-    - admonition
-    - attr_list
-    - def_list
-    - footnotes
-    - md_in_html
-    - tables
-    - toc:
-          permalink: true
-          permalink_title: Anchor link to this section
-          toc_depth: 3
+  - abbr
+  - attr_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.highlight:
+      line_spans: __span
+      linenums_style: pymdownx-inline
+  - pymdownx.inlinehilite
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tilde
+  - pymdownx.blocks.admonition:
+      types:
+        - note
+        - attention
+        - caution
+        - danger
+        - error
+        - tip
+        - hint
+        - warning
+        - info
+        - check
+  - pymdownx.blocks.details
+  - pymdownx.blocks.tab:
+      alternate_style: true
 
-    # PyMdownX extensions — rich content
-    - pymdownx.arithmatex:
-          generic: true
-    - pymdownx.betterem:
-          smart_enable: all
-    - pymdownx.caret
-    - pymdownx.details
-    - pymdownx.emoji:
-          emoji_index: !!python/name:material.extensions.emoji.twemoji
-          emoji_generator: !!python/name:material.extensions.emoji.to_svg
-    - pymdownx.highlight:
-          anchor_linenums: true
-          line_spans: __span
-          pygments_lang_class: true
-          use_pygments: true
-    - pymdownx.inlinehilite
-    - pymdownx.keys
-    - pymdownx.mark
-    - pymdownx.smartsymbols
-    - pymdownx.snippets:
-          auto_append:
-              - docs/includes/abbreviations.md
-    - pymdownx.superfences:
-          custom_fences:
-              - name: mermaid
-                class: mermaid
-                format: !!python/name:pymdownx.superfences.fence_code_format
-    - pymdownx.tabbed:
-          alternate_style: true
-    - pymdownx.tasklist:
-          custom_checkbox: true
-    - pymdownx.tilde
-
-extra_javascript:
-    - javascripts/mathjax.js
-    - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
-
-# Files not in navigation (auto-included snippets)
-not_in_nav: |
-    includes/abbreviations.md
-    examples/README.md
-    examples/grid_configs/README.md
-
-# Extra site variables
 extra:
-    social:
-        - icon: fontawesome/brands/github
-          link: https://github.com/frandorr/aereo
-          name: AER.EO on GitHub
-        - icon: fontawesome/brands/python
-          link: https://pypi.org/project/aereo/
-          name: AER.EO on PyPI
-    version:
-        provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/frandorr/aereo
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/aereo/
 
-# Navigation structure
+validation:
+  links:
+    not_found: warn
+    absolute_links: warn
+
+not_in_nav: |
+  examples/config/README.md
+
 nav:
-    - Home: index.md
-    - 🚀 Getting Started:
-          - Quick Start: quickstart.md
-          - Installation & Plugins: using-plugins.md
-          - CLI: cli.md
-          - Examples: examples.md
-    - 📖 User Guide:
-          - Running the Pipeline: pipeline.md
-          - Grid System: grid.md
-          - EOIDS Output: eoids.md
-          - Troubleshooting: troubleshooting.md
-    - 🛠️ For Developers:
-          - Contributing:
-                - Guidelines: contributing.md
-                - Developer Setup: contributing/dev-setup.md
-          - Architecture:
-                - Pipeline Architecture: pipeline-architecture.md
-                - Visual Architecture Guide: aer-architecture-visualization.md
-                - Execution Backends: execution.md
-                - Plugin System: plugins.md
-          - Building Plugins:
-                - Build Your Own Plugin: build-your-own-plugin.md
-    - 📚 API Reference:
-          - Client: api/client.md
-          - Interfaces: api/interfaces.md
-          - Registry: api/registry.md
-          - Schemas: api/schemas.md
-          - Grid: api/grid.md
-          - Spatial: api/spatial.md
-          - EOIDS: api/eoids.md
-          - Asset Downloader: api/asset_downloader.md
-          - Viz: api/viz.md
+  - Home: index.md
+  - Core Concepts: getting-started/concepts.md
+  - Tutorials:
+      - Overview: examples/index.md
+      - Install: install.md
+      - Your First Pipeline: getting-started/first-pipeline.md
+      - Pure Python Quickstart: getting-started/pure-python.md
+      - Sentinel-2 (nir, red): examples/01-sentinel2.ipynb
+      - Sentinel-2 NDVI: examples/01b-sentinel2-ndvi.ipynb
+      - Sentinel-2 NDWI: examples/01c-sentinel2-ndwi.ipynb
+      - Sentinel-2 raw Python: examples/step_by_step_raw.ipynb
+      - VIIRS: examples/02-viirs.ipynb
+      - Sentinel-3 OLCI: examples/03-sentinel3.ipynb
+      - Sentinel-3 NDVI: examples/03b-sentinel3-ndvi.ipynb
+      - GeoTessera: examples/04-tessera.ipynb
+      - GOES-19 ABI: examples/05-goes19.ipynb
+      - Multiple constellations: examples/06-multiple-constellation.ipynb
+  - Configuration:
+      - Config Package: configuration/config-package.md
+      - YAML Schema: configuration/yaml-schema.md
+      - Hydra Overrides: configuration/overrides.md
+  - User Guide:
+      - Choosing a Sensor: user-guide/choosing-a-sensor.md
+      - Search: user-guide/search.md
+      - Grids: user-guide/grids.md
+      - Reprojection: user-guide/reprojection.md
+      - Processing: user-guide/processing.md
+      - Outputs & Catalog: user-guide/outputs.md
+  - Serverless:
+      - Run on AWS Lambda: serverless/lambda.md
+  - Plugins:
+      - Overview: plugins/overview.md
+      - Build a Plugin: plugins/build-a-plugin.md
+  - API Reference:
+      - Pipeline: api/pipeline.md
+      - Built-ins: api/builtins.md
+      - Executors: api/executors.md
+      - Interfaces: api/interfaces.md
+      - Grid: api/grid.md
+      - Schemas: api/schemas.md
+      - Registry: api/registry.md
+  - Contributing: contributing.md

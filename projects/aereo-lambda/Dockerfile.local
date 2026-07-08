@@ -1,0 +1,79 @@
+# ---------------------------------------------------------------------------
+# AEREO Lambda Container Image — Local Plugins (testing)
+# ---------------------------------------------------------------------------
+# Build context must be the parent of the aereo repo (e.g. /root/repos):
+#
+#   cd /root/repos
+#   docker build -f aereo/projects/aereo-lambda/Dockerfile.local -t aereo-lambda:local .
+#
+# For local testing with docker compose:
+#   cd aereo/projects/aereo-lambda
+#   docker compose -f docker-compose.yml up --build
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Stage 1 — Builder
+# ---------------------------------------------------------------------------
+FROM python:3.12-slim AS builder
+
+WORKDIR /build
+
+# Install build toolchain
+RUN pip install --no-cache-dir hatch hatch-polylith-bricks uv
+
+# ------------------------------------------------------------------
+# Copy AEREO workspace
+# ------------------------------------------------------------------
+COPY aereo/pyproject.toml aereo/workspace.toml ./
+COPY aereo/components/ components/
+COPY aereo/bases/ bases/
+COPY aereo/projects/aereo-lambda/ projects/aereo-lambda/
+COPY aereo/projects/aereo/ projects/aereo/
+
+# ------------------------------------------------------------------
+# Build aereo core wheels
+# ------------------------------------------------------------------
+RUN cd projects/aereo && hatch build -t wheel
+RUN cd projects/aereo-lambda && hatch build -t wheel
+
+# ------------------------------------------------------------------
+# Copy local plugin repos (siblings to aereo/) and build from their
+# projects/ subdirectories. Each is a polylith workspace.
+# Adjust or comment out plugins you don't need.
+# ------------------------------------------------------------------
+# COPY aereo-extract-satpy/ plugins/aereo-extract-satpy/
+# RUN cd plugins/aereo-extract-satpy/projects/aereo-extract-satpy && hatch build -t wheel
+
+# COPY aereo-extract-odc-stac/ plugins/aereo-extract-odc-stac/
+# RUN cd plugins/aereo-extract-odc-stac/projects/aereo-extract-odc-stac && hatch build -t wheel
+
+# COPY aereo-extract-aws-goes/ plugins/aereo-extract-aws-goes/
+# RUN cd plugins/aereo-extract-aws-goes/projects/aereo-extract-aws-goes && hatch build -t wheel
+
+# COPY aereo-extract-lazycogs/ plugins/aereo-extract-lazycogs/
+# RUN cd plugins/aereo-extract-lazycogs/projects/aereo-extract-lazycogs && hatch build -t wheel
+
+# COPY aereo-extract-tessera/ plugins/aereo-extract-tessera/
+# RUN cd plugins/aereo-extract-tessera/projects/aereo-extract-tessera && hatch build -t wheel
+
+# ---------------------------------------------------------------------------
+# Stage 2 — Lambda Runtime
+# ---------------------------------------------------------------------------
+FROM public.ecr.aws/lambda/python:3.12
+
+# Install system libraries required by extractors (e.g. GDAL → libexpat)
+RUN microdnf install -y expat && microdnf clean all
+
+# Install the AEREO Lambda wheel + all local plugin wheels.
+COPY --from=builder /build/projects/aereo/dist/*.whl /tmp/
+COPY --from=builder /build/projects/aereo-lambda/dist/*.whl /tmp/
+# COPY --from=builder /build/plugins/aereo-extract-satpy/projects/aereo-extract-satpy/dist/*.whl /tmp/
+# COPY --from=builder /build/plugins/aereo-extract-odc-stac/projects/aereo-extract-odc-stac/dist/*.whl /tmp/
+# COPY --from=builder /build/plugins/aereo-extract-aws-goes/projects/aereo-extract-aws-goes/dist/*.whl /tmp/
+# COPY --from=builder /build/plugins/aereo-extract-lazycogs/projects/aereo-extract-lazycogs/dist/*.whl /tmp/
+# COPY --from=builder /build/plugins/aereo-extract-tessera/projects/aereo-extract-tessera/dist/*.whl /tmp/
+COPY --from=builder /build/projects/aereo-lambda/test_pipeline /tmp/test_pipeline
+RUN pip install --no-cache-dir /tmp/*.whl /tmp/test_pipeline && rm -rf /tmp/*.whl /tmp/test_pipeline
+
+# AWS Lambda handler entrypoint
+CMD ["aereo.lambda_handler.core.handler"]

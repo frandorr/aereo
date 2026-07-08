@@ -1,15 +1,26 @@
 import threading
 import zipfile
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
+import pytest
 
-from aereo.asset_downloader import download_assets_safely, extract_asset_safely
+from aereo.asset_downloader import (
+    download_assets_safely,
+    extract_archives,
+    extract_asset_safely,
+)
 
 
 def _make_zip(archive: Path, members: dict[str, str]) -> None:
     with zipfile.ZipFile(archive, "w") as zf:
         for name, data in members.items():
             zf.writestr(name, data)
+
+
+# ---------------------------------------------------------------------------
+# extract_asset_safely tests (unchanged behaviour)
+# ---------------------------------------------------------------------------
 
 
 def test_extract_asset_safely_basic(tmp_path: Path) -> None:
@@ -108,7 +119,86 @@ def test_extract_asset_safely_recovers_from_stale_dir(tmp_path: Path) -> None:
     assert (extract_dir / "data.txt").read_text() == "hello"
 
 
-def test_download_assets_safely_basic(tmp_path: Path) -> None:
+def test_extract_archives_returns_extracted_directory(tmp_path: Path) -> None:
+    """ZIP archives are extracted and the extracted directory is returned."""
+    archive = tmp_path / "product.zip"
+    _make_zip(archive, {"data.txt": "hello", "sub/nested.bin": "world"})
+
+    result = extract_archives([str(archive)])
+
+    assert len(result) == 1
+    extract_dir = Path(result[0])
+    assert extract_dir.name == "product"
+    assert (extract_dir / "data.txt").read_text() == "hello"
+    assert (extract_dir / "sub" / "nested.bin").read_text() == "world"
+
+
+def test_extract_archives_hoists_single_root_directory(tmp_path: Path) -> None:
+    """SEN3-style ZIPs with one root directory return the inner directory."""
+    archive = tmp_path / "product.SEN3.zip"
+    _make_zip(
+        archive,
+        {
+            "product.SEN3/data.txt": "hello",
+            "product.SEN3/meta.xml": "<xml/>",
+        },
+    )
+
+    result = extract_archives([str(archive)])
+
+    assert len(result) == 1
+    product_dir = Path(result[0])
+    assert product_dir.name == "product.SEN3"
+    assert (product_dir / "data.txt").read_text() == "hello"
+    assert (product_dir / "meta.xml").read_text() == "<xml/>"
+
+
+def test_extract_archives_expands_sen3_to_netcdf_files(tmp_path: Path) -> None:
+    """SEN3 product directories are expanded to their netCDF files for Satpy."""
+    archive = tmp_path / "product.SEN3.zip"
+    _make_zip(
+        archive,
+        {
+            "S3A_OL_1_EFR____20240101T141748_20240101T142048_20240102T142948_0179_107_224_3600_PS1_O_NT_003.SEN3/Oa08_radiance.nc": "nc8",
+            "S3A_OL_1_EFR____20240101T141748_20240101T142048_20240102T142948_0179_107_224_3600_PS1_O_NT_003.SEN3/Oa17_radiance.nc": "nc17",
+            "S3A_OL_1_EFR____20240101T141748_20240101T142048_20240102T142948_0179_107_224_3600_PS1_O_NT_003.SEN3/geo_coordinates.nc": "geo",
+            "S3A_OL_1_EFR____20240101T141748_20240101T142048_20240102T142948_0179_107_224_3600_PS1_O_NT_003.SEN3/Oa08_radiance_unc.nc": "unc",
+        },
+    )
+
+    result = extract_archives([str(archive)])
+
+    assert len(result) == 4
+    names = [Path(p).name for p in result]
+    assert names == [
+        "Oa08_radiance.nc",
+        "Oa08_radiance_unc.nc",
+        "Oa17_radiance.nc",
+        "geo_coordinates.nc",
+    ]
+    assert all(Path(p).exists() for p in result)
+
+
+def test_extract_archives_leaves_non_zip_paths_unchanged() -> None:
+    """Non-ZIP paths are returned unchanged."""
+    paths = ["/tmp/some_file.nc", "/data/another_file.h5"]
+    assert extract_archives(paths) == paths
+
+
+# ---------------------------------------------------------------------------
+# download_assets_safely tests — obstore-backed
+# ---------------------------------------------------------------------------
+
+
+def _mock_get_result(data: bytes) -> MagicMock:
+    """Return a mock obstore GetResult that yields *data* as one chunk."""
+    mock = MagicMock()
+    mock.__iter__ = MagicMock(return_value=iter([data]))
+    return mock
+
+
+def test_download_assets_safely_local_files(tmp_path: Path) -> None:
+    """Built-in logic copies local files via obstore LocalStore."""
     src_dir = tmp_path / "src"
     src_dir.mkdir()
     dest_dir = tmp_path / "dest"
@@ -131,7 +221,54 @@ def test_download_assets_safely_basic(tmp_path: Path) -> None:
     assert dest2.read_text() == "content2"
 
 
-def test_download_assets_safely_downloader(tmp_path: Path) -> None:
+def test_download_assets_safely_s3(tmp_path: Path) -> None:
+    """S3 URLs are resolved to S3Store and streamed via obstore.get."""
+    dest = tmp_path / "s3_file.tif"
+
+    with (
+        patch("obstore.get") as mock_get,
+        patch("obstore.store.S3Store") as mock_store_cls,
+    ):
+        mock_store = MagicMock()
+        mock_store_cls.return_value = mock_store
+        mock_get.return_value = _mock_get_result(b"s3-payload")
+
+        download_assets_safely(
+            hrefs=["s3://my-bucket/path/to/file.tif"],
+            local_paths=[dest],
+        )
+
+        mock_store_cls.assert_called_once_with("my-bucket", skip_signature=True)
+        mock_get.assert_called_once_with(mock_store, "path/to/file.tif")
+        assert dest.read_bytes() == b"s3-payload"
+
+
+def test_download_assets_safely_https(tmp_path: Path) -> None:
+    """HTTPS URLs are resolved to HTTPStore and streamed via obstore.get."""
+    dest = tmp_path / "http_file.tif"
+
+    with (
+        patch("obstore.get") as mock_get,
+        patch("obstore.store.HTTPStore") as mock_store_cls,
+    ):
+        mock_store = MagicMock()
+        mock_store_cls.from_url.return_value = mock_store
+        mock_get.return_value = _mock_get_result(b"http-payload")
+
+        download_assets_safely(
+            hrefs=["https://example.com/data/file.tif"],
+            local_paths=[dest],
+        )
+
+        mock_store_cls.from_url.assert_called_once_with(
+            "https://example.com/data/file.tif"
+        )
+        mock_get.assert_called_once_with(mock_store, "")
+        assert dest.read_bytes() == b"http-payload"
+
+
+def test_download_assets_safely_custom_downloader(tmp_path: Path) -> None:
+    """Custom downloader callable is invoked for each asset (plugin contract)."""
     dest_dir = tmp_path / "dest"
     dest_dir.mkdir()
 
@@ -155,9 +292,40 @@ def test_download_assets_safely_downloader(tmp_path: Path) -> None:
     assert len(called_args) == 2
 
 
-def test_download_assets_safely_length_mismatch(tmp_path: Path) -> None:
-    import pytest
+def test_download_assets_safely_concurrent_locking(tmp_path: Path) -> None:
+    """Multiple threads downloading the same file do not corrupt it."""
+    dest = tmp_path / "shared.tif"
 
+    with (
+        patch("obstore.get") as mock_get,
+        patch("obstore.store.S3Store") as mock_store_cls,
+    ):
+        mock_store = MagicMock()
+        mock_store_cls.return_value = mock_store
+        mock_get.return_value = _mock_get_result(b"concurrent-payload")
+
+        errors: list[Exception] = []
+
+        def worker() -> None:
+            try:
+                download_assets_safely(
+                    hrefs=["s3://bucket/file.tif"],
+                    local_paths=[dest],
+                )
+            except Exception as exc:  # noqa: BLE001
+                errors.append(exc)
+
+        threads = [threading.Thread(target=worker) for _ in range(8)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+        assert not errors
+        assert dest.read_bytes() == b"concurrent-payload"
+
+
+def test_download_assets_safely_length_mismatch(tmp_path: Path) -> None:
     with pytest.raises(
         ValueError, match="hrefs and local_paths must have the same length"
     ):
@@ -165,3 +333,73 @@ def test_download_assets_safely_length_mismatch(tmp_path: Path) -> None:
             hrefs=["mock://file1"],
             local_paths=[],
         )
+
+
+def test_download_assets_safely_s3_with_store_options(tmp_path: Path) -> None:
+    """store_options are forwarded to the S3Store constructor."""
+    dest = tmp_path / "s3_auth_file.tif"
+
+    with (
+        patch("obstore.get") as mock_get,
+        patch("obstore.store.S3Store") as mock_store_cls,
+    ):
+        mock_store = MagicMock()
+        mock_store_cls.return_value = mock_store
+        mock_get.return_value = _mock_get_result(b"s3-auth-payload")
+
+        download_assets_safely(
+            hrefs=["s3://my-bucket/path/to/file.tif"],
+            local_paths=[dest],
+            store_options={
+                "skip_signature": False,
+                "access_key_id": "AKIA...",
+                "secret_access_key": "secret...",
+            },
+        )
+
+        mock_store_cls.assert_called_once_with(
+            "my-bucket",
+            skip_signature=False,
+            access_key_id="AKIA...",
+            secret_access_key="secret...",
+        )
+        assert dest.read_bytes() == b"s3-auth-payload"
+
+
+def test_download_assets_safely_unsupported_scheme(tmp_path: Path) -> None:
+    """Unsupported URL schemes raise ValueError."""
+    dest = tmp_path / "bad.txt"
+    with pytest.raises(ValueError, match="Unsupported URL scheme"):
+        download_assets_safely(
+            hrefs=["ftp://example.com/file.txt"],
+            local_paths=[dest],
+        )
+
+
+def test_download_assets_safely_s3_fallback_to_non_earthdata_https(
+    tmp_path: Path,
+) -> None:
+    """When S3 fails and fallback is a generic HTTPS URL, use obstore HTTPStore."""
+    dest = tmp_path / "http_file.tif"
+
+    with (
+        patch("obstore.store.S3Store") as mock_s3_cls,
+        patch("obstore.get") as mock_get,
+        patch("obstore.store.HTTPStore") as mock_http_cls,
+    ):
+        mock_s3_cls.side_effect = RuntimeError("cross-region S3 failure")
+        mock_http_store = MagicMock()
+        mock_http_cls.from_url.return_value = mock_http_store
+        mock_get.return_value = _mock_get_result(b"http-fallback-payload")
+
+        download_assets_safely(
+            hrefs=["s3://my-bucket/path/to/file.tif"],
+            local_paths=[dest],
+            fallback_hrefs=["https://example.com/data/file.tif"],
+        )
+
+        mock_http_cls.from_url.assert_called_once_with(
+            "https://example.com/data/file.tif"
+        )
+        mock_get.assert_called_once_with(mock_http_store, "")
+        assert dest.read_bytes() == b"http-fallback-payload"

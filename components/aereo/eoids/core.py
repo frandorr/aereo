@@ -1,20 +1,28 @@
+"""Core implementation of EOIDS file naming, path generation, scanning, and loading utilities.
+
+Handles the naming structure of Earth Observation Image Datasets (EOIDS) and integrates
+them with Major TOM format parquet files.
+"""
+
 import datetime
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
-from aereo.interfaces import AereoProfile
+import geopandas as gpd
+import pandas as pd
+
+# Removed AereoProfile import
 
 # Known EOIDS key tokens — order matters for greedy matching
 _EOIDS_KEYS = (
     "loc",
     "start",
     "end",
-    "profile",
+    "job",
     "collection",
     "variable",
     "res",
-    "desc",
 )
 _EOIDS_PATTERN = re.compile(
     r"(" + "|".join(_EOIDS_KEYS) + r")-"
@@ -22,76 +30,113 @@ _EOIDS_PATTERN = re.compile(
     r"(?=_(?:" + "|".join(_EOIDS_KEYS) + r")-|$)"
 )
 
+_EOIDS_DT_FMT = "%Y%m%dT%H%M%S"
+_EOIDS_DATE_FMT = "%Y%m%d"
+
+
+def _sanitize_cell(cell_id: str) -> str:
+    """Remove underscores from a cell id to make it filename-safe."""
+    return str(cell_id).replace("_", "")
+
+
+def _sanitize_job_name(name: str) -> str:
+    """Return a filesystem-safe version of a job name.
+
+    Replaces path separators and whitespace with underscores and strips
+    leading/trailing whitespace.
+    """
+    return re.sub(r"[\\/\s]+", "_", str(name)).strip("_") or "default"
+
+
+def _normalize_suffix(suffix: str) -> str:
+    """Strip a leading dot from a file extension suffix."""
+    return suffix.lstrip(".")
+
+
+def _write_job_meta(
+    base_dir: Path, job_name: str, meta: dict[str, Any] | None = None
+) -> None:
+    job_path = base_dir / "job.json"
+    if not job_path.exists() and meta is not None:
+        import json
+
+        payload = {"job": job_name, **meta}
+        job_path.write_text(
+            json.dumps(payload, indent=2),
+            encoding="utf-8",
+        )
+
 
 def build_eoids_path(
     local_dir: str | Path,
-    profile: AereoProfile,
+    job_name: str,
+    resolution: float | None = None,
     *,
+    collections: Sequence[str] | None = None,
+    variables: Sequence[str] | None = None,
     cell_id: str | None = None,
     start_time: datetime.datetime | None = None,
     end_time: datetime.datetime | None = None,
     derivative: str | None = None,
-    desc: str | None = None,
     suffix: str = "tif",
-    write_profile_meta: bool = True,
+    write_job_meta: bool = True,
+    meta_dict: dict[str, Any] | None = None,
     **_kwargs: Any,
 ) -> Path:
     """Build an Earth Observation Imaging Data Structure (EOIDS) compliant file path.
 
-    ``collection`` and ``variable`` are automatically derived from
-    ``profile.collections`` and encoded in the filename (joined by ``+`` when
+    ``collection`` and ``variable`` are encoded in the filename (joined by ``+`` when
     multiple values exist).  The ``variable`` segment names the *set* of bands
     that will be stored as separate raster bands inside the single file — it
     does **not** cause the variables to be split into separate files.
     The directory hierarchy is flattened — there are no
     ``collection-<name>/`` or ``variable-<name>/`` subdirectories.
 
-    On the first call for a given profile, a ``profile.json`` sidecar is written
-    next to the data file so the full profile metadata can be recovered from disk.
+    On the first call for a given job, a ``job.json`` sidecar is written
+    next to the data file so the job metadata can be recovered from disk.
 
     Args:
         local_dir: Root directory for the dataset.
-        profile: The AereoProfile used for extraction. Provides the profile name,
-            default resolution, and collection/variable mapping.
+        job_name: Human-readable name of the extraction job.
+        resolution: Target resolution in metres, or *None* when the data is
+            kept at its native resolution (e.g. ``reproject_mode="raw"``).
+            When *None*, the ``res-`` segment is omitted from the filename.
+        collections: Sequence of collection identifiers.
+        variables: Sequence of variables/bands.
         cell_id: Geographic cell identifier (e.g., '36D61L').
         start_time: Start time of the observation.
         end_time: End time of the observation.
         derivative: Name of the derivative pipeline (places file in derivatives/<name>/).
-        desc: Custom descriptor for the file (e.g., 'cloudmask').
         suffix: File extension (default: 'tif').
-        write_profile_meta: When *True* (the default), serialize the full
-            ``AereoProfile`` to ``profile.json`` in the profile directory on the
-            first call.
+        write_job_meta: When *True* (the default), serialize metadata to
+            ``job.json`` in the job directory on the first call.
+        meta_dict: Optional metadata dictionary to save as job.json.
     """
+    safe_job = _sanitize_job_name(job_name)
     parts: list[str] = []
 
-    if cell_id:
-        safe_cell = str(cell_id).replace("_", "")
+    if collections:
+        parts.append(f"collection-{('+').join(collections)}")
+
+    safe_cell = _sanitize_cell(cell_id) if cell_id else None
+    if safe_cell:
         parts.append(f"loc-{safe_cell}")
-    else:
-        safe_cell = None
 
     if start_time:
-        parts.append(f"start-{start_time.strftime('%Y%m%dT%H%M%S')}")
+        parts.append(f"start-{start_time.strftime(_EOIDS_DT_FMT)}")
     if end_time:
-        parts.append(f"end-{end_time.strftime('%Y%m%dT%H%M%S')}")
-    parts.append(f"profile-{profile.name}")
+        parts.append(f"end-{end_time.strftime(_EOIDS_DT_FMT)}")
 
-    # Derive collection and variable from profile.collections
-    if profile.collections:
-        collections = list(profile.collections.keys())
-        variables = [v for vars_list in profile.collections.values() for v in vars_list]
-        if collections:
-            parts.append(f"collection-{('+').join(collections)}")
-        if variables:
-            parts.append(f"variable-{('+').join(variables)}")
+    if variables:
+        parts.append(f"variable-{('+').join(variables)}")
 
-    res_str = f"{int(profile.resolution)}m"
-    parts.append(f"res-{res_str}")
-    if desc:
-        parts.append(f"desc-{desc}")
+    if resolution is not None:
+        res_str = f"{int(resolution)}m"
+        parts.append(f"res-{res_str}")
 
-    safe_suffix = suffix.lstrip(".")
+    parts.append(f"job-{safe_job}")
+
+    safe_suffix = _normalize_suffix(suffix)
     if not parts:
         filename = f"unnamed.{safe_suffix}"
     else:
@@ -102,23 +147,18 @@ def build_eoids_path(
     if derivative:
         base_dir = base_dir / "derivatives" / derivative
 
+    base_dir = base_dir / f"job-{safe_job}"
+
     if safe_cell:
         base_dir = base_dir / f"loc-{safe_cell}"
 
     if start_time:
-        base_dir = base_dir / f"date-{start_time.strftime('%Y%m%d')}"
-
-    base_dir = base_dir / f"profile-{profile.name}"
+        base_dir = base_dir / f"date-{start_time.strftime(_EOIDS_DATE_FMT)}"
 
     base_dir.mkdir(parents=True, exist_ok=True)
 
-    if write_profile_meta:
-        profile_path = base_dir / "profile.json"
-        if not profile_path.exists():
-            profile_path.write_text(
-                profile.model_dump_json(exclude={"downloader"}, indent=2),
-                encoding="utf-8",
-            )
+    if write_job_meta:
+        _write_job_meta(base_dir, safe_job, meta_dict)
 
     return base_dir / filename
 
@@ -131,7 +171,7 @@ def build_eoids_path(
 def parse_eoids_filename(path: str | Path) -> dict[str, str]:
     """Extract metadata key-value pairs from an EOIDS-compliant filename.
 
-    Values whose keys contain underscores (e.g. ``profile-goes_c01``) are handled
+    Values whose keys contain underscores (e.g. ``job-goes_c01``) are handled
     correctly thanks to a greedy regex that stops only at the next recognised
     EOIDS key token.
 
@@ -139,19 +179,19 @@ def parse_eoids_filename(path: str | Path) -> dict[str, str]:
         path: Full path or bare filename following the EOIDS naming convention.
 
     Returns:
-        Dictionary mapping EOIDS keys (``loc``, ``start``, ``end``, ``profile``,
-        ``collection``, ``variable``, ``res``, ``desc``) to their string values.
+        Dictionary mapping EOIDS keys (``loc``, ``start``, ``end``, ``job``,
+        ``collection``, ``variable``, ``res``) to their string values.
         Only keys present in the filename are included.
 
     Example::
 
         >>> parse_eoids_filename(
-        ...     "loc-0U38L_start-20260101T100022_end-20260101T100953_"
-        ...     "profile-goes_east_collection-ABI-L1b-RadF_variable-C01_res-1000m.tif"
+        ...     "collection-ABI-L1b-RadF_loc-0U38L_start-20260101T100022_"
+        ...     "end-20260101T100953_variable-C01_res-1000m_job-goes_east.tif"
         ... )
-        {'loc': '0U38L', 'start': '20260101T100022', 'end': '20260101T100953',
-         'profile': 'goes_east', 'collection': 'ABI-L1b-RadF',
-         'variable': 'C01', 'res': '1000m'}
+        {'collection': 'ABI-L1b-RadF', 'loc': '0U38L',
+         'start': '20260101T100022', 'end': '20260101T100953',
+         'variable': 'C01', 'res': '1000m', 'job': 'goes_east'}
     """
     stem = Path(path).stem
     return dict(_EOIDS_PATTERN.findall(stem))
@@ -167,6 +207,14 @@ def _matches_filter(filter_value: str | None, file_value: str | None) -> bool:
 
     Both sides may use ``+`` concatenation (e.g. ``"C01+C02"``).  The filter
     matches when at least one component appears on both sides.
+
+    Args:
+        filter_value: The filter pattern, or *None* to match all.
+        file_value: The file's value to test, or *None*.
+
+    Returns:
+        *True* when at least one ``+``-separated component exists in both
+        strings, or when *filter_value* is *None*.
     """
     if filter_value is None:
         return True
@@ -181,7 +229,7 @@ def scan_eoids_dir(
     root_dir: str | Path,
     *,
     date: str | None = None,
-    profile: str | None = None,
+    job: str | None = None,
     collection: str | None = None,
     variable: str | None = None,
     cell_id: str | None = None,
@@ -197,7 +245,7 @@ def scan_eoids_dir(
         root_dir: Top-level EOIDS dataset directory.
         date: Filter by date string as it appears in the directory hierarchy
             (e.g. ``"20260101"``).
-        profile: Filter by profile name (e.g. ``"goes_c01"``).
+        job: Filter by job name (e.g. ``"goes_c01"``).
         collection: Filter by collection value (e.g. ``"ABI-L1b-RadF"``).
         variable: Filter by variable value (e.g. ``"C01"``).
         cell_id: Filter by cell identifier (e.g. ``"0U38L"``).
@@ -209,7 +257,7 @@ def scan_eoids_dir(
         ``"date"`` (extracted from the directory hierarchy).
     """
     root = Path(root_dir)
-    safe_suffix = suffix.lstrip(".")
+    safe_suffix = _normalize_suffix(suffix)
     results: list[dict[str, Any]] = []
 
     for filepath in root.rglob(f"*.{safe_suffix}"):
@@ -229,13 +277,13 @@ def scan_eoids_dir(
         # Apply filters — skip if any filter doesn't match
         if date is not None and file_date != date:
             continue
-        if profile is not None and meta.get("profile") != profile:
+        if job is not None and meta.get("job") != job:
             continue
         if not _matches_filter(collection, meta.get("collection")):
             continue
         if not _matches_filter(variable, meta.get("variable")):
             continue
-        if cell_id is not None and meta.get("loc") != cell_id.replace("_", ""):
+        if cell_id is not None and meta.get("loc") != _sanitize_cell(cell_id):
             continue
 
         results.append(entry)
@@ -244,3 +292,66 @@ def scan_eoids_dir(
 
 
 # ---------------------------------------------------------------------------
+# EOIDSLoader — Major TOM dataset integration
+# ---------------------------------------------------------------------------
+
+
+class EOIDSLoader:
+    """Load and manage Major TOM-format EOIDS datasets from parquet files."""
+
+    def __init__(self, dataset_path: str | Path) -> None:
+        """Initialise loader with a path to a Major TOM parquet dataset.
+
+        Args:
+            dataset_path: Path to the parquet file or directory containing
+                the Major TOM dataset.
+        """
+        self.dataset_path = Path(dataset_path)
+
+    @classmethod
+    def from_parquet(cls, path: str | Path) -> "EOIDSLoader":
+        """Create an EOIDSLoader from a parquet file.
+
+        Args:
+            path: Path to the parquet file.
+
+        Returns:
+            An EOIDSLoader instance.
+        """
+        return cls(path)
+
+    def load(self) -> gpd.GeoDataFrame:
+        """Load the dataset as a GeoDataFrame.
+
+        Returns:
+            GeoDataFrame containing the Major TOM dataset.
+        """
+        return gpd.read_parquet(self.dataset_path)
+
+    def merge_with_extraction(
+        self,
+        existing_dataset: gpd.GeoDataFrame,
+        new_artifacts: gpd.GeoDataFrame,
+        dedup_by: tuple[str, ...] = ("grid_cell", "collection", "start_time"),
+    ) -> gpd.GeoDataFrame:
+        """Merge new extraction artifacts into an existing Major TOM dataset.
+
+        Duplicates are identified by the *dedup_by* columns. When a conflict
+        is found, the new artifact takes precedence.
+
+        Args:
+            existing_dataset: Existing Major TOM dataset loaded from parquet.
+            new_artifacts: New artifacts produced by an extraction run.
+            dedup_by: Columns used to identify duplicate rows.
+
+        Returns:
+            Merged GeoDataFrame with duplicates removed.
+        """
+        combined = pd.concat([existing_dataset, new_artifacts], ignore_index=True)
+
+        # Determine which columns are available for deduplication
+        available_cols = [c for c in dedup_by if c in combined.columns]
+        if available_cols:
+            combined = combined.drop_duplicates(subset=available_cols, keep="last")
+
+        return gpd.GeoDataFrame(combined, crs=existing_dataset.crs)

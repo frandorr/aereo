@@ -1,0 +1,32 @@
+name: tessera_sample
+grid_dist: 10_000
+grid_cells_margin: 10
+target_aoi: config/aoi/oxford.geojson
+output_uri: /tmp/aereo_extraction
+overwrite: false
+
+search:
+  _target_: aereo.search_tessera.search_tessera
+  _partial_: true
+  collections:
+    geotessera: []
+  intersects: ${target_aoi}
+  start_datetime: "2025-01-01T00:00:00Z"
+  end_datetime: "2025-12-31T00:00:00Z"
+  tessera_version: v1.1
+  tessera_variant: cambridge
+
+read:
+  _target_: aereo.read_tessera.read_tessera
+  _partial_: true
+  bands: [1,2,3]
+
+
+reproject:
+  _target_: aereo.builtins.reproject_odc
+  _partial_: true
+reproject_mode: grid
+resolution: 10
+
+write:
+  _target_: aereo.builtins.write.write_geotiff

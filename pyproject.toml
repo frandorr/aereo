@@ -26,8 +26,11 @@ dependencies = [
   "cattrs>=26.1",
   "filelock>=3",
   "geopandas>=1.1.2",
+  "hydra-core>=1.3.2",
+  "joblib>=1.3",
   "majortom-eg",
   "numpy",
+  "obstore>=0.9.3",
   "odc-geo>=0.5.1",
   "openpyxl>=3.1.5",
   "pandas>=3.0.1",
@@ -38,40 +41,57 @@ dependencies = [
   "pyhdf>=0.11.6",
   "pyproj>=3.7.1",
   "pyresample>=1.35",
+  "pystac>=1.8",
+  "pystac-client>=0.8",
   "python-geotiepoints>=1.9",
   "pyyaml>=6.0.3",
-  "requests>=2.32",
   "returns[compatible-mypy]>=0.26",
   "rich>=13",
   "rtree>=1.4.1",
-  "s3fs>=2025.2",
   "scikit-learn>=1.8",
   "shapely>=2.1.2",
   "structlog>=25.5",
-  "typer>=0.12",
   "utm>=0.8.1",
 ]
-optional-dependencies.aws-goes = [ "aereo-search-aws-goes>=2" ]
-optional-dependencies.docs = [ "mkdocs-material>=9", "mkdocs-minify-plugin>=0.8", "mkdocstrings[python]>=0.24" ]
-optional-dependencies.earthaccess = [ "aereo-search-earthaccess>=1.1.1" ]
+optional-dependencies.docs = [
+  "mkdocs-exclude>=1.0.2",
+  "mkdocs-material>=9",
+  "mkdocs-mermaid2-plugin>=1",
+  "mkdocs-minify-plugin>=0.8",
+  "mkdocstrings[python]>=0.24",
+  "mknotebooks>=0.8",
+  "ruff>=0.11",
+]
+optional-dependencies.serverless = [ "boto3>=1.34" ]
 urls.Documentation = "https://frandorr.github.io/aereo"
 urls.Homepage = "https://github.com/frandorr/aereo"
 urls.Issues = "https://github.com/frandorr/aereo/issues"
 urls.Repository = "https://github.com/frandorr/aereo"
+entry-points."aereo.plugins".process_composite = "aereo.builtins.processor:composite"
+entry-points."aereo.plugins".process_ndvi = "aereo.builtins.processor:ndvi"
+entry-points."aereo.plugins".process_ndwi = "aereo.builtins.processor:ndwi"
+entry-points."aereo.plugins".process_normalize = "aereo.builtins.processor:normalize"
+entry-points."aereo.plugins".process_qa_mask = "aereo.builtins.processor:qa_mask"
+entry-points."aereo.plugins".process_select_bands = "aereo.builtins.processor:select_bands"
+entry-points."aereo.plugins".read_odc_stac = "aereo.builtins.read:read_odc_stac"
+entry-points."aereo.plugins".reproject_odc = "aereo.builtins.reproject:reproject_odc"
+entry-points."aereo.plugins".reproject_swath = "aereo.builtins.reproject:reproject_swath"
+entry-points."aereo.plugins".search_stac = "aereo.builtins.search:search_stac"
+entry-points."aereo.plugins".task_builder_grouped = "aereo.builtins.task_builder:build_grouped_tasks"
+entry-points."aereo.plugins".write_geotiff = "aereo.builtins.write:write_geotiff"
 
 [dependency-groups]
 dev = [
-  "aereo-extract-aws-goes",
-  "aereo-extract-odc-stac",
-  "aereo-extract-remote",
-  "aereo-extract-satpy",
-  "aereo-extract-tessera",
-  "aereo-search-aws-goes>=2",
-  "aereo-search-earthaccess>=2.0.3,<3",
-  "aereo-search-planetary-computer",
+  "aereo-read-satpy",
+  "aereo-read-tessera",
+  "aereo-reproject-satpy",
+  "aereo-search-aws-goes",
   "aereo-search-tessera",
+  "aereo-test-pipeline",
   "basedpyright>=1.38",
   "cartopy>=0.25",
+  "earthaccess>=0.18",
+  "faiss-cpu>=1.14.3",
   "graphviz>=0.21",
   "icechunk>=2.0.3",
   "ipykernel>=7.2",
@@ -80,12 +100,17 @@ dev = [
   "matplotlib>=3.10.8",
   "nbformat>=5.10.4",
   "obstore>=0.9.3",
+  "odc-loader>=0.6.4",
+  "odc-stac>=0.5.2",
+  "planetary-computer>=1",
   "polylith-cli>=1.42.5,<2",
   "pytest>=9.0.2,<10",
   "pytest-cov>=6",
   "python-semantic-release>=10.5.3,<11",
   "rioxarray>=0.22",
   "satpy>=0.59",
+  "scipy>=1.13",
+  "tqdm>=4.68.2",
   "types-requests>=2.32.4.20260107,<3",
   "virtualizarr>=2.4",
   "xarray>=2026.4",
@@ -102,16 +127,13 @@ build.dev-mode-dirs = [ "components", "bases", "development", "../majortom", "."
 metadata.allow-direct-references = true
 
 [tool.uv]
-sources.aereo = { path = "projects/aereo", editable = true }
-sources.aereo-extract-aws-goes = { path = "../aereo-extract-aws-goes/projects/aereo-extract-aws-goes", editable = true }
-sources.aereo-extract-odc-stac = { path = "../aereo-extract-odc-stac/projects/aereo-extract-odc-stac", editable = true }
-sources.aereo-extract-remote = { path = "../aereo-extract-remote", editable = true }
-sources.aereo-extract-satpy = { path = "../aereo-extract-satpy/projects/aereo-extract-satpy", editable = true }
-sources.aereo-extract-tessera = { path = "../aereo-extract-tessera/projects/aereo-extract-tessera", editable = true }
-sources.aereo-search-aws-goes = { path = "../aereo-search-aws-goes/projects/aereo-search-aws-goes", editable = true }
-sources.aereo-search-earthaccess = { path = "../aereo-search-earthaccess/projects/aereo-search-earthaccess", editable = true }
-sources.aereo-search-planetary-computer = { path = "../aereo-search-planetary-computer/projects/aereo-search-planetary-computer", editable = true }
-sources.aereo-search-tessera = { path = "../aereo-search-tessera/projects/aereo-search-tessera", editable = true }
+sources.aereo = { workspace = true }
+sources.aereo-read-satpy = { path = "../aereo-read-satpy/projects/aereo-read-satpy" }
+sources.aereo-read-tessera = { path = "../aereo-read-tessera/projects/aereo-read-tessera" }
+sources.aereo-reproject-satpy = { path = "../aereo-reproject-satpy/projects/aereo-reproject-satpy" }
+sources.aereo-search-aws-goes = { path = "../aereo-search-aws-goes/projects/aereo-search-aws-goes" }
+sources.aereo-search-tessera = { path = "../aereo-search-tessera/projects/aereo-search-tessera" }
+sources.aereo-test-pipeline = { path = "projects/aereo-lambda/test_pipeline", editable = true }
 managed = true
 workspace.members = [ "projects/*" ]
 
@@ -165,6 +187,10 @@ exclude = [
   "site/",
   ".venv/",
   "test/",
+  "build/",
+  "docs/examples/",
+  "docs/examples/legacy/",
+  "development/local/",
 ]
 typeCheckingMode = "basic"
 reportMissingTypeStubs = false
@@ -185,6 +211,11 @@ bricks."components/aereo/registry" = "aereo/registry"
 bricks."components/aereo/schemas" = "aereo/schemas"
 bricks."components/aereo/spatial" = "aereo/spatial"
 bricks."components/aereo/asset_downloader" = "aereo/asset_downloader"
+bricks."components/aereo/backends" = "aereo/backends"
+bricks."components/aereo/serialization" = "aereo/serialization"
+bricks."components/aereo/storage" = "aereo/storage"
+bricks."components/aereo/viz" = "aereo/viz"
+bricks."components/aereo_extract" = "aereo_extract"
 bricks."bases/aereo/cli" = "aereo/cli"
 bricks."bases/aereo/client" = "aereo/client"
 bricks."bases/aereo/lambda_handler" = "aereo/lambda_handler"

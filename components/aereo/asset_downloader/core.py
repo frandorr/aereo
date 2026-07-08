@@ -1,83 +1,276 @@
+"""Core implementation of safe, lock-protected asset downloading and extraction routines.
+
+Provides concurrent download and extract utilities designed for multi-process environments.
+"""
+
+import base64
+import contextlib
+import filelock
+import netrc
+import os
 import shutil
+import tempfile
+import zipfile
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from typing import Any, cast
 
-if TYPE_CHECKING:
-    from aereo.interfaces import Downloader
+from ._obstore_utils import (
+    _resolve_store,
+    _stream_obstore_to_disk,
+)
+from aereo.interfaces.core import ExtractionTask
+from structlog import get_logger
+
+_LOCK_TIMEOUT_SECONDS = 600
+
+try:
+    from obstore.auth.earthdata import (
+        NasaEarthdataCredentialProvider as _NasaEarthdataCredentialProvider,
+    )
+
+    _EARTHDATA_AUTH_AVAILABLE = True
+except ImportError:
+    _EARTHDATA_AUTH_AVAILABLE = False
+
+try:
+    import earthaccess as _earthaccess
+
+    _EARTHACCESS_AVAILABLE = True
+except ImportError:
+    _EARTHACCESS_AVAILABLE = False
+
+logger = get_logger(__name__)
+
+DownloaderCallable = Callable[[str, Path], None]
+
+
+def _read_earthdata_auth_header(
+    host: str = "urs.earthdata.nasa.gov",
+) -> dict[str, str] | None:
+    """Read NASA Earthdata credentials and return an Authorization header.
+
+    Tries, in order:
+
+    1. ``EARTHDATA_TOKEN`` environment variable (Bearer token).
+    2. ``EARTHDATA_USERNAME`` + ``EARTHDATA_PASSWORD`` environment variables
+       (Basic auth).
+    3. ``~/.netrc`` (or ``NETRC``-specified file) for *host* (Basic auth).
+
+    Returns:
+        A dict with an ``Authorization`` header, or ``None`` if no credentials
+        could be located.
+    """
+    token = os.environ.get("EARTHDATA_TOKEN")
+    if token:
+        return {"Authorization": f"Bearer {token}"}
+
+    username = os.environ.get("EARTHDATA_USERNAME")
+    password = os.environ.get("EARTHDATA_PASSWORD")
+
+    if not username or not password:
+        try:
+            netrc_path = os.environ.get("NETRC")
+            nrc = netrc.netrc(netrc_path) if netrc_path else netrc.netrc()
+            auth = nrc.authenticators(host)
+            if auth:
+                username, _, password = auth
+        except (FileNotFoundError, netrc.NetrcParseError):
+            pass
+
+    if username and password:
+        creds = base64.b64encode(f"{username}:{password}".encode()).decode("ascii")
+        return {"Authorization": f"Basic {creds}"}
+
+    return None
+
+
+def _safe_unlink(path: Path) -> None:
+    """Remove a file, ignoring errors if it does not exist or is inaccessible."""
+    with contextlib.suppress(OSError):
+        path.unlink()
+
+
+def _download_with_earthaccess(url: str, local_path: Path) -> None:
+    """Download *url* to *local_path* using earthaccess authenticated session.
+
+    Falls back to ``earthaccess`` when obstore fails (e.g. NASA Earthdata
+    URLs that require URS authentication).  This is a tertiary fallback
+    so users do not need to configure a custom *downloader* for
+    Earthdata collections.
+
+    Args:
+        url: Remote URL of the granule to download.
+        local_path: Destination file path on the local filesystem.
+
+    Raises:
+        ValueError: If the URL scheme is not supported by earthaccess.
+        RuntimeError: If earthaccess is not installed or the download fails.
+    """
+    if not _EARTHACCESS_AVAILABLE:
+        raise RuntimeError(
+            "earthaccess is required to download NASA Earthdata assets. "
+            "Install it with: uv pip install earthaccess"
+        )
+
+    if not url.startswith(("http://", "https://", "s3://")):
+        raise ValueError(f"Unsupported URL scheme or path: {url}")
+
+    local_path = Path(local_path)
+    local_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # earthaccess handles auth internally via .netrc or environment
+    _earthaccess.login(persist=True)
+
+    downloaded = _earthaccess.download(
+        url,
+        local_path=local_path.parent,
+        threads=1,
+        show_progress=False,
+    )
+
+    if not downloaded:
+        raise RuntimeError(f"earthaccess.download returned no files for {url}")
+
+    if len(downloaded) != 1:
+        raise RuntimeError(
+            f"earthaccess.download returned {len(downloaded)} files for a single URL, expected 1"
+        )
+
+    downloaded_file = Path(downloaded[0])
+    if downloaded_file.resolve() != local_path.resolve():
+        shutil.move(str(downloaded_file), str(local_path))
 
 
 def download_asset_safely(
     href: str,
     local_path: Path,
-    s3_client: Optional[Any] = None,
-    http_session: Optional[Any] = None,
-    downloader: Optional["Downloader"] = None,
+    downloader: DownloaderCallable | None = None,
+    store_options: dict[str, Any] | None = None,
+    fallback_href: str | None = None,
+    fallback_store_options: dict[str, Any] | None = None,
 ) -> None:
     """Download asset with a filelock to avoid corruption in multi-processing.
 
     Args:
-        href: URL or local path to the asset.
+        href: URL or local path to the asset. Supported schemes:
+            ``s3://``, ``gs://``, ``az://``, ``http(s)://``, ``file://``,
+            or a bare local filesystem path.
         local_path: Destination path for the downloaded file.
-        s3_client: Optional authenticated S3FileSystem for S3 access.
-            Note: Only works when running in AWS us-west-2 region.
-        http_session: Optional authenticated requests.Session for HTTPS downloads.
-            Use earthaccess.get_requests_https_session() to create.
-            Works from anywhere (no AWS region requirement).
         downloader: Optional callable that handles the download itself.
             If provided, it is called unconditionally inside the file lock
-            and all built-in logic is skipped.
-    """
-    import filelock
-    import s3fs
-    import requests
+            and all built-in logic is skipped. This is the escape hatch used
+            by plugins such as *aereo-search-earthaccess* that need custom
+            authentication or region-fallback logic.
+        store_options: Optional dict of keyword arguments forwarded to the
+            obstore store constructor.  For ``s3://`` URLs this is passed as
+            ``S3Store(bucket, **store_options)``.  Common keys:
 
+            - ``skip_signature=False`` -- disable anonymous access.
+            - ``access_key_id`` / ``secret_access_key`` / ``token`` --
+              explicit AWS credentials.
+            - ``credential_provider`` -- a callable that returns credentials
+              (enables automatic refresh).
+        fallback_href: Optional fallback URL to try if the primary *href*
+            fails (e.g. an HTTPS URL when cross-region S3 direct access
+            is unavailable).
+        fallback_store_options: Optional store options used for the fallback
+            URL. Defaults to *store_options* if not provided. Useful when the
+            fallback scheme differs from the primary (e.g. S3 → HTTPS).
+    """
     local_path.parent.mkdir(parents=True, exist_ok=True)
     lock_path = local_path.with_suffix(".lock")
 
-    with filelock.FileLock(str(lock_path)):
+    with filelock.FileLock(str(lock_path), timeout=_LOCK_TIMEOUT_SECONDS):
         if not local_path.exists():
             if downloader is not None:
                 downloader(href, local_path)
-            elif href.startswith("s3://"):
-                fs = (
-                    s3_client if s3_client is not None else s3fs.S3FileSystem(anon=True)
-                )
-                fs.get(href.replace("s3://", ""), str(local_path))
-            elif href.startswith("http://") or href.startswith("https://"):
-                http = http_session if http_session is not None else requests
-                response = http.get(href, stream=True)
-                response.raise_for_status()
-                with open(local_path, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        f.write(chunk)
-            elif Path(href).exists():
-                if Path(href).absolute() != local_path.absolute():
-                    shutil.copy(href, local_path)
             else:
-                raise FileNotFoundError(f"Source file not found at {href}")
+                try:
+                    store, path = _resolve_store(href, store_options)
+                    _stream_obstore_to_disk(store, path, local_path)
+                except Exception as primary_exc:
+                    logger.warning(
+                        "primary_download_failed",
+                        href=href,
+                        error=str(primary_exc),
+                    )
+                    if fallback_href:
+                        try:
+                            fb_opts = (
+                                fallback_store_options
+                                if fallback_store_options is not None
+                                else store_options
+                            )
+                            store, path = _resolve_store(fallback_href, fb_opts)
+                            _stream_obstore_to_disk(store, path, local_path)
+                        except Exception as fallback_exc:
+                            logger.warning(
+                                "fallback_download_failed",
+                                href=fallback_href,
+                                error=str(fallback_exc),
+                            )
+                            _download_with_earthaccess(fallback_href, local_path)
+                    else:
+                        _download_with_earthaccess(href, local_path)
 
 
 def download_assets_safely(
     hrefs: list[str],
     local_paths: list[Path],
-    s3_client: Optional[Any] = None,
-    http_session: Optional[Any] = None,
-    downloader: Optional["Downloader"] = None,
-    max_workers: Optional[int] = None,
+    downloader: DownloaderCallable | None = None,
+    store_options: dict[str, Any] | list[dict[str, Any] | None] | None = None,
+    fallback_hrefs: list[str | None] | None = None,
+    fallback_store_options: dict[str, Any] | list[dict[str, Any] | None] | None = None,
+    max_workers: int | None = None,
 ) -> None:
     """Download multiple assets concurrently using a thread pool.
 
     Args:
         hrefs: List of URLs or local paths to the assets.
         local_paths: List of destination paths for the downloaded files.
-        s3_client: Optional authenticated S3FileSystem for S3 access.
-        http_session: Optional authenticated requests.Session for HTTPS downloads.
         downloader: Optional callable that handles the download itself.
-        max_workers: The maximum number of threads to use. Defaults to None.
+        store_options: Optional dict or list of dicts forwarded to the obstore
+            store constructor.  When a list is provided, the *i*-th element is
+            used for the *i*-th asset; otherwise the same dict is used for all
+            assets.  See :func:`download_asset_safely` for details.
+        fallback_hrefs: Optional list of fallback URLs, one per asset.
+            See :func:`download_asset_safely` for details.
+        fallback_store_options: Optional dict or list of dicts used for
+            fallback URLs.  Same semantics as *store_options*.  Defaults to
+            *store_options* if not provided.
+        max_workers: Maximum number of worker threads. If ``None``, the
+            default is ``min(32, os.cpu_count() + 4)`` as defined by
+            :class:`concurrent.futures.ThreadPoolExecutor`.
+
+    Raises:
+        ValueError: If *hrefs* and *local_paths* have different lengths.
     """
     if len(hrefs) != len(local_paths):
         raise ValueError("hrefs and local_paths must have the same length")
+    if fallback_hrefs is not None and len(fallback_hrefs) != len(hrefs):
+        raise ValueError("fallback_hrefs and hrefs must have the same length")
+    if isinstance(store_options, list) and len(store_options) != len(hrefs):
+        raise ValueError("store_options and hrefs must have the same length")
+    if isinstance(fallback_store_options, list) and len(fallback_store_options) != len(
+        hrefs
+    ):
+        raise ValueError("fallback_store_options and hrefs must have the same length")
+
+    per_asset_opts: list[dict[str, Any] | None]
+    if isinstance(store_options, list):
+        per_asset_opts = store_options
+    else:
+        per_asset_opts = [store_options] * len(hrefs)
+
+    per_asset_fallback_opts: list[dict[str, Any] | None]
+    if fallback_store_options is None:
+        per_asset_fallback_opts = per_asset_opts
+    elif isinstance(fallback_store_options, list):
+        per_asset_fallback_opts = fallback_store_options
+    else:
+        per_asset_fallback_opts = [fallback_store_options] * len(hrefs)
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [
@@ -85,11 +278,12 @@ def download_assets_safely(
                 download_asset_safely,
                 href=href,
                 local_path=local_path,
-                s3_client=s3_client,
-                http_session=http_session,
                 downloader=downloader,
+                store_options=per_asset_opts[i],
+                fallback_href=fallback_hrefs[i] if fallback_hrefs else None,
+                fallback_store_options=per_asset_fallback_opts[i],
             )
-            for href, local_path in zip(hrefs, local_paths, strict=True)
+            for i, (href, local_path) in enumerate(zip(hrefs, local_paths, strict=True))
         ]
         for future in futures:
             future.result()
@@ -97,8 +291,8 @@ def download_assets_safely(
 
 def extract_asset_safely(
     archive_path: Path,
-    extract_dir: Optional[Path] = None,
-    lock_path: Optional[Path] = None,
+    extract_dir: Path | None = None,
+    lock_path: Path | None = None,
 ) -> None:
     """Extract a zip archive safely with file locking.
 
@@ -114,11 +308,6 @@ def extract_asset_safely(
         lock_path: Path to the lock file.  Defaults to
             ``extract_dir.with_suffix(".lock")``.
     """
-    import filelock
-    import shutil
-    import tempfile
-    import zipfile
-
     archive_path = Path(archive_path)
     if extract_dir is None:
         extract_dir = archive_path.with_suffix("")
@@ -130,7 +319,7 @@ def extract_asset_safely(
 
     marker_path = extract_dir.with_suffix(".extracted")
 
-    with filelock.FileLock(str(lock_path)):
+    with filelock.FileLock(str(lock_path), timeout=_LOCK_TIMEOUT_SECONDS):
         # Already extracted and marked complete
         if marker_path.exists() and extract_dir.exists():
             return
@@ -142,7 +331,7 @@ def extract_asset_safely(
         extract_dir.parent.mkdir(parents=True, exist_ok=True)
 
         # Extract to a temporary directory so other processes never
-        # see an incomplete destination.
+        # see a partially extracted destination.
         temp_dir = tempfile.mkdtemp(
             prefix=extract_dir.name + "_tmp_",
             dir=extract_dir.parent,
@@ -152,43 +341,208 @@ def extract_asset_safely(
                 zf.extractall(temp_dir)
 
             Path(temp_dir).rename(extract_dir)
-        except Exception:
+        except (OSError, zipfile.BadZipFile, zipfile.LargeZipFile):
             shutil.rmtree(temp_dir, ignore_errors=True)
             raise
 
         marker_path.touch()
 
 
-def cleanup_asset_safely(
-    local_path: Path, chunk_id: Optional[int] = None, total_chunks: int = 1
-) -> None:
-    """Safely clean up the downloaded asset after all chunks are processed."""
-    import filelock
+def cleanup_task_assets(local_paths: list[str], task: ExtractionTask) -> None:
+    """Remove downloaded assets, respecting chunked-task context.
 
+    Args:
+        local_paths: List of local file paths to clean up.
+        task: The extraction task (used to read ``chunk_id`` / ``total_chunks``
+            from ``task_context``).
+    """
+    for local_path in local_paths:
+        cleanup_asset_safely(
+            local_path=Path(local_path),
+            chunk_id=task.task_context.get("chunk_id"),
+            total_chunks=task.task_context.get("total_chunks", 1),
+        )
+
+
+def cleanup_asset_safely(
+    local_path: Path, chunk_id: int | None = None, total_chunks: int = 1
+) -> None:
+    """Safely clean up a downloaded asset.
+
+    When *total_chunks* is greater than 1 and *chunk_id* is provided,
+    the function tracks completion via per-chunk marker files and only
+    removes the asset once every chunk has signaled completion.  File
+    locking is used to avoid race conditions in multi-processing.
+
+    Args:
+        local_path: Path to the downloaded file to remove.
+        chunk_id: Identifier of the current chunk (0-based). Used only
+            when *total_chunks* is greater than 1.
+        total_chunks: Total number of chunks that must complete before
+            the asset is removed. Defaults to 1.
+    """
     lock_path = local_path.with_suffix(".lock")
     if total_chunks > 1 and chunk_id is not None:
         done_file = local_path.with_suffix(f".chunk_{chunk_id}.done")
         done_file.touch()
-        with filelock.FileLock(str(lock_path)):
+        with filelock.FileLock(str(lock_path), timeout=_LOCK_TIMEOUT_SECONDS):
             done_files = list(local_path.parent.glob(f"{local_path.stem}.chunk_*.done"))
             if len(done_files) >= total_chunks:
-                if local_path.exists():
-                    try:
-                        local_path.unlink()
-                    except Exception:
-                        pass
+                _safe_unlink(local_path)
                 for df in done_files:
-                    try:
-                        df.unlink()
-                    except Exception:
-                        pass
-                try:
-                    lock_path.unlink()
-                except Exception:
-                    pass
+                    _safe_unlink(df)
+                _safe_unlink(lock_path)
     else:
-        if local_path.exists():
-            try:
-                local_path.unlink()
-            except Exception:
-                pass
+        _safe_unlink(local_path)
+
+
+def _resolve_extracted_path(extract_dir: Path) -> Path:
+    """Return the usable product path inside an extraction directory.
+
+    Many satellite products (e.g. Sentinel-3 ``.SEN3`` archives) ship as a
+    ZIP file that contains exactly one root directory.  After extracting to
+    ``extract_dir`` the real product directory is therefore nested one level
+    deeper.  When *extract_dir* contains a single directory and nothing else,
+    that directory is returned; otherwise *extract_dir* itself is returned.
+    """
+    if not extract_dir.exists():
+        return extract_dir
+
+    entries = list(extract_dir.iterdir())
+    if len(entries) == 1 and entries[0].is_dir():
+        return entries[0]
+    return extract_dir
+
+
+def _expand_product_directory(product_path: Path) -> list[str]:
+    """Expand a satellite product directory into scene-ready file paths.
+
+    Satpy 0.60+ expects explicit file paths rather than product directories
+    for readers such as ``olci_l1b``.  When *product_path* is a Sentinel-3
+    ``.SEN3`` directory, return the sorted list of netCDF files inside it.
+    Otherwise return the path itself.
+
+    Args:
+        product_path: Path to an extracted product directory or file.
+
+    Returns:
+        List of scene-ready file paths.
+    """
+    if product_path.is_dir() and product_path.suffix == ".SEN3":
+        nc_files = sorted(product_path.glob("*.nc"))
+        if nc_files:
+            return [str(f) for f in nc_files]
+    return [str(product_path)]
+
+
+def extract_archives(local_paths: list[str]) -> list[str]:
+    """Expand ZIP archives (e.g. Sentinel-3 ``.SEN3`` products) and return ready paths.
+
+    Uses :func:`extract_asset_safely` so that concurrent workers never
+    partially overwrite the same extraction directory.
+
+    Non-ZIP paths are returned unchanged.
+
+    Args:
+        local_paths: List of local file paths (may include ``.zip`` files).
+
+    Returns:
+        List of scene-ready file paths with archives expanded.
+    """
+    scene_paths: list[str] = []
+    for p in local_paths:
+        path = Path(p)
+        if path.suffix == ".zip":
+            extract_dir = path.parent / path.stem
+            extract_asset_safely(path, extract_dir)
+            scene_paths.extend(
+                _expand_product_directory(_resolve_extracted_path(extract_dir))
+            )
+        else:
+            scene_paths.append(str(p))
+    return scene_paths
+
+
+def download_task_assets(
+    task: ExtractionTask,
+    *,
+    downloader: Any | None = None,
+    download_workers: int | None = None,
+) -> list[str]:
+    """Download every file referenced in *task* and return local paths.
+
+    When a custom *downloader* is configured, HTTPS URLs are preferred over S3
+    so that the downloader receives a scheme it can handle.
+
+    Args:
+        task: The extraction task containing asset references.
+        downloader: Optional custom downloader callable.
+        download_workers: Max threads for concurrent asset downloads.
+
+    Returns:
+        List of local filesystem paths to the downloaded assets.
+    """
+    hrefs: list[str] = []
+    local_paths: list[Path] = []
+    fallback_hrefs: list[str | None] = []
+    per_asset_store_options: list[dict[str, Any] | None] = []
+    per_asset_fallback_store_options: list[dict[str, Any] | None] = []
+    credential_providers: dict[str, Any] = {}
+    for _, row in task.assets.iterrows():
+        href = cast(str, row["href"])
+        https_url = row.get("https_url")
+        s3_credentials_url = row.get("s3_credentials_url")
+        if downloader is not None and https_url:
+            href = cast(str, https_url)
+
+        # Attach NASA Earthdata authentication when a credentials endpoint is
+        # available. For S3 URLs this uses NasaEarthdataCredentialProvider;
+        # for HTTPS URLs it injects an Authorization header via HTTPStore
+        # client_options.
+        opts: dict[str, Any] | None = None
+        fallback_opts: dict[str, Any] | None = None
+        if _EARTHDATA_AUTH_AVAILABLE and s3_credentials_url:
+            auth_header = _read_earthdata_auth_header()
+            if href.startswith("s3://"):
+                cp = credential_providers.get(s3_credentials_url)
+                if cp is None:
+                    cp = _NasaEarthdataCredentialProvider(s3_credentials_url)
+                    credential_providers[s3_credentials_url] = cp
+                opts = {"credential_provider": cp}
+                # The HTTPS fallback needs auth headers, not an S3 credential
+                # provider, because HTTPStore does not accept credential_provider.
+                if auth_header and https_url:
+                    fallback_opts = {"client_options": {"default_headers": auth_header}}
+            elif href.startswith(("http://", "https://")):
+                if auth_header:
+                    opts = {"client_options": {"default_headers": auth_header}}
+
+        hrefs.append(href)
+        fallback_hrefs.append(cast(str, https_url) if https_url else None)
+        per_asset_store_options.append(opts)
+        per_asset_fallback_store_options.append(fallback_opts)
+        local_path = Path(task.output_uri).absolute() / Path(href).name
+        local_paths.append(local_path)
+
+    try:
+        download_assets_safely(
+            hrefs=hrefs,
+            local_paths=local_paths,
+            downloader=downloader,
+            store_options=per_asset_store_options,
+            fallback_hrefs=fallback_hrefs,
+            fallback_store_options=per_asset_fallback_store_options,
+            max_workers=download_workers,
+        )
+    finally:
+        for cp in credential_providers.values():
+            cp.close()
+
+    for lp in local_paths:
+        logger.debug(
+            "file_downloaded",
+            local_path=str(lp),
+            engine="satpy",
+        )
+
+    return [str(lp) for lp in local_paths]

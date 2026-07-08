@@ -1,0 +1,32 @@
+# default config.yaml
+action: run
+verbose: false
+
+# Overrides / options
+geojson: null
+target_aoi: null
+start: null
+end: null
+output: null
+output_dir: ./out
+output_uri: ${output_dir}
+workers: 1
+overwrite: false
+search_results: null
+tasks: null
+plugin_name: null
+format: table
+
+# Runtime plugins (not part of ExtractionJob)
+search: null
+
+# ExtractionJob configuration
+name: default
+grid_dist: 50000
+read: null
+write: null
+
+# Optional reprojection / grid parameters
+resolution: null
+margin: null
+grid_cells_margin: 0.0

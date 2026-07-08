@@ -1,7 +1,0 @@
-{
-  "target_grid_dist": 50000,
-  "target_grid_overlap": false,
-  "target_grid_margin": 6.8,
-  "grid_filter_mode": "intersection",
-  "min_coverage": 0.0
-}

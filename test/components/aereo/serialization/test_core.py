@@ -1,21 +1,27 @@
 from datetime import datetime
-from typing import Any, cast
+from typing import Any, Sequence, cast
 
 import geopandas as gpd
-from aereo.grid import GridCell
-from aereo.interfaces import AereoProfile, ExtractionTask, GridConfig
+from aereo.builtins.read import read_odc_stac
+from aereo.builtins.write import write_geotiff
+from aereo.interfaces import ExtractionTask
+from aereo.pipeline import ExtractionJob
 from aereo.schemas import AssetSchema
-from aereo.serialization import TaskSerializer
+from aereo.executors._serialization import _TaskSerializer
+from aereo.grid import GridCell
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import Polygon
+from shapely.geometry.base import BaseGeometry
 
 
 def _make_task(
     *,
-    cell_id: str = "0U_0R",
-    is_primary: bool = True,
     aoi: Polygon | None = None,
+    job_target_aoi: Polygon | None = None,
+    grid_cells: Sequence[GridCell] | None = None,
     task_context: dict[str, Any] | None = None,
+    preprocess: Any = None,
+    postprocess: Any = None,
 ) -> ExtractionTask:
     """Build a minimal but realistic ExtractionTask for serializer tests."""
     df = gpd.GeoDataFrame(
@@ -30,29 +36,30 @@ def _make_task(
         crs="EPSG:4326",
     )
 
-    profile = AereoProfile(name="test_profile", resolution=100.0)
-    grid_config = GridConfig(target_grid_dist=50_000)
-    grid_cell = GridCell(
-        d=50_000,
-        geom=Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]]),
-        is_primary=is_primary,
-        cell_id=cell_id,
+    job = ExtractionJob(
+        name="test-job",
+        grid_dist=50_000,
+        output_uri="test_uri",
+        read=read_odc_stac,
+        write=write_geotiff,
+        target_aoi=job_target_aoi,
+        preprocess=preprocess,
+        postprocess=postprocess,
     )
 
     return ExtractionTask(
+        id="task-1",
         assets=cast(GeoDataFrame[AssetSchema], df),
-        profile=profile,
-        uri="test_uri",
-        grid_cells=[grid_cell],
-        grid_config=grid_config,
+        job=job,
         aoi=aoi,
+        grid_cells=grid_cells,
         task_context=task_context or {},
     )
 
 
 def test_round_trip_basic(tmp_path: Any) -> None:
     """Serialize and deserialize a basic task; assert equality."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     original = _make_task()
 
     dest = tmp_path / "task_dir"
@@ -60,40 +67,31 @@ def test_round_trip_basic(tmp_path: Any) -> None:
 
     reconstructed = serializer.deserialize(dest)
 
+    # Task id
+    assert reconstructed.id == original.id
+
     # Assets
     assert len(reconstructed.assets) == len(original.assets)
     assert list(reconstructed.assets["id"]) == ["asset_1"]
     assert list(reconstructed.assets["collection"]) == ["GOES"]
 
-    # Profile
-    assert reconstructed.profile.name == original.profile.name
-    assert reconstructed.profile.resolution == original.profile.resolution
+    # Reader / writer
+    assert type(reconstructed.read) is type(original.read)
+    assert type(reconstructed.write) is type(original.write)
 
     # Grid config
-    assert reconstructed.grid_config == original.grid_config
+    assert reconstructed.grid_dist == original.grid_dist
 
-    # URI
-    assert reconstructed.uri == original.uri
-
-    # Grid cells
-    assert len(reconstructed.grid_cells) == 1
-    assert reconstructed.grid_cells[0].id() == original.grid_cells[0].id()
-    assert reconstructed.grid_cells[0].D == original.grid_cells[0].D
-    assert reconstructed.grid_cells[0].is_primary == original.grid_cells[0].is_primary
-    assert reconstructed.grid_cells[0].geom.equals_exact(
-        original.grid_cells[0].geom, tolerance=1e-9
-    )
-
-    # AOI
-    assert reconstructed.aoi is None
+    # output URI
+    assert reconstructed.output_uri == original.output_uri
 
     # Task context
     assert reconstructed.task_context == original.task_context
 
 
-def test_round_trip_with_aoi(tmp_path: Any) -> None:
-    """AOI geometry survives round-trip via WKT."""
-    serializer = TaskSerializer()
+def test_round_trip_with_task_aoi(tmp_path: Any) -> None:
+    """Task-level AOI geometry survives round-trip via WKT."""
+    serializer = _TaskSerializer()
     aoi = Polygon([[-1, -1], [2, -1], [2, 2], [-1, 2]])
     original = _make_task(aoi=aoi)
 
@@ -101,13 +99,27 @@ def test_round_trip_with_aoi(tmp_path: Any) -> None:
     serializer.serialize(original, dest)
     reconstructed = serializer.deserialize(dest)
 
-    assert reconstructed.aoi is not None
+    assert isinstance(reconstructed.aoi, BaseGeometry)
     assert reconstructed.aoi.equals_exact(aoi, tolerance=1e-9)
+
+
+def test_round_trip_with_job_aoi(tmp_path: Any) -> None:
+    """Job-level target AOI geometry survives round-trip via WKT stored on the job."""
+    serializer = _TaskSerializer()
+    aoi = Polygon([[-1, -1], [2, -1], [2, 2], [-1, 2]])
+    original = _make_task(job_target_aoi=aoi)
+
+    dest = tmp_path / "job_aoi"
+    serializer.serialize(original, dest)
+    reconstructed = serializer.deserialize(dest)
+
+    assert isinstance(reconstructed.job.target_aoi, BaseGeometry)
+    assert reconstructed.job.target_aoi.equals_exact(aoi, tolerance=1e-9)
 
 
 def test_round_trip_task_context(tmp_path: Any) -> None:
     """Arbitrary task_context metadata is preserved."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     ctx = {"chunk_id": 7, "total_chunks": 42, "extractor_hint": "aereo-extract-dummy"}
     original = _make_task(task_context=ctx)
 
@@ -118,63 +130,55 @@ def test_round_trip_task_context(tmp_path: Any) -> None:
     assert reconstructed.task_context == ctx
 
 
-def test_round_trip_multiple_grid_cells(tmp_path: Any) -> None:
-    """Tasks with several grid cells reconstruct every cell faithfully."""
-    serializer = TaskSerializer()
-
-    df = gpd.GeoDataFrame(
-        {
-            "id": ["a", "b"],
-            "collection": ["S2", "S2"],
-            "start_time": [datetime(2023, 6, 1), datetime(2023, 6, 1)],
-            "end_time": [datetime(2023, 6, 1, 0, 15), datetime(2023, 6, 1, 0, 15)],
-            "href": ["http://a", "http://b"],
-        },
-        geometry=[
-            Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-            Polygon([[1, 1], [2, 1], [2, 2], [1, 2]]),
-        ],
-        crs="EPSG:4326",
-    )
-
-    cells = [
+def test_round_trip_grid_cells(tmp_path: Any) -> None:
+    """GridCell objects survive round-trip via WKB hex."""
+    serializer = _TaskSerializer()
+    grid_cells = [
         GridCell(
-            d=10_000,
-            geom=Polygon([[0, 0], [0.1, 0], [0.1, 0.1], [0, 0.1]]),
-            is_primary=True,
-            cell_id="1U_1R",
-        ),
-        GridCell(
-            d=10_000,
-            geom=Polygon([[0.1, 0.1], [0.2, 0.1], [0.2, 0.2], [0.1, 0.2]]),
-            is_primary=False,
-            cell_id="1U_1R_OV",
+            id="0U_0R",
+            d=50_000,
+            cell_geometry=Polygon([[-1, -1], [2, -1], [2, 2], [-1, 2], [-1, -1]]),
         ),
     ]
+    original = _make_task(grid_cells=grid_cells)
 
-    original = ExtractionTask(
-        assets=cast(GeoDataFrame[AssetSchema], df),
-        profile=AereoProfile(name="multi", resolution=10.0),
-        uri="out",
-        grid_cells=cells,
-        grid_config=GridConfig(target_grid_dist=10_000),
-    )
-
-    dest = tmp_path / "task_multi"
+    dest = tmp_path / "task_grid_cells"
     serializer.serialize(original, dest)
     reconstructed = serializer.deserialize(dest)
 
-    assert len(reconstructed.grid_cells) == 2
-    for orig, recon in zip(cells, reconstructed.grid_cells):
-        assert recon.id() == orig.id()
-        assert recon.D == orig.D
-        assert recon.is_primary == orig.is_primary
-        assert recon.geom.equals_exact(orig.geom, tolerance=1e-9)
+    assert reconstructed.grid_cells is not None
+    assert len(reconstructed.grid_cells) == len(grid_cells)
+    assert [c.id for c in reconstructed.grid_cells] == [c.id for c in grid_cells]
+    assert [c.d for c in reconstructed.grid_cells] == [c.d for c in grid_cells]
+    for orig_cell, recon_cell in zip(grid_cells, reconstructed.grid_cells):
+        assert recon_cell.cell_geometry.equals_exact(
+            orig_cell.cell_geometry, tolerance=1e-9
+        )
+
+
+def test_serialize_to_bytes_grid_cells() -> None:
+    """GridCell objects survive byte payload round-trip."""
+    serializer = _TaskSerializer()
+    grid_cells = [
+        GridCell(
+            id="0U_0R",
+            d=50_000,
+            cell_geometry=Polygon([[-1, -1], [2, -1], [2, 2], [-1, 2], [-1, -1]]),
+        ),
+    ]
+    original = _make_task(grid_cells=grid_cells)
+
+    payload = serializer.serialize_to_bytes(original)
+    reconstructed = serializer.deserialize_from_bytes(payload)
+
+    assert reconstructed.grid_cells is not None
+    assert len(reconstructed.grid_cells) == len(grid_cells)
+    assert [c.id for c in reconstructed.grid_cells] == [c.id for c in grid_cells]
 
 
 def test_assets_crs_preserved(tmp_path: Any) -> None:
     """The assets GeoDataFrame CRS is preserved through GeoParquet round-trip."""
-    serializer = TaskSerializer()
+    serializer = _TaskSerializer()
     original = _make_task()
 
     dest = tmp_path / "task_crs"
@@ -185,50 +189,96 @@ def test_assets_crs_preserved(tmp_path: Any) -> None:
     assert reconstructed.assets.crs.to_epsg() == 4326
 
 
-def test_profile_reconstruction_matches_original(tmp_path: Any) -> None:
-    """Complex profiles with collections and params reconstruct identically."""
-    serializer = TaskSerializer()
-    profile = AereoProfile(
-        name="complex",
-        resolution=500.0,
-        collections={"ABI-L1b-RadC": ["C01", "C02"]},
-        padding=4,
-        conform_to=(256, 256),
-        plugin_hints={"extract": "aereo-extract-aws-goes"},
-        search_params={"version": "061"},
-        extract_params={"calibration": "reflectance"},
-    )
+def test_serialize_to_bytes_round_trip() -> None:
+    """Task round-trips through a zip byte payload."""
+    serializer = _TaskSerializer()
+    original = _make_task()
 
-    df = gpd.GeoDataFrame(
-        {
-            "id": ["x"],
-            "collection": ["ABI-L1b-RadC"],
-            "start_time": [datetime(2023, 1, 1)],
-            "end_time": [datetime(2023, 1, 1)],
-            "href": ["s3://x"],
-        },
-        geometry=[Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])],
-        crs="EPSG:4326",
-    )
+    payload = serializer.serialize_to_bytes(original)
+    reconstructed = serializer.deserialize_from_bytes(payload)
 
-    original = ExtractionTask(
-        assets=cast(GeoDataFrame[AssetSchema], df),
-        profile=profile,
-        uri="complex_uri",
-        grid_cells=[
-            GridCell(
-                d=100_000,
-                geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]),
-                is_primary=True,
-                cell_id="0U_0R",
-            )
-        ],
-        grid_config=GridConfig(target_grid_dist=100_000, target_grid_margin=6.8),
-    )
+    assert reconstructed.id == original.id
+    assert len(reconstructed.assets) == len(original.assets)
+    assert type(reconstructed.read) is type(original.read)
+    assert reconstructed.grid_dist == original.grid_dist
+    assert reconstructed.task_context == original.task_context
 
-    dest = tmp_path / "task_complex"
+
+def test_serialize_to_bytes_preserved_crs() -> None:
+    """Assets CRS survives byte payload round-trip."""
+    serializer = _TaskSerializer()
+    original = _make_task()
+
+    payload = serializer.serialize_to_bytes(original)
+    reconstructed = serializer.deserialize_from_bytes(payload)
+
+    assert reconstructed.assets.crs is not None
+    assert reconstructed.assets.crs.to_epsg() == 4326
+
+
+# ---------------------------------------------------------------------------
+# Processor list serialization
+# ---------------------------------------------------------------------------
+
+
+def _noop_processor(ds, **kwargs):
+    return ds
+
+
+def _another_processor(ds, **kwargs):
+    return ds
+
+
+def test_round_trip_with_multiple_preprocessors(tmp_path: Any) -> None:
+    """A list of preprocessors survives serialization round-trip."""
+    serializer = _TaskSerializer()
+    original = _make_task(preprocess=[_noop_processor, _another_processor])
+
+    dest = tmp_path / "task_preprocess"
     serializer.serialize(original, dest)
     reconstructed = serializer.deserialize(dest)
 
-    assert reconstructed.profile == profile
-    assert reconstructed.grid_config.target_grid_margin == 6.8
+    preprocess = reconstructed.job.preprocess
+    assert isinstance(preprocess, list)
+    assert len(preprocess) == 2
+    assert preprocess[0] is _noop_processor
+    assert preprocess[1] is _another_processor
+
+
+def test_round_trip_with_multiple_postprocessors(tmp_path: Any) -> None:
+    """A list of postprocessors survives serialization round-trip."""
+    serializer = _TaskSerializer()
+    original = _make_task(postprocess=[_noop_processor, _another_processor])
+
+    dest = tmp_path / "task_postprocess"
+    serializer.serialize(original, dest)
+    reconstructed = serializer.deserialize(dest)
+
+    postprocess = reconstructed.job.postprocess
+    assert isinstance(postprocess, list)
+    assert len(postprocess) == 2
+    assert postprocess[0] is _noop_processor
+    assert postprocess[1] is _another_processor
+
+
+def test_deserialize_legacy_single_processor(tmp_path: Any) -> None:
+    """Legacy tasks with a single serialized processor dict still load."""
+    serializer = _TaskSerializer()
+    original = _make_task(preprocess=[_noop_processor])
+
+    dest = tmp_path / "task_legacy"
+    serializer.serialize(original, dest)
+
+    # Simulate a legacy payload where preprocess was a single dict.
+    import json
+
+    meta_path = dest / serializer.META_NAME
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    meta["job"]["preprocess"] = meta["job"]["preprocess"][0]
+    meta_path.write_text(json.dumps(meta, default=str), encoding="utf-8")
+
+    reconstructed = serializer.deserialize(dest)
+    preprocess = reconstructed.job.preprocess
+    assert isinstance(preprocess, list)
+    assert len(preprocess) == 1
+    assert preprocess[0] is _noop_processor

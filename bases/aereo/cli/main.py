@@ -1,98 +1,240 @@
 """AEREO CLI — command-line interface for the AEREO satellite data framework."""
 
-# ruff: noqa: E402
 from __future__ import annotations
 
 import json
 import pickle
+import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Any, Optional
+from typing import Any, Callable, cast
+
+import attrs
 
 import geopandas as gpd
-import typer
+import hydra
+import pandas as pd
+from omegaconf import DictConfig
 from rich.console import Console
 from rich.table import Table
+from shapely.geometry.base import BaseGeometry
 
-from aereo.client import AereoClient
-from aereo.execution import LocalProcessBackend
-from aereo.interfaces import AereoProfile, GridConfig
-from aereo.schemas import AssetSchema
-
-app = typer.Typer(
-    name="aereo",
-    help="AEREO — Modular satellite data discovery, extraction, and processing",
-    no_args_is_help=True,
+from aereo.executors import LocalExecutor
+from aereo.interfaces import normalize_geometry_input
+from aereo.interfaces.utils import (
+    _extract_geometry_from_geojson,
+    _prepare_config_for_instantiate,
+    update_callable,
 )
+from aereo.pipeline import ExtractionJob
+from aereo.schemas import AssetSchema
+from aereo.registry import AereoRegistry
+
 console = Console()
+
+_MAX_TABLE_ROWS = 50
+_HREF_PREVIEW_CHARS = 60
+
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
 
-def _load_geometry(geojson_path: Path) -> Optional[dict[str, Any]]:
-    """Load a GeoJSON file and return the geometry dict."""
+def _load_geometry(geojson_path: Path) -> dict[str, Any] | None:
+    """Load a GeoJSON file and return the geometry dict.
+
+    Args:
+        geojson_path: Path to the GeoJSON file.
+
+    Returns:
+        The geometry dictionary, or None if the path is missing.
+
+    Raises:
+        ValueError: If the GeoJSON has no extractable geometry.
+    """
     data = json.loads(geojson_path.read_text())
-    if data.get("type") == "FeatureCollection":
-        if not data.get("features"):
-            raise ValueError("GeoJSON FeatureCollection has no features.")
-        return data["features"][0]["geometry"]
-    elif data.get("type") == "Feature":
-        return data["geometry"]
-    elif "type" in data and data["type"] in (
-        "Point",
-        "MultiPoint",
-        "LineString",
-        "MultiLineString",
-        "Polygon",
-        "MultiPolygon",
-        "GeometryCollection",
-    ):
-        return data
-    raise ValueError("Could not extract geometry from GeoJSON.")
+    geometry = _extract_geometry_from_geojson(data)
+    if geometry is None:
+        raise ValueError("Could not extract geometry from GeoJSON.")
+    return geometry
+
+
+def _load_geometry_safe(path: Path | None) -> BaseGeometry | None:
+    """Load geometry from GeoJSON if path is provided and exists.
+
+    Args:
+        path: Path to GeoJSON file, or None.
+
+    Returns:
+        Shapely geometry, or None if path is None or missing.
+    """
+    geom_dict = _load_geometry(path) if path and path.exists() else None
+    return normalize_geometry_input(geom_dict) if geom_dict is not None else None
+
+
+def _build_search_provider(cfg: DictConfig) -> Any:
+    """Instantiate and configure a search provider from CLI config.
+
+    Args:
+        cfg: Hydra DictConfig containing ``search``, ``geojson``, ``target_aoi``,
+            ``start``, and ``end`` keys.
+
+    Returns:
+        Configured search provider callable.
+    """
+    from omegaconf import OmegaConf
+
+    search_cfg = OmegaConf.to_container(cfg.search, resolve=True)
+    search_provider = hydra.utils.instantiate(
+        _prepare_config_for_instantiate(search_cfg)
+    )
+
+    update_dict: dict[str, Any] = {}
+    intersects = _resolve_target_aoi(cfg)
+    if intersects:
+        update_dict["intersects"] = intersects
+    start_dt = _parse_iso_datetime(cfg.get("start"))
+    if start_dt:
+        update_dict["start_datetime"] = start_dt
+    end_dt = _parse_iso_datetime(cfg.get("end"))
+    if end_dt:
+        update_dict["end_datetime"] = end_dt
+
+    if update_dict:
+        search_provider = update_callable(search_provider, **update_dict)
+
+    return search_provider
+
+
+def _build_task_builder(cfg: DictConfig) -> Any:
+    """Instantiate a task builder from CLI config.
+
+    Defaults to ``aereo.builtins.build_grouped_tasks`` when ``task_builder`` is
+    not provided.
+
+    Args:
+        cfg: Hydra DictConfig optionally containing a ``task_builder`` block.
+
+    Returns:
+        Configured task builder callable.
+    """
+    from omegaconf import OmegaConf
+
+    if cfg.get("task_builder") is None:
+        task_builder_cfg = {"_target_": "aereo.builtins.build_grouped_tasks"}
+    else:
+        task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
+
+    return hydra.utils.instantiate(_prepare_config_for_instantiate(task_builder_cfg))
+
+
+def _resolve_target_aoi(
+    cfg: DictConfig,
+    fallback: BaseGeometry | None = None,
+) -> BaseGeometry | None:
+    """Resolve the target AOI used to clip prepared extraction tasks.
+
+    Resolution order:
+        1. ``cfg.target_aoi`` (GeoJSON dict, file path, or Shapely object).
+        2. ``cfg.geojson`` path.
+        3. ``fallback`` geometry (commonly ``search_provider.intersects``).
+
+    Args:
+        cfg: Hydra DictConfig.
+        fallback: Optional fallback geometry.
+
+    Returns:
+        A Shapely BaseGeometry, or None if no AOI is available.
+    """
+    target = cfg.get("target_aoi")
+    if target is not None:
+        from omegaconf import DictConfig as OmegaConfDictConfig, OmegaConf
+
+        if isinstance(target, OmegaConfDictConfig):
+            target = OmegaConf.to_container(target, resolve=True)
+        return normalize_geometry_input(
+            cast("BaseGeometry | dict[str, Any] | str | Path | None", target)
+        )
+
+    if cfg.get("geojson"):
+        return _load_geometry_safe(Path(cfg.geojson))
+
+    return fallback
+
+
+def _parse_iso_datetime(value: str | None) -> datetime | None:
+    """Parse an ISO 8601 datetime string.
+
+    Args:
+        value: ISO 8601 datetime string, or None.
+
+    Returns:
+        Parsed datetime, or None if input was None.
+    """
+    return datetime.fromisoformat(value) if value else None
 
 
 def _search_results_to_json(df: gpd.GeoDataFrame) -> list[dict[str, Any]]:
-    """Convert search results GeoDataFrame to JSON-serializable records."""
-    # Convert to GeoJSON feature collection then to simple records
-    df = df.copy()
-    df["geometry"] = df.geometry.apply(
+    """Convert search results GeoDataFrame to JSON-serializable records.
+
+    Args:
+        df: GeoDataFrame containing search results.
+
+    Returns:
+        List of JSON-serializable record dictionaries.
+    """
+    # Convert to plain DataFrame to avoid GeoDataFrame geometry warnings
+    plain_df = pd.DataFrame(df.copy())
+    plain_df["geometry"] = plain_df["geometry"].apply(
         lambda g: g.__geo_interface__ if g is not None else None
     )
-    records = df.to_dict(orient="records")
+    records = plain_df.to_dict(orient="records")
     # Convert datetime to ISO strings
     for rec in records:
         for key in ("start_time", "end_time"):
-            if key in rec and rec[key] is not None:
-                rec[key] = (
-                    rec[key].isoformat() if hasattr(rec[key], "isoformat") else rec[key]
-                )
+            val = rec.get(key)
+            if val is not None and isinstance(val, datetime):
+                rec[key] = val.isoformat()
     return records
 
 
-def _search_results_from_json(records: list[dict[str, Any]]) -> Any:
-    """Reconstruct a GeoDataFrame from JSON records."""
+def _search_results_from_json(records: list[dict[str, Any]]) -> gpd.GeoDataFrame:
+    """Reconstruct a GeoDataFrame from JSON records.
+
+    Args:
+        records: List of JSON record dictionaries.
+
+    Returns:
+        A validated GeoDataFrame.
+    """
     df = gpd.GeoDataFrame.from_records(records)
     if "geometry" in df.columns:
         from shapely.geometry import shape
 
         def _to_geom(g: Any) -> Any:
+            """Convert a GeoJSON dict to a Shapely geometry."""
             if isinstance(g, dict):
                 return shape(g)
             return g
 
         df["geometry"] = gpd.GeoSeries(df["geometry"].apply(_to_geom))
         df = gpd.GeoDataFrame(df, geometry="geometry")
-        df.set_crs(epsg=4326, inplace=True)
+        df = cast(gpd.GeoDataFrame, df.set_crs(epsg=4326))
     for key in ("start_time", "end_time"):
         if key in df.columns:
-            df[key] = gpd.pd.to_datetime(df[key])
+            df[key] = pd.to_datetime(df[key])
     return gpd.GeoDataFrame(AssetSchema.validate(df))
 
 
 def _print_search_table(df: gpd.GeoDataFrame) -> None:
-    """Pretty-print search results as a Rich table."""
+    """Pretty-print search results as a Rich table.
+
+    Displays the first 50 rows with a trailing indicator when more exist.
+
+    Args:
+        df: GeoDataFrame containing search results.
+    """
     table = Table(title=f"Search Results ({len(df)} scenes)")
     table.add_column("ID", style="cyan", no_wrap=True)
     table.add_column("Collection", style="magenta")
@@ -100,392 +242,461 @@ def _print_search_table(df: gpd.GeoDataFrame) -> None:
     table.add_column("End Time", style="green")
     table.add_column("Href", style="blue", overflow="fold")
 
-    for _, row in df.head(50).iterrows():
+    for row in df.head(_MAX_TABLE_ROWS).itertuples(index=False):
         table.add_row(
-            str(row.get("id", "")),
-            str(row.get("collection", "")),
-            str(row.get("start_time", "")),
-            str(row.get("end_time", "")),
-            str(row.get("href", ""))[:60] + "...",
+            str(getattr(row, "id", "")),
+            str(getattr(row, "collection", "")),
+            str(getattr(row, "start_time", "")),
+            str(getattr(row, "end_time", "")),
+            str(getattr(row, "href", ""))[:_HREF_PREVIEW_CHARS] + "...",
         )
-    if len(df) > 50:
-        table.add_row("...", f"... and {len(df) - 50} more rows", "", "", "")
+    if len(df) > _MAX_TABLE_ROWS:
+        table.add_row(
+            "...",
+            f"... and {len(df) - _MAX_TABLE_ROWS} more rows",
+            "",
+            "",
+            "",
+        )
     console.print(table)
 
 
-# ---------------------------------------------------------------------------
-# Commands
-# ---------------------------------------------------------------------------
+def _build_job(
+    cfg: DictConfig,
+    fallback: BaseGeometry | None = None,
+    create_output_dir: bool = True,
+) -> ExtractionJob:
+    """Build an ``ExtractionJob`` from the CLI config.
+
+    Args:
+        cfg: Hydra DictConfig containing the ``ExtractionJob`` fields.
+        fallback: Optional fallback geometry for ``target_aoi``.
+        create_output_dir: Whether to create ``cfg.output_dir`` on disk.
+
+    Returns:
+        Validated ``ExtractionJob`` instance.
+    """
+    grid_dist = cfg.grid_dist
+
+    try:
+        from omegaconf import OmegaConf
+
+        read_cfg = OmegaConf.to_container(cfg.read, resolve=True)
+        read_prepared = _prepare_config_for_instantiate(read_cfg)
+        read = hydra.utils.instantiate(read_prepared, _convert_="all")
+    except Exception as exc:
+        console.print(f"[red]Invalid read configuration:[/red] {exc}")
+        sys.exit(1)
+
+    write = None
+    if cfg.get("write") is not None:
+        try:
+            from omegaconf import OmegaConf
+
+            write_cfg = OmegaConf.to_container(cfg.write, resolve=True)
+            write_prepared = _prepare_config_for_instantiate(write_cfg)
+            write = hydra.utils.instantiate(write_prepared, _convert_="all")
+        except Exception as exc:
+            console.print(f"[red]Invalid write configuration:[/red] {exc}")
+            sys.exit(1)
+
+    if write is None:
+        console.print("[red]write is required in the job configuration.[/red]")
+        sys.exit(1)
+
+    output_dir = Path(cfg.get("output_dir", "."))
+    if create_output_dir:
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+    target_aoi = _resolve_target_aoi(cfg, fallback=fallback)
+
+    return ExtractionJob(
+        name=cfg.get("name", "default"),
+        grid_dist=grid_dist,
+        output_uri=cfg.get("output_uri") or str(output_dir),
+        overwrite=cfg.get("overwrite", False),
+        target_aoi=target_aoi,
+        read=read,
+        write=write,
+    )
 
 
-@app.command()
-def search(
-    profile: Annotated[
-        list[Path],
-        typer.Option("--profile", "-p", help="Path to profile YAML (repeatable)"),
-    ],
-    config: Annotated[
-        Optional[Path], typer.Option("--config", "-c", help="Path to grid config YAML")
-    ] = None,
-    geojson: Annotated[
-        Optional[Path], typer.Option("--geojson", "-g", help="Path to AOI GeoJSON file")
-    ] = None,
-    start: Annotated[
-        Optional[str], typer.Option("--start", "-s", help="Start datetime (ISO 8601)")
-    ] = None,
-    end: Annotated[
-        Optional[str], typer.Option("--end", "-e", help="End datetime (ISO 8601)")
-    ] = None,
-    output: Annotated[
-        Optional[Path],
-        typer.Option("--output", "-o", help="Output JSON file for search results"),
-    ] = None,
-    fmt: Annotated[
-        str, typer.Option("--format", help="Output format: table or json")
-    ] = "table",
-    verbose: Annotated[
-        bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
-    ] = False,
-) -> None:
-    """Search for satellite data across configured profiles."""
+def _configure_verbose_logging(verbose: bool) -> None:
+    """Configure structlog for verbose output if requested.
+
+    Args:
+        verbose: Whether to enable verbose (DEBUG) logging.
+    """
     if verbose:
         import structlog
 
         structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(10))
 
-    # Load profiles
-    profiles: list[AereoProfile] = []
-    for p in profile:
-        if not p.exists():
-            console.print(f"[red]Profile not found:[/red] {p}")
-            raise typer.Exit(code=1)
-        profiles.extend(AereoProfile.from_yaml(p))
 
-    # Load geometry
-    intersects = _load_geometry(geojson) if geojson and geojson.exists() else None
+def _add_plugin_rows(
+    table: Table, label: str, plugins: dict[str, type], registry: AereoRegistry
+) -> None:
+    """Add plugin summary rows to a Rich table.
 
-    # Parse datetimes
-    start_dt = datetime.fromisoformat(start) if start else None
-    end_dt = datetime.fromisoformat(end) if end else None
+    Args:
+        table: Rich Table to append rows to.
+        label: Human-readable plugin type label.
+        plugins: Mapping of plugin name to plugin class.
+        registry: AereoRegistry instance to query metadata.
+    """
+    for name, cls in plugins.items():
+        reg_key = label.replace(" ", "_").lower()
+        collections = registry._registries[reg_key].get_collections(name)
+        cols = ", ".join(collections[:3])
+        if len(collections) > 3:
+            cols += " ..."
+        try:
+            params = registry.get_plugin_params(name)
+            req = str(len(params.get("required", [])))
+            opt = str(len(params.get("optional", [])))
+        except Exception:
+            req = "0"
+            opt = "0"
+        table.add_row(label, name, cols, req, opt)
 
-    client = AereoClient()
+
+def _run_with_exit(
+    label: str, fn: Callable[..., Any], *args: Any, **kwargs: Any
+) -> Any:
+    """Execute *fn*, printing a styled error and exiting on exception.
+
+    Args:
+        label: Human-readable name of the operation for error messages.
+        fn: Callable to execute.
+        *args: Positional arguments for *fn*.
+        **kwargs: Keyword arguments for *fn*.
+
+    Returns:
+        The return value of *fn*.
+    """
     try:
-        results = client.search(
-            profiles=profiles,
-            intersects=intersects,
-            start_datetime=start_dt,
-            end_datetime=end_dt,
-        )
+        return fn(*args, **kwargs)
     except Exception as exc:
-        console.print(f"[red]Search failed:[/red] {exc}")
-        raise typer.Exit(code=1)
+        console.print(f"[red]{label} failed:[/red] {exc}")
+        sys.exit(1)
 
+
+def _check_results(results: gpd.GeoDataFrame | None) -> None:
+    """Exit if search results are empty or None.
+
+    Args:
+        results: GeoDataFrame from a search operation.
+    """
     if results is None or len(results) == 0:
         console.print("[yellow]No results found.[/yellow]")
-        raise typer.Exit(code=2)
-
-    if fmt == "json":
-        records = _search_results_to_json(results)
-        json_out = json.dumps(records, indent=2, default=str)
-        if output:
-            output.write_text(json_out)
-            console.print(f"[green]Wrote {len(records)} results to[/green] {output}")
-        else:
-            console.print(json_out)
-    else:
-        _print_search_table(results)
-        if output:
-            records = _search_results_to_json(results)
-            output.write_text(json.dumps(records, indent=2, default=str))
-            console.print(f"[green]Wrote results to[/green] {output}")
+        sys.exit(2)
 
 
-@app.command()
-def prepare(
-    search_results: Annotated[Path, typer.Argument(help="Path to search results JSON")],
-    profile: Annotated[
-        list[Path],
-        typer.Option("--profile", "-p", help="Path to profile YAML (repeatable)"),
-    ],
-    config: Annotated[
-        Optional[Path], typer.Option("--config", "-c", help="Path to grid config YAML")
-    ] = None,
-    output_dir: Annotated[
-        Path, typer.Option("--output-dir", "-d", help="Output directory for extraction")
-    ] = Path("./out"),
-    output: Annotated[
-        Optional[Path],
-        typer.Option("--output", "-o", help="Output pickle file for tasks"),
-    ] = None,
-    cells_per_chunk: Annotated[
-        int, typer.Option("--cells-per-chunk", help="Max grid cells per task")
-    ] = 50,
-    verbose: Annotated[
-        bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
-    ] = False,
-) -> None:
-    """Prepare search results for extraction."""
-    if verbose:
-        import structlog
+def plugins_cmd(cfg: DictConfig | None = None) -> None:
+    """List installed AEREO plugins.
 
-        structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(10))
-
-    if not search_results.exists():
-        console.print(f"[red]Search results not found:[/red] {search_results}")
-        raise typer.Exit(code=1)
-
-    records = json.loads(search_results.read_text())
-    df = _search_results_from_json(records)
-
-    profiles: list[AereoProfile] = []
-    for p in profile:
-        if not p.exists():
-            console.print(f"[red]Profile not found:[/red] {p}")
-            raise typer.Exit(code=1)
-        profiles.extend(AereoProfile.from_yaml(p))
-
-    grid_config = (
-        GridConfig.from_yaml(config) if config and config.exists() else GridConfig()
-    )
-
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    client = AereoClient()
-    try:
-        tasks = client.prepare_for_extraction(
-            search_results=df,  # type: ignore[arg-type]
-            grid_config=grid_config,
-            profiles=profiles,
-            uri=str(output_dir),
-            cells_per_chunk=cells_per_chunk,
-        )
-    except Exception as exc:
-        console.print(f"[red]Prepare failed:[/red] {exc}")
-        raise typer.Exit(code=1)
-
-    task_file = output or (output_dir / "tasks.pkl")
-    task_file.write_bytes(pickle.dumps(tasks))
-    console.print(
-        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cells_per_chunk}).[/green]"
-    )
-    console.print(f"[green]Wrote tasks to[/green] {task_file}")
-
-
-@app.command()
-def extract(
-    tasks: Annotated[Path, typer.Argument(help="Path to prepared tasks pickle file")],
-    output_dir: Annotated[
-        Path, typer.Option("--output-dir", "-d", help="Output directory")
-    ] = Path("./out"),
-    workers: Annotated[
-        int, typer.Option("--workers", "-w", help="Max batch workers")
-    ] = 1,
-    verbose: Annotated[
-        bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
-    ] = False,
-) -> None:
-    """Run extraction on prepared tasks."""
-    if verbose:
-        import structlog
-
-        structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(10))
-
-    if not tasks.exists():
-        console.print(f"[red]Tasks file not found:[/red] {tasks}")
-        raise typer.Exit(code=1)
-
-    task_list = pickle.loads(tasks.read_bytes())
-
-    backend = LocalProcessBackend(max_workers=workers)
-    client = AereoClient()
-    try:
-        artifacts = client.execute_tasks(task_list, backend=backend)
-    except Exception as exc:
-        console.print(f"[red]Extraction failed:[/red] {exc}")
-        raise typer.Exit(code=1)
-
-    # Write full GeoDataFrame to parquet
-    parquet_path = output_dir / "artifacts.parquet"
-    artifacts.to_parquet(parquet_path)
-
-    console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
-    console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
-    console.print(f"[green]Output directory:[/green] {output_dir}")
-
-
-@app.command()
-def run(
-    profile: Annotated[
-        list[Path],
-        typer.Option("--profile", "-p", help="Path to profile YAML (repeatable)"),
-    ],
-    config: Annotated[
-        Optional[Path], typer.Option("--config", "-c", help="Path to grid config YAML")
-    ] = None,
-    geojson: Annotated[
-        Optional[Path], typer.Option("--geojson", "-g", help="Path to AOI GeoJSON file")
-    ] = None,
-    start: Annotated[
-        Optional[str], typer.Option("--start", "-s", help="Start datetime (ISO 8601)")
-    ] = None,
-    end: Annotated[
-        Optional[str], typer.Option("--end", "-e", help="End datetime (ISO 8601)")
-    ] = None,
-    output_dir: Annotated[
-        Path, typer.Option("--output-dir", "-d", help="Output directory")
-    ] = Path("./out"),
-    workers: Annotated[
-        int, typer.Option("--workers", "-w", help="Max batch workers")
-    ] = 1,
-    cells_per_chunk: Annotated[
-        int, typer.Option("--cells-per-chunk", help="Max grid cells per task")
-    ] = 50,
-    verbose: Annotated[
-        bool, typer.Option("--verbose", "-v", help="Enable verbose logging")
-    ] = False,
-) -> None:
-    """One-shot: search → prepare → extract."""
-    if verbose:
-        import structlog
-
-        structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(10))
-
-    # Load profiles
-    profiles: list[AereoProfile] = []
-    for p in profile:
-        if not p.exists():
-            console.print(f"[red]Profile not found:[/red] {p}")
-            raise typer.Exit(code=1)
-        profiles.extend(AereoProfile.from_yaml(p))
-
-    grid_config = (
-        GridConfig.from_yaml(config) if config and config.exists() else GridConfig()
-    )
-    intersects = _load_geometry(geojson) if geojson and geojson.exists() else None
-    start_dt = datetime.fromisoformat(start) if start else None
-    end_dt = datetime.fromisoformat(end) if end else None
-
-    output_dir.mkdir(parents=True, exist_ok=True)
-    client = AereoClient()
-
-    # Search
-    console.print("[bold blue]🔍 Searching...[/bold blue]")
-    try:
-        results = client.search(
-            profiles=profiles,
-            intersects=intersects,
-            start_datetime=start_dt,
-            end_datetime=end_dt,
-        )
-    except Exception as exc:
-        console.print(f"[red]Search failed:[/red] {exc}")
-        raise typer.Exit(code=1)
-
-    if results is None or len(results) == 0:
-        console.print("[yellow]No results found.[/yellow]")
-        raise typer.Exit(code=2)
-    console.print(f"[green]✓ Found {len(results)} scenes.[/green]")
-
-    # Prepare
-    console.print("[bold blue]📦 Preparing...[/bold blue]")
-    try:
-        tasks = client.prepare_for_extraction(
-            search_results=results,
-            grid_config=grid_config,
-            profiles=profiles,
-            uri=str(output_dir),
-            cells_per_chunk=cells_per_chunk,
-        )
-    except Exception as exc:
-        console.print(f"[red]Prepare failed:[/red] {exc}")
-        raise typer.Exit(code=1)
-    console.print(
-        f"[green]✓ Prepared {len(tasks)} tasks (chunk size: {cells_per_chunk}).[/green]"
-    )
-
-    # Extract
-    console.print("[bold blue]⛏️ Extracting...[/bold blue]")
-    backend = LocalProcessBackend(max_workers=workers)
-    try:
-        artifacts = client.execute_tasks(tasks, backend=backend)
-    except Exception as exc:
-        console.print(f"[red]Extraction failed:[/red] {exc}")
-        raise typer.Exit(code=1)
-
-    parquet_path = output_dir / "artifacts.parquet"
-    artifacts.to_parquet(parquet_path)
-
-    console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
-    console.print(f"[green]Parquet saved to:[/green] {parquet_path}")
-    console.print(f"[green]Output:[/green] {output_dir}")
-
-
-@app.command()
-def validate(
-    config: Annotated[
-        Optional[Path],
-        typer.Option("--config", "-c", help="Path to config YAML to validate"),
-    ] = None,
-    profile: Annotated[
-        Optional[Path],
-        typer.Option("--profile", "-p", help="Path to profile YAML to validate"),
-    ] = None,
-) -> None:
-    """Validate a config or profile YAML against AEREO schemas."""
-    if config:
-        if not config.exists():
-            console.print(f"[red]Config not found:[/red] {config}")
-            raise typer.Exit(code=1)
-        try:
-            GridConfig.from_yaml(config)
-            console.print(f"[green]✓ Config valid:[/green] {config}")
-        except Exception as exc:
-            console.print(f"[red]✗ Config invalid:[/red] {config}\n{exc}")
-            raise typer.Exit(code=1)
-
-    if profile:
-        if not profile.exists():
-            console.print(f"[red]Profile not found:[/red] {profile}")
-            raise typer.Exit(code=1)
-        try:
-            AereoProfile.from_yaml(profile)
-            console.print(f"[green]✓ Profile valid:[/green] {profile}")
-        except Exception as exc:
-            console.print(f"[red]✗ Profile invalid:[/red] {profile}\n{exc}")
-            raise typer.Exit(code=1)
-
-    if not config and not profile:
-        console.print("[yellow]Provide --config or --profile to validate.[/yellow]")
-        raise typer.Exit(code=1)
-
-
-@app.command()
-def plugins() -> None:
-    """List installed AEREO plugins."""
-    from aereo.registry import AereoRegistry
-
+    Args:
+        cfg: Unused; accepted so ``plugins_cmd`` matches the action runner
+            signature.
+    """
     registry = AereoRegistry()
 
     table = Table(title="Installed AEREO Plugins")
     table.add_column("Type", style="cyan")
     table.add_column("Name", style="magenta")
     table.add_column("Collections", style="green")
+    table.add_column("Required", style="yellow")
+    table.add_column("Optional", style="blue")
 
-    for name, cls in registry._searchers.items():
-        cols = ", ".join(cls.supported_collections[:3])
-        if len(cls.supported_collections) > 3:
-            cols += " ..."
-        table.add_row("Searcher", name, cols)
+    _add_plugin_rows(table, "Searcher", registry._searchers, registry)
+    _add_plugin_rows(
+        table,
+        "Task Builder",
+        registry._registries["task_builder"].plugins,
+        registry,
+    )
 
-    for name, cls in registry._extractors.items():
-        cols = ", ".join(cls.supported_collections[:3])
-        if len(cls.supported_collections) > 3:
-            cols += " ..."
-        table.add_row("Extractor", name, cols)
+    for label in ("reader", "reprojector", "processor", "writer"):
+        _add_plugin_rows(
+            table,
+            label.replace("_", " ").title(),
+            registry._registries[label].plugins,
+            registry,
+        )
 
     console.print(table)
 
 
-# Entry point for `python -m aer.cli`
+def plugin_params_cmd(name: str) -> None:
+    """Show parameters for a specific AEREO plugin.
+
+    Args:
+        name: Name of the plugin to inspect.
+    """
+    registry = AereoRegistry()
+    try:
+        params = registry.get_plugin_params(name)
+    except KeyError:
+        console.print(f"[red]Plugin '{name}' not found.[/red]")
+        sys.exit(1)
+
+    table = Table(title=f"Parameters for {name}")
+    table.add_column("Type", style="cyan")
+    table.add_column("Name", style="magenta")
+    table.add_column("Data Type", style="green")
+    table.add_column("Description", style="yellow")
+    table.add_column("Required", style="blue")
+    table.add_column("Default", style="dim")
+
+    for section, required_flag in (("required", "Yes"), ("optional", "No")):
+        for param in params.get(section, []):
+            table.add_row(
+                section.capitalize(),
+                param["name"],
+                param["type"],
+                param["description"],
+                required_flag,
+                str(param["default"]) if param.get("default") is not None else "—",
+            )
+
+    console.print(table)
+
+
+# ---------------------------------------------------------------------------
+# Action runners
+# ---------------------------------------------------------------------------
+
+
+def _run_search_action(cfg: DictConfig) -> None:
+    """Execute the ``search`` CLI action."""
+    if not cfg.get("search"):
+        console.print(
+            "[red]No search provider configuration provided (search key is missing).[/red]"
+        )
+        sys.exit(1)
+
+    search_provider = _build_search_provider(cfg)
+    results = _run_with_exit("Search", search_provider)
+    _check_results(results)
+
+    fmt = cfg.get("format", "table")
+    output_path = cfg.get("output")
+    if fmt == "json":
+        records = _search_results_to_json(results)
+        json_out = json.dumps(records, indent=2, default=str)
+        if output_path:
+            Path(output_path).write_text(json_out)
+            console.print(
+                f"[green]Wrote {len(records)} results to[/green] {output_path}"
+            )
+        else:
+            console.print(json_out)
+    else:
+        _print_search_table(results)
+        if output_path:
+            records = _search_results_to_json(results)
+            Path(output_path).write_text(json.dumps(records, indent=2, default=str))
+            console.print(f"[green]Wrote results to[/green] {output_path}")
+
+
+def _run_build_tasks_action(cfg: DictConfig) -> None:
+    """Execute the ``build-tasks`` CLI action."""
+    if not cfg.get("search_results"):
+        console.print(
+            "[red]search_results file path is required for build-tasks action.[/red]"
+        )
+        sys.exit(1)
+
+    search_results_path = Path(cfg.search_results)
+    if not search_results_path.exists():
+        console.print(f"[red]Search results not found:[/red] {search_results_path}")
+        sys.exit(1)
+
+    records = json.loads(search_results_path.read_text())
+    df = _search_results_from_json(records)
+
+    task_builder = _build_task_builder(cfg)
+
+    job = _build_job(cfg)
+
+    build_kwargs: dict[str, Any] = {}
+    if cfg.get("cells_per_task") is not None:
+        build_kwargs["cells_per_task"] = cfg.cells_per_task
+
+    tasks = _run_with_exit(
+        "Build tasks",
+        job.build_tasks,
+        df,
+        task_builder,
+        **build_kwargs,
+    )
+
+    output_path = cfg.get("output")
+    task_file = (
+        Path(output_path)
+        if output_path
+        else (Path(cfg.get("output_dir", ".")) / "tasks.pkl")
+    )
+    task_file.write_bytes(pickle.dumps(tasks))
+    chunk_size = cfg.get("cells_per_task")
+    if chunk_size is None:
+        chunk_msg = ""
+    elif chunk_size < 0:
+        chunk_msg = " (chunk size: all cells)"
+    else:
+        chunk_msg = f" (chunk size: {chunk_size})"
+    console.print(f"[green]✓ Prepared {len(tasks)} tasks{chunk_msg}.[/green]")
+    console.print(f"[green]Wrote tasks to[/green] {task_file}")
+
+
+def _run_extract_action(cfg: DictConfig) -> None:
+    """Execute the ``extract`` CLI action."""
+    if not cfg.get("tasks"):
+        console.print(
+            "[red]tasks pickle file path is required for extract action.[/red]"
+        )
+        sys.exit(1)
+
+    tasks_path = Path(cfg.tasks)
+    if not tasks_path.exists():
+        console.print(f"[red]Tasks file not found:[/red] {tasks_path}")
+        sys.exit(1)
+
+    task_list = pickle.loads(tasks_path.read_bytes())
+
+    if not task_list:
+        console.print("[yellow]No tasks to extract.[/yellow]")
+        sys.exit(2)
+
+    if cfg.get("overwrite") is not None:
+        task_list = [
+            attrs.evolve(
+                task,
+                job=task.job.model_copy(update={"overwrite": cfg.overwrite}),
+            )
+            for task in task_list
+        ]
+
+    executor = LocalExecutor(workers=cfg.get("workers", 1))
+    job = task_list[0].job
+    artifacts = _run_with_exit("Extraction", job.execute, task_list, executor)
+
+    catalog_uri = _run_with_exit("Catalog", job.write_catalog, artifacts)
+
+    console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
+    console.print(f"[green]Catalog saved to:[/green] {catalog_uri}")
+
+
+def _run_run_action(cfg: DictConfig) -> None:
+    """Execute the full ``run`` pipeline action."""
+    if not cfg.get("search"):
+        console.print(
+            "[red]No search provider configuration provided (search key is missing).[/red]"
+        )
+        sys.exit(1)
+
+    search_provider = _build_search_provider(cfg)
+
+    task_builder = _build_task_builder(cfg)
+
+    job = _build_job(cfg, fallback=_resolve_target_aoi(cfg))
+
+    # Search
+    console.print("[bold blue]🔍 Searching...[/bold blue]")
+    results = _run_with_exit("Search", job.search, search_provider)
+    _check_results(results)
+    console.print(f"[green]✓ Found {len(results)} scenes.[/green]")
+
+    # Build tasks
+    console.print("[bold blue]📦 Building tasks...[/bold blue]")
+    build_kwargs: dict[str, Any] = {}
+    if cfg.get("cells_per_task") is not None:
+        build_kwargs["cells_per_task"] = cfg.cells_per_task
+
+    tasks = _run_with_exit(
+        "Build tasks",
+        job.build_tasks,
+        results,
+        task_builder,
+        **build_kwargs,
+    )
+    chunk_size = cfg.get("cells_per_task")
+    if chunk_size is None:
+        chunk_msg = ""
+    elif chunk_size < 0:
+        chunk_msg = " (chunk size: all cells)"
+    else:
+        chunk_msg = f" (chunk size: {chunk_size})"
+    console.print(f"[green]✓ Prepared {len(tasks)} tasks{chunk_msg}.[/green]")
+
+    # Extract
+    console.print("[bold blue]⛏️ Extracting...[/bold blue]")
+    executor = LocalExecutor(workers=cfg.get("workers", 1))
+    artifacts = _run_with_exit("Extraction", job.execute, tasks, executor)
+
+    catalog_uri = _run_with_exit("Catalog", job.write_catalog, artifacts)
+
+    console.print(f"[green]✓ Extracted {len(artifacts)} artifacts.[/green]")
+    console.print(f"[green]Catalog saved to:[/green] {catalog_uri}")
+
+
+def _run_validate_action(cfg: DictConfig) -> None:
+    """Execute the ``validate`` CLI action."""
+    from omegaconf import OmegaConf
+
+    try:
+        if cfg.get("search"):
+            search_cfg = OmegaConf.to_container(cfg.search, resolve=True)
+            hydra.utils.instantiate(_prepare_config_for_instantiate(search_cfg))
+        if cfg.get("task_builder"):
+            task_builder_cfg = OmegaConf.to_container(cfg.task_builder, resolve=True)
+            hydra.utils.instantiate(_prepare_config_for_instantiate(task_builder_cfg))
+
+        _build_job(cfg, create_output_dir=False)
+        console.print("[green]✓ Configuration is valid.[/green]")
+    except Exception as exc:
+        console.print(f"[red]✗ Configuration is invalid:[/red] {exc}")
+        sys.exit(1)
+
+
+def _run_plugin_params_action(cfg: DictConfig) -> None:
+    """Execute the ``plugin_params`` CLI action."""
+    if not cfg.get("plugin_name"):
+        console.print("[red]plugin_name is required for plugin_params action.[/red]")
+        sys.exit(1)
+    plugin_params_cmd(cfg.plugin_name)
+
+
+# ---------------------------------------------------------------------------
+# Main Entry Point with Hydra
+# ---------------------------------------------------------------------------
+
+
+_CONF_DIR = str(Path(__file__).parent / "conf")
+
+
+@hydra.main(version_base=None, config_path=_CONF_DIR, config_name="config")
+def main(cfg: DictConfig) -> None:
+    """Main execution entry point loaded by Hydra."""
+    _configure_verbose_logging(cfg.verbose)
+
+    action = cfg.get("action", "run")
+    runners: dict[str, Callable[[DictConfig], None]] = {
+        "search": _run_search_action,
+        "build-tasks": _run_build_tasks_action,
+        "extract": _run_extract_action,
+        "run": _run_run_action,
+        "validate": _run_validate_action,
+        "plugins": plugins_cmd,
+        "plugin_params": _run_plugin_params_action,
+    }
+
+    runner = runners.get(action)
+    if runner is None:
+        console.print(f"[red]Unknown action: {action}[/red]")
+        sys.exit(1)
+    runner(cfg)
+
+
 if __name__ == "__main__":
-    app()
+    main()

@@ -1,0 +1,34 @@
+aoi_path: config/aoi/cordoba.geojson
+# Common Job config, like name, MajorTOM grid distance, etc
+name: viirs_sample
+grid_dist: 50_000
+grid_cells_margin: 10
+target_aoi: ${aoi_path}
+output_uri: /tmp/aereo_extraction
+overwrite: false
+# Search block
+search:
+  _target_: aereo.search_aws_goes.search_aws_goes
+  _partial_: true
+  collections:
+    ABI-L1b-RadF: [C07]
+  intersects: ${aoi_path}
+  start_datetime: "2026-01-01T15:00:00Z"
+  end_datetime: "2026-01-01T15:10:59Z"
+  satellites: [GOES-19]
+  channels: [C07]
+
+read:
+  _partial_: true
+  _target_: aereo.read_satpy.read_satpy
+  reader: abi_l1b
+  wishlist: [C07]
+
+reproject:
+  _target_: aereo.builtins.reproject_odc
+  _partial_: true
+reproject_mode: grid
+resolution: 2000
+
+write:
+  _target_: aereo.builtins.write.write_geotiff

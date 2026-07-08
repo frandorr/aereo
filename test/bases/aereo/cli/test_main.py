@@ -1,151 +1,135 @@
-"""Tests for the AEREO CLI."""
+"""Tests for the AEREO CLI using Hydra."""
 
 import json
 from pathlib import Path
+import pytest
+from hydra import initialize_config_dir, compose
+from aereo.cli.main import main
 
-from typer.testing import CliRunner
 
-from aereo.cli.main import app
-
-runner = CliRunner()
+def run_cli_config(config_dir: Path, config_name: str, overrides: list[str]) -> None:
+    """Helper to initialize and execute main with composed Hydra config."""
+    # Ensure config_dir is absolute
+    config_dir_abs = str(config_dir.resolve())
+    with initialize_config_dir(version_base=None, config_dir=config_dir_abs):
+        cfg = compose(config_name=config_name, overrides=overrides)
+        main(cfg)
 
 
 class TestValidate:
-    def test_validate_missing_file(self):
-        result = runner.invoke(app, ["validate", "--config", "nonexistent.yaml"])
-        assert result.exit_code == 1
-        assert "not found" in result.output
-
-    def test_validate_profile_success(self, tmp_path: Path):
-        profile_yaml = tmp_path / "profile.yaml"
-        profile_yaml.write_text(
-            """
-profiles:
-  - name: test_profile
-    resolution: 1000
-    collections:
-      S2: ["B02", "B03"]
-"""
-        )
-        result = runner.invoke(app, ["validate", "--profile", str(profile_yaml)])
-        assert result.exit_code == 0
-        assert "✓ Profile valid" in result.output
-
-    def test_validate_profile_failure(self, tmp_path: Path):
-        profile_yaml = tmp_path / "profile.yaml"
-        profile_yaml.write_text(
-            """
-profiles:
-  - name: test_profile
-    # missing required 'resolution'
-"""
-        )
-        result = runner.invoke(app, ["validate", "--profile", str(profile_yaml)])
-        assert result.exit_code == 1
-        assert "✗ Profile invalid" in result.output
-
-    def test_validate_config_success(self, tmp_path: Path):
+    def test_validate_success(self, tmp_path: Path):
         config_yaml = tmp_path / "config.yaml"
         config_yaml.write_text(
             """
-grid_config:
-  target_grid_dist: 50000
-  target_grid_overlap: false
+action: validate
+verbose: false
+search:
+  _target_: aereo.builtins.search_stac
+  stac_api_url: "https://stac"
+  collections:
+    s2: []
+task_builder:
+  _target_: aereo.builtins.task_builder.build_grouped_tasks
+  cells_per_task: 50
+grid_dist: 50000
+output_uri: "out"
+read:
+  _target_: aereo.builtins.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
 """
         )
-        result = runner.invoke(app, ["validate", "--config", str(config_yaml)])
-        assert result.exit_code == 0
-        assert "✓ Config valid" in result.output
+        run_cli_config(tmp_path, "config", [])
 
-    def test_validate_nothing_provided(self):
-        result = runner.invoke(app, ["validate"])
-        assert result.exit_code == 1
-        assert "Provide --config or --profile" in result.output
+    def test_validate_failure(self, tmp_path: Path):
+        config_yaml = tmp_path / "config.yaml"
+        config_yaml.write_text(
+            """
+action: validate
+verbose: false
+search:
+  _target_: aereo.builtins.search_stac
+  # missing stac_api_url (required for search_stac)
+  collections:
+    s2: []
+"""
+        )
+        with pytest.raises(SystemExit) as excinfo:
+            run_cli_config(tmp_path, "config", [])
+        assert excinfo.value.code == 1
 
 
 class TestPlugins:
-    def test_plugins_list(self):
-        result = runner.invoke(app, ["plugins"])
-        assert result.exit_code == 0
-        assert "Installed AEREO Plugins" in result.output
+    def test_plugins_list(self, tmp_path: Path):
+        config_yaml = tmp_path / "config.yaml"
+        config_yaml.write_text("action: plugins\nverbose: false\n")
+        run_cli_config(tmp_path, "config", [])
 
 
 class TestSearch:
-    def test_search_missing_profile(self):
-        result = runner.invoke(app, ["search", "--profile", "nonexistent.yaml"])
-        assert result.exit_code == 1
-        assert "not found" in result.output
-
-    def test_search_json_output(self, tmp_path: Path):
-        profile_yaml = tmp_path / "profile.yaml"
-        profile_yaml.write_text(
+    def test_search_missing_search_config(self, tmp_path: Path):
+        config_yaml = tmp_path / "config.yaml"
+        config_yaml.write_text(
             """
-profiles:
-  - name: test_profile
-    resolution: 1000
-    collections:
-      fake_collection: []
-    plugin_hints:
-      search: search_planetary_computer
+action: search
+verbose: false
+search: null
 """
         )
-        output_json = tmp_path / "results.json"
-        # This will likely fail at search time (no real data), but tests CLI arg parsing
-        result = runner.invoke(
-            app,
-            [
-                "search",
-                "--profile",
-                str(profile_yaml),
-                "--format",
-                "json",
-                "--output",
-                str(output_json),
-            ],
-        )
-        # Exit code may be 1 (search error) or 2 (no results) — both acceptable for this test
-        assert result.exit_code in (0, 1, 2)
+        with pytest.raises(SystemExit) as excinfo:
+            run_cli_config(tmp_path, "config", [])
+        assert excinfo.value.code == 1
 
 
-class TestPrepare:
-    def test_prepare_missing_search_results(self):
-        result = runner.invoke(
-            app,
-            [
-                "prepare",
-                "nonexistent.json",
-                "--profile",
-                "nonexistent.yaml",
-            ],
+class TestBuildTasks:
+    def test_build_tasks_missing_search_results(self, tmp_path: Path):
+        config_yaml = tmp_path / "config.yaml"
+        config_yaml.write_text(
+            """
+action: build-tasks
+verbose: false
+search_results: null
+"""
         )
-        assert result.exit_code == 1
-        assert "not found" in result.output
+        with pytest.raises(SystemExit) as excinfo:
+            run_cli_config(tmp_path, "config", [])
+        assert excinfo.value.code == 1
 
 
 class TestExtract:
-    def test_extract_missing_tasks(self):
-        result = runner.invoke(app, ["extract", "nonexistent.pkl"])
-        assert result.exit_code == 1
-        assert "not found" in result.output
+    def test_extract_missing_tasks(self, tmp_path: Path):
+        config_yaml = tmp_path / "config.yaml"
+        config_yaml.write_text(
+            """
+action: extract
+verbose: false
+tasks: null
+"""
+        )
+        with pytest.raises(SystemExit) as excinfo:
+            run_cli_config(tmp_path, "config", [])
+        assert excinfo.value.code == 1
 
 
 class TestRun:
-    def test_run_missing_profile(self):
-        result = runner.invoke(
-            app,
-            [
-                "run",
-                "--profile",
-                "nonexistent.yaml",
-            ],
+    def test_run_missing_search(self, tmp_path: Path):
+        config_yaml = tmp_path / "config.yaml"
+        config_yaml.write_text(
+            """
+action: run
+verbose: false
+search: null
+"""
         )
-        assert result.exit_code == 1
-        assert "not found" in result.output
+        with pytest.raises(SystemExit) as excinfo:
+            run_cli_config(tmp_path, "config", [])
+        assert excinfo.value.code == 1
 
 
 class TestHelpers:
     def test_load_geometry_feature(self, tmp_path: Path):
-        from aereo.cli.main import _load_geometry
+        from aereo.cli.main import _load_geometry_safe
+        from shapely.geometry import Point
 
         geojson = tmp_path / "aoi.geojson"
         geojson.write_text(
@@ -159,11 +143,14 @@ class TestHelpers:
                 }
             )
         )
-        geom = _load_geometry(geojson)
-        assert geom == {"type": "Point", "coordinates": [0, 0]}
+        geom = _load_geometry_safe(geojson)
+        assert isinstance(geom, Point)
+        assert geom.x == 0.0
+        assert geom.y == 0.0
 
     def test_load_geometry_feature_collection(self, tmp_path: Path):
-        from aereo.cli.main import _load_geometry
+        from aereo.cli.main import _load_geometry_safe
+        from shapely.geometry import Polygon
 
         geojson = tmp_path / "aoi.geojson"
         geojson.write_text(
@@ -184,13 +171,14 @@ class TestHelpers:
                 }
             )
         )
-        geom = _load_geometry(geojson)
-        assert geom is not None
-        assert geom["type"] == "Polygon"
+        geom = _load_geometry_safe(geojson)
+        assert isinstance(geom, Polygon)
+        assert geom.is_valid
 
     def test_search_results_roundtrip(self, tmp_path: Path):
         from aereo.cli.main import _search_results_to_json
         import geopandas as gpd
+        import pandas as pd
         from shapely.geometry import Point
 
         df = gpd.GeoDataFrame(
@@ -203,8 +191,8 @@ class TestHelpers:
                 "geometry": [Point(0, 0), Point(1, 1)],
             }
         )
-        df["start_time"] = gpd.pd.to_datetime(df["start_time"])
-        df["end_time"] = gpd.pd.to_datetime(df["end_time"])
+        df["start_time"] = pd.to_datetime(df["start_time"])
+        df["end_time"] = pd.to_datetime(df["end_time"])
         df.set_crs(epsg=4326, inplace=True)
 
         records = _search_results_to_json(df)

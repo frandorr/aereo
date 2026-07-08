@@ -1,165 +1,59 @@
-# Contributing to AEREO
+# Contributing
 
-Thank you for your interest in contributing to AEREO! This document provides guidelines for reporting issues, setting up your development environment, and submitting changes.
+AerEO is a Polylith monorepo managed with `uv` and `uv poly`.
 
-## Table of Contents
-
-- [Reporting Issues](#reporting-issues)
-- [Development Setup](#development-setup)
-- [Running Tests](#running-tests)
-- [Pull Request Process](#pull-request-process)
-- [Conventional Commits](#conventional-commits)
-- [Code Style](#code-style)
-
-## Reporting Issues
-
-Before opening a new issue, please search existing issues to avoid duplicates.
-
-When reporting bugs, include:
-- A clear, descriptive title
-- Steps to reproduce the issue
-- Expected vs. actual behavior
-- Your Python version (`python --version`)
-- Relevant environment details (OS, plugin versions)
-- Full error messages and tracebacks
-
-For feature requests, describe the use case and the problem you're trying to solve.
-
-## Development Setup
-
-For a detailed step-by-step guide, see [Developer Setup](contributing/dev-setup.md).
-
-AEREO uses [uv](https://docs.astral.sh/uv/) for dependency management and [Polylith](https://polylith.gitbook.io/polylith) for code organization.
-
-### Prerequisites
-
-- Python >= 3.12
-- [uv](https://docs.astral.sh/uv/getting-started/installation/)
-- Git
-
-### Clone and Install
+## Development setup
 
 ```bash
 git clone https://github.com/frandorr/aereo.git
 cd aereo
-uv sync --all-extras
+uv sync
 ```
 
-The `--all-extras` flag installs optional dependencies for all plugins so you can run the full test suite.
-
-### Polylith Workspace
-
-AEREO is organized as a Polylith workspace:
-
-- `components/` — reusable bricks (e.g., `aereo/grid`, `aereo/eoids`)
-- `bases/` — entry points (e.g., `aereo/client`)
-- `projects/` — publishable packages (e.g., `projects/aereo-core`)
-- `test/` — mirrors the `components/` and `bases/` structure
-
-When adding new functionality, prefer creating or extending a component in `components/` over adding code directly to a base.
-
-## Running Tests
-
-### All Tests
+## Run tests
 
 ```bash
-uv run pytest
+uv run pytest test/ -v --tb=short
 ```
 
-### Specific Test Directory
-
-```bash
-uv run pytest test/components/aereo/grid
-```
-
-### With Type Checking
-
-```bash
-uv run basedpyright components/ bases/
-```
-
-### Linting
+## Lint and type check
 
 ```bash
 uv run ruff check .
+uv run basedpyright
 ```
 
-### Slow Tests
-
-Some tests are marked as slow or integration tests. To skip them:
+## Build the docs
 
 ```bash
-uv run pytest -m "not slow and not integration"
+uv sync --extra docs
+uv run mkdocs serve
 ```
 
-To run integration tests (requires credentials):
+The docs include the example notebooks under `examples/`. They are copied into
+`docs/examples/` by `docs/hooks/copy_notebooks.py` and rendered with
+`mknotebooks`. Notebooks are **not** executed during the build; the rendered
+pages rely on the outputs already saved in the notebooks.
 
-```bash
-RUN_INTEGRATION_TESTS=1 uv run pytest -m integration
-```
+## Commit style
 
-## Pull Request Process
-
-1. **Fork and branch** — Create a feature branch from `main`:
-   ```bash
-   git checkout -b feature/my-feature
-   ```
-
-2. **Make changes** — Write code, tests, and documentation.
-
-3. **Run checks locally** — Ensure tests, type checks, and linting pass:
-   ```bash
-   uv run pytest
-   uv run ruff check .
-   uv run basedpyright components/ bases/
-   ```
-
-4. **Commit** — Use [Conventional Commits](#conventional-commits).
-
-5. **Push and open a PR** — Fill out the PR template and link any related issues.
-
-6. **Review** — Maintainers will review and may request changes.
-
-## Conventional Commits
-
-We use [Conventional Commits](https://www.conventionalcommits.org/) to automate changelogs and versioning.
-
-Format:
-```
-<type>(<scope>): <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-Common types:
-- `feat` — new feature
-- `fix` — bug fix
-- `docs` — documentation only
-- `style` — formatting, missing semicolons, etc.
-- `refactor` — code change that neither fixes a bug nor adds a feature
-- `test` — adding or correcting tests
-- `chore` — maintenance tasks, dependency updates
-
+This project uses [Conventional Commits](https://www.conventionalcommits.org/).
 Examples:
+
+```text
+feat(search): add Earthaccess search provider
+docs(tutorial): add Sentinel-3 NDVI notebook
+fix(grid): handle empty intersection results
 ```
-feat(grid): add support for custom CRS in grid alignment
-fix(extract): handle missing bands in satpy reader
-docs(readme): update installation instructions
-```
 
-## Code Style
+## Code style
 
-- **Formatter**: Ruff (replaces Black)
-- **Linter**: Ruff (replaces flake8, isort, pydocstyle)
-- **Type checker**: basedpyright
-- **Line length**: 88 characters
+- Google-style docstrings.
+- Use `| None` instead of `Optional`.
+- Type hints on all public functions.
+- Do not use `assert` for runtime input validation; raise explicit exceptions.
 
-Configuration is in `pyproject.toml`.
+## Getting help
 
----
-
-## Questions?
-
-Feel free to open a [Discussion](https://github.com/frandorr/aereo/discussions) or reach out in an existing issue.
+- [GitHub Issues](https://github.com/frandorr/aereo/issues)
+- [GitHub Discussions](https://github.com/frandorr/aereo/discussions)

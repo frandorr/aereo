@@ -4,7 +4,7 @@ import geopandas as gpd
 import pytest
 from aereo.grid import core
 from odc.geo.geobox import GeoBox
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, Point
 
 
 def test_grid_definition_init():
@@ -13,47 +13,56 @@ def test_grid_definition_init():
     assert not grid.overlap
 
 
-def test_generate_grid_cells():
+def test_generate_raw_cells():
     grid = core.GridDefinition(d=10000, overlap=False)
     # create a small polygon near equator
     polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
-    cells = grid.generate_grid_cells(polygon)
+    cells = grid.generate_raw_cells(polygon)
     assert len(cells) > 0
     # Every cell should intersect
-    for cell in cells:
-        assert cell.geom.intersects(polygon)
-        assert cell.is_primary
+    for poly, cell_id, is_primary in cells:
+        assert poly.intersects(polygon)
+        assert is_primary
 
 
-def test_generate_grid_cells_overlap():
+def test_generate_raw_cells_overlap():
     grid = core.GridDefinition(d=10000, overlap=True)
     polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
-    cells = grid.generate_grid_cells(polygon)
+    cells = grid.generate_raw_cells(polygon)
     assert len(cells) > 0
-    primary_cells = [c for c in cells if c.is_primary]
-    overlap_cells = [c for c in cells if not c.is_primary]
+    primary_cells = [c for c in cells if c[2]]
+    overlap_cells = [c for c in cells if not c[2]]
     assert len(primary_cells) > 0
     assert len(overlap_cells) > 0
 
 
-def test_cell_from_id():
+def test_raw_cell_from_id():
     grid = core.GridDefinition(d=10000)
     polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
-    cells = grid.generate_grid_cells(polygon)
-    first_cell_id = cells[0].id()
+    cells = grid.generate_raw_cells(polygon)
+    first_poly, first_cell_id, _ = cells[0]
 
-    reconstructed_cell = grid.cell_from_id(first_cell_id)
-    assert reconstructed_cell.id() == first_cell_id
+    recon_poly, recon_id, _ = grid.raw_cell_from_id(first_cell_id)
+    assert recon_id == first_cell_id
     # Test if geometry is reconstructed closely enough
-    assert (
-        reconstructed_cell.geom.intersection(cells[0].geom).area
-        > 0.99 * cells[0].geom.area
-    )
+    assert recon_poly.intersection(first_poly).area > 0.99 * first_poly.area
+
+
+def test_build_grid_cells():
+    polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
+
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=10_000)
+    assert len(cells) > 0
+    assert isinstance(cells[0], core.GridCell)
+    assert cells[0].d == 10000
+
+    gb = cells[0].to_geobox(resolution=50.0)
+    assert isinstance(gb, GeoBox)
 
 
 def test_grid_cell_to_geodataframe():
     polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
-    cell = core.GridCell(d=10000, geom=polygon, is_primary=True, cell_id="0U_0R")
+    cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
     gdf = cell.to_geodataframe()
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert len(gdf) == 1
@@ -77,32 +86,15 @@ def test_get_cell_name():
     assert "OV" in name_ov
 
 
-def test_grid_cell_area_name_and_def():
+def test_grid_cell_area_name_and_geobox():
     polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
-    cell = core.GridCell(d=10000, geom=polygon, is_primary=True, cell_id="0U_0R")
+    cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
 
-    assert cell.area_name(50) == "0U_0R_dist-10000m_res-50m"
-    area = cell.area_def(50)
+    assert cell.area_name(resolution=50.0) == "0U_0R_dist-10000m_res-50m"
+    area = cell.to_geobox(resolution=50.0, margin=0.0)
     # With margin=0 the box is D x D metres (≈200 px at 50 m)
     assert area.shape.x == pytest.approx(10000 / 50, abs=1)
     assert area.shape.y == pytest.approx(10000 / 50, abs=1)
-
-
-def test_to_esa_compatible_dataframe():
-    grid = core.GridDefinition(d=10000)
-    polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
-    cells = grid.generate_grid_cells(polygon)
-
-    gdf = grid.to_esa_compatible_dataframe(cells)
-    assert len(gdf) > 0
-    assert "name" in gdf.columns
-    assert "row" in gdf.columns
-    assert "col" in gdf.columns
-    assert "row_idx" in gdf.columns
-    assert "col_idx" in gdf.columns
-    assert "utm_zone" in gdf.columns
-    assert "epsg" in gdf.columns
-    assert gdf.crs == "EPSG:4326"
 
 
 # --- GeoBox tests ---
@@ -114,36 +106,31 @@ def test_area_def_removed():
         getattr(core, "AreaDef")
 
 
-def test_area_def_returns_geobox():
+def test_geobox_returns_geobox():
     cell = core.GridCell(
-        d=10000, geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]), cell_id="test"
+        id="test", d=10000, cell_geometry=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]])
     )
-    gb = cell.area_def(100)
+    gb = cell.to_geobox(resolution=100.0, margin=0.0)
     assert isinstance(gb, GeoBox)
     assert gb.crs is not None
     assert gb.crs.to_epsg() == int(cell.utm_crs.split(":")[-1])
 
 
-def test_area_def_fixed_shape_matches_d():
-    from shapely.geometry import Point
-
-    grid = core.GridDefinition(d=100_000)
-    cells = grid.generate_grid_cells(Point(-64.0, -31.4).buffer(0.1))
-    cell = cells[0]
-    gb = cell.area_def(2000)
+def test_geobox_fixed_shape_matches_d():
+    polygon = Point(-64.0, -31.4).buffer(0.1)
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
+    gb = cells[0].to_geobox(resolution=2000.0)
     # GeoBox rounds to whole pixels; shape must be ≈ D / resolution
     assert gb.shape.x == pytest.approx(100_000 / 2000, abs=1)
     assert gb.shape.y == pytest.approx(100_000 / 2000, abs=1)
 
 
-def test_area_def_from_generated_cell():
+def test_geobox_from_generated_cell():
     """GeoBox from a real grid-generated cell should have valid extent and CRS."""
-    from shapely.geometry import Point
-
-    grid = core.GridDefinition(d=100000)
-    cells = grid.generate_grid_cells(Point(-64.0, -31.4).buffer(0.1))
+    polygon = Point(-64.0, -31.4).buffer(0.1)
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
     assert len(cells) > 0
-    ad = cells[0].area_def(2000)
+    ad = cells[0].to_geobox(resolution=2000.0)
     assert isinstance(ad, GeoBox)
     # With margin=0 the box is D x D metres (≈50 px at 2000 m)
     assert ad.shape.x == pytest.approx(100_000 / 2000, abs=1)
@@ -153,53 +140,30 @@ def test_area_def_from_generated_cell():
     assert ad.extent.boundingbox.bottom < ad.extent.boundingbox.top
 
 
-def test_area_def_uses_fixed_size():
-    """A cell's area_def extent should be a fixed D x D square, not natural bounds."""
-    from shapely.geometry import Point
-
-    grid = core.GridDefinition(d=100_000)
-    cells = grid.generate_grid_cells(Point(-64.0, -31.4).buffer(0.1))
-    cell = cells[0]
-    area = cell.area_def(2000)
+def test_geobox_uses_fixed_size():
+    """A cell's geobox extent should be a fixed D x D square, not natural bounds."""
+    polygon = Point(-64.0, -31.4).buffer(0.1)
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
+    area = cells[0].to_geobox(resolution=2000.0)
     # The extent should be D x D metres (≈50 px), not derived from utm_footprint.bounds
     assert area.shape.x == pytest.approx(100_000 / 2000, abs=1)
     assert area.shape.y == pytest.approx(100_000 / 2000, abs=1)
 
 
-def test_area_def_conform_to():
-    """When conform_to is given, width/height should match target + padding."""
-    cell = core.GridCell(
-        d=10000, geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]), cell_id="test"
-    )
-    area = cell.area_def(100, padding=1, conform_to=(50, 60))
-    assert area.shape.x == 52  # 50 + 2*1
-    assert area.shape.y == 62  # 60 + 2*1
-
-
-def test_area_def_geobox_kwargs():
-    cell = core.GridCell(
-        d=10000, geom=Polygon([[0, 0], [1, 0], [1, 1], [0, 1]]), cell_id="test"
-    )
-    gb_edge = cell.area_def(100, anchor="edge")
-    gb_tight = cell.area_def(100, tight=True)
-    # With the centre snapped to the resolution grid, both modes can produce
-    # identical extents when the box is perfectly pixel-aligned.
-    assert abs(gb_edge.shape.x - gb_tight.shape.x) <= 1
-    assert abs(gb_edge.shape.y - gb_tight.shape.y) <= 1
-
-
-def test_area_def_centered_on_grid_point():
-    """area_def should be centred on the reprojected WGS84 centroid."""
+def test_geobox_centered_on_grid_point():
+    """geobox should be centred on the reprojected WGS84 centroid."""
     from aereo.spatial import reproject_geom
-    from shapely.geometry import Point
 
-    grid = core.GridDefinition(d=100_000)
-    cells = grid.generate_grid_cells(Point(-64.0, -31.4).buffer(0.1))
-    cell = cells[0]
-    gb = cell.area_def(2000)
+    polygon = Point(-64.0, -31.4).buffer(0.1)
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
+    gb = cells[0].to_geobox(resolution=2000.0)
     utm_centroid = cast(
         Point,
-        reproject_geom(cell.geom.centroid, src_epsg="epsg:4326", dst_epsg=cell.utm_crs),
+        reproject_geom(
+            cells[0].cell_geometry.centroid,
+            src_epsg="epsg:4326",
+            dst_epsg=cells[0].utm_crs,
+        ),
     )
     bbox = gb.boundingbox
     cx = (bbox.left + bbox.right) / 2
@@ -208,37 +172,131 @@ def test_area_def_centered_on_grid_point():
     assert cy == pytest.approx(utm_centroid.y, abs=2000)
 
 
-def test_area_def_with_margin():
+def test_geobox_with_margin():
     """margin should expand the box beyond D x D."""
     polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
-    cell = core.GridCell(d=10000, geom=polygon, is_primary=True, cell_id="0U_0R")
-    gb_no_margin = cell.area_def(50, margin=0.0)
-    gb_with_margin = cell.area_def(50, margin=6.8)
+    cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
+    gb_no_margin = cell.to_geobox(resolution=50.0, margin=0.0)
+    gb_with_margin = cell.to_geobox(resolution=50.0, margin=6.8)
     assert gb_with_margin.shape.x > gb_no_margin.shape.x
     assert gb_with_margin.shape.y > gb_no_margin.shape.y
 
 
-def test_max_shape_across_cells():
-    """max_shape should return the maximum pixel dimensions across cells."""
-    grid = core.GridDefinition(d=10_000)
-    polygon = Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]])
-    cells = grid.generate_grid_cells(polygon)
-    max_w, max_h = grid.max_shape(cells, resolution=100)
-    assert max_w > 0
-    assert max_h > 0
-    # Every cell should fit inside max_shape when conformed to it
-    for cell in cells:
-        area = cell.area_def(100, conform_to=(max_w, max_h))
-        assert area.shape.x == max_w
-        assert area.shape.y == max_h
+def test_geobox_origin_independent_of_resolution():
+    """GeoBoxes for the same cell at different resolutions share the same origin.
+
+    This guarantees that independent extractions of the same cell (e.g. GOES at
+    2 km and VIIRS at 400 m) produce aligned pixel grids when the resolutions
+    are integer multiples of each other. The finer resolution is aligned to the
+    coarser one so the pixel edges match.
+    """
+    polygon = Point(-64.0, -31.4).buffer(0.1)
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
+    cell = cells[0]
+    gb_400m = cell.to_geobox(resolution=400.0, alignment_resolution=2000.0)
+    gb_2km = cell.to_geobox(resolution=2000.0, alignment_resolution=2000.0)
+
+    assert gb_400m.extent.boundingbox.left == pytest.approx(
+        gb_2km.extent.boundingbox.left
+    )
+    assert gb_400m.extent.boundingbox.top == pytest.approx(
+        gb_2km.extent.boundingbox.top
+    )
 
 
-def test_max_shape_with_padding():
-    """Padding should be accounted for in max_shape."""
-    grid = core.GridDefinition(d=10_000)
-    polygon = Polygon([[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]])
-    cells = grid.generate_grid_cells(polygon)
-    max_w_padded, max_h_padded = grid.max_shape(cells, resolution=100, padding=2)
-    max_w, max_h = grid.max_shape(cells, resolution=100, padding=0)
-    assert max_w_padded == max_w + 4
-    assert max_h_padded == max_h + 4
+def test_geobox_origin_independent_of_resolution_with_margin():
+    """Alignment is preserved even when a margin expands the box."""
+    polygon = Point(-64.0, -31.4).buffer(0.1)
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
+    cell = cells[0]
+    gb_400m = cell.to_geobox(resolution=400.0, margin=10.0, alignment_resolution=2000.0)
+    gb_2km = cell.to_geobox(resolution=2000.0, margin=10.0, alignment_resolution=2000.0)
+
+    assert gb_400m.extent.boundingbox.left == pytest.approx(
+        gb_2km.extent.boundingbox.left
+    )
+    assert gb_400m.extent.boundingbox.top == pytest.approx(
+        gb_2km.extent.boundingbox.top
+    )
+    # The finer grid should be an exact refinement of the coarser one.
+    assert gb_400m.shape.x == gb_2km.shape.x * 5
+    assert gb_400m.shape.y == gb_2km.shape.y * 5
+
+
+# --- cells_bounds tests ---
+
+
+def test_cells_bounds_empty_raises():
+    with pytest.raises(ValueError, match="At least one GridCell is required"):
+        core.cells_bounds([])
+
+
+def test_cells_bounds_single_cell():
+    polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
+    cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
+
+    bounds = core.cells_bounds([cell])
+    assert bounds == pytest.approx(polygon.bounds, abs=1e-9)
+
+
+def test_cells_bounds_multiple_cells():
+    polygon = Polygon([[0.0, 0.0], [0.2, 0.0], [0.2, 0.2], [0.0, 0.2]])
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=10_000)
+    assert len(cells) > 1
+
+    bounds = core.cells_bounds(cells)
+    minx, miny, maxx, maxy = bounds
+
+    # Bounds should exactly match the union of all cell bounds.
+    expected_minx = min(cell.cell_geometry.bounds[0] for cell in cells)
+    expected_miny = min(cell.cell_geometry.bounds[1] for cell in cells)
+    expected_maxx = max(cell.cell_geometry.bounds[2] for cell in cells)
+    expected_maxy = max(cell.cell_geometry.bounds[3] for cell in cells)
+    assert minx == pytest.approx(expected_minx, abs=1e-9)
+    assert miny == pytest.approx(expected_miny, abs=1e-9)
+    assert maxx == pytest.approx(expected_maxx, abs=1e-9)
+    assert maxy == pytest.approx(expected_maxy, abs=1e-9)
+
+
+def test_cells_bounds_with_buffer_expands():
+    polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=10_000)
+    assert len(cells) > 0
+
+    base_bounds = core.cells_bounds(cells)
+    buffered_bounds = core.cells_bounds(cells, buffer_m=1000.0)
+
+    assert buffered_bounds[0] < base_bounds[0]
+    assert buffered_bounds[1] < base_bounds[1]
+    assert buffered_bounds[2] > base_bounds[2]
+    assert buffered_bounds[3] > base_bounds[3]
+
+
+def test_cells_bounds_buffer_approximate_size():
+    """Buffer expansion near the equator should be close to the requested metres."""
+    polygon = Polygon([[0.0, 0.0], [0.1, 0.0], [0.1, 0.1], [0.0, 0.1]])
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=10_000)
+    assert len(cells) > 0
+
+    buffer_m = 1000.0
+    base_bounds = core.cells_bounds(cells)
+    buffered_bounds = core.cells_bounds(cells, buffer_m=buffer_m)
+
+    # At the equator 1 degree ≈ 111,320 m, so 1000 m ≈ 0.009 degrees.
+    # Allow generous tolerance because buffering is done in UTM and reprojected.
+    expansion_x = (buffered_bounds[2] - buffered_bounds[0]) - (
+        base_bounds[2] - base_bounds[0]
+    )
+    expansion_y = (buffered_bounds[3] - buffered_bounds[1]) - (
+        base_bounds[3] - base_bounds[1]
+    )
+
+    expected_deg = buffer_m / 111_320
+    assert expansion_x == pytest.approx(2 * expected_deg, abs=0.01)
+    assert expansion_y == pytest.approx(2 * expected_deg, abs=0.01)
+
+
+def test_cells_bounds_exported_from_module():
+    from aereo.grid import cells_bounds
+
+    assert callable(cells_bounds)

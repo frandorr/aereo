@@ -4,7 +4,7 @@ requires = [ "hatch-polylith-bricks", "hatchling" ]
 
 [project]
 name = "aereo"
-version = "1.1.1"
+version = "1.1.3"
 description = """\
   Plugin-based satellite data extraction — search across catalogs, extract assets, and reproject to analysis-ready \
   Major TOM grids.\
@@ -32,39 +32,88 @@ classifiers = [
 ]
 dependencies = [
   "attrs>=25.4",
-  "cattrs>=24.1",
+  "earthaccess>=0.18",
+  "filelock>=3.13",
   "geopandas>=1.1.2",
+  "hydra-core>=1.3.2",
+  "joblib>=1.3",
   "majortom-eg",
+  "matplotlib>=3.10.8",
+  "numpy",
+  "obstore>=0.9.3",
+  "odc-geo>=0.5.1",
+  "odc-stac>=0.5.2",
+  "omegaconf>=2.3",
   "pandas>=3.0.1",
   "pandera[geopandas]>=0.24",
+  "pydantic>=2.12.5",
   "pyproj>=3.7.1",
+  "pystac>=1",
+  "pystac-client>=0.8",
+  "rasterio>=1.3",
   "rich>=13",
+  "rioxarray>=0.22",
   "shapely>=2.1.2",
   "structlog>=25.5",
   "typer>=0.12",
   "utm>=0.8.1",
+  "xarray>=2026.4",
 ]
+optional-dependencies.all = [
+  "boto3>=1.34",
+  "cartopy>=0.25",
+  "pyresample>=1.28",
+]
+optional-dependencies.serverless = [ "boto3>=1.34", "botocore>=1.34" ]
+optional-dependencies.swath = [ "pyresample>=1.28" ]
+optional-dependencies.viz = [ "cartopy>=0.25" ]
 urls.Documentation = "https://frandorr.github.io/aereo"
 urls.Homepage = "https://github.com/frandorr/aereo"
 urls.Issues = "https://github.com/frandorr/aereo/issues"
 urls.Repository = "https://github.com/frandorr/aereo"
-scripts.aereo = "aereo.cli.main:app"
+scripts.aereo = "aereo.cli.main:main"
+scripts.aereo-extract = "aereo.cli.extract:app"
+entry-points."aereo.plugins".process_composite = "aereo.builtins.processor:composite"
+entry-points."aereo.plugins".process_ndvi = "aereo.builtins.processor:ndvi"
+entry-points."aereo.plugins".process_normalize = "aereo.builtins.processor:normalize"
+entry-points."aereo.plugins".process_qa_mask = "aereo.builtins.processor:qa_mask"
+entry-points."aereo.plugins".process_select_bands = "aereo.builtins.processor:select_bands"
+entry-points."aereo.plugins".read_odc_stac = "aereo.builtins.read:read_odc_stac"
+entry-points."aereo.plugins".reproject_odc = "aereo.builtins.reproject:reproject_odc"
+entry-points."aereo.plugins".search_stac = "aereo.builtins.search:search_stac"
+entry-points."aereo.plugins".task_builder_grouped = "aereo.builtins.task_builder:build_grouped_tasks"
+entry-points."aereo.plugins".write_geotiff = "aereo.builtins.write:write_geotiff"
 
 [tool.hatch]
 build.dev-mode-dirs = [ "../../components", "../../bases", "../../development", "." ]
 build.hooks.polylith-bricks = {}
 build.targets.wheel.packages = [ "aereo" ]
 
+[tool.deptry]
+exclude = [
+  "components/aereo_extract",
+]
+package_module_name_map."hydra-core" = "hydra"
+package_module_name_map."odc-geo" = "odc"
+package_module_name_map."odc-stac" = "odc"
+per_rule_ignores.DEP001 = [ "aereo" ]
+
 [tool.polylith]
 bricks."../../bases/aereo/cli" = "aereo/cli"
 bricks."../../bases/aereo/client" = "aereo/client"
 bricks."../../components/aereo/asset_downloader" = "aereo/asset_downloader"
-bricks."../../components/aereo/eoids" = "aereo/eoids"
+bricks."../../components/aereo/cache" = "aereo/cache"
 bricks."../../components/aereo/execution" = "aereo/execution"
+bricks."../../components/aereo/executors" = "aereo/executors"
+bricks."../../components/aereo/eoids" = "aereo/eoids"
+bricks."../../components/aereo/backends" = "aereo/backends"
 bricks."../../components/aereo/grid" = "aereo/grid"
 bricks."../../components/aereo/interfaces" = "aereo/interfaces"
+bricks."../../components/aereo/pipeline" = "aereo/pipeline"
 bricks."../../components/aereo/registry" = "aereo/registry"
 bricks."../../components/aereo/schemas" = "aereo/schemas"
 bricks."../../components/aereo/serialization" = "aereo/serialization"
 bricks."../../components/aereo/spatial" = "aereo/spatial"
+bricks."../../components/aereo/storage" = "aereo/storage"
 bricks."../../components/aereo/viz" = "aereo/viz"
+bricks."../../components/aereo/builtins" = "aereo/builtins"

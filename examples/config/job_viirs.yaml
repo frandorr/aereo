@@ -1,0 +1,40 @@
+aoi_path: config/aoi/chocon.geojson
+# Common Job config, like name, MajorTOM grid distance, etc
+name: viirs_sample
+grid_dist: 50_000
+grid_cells_margin: 10
+target_aoi: ${aoi_path}
+output_uri: /tmp/aereo_extraction
+overwrite: false
+# Search block
+search:
+  _target_: aereo.builtins.search_earthaccess
+  _partial_: true
+  collections:
+    VJ202IMG: ["I04"]
+    VJ203IMG: []
+  intersects: ${aoi_path}
+  start_datetime: "2024-01-01T00:00:00Z"
+  end_datetime: "2024-01-02T23:59:59Z"
+
+read:
+  _partial_: true
+  _target_: aereo.read_satpy.read_satpy
+  reader: viirs_l1b
+  wishlist: [I04]
+  # Use earthaccess directly for downloads. Because this environment is in a
+  # different AWS region than the NASA data, obstore's S3 direct access fails
+  # and falls back through HTTPS before finally using earthaccess. Going
+  # straight to earthaccess avoids those retries.
+  downloader:
+    _target_: aereo.asset_downloader.core._download_with_earthaccess
+    _partial_: true
+
+reproject:
+  _target_: aereo.builtins.reproject_swath
+  _partial_: true
+reproject_mode: grid
+resolution: 375
+
+write:
+  _target_: aereo.builtins.write.write_geotiff
