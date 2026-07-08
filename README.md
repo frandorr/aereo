@@ -54,6 +54,18 @@ Install the core framework with `uv add aereo` (or `pip install aereo`).
 Sensor-specific search and I/O plugins are separate packages so you only ship
 what you need.
 
+## Optional extras
+
+AerEO's core install covers STAC search, ODC-based reprojection, GeoTIFF writing,
+and local execution. A few built-in capabilities need extra dependencies:
+
+| Extra | Enables | Install |
+|---|---|---|
+| `serverless` | `LambdaExecutor` and S3 staging (via `boto3`) | `uv add aereo[serverless]` |
+| `swath` | `reproject_swath` / `reproject_pyresample` for 2-D lat/lon swath data | `uv add aereo[swath]` |
+| `viz` | Cartopy-backed plots in `aereo.viz` | `uv add aereo[viz]` |
+| `all` | Everything above in one command | `uv add aereo[all]` |
+
 ## Copy/paste example
 
 Save this as `quickstart.py` and run it with `uv run python quickstart.py`:

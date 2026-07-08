@@ -62,6 +62,8 @@ you can access hundreds of constellations without changing your pipeline.
 
 > Install the core framework with `uv add aereo` (or `pip install aereo`).
 > Sensor-specific plugins are separate packages so you only ship what you need.
+> Optional extras cover serverless (`aereo[serverless]`), swath reprojection
+> (`aereo[swath]`), and viz (`aereo[viz]`); use `aereo[all]` to install them all.
 
 ---
 

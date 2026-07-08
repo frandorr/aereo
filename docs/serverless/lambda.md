@@ -36,6 +36,14 @@ Lambda.
 
 ## Swap the executor
 
+Make sure the `serverless` extra is installed so that `boto3` is available:
+
+```bash
+uv add aereo[serverless]
+# or
+pip install aereo[serverless]
+```
+
 ```python
 from aereo.executors import LambdaExecutor
 from aereo.pipeline import ExtractionJob

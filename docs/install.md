@@ -56,6 +56,18 @@ Install the core framework with `uv add aereo` (or `pip install aereo`), then
 add plugins for search, read, reproject, or write stages. By combining plugins
 you can access hundreds of constellations without changing your pipeline.
 
+## Optional extras
+
+AerEO's core install covers STAC search, ODC-based reprojection, GeoTIFF writing,
+and local execution. A few built-in capabilities need extra dependencies:
+
+| Extra | Enables | Install |
+|---|---|---|
+| `serverless` | `LambdaExecutor` and S3 staging (via `boto3`) | `uv add aereo[serverless]` |
+| `swath` | `reproject_swath` / `reproject_pyresample` for 2-D lat/lon swath data | `uv add aereo[swath]` |
+| `viz` | Cartopy-backed plots in `aereo.viz` | `uv add aereo[viz]` |
+| `all` | Everything above in one command | `uv add aereo[all]` |
+
 ## Verify the installation
 
 ```python

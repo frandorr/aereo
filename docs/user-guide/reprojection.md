@@ -61,7 +61,15 @@ job = ExtractionJob(
 ## Swath data
 
 Sensors like VIIRS and Sentinel-3 are often stored as swaths (2-D lat/lon
-arrays). For these data you usually need the built-in `reproject_swath` helper.
+arrays). For these data you usually need the built-in `reproject_swath` helper,
+which uses `pyresample` under the hood. Install it with the `swath` extra:
+
+```bash
+uv add aereo[swath]
+# or
+pip install aereo[swath]
+```
+
 See the [VIIRS](../examples/02-viirs.ipynb) and
 [Sentinel-3](../examples/03-sentinel3.ipynb) tutorials, and the
 [Configuration](../configuration/yaml-schema.md) reference for all
