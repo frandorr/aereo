@@ -453,3 +453,52 @@ def test_plot_artifact_patches_reuses_shared_uri(
     assert len(open_calls) == 1
     assert len(ax.images) == 1
     fig.clf()
+
+
+def test_plot_artifact_patches_overlay_on_existing_ax(
+    tmp_path: Path,
+) -> None:
+    """Passing an existing axes plots the mosaic on that axes for overlay."""
+    import matplotlib.pyplot as plt
+
+    bounds_a = (300000.0, 5000000.0, 301000.0, 5001000.0)
+    bounds_b = (301000.0, 5000000.0, 302000.0, 5001000.0)
+
+    path_a = tmp_path / "cell_a.tif"
+    path_b = tmp_path / "cell_b.tif"
+    _make_test_tiff(path_a, bounds_a, data=np.ones((32, 32), dtype=np.float32) * 10)
+    _make_test_tiff(path_b, bounds_b, data=np.ones((32, 32), dtype=np.float32) * 20)
+
+    gdf_base = gpd.GeoDataFrame(
+        {
+            "uri": [str(path_a), str(path_b)],
+            "grid_cell": ["cell_a", "cell_b"],
+            "cell_utm_footprint": [box(*bounds_a), box(*bounds_b)],
+        },
+        geometry="cell_utm_footprint",
+        crs="EPSG:32633",
+    )
+
+    path_c = tmp_path / "cell_c.tif"
+    _make_test_tiff(path_c, bounds_a, data=np.ones((32, 32), dtype=np.float32) * 30)
+    gdf_overlay = gpd.GeoDataFrame(
+        {
+            "uri": [str(path_c)],
+            "grid_cell": ["cell_c"],
+            "cell_utm_footprint": [box(*bounds_a)],
+        },
+        geometry="cell_utm_footprint",
+        crs="EPSG:32633",
+    )
+
+    fig, ax = plot_artifact_patches(gdf_base, cmap="Grays")
+    base_images = len(ax.images)
+    assert base_images > 0
+
+    fig2, ax2 = plot_artifact_patches(gdf_overlay, ax=ax, alpha=0.5, cmap="Greens")
+    assert fig2 is fig
+    assert ax2 is ax
+    assert len(ax.images) == base_images + 1
+    assert ax.images[-1].get_alpha() == pytest.approx(0.5)
+
+    plt.close(fig)

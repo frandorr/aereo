@@ -11,6 +11,7 @@ from pydantic import ValidationError
 from aereo.builtins import (
     composite,
     ndvi,
+    ndwi,
     normalize,
     qa_mask,
     select_bands,
@@ -146,6 +147,51 @@ def test_ndvi_raises_on_missing_band():
     ds = _make_dataset()
     with pytest.raises(ValueError, match="not found"):
         ndvi(ds, ndvi_nir_band="B08", ndvi_red_band="B99")
+
+
+# ---------------------------------------------------------------------------
+# ndwi
+# ---------------------------------------------------------------------------
+
+
+def test_ndwi_computes_correct_values():
+    green = np.array([[0.1, 0.2], [0.3, 0.4]])
+    nir = np.array([[0.3, 0.4], [0.5, 0.6]])
+    ds = xr.Dataset(
+        {"B03": (["y", "x"], green), "B08": (["y", "x"], nir)},
+        coords={"y": range(2), "x": range(2)},
+    )
+
+    result = ndwi(ds, ndwi_green_band="B03", ndwi_nir_band="B08")
+
+    expected = (green - nir) / (green + nir)
+    np.testing.assert_array_almost_equal(result["ndwi"].values, expected)
+    assert "B03" not in result.data_vars
+    assert "B08" not in result.data_vars
+
+
+def test_ndwi_handles_zero_denominator():
+    green = np.zeros((2, 2))
+    nir = np.zeros((2, 2))
+    ds = xr.Dataset(
+        {"B03": (["y", "x"], green), "B08": (["y", "x"], nir)},
+        coords={"y": range(2), "x": range(2)},
+    )
+
+    result = ndwi(ds, ndwi_green_band="B03", ndwi_nir_band="B08")
+
+    assert np.all(np.isnan(result["ndwi"].values))
+
+
+def test_ndwi_raises_on_missing_params():
+    with pytest.raises(ValidationError):
+        ndwi()  # type: ignore[reportCallIssue]
+
+
+def test_ndwi_raises_on_missing_band():
+    ds = _make_dataset()
+    with pytest.raises(ValueError, match="not found"):
+        ndwi(ds, ndwi_green_band="B03", ndwi_nir_band="B99")
 
 
 # ---------------------------------------------------------------------------

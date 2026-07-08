@@ -196,6 +196,16 @@ class ExtractionJob(BaseModel):
             "Distinct from ``margin``, which is a metre buffer around the full AOI."
         ),
     )
+    alignment_resolution: float | None = Field(
+        default=None,
+        description=(
+            "Optional resolution in metres used to align the grid cell GeoBox. "
+            "When set, the GeoBox centre and half-width are snapped to this grid "
+            "instead of ``resolution``. This is useful for nested extractions "
+            "(e.g. VIIRS at 400 m and GOES at 2000 m) where the finer resolution "
+            "should be an exact refinement of a coarser grid. Defaults to ``resolution``."
+        ),
+    )
 
     # Pipeline steps
     read: Reader = Field(

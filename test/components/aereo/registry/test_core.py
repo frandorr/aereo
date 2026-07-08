@@ -267,6 +267,7 @@ def test_builtin_entry_points_load():
         "process_select_bands",
         "process_qa_mask",
         "process_ndvi",
+        "process_ndwi",
         "process_normalize",
         "process_composite",
     ]

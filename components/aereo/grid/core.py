@@ -10,6 +10,7 @@ from collections.abc import Iterable
 from typing import Callable, Sequence, cast
 
 import attrs
+import math
 import geopandas as gpd
 import numpy as np
 import shapely
@@ -141,13 +142,30 @@ class GridCell:
         self,
         resolution: float,
         margin: float = 0.0,
+        alignment_resolution: float | None = None,
     ) -> GeoBox:
         """Return an odc-geo GeoBox for this cell's UTM footprint.
+
+        The GeoBox is centred on the reprojected WGS84 centroid and its
+        dimensions are an integer number of pixels, so it covers at least
+        ``d * (1 + margin/100)`` metres in each direction. The centre and
+        half-width are snapped to ``alignment_resolution`` (defaulting to
+        ``resolution``) and the bounding box is built with ``anchor='edge'``,
+        which preserves the snapped extent.
+
+        To guarantee that nested resolutions share the same origin (e.g. VIIRS
+        at 400 m and GOES at 2000 m), pass the coarser resolution as
+        ``alignment_resolution`` when building the finer-resolution GeoBox. The
+        half-width is then rounded up to a multiple of both resolutions, so the
+        finer grid is an exact refinement of the coarser one.
 
         Args:
             resolution: Target pixel resolution in metres.
             margin: Percentage margin added to the patch's nominal size
                 (e.g. 5.0 for 5%).
+            alignment_resolution: Grid to which the centre and half-width are
+                snapped. Defaults to ``resolution``. Use a coarser resolution
+                when you need pixel-level alignment across nested extractions.
 
         Returns:
             A GeoBox aligned to the cell's UTM grid point.
@@ -158,12 +176,27 @@ class GridCell:
                 self.cell_geometry.centroid, src_epsg=_WGS84_CRS, dst_epsg=self.utm_crs
             ),
         )
-        cx = round(utm_centroid.x / resolution) * resolution
-        cy = round(utm_centroid.y / resolution) * resolution
+
+        align_res = (
+            alignment_resolution if alignment_resolution is not None else resolution
+        )
+
+        # Snap the centre to the alignment grid. Using the same alignment grid
+        # for different resolutions keeps origins stable.
+        cx = round(utm_centroid.x / align_res) * align_res
+        cy = round(utm_centroid.y / align_res) * align_res
         crs = self.utm_crs
 
-        half = (self.d * (1 + margin / 100)) / 2
-        bbox = (cx - half, cy - half, cx + half, cy + half)
+        nominal_half = (self.d * (1 + margin / 100)) / 2
+        # Round the half-width up to a multiple of both the target resolution
+        # and the alignment resolution so the output shape is an integer number
+        # of pixels at both resolutions.
+        step = math.lcm(int(round(resolution)), int(round(align_res)))
+        exact_half = math.ceil(nominal_half / step) * step
+
+        bbox = (cx - exact_half, cy - exact_half, cx + exact_half, cy + exact_half)
+        # anchor='edge' preserves the snapped bounding box instead of expanding
+        # it to centre a pixel, giving deterministic origins across resolutions.
         return GeoBox.from_bbox(bbox, crs, resolution=resolution, anchor="edge")
 
 

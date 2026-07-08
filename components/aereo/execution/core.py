@@ -295,7 +295,9 @@ def _run_grid_reproject(
         cell_ds = reproject(
             cell_ds,
             geobox=cell.to_geobox(
-                resolution=job.resolution, margin=job.grid_cells_margin
+                resolution=job.resolution,
+                margin=job.grid_cells_margin,
+                alignment_resolution=job.alignment_resolution,
             ),
         )
 
