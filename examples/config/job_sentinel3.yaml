@@ -1,4 +1,4 @@
-aoi_path: config/aoi/trenquelauquen.geojson
+aoi_path: config/aoi/chocon.geojson
 # Common Job config, like name, MajorTOM grid distance, etc
 name: sentinel3_sample
 grid_dist: 50_000

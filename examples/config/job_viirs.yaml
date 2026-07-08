@@ -1,11 +1,8 @@
-aoi_path: config/aoi/trenquelauquen.geojson
+aoi_path: config/aoi/chocon.geojson
 # Common Job config, like name, MajorTOM grid distance, etc
 name: viirs_sample
 grid_dist: 50_000
 grid_cells_margin: 10
-# Align the 400 m VIIRS GeoBox to the 2 km GOES grid so the two products
-# share the same pixel origin and can be stacked directly.
-alignment_resolution: 2000
 target_aoi: ${aoi_path}
 output_uri: /tmp/aereo_extraction
 overwrite: false
@@ -37,7 +34,7 @@ reproject:
   _target_: aereo.builtins.reproject_swath
   _partial_: true
 reproject_mode: grid
-resolution: 400
+resolution: 375
 
 write:
   _target_: aereo.builtins.write.write_geotiff
