@@ -263,6 +263,7 @@ class ExtractionTask:
                 gb = cell.to_geobox(
                     resolution=self.job.resolution,
                     margin=self.job.grid_cells_margin,
+                    alignment_resolution=self.job.alignment_resolution,
                 )
                 bb = gb.boundingbox
                 utm_box = box(bb.left, bb.bottom, bb.right, bb.top)

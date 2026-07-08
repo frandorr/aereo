@@ -121,6 +121,25 @@ read:
         ExtractionJob.from_yaml(job_yaml)
 
 
+def test_extraction_job_alignment_resolution_field(tmp_path: Path):
+    job_yaml = tmp_path / "job.yaml"
+    job_yaml.write_text(
+        """
+grid_dist: 50000
+output_uri: "out_dir"
+resolution: 400
+alignment_resolution: 2000
+read:
+  _target_: aereo.builtins.read.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
+"""
+    )
+    job = ExtractionJob.from_yaml(job_yaml)
+    assert job.alignment_resolution == 2000
+    assert job.resolution == 400
+
+
 def test_extraction_job_from_yaml_with_writer(tmp_path: Path):
     job_yaml = tmp_path / "job.yaml"
     job_yaml.write_text(

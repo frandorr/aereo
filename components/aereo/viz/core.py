@@ -418,6 +418,8 @@ def plot_artifact_patches(
     colorbar: bool = True,
     colorbar_label: str | None = None,
     nodata: float | None = None,
+    ax: Axes | None = None,
+    alpha: float = 1.0,
 ) -> tuple[Figure, Axes]:
     """Plot extracted raster patches and their grid-cell footprints on one canvas.
 
@@ -478,6 +480,14 @@ def plot_artifact_patches(
         nodata: Nodata value to mask as transparent. If ``None``, the nodata
             value read from each raster is used. Invalid floating-point values
             are always masked.
+        ax: Optional existing axes to draw on. When provided, the function
+            plots the patches and footprints on this axes and skips creating a
+            new figure, title, labels, legend, colorbar, and axis limits. This
+            is useful for overlaying multiple constellations on the same canvas.
+        alpha: Opacity of the raster overlay, passed to ``imshow``. Use values
+            less than 1.0 when layering on top of another plot. Values below
+            1.0 will accumulate in overlapping margin regions, which can create
+            brighter seams at cell borders.
 
     Returns:
         A tuple of ``(figure, axes)``.
@@ -499,17 +509,25 @@ def plot_artifact_patches(
     if artifacts.empty:
         raise ValueError("artifacts GeoDataFrame is empty")
 
+    artifacts = cast(
+        gpd.GeoDataFrame, artifacts.drop_duplicates(subset=["grid_cell"], keep="first")
+    )
+
     band_list = _normalize_bands(bands)
     n_bands = len(band_list)
     is_rgb = n_bands > 1
 
-    minx, miny, maxx, maxy = artifacts["cell_utm_footprint"].total_bounds
-    width = maxx - minx
-    height = maxy - miny
-    aspect_ratio = width / height if height > 0 else 1.0
-    fig_height = max(fig_width / aspect_ratio, 2.0)
-
-    fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+    if ax is None:
+        minx, miny, maxx, maxy = artifacts["cell_utm_footprint"].total_bounds
+        width = maxx - minx
+        height = maxy - miny
+        aspect_ratio = width / height if height > 0 else 1.0
+        fig_height = max(fig_width / aspect_ratio, 2.0)
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+        _configure_axes = True
+    else:
+        fig = ax.figure
+        _configure_axes = False
 
     # First pass: load every patch (downsampled) and collect all valid pixel
     # values per band so normalization is computed across the whole AOI.
@@ -625,6 +643,7 @@ def plot_artifact_patches(
                         rgb,
                         extent=extent,
                         origin="upper",
+                        alpha=alpha,
                     )
                 else:
                     data = data[0]
@@ -640,6 +659,7 @@ def plot_artifact_patches(
                         origin="upper",
                         vmin=plot_vmin,
                         vmax=plot_vmax,
+                        alpha=alpha,
                     )
 
         # Annotate the grid cell ID at the footprint centre.
@@ -672,37 +692,38 @@ def plot_artifact_patches(
             linewidth=footprint_linewidth,
         )
 
-    ax.set_title(title, fontsize=16)
-    ax.set_xlabel("UTM X")
-    ax.set_ylabel("UTM Y")
-    ax.set_aspect("equal", "datalim")
-    ax.set_xlim(minx - _FOOTPRINT_VIEW_BUFFER_M, maxx + _FOOTPRINT_VIEW_BUFFER_M)
-    ax.set_ylim(miny - _FOOTPRINT_VIEW_BUFFER_M, maxy + _FOOTPRINT_VIEW_BUFFER_M)
+    if _configure_axes:
+        ax.set_title(title, fontsize=16)
+        ax.set_xlabel("UTM X")
+        ax.set_ylabel("UTM Y")
+        ax.set_aspect("equal", "datalim")
+        ax.set_xlim(minx - _FOOTPRINT_VIEW_BUFFER_M, maxx + _FOOTPRINT_VIEW_BUFFER_M)
+        ax.set_ylim(miny - _FOOTPRINT_VIEW_BUFFER_M, maxy + _FOOTPRINT_VIEW_BUFFER_M)
 
-    legend_patch = mpatches.Patch(
-        edgecolor=footprint_edgecolor,
-        facecolor="none",
-        linestyle="--",
-        linewidth=footprint_linewidth,
-        label="Target Grid Cell",
-    )
-    fig.legend(
-        handles=[legend_patch],
-        loc="upper center",
-        bbox_to_anchor=(0.5, 1.1),
-        ncol=1,
-        fontsize=12,
-    )
+        legend_patch = mpatches.Patch(
+            edgecolor=footprint_edgecolor,
+            facecolor="none",
+            linestyle="--",
+            linewidth=footprint_linewidth,
+            label="Target Grid Cell",
+        )
+        fig.legend(
+            handles=[legend_patch],
+            loc="upper center",
+            bbox_to_anchor=(0.5, 1.1),
+            ncol=1,
+            fontsize=12,
+        )
 
-    if (
-        not is_rgb
-        and colorbar
-        and im is not None
-        and plot_vmin is not None
-        and plot_vmax is not None
-    ):
-        cbar = fig.colorbar(im, ax=ax, shrink=0.6)
-        if colorbar_label:
-            cbar.set_label(colorbar_label)
+        if (
+            not is_rgb
+            and colorbar
+            and im is not None
+            and plot_vmin is not None
+            and plot_vmax is not None
+        ):
+            cbar = fig.colorbar(im, ax=ax, shrink=0.6)
+            if colorbar_label:
+                cbar.set_label(colorbar_label)
 
-    return fig, ax
+    return cast(Figure, fig), ax

@@ -7,6 +7,7 @@ processing, and writing stages as pure functions.
 from aereo.builtins.processor import (
     composite,
     ndvi,
+    ndwi,
     normalize,
     qa_mask,
     select_bands,
@@ -25,6 +26,7 @@ __all__ = [
     "build_grouped_tasks",
     "composite",
     "ndvi",
+    "ndwi",
     "normalize",
     "qa_mask",
     "read_odc_stac",

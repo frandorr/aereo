@@ -126,6 +126,47 @@ def ndvi(ds: xr.Dataset, ndvi_nir_band: str, ndvi_red_band: str) -> xr.Dataset:
 
 
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
+def ndwi(ds: xr.Dataset, ndwi_green_band: str, ndwi_nir_band: str) -> xr.Dataset:
+    """Post-reproject processor that computes the Normalised Difference Water Index.
+
+    NDWI is computed on co-registered pixels after reprojection so that the
+    band math is physically correct. The source green and NIR bands are dropped
+    and only the ``ndwi`` variable is retained. Uses the McFeeters formulation:
+    ``(green - nir) / (green + nir)``.
+
+    Args:
+        ds: Input dataset containing green and NIR variables.
+        ndwi_green_band: Name of the green band.
+        ndwi_nir_band: Name of the NIR band.
+
+    Returns:
+        Dataset with a single ``ndwi`` variable. Source bands are removed.
+
+    Raises:
+        ValueError: If green/NIR bands are not found.
+    """
+    if ndwi_green_band not in ds.data_vars:
+        raise ValueError(
+            f"ndwi: green band '{ndwi_green_band}' not found. Available: {list(ds.data_vars)}"
+        )
+    if ndwi_nir_band not in ds.data_vars:
+        raise ValueError(
+            f"ndwi: NIR band '{ndwi_nir_band}' not found. Available: {list(ds.data_vars)}"
+        )
+
+    # Cast to float32 to prevent uint16 underflow and allow decimal division
+    green = ds[ndwi_green_band].astype("float32")
+    nir = ds[ndwi_nir_band].astype("float32")
+    denom = green + nir
+    ndwi_val = (green - nir) / denom
+    ndwi_val = ndwi_val.where(denom != 0)
+
+    result = ds.drop_vars([ndwi_green_band, ndwi_nir_band])
+    result["ndwi"] = ndwi_val
+    return result
+
+
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
 def normalize(
     ds: xr.Dataset, normalize_method: str = _DEFAULT_NORMALIZE_METHOD
 ) -> xr.Dataset:

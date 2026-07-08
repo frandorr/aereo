@@ -182,6 +182,47 @@ def test_geobox_with_margin():
     assert gb_with_margin.shape.y > gb_no_margin.shape.y
 
 
+def test_geobox_origin_independent_of_resolution():
+    """GeoBoxes for the same cell at different resolutions share the same origin.
+
+    This guarantees that independent extractions of the same cell (e.g. GOES at
+    2 km and VIIRS at 400 m) produce aligned pixel grids when the resolutions
+    are integer multiples of each other. The finer resolution is aligned to the
+    coarser one so the pixel edges match.
+    """
+    polygon = Point(-64.0, -31.4).buffer(0.1)
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
+    cell = cells[0]
+    gb_400m = cell.to_geobox(resolution=400.0, alignment_resolution=2000.0)
+    gb_2km = cell.to_geobox(resolution=2000.0, alignment_resolution=2000.0)
+
+    assert gb_400m.extent.boundingbox.left == pytest.approx(
+        gb_2km.extent.boundingbox.left
+    )
+    assert gb_400m.extent.boundingbox.top == pytest.approx(
+        gb_2km.extent.boundingbox.top
+    )
+
+
+def test_geobox_origin_independent_of_resolution_with_margin():
+    """Alignment is preserved even when a margin expands the box."""
+    polygon = Point(-64.0, -31.4).buffer(0.1)
+    cells = core.build_grid_cells(aoi=polygon, grid_dist=100_000)
+    cell = cells[0]
+    gb_400m = cell.to_geobox(resolution=400.0, margin=10.0, alignment_resolution=2000.0)
+    gb_2km = cell.to_geobox(resolution=2000.0, margin=10.0, alignment_resolution=2000.0)
+
+    assert gb_400m.extent.boundingbox.left == pytest.approx(
+        gb_2km.extent.boundingbox.left
+    )
+    assert gb_400m.extent.boundingbox.top == pytest.approx(
+        gb_2km.extent.boundingbox.top
+    )
+    # The finer grid should be an exact refinement of the coarser one.
+    assert gb_400m.shape.x == gb_2km.shape.x * 5
+    assert gb_400m.shape.y == gb_2km.shape.y * 5
+
+
 # --- cells_bounds tests ---
 
 
