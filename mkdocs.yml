@@ -159,17 +159,12 @@ not_in_nav: |
 
 nav:
   - Home: index.md
-  - Get Started:
+  - Core Concepts: getting-started/concepts.md
+  - Tutorials:
+      - Overview: examples/index.md
       - Install: install.md
       - Your First Pipeline: getting-started/first-pipeline.md
       - Pure Python Quickstart: getting-started/pure-python.md
-      - Core Concepts: getting-started/concepts.md
-  - Configuration:
-      - Config Package: configuration/config-package.md
-      - YAML Schema: configuration/yaml-schema.md
-      - Hydra Overrides: configuration/overrides.md
-  - Tutorials:
-      - Overview: examples/index.md
       - Sentinel-2 (nir, red): examples/01-sentinel2.ipynb
       - Sentinel-2 NDVI: examples/01b-sentinel2-ndvi.ipynb
       - Sentinel-2 NDWI: examples/01c-sentinel2-ndwi.ipynb
@@ -180,6 +175,10 @@ nav:
       - GeoTessera: examples/04-tessera.ipynb
       - GOES-19 ABI: examples/05-goes19.ipynb
       - Multiple constellations: examples/06-multiple-constellation.ipynb
+  - Configuration:
+      - Config Package: configuration/config-package.md
+      - YAML Schema: configuration/yaml-schema.md
+      - Hydra Overrides: configuration/overrides.md
   - User Guide:
       - Choosing a Sensor: user-guide/choosing-a-sensor.md
       - Search: user-guide/search.md

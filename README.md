@@ -59,19 +59,39 @@ what you need.
 
 ```python
 from datetime import datetime, timezone
-from aereo.builtins import search_stac, build_grouped_tasks
+from shapely.geometry import Polygon
+
+from aereo.builtins import (
+    build_grouped_tasks,
+    read_odc_stac,
+    search_stac,
+    write_geotiff,
+)
 from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
 
-# 1. Load the job (grid + read/write stages)
-job = ExtractionJob.load_from_config("examples/config", config_name="job_sentinel2")
+aoi = Polygon([
+    (-68.90986824592407, -39.23705421799603),
+    (-68.65925870907353, -39.23705421799603),
+    (-68.65925870907353, -39.41589522092947),
+    (-68.90986824592407, -39.41589522092947),
+    (-68.90986824592407, -39.23705421799603),
+])
 
-# 2. Search   3. Prepare tasks   4. Execute
+job = ExtractionJob(
+    name="demo",
+    grid_dist=10_000,
+    output_uri="/tmp/aereo_demo",
+    read=read_odc_stac,
+    write=write_geotiff,
+    target_aoi=aoi,
+)
+
 assets = job.search(
     search_stac,
     stac_api_url="https://earth-search.aws.element84.com/v1",
     collections={"sentinel-2-l2a": ["red", "nir"]},
-    intersects="examples/config/aoi/chocon.geojson",
+    intersects=aoi,
     start_datetime=datetime(2024, 1, 1, tzinfo=timezone.utc),
     end_datetime=datetime(2024, 1, 10, tzinfo=timezone.utc),
 )
