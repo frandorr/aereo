@@ -142,34 +142,12 @@ preprocess:
 ```
 
 You can also split common choices into config groups (`search/`, `read/`,
-`write/`, `grid_dist/`) and let the CLI swap them. But this is optional: a
-single root YAML file with every step defined is enough for most jobs.
-
-## CLI usage
-
-The same config package runs from the terminal:
-
-```bash
-cd examples/config
-aereo action=run \
-  search=sentinel2_pc \
-  grid_dist=grid_10km \
-  read=sentinel2 \
-  write=sentinel2
-```
-
-Here `search`, `grid_dist`, `read`, and `write` are Hydra overrides that select
-files from the matching config groups. If the root YAML already defines those
-steps, you can run it directly:
-
-```bash
-aereo action=run config_name=job_sentinel2
-```
-
-See [Hydra Overrides](overrides.md) for more override examples.
+`write/`, `grid_dist/`) and select them with Hydra overrides. But this is
+optional: a single root YAML file with every step defined is enough for most
+jobs.
 
 ## Next steps
 
 - [YAML Schema](yaml-schema.md) — every `ExtractionJob` field explained.
-- [Hydra Overrides](overrides.md) — override values from Python and the CLI.
+- [Hydra Overrides](overrides.md) — override values from Python.
 - [Your First Pipeline](../getting-started/first-pipeline.md) — hands-on walkthrough.

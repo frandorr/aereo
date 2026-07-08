@@ -61,9 +61,12 @@ artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 
 ## Listing installed plugins
 
-```bash
-aereo action=plugins
-aereo action=plugin_params plugin=search_stac
+```python
+from aereo.registry import AereoRegistry
+
+registry = AereoRegistry()
+print(registry.list_supported_collections())
+print(list(registry.list_all_params()))
 ```
 
 ## Next steps

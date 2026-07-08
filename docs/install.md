@@ -66,10 +66,14 @@ from aereo.executors import LocalExecutor
 print("AerEO imported successfully")
 ```
 
-You can also list installed plugins:
+You can also list installed plugins from Python:
 
-```bash
-aereo action=plugins
+```python
+from aereo.registry import AereoRegistry
+
+registry = AereoRegistry()
+print(registry.list_supported_collections())
+print(list(registry.list_all_params()))
 ```
 
 ## Development install

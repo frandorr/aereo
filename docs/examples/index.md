@@ -41,44 +41,6 @@ have:
 | [04 — Tessera](04-tessera.ipynb) | GeoTessera | `aereo` + `aereo-search-tessera` + `aereo-read-tessera` | None | Tessera tile search and extraction. | ![Tessera](../assets/images/04-tessera-2d4730ca.png) |
 | [06 — Multiple constellations](06-multiple-constellation.ipynb) | Sentinel-2 + VIIRS | `aereo` + `aereo-read-satpy` | NASA Earthdata | Search and extract multiple sensors with a shared cache. | ![Multi-constellation](../assets/images/06-multiple-constellation-f6d7b8aa.png) |
 
-## Run a notebook locally
-
-```bash
-cd examples
-jupyter lab 01-sentinel2.ipynb
-```
-
-Or convert it to a script:
-
-```bash
-jupyter nbconvert --to script 01-sentinel2.ipynb
-python 01-sentinel2.py
-```
-
-## Run the same pipeline from the CLI
-
-The `aereo` CLI can run the same search/read/write pipeline with Hydra
-overrides. Because `search`, `read`, and `write` default to `null` in the CLI
-config, add them with `+`:
-
-```bash
-cd examples
-
-uv run aereo action=run \
-  +search._target_=aereo.builtins.search.search_stac \
-  +search.stac_api_url="https://earth-search.aws.element84.com/v1" \
-  +search.collections.sentinel-2-l2a="[red, nir]" \
-  geojson=config/aoi/chocon.geojson \
-  start="2024-01-01T00:00:00Z" \
-  end="2024-01-10T23:59:59Z" \
-  +read._target_=aereo.builtins.read.read_odc_stac \
-  +write._target_=aereo.builtins.write.write_geotiff
-```
-
-See [CLI](../user-guide/cli.md) for the full command reference, and the
-[Configuration](../configuration/config-package.md) section for how the YAML
-files are composed.
-
 ## Download notebooks
 
 You can also download the raw notebooks directly from GitHub:

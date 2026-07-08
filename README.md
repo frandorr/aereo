@@ -18,7 +18,7 @@ grid](https://github.com/majortom-eg), ready for ML or downstream analysis.
 
 - **Plugin-based** — every stage (search, read, reproject, process, write) is a plain Python function you can swap.
 - **Grid-aligned** — outputs are indexed on the [Major TOM grid](https://github.com/majortom-eg), so Sentinel-2, VIIRS, Sentinel-3, GOES, and custom sources stack together.
-- **One config, three runtimes** — the same Hydra config runs in a notebook, from the CLI, and serverless with `LambdaExecutor`.
+- **One config, two runtimes** — the same Hydra config runs in a notebook and serverless with `LambdaExecutor`.
 
 ## Install
 
@@ -150,7 +150,7 @@ Open `/tmp/aereo_quickstart` — you have GeoTIFFs on the Major TOM grid. The sc
 | Tiles do not line up across sensors | Built-in Major TOM grid + local UTM patch geoboxes. |
 | Reprojection boilerplate | Readers/writers can call `reproject_odc` (or any reprojector) as needed. |
 | Mixed-CRS scenes fail | `build_grouped_tasks` groups assets by native CRS. |
-| Notebook → production is hard | Same config package runs in Python, CLI, and AWS Lambda. |
+| Notebook → production is hard | Same config package runs in Python and AWS Lambda. |
 | Plugin frameworks force inheritance | AerEO plugins are `@validate_call` functions + standard entry points. |
 
 ## Core concepts

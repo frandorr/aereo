@@ -224,44 +224,13 @@ Any stage can be replaced by a function you write. Learn how in
     Sentinel-2, VIIRS, Sentinel-3, and GOES scenes stack together out of the
     box.
 
--   ### One config, three runtimes
+-   ### One config, multiple runtimes
 
-    The same Hydra config package runs in a notebook, from the CLI, and on
-    AWS Lambda.
+    The same Hydra config package runs in a notebook and on AWS Lambda.
 
 -   ### Plain Python plugins
 
     No inheritance, no framework boilerplate. AerEO plugins are
     `@validate_call` functions registered via standard Python entry points.
-
-</div>
-
----
-
-<div class="hero-grid" markdown>
-
--   ### [Install](install.md)
-
-    Set up AerEO and credentials for your first sensor.
-
--   ### [Your First Pipeline](getting-started/first-pipeline.md)
-
-    Run a Sentinel-2 extraction from a Hydra config package.
-
--   ### [Configuration](configuration/config-package.md)
-
-    Understand the YAML files, config groups, and Hydra overrides.
-
--   ### [Tutorials](examples/index.md)
-
-    Sentinel-2, VIIRS, Sentinel-3, Tessera, GOES-19, and NDVI/NDWI examples.
-
--   ### [Build a Plugin](plugins/build-a-plugin.md)
-
-    Add a search provider, reader, or processing step with schemas and protocols.
-
--   ### [Run on AWS Lambda](serverless/lambda.md)
-
-    Go serverless by swapping one line of code.
 
 </div>

@@ -342,16 +342,17 @@ Once your plugin is registered, install it in the same environment as AerEO:
 
 ```bash
 pip install -e .
-aereo action=plugins
 ```
 
-Your plugin will appear in the list and can be used in config packages, the
-CLI, and Python code.
+Your plugin will appear in the registry and can be used in config packages and
+Python code:
 
-For a quick lookup of a plugin's parameters:
+```python
+from aereo.registry import AereoRegistry
 
-```bash
-aereo action=plugin_params plugin=search_stac
+registry = AereoRegistry()
+print("search_my_catalog" in registry.list_all_params())
+print(registry.get_plugin_params("search_my_catalog"))
 ```
 
 ---

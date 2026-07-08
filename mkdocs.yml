@@ -186,7 +186,6 @@ nav:
       - Reprojection: user-guide/reprojection.md
       - Processing: user-guide/processing.md
       - Outputs & Catalog: user-guide/outputs.md
-      - CLI: user-guide/cli.md
   - Serverless:
       - Run on AWS Lambda: serverless/lambda.md
   - Plugins:

@@ -124,6 +124,6 @@ so absolute paths are recommended in composed configs.
 
 ## Next steps
 
-- [Hydra Overrides](overrides.md) — change any value from Python or the CLI.
+- [Hydra Overrides](overrides.md) — change any value from Python.
 - [Build a Plugin](../plugins/build-a-plugin.md) — write your own stage functions.
 - [API: Pipeline](../api/pipeline.md) — `ExtractionJob` reference.
