@@ -1,6 +1,6 @@
-# AEREO Examples
+# AerEO Examples
 
-This directory contains runnable examples for the AEREO satellite data
+This directory contains runnable examples for the AerEO satellite data
 extraction framework.
 
 ## Structure

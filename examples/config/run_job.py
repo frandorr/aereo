@@ -1,4 +1,4 @@
-"""Example: load an AEREO extraction job from a Hydra config package.
+"""Example: load an AerEO extraction job from a Hydra config package.
 
 This script shows how to compose an ``ExtractionJob`` from the Hydra config
 package in this directory and run the full search → build-tasks → extract
@@ -100,7 +100,7 @@ def run_pipeline(
 def main() -> None:
     """Entry point for the example script."""
     parser = argparse.ArgumentParser(
-        description="Run an AEREO extraction from a Hydra config package."
+        description="Run an AerEO extraction from a Hydra config package."
     )
     parser.add_argument(
         "--config-name",

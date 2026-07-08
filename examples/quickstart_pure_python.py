@@ -1,8 +1,8 @@
-"""Pure-Python quickstart for AEREO.
+"""Pure-Python quickstart for AerEO.
 
 This example builds an ``ExtractionJob`` and runs the search → build-tasks →
 extract pipeline without any YAML config files or Hydra. It is the fastest way
-to see the function-based AEREO API in action.
+to see the function-based AerEO API in action.
 
 The example uses a tiny AOI so it can run quickly. Set ``DRY_RUN=true`` to
 validate the job without making network calls:

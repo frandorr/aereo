@@ -1,12 +1,12 @@
 # Grids
 
-AEREO uses the [Major TOM grid](https://github.com/majortom-eg) to turn any AOI
+AerEO uses the [Major TOM grid](https://github.com/majortom-eg) to turn any AOI
 into a set of equal-area, globally consistent cells. Outputs are indexed by
 cell ID, so scenes from different sensors line up without manual reprojection.
 
 ## Major TOM grid basics
 
-The grid divides the world into fixed cells. When you set `grid_dist`, AEREO
+The grid divides the world into fixed cells. When you set `grid_dist`, AerEO
 selects the cells that intersect your AOI and uses them as the extraction
 framework.
 
@@ -50,7 +50,7 @@ more `ExtractionTask` objects, depending on `cells_per_task`.
 
 ## Reprojecting to a cell's local UTM geobox
 
-When `reproject_mode` is `"grid"`, AEREO reprojects each cell to its local UTM
+When `reproject_mode` is `"grid"`, AerEO reprojects each cell to its local UTM
 zone before writing. This keeps pixels square and avoids warping a whole scene
 to a single CRS when it spans multiple UTM zones.
 
@@ -66,4 +66,5 @@ selected = intersect_cells(cells, aoi)
 ```
 
 These helpers are useful when you want to inspect the grid before running an
-extraction.
+extraction. The [Configuration](../configuration/config-package.md) section
+explains how `grid_dist` and `target_aoi` are declared in YAML.

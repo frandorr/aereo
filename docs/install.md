@@ -1,7 +1,9 @@
 # Install
 
-AEREO is a Python 3.12+ framework. The core package is small; sensor-specific
-search and I/O plugins are installed separately.
+AerEO is a Python 3.12+ orchestration framework. The core package includes
+built-in search (STAC, NASA Earthaccess, etc.), read, reproject, and write
+functions. Sensor-specific plugins are installed separately, so you only ship
+what you need.
 
 ## Requirements
 
@@ -11,29 +13,31 @@ search and I/O plugins are installed separately.
 
 ## Quick install
 
-=== "Sentinel-2 (Planetary Computer)"
+=== "STAC (Sentinel-2, Landsat, etc.)"
 
     ```bash
-    pip install aereo aereo-search-planetary-computer
+    uv add aereo
+    # or
+    pip install aereo
     ```
 
-    You will need a [Planetary Computer subscription key](https://planetarycomputer.microsoft.com/docs/concepts/sas/)
-    for signed assets. Set it as an environment variable or in your notebook.
-
-=== "MODIS / VIIRS / Sentinel-3 (NASA Earthdata)"
+=== "NASA Earthaccess (MODIS, VIIRS, Sentinel-3, etc.)"
 
     ```bash
-    pip install aereo aereo-search-earthaccess
+    uv add aereo aereo-read-satpy
+    # or
+    pip install aereo aereo-read-satpy
     ```
 
-    Register for a free [NASA Earthdata Login](https://urs.earthdata.nasa.gov/)
-    and store your credentials with `earthaccess.login()` or environment
-    variables.
+    Configure [earthaccess](https://github.com/nsidc/earthaccess) credentials
+    (`.netrc`, environment variables, or `earthaccess.login()`) before searching.
 
 === "GOES ABI (public S3)"
 
     ```bash
-    pip install aereo aereo-search-aws-goes aereo-read-satpy aereo-reproject-satpy
+    uv add aereo aereo-search-aws-goes aereo-read-satpy
+    # or
+    pip install aereo aereo-search-aws-goes aereo-read-satpy
     ```
 
     GOES data on AWS is public, so no authentication is required.
@@ -41,10 +45,16 @@ search and I/O plugins are installed separately.
 === "GeoTessera"
 
     ```bash
+    uv add aereo aereo-search-tessera aereo-read-tessera
+    # or
     pip install aereo aereo-search-tessera aereo-read-tessera
     ```
 
-    Check your Tessera catalog documentation for authentication.
+    GeoTessera data is public, so no authentication is required.
+
+Install the core framework with `uv add aereo` (or `pip install aereo`), then
+add plugins for search, read, reproject, or write stages. By combining plugins
+you can access hundreds of constellations without changing your pipeline.
 
 ## Verify the installation
 
@@ -53,7 +63,7 @@ from aereo.pipeline import ExtractionJob
 from aereo.builtins import search_stac, build_grouped_tasks
 from aereo.executors import LocalExecutor
 
-print("AEREO imported successfully")
+print("AerEO imported successfully")
 ```
 
 You can also list installed plugins:
@@ -64,7 +74,7 @@ aereo action=plugins
 
 ## Development install
 
-If you are contributing to AEREO or running the example notebooks from the
+If you are contributing to AerEO or running the example notebooks from the
 repo:
 
 ```bash
@@ -82,4 +92,6 @@ uv run mkdocs serve
 ## Next step
 
 Head to [Your First Pipeline](getting-started/first-pipeline.md) to extract
-your first Sentinel-2 GeoTIFF.
+your first Sentinel-2 GeoTIFF, or read the
+[Configuration](configuration/config-package.md) section to understand the YAML
+files before you run anything.

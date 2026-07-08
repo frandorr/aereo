@@ -1,6 +1,6 @@
 # Reprojection
 
-AEREO can write data in its native projection or reproject it to a target CRS
+AerEO can write data in its native projection or reproject it to a target CRS
 and resolution. The choice is controlled by the `reproject` and
 `reproject_mode` fields of `ExtractionJob`.
 
@@ -61,7 +61,8 @@ job = ExtractionJob(
 ## Swath data
 
 Sensors like VIIRS and Sentinel-3 are often stored as swaths (2-D lat/lon
-arrays). For these data you usually need a Satpy-based reprojector
-(`reproject_satpy`) or the `reproject_swath` helper. See the
-[VIIRS](../examples/02-viirs.ipynb) and
-[Sentinel-3](../examples/03-sentinel3.ipynb) tutorials.
+arrays). For these data you usually need the built-in `reproject_swath` helper.
+See the [VIIRS](../examples/02-viirs.ipynb) and
+[Sentinel-3](../examples/03-sentinel3.ipynb) tutorials, and the
+[Configuration](../configuration/yaml-schema.md) reference for all
+`reproject` and `reproject_mode` fields.

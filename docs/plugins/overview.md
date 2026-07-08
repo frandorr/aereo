@@ -1,21 +1,25 @@
 # Plugin System Overview
 
-AEREO is built around plain Python functions. Search providers, readers,
+AerEO is built around plain Python functions. Search providers, readers,
 processors, reprojectors, writers, and task builders are all plugins.
 
 ## How plugins are discovered
 
-AEREO scans the `aereo.plugins` Python entry-point group at runtime. The
-prefix of the entry-point name tells AEREO which stage the plugin belongs to:
+AerEO scans the `aereo.plugins` Python entry-point group at runtime. The
+prefix of the entry-point name tells AerEO which stage the plugin belongs to,
+and each stage has a typed Protocol that defines the input/output contract:
 
-| Prefix | Stage | Example |
-|---|---|---|
-| `search_` | Search provider | `search_stac` |
-| `task_builder_` | Task builder | `build_grouped_tasks` |
-| `read_` | Reader | `read_odc_stac` |
-| `reproject_` | Reprojector | `reproject_odc` |
-| `process_` | Processor | `ndvi`, `qa_mask` |
-| `write_` | Writer | `write_geotiff` |
+| Prefix | Stage | Example | Input → Output |
+|---|---|---|---|
+| `search_` | Search provider | `search_stac` | catalog query → `GeoDataFrame[AssetSchema]` |
+| `task_builder_` | Task builder | `build_grouped_tasks` | assets + job → `Sequence[ExtractionTask]` |
+| `read_` | Reader | `read_odc_stac` | `ExtractionTask` → `xr.Dataset` |
+| `reproject_` | Reprojector | `reproject_odc` | `xr.Dataset` → `xr.Dataset` |
+| `process_` | Processor | `ndvi`, `qa_mask` | `xr.Dataset` → `xr.Dataset` |
+| `write_` | Writer | `write_geotiff` | `xr.Dataset` → artifact path/URI |
+
+A plugin is a plain Python function. You do not need to subclass anything, but
+you must satisfy the Protocol and schema of the stage you are implementing.
 
 ## Built-in plugins
 
@@ -28,12 +32,13 @@ The `aereo.builtins` package ships with common plugins:
 - **Processors:** `select_bands`, `qa_mask`, `ndvi`, `ndwi`, `normalize`, `composite`
 - **Writer:** `write_geotiff`
 
-External plugins include `search_aws_goes`, `read_satpy`, `reproject_satpy`,
-`search_tessera`, and `read_tessera`.
+External plugins include `search_aws_goes`, `read_satpy`, `search_tessera`, and
+`read_tessera`.
 
 ## Using plugins
 
-Plugins are passed directly to `ExtractionJob` or `job.search()` / `job.build_tasks()`:
+Plugins are passed directly to `ExtractionJob` or `job.search()` /
+`job.build_tasks()`:
 
 ```python
 from aereo.builtins import search_stac, build_grouped_tasks, read_odc_stac, write_geotiff

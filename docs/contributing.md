@@ -1,6 +1,6 @@
 # Contributing
 
-AEREO is a Polylith monorepo managed with `uv` and `uv poly`.
+AerEO is a Polylith monorepo managed with `uv` and `uv poly`.
 
 ## Development setup
 

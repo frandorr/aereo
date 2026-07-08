@@ -1,6 +1,6 @@
 # Pure Python Quickstart
 
-You do not need YAML or Hydra to use AEREO. Every pipeline stage is a plain
+You do not need YAML or Hydra to use AerEO. Every pipeline stage is a plain
 Python function, so you can build an `ExtractionJob` directly and pass the
 functions you need.
 
@@ -97,4 +97,6 @@ uv run python examples/quickstart_pure_python.py
 - Writing unit tests for plugins.
 
 For production and reusable configs, the Hydra package shown in
-[Your First Pipeline](first-pipeline.md) is usually more convenient.
+[Your First Pipeline](first-pipeline.md) is usually more convenient. See the
+[Configuration](../configuration/config-package.md) section for details on the
+YAML schema and overrides.

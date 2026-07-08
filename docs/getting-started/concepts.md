@@ -1,6 +1,6 @@
 # Core Concepts
 
-AEREO is built around a small number of ideas. Understanding them makes every
+AerEO is built around a small number of ideas. Understanding them makes every
 tutorial and API page easier to follow.
 
 ## The big picture
@@ -12,17 +12,38 @@ flowchart LR
     C --> D["Artifacts + catalog"]
 ```
 
-A typical AEREO program has three steps:
+A typical AerEO program has three steps:
 
 1. **Search** — find scenes/assets for a sensor, AOI, and time range.
 2. **Prepare** — turn search results into `ExtractionTask` objects.
 3. **Execute** — run each task and write grid-aligned outputs.
 
+AerEO is an orchestrator. Each box below wraps a robust existing tool, and every
+box can be replaced by a function you write:
+
+```mermaid
+flowchart LR
+    subgraph Catalogs["Catalogs"]
+        STAC[STAC / Planetary Computer]
+        EARTH[Earthaccess]
+        S3[Public S3]
+    end
+
+    STAC --> Search
+    EARTH --> Search
+    S3 --> Search
+
+    Search --"GeoDataFrame[AssetSchema]"--> Builder["Task builder"]
+    Builder --"ExtractionTask"--> Executor["Executor"]
+    Executor --"xr.Dataset"--> Pipeline["read → preprocess\n→ reproject → postprocess\n→ write"]
+    Pipeline --"GeoDataFrame[ArtifactSchema]"--> CatalogOut["artifacts.parquet\n+ GeoTIFFs"]
+```
+
 ## ExtractionJob
 
-An `ExtractionJob` is a validated bundle that describes *what* to extract and
-*how* to write it. It is created from a Hydra config package or directly in
-Python.
+An `ExtractionJob` is created from a [Hydra config package](../configuration/config-package.md)
+or directly in Python. It is a validated bundle that describes *what* to extract
+and *how* to write it.
 
 Key fields:
 
@@ -71,24 +92,26 @@ Any stage can be omitted by not passing a function for it.
 
 ## Plugins are plain functions
 
-AEREO discovers plugins through the `aereo.plugins` entry-point group. The
+AerEO discovers plugins through the `aereo.plugins` entry-point group. The
 prefix of the entry-point name determines the stage:
 
-| Prefix | Stage | Example |
-|---|---|---|
-| `search_` | Search provider | `search_stac` |
-| `task_builder_` | Task builder | `build_grouped_tasks` |
-| `read_` | Reader | `read_odc_stac` |
-| `reproject_` | Reprojector | `reproject_odc` |
-| `process_` | Processor | `ndvi`, `qa_mask` |
-| `write_` | Writer | `write_geotiff` |
+| Prefix | Stage | Example | Input → Output |
+|---|---|---|---|
+| `search_` | Search provider | `search_stac` | catalog query → `GeoDataFrame[AssetSchema]` |
+| `task_builder_` | Task builder | `build_grouped_tasks` | assets + job → `Sequence[ExtractionTask]` |
+| `read_` | Reader | `read_odc_stac` | `ExtractionTask` → `xr.Dataset` |
+| `reproject_` | Reprojector | `reproject_odc` | `xr.Dataset` → `xr.Dataset` |
+| `process_` | Processor | `ndvi`, `qa_mask` | `xr.Dataset` → `xr.Dataset` |
+| `write_` | Writer | `write_geotiff` | `xr.Dataset` → artifact path/URI |
 
 A plugin is just a Python function with a typed signature, usually decorated
-with Pydantic's `@validate_call`. You do not need to subclass anything.
+with Pydantic's `@validate_call`. You do not need to subclass anything, but you
+must satisfy the input/output contract of the stage. See
+[Build a Plugin](../plugins/build-a-plugin.md) for examples of every stage.
 
 ## Grid alignment
 
-AEREO uses the [Major TOM grid](https://github.com/majortom-eg) to tile the
+AerEO uses the [Major TOM grid](https://github.com/majortom-eg) to tile the
 AOI. Every output artifact is indexed against this grid, which means outputs
 from different sensors can be stacked by grid cell ID.
 

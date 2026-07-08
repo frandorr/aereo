@@ -1,21 +1,26 @@
 # Your First Pipeline
 
 Get from zero to your first extracted satellite image in under 5 minutes. This
-tutorial uses the Sentinel-2 Hydra config package that ships with AEREO.
+tutorial uses the Sentinel-2 Hydra config package that ships with AerEO.
 
 ## 1. Install
 
 ```bash
-pip install aereo aereo-search-planetary-computer
+uv add aereo
+# or
+pip install aereo
 ```
 
-You will need a [Planetary Computer subscription key](https://planetarycomputer.microsoft.com/docs/concepts/sas/)
-for signed assets.
+AerEO's core includes built-in STAC and NASA Earthaccess search, plus reading
+and writing. Plugins for other sensors and formats are installed separately;
+see [Install](../install.md) for common combinations.
 
 ## 2. Load the job
 
-AEREO pipelines are easiest to run when they are declared as a Hydra config
-package. The repo ships an example package under `examples/config`.
+AerEO pipelines are easiest to run when they are declared as a Hydra config
+package. The repo ships an example package under `examples/config`. See the
+[Configuration](../configuration/config-package.md) section for a deep dive into
+the YAML files and Hydra composition.
 
 ```python
 from aereo.pipeline import ExtractionJob
@@ -97,6 +102,7 @@ Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid and an
 
 ## Next steps
 
+- [Configuration](../configuration/config-package.md) — understand the config package and YAML schema.
 - [Pure Python Quickstart](pure-python.md) — build the same pipeline without
   Hydra.
 - [Core Concepts](concepts.md) — learn how jobs, tasks, and plugins fit

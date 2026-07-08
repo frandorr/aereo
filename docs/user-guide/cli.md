@@ -1,8 +1,9 @@
 # CLI
 
-AEREO ships with a Hydra-driven CLI. If you have already built a config
+AerEO ships with a Hydra-driven CLI. If you have already built a config
 package, you can run the same pipeline from the terminal without writing extra
-Python.
+Python. See the [Configuration](../configuration/config-package.md) section for
+how the config package is laid out.
 
 ## Run the full pipeline
 

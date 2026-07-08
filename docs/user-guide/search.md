@@ -1,7 +1,7 @@
 # Search
 
 Search providers turn a sensor catalog query into a validated
-`GeoDataFrame[AssetSchema]`. AEREO ships with two built-in providers and
+`GeoDataFrame[AssetSchema]`. AerEO ships with two built-in providers and
 supports many more through plugins.
 
 ## Built-in providers
@@ -63,4 +63,6 @@ assets.plot()
 - **NASA Earthdata** — use `earthaccess.login()` or set `EARTHDATA_USERNAME`
   and `EARTHDATA_PASSWORD`.
 
-See [Install](../install.md) for links and setup details.
+See [Install](../install.md) for links and setup details, and the
+[Configuration](../configuration/config-package.md) section for how search
+providers fit into a Hydra job config.

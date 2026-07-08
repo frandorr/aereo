@@ -1,4 +1,4 @@
-/* AEREO docs — minimal custom styles */
+/* AerEO docs — minimal custom styles */
 
 .hero-grid {
   display: grid;
@@ -35,4 +35,33 @@
 .hero-banner img {
   max-width: 280px;
   width: 100%;
+}
+
+.hero-grid img {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+}
+
+/* Gallery images used in examples/index.md and the landing page */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.gallery-grid img {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+}
+
+/* Thumbnails inside tutorial tables */
+.md-typeset table img {
+  max-width: 220px;
+  max-height: 160px;
+  width: auto;
+  height: auto;
+  border-radius: 0.25rem;
 }

@@ -1,42 +1,67 @@
 <div class="hero-banner" markdown>
-![AEREO logo](banner.svg)
+![AerEO logo](banner.svg)
+
+**Access, extract, reproject for Earth Observation — locally or on AWS Lambda, without reinventing the wheel.**
 </div>
 
-# AEREO
+# AerEO
 
-**Plugin-based satellite data extraction — from search to analysis-ready Major TOM grid in minutes.**
-
-AEREO unifies dozens of Earth-observation catalogs into one pipeline:
-**search** across catalogs, **prepare** extraction tasks on a shared grid, and
-**execute** them locally, from the CLI, or on AWS Lambda — all from plain
-Python functions.
+AerEO is a plugin-based satellite data extraction framework. It wires together
+the catalog, reading, reprojection, and writing tools you already trust (STAC,
+Earthaccess, Satpy, `odc-geo`) behind a single pipeline where every step can be
+replaced. The result: analysis-ready GeoTIFFs aligned to the [Major TOM
+grid](user-guide/grids.md).
 
 ---
 
 ## Install
 
-Pick your sensor and copy-paste:
+AerEO's core framework includes built-in search (STAC, NASA Earthaccess, etc.),
+read, reproject, and write functions. You can extend it with plugins for other
+sensors and formats — by combining search, read, reproject, and write plugins
+you can access hundreds of constellations without changing your pipeline.
 
-=== "Sentinel-2 (Planetary Computer)"
-
-    ```bash
-    pip install aereo aereo-search-planetary-computer
-    ```
-
-=== "MODIS / VIIRS / Sentinel-3 (NASA Earthdata)"
+=== "STAC (Sentinel-2, Landsat, etc.)"
 
     ```bash
-    pip install aereo aereo-search-earthaccess
+    uv add aereo
+    # or
+    pip install aereo
     ```
+
+=== "NASA Earthaccess (MODIS, VIIRS, Sentinel-3, etc.)"
+
+    ```bash
+    uv add aereo aereo-read-satpy
+    # or
+    pip install aereo aereo-read-satpy
+    ```
+
+    Configure [earthaccess](https://github.com/nsidc/earthaccess) credentials
+    (`.netrc`, environment variables, or `earthaccess.login()`) before searching.
 
 === "GOES ABI (public S3)"
 
     ```bash
-    pip install aereo aereo-search-aws-goes aereo-read-satpy aereo-reproject-satpy
+    uv add aereo aereo-search-aws-goes aereo-read-satpy
+    # or
+    pip install aereo aereo-search-aws-goes aereo-read-satpy
     ```
 
-> Install the core framework with `pip install aereo`. Search and I/O plugins
-> are separate packages so you only ship what you need.
+    GOES data on AWS is public, so no authentication is required.
+
+=== "GeoTessera"
+
+    ```bash
+    uv add aereo aereo-search-tessera aereo-read-tessera
+    # or
+    pip install aereo aereo-search-tessera aereo-read-tessera
+    ```
+
+    GeoTessera data is public, so no authentication is required.
+
+> Install the core framework with `uv add aereo` (or `pip install aereo`).
+> Sensor-specific plugins are separate packages so you only ship what you need.
 
 ---
 
@@ -64,11 +89,61 @@ tasks = job.build_tasks(assets, build_grouped_tasks, cells_per_task=5)
 artifacts = job.execute(tasks, executor=LocalExecutor(workers=2))
 ```
 
-Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid.
+Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid and an
+`artifacts.parquet` catalog.
 
 ---
 
-## Why AEREO?
+## What you get
+
+These outputs come straight from the tutorial notebooks. Every plot shows
+grid-aligned patches on the Major TOM grid, with the target AOI overlaid.
+
+<div class="hero-grid" markdown>
+
+-   ### [Sentinel-2 true-color](examples/01-sentinel2.ipynb)
+
+    ![Sentinel-2 extracted patches](assets/images/01-sentinel2-plot-patches.png)
+
+-   ### [Sentinel-2 NDVI](examples/01b-sentinel2-ndvi.ipynb)
+
+    ![Sentinel-2 NDVI patches](assets/images/01b-sentinel2-ndvi-plot-patches.png)
+
+-   ### [VIIRS](examples/02-viirs.ipynb)
+
+    ![VIIRS extracted patches](assets/images/02-viirs-plot-patches.png)
+
+-   ### [GOES-19 ABI](examples/05-goes19.ipynb)
+
+    ![GOES-19 ABI preview](assets/images/05-goes19-bed3cf89.png)
+
+</div>
+
+See the full gallery in the [Tutorials](examples/index.md) section.
+
+---
+
+## How it works
+
+```mermaid
+flowchart LR
+    Search["Search provider"] --> Prepare["Prepare tasks\n(grid + grouping)"]
+    Prepare --> Execute["Execute\n(local / Lambda)"]
+    Execute --> Catalog["Output catalog\n+ GeoTIFFs"]
+```
+
+1. **Search** — query a catalog and get a validated `GeoDataFrame[AssetSchema]`.
+2. **Prepare** — group assets by time and native CRS into `ExtractionTask`
+   objects.
+3. **Execute** — run each task through `read → preprocess → reproject →
+   postprocess → write`, producing grid-aligned artifacts and a catalog.
+
+Any stage can be replaced by a function you write. Learn how in
+[Build a Plugin](plugins/build-a-plugin.md).
+
+---
+
+## Why AerEO?
 
 <div class="hero-grid" markdown>
 
@@ -90,27 +165,10 @@ Open `job.output_uri` — you have GeoTIFFs on the Major TOM grid.
 
 -   ### Plain Python plugins
 
-    No inheritance, no framework boilerplate. AEREO plugins are
+    No inheritance, no framework boilerplate. AerEO plugins are
     `@validate_call` functions registered via standard Python entry points.
 
 </div>
-
----
-
-## How it works
-
-```mermaid
-flowchart LR
-    Search["Search provider"] --> Prepare["Prepare tasks\n(grid + grouping)"]
-    Prepare --> Execute["Execute\n(local / Lambda)"]
-    Execute --> Catalog["EOIDS catalog\n+ GeoTIFFs"]
-```
-
-1. **Search** — query a catalog and get a validated `GeoDataFrame[AssetSchema]`.
-2. **Prepare** — group assets by time and native CRS into `ExtractionTask`
-   objects.
-3. **Execute** — run each task through `read → preprocess → reproject →
-   postprocess → write`, producing grid-aligned artifacts and a catalog.
 
 ---
 
@@ -120,18 +178,26 @@ flowchart LR
 
 -   ### [Install](install.md)
 
-    Set up AEREO and credentials for your first sensor.
+    Set up AerEO and credentials for your first sensor.
 
 -   ### [Your First Pipeline](getting-started/first-pipeline.md)
 
     Run a Sentinel-2 extraction from a Hydra config package.
 
+-   ### [Configuration](configuration/config-package.md)
+
+    Understand the YAML files, config groups, and Hydra overrides.
+
 -   ### [Tutorials](examples/index.md)
 
     Sentinel-2, VIIRS, Sentinel-3, Tessera, GOES-19, and NDVI/NDWI examples.
 
--   ### [Choosing a Sensor](user-guide/choosing-a-sensor.md)
+-   ### [Build a Plugin](plugins/build-a-plugin.md)
 
-    Pick the right search, read, and reproject plugins for your dataset.
+    Add a search provider, reader, or processing step with schemas and protocols.
+
+-   ### [Run on AWS Lambda](serverless/lambda.md)
+
+    Go serverless by swapping one line of code.
 
 </div>

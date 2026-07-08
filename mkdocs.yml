@@ -1,5 +1,5 @@
-site_name: AEREO
-site_description: AEREO — Plugin-based satellite data extraction framework. From search to analysis-ready GeoTIFF in minutes.
+site_name: AerEO
+site_description: AerEO — Plugin-based satellite data extraction framework. From search to analysis-ready GeoTIFF in minutes.
 site_author: Francisco Dorr
 copyright: Copyright &copy; 2026 Francisco Dorr
 site_url: https://frandorr.github.io/aereo
@@ -77,6 +77,7 @@ plugins:
         - "includes/*"
         - "examples/config/*"
         - "examples/config/**/*"
+        - "examples/06b-viirs-swath-odc-vs-faiss.ipynb"
   - minify:
       minify_html: true
   - mkdocstrings:
@@ -122,6 +123,8 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:mermaid2.fence_mermaid_custom
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.tilde
   - pymdownx.blocks.admonition:
       types:
@@ -161,6 +164,10 @@ nav:
       - Your First Pipeline: getting-started/first-pipeline.md
       - Pure Python Quickstart: getting-started/pure-python.md
       - Core Concepts: getting-started/concepts.md
+  - Configuration:
+      - Config Package: configuration/config-package.md
+      - YAML Schema: configuration/yaml-schema.md
+      - Hydra Overrides: configuration/overrides.md
   - Tutorials:
       - Overview: examples/index.md
       - Sentinel-2 true-color: examples/01-sentinel2.ipynb
@@ -174,6 +181,8 @@ nav:
       - GeoTessera: examples/04-tessera.ipynb
       - GOES-19 ABI: examples/05-goes19.ipynb
       - Multiple constellations: examples/06-multiple-constellation.ipynb
+      - Swath reprojection comparison: examples/06-swath-to-geobox-odc-vs-faiss.ipynb
+      - Major TOM grid: examples/major.ipynb
   - User Guide:
       - Choosing a Sensor: user-guide/choosing-a-sensor.md
       - Search: user-guide/search.md
@@ -182,7 +191,8 @@ nav:
       - Processing: user-guide/processing.md
       - Outputs & Catalog: user-guide/outputs.md
       - CLI: user-guide/cli.md
-      - AWS Lambda: user-guide/lambda.md
+  - Serverless:
+      - Run on AWS Lambda: serverless/lambda.md
   - Plugins:
       - Overview: plugins/overview.md
       - Build a Plugin: plugins/build-a-plugin.md

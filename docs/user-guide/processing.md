@@ -64,4 +64,5 @@ def scale(ds: xr.Dataset, factor: float = 1.0) -> xr.Dataset:
 
 For production use, decorate it with `@validate_call` and register it under the
 `aereo.plugins` entry-point group with a `process_` prefix. See
-[Build a Plugin](../plugins/build-a-plugin.md).
+[Build a Plugin](../plugins/build-a-plugin.md) for the Processor Protocol,
+schema contract, and a complete stage-by-stage reference.
