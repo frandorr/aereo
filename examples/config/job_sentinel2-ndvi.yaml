@@ -1,0 +1,10 @@
+defaults:
+  - job_sentinel2
+  - _self_
+
+name: sentinel2_ndvi
+preprocess:
+  - _target_: aereo.builtins.ndvi
+    _partial_: true
+    ndvi_nir_band: nir
+    ndvi_red_band: red
