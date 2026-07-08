@@ -1,8 +1,12 @@
 # Grids
 
-AerEO uses the [Major TOM grid](https://github.com/majortom-eg) to turn any AOI
-into a set of equal-area, globally consistent cells. Outputs are indexed by
-cell ID, so scenes from different sensors line up without manual reprojection.
+AerEO uses the [Major TOM grid](https://github.com/ESA-PhiLab/Major-TOM)
+([paper](https://arxiv.org/abs/2402.12095/)) to turn any AOI into a set of
+equal-area, globally consistent cells. Outputs are indexed by cell ID, so
+scenes from different sensors line up without manual reprojection.
+
+![Major TOM grid overview](../assets/images/major-tom-grid-overview.jpeg)
+*The Major TOM equal-area grid. Image from the ESA Phi Lab repository.*
 
 ## Major TOM grid basics
 

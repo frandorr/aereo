@@ -14,10 +14,10 @@ AerEO is a plugin-based satellite data extraction framework. It wires together
 the catalog, reading, reprojection, and writing tools you already trust (STAC,
 Earthaccess, Satpy, `odc-geo`) behind a single, replaceable-step pipeline. The
 result: analysis-ready GeoTIFFs aligned to the [Major TOM
-grid](https://github.com/majortom-eg), ready for ML or downstream analysis.
+grid](https://github.com/ESA-PhiLab/Major-TOM), ready for ML or downstream analysis.
 
 - **Plugin-based** — every stage (search, read, reproject, process, write) is a plain Python function you can swap.
-- **Grid-aligned** — outputs are indexed on the [Major TOM grid](https://github.com/majortom-eg), so Sentinel-2, VIIRS, Sentinel-3, GOES, and custom sources stack together.
+- **Grid-aligned** — outputs are indexed on the [Major TOM grid](https://github.com/ESA-PhiLab/Major-TOM), so Sentinel-2, VIIRS, Sentinel-3, GOES, and custom sources stack together.
 - **One config, multiple runtimes** — the same Hydra config runs in a notebook and serverless with `LambdaExecutor`.
 
 ## Install

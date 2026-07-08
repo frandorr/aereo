@@ -111,9 +111,10 @@ must satisfy the input/output contract of the stage. See
 
 ## Grid alignment
 
-AerEO uses the [Major TOM grid](https://github.com/majortom-eg) to tile the
-AOI. Every output artifact is indexed against this grid, which means outputs
-from different sensors can be stacked by grid cell ID.
+AerEO uses the [Major TOM grid](https://github.com/ESA-PhiLab/Major-TOM)
+([paper](https://arxiv.org/abs/2402.12095/)) to tile the AOI. Every output
+artifact is indexed against this grid, which means outputs from different
+sensors can be stacked by grid cell ID.
 
 Learn more in the [Grids](../user-guide/grids.md) guide.
 
