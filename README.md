@@ -143,7 +143,7 @@ def main() -> None:
         return
 
     print("\n--- Build tasks ---")
-    tasks = job.build_tasks(assets, build_grouped_tasks, cells_per_task=5)
+    tasks = job.build_tasks(assets, build_grouped_tasks)
     print(f"Built {len(tasks)} task(s)")
 
     print("\n--- Extract ---")
@@ -158,7 +158,7 @@ if __name__ == "__main__":
     main()
 ```
 
-Open `/tmp/aereo_quickstart` — you have GeoTIFFs on the Major TOM grid and an `artifacts.parquet` catalog.
+Open `/tmp/aereo_quickstart` — you have GeoTIFFs on the Major TOM grid. The script also calls `job.write_catalog(artifacts)`, so an `artifacts.parquet` catalog is written next to the GeoTIFFs.
 
 ## Why AerEO?
 

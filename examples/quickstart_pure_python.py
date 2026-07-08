@@ -80,7 +80,7 @@ def main() -> None:
         return
 
     print("\n--- Build tasks ---")
-    tasks = job.build_tasks(assets, build_grouped_tasks, cells_per_task=5)
+    tasks = job.build_tasks(assets, build_grouped_tasks)
     print(f"Built {len(tasks)} task(s)")
 
     print("\n--- Extract ---")
