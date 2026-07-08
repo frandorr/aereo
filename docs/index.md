@@ -113,9 +113,9 @@ grid-aligned patches on the Major TOM grid, with the target AOI overlaid.
 
     ![VIIRS extracted patches](assets/images/02-viirs-plot-patches.png)
 
--   ### [GOES-19 ABI](examples/05-goes19.ipynb)
+-   ### [Multiple constellations](examples/06-multiple-constellation.ipynb)
 
-    ![GOES-19 ABI preview](assets/images/05-goes19-bed3cf89.png)
+    ![GOES-19 and VIIRS overlaid on the same Major TOM grid](assets/images/06-multiple-constellation-523c4a3f.png)
 
 </div>
 
