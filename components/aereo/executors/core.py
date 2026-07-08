@@ -8,11 +8,11 @@ optional parallelism.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from typing import TYPE_CHECKING, Literal, Protocol, cast
 
 import geopandas as gpd
 import pandas as pd
+from joblib import Parallel, delayed
 from structlog import get_logger
 
 from aereo.execution import run_task
@@ -70,11 +70,47 @@ def _run_single_task(
     return artifacts
 
 
+class _TaskOutcome:
+    """Result or error from running a single task in a worker."""
+
+    def __init__(
+        self,
+        idx: int,
+        artifacts: GeoDataFrame[ArtifactSchema] | None = None,
+        error: BaseException | None = None,
+    ) -> None:
+        self.idx = idx
+        self.artifacts = artifacts
+        self.error = error
+
+
+def _run_single_task_indexed(
+    idx: int,
+    task: ExtractionTask,
+    cache: TaskResultCache | None,
+) -> _TaskOutcome:
+    """Run a task and return a picklable outcome object.
+
+    Returning the exception object instead of raising lets ``joblib.Parallel``
+    finish the rest of the batch in ``best_effort`` mode, while ``strict`` mode
+    can re-raise the original exception in the parent process.
+    """
+    try:
+        return _TaskOutcome(idx=idx, artifacts=_run_single_task(task, cache))
+    except BaseException as exc:  # noqa: BLE001
+        return _TaskOutcome(idx=idx, error=exc)
+
+
 class LocalExecutor:
     """Execute extraction tasks locally.
 
     Wraps :func:`aereo.execution.run_task` with optional caching, failure
-    handling, and local parallelism through process or thread pools.
+    handling, and local parallelism through ``joblib``.
+
+    By default ``joblib``'s ``loky`` backend is used for process-based
+    parallelism. ``loky`` starts clean interpreter processes, which avoids the
+    fork-after-read deadlock that happens when worker processes inherit
+    netCDF/HDF5 state from the parent.
     """
 
     def __init__(
@@ -89,14 +125,13 @@ class LocalExecutor:
         Args:
             workers: Maximum number of parallel workers. ``None`` or ``1`` runs
                 tasks sequentially in the current process. ``>1`` dispatches
-                tasks through a process or thread pool.
-                If -1 is passed, the number of workers will be set to the number of CPUs in the system.
+                tasks through a joblib pool. If -1 is passed, the number of
+                workers is set to the number of CPUs in the system.
             failure_mode: ``"strict"`` aborts on the first failed task;
                 ``"best_effort"`` skips failed tasks and returns successful ones.
             cache: Optional per-task artifact catalog cache.
-            use_threads: When ``True`` and *workers* > 1, use a
-                :class:`ThreadPoolExecutor` instead of a
-                :class:`ProcessPoolExecutor`.
+            use_threads: When ``True`` and *workers* > 1, use joblib's
+                ``threading`` backend instead of ``loky``.
         """
         self.workers = workers
         if self.workers == -1:
@@ -106,6 +141,21 @@ class LocalExecutor:
         self.failure_mode = failure_mode
         self.cache = cache
         self.use_threads = use_threads
+
+    def shutdown(self, _wait: bool = True) -> None:
+        """No-op for API compatibility.
+
+        ``joblib``'s ``loky`` backend already reuses and cleans up its worker
+        pool automatically.
+        """
+        return None
+
+    def __enter__(self) -> LocalExecutor:
+        return self
+
+    def __exit__(self, *_exc: object) -> Literal[False]:
+        self.shutdown()
+        return False
 
     def __call__(self, tasks: Sequence[ExtractionTask]) -> GeoDataFrame[ArtifactSchema]:
         """Execute *tasks* and return a unified artifact GeoDataFrame.
@@ -121,7 +171,7 @@ class LocalExecutor:
                 GeoDataFrame[ArtifactSchema], ArtifactSchema.empty_geodataframe()
             )
 
-        if self.workers is None or self.workers == 1 or len(tasks) == 1:
+        if self.workers is None or self.workers == 1:
             results = self._run_sequential(tasks)
         else:
             results = self._run_parallel(tasks)
@@ -161,28 +211,27 @@ class LocalExecutor:
         self,
         tasks: Sequence[ExtractionTask],
     ) -> list[GeoDataFrame[ArtifactSchema]]:
-        """Run tasks through a process or thread pool, applying failure mode."""
-        executor_cls = ThreadPoolExecutor if self.use_threads else ProcessPoolExecutor
-        results: list[GeoDataFrame[ArtifactSchema] | None] = [None] * len(tasks)
+        """Run tasks through joblib, applying failure mode."""
+        backend = "threading" if self.use_threads else "loky"
+        outcomes = cast(
+            list[_TaskOutcome],
+            Parallel(n_jobs=self.workers, backend=backend)(
+                delayed(_run_single_task_indexed)(idx, task, self.cache)
+                for idx, task in enumerate(tasks)
+            ),
+        )
 
-        with executor_cls(max_workers=self.workers) as executor:
-            futures = {
-                executor.submit(_run_single_task, task, self.cache): i
-                for i, task in enumerate(tasks)
-            }
-            for future in as_completed(futures):
-                idx = futures[future]
-                try:
-                    results[idx] = future.result()
-                except Exception as exc:
-                    if self.failure_mode == _STRICT_MODE:
-                        for pending in futures:
-                            pending.cancel()
-                        raise
-                    logger.warning(
-                        "task_failed_best_effort",
-                        task_index=idx,
-                        error=str(exc),
-                    )
+        results: list[GeoDataFrame[ArtifactSchema] | None] = [None] * len(tasks)
+        for outcome in outcomes:
+            if outcome.error is not None:
+                if self.failure_mode == _STRICT_MODE:
+                    raise outcome.error
+                logger.warning(
+                    "task_failed_best_effort",
+                    task_index=outcome.idx,
+                    error=str(outcome.error),
+                )
+            else:
+                results[outcome.idx] = outcome.artifacts
 
         return [r for r in results if r is not None]
