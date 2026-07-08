@@ -470,12 +470,14 @@ def _make_assets() -> GeoDataFrame[AssetSchema]:
     return cast(GeoDataFrame[AssetSchema], df)
 
 
-def _make_task(job: ExtractionJob, task_id: str = "task-1") -> ExtractionTask:
+def _make_task(
+    job: ExtractionJob, task_id: str = "task-1", collection: str = "C1"
+) -> ExtractionTask:
     """Return a minimal ExtractionTask tied to *job*."""
     valid_df = gpd.GeoDataFrame(
         {
             "id": ["asset-1"],
-            "collection": ["C1"],
+            "collection": [collection],
             "start_time": [pd.Timestamp("2023-01-01")],
             "end_time": [pd.Timestamp("2023-01-02")],
             "href": ["s3://bucket/file.tif"],
@@ -675,7 +677,9 @@ def test_job_execute_with_custom_executor(tmp_path: Path):
         write=_DummyWriter(),
     )
     custom = LocalExecutor(workers=2, use_threads=True)
-    tasks = [_make_task(job, task_id="a"), _make_task(job, task_id="b")]
+    task_a = _make_task(job, task_id="a", collection="C1")
+    task_b = _make_task(job, task_id="b", collection="C2")
+    tasks = [task_a, task_b]
     artifacts = job.execute(tasks, executor=custom)
     assert isinstance(artifacts, gpd.GeoDataFrame)
     assert len(artifacts) >= 2

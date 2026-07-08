@@ -3,15 +3,17 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import Any, Literal, cast
 
 from structlog import get_logger
 
-if TYPE_CHECKING:
-    import geopandas as gpd
-    import numpy as np
-    from matplotlib.axes import Axes
-    from matplotlib.figure import Figure
+import geopandas as gpd
+import numpy as np
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
+from shapely.geometry.base import BaseGeometry
+
+from aereo.spatial import reproject_geom
 
 logger = get_logger()
 
@@ -400,6 +402,45 @@ def _compute_stretch_params(values: np.ndarray) -> tuple[float, float, float, fl
     return float(lo), float(hi), float(np.mean(values)), float(np.std(values))
 
 
+def _reproject_aoi_to_utm(
+    aoi: BaseGeometry | gpd.GeoDataFrame | gpd.GeoSeries,
+    aoi_crs: str | None,
+    target_crs: str,
+) -> BaseGeometry:
+    """Reproject an AOI geometry to the UTM CRS used by the artifacts.
+
+    Args:
+        aoi: AOI as a Shapely geometry, GeoDataFrame, or GeoSeries.
+        aoi_crs: Optional source CRS for *aoi* when it is a Shapely geometry.
+            When *aoi* is a GeoDataFrame/GeoSeries, its own CRS is used by
+            default and *aoi_crs* overrides it.
+        target_crs: Target EPSG code string (e.g. ``"EPSG:32633"``).
+
+    Returns:
+        The AOI reprojected to *target_crs*.
+
+    Raises:
+        ValueError: If *aoi* is a GeoDataFrame/GeoSeries with no CRS and no
+            *aoi_crs* is provided.
+    """
+    if isinstance(aoi, gpd.GeoDataFrame):
+        aoi = aoi.geometry
+
+    if isinstance(aoi, gpd.GeoSeries):
+        src_crs = aoi_crs or (aoi.crs.to_string() if aoi.crs is not None else None)
+        if src_crs is None:
+            raise ValueError(
+                "aoi GeoDataFrame/GeoSeries has no CRS; pass aoi_crs explicitly."
+            )
+        geom = aoi.union_all()
+    else:
+        src_crs = aoi_crs or "EPSG:4326"
+        geom = aoi
+
+    assert isinstance(geom, BaseGeometry)
+    return reproject_geom(geom, src_epsg=src_crs, dst_epsg=target_crs)
+
+
 def plot_artifact_patches(
     artifacts: gpd.GeoDataFrame,
     *,
@@ -420,6 +461,12 @@ def plot_artifact_patches(
     nodata: float | None = None,
     ax: Axes | None = None,
     alpha: float = 1.0,
+    aoi: BaseGeometry | gpd.GeoDataFrame | gpd.GeoSeries | None = None,
+    aoi_crs: str | None = None,
+    aoi_edgecolor: str = "red",
+    aoi_linewidth: float = 2.5,
+    aoi_linestyle: Literal["-", "--", "-.", ":", ""] = "-",
+    aoi_label: str = "Target AOI",
 ) -> tuple[Figure, Axes]:
     """Plot extracted raster patches and their grid-cell footprints on one canvas.
 
@@ -488,19 +535,29 @@ def plot_artifact_patches(
             less than 1.0 when layering on top of another plot. Values below
             1.0 will accumulate in overlapping margin regions, which can create
             brighter seams at cell borders.
+        aoi: Optional AOI geometry to overlay on the patches. Accepts a Shapely
+            geometry, GeoDataFrame, or GeoSeries. Shapely geometries are assumed
+            to be in EPSG:4326 unless ``aoi_crs`` is given. GeoDataFrames/
+            GeoSeries use their own CRS by default.
+        aoi_crs: Optional source CRS for ``aoi`` when it is a Shapely geometry,
+            or an override when ``aoi`` is a GeoDataFrame/GeoSeries.
+        aoi_edgecolor: Colour of the AOI outline.
+        aoi_linewidth: Width of the AOI outline.
+        aoi_linestyle: Matplotlib linestyle for the AOI outline.
+        aoi_label: Legend label for the AOI outline.
 
     Returns:
         A tuple of ``(figure, axes)``.
 
     Raises:
-        ValueError: If ``artifacts`` is empty or missing a required column.
+        ValueError: If ``artifacts`` is empty, missing a required column, or
+            ``aoi`` is provided without ``cell_utm_crs`` in ``artifacts``.
     """
     import geopandas as gpd
     import matplotlib.pyplot as plt
     import matplotlib.patches as mpatches
     import numpy as np
     import rasterio
-    from shapely.geometry.base import BaseGeometry
 
     required_cols = {"uri", "cell_utm_footprint", "grid_cell"}
     missing = required_cols - set(artifacts.columns)
@@ -692,6 +749,22 @@ def plot_artifact_patches(
             linewidth=footprint_linewidth,
         )
 
+    # Overlay the target AOI if requested.
+    if aoi is not None:
+        if "cell_utm_crs" not in artifacts.columns:
+            raise ValueError(
+                "aoi overlay requires artifacts to have a 'cell_utm_crs' column"
+            )
+        target_crs = artifacts["cell_utm_crs"].iloc[0]
+        aoi_utm = _reproject_aoi_to_utm(aoi, aoi_crs, target_crs)
+        gpd.GeoSeries([aoi_utm], crs=target_crs).plot(
+            ax=ax,
+            facecolor="none",
+            edgecolor=aoi_edgecolor,
+            linewidth=aoi_linewidth,
+            linestyle=aoi_linestyle,
+        )
+
     if _configure_axes:
         ax.set_title(title, fontsize=16)
         ax.set_xlabel("UTM X")
@@ -700,18 +773,30 @@ def plot_artifact_patches(
         ax.set_xlim(minx - _FOOTPRINT_VIEW_BUFFER_M, maxx + _FOOTPRINT_VIEW_BUFFER_M)
         ax.set_ylim(miny - _FOOTPRINT_VIEW_BUFFER_M, maxy + _FOOTPRINT_VIEW_BUFFER_M)
 
-        legend_patch = mpatches.Patch(
-            edgecolor=footprint_edgecolor,
-            facecolor="none",
-            linestyle="--",
-            linewidth=footprint_linewidth,
-            label="Target Grid Cell",
-        )
+        handles = [
+            mpatches.Patch(
+                edgecolor=footprint_edgecolor,
+                facecolor="none",
+                linestyle="--",
+                linewidth=footprint_linewidth,
+                label="Target Grid Cell",
+            )
+        ]
+        if aoi is not None:
+            handles.append(
+                mpatches.Patch(
+                    edgecolor=aoi_edgecolor,
+                    facecolor="none",
+                    linestyle=aoi_linestyle,
+                    linewidth=aoi_linewidth,
+                    label=aoi_label,
+                )
+            )
         fig.legend(
-            handles=[legend_patch],
+            handles=handles,
             loc="upper center",
-            bbox_to_anchor=(0.5, 1.1),
-            ncol=1,
+            bbox_to_anchor=(0.5, 1.02),
+            ncol=len(handles),
             fontsize=12,
         )
 
