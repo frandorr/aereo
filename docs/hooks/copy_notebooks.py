@@ -28,7 +28,12 @@ def on_config(config: dict, **kwargs: object) -> dict:
 
     dst_dir.mkdir(parents=True, exist_ok=True)
 
-    # Copy all notebooks, including step-by-step and any new ones.
+    # Remove previously-copied notebooks so deleted source notebooks do not
+    # remain in the docs tree.
+    for old_notebook in sorted(dst_dir.glob("*.ipynb")):
+        old_notebook.unlink()
+
+    # Copy all notebooks from the canonical source directory.
     for notebook in sorted(src_dir.glob("*.ipynb")):
         shutil.copy(notebook, dst_dir / notebook.name)
 

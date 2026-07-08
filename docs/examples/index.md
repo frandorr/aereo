@@ -22,8 +22,7 @@ have:
 |---|---|---|---|---|---|
 | [01 — Sentinel-2 (nir, red)](01-sentinel2.ipynb) | Sentinel-2 MSI | `aereo` | None (Earth Search is public) | Load a Hydra job, search STAC, extract a GeoTIFF on the Major TOM grid. | ![Sentinel-2](../assets/images/01-sentinel2-plot-patches.png) |
 | [05 — GOES-19 ABI preview](05-goes19.ipynb) | GOES-19 ABI | `aereo` + `aereo-search-aws-goes` + `aereo-read-satpy` | None | Public S3 search and Satpy-based reading/reprojection. | ![GOES-19](../assets/images/05-goes19-bed3cf89.png) |
-| [step_by_step](step_by_step.ipynb) | Sentinel-2 MSI | `aereo` | None (Earth Search is public) | Same as `01`, but each stage is run and inspected explicitly. | |
-| [step_by_step_raw](step_by_step_raw.ipynb) | Sentinel-2 MSI | `aereo` | None (Earth Search is public) | Same pipeline built entirely from raw Python — no config files or Hydra. | |
+| [step_by_step_raw](step_by_step_raw.ipynb) | Sentinel-2 MSI | `aereo` | None (Earth Search is public) | Same pipeline built entirely from raw Python — no config files or Hydra. | ![Sentinel-2 raw](../assets/images/step_by_step_raw-visualise.png) |
 
 ## Processing
 
@@ -39,7 +38,7 @@ have:
 |---|---|---|---|---|---|
 | [02 — VIIRS](02-viirs.ipynb) | VIIRS | `aereo` + `aereo-read-satpy` | NASA Earthdata | Search Earthaccess and read with Satpy. | ![VIIRS](../assets/images/02-viirs-plot-patches.png) |
 | [03 — Sentinel-3 OLCI](03-sentinel3.ipynb) | Sentinel-3 OLCI | `aereo` + `aereo-read-satpy` | NASA Earthdata | Sentinel-3 extraction workflow. | ![Sentinel-3 OLCI](../assets/images/03-sentinel3-2d4730ca.png) |
-| [04 — Tessera](04-tessera.ipynb) | GeoTessera | `aereo` + `aereo-search-tessera` + `aereo-read-tessera` | Depends on catalog | Tessera tile search and extraction. | ![Tessera](../assets/images/04-tessera-2d4730ca.png) |
+| [04 — Tessera](04-tessera.ipynb) | GeoTessera | `aereo` + `aereo-search-tessera` + `aereo-read-tessera` | None | Tessera tile search and extraction. | ![Tessera](../assets/images/04-tessera-2d4730ca.png) |
 | [06 — Multiple constellations](06-multiple-constellation.ipynb) | Sentinel-2 + VIIRS | `aereo` + `aereo-read-satpy` | NASA Earthdata | Search and extract multiple sensors with a shared cache. | ![Multi-constellation](../assets/images/06-multiple-constellation-f6d7b8aa.png) |
 
 ## Run a notebook locally
@@ -56,17 +55,24 @@ jupyter nbconvert --to script 01-sentinel2.ipynb
 python 01-sentinel2.py
 ```
 
-## Run the same config from the CLI
+## Run the same pipeline from the CLI
 
-Every notebook config can also be run with the `aereo` CLI:
+The `aereo` CLI can run the same search/read/write pipeline with Hydra
+overrides. Because `search`, `read`, and `write` default to `null` in the CLI
+config, add them with `+`:
 
 ```bash
-cd examples/config
-aereo action=run \
-  search=sentinel2_pc \
-  grid_dist=grid_10km \
-  read=sentinel2 \
-  write=sentinel2
+cd examples
+
+uv run aereo action=run \
+  +search._target_=aereo.builtins.search.search_stac \
+  +search.stac_api_url="https://earth-search.aws.element84.com/v1" \
+  +search.collections.sentinel-2-l2a="[red, nir]" \
+  geojson=config/aoi/chocon.geojson \
+  start="2024-01-01T00:00:00Z" \
+  end="2024-01-10T23:59:59Z" \
+  +read._target_=aereo.builtins.read.read_odc_stac \
+  +write._target_=aereo.builtins.write.write_geotiff
 ```
 
 See [CLI](../user-guide/cli.md) for the full command reference, and the
@@ -86,5 +92,4 @@ You can also download the raw notebooks directly from GitHub:
 - [04-tessera.ipynb](https://github.com/frandorr/aereo/blob/main/examples/04-tessera.ipynb)
 - [05-goes19.ipynb](https://github.com/frandorr/aereo/blob/main/examples/05-goes19.ipynb)
 - [06-multiple-constellation.ipynb](https://github.com/frandorr/aereo/blob/main/examples/06-multiple-constellation.ipynb)
-- [step_by_step.ipynb](https://github.com/frandorr/aereo/blob/main/examples/step_by_step.ipynb)
 - [step_by_step_raw.ipynb](https://github.com/frandorr/aereo/blob/main/examples/step_by_step_raw.ipynb)

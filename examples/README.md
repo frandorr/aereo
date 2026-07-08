@@ -79,8 +79,7 @@ aereo action=plugin_params plugin=search_stac
 | `01-sentinel2.ipynb` | Sentinel-2 MSI | `red` and `nir` extraction from Earth Search |
 | `01b-sentinel2-ndvi.ipynb` | Sentinel-2 MSI | NDVI processing example |
 | `01c-sentinel2-ndwi.ipynb` | Sentinel-2 MSI | NDWI processing example |
-| `step_by_step.ipynb` | Sentinel-2 MSI | Same pipeline as `01-sentinel2.ipynb`, but each stage is run and inspected explicitly |
-| `step_by_step_raw.ipynb` | Sentinel-2 MSI | Same pipeline as `step_by_step.ipynb`, but built entirely from raw Python functions and parameters — no config files or Hydra |
+| `step_by_step_raw.ipynb` | Sentinel-2 MSI | Sentinel-2 pipeline built entirely from raw Python functions and parameters — no config files or Hydra |
 | `02-viirs.ipynb` | VIIRS | Earthaccess search + Satpy read |
 | `03-sentinel3.ipynb` | Sentinel-3 OLCI | Earthaccess search + Satpy read |
 | `03b-sentinel3-ndvi.ipynb` | Sentinel-3 OLCI | NDVI processing example |
