@@ -5,15 +5,6 @@ target_aoi: config/aoi/oxford.geojson
 output_uri: /tmp/aereo_extraction
 overwrite: false
 
-# search_tessera(
-#     collections={"geotessera": []},
-#     intersects="config/aoi/oxford.geojson",
-#     start_datetime=datetime(2025, 1, 1, tzinfo=timezone.utc),
-#     end_datetime=datetime(2025, 1, 10, 23, 59, 59, tzinfo=timezone.utc),
-#     tessera_version="v1.1",
-#     tessera_variant="cambridge",
-# )
-
 search:
   _target_: aereo.search_tessera.search_tessera
   _partial_: true
@@ -27,6 +18,8 @@ search:
 
 read:
   _target_: aereo.read_tessera.read_tessera
+  _partial_: true
+  bands: [1,2,3]
 
 
 reproject:
