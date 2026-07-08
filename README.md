@@ -57,21 +57,10 @@ what you need.
 
 ## Copy/paste example
 
-Save this as `quickstart.py` and run it with `uv run python quickstart.py`
-(or set `DRY_RUN=true` to validate the job without network calls):
+Save this as `quickstart.py` and run it with `uv run python quickstart.py`:
 
 ```python
 """Pure-Python quickstart for AerEO.
-
-This example builds an ``ExtractionJob`` and runs the search → build-tasks →
-extract pipeline without any YAML config files or Hydra. It is the fastest way
-to see the function-based AerEO API in action.
-
-The example uses a tiny AOI so it can run quickly. Set ``DRY_RUN=true`` to
-validate the job without making network calls:
-
-    DRY_RUN=true uv run python examples/quickstart_pure_python.py
-
 To run the full pipeline:
 
     uv run python examples/quickstart_pure_python.py
@@ -79,7 +68,6 @@ To run the full pipeline:
 
 from __future__ import annotations
 
-import os
 from datetime import datetime, timezone
 
 from shapely.geometry import Polygon
@@ -92,8 +80,6 @@ from aereo.builtins import (
 )
 from aereo.executors import LocalExecutor
 from aereo.pipeline import ExtractionJob
-
-DRY_RUN = os.environ.get("DRY_RUN", "false").lower() in ("1", "true", "yes")
 
 
 def main() -> None:
@@ -113,6 +99,7 @@ def main() -> None:
         name="quickstart",
         grid_dist=10_000,
         output_uri="/tmp/aereo_quickstart",
+        search=search_stac,
         read=read_odc_stac,
         write=write_geotiff,
         target_aoi=aoi,
@@ -123,13 +110,8 @@ def main() -> None:
     print(f"output_uri: {job.output_uri}")
     print(f"grid_dist: {job.grid_dist}")
 
-    if DRY_RUN:
-        print("\nDRY_RUN enabled: skipping search/build-tasks/extract.")
-        return
-
     print("\n--- Search ---")
     assets = job.search(
-        search_stac,
         stac_api_url="https://earth-search.aws.element84.com/v1",
         collections={"sentinel-2-l2a": ["red", "nir"]},
         intersects=aoi,
