@@ -1,0 +1,10 @@
+defaults:
+  - job_sentinel3
+  - _self_
+
+name: sentinel3_ndvi
+preprocess:
+  - _target_: aereo.builtins.ndvi
+    _partial_: true
+    ndvi_nir_band: Oa17
+    ndvi_red_band: Oa08

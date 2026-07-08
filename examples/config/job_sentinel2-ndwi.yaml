@@ -1,0 +1,18 @@
+defaults:
+  - job_sentinel2-ndvi
+  - _self_
+
+name: sentinel2_ndwi
+target_bands: [green, nir]
+
+preprocess:
+  - _target_: aereo.builtins.ndwi
+    _partial_: true
+    ndwi_nir_band: nir
+    ndwi_green_band: green
+
+reproject:
+  _target_: aereo.builtins.reproject_odc
+  _partial_: true
+reproject_mode: grid
+resolution: 10
