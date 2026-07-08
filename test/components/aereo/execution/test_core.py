@@ -214,6 +214,50 @@ def test_crop_dataset_to_cell_reduces_shape():
     assert cropped["band"].shape != ds["band"].shape
 
 
+def test_crop_dataset_to_cell_uses_geobox_when_given():
+    """When a GeoBox is passed, the crop region follows the GeoBox extent."""
+    ds = _swath_reader((40, 40))(
+        ExtractionTask(
+            id="t",
+            assets=cast(
+                GeoDataFrame[AssetSchema],
+                gpd.GeoDataFrame(
+                    {"id": ["a"], "href": ["h"], "geometry": [box(-70, -40, -69, -39)]},
+                    crs="EPSG:4326",
+                ),
+            ),
+            job=ExtractionJob(
+                grid_dist=1000,
+                output_uri="s3://test",
+                read=_DummyReader(),
+                write=_DummyWriter(),
+            ),
+        )
+    )
+
+    # Small cell (~1 km) near the centre of the swath.
+    cell = GridCell(
+        id="cell",
+        d=1000,
+        cell_geometry=box(-69.52, -39.52, -69.51, -39.51),
+    )
+    # GeoBox with a large margin so it extends well beyond the cell geometry.
+    geobox = cell.to_geobox(resolution=1000.0, margin=200.0)
+
+    cropped_cell = _crop_dataset_to_cell(ds, cell, buffer=0.01)
+    cropped_geobox = _crop_dataset_to_cell(ds, cell, buffer=0.01, geobox=geobox)
+
+    # The GeoBox-based crop must cover at least as many source pixels because
+    # the GeoBox extent (with margin) is larger than the cell geometry.
+    assert cropped_geobox["band"].shape[0] >= cropped_cell["band"].shape[0]
+    assert cropped_geobox["band"].shape[1] >= cropped_cell["band"].shape[1]
+    # And strictly larger in at least one dimension because the margin is non-zero.
+    assert (
+        cropped_geobox["band"].shape[0] > cropped_cell["band"].shape[0]
+        or cropped_geobox["band"].shape[1] > cropped_cell["band"].shape[1]
+    )
+
+
 def test_run_task_grid_mode_crops_before_reproject(tmp_path):
     """In grid mode, each cell receives a cropped swath before reprojection."""
     seen_shapes: list[tuple[int, ...]] = []
