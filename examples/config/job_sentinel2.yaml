@@ -2,12 +2,14 @@
 target_bands: [red, nir]
 aoi_path: config/aoi/chocon.geojson
 # Common Job config, like name, MajorTOM grid distance, etc
+
 name: sentinel2_sample
 grid_dist: 10_000
+grid_cells_margin: 10
 target_aoi: ${aoi_path}
 output_uri: /tmp/aereo_extraction
 overwrite: false
-# Search block
+
 search:
   _target_: aereo.builtins.search_stac
   _partial_: true
@@ -17,16 +19,9 @@ search:
   intersects: ${aoi_path}
   start_datetime: "2024-01-01T00:00:00Z"
   end_datetime: "2024-01-10T23:59:59Z"
-# Task builder block, we define 12 grid cells per task
-task_builder:
-  _target_: aereo.builtins.build_grouped_tasks
-  _partial_: true
-  cells_per_task: 12
-# Extraction Pipeline block with read and write.
+
 read:
   _partial_: true
   _target_: aereo.builtins.read_odc_stac
-  reader: sentinel2_l1c
-  wishlist: ${target_bands}
 write:
   _target_: aereo.builtins.write.write_geotiff
