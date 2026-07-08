@@ -1,9 +1,0 @@
-services:
-  aereo-extract:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      - AEREO_LOG_LEVEL=info
-    volumes:
-      - ./output:/tmp/aereo/output
