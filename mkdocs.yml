@@ -163,7 +163,6 @@ nav:
   - Tutorials:
       - Overview: examples/index.md
       - Install: install.md
-      - Your First Pipeline: getting-started/first-pipeline.md
       - Pure Python Quickstart: getting-started/pure-python.md
       - Sentinel-2 (nir, red): examples/01-sentinel2.ipynb
       - Sentinel-2 NDVI: examples/01b-sentinel2-ndvi.ipynb

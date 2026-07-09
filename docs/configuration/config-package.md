@@ -150,4 +150,4 @@ jobs.
 
 - [YAML Schema](yaml-schema.md) — every `ExtractionJob` field explained.
 - [Hydra Overrides](overrides.md) — override values from Python.
-- [Your First Pipeline](../getting-started/first-pipeline.md) — hands-on walkthrough.
+- [Pure Python Quickstart](../getting-started/pure-python.md) — run a job without writing YAML.
