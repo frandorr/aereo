@@ -4,7 +4,7 @@ requires = [ "hatch-polylith-bricks", "hatchling" ]
 
 [project]
 name = "aereo"
-version = "1.1.5"
+version = "1.2.0"
 description = "Access, extract, reproject for Earth Observation — locally or remotely, without reinventing the wheel."
 readme = "README.md"
 keywords = [
