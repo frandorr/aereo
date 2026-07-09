@@ -12,6 +12,20 @@ Earthaccess, Satpy, `odc-geo`) behind a single pipeline where every step can be
 replaced. The result: analysis-ready GeoTIFFs aligned to the [Major TOM
 grid](https://github.com/ESA-PhiLab/Major-TOM), ready for ML or downstream analysis.
 
+## Install
+
+The fastest way to get started is to install AerEO with all optional extras:
+
+```bash
+uv add "aereo[all]"
+# or
+pip install "aereo[all]"
+```
+
+Sensor-specific search and I/O plugins are separate packages, so you only ship
+what you need. For per-sensor install commands and credentials, see
+[Install](https://frandorr.github.io/aereo/install/).
+
 ## Examples
 
 All tutorial notebooks can be opened directly in Google Colab. Each notebook starts with a setup cell that installs AerEO and any sensor-specific plugins it needs.
@@ -74,53 +88,6 @@ Path.home().joinpath(".netrc").write_text(
 ```
 
 Replace `YOUR_USERNAME` and `YOUR_PASSWORD` with your NASA Earthdata credentials.
-
-## Install
-
-AerEO's core framework includes built-in search (STAC, NASA Earthaccess, etc.),
-read, reproject, and write functions. You can extend it with plugins for other
-sensors and formats — by combining search, read, reproject, and write plugins
-you can access hundreds of constellations without changing your pipeline.
-
-Several capabilities are shipped as optional dependencies (extras). If you are
-trying AerEO for the first time, the easiest way to get everything is:
-
-```bash
-uv add "aereo[all]"
-# or
-pip install "aereo[all]"
-```
-
-For production, install only what you need. A few common combinations:
-
-```bash
-# STAC catalogs (Sentinel-2, Landsat, etc.)
-uv add aereo
-# or
-pip install aereo
-
-# NASA Earthaccess data (MODIS, VIIRS, Sentinel-3, etc.) with Satpy reading
-uv add aereo aereo-read-satpy
-# or
-pip install aereo aereo-read-satpy
-
-> The VIIRS and Sentinel-3 notebooks require a NASA Earthdata account. See the
-> [earthaccess authentication guide](https://earthaccess.readthedocs.io/en/latest/user/howto/authenticate/)
-> or the [Colab instructions](#running-nasa-notebooks-in-colab) below.
-
-# GOES ABI public S3 data
-uv add aereo aereo-search-aws-goes aereo-read-satpy
-# or
-pip install aereo aereo-search-aws-goes aereo-read-satpy
-
-# GeoTessera tile catalogs
-uv add aereo aereo-search-tessera aereo-read-tessera
-# or
-pip install aereo aereo-search-tessera aereo-read-tessera
-```
-
-Sensor-specific search and I/O plugins are separate packages so you only ship
-what you need.
 
 ## Optional extras
 
