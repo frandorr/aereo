@@ -53,41 +53,31 @@ All tutorial notebooks can be opened directly in Google Colab. Each notebook sta
 
 ### Running NASA notebooks in Colab
 
-In Colab, the simplest option is to call `earthaccess.login()` and enter your
-NASA Earthdata username and password when prompted:
-
-```python
-import earthaccess
-
-earthaccess.login()
-```
-
-If you prefer not to type credentials each time, set environment variables in a
-notebook cell before calling `login`:
+The NASA notebooks need a valid `~/.netrc` file. Run this cell once in Colab to create it from your credentials:
 
 ```python
 import os
 from getpass import getpass
 
-os.environ["EARTHDATA_USERNAME"] = getpass("Earthdata username: ")
-os.environ["EARTHDATA_PASSWORD"] = getpass("Earthdata password: ")
+# Get Earthdata credentials from the user
+earthdata_username = getpass("Earthdata username: ")
+earthdata_password = getpass("Earthdata password: ")
 
-import earthaccess
+# Define the path for the .netrc file in the user's home directory
+netrc_path = os.path.expanduser("~/.netrc")
 
-earthaccess.login(strategy="environment")
+# Create the .netrc file with the provided credentials
+with open(netrc_path, "w") as f:
+    f.write("machine urs.earthdata.nasa.gov login {username} password {password}\n".format(
+        username=earthdata_username,
+        password=earthdata_password
+    ))
+
+# Set permissions for the .netrc file to be readable only by the owner
+os.chmod(netrc_path, 0o600)
+
+print(f"Successfully created {netrc_path} for Earthdata authentication.")
 ```
-
-Or write a `~/.netrc` file directly from the notebook:
-
-```python
-from pathlib import Path
-
-Path.home().joinpath(".netrc").write_text(
-    "machine urs.earthdata.nasa.gov login YOUR_USERNAME password YOUR_PASSWORD\n"
-)
-```
-
-Replace `YOUR_USERNAME` and `YOUR_PASSWORD` with your NASA Earthdata credentials.
 
 ## Optional extras
 
