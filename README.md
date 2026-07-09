@@ -13,7 +13,7 @@ replaced. The result: analysis-ready GeoTIFFs aligned to the [Major TOM
 grid](https://github.com/ESA-PhiLab/Major-TOM), ready for ML or downstream analysis.
 
 <p align="center">
-  <img src="docs/assets/images/01c-sentinel2-ndwi-search-sentinel2.png" alt="Sentinel-2 NDWI extracted on the Major TOM grid" width="600">
+  <img src="docs/assets/images/01c-sentinel2-ndwi-search-sentinel2.png" alt="Sentinel-2 NDWI extracted on the Major TOM grid" width="500">
 </p>
 
 *Sentinel-2 NDWI extracted as Major TOM grid cells. Every job writes an
@@ -196,6 +196,65 @@ if __name__ == "__main__":
 
 Open `/tmp/aereo_quickstart` — you have GeoTIFFs on the Major TOM grid. The script also calls `job.write_catalog(artifacts)`, so an `artifacts.parquet` catalog is written next to the GeoTIFFs.
 
+## Configuration with Hydra
+
+For reusable jobs, put YAML configs in a Hydra package and load them with
+`ExtractionJob.load_from_config`. This is the same Sentinel-2 job as the
+quickstart, expressed as config:
+
+```yaml
+# examples/config/job_sentinel2.yaml
+target_bands: [red, nir]
+aoi_path: config/aoi/chocon.geojson
+
+name: sentinel2_sample
+grid_dist: 10_000
+grid_cells_margin: 10
+target_aoi: ${aoi_path}
+output_uri: /tmp/aereo_extraction
+overwrite: false
+
+search:
+  _target_: aereo.builtins.search_stac
+  _partial_: true
+  stac_api_url: "https://earth-search.aws.element84.com/v1"
+  collections:
+    sentinel-2-l2a: ${target_bands}
+  intersects: ${aoi_path}
+  start_datetime: "2024-01-01T00:00:00Z"
+  end_datetime: "2024-01-10T23:59:59Z"
+
+read:
+  _partial_: true
+  _target_: aereo.builtins.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
+```
+
+Load and override values from Python:
+
+```python
+from aereo.pipeline import ExtractionJob
+
+job = ExtractionJob.load_from_config(
+    config_dir="examples/config",
+    config_name="job_sentinel2",
+    overrides=[
+        "grid_dist=50_000",
+        "search.start_datetime=2024-02-01T00:00:00Z",
+    ],
+)
+```
+
+You can also run configs from the CLI using the example runner:
+
+```bash
+uv run python examples/run_job.py config_name=job_sentinel2 grid_dist=50_000
+```
+
+The `overrides` use Hydra dot notation, so any field in the YAML can be changed
+without editing the file.
+
 ## What you get
 
 These outputs come straight from the tutorial notebooks. Every plot shows
@@ -203,15 +262,15 @@ grid-aligned patches on the Major TOM grid, with the target AOI overlaid.
 
 ### [Sentinel-2 (nir, red)](examples/01-sentinel2.ipynb)
 
-![Sentinel-2 extracted patches](docs/assets/images/01-sentinel2-plot-patches.png)
+<img src="docs/assets/images/01-sentinel2-plot-patches.png" alt="Sentinel-2 extracted patches" width="500">
 
 ### [Sentinel-2 NDVI](examples/01b-sentinel2-ndvi.ipynb)
 
-![Sentinel-2 NDVI patches](docs/assets/images/01b-sentinel2-ndvi-plot-patches.png)
+<img src="docs/assets/images/01b-sentinel2-ndvi-plot-patches.png" alt="Sentinel-2 NDVI patches" width="500">
 
 ### [VIIRS](examples/02-viirs.ipynb)
 
-![VIIRS extracted patches](docs/assets/images/02-viirs-plot-patches.png)
+<img src="docs/assets/images/02-viirs-plot-patches.png" alt="VIIRS extracted patches" width="500">
 
 ### VIIRS vs GOES-19 ABI — same grid, different sensors
 
@@ -219,7 +278,7 @@ The same Major TOM grid cells extracted from two very different sensors:
 
 | GOES-19 ABI | VIIRS |
 |---|---|
-| ![GOES-19 ABI on the shared grid](docs/assets/images/06-multiple-constellation-f6d7b8aa.png) | ![VIIRS on the shared grid](docs/assets/images/06-multiple-constellation-7790c104.png) |
+| <img src="docs/assets/images/06-multiple-constellation-f6d7b8aa.png" alt="GOES-19 ABI on the shared grid" width="400"> | <img src="docs/assets/images/06-multiple-constellation-7790c104.png" alt="VIIRS on the shared grid" width="400"> |
 
 See the full walkthrough in [06 — Multiple constellations](examples/06-multiple-constellation.ipynb).
 
@@ -274,11 +333,11 @@ Any stage can be replaced by a function you write. Learn how in
 
 - AerEO is inspired by the work done in [FDL sat-extractor](https://github.com/FrontierDevelopmentLab/sat-extractor).
 
-  ![FDL Europe / ESA](https://github.com/FrontierDevelopmentLab/sat-extractor/raw/main/images/fdleuropeESA.png)
+  <img src="https://github.com/FrontierDevelopmentLab/sat-extractor/raw/main/images/fdleuropeESA.png" alt="FDL Europe / ESA" width="200">
 
 - It is built upon the [Major TOM grid from ESA](https://github.com/ESA-PhiLab/Major-TOM).
 
-  ![Major TOM grid overview](docs/assets/images/major-tom-grid-overview.jpeg)
+  <img src="docs/assets/images/major-tom-grid-overview.jpeg" alt="Major TOM grid overview" width="200">
 
 ---
 
