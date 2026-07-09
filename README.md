@@ -12,6 +12,17 @@ Earthaccess, Satpy, `odc-geo`) behind a single pipeline where every step can be
 replaced. The result: analysis-ready GeoTIFFs aligned to the [Major TOM
 grid](https://github.com/ESA-PhiLab/Major-TOM), ready for ML or downstream analysis.
 
+<p align="center">
+  <img src="docs/assets/images/01c-sentinel2-ndwi-search-sentinel2.png" alt="Sentinel-2 NDWI extracted on the Major TOM grid" width="600">
+</p>
+
+*Sentinel-2 NDWI extracted as Major TOM grid cells. Every job writes an
+`artifacts.parquet` catalog where each row is a Major TOM grid cell referencing
+the file that was just extracted; the default writer emits GeoTIFFs, but you
+can swap in any writer plugin. Because everything is aligned to the same grid,
+outputs from different sensors and dates can be merged directly into ML
+datasets.*
+
 ## Install
 
 The fastest way to get started is to install AerEO with all optional extras:
@@ -27,6 +38,12 @@ what you need. For per-sensor install commands and credentials, see
 [Install](https://frandorr.github.io/aereo/install/).
 
 ## Examples
+
+> **Performance tip:** Run AerEO in the same region as your data source. During
+> extraction, data is downloaded from the source catalog; if your runtime is not
+> in the same AWS region as the data, downloads can be **very slow**. Being in the
+> same region is **HIGHLY recommended** to avoid slow transfers and egress
+> charges.
 
 All tutorial notebooks can be opened directly in Google Colab. Each notebook starts with a setup cell that installs AerEO and any sensor-specific plugins it needs.
 
@@ -93,10 +110,6 @@ and local execution. A few built-in capabilities need extra dependencies:
 | `all` | Everything above in one command | `uv add aereo[all]` |
 
 ## Copy/paste example
-
-> **Performance tip:** Run AerEO in the same region as your data source. Being
-> in the same region is **HIGHLY recommended** to avoid slow transfers and egress
-> charges.
 
 Save this as `quickstart.py` and run it with `uv run python quickstart.py`:
 
@@ -251,11 +264,21 @@ Any stage can be replaced by a function you write. Learn how in
 ## Docs
 
 - [Install](https://frandorr.github.io/aereo/install/) — per-sensor install and credentials
-- [Your First Pipeline](https://frandorr.github.io/aereo/getting-started/first-pipeline/) — first extraction in 5 minutes
+- [Pure Python Quickstart](https://frandorr.github.io/aereo/getting-started/pure-python/) — first extraction in 5 minutes
 - [Configuration](https://frandorr.github.io/aereo/configuration/config-package/) — Hydra config package and YAML schema
 - [Tutorials](https://frandorr.github.io/aereo/examples/) — Sentinel-2, VIIRS, Sentinel-3, Tessera, GOES-19
 - [Build a Plugin](https://frandorr.github.io/aereo/plugins/build-a-plugin/) — add a search, reader, or processing step
 - [Run on AWS Lambda](https://frandorr.github.io/aereo/serverless/lambda/) — go serverless by changing one line
+
+## Acknowledgments
+
+- AerEO is inspired by the work done in [FDL sat-extractor](https://github.com/FrontierDevelopmentLab/sat-extractor).
+
+  ![FDL Europe / ESA](https://github.com/FrontierDevelopmentLab/sat-extractor/raw/main/images/fdleuropeESA.png)
+
+- It is built upon the [Major TOM grid from ESA](https://github.com/ESA-PhiLab/Major-TOM).
+
+  ![Major TOM grid overview](docs/assets/images/major-tom-grid-overview.jpeg)
 
 ---
 
