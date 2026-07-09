@@ -126,9 +126,53 @@ def test_read_odcstac_fields():
     sig = inspect.signature(read_odc_stac)
     assert "task" in sig.parameters
     assert "kwargs" in sig.parameters
+    assert "gdal_env" in sig.parameters
     assert "files" not in sig.parameters
     assert "assets" not in sig.parameters
     assert "aoi" not in sig.parameters
+
+
+def test_read_odcstac_cloud_defaults_without_gdal_env(monkeypatch):
+    """Without gdal_env, configure_rio is called with cloud defaults only."""
+    fake_ds = _make_fake_ds()
+    monkeypatch.setattr("aereo.builtins.read.odc_load", lambda items, **kwargs: fake_ds)
+
+    captured: dict[str, Any] = {}
+
+    def fake_configure_rio(*, cloud_defaults: bool = False, **opts: Any) -> None:
+        captured["cloud_defaults"] = cloud_defaults
+        captured["opts"] = opts
+
+    monkeypatch.setattr("aereo.builtins.read.configure_rio", fake_configure_rio)
+    monkeypatch.setattr("aereo.builtins.read._RIO_CONFIGURED", False)
+
+    task = _make_task(_make_stac_item_dict())
+    read_odc_stac(task)
+
+    assert captured["cloud_defaults"] is True
+    assert captured["opts"] == {}
+
+
+def test_read_odcstac_passes_gdal_env_to_configure_rio(monkeypatch):
+    """gdal_env options are forwarded to odc.loader.configure_rio."""
+    fake_ds = _make_fake_ds()
+    monkeypatch.setattr("aereo.builtins.read.odc_load", lambda items, **kwargs: fake_ds)
+
+    captured: dict[str, Any] = {}
+
+    def fake_configure_rio(*, cloud_defaults: bool = False, **opts: Any) -> None:
+        captured["cloud_defaults"] = cloud_defaults
+        captured["opts"] = opts
+
+    monkeypatch.setattr("aereo.builtins.read.configure_rio", fake_configure_rio)
+    monkeypatch.setattr("aereo.builtins.read._RIO_CONFIGURED", False)
+
+    task = _make_task(_make_stac_item_dict())
+    reader = partial(read_odc_stac, gdal_env={"GDAL_HTTP_MAX_RETRY": "3"})
+    reader(task)
+
+    assert captured["cloud_defaults"] is True
+    assert captured["opts"] == {"GDAL_HTTP_MAX_RETRY": "3"}
 
 
 def test_read_odcstac_raises_without_stac_items():

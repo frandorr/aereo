@@ -5,10 +5,7 @@ requires = [ "hatch-polylith-bricks", "hatchling" ]
 [project]
 name = "aereo"
 version = "1.1.5"
-description = """\
-  Plugin-based satellite data extraction — search across catalogs, extract assets, and reproject to analysis-ready \
-  Major TOM grids.\
-  """
+description = "Access, extract, reproject for Earth Observation — locally or remotely, without reinventing the wheel."
 readme = "README.md"
 keywords = [
   "earth-observation",
@@ -63,8 +60,10 @@ dependencies = [
 optional-dependencies.all = [
   "boto3>=1.34",
   "cartopy>=0.25",
+  "planetary-computer>=1",
   "pyresample>=1.28",
 ]
+optional-dependencies.pc = [ "planetary-computer>=1" ]
 optional-dependencies.serverless = [ "boto3>=1.34", "botocore>=1.34" ]
 optional-dependencies.swath = [ "pyresample>=1.28" ]
 optional-dependencies.viz = [ "cartopy>=0.25" ]

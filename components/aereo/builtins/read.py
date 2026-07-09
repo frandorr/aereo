@@ -26,22 +26,31 @@ except ImportError:  # pragma: no cover
 _RIO_CONFIGURED = False
 
 
-def _ensure_rio_configured() -> None:
+def _ensure_rio_configured(gdal_env: dict[str, Any] | None = None) -> None:
     """Pre-initialize odc.loader's GDAL/rasterio session once per process.
 
     This avoids a deadlock that can occur when ``odc.stac.load`` initializes
     the ThreadSession lazily inside nested ``rio_env`` context managers on
     some GDAL/rasterio combinations.
+
+    Args:
+        gdal_env: Optional GDAL configuration options to merge with the
+            cloud defaults (e.g. ``{"GDAL_HTTP_MAX_RETRY": "3"}``). These
+            are passed to ``odc.loader.configure_rio`` and become the
+            process-wide default for rasterio sessions used by odc-stac.
     """
     global _RIO_CONFIGURED
-    if configure_rio is not None and not _RIO_CONFIGURED:
-        configure_rio(cloud_defaults=True)
+    if configure_rio is None:
+        return
+    if not _RIO_CONFIGURED or gdal_env is not None:
+        configure_rio(cloud_defaults=True, **(gdal_env or {}))
         _RIO_CONFIGURED = True
 
 
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
 def read_odc_stac(
     task: ExtractionTask,
+    gdal_env: dict[str, Any] | None = None,
     **kwargs: Any,
 ) -> xr.Dataset:
     """Load STAC assets using ``odc.stac.load``.
@@ -51,6 +60,10 @@ def read_odc_stac(
 
     Args:
         task: The extraction task containing STAC items and read context.
+        gdal_env: Optional GDAL configuration options to merge with odc-stac's
+            cloud defaults (e.g. ``{"GDAL_HTTP_MAX_RETRY": "3"}``). These are
+            forwarded to ``odc.loader.configure_rio`` and become the process-wide
+            default for rasterio sessions used by this reader.
         **kwargs: Keyword arguments forwarded to ``odc.stac.load``. AEREO
             injects sensible defaults for ``chunks``, ``bands``, and ``bbox``
             only when they are not already provided.
@@ -88,7 +101,7 @@ def read_odc_stac(
     if task.bbox is not None and "bbox" not in params:
         params["bbox"] = task.bbox
 
-    _ensure_rio_configured()
+    _ensure_rio_configured(gdal_env)
 
     ds: xr.Dataset = odc_load(items, **params)
 

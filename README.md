@@ -1,23 +1,33 @@
-# AerEO 🪐
+<p align="center">
+  <img src="docs/banner.svg" alt="AerEO banner" width="400">
+</p>
 
-[![PyPI](https://img.shields.io/pypi/v/aereo.svg)](https://pypi.org/project/aereo)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/aereo.svg)](https://pypi.org/project/aereo)
-[![Python Versions](https://img.shields.io/pypi/pyversions/aereo.svg)](https://pypi.org/project/aereo)
-[![GitHub Issues](https://img.shields.io/github/issues/frandorr/aereo.svg)](https://github.com/frandorr/aereo/issues)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/frandorr/aereo/blob/main/LICENSE)
-[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://frandorr.github.io/aereo)
+# AerEO
 
-> **Access, extract, reproject for Earth Observation — locally or on AWS Lambda, without reinventing the wheel.**
+> **Access, extract, reproject for Earth Observation — locally or remotely, without reinventing the wheel.**
 
 AerEO is a plugin-based satellite data extraction framework. It wires together
 the catalog, reading, reprojection, and writing tools you already trust (STAC,
-Earthaccess, Satpy, `odc-geo`) behind a single, replaceable-step pipeline. The
-result: analysis-ready GeoTIFFs aligned to the [Major TOM
+Earthaccess, Satpy, `odc-geo`) behind a single pipeline where every step can be
+replaced. The result: analysis-ready GeoTIFFs aligned to the [Major TOM
 grid](https://github.com/ESA-PhiLab/Major-TOM), ready for ML or downstream analysis.
 
-- **Plugin-based** — every stage (search, read, reproject, process, write) is a plain Python function you can swap.
-- **Grid-aligned** — outputs are indexed on the [Major TOM grid](https://github.com/ESA-PhiLab/Major-TOM), so Sentinel-2, VIIRS, Sentinel-3, GOES, and custom sources stack together.
-- **One config, multiple runtimes** — the same Hydra config runs in a notebook and serverless with `LambdaExecutor`.
+## Examples
+
+All tutorial notebooks can be opened directly in Google Colab. Each notebook starts with a setup cell that installs AerEO and any sensor-specific plugins it needs.
+
+| Notebook | Sensor(s) | Open in Colab |
+|---|---|---|
+| [01 — Sentinel-2](examples/01-sentinel2.ipynb) | Sentinel-2 L2A | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/01-sentinel2.ipynb) |
+| [01b — Sentinel-2 NDVI](examples/01b-sentinel2-ndvi.ipynb) | Sentinel-2 L2A (NDVI) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/01b-sentinel2-ndvi.ipynb) |
+| [01c — Sentinel-2 NDWI](examples/01c-sentinel2-ndwi.ipynb) | Sentinel-2 L2A (NDWI) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/01c-sentinel2-ndwi.ipynb) |
+| [02 — VIIRS](examples/02-viirs.ipynb) | VIIRS | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/02-viirs.ipynb) |
+| [03 — Sentinel-3 OLCI](examples/03-sentinel3.ipynb) | Sentinel-3 OLCI | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/03-sentinel3.ipynb) |
+| [03b — Sentinel-3 NDVI](examples/03b-sentinel3-ndvi.ipynb) | Sentinel-3 OLCI (NDVI) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/03b-sentinel3-ndvi.ipynb) |
+| [04 — GeoTessera](examples/04-tessera.ipynb) | GeoTessera | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/04-tessera.ipynb) |
+| [05 — GOES-19 ABI](examples/05-goes19.ipynb) | GOES-19 ABI | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/05-goes19.ipynb) |
+| [06 — Multiple constellations](examples/06-multiple-constellation.ipynb) | VIIRS + GOES-19 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/06-multiple-constellation.ipynb) |
+| [Step by step raw pipeline](examples/step_by_step_raw.ipynb) | Sentinel-2 (raw API) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/step_by_step_raw.ipynb) |
 
 ## Install
 
@@ -26,7 +36,16 @@ read, reproject, and write functions. You can extend it with plugins for other
 sensors and formats — by combining search, read, reproject, and write plugins
 you can access hundreds of constellations without changing your pipeline.
 
-Here are a few common combinations:
+Several capabilities are shipped as optional dependencies (extras). If you are
+trying AerEO for the first time, the easiest way to get everything is:
+
+```bash
+uv add "aereo[all]"
+# or
+pip install "aereo[all]"
+```
+
+For production, install only what you need. A few common combinations:
 
 ```bash
 # STAC catalogs (Sentinel-2, Landsat, etc.)
@@ -50,7 +69,6 @@ uv add aereo aereo-search-tessera aereo-read-tessera
 pip install aereo aereo-search-tessera aereo-read-tessera
 ```
 
-Install the core framework with `uv add aereo` (or `pip install aereo`).
 Sensor-specific search and I/O plugins are separate packages so you only ship
 what you need.
 
@@ -64,9 +82,14 @@ and local execution. A few built-in capabilities need extra dependencies:
 | `serverless` | `LambdaExecutor` and S3 staging (via `boto3`) | `uv add aereo[serverless]` |
 | `swath` | `reproject_swath` / `reproject_pyresample` for 2-D lat/lon swath data | `uv add aereo[swath]` |
 | `viz` | Cartopy-backed plots in `aereo.viz` | `uv add aereo[viz]` |
+| `pc` | Microsoft Planetary Computer integration | `uv add aereo[pc]` |
 | `all` | Everything above in one command | `uv add aereo[all]` |
 
 ## Copy/paste example
+
+> **Performance tip:** Run AerEO in the same region as your data source. Being
+> in the same region is **HIGHLY recommended** to avoid slow transfers and egress
+> charges.
 
 Save this as `quickstart.py` and run it with `uv run python quickstart.py`:
 
@@ -153,22 +176,50 @@ if __name__ == "__main__":
 
 Open `/tmp/aereo_quickstart` — you have GeoTIFFs on the Major TOM grid. The script also calls `job.write_catalog(artifacts)`, so an `artifacts.parquet` catalog is written next to the GeoTIFFs.
 
-## Examples
+## What you get
 
-All tutorial notebooks can be opened directly in Google Colab. Each notebook starts with a setup cell that installs AerEO and any sensor-specific plugins it needs.
+These outputs come straight from the tutorial notebooks. Every plot shows
+grid-aligned patches on the Major TOM grid, with the target AOI overlaid.
 
-| Notebook | Sensor(s) | Open in Colab |
-|---|---|---|
-| [01 — Sentinel-2](examples/01-sentinel2.ipynb) | Sentinel-2 L2A | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/01-sentinel2.ipynb) |
-| [01b — Sentinel-2 NDVI](examples/01b-sentinel2-ndvi.ipynb) | Sentinel-2 L2A (NDVI) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/01b-sentinel2-ndvi.ipynb) |
-| [01c — Sentinel-2 NDWI](examples/01c-sentinel2-ndwi.ipynb) | Sentinel-2 L2A (NDWI) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/01c-sentinel2-ndwi.ipynb) |
-| [02 — VIIRS](examples/02-viirs.ipynb) | VIIRS | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/02-viirs.ipynb) |
-| [03 — Sentinel-3 OLCI](examples/03-sentinel3.ipynb) | Sentinel-3 OLCI | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/03-sentinel3.ipynb) |
-| [03b — Sentinel-3 NDVI](examples/03b-sentinel3-ndvi.ipynb) | Sentinel-3 OLCI (NDVI) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/03b-sentinel3-ndvi.ipynb) |
-| [04 — GeoTessera](examples/04-tessera.ipynb) | GeoTessera | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/04-tessera.ipynb) |
-| [05 — GOES-19 ABI](examples/05-goes19.ipynb) | GOES-19 ABI | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/05-goes19.ipynb) |
-| [06 — Multiple constellations](examples/06-multiple-constellation.ipynb) | VIIRS + GOES-19 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/06-multiple-constellation.ipynb) |
-| [Step by step raw pipeline](examples/step_by_step_raw.ipynb) | Sentinel-2 (raw API) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/step_by_step_raw.ipynb) |
+### [Sentinel-2 (nir, red)](examples/01-sentinel2.ipynb)
+
+![Sentinel-2 extracted patches](docs/assets/images/01-sentinel2-plot-patches.png)
+
+### [Sentinel-2 NDVI](examples/01b-sentinel2-ndvi.ipynb)
+
+![Sentinel-2 NDVI patches](docs/assets/images/01b-sentinel2-ndvi-plot-patches.png)
+
+### [VIIRS](examples/02-viirs.ipynb)
+
+![VIIRS extracted patches](docs/assets/images/02-viirs-plot-patches.png)
+
+### VIIRS vs GOES-19 ABI — same grid, different sensors
+
+The same Major TOM grid cells extracted from two very different sensors:
+
+| GOES-19 ABI | VIIRS |
+|---|---|
+| ![GOES-19 ABI on the shared grid](docs/assets/images/06-multiple-constellation-f6d7b8aa.png) | ![VIIRS on the shared grid](docs/assets/images/06-multiple-constellation-7790c104.png) |
+
+See the full walkthrough in [06 — Multiple constellations](examples/06-multiple-constellation.ipynb).
+
+## How it works
+
+```mermaid
+flowchart LR
+    Search["Search provider"] --> Prepare["Prepare tasks\n(grid + grouping)"]
+    Prepare --> Execute["Execute\n(local / Lambda)"]
+    Execute --> Catalog["Output catalog\n+ GeoTIFFs"]
+```
+
+1. **Search** — query a catalog and get a validated `GeoDataFrame[AssetSchema]`.
+2. **Prepare** — group assets by time and native CRS into `ExtractionTask`
+   objects.
+3. **Execute** — run each task through `read → preprocess → reproject →
+   postprocess → write`, producing grid-aligned artifacts and a catalog.
+
+Any stage can be replaced by a function you write. Learn how in
+[Build a Plugin](https://frandorr.github.io/aereo/plugins/build-a-plugin/).
 
 ## Why AerEO?
 
@@ -190,7 +241,7 @@ All tutorial notebooks can be opened directly in Google Colab. Each notebook sta
 5. **Stage functions** — `read_odc_stac`, `reproject_odc`, `ndvi`, `write_geotiff`, etc. Passed directly to `ExtractionJob(read=..., write=...)`.
 6. **`LocalExecutor`** — runs tasks locally. Swap for `LambdaExecutor` later without changing the pipeline.
 
-## Docs & Examples
+## Docs
 
 - [Install](https://frandorr.github.io/aereo/install/) — per-sensor install and credentials
 - [Your First Pipeline](https://frandorr.github.io/aereo/getting-started/first-pipeline/) — first extraction in 5 minutes
