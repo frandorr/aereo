@@ -133,9 +133,8 @@ sources.aereo-read-tessera = { path = "../aereo-read-tessera/projects/aereo-read
 sources.aereo-reproject-satpy = { path = "../aereo-reproject-satpy/projects/aereo-reproject-satpy" }
 sources.aereo-search-aws-goes = { path = "../aereo-search-aws-goes/projects/aereo-search-aws-goes" }
 sources.aereo-search-tessera = { path = "../aereo-search-tessera/projects/aereo-search-tessera" }
-sources.aereo-test-pipeline = { path = "projects/aereo-lambda/test_pipeline", editable = true }
 managed = true
-workspace.members = [ "projects/*" ]
+workspace.members = [ "projects/aereo" ]
 
 [tool.pytest]
 ini_options.testpaths = [ "test" ]
