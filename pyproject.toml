@@ -87,7 +87,6 @@ dev = [
   "aereo-reproject-satpy",
   "aereo-search-aws-goes",
   "aereo-search-tessera",
-  "aereo-test-pipeline",
   "basedpyright>=1.38",
   "cartopy>=0.25",
   "earthaccess>=0.18",
