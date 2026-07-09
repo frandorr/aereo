@@ -37,6 +37,8 @@ Sensor-specific search and I/O plugins are separate packages, so you only ship
 what you need. For per-sensor install commands and credentials, see
 [Install](https://frandorr.github.io/aereo/install/).
 
+Full documentation: https://frandorr.github.io/aereo
+
 ## Examples
 
 > **Performance tip:** Run AerEO in the same region as your data source. During
