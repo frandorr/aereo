@@ -46,6 +46,7 @@ dependencies = [
   "omegaconf>=2.3",
   "pandas>=3.0.1",
   "pandera[geopandas]>=0.24",
+  "pyarrow>=23.0.1",
   "pydantic>=2.12.5",
   "pyproj>=3.7.1",
   "pystac>=1",

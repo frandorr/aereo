@@ -54,7 +54,7 @@ def main() -> None:
         collections={"sentinel-2-l2a": ["red", "nir"]},
         intersects=aoi,
         start_datetime=datetime(2024, 1, 1, tzinfo=timezone.utc),
-        end_datetime=datetime(2024, 1, 10, tzinfo=timezone.utc),
+        end_datetime=datetime(2024, 1, 3, tzinfo=timezone.utc),
     )
     print(f"Found {len(assets)} asset rows")
 
@@ -67,7 +67,7 @@ def main() -> None:
     print(f"Built {len(tasks)} task(s)")
 
     print("\n--- Extract ---")
-    artifacts = job.execute(tasks, executor=LocalExecutor(workers=1))
+    artifacts = job.execute(tasks, executor=LocalExecutor(workers=-1, use_threads=True))
     print(f"Extracted {len(artifacts)} artifact(s)")
 
     catalog_uri = job.write_catalog(artifacts)
