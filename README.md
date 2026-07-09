@@ -4,13 +4,59 @@
 
 # AerEO
 
-> **Access, extract, reproject for Earth Observation — locally or remotely, without reinventing the wheel.**
+> **Access, extract, reproject for Earth Observation — locally or remotely, with a pluggable pipeline, without reinventing the wheel.**
+
+[![Install](https://img.shields.io/badge/install-uv%20add%20aereo-3776AB?logo=python&logoColor=white)](https://frandorr.github.io/aereo/install/)
+[![Docs](https://img.shields.io/badge/docs-frandorr.github.io%2Faereo-2ea44f?logo=materialformkdocs)](https://frandorr.github.io/aereo)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 AerEO is a plugin-based satellite data extraction framework. It wires together
 the catalog, reading, reprojection, and writing tools you already trust (STAC,
 Earthaccess, Satpy, `odc-geo`) behind a single pipeline where every step can be
 replaced. The result: analysis-ready GeoTIFFs aligned to the [Major TOM
 grid](https://github.com/ESA-PhiLab/Major-TOM), ready for ML or downstream analysis.
+
+Each stage below is a plain Python function you can swap. You can keep the
+built-ins, replace one step, or plug in an entirely different block at any
+point in the pipeline.
+
+```mermaid
+flowchart TB
+    classDef required stroke-width:4px
+    classDef optional stroke-dasharray: 5 5
+
+    subgraph SearchAndPrepare ["Search and prepare"]
+        direction LR
+        Search["🔍 Search"] --> Build["📋 Build tasks"]
+    end
+
+    subgraph Extract ["Extract"]
+        direction LR
+        Read["📖 Read assets"] --> Preprocess["⚙️ Preprocess"] --> Reproject["🗺️ Reproject"] --> Postprocess["⚙️ Postprocess"]
+    end
+
+    subgraph WriteArtifacts ["Write artifacts"]
+        direction LR
+        Write["💾 Write GeoTIFF"] --> Catalog["📊 Major TOM catalog<br/>artifacts.parquet"]
+    end
+
+    SearchAndPrepare --> Extract
+    Extract --> WriteArtifacts
+
+    class Search,Build,Read,Write required
+    class Preprocess,Reproject,Postprocess,Catalog optional
+
+    style Search fill:#e3f2fd,stroke:#1565c0
+    style Build fill:#e8f5e9,stroke:#2e7d32
+    style Read fill:#fff3e0,stroke:#ef6c00
+    style Preprocess fill:#f3e5f5,stroke:#6a1b9a
+    style Reproject fill:#fce4ec,stroke:#c2185b
+    style Postprocess fill:#f3e5f5,stroke:#6a1b9a
+    style Write fill:#e0f2f1,stroke:#00695c
+    style Catalog fill:#e8eaf6,stroke:#283593
+```
+
+*Solid borders = required stages. Dashed borders = optional stages. Every stage is interchangeable.*
 
 <p align="center">
   <img src="docs/assets/images/01c-sentinel2-ndwi-search-sentinel2.png" alt="Sentinel-2 NDWI extracted on the Major TOM grid" width="500">
@@ -37,15 +83,47 @@ Sensor-specific search and I/O plugins are separate packages, so you only ship
 what you need. For per-sensor install commands and credentials, see
 [Install](https://frandorr.github.io/aereo/install/).
 
-Full documentation: https://frandorr.github.io/aereo
-
-## Examples
+> **First-run checklist**
+> - Python 3.12 or newer
+> - `pip` or `uv`
+> - Credentials for any catalog that requires them (e.g. NASA Earthdata for VIIRS / Sentinel-3)
+> - Run in the same AWS region as your data source for large extractions
 
 > **Performance tip:** Run AerEO in the same region as your data source. During
 > extraction, data is downloaded from the source catalog; if your runtime is not
 > in the same AWS region as the data, downloads can be **very slow**. Being in the
 > same region is **HIGHLY recommended** to avoid slow transfers and egress
 > charges.
+
+Full documentation: https://frandorr.github.io/aereo
+
+<details>
+<summary><b>📦 Optional extras</b></summary>
+
+AerEO's core install covers STAC search, ODC-based reprojection, GeoTIFF writing,
+and local execution. A few built-in capabilities need extra dependencies:
+
+| Extra | Enables | Install |
+|---|---|---|
+| `serverless` | `LambdaExecutor` and S3 staging (via `boto3`) | `uv add aereo[serverless]` |
+| `swath` | `reproject_swath` / `reproject_pyresample` for 2-D lat/lon swath data | `uv add aereo[swath]` |
+| `viz` | Cartopy-backed plots in `aereo.viz` | `uv add aereo[viz]` |
+| `pc` | Microsoft Planetary Computer integration | `uv add aereo[pc]` |
+| `all` | Everything above in one command | `uv add aereo[all]` |
+
+</details>
+
+## Which example should I run?
+
+| I want to... | Start with | Why |
+|---|---|---|
+| Try without credentials | [01 — Sentinel-2](examples/01-sentinel2.ipynb) | STAC, public data, no auth |
+| Learn the raw API | [Step by step raw pipeline](examples/step_by_step_raw.ipynb) | No Hydra, no config files |
+| Compute an index (NDVI) | [01b — Sentinel-2 NDVI](examples/01b-sentinel2-ndvi.ipynb) | Shows the `postprocess` stage |
+| Use NASA data (VIIRS / Sentinel-3) | [02 — VIIRS](examples/02-viirs.ipynb) or [03 — Sentinel-3 OLCI](examples/03-sentinel3.ipynb) | Earthaccess + Satpy |
+| Run multiple sensors on the same grid | [06 — Multiple constellations](examples/06-multiple-constellation.ipynb) | Compares VIIRS and GOES-19 ABI |
+
+## Examples
 
 All tutorial notebooks can be opened directly in Google Colab. Each notebook starts with a setup cell that installs AerEO and any sensor-specific plugins it needs.
 
@@ -62,58 +140,148 @@ All tutorial notebooks can be opened directly in Google Colab. Each notebook sta
 | [06 — Multiple constellations](examples/06-multiple-constellation.ipynb) | VIIRS + GOES-19 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/06-multiple-constellation.ipynb) |
 | [Step by step raw pipeline](examples/step_by_step_raw.ipynb) | Sentinel-2 (raw API) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/step_by_step_raw.ipynb) |
 
-> **NASA Earthaccess authentication:** The [VIIRS](examples/02-viirs.ipynb),
-> [Sentinel-3 OLCI](examples/03-sentinel3.ipynb), and
-> [Sentinel-3 NDVI](examples/03b-sentinel3-ndvi.ipynb) notebooks use
-> `earthaccess` to query NASA data. You must configure authentication first.
-> The recommended way is to create a `~/.netrc` file — follow the
-> [earthaccess authentication guide](https://earthaccess.readthedocs.io/en/latest/user/howto/authenticate/).
-> For Google Colab, see [Running NASA notebooks in Colab](#running-nasa-notebooks-in-colab).
+<details>
+<summary><b>📡 NASA Earthaccess authentication for Colab</b></summary>
 
-### Running NASA notebooks in Colab
+The [VIIRS](examples/02-viirs.ipynb), [Sentinel-3 OLCI](examples/03-sentinel3.ipynb), and [Sentinel-3 NDVI](examples/03b-sentinel3-ndvi.ipynb) notebooks use `earthaccess` to query NASA data. You must configure authentication first. The recommended way is to create a `~/.netrc` file — follow the [earthaccess authentication guide](https://earthaccess.readthedocs.io/en/latest/user/howto/authenticate/).
 
-The NASA notebooks need a valid `~/.netrc` file. Run this cell once in Colab to create it from your credentials:
+For Google Colab, run this cell once to create `~/.netrc`:
 
 ```python
 import os
 from getpass import getpass
 
-# Get Earthdata credentials from the user
 earthdata_username = getpass("Earthdata username: ")
 earthdata_password = getpass("Earthdata password: ")
 
-# Define the path for the .netrc file in the user's home directory
 netrc_path = os.path.expanduser("~/.netrc")
-
-# Create the .netrc file with the provided credentials
 with open(netrc_path, "w") as f:
     f.write("machine urs.earthdata.nasa.gov login {username} password {password}\n".format(
         username=earthdata_username,
         password=earthdata_password
     ))
-
-# Set permissions for the .netrc file to be readable only by the owner
 os.chmod(netrc_path, 0o600)
-
 print(f"Successfully created {netrc_path} for Earthdata authentication.")
 ```
 
-## Optional extras
+</details>
 
-AerEO's core install covers STAC search, ODC-based reprojection, GeoTIFF writing,
-and local execution. A few built-in capabilities need extra dependencies:
+## Quickstart with a YAML config
 
-| Extra | Enables | Install |
-|---|---|---|
-| `serverless` | `LambdaExecutor` and S3 staging (via `boto3`) | `uv add aereo[serverless]` |
-| `swath` | `reproject_swath` / `reproject_pyresample` for 2-D lat/lon swath data | `uv add aereo[swath]` |
-| `viz` | Cartopy-backed plots in `aereo.viz` | `uv add aereo[viz]` |
-| `pc` | Microsoft Planetary Computer integration | `uv add aereo[pc]` |
-| `all` | Everything above in one command | `uv add aereo[all]` |
+This five-step guide extracts Sentinel-2 red + nir bands from Microsoft Planetary
+Computer over the Chocón reservoir in Argentina. Planetary Computer serves data
+from Azure Blob Storage, so this works well even when your runtime is not in an
+AWS data region. No repo clone required.
+
+<details>
+<summary><b>🛠️ Step 1: create a project (30 seconds)</b></summary>
+
+```bash
+mkdir my_first_job && cd my_first_job
+uv init
+uv add "aereo[pc]"
+```
+
+`aereo[pc]` includes the core framework plus the Planetary Computer signing helper, which gives fast global access to Sentinel-2 data.
+
+</details>
+
+<details>
+<summary><b>🗺️ Step 2: download a sample AOI</b></summary>
+
+```bash
+curl -L -o aoi.geojson https://raw.githubusercontent.com/frandorr/aereo/main/examples/config/aoi/chocon.geojson
+```
+
+</details>
+
+<details>
+<summary><b>📝 Step 3: write the job config</b></summary>
+
+Create `job.yaml`:
+
+```yaml
+name: pc_s2_demo
+grid_dist: 10_000
+output_uri: ./output
+target_aoi: ./aoi.geojson
+
+search:
+  _target_: aereo.builtins.search_stac
+  _partial_: true
+  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
+  collections:
+    sentinel-2-l2a: [B04, B08]
+  intersects: ./aoi.geojson
+  start_datetime: "2024-01-01T00:00:00Z"
+  end_datetime: "2024-01-03T23:59:59Z"
+  pystac_open_params:
+    modifier:
+      _target_: planetary_computer.sign_inplace
+
+read:
+  _partial_: true
+  _target_: aereo.builtins.read_odc_stac
+  patch_url:
+    _target_: planetary_computer.sign
+  dtype: "uint16"
+  nodata: 0
+write:
+  _target_: aereo.builtins.write.write_geotiff
+```
+
+*Key fields:*
+- `grid_dist`: Major TOM grid spacing in meters (`10_000` = 10 km cells).
+- `target_aoi`: Path to a GeoJSON polygon.
+- `collections`: Map of STAC collection names to the bands you want (`B04`, `B08` for Sentinel-2 red / nir).
+- `pystac_open_params.modifier` / `read.patch_url`: Planetary Computer URL signing; required to fetch assets from Azure Blob Storage.
+
+</details>
+
+<details>
+<summary><b>🐍 Step 4: write the runner script</b></summary>
+
+Create `run_job.py`:
+
+```python
+from aereo.pipeline import ExtractionJob
+from aereo.builtins import build_grouped_tasks
+from aereo.executors import LocalExecutor
+
+job = ExtractionJob.load_from_config(".", config_name="job")
+
+assets = job.search()
+if assets.empty:
+    raise SystemExit("No assets found.")
+
+tasks = job.build_tasks(assets, build_grouped_tasks)
+
+# Run only the first task for demo speed.
+artifacts = job.execute(tasks[:1], executor=LocalExecutor(workers=1))
+catalog_uri = job.write_catalog(artifacts)
+print(f"Catalog: {catalog_uri}")
+```
+
+*Why `tasks[:1]`?* A real extraction runs every task; slicing to one task keeps the first demo fast and avoids downloading more data than needed.
+
+</details>
+
+<details>
+<summary><b>▶️ Step 5: run it</b></summary>
+
+```bash
+uv run run_job.py
+```
+
+You will get GeoTIFFs in `./output` plus `output/artifacts.parquet`, where each row is one Major TOM grid cell.
+
+</details>
 
 ## Copy/paste example
 
-Save this as `quickstart.py` and run it with `uv run python quickstart.py`:
+Save this as `quickstart.py` and run it with `uv run quickstart.py`:
+
+> **Network speed note:** This example downloads Sentinel-2 data from Earth Search over the public internet. From a local machine the download can be a bottleneck. For the fastest first experience, run it in Google Colab or an AWS compute instance in the same region as the data (`us-west-2` for Earth Search).
 
 ```python
 """Pure-Python quickstart for AerEO.
@@ -185,7 +353,8 @@ def main() -> None:
     print(f"Built {len(tasks)} task(s)")
 
     print("\n--- Extract ---")
-    artifacts = job.execute(tasks, executor=LocalExecutor(workers=1))
+    # Run only the first task for demo speed.
+    artifacts = job.execute(tasks[:1], executor=LocalExecutor(workers=1))
     print(f"Extracted {len(artifacts)} artifact(s)")
 
     catalog_uri = job.write_catalog(artifacts)
@@ -248,14 +417,54 @@ job = ExtractionJob.load_from_config(
 )
 ```
 
-You can also run configs from the CLI using the example runner:
-
-```bash
-uv run python examples/run_job.py config_name=job_sentinel2 grid_dist=50_000
-```
-
 The `overrides` use Hydra dot notation, so any field in the YAML can be changed
 without editing the file.
+
+## How it works
+
+<details>
+<summary><b>🔄 Pipeline overview</b></summary>
+
+```mermaid
+flowchart LR
+    Search["Search provider"] --> Prepare["Prepare tasks\n(grid + grouping)"]
+    Prepare --> Execute["Execute\n(local / Lambda)"]
+    Execute --> Catalog["Output catalog\n+ GeoTIFFs"]
+```
+
+1. **Search** — query a catalog and get a validated `GeoDataFrame[AssetSchema]`.
+2. **Prepare** — group assets by time and native CRS into `ExtractionTask` objects.
+3. **Execute** — run each task through `read → preprocess → reproject → postprocess → write`, producing grid-aligned artifacts and a catalog.
+
+Any stage can be replaced by a function you write. Learn how in
+[Build a Plugin](https://frandorr.github.io/aereo/plugins/build-a-plugin/).
+
+</details>
+
+## Why AerEO?
+
+| Problem | How AerEO solves it |
+|---|---|
+| Every catalog has a different API | One `job.search(...)` call with swappable search functions. |
+| Tiles do not line up across sensors | Built-in Major TOM grid + local UTM patch geoboxes. |
+| Reprojection boilerplate | Readers/writers can call `reproject_odc` (or any reprojector) as needed. |
+| Mixed-CRS scenes fail | `build_grouped_tasks` groups assets by native CRS. |
+| Notebook → production is hard | Same config package runs in Python and AWS Lambda. |
+| Plugin frameworks force inheritance | AerEO plugins are `@validate_call` functions + standard entry points. |
+
+## Core concepts
+
+<details>
+<summary><b>📖 Core concepts</b></summary>
+
+1. **`ExtractionJob`** — a validated bundle of grid size, output URI, AOI, and reader/writer callables.
+2. **Search function** — e.g. `search_stac`. Pass it to `job.search(...)` with kwargs.
+3. **Task builder function** — e.g. `build_grouped_tasks`. Groups assets into `ExtractionTask` objects.
+4. **`ExtractionTask`** — one unit of work: assets + grid patches + stage pipeline.
+5. **Stage functions** — `read_odc_stac`, `reproject_odc`, `ndvi`, `write_geotiff`, etc. Passed directly to `ExtractionJob(read=..., write=...)`.
+6. **`LocalExecutor`** — runs tasks locally. Swap for `LambdaExecutor` later without changing the pipeline.
+
+</details>
 
 ## What you get
 
@@ -284,43 +493,42 @@ The same Major TOM grid cells extracted from two very different sensors:
 
 See the full walkthrough in [06 — Multiple constellations](examples/06-multiple-constellation.ipynb).
 
-## How it works
+## For ML users
 
-```mermaid
-flowchart LR
-    Search["Search provider"] --> Prepare["Prepare tasks\n(grid + grouping)"]
-    Prepare --> Execute["Execute\n(local / Lambda)"]
-    Execute --> Catalog["Output catalog\n+ GeoTIFFs"]
+AerEO outputs are designed to be loaded directly into ML pipelines. After a run you have:
+
+- GeoTIFFs aligned to the Major TOM grid, so multi-sensor and multi-date stacks line up without manual reprojection.
+- `artifacts.parquet`, a per-cell catalog with columns: `id`, `source_ids`, `start_time`, `end_time`, `uri`, `collection`, `geometry`, `grid_cell`, `grid_dist`, `cell_geometry`, `cell_utm_crs`, `cell_utm_footprint`.
+
+Load the catalog and read the rasters:
+
+```python
+import geopandas as gpd
+import rasterio
+
+df = gpd.read_parquet("output/artifacts.parquet")
+print(df[["grid_cell", "start_time", "uri"]].head())
+
+with rasterio.open(df.iloc[0].uri) as src:
+    print(src.shape, src.count, src.crs)
 ```
 
-1. **Search** — query a catalog and get a validated `GeoDataFrame[AssetSchema]`.
-2. **Prepare** — group assets by time and native CRS into `ExtractionTask`
-   objects.
-3. **Execute** — run each task through `read → preprocess → reproject →
-   postprocess → write`, producing grid-aligned artifacts and a catalog.
+Because every sensor writes the same grid cells, you can join rows by `grid_cell` and `start_time` to build multi-sensor training samples.
 
-Any stage can be replaced by a function you write. Learn how in
-[Build a Plugin](https://frandorr.github.io/aereo/plugins/build-a-plugin/).
+## Troubleshooting
 
-## Why AerEO?
+<details>
+<summary><b>🛠️ Common issues</b></summary>
 
-| Problem | How AerEO solves it |
-|---|---|
-| Every catalog has a different API | One `job.search(...)` call with swappable search functions. |
-| Tiles do not line up across sensors | Built-in Major TOM grid + local UTM patch geoboxes. |
-| Reprojection boilerplate | Readers/writers can call `reproject_odc` (or any reprojector) as needed. |
-| Mixed-CRS scenes fail | `build_grouped_tasks` groups assets by native CRS. |
-| Notebook → production is hard | Same config package runs in Python and AWS Lambda. |
-| Plugin frameworks force inheritance | AerEO plugins are `@validate_call` functions + standard entry points. |
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `No assets found` | Date range or AOI too restrictive | Widen the time range or check the AOI geometry |
+| Downloads are very slow | Running in a different AWS region than the data | Move your runtime to the same region as the catalog (e.g. `us-west-2` for Earth Search) |
+| `earthaccess` authentication error | Missing `.netrc` or expired credentials | Create `~/.netrc` following the [earthaccess guide](https://earthaccess.readthedocs.io/en/latest/user/howto/authenticate/) |
+| `grid_dist` looks wrong | It is in meters, not pixels or degrees | Use values like `10_000` for 10 km cells |
+| Outputs do not line up | Different sensors without a shared grid | Ensure all jobs use the same `grid_dist` and Major TOM grid |
 
-## Core concepts
-
-1. **`ExtractionJob`** — a validated bundle of grid size, output URI, AOI, and reader/writer callables.
-2. **Search function** — e.g. `search_stac`. Pass it to `job.search(...)` with kwargs.
-3. **Task builder function** — e.g. `build_grouped_tasks`. Groups assets into `ExtractionTask` objects.
-4. **`ExtractionTask`** — one unit of work: assets + grid patches + stage pipeline.
-5. **Stage functions** — `read_odc_stac`, `reproject_odc`, `ndvi`, `write_geotiff`, etc. Passed directly to `ExtractionJob(read=..., write=...)`.
-6. **`LocalExecutor`** — runs tasks locally. Swap for `LambdaExecutor` later without changing the pipeline.
+</details>
 
 ## Docs
 

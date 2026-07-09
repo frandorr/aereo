@@ -58,20 +58,6 @@ Or load a single YAML file:
 job = ExtractionJob.from_yaml("my_job.yaml")
 ```
 
-## CLI
-
-Run the same pipeline from the command line with the `aereo` CLI. See the
-[CLI guide](https://frandorr.github.io/aereo/user-guide/cli/) for the full
-command reference and current Hydra override syntax.
-
-```bash
-# List installed plugins
-aereo action=plugins
-
-# Show parameters for a plugin
-aereo action=plugin_params plugin=search_stac
-```
-
 ## Notebooks
 
 | Notebook | Sensor | Description |

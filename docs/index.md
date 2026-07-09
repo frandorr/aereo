@@ -69,7 +69,9 @@ you can access hundreds of constellations without changing your pipeline.
 
 ## Copy/paste example
 
-Save this as `quickstart.py` and run it with `uv run python quickstart.py`:
+Save this as `quickstart.py` and run it with `uv run quickstart.py`:
+
+> **Network speed note:** This example downloads Sentinel-2 data from Earth Search over the public internet. From a local machine the download can be a bottleneck. For the fastest first experience, run it in Google Colab or an AWS compute instance in the same region as the data (`us-west-2` for Earth Search).
 
 ```python
 """Pure-Python quickstart for AerEO.
@@ -141,7 +143,8 @@ def main() -> None:
     print(f"Built {len(tasks)} task(s)")
 
     print("\n--- Extract ---")
-    artifacts = job.execute(tasks, executor=LocalExecutor(workers=1))
+    # Run only the first task for demo speed.
+    artifacts = job.execute(tasks[:1], executor=LocalExecutor(workers=1))
     print(f"Extracted {len(artifacts)} artifact(s)")
 
     catalog_uri = job.write_catalog(artifacts)
