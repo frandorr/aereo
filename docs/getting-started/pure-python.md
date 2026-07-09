@@ -6,6 +6,8 @@ functions you need.
 
 ## Full example
 
+> **Network speed note:** This example downloads Sentinel-2 data from Earth Search over the public internet. From a local machine the download can be a bottleneck. For the fastest first experience, run it in Google Colab or an AWS compute instance in the same region as the data (`us-west-2` for Earth Search).
+
 ```python
 import os
 from datetime import datetime, timezone
@@ -59,7 +61,8 @@ else:
     tasks = job.build_tasks(assets, build_grouped_tasks, cells_per_task=5)
     print(f"Built {len(tasks)} task(s)")
 
-    artifacts = job.execute(tasks, executor=LocalExecutor(workers=1))
+    # Run only the first task for demo speed.
+    artifacts = job.execute(tasks[:1], executor=LocalExecutor(workers=1))
     print(f"Extracted {len(artifacts)} artifact(s)")
 
     catalog_uri = job.write_catalog(artifacts)
