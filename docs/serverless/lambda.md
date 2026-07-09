@@ -53,7 +53,7 @@ assets = job.search(...)
 tasks = job.build_tasks(assets, build_grouped_tasks)
 
 executor = LambdaExecutor(
-    function_name="aereo-extract",
+    function_name="my-aereo-lambda",
     workers=10,
 )
 artifacts = job.execute(tasks, executor=executor)
@@ -79,15 +79,10 @@ That is the only code change.
 ## Packaging
 
 The Lambda function must have AerEO and the same pipeline plugins installed as
-your local environment. The repo provides two starting points:
-
-- `aereo-extract` — a Docker-based runtime with HTTP and Lambda handlers. You
-  can scaffold a project with `aereo-extract init-docker my-lambda`.
-- `projects/aereo-lambda/` — a container image, SAM template, LocalStack setup,
-  and integration tests for the older Lambda handler.
-
-See [`projects/aereo-lambda/README.md`](https://github.com/frandorr/aereo/tree/main/projects/aereo-lambda)
-for full build, local testing, and SAM deployment instructions.
+your local environment. Package it as a Docker image or a Lambda layer that
+includes `aereo`, any sensor-specific plugins, and their dependencies. At
+runtime the handler receives a staged task URI, runs the pipeline, and writes
+results to the configured `output_uri`.
 
 ## Required permissions
 
