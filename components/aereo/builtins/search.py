@@ -20,7 +20,6 @@ from aereo.interfaces.utils import normalize_geometry_input
 from aereo.schemas import AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
 from pydantic import ConfigDict, validate_call
-from pystac_client import Client
 from shapely.geometry import MultiPolygon, Polygon, shape
 from shapely.geometry.base import BaseGeometry
 from structlog import get_logger
@@ -102,6 +101,8 @@ def search_stac(
         client_kwargs["headers"] = {
             str(k): str(v) for k, v in client_kwargs["headers"].items()
         }
+
+    from pystac_client import Client
 
     try:
         client = Client.open(stac_api_url, **client_kwargs)
