@@ -97,6 +97,6 @@ uv run python examples/quickstart_pure_python.py
 - Writing unit tests for plugins.
 
 For production and reusable configs, the Hydra package shown in
-[Your First Pipeline](first-pipeline.md) is usually more convenient. See the
-[Configuration](../configuration/config-package.md) section for details on the
+[Config Package](../configuration/config-package.md) is usually more convenient.
+See the [YAML Schema](../configuration/yaml-schema.md) section for details on the
 YAML schema and overrides.

@@ -107,7 +107,7 @@ uv run mkdocs serve
 
 ## Next step
 
-Head to [Your First Pipeline](getting-started/first-pipeline.md) to extract
+Head to [Pure Python Quickstart](getting-started/pure-python.md) to extract
 your first Sentinel-2 GeoTIFF, or read the
 [Configuration](configuration/config-package.md) section to understand the YAML
 files before you run anything.
