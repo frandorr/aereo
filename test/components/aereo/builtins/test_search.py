@@ -45,7 +45,7 @@ def test_search_stac_missing_api_url():
         search_stac(collections={"test-collection": []})  # type: ignore[call-arg]
 
 
-@patch("aereo.builtins.search.Client")
+@patch("pystac_client.Client")
 def test_search_stac_connection_error(mock_client):
     mock_client.open.side_effect = Exception("Connection timed out")
     provider = partial(
@@ -60,7 +60,7 @@ def test_search_stac_connection_error(mock_client):
         provider()
 
 
-@patch("aereo.builtins.search.Client")
+@patch("pystac_client.Client")
 def test_search_stac_query_error(mock_client):
     mock_catalog = MagicMock()
     mock_client.open.return_value = mock_catalog
@@ -78,7 +78,7 @@ def test_search_stac_query_error(mock_client):
         provider()
 
 
-@patch("aereo.builtins.search.Client")
+@patch("pystac_client.Client")
 def test_search_stac_empty_results(mock_client):
     mock_catalog = MagicMock()
     mock_client.open.return_value = mock_catalog
@@ -97,7 +97,7 @@ def test_search_stac_empty_results(mock_client):
     assert "geometry" in result.columns
 
 
-@patch("aereo.builtins.search.Client")
+@patch("pystac_client.Client")
 def test_search_stac_with_wildcard_assets(mock_client, mock_pystac_item):
     """Profile collections with ['*'] should include all assets."""
     mock_catalog = MagicMock()
@@ -122,7 +122,7 @@ def test_search_stac_with_wildcard_assets(mock_client, mock_pystac_item):
     assert set(result["crs"]) == {"EPSG:32633"}
 
 
-@patch("aereo.builtins.search.Client")
+@patch("pystac_client.Client")
 def test_search_stac_with_channel_filter(mock_client, mock_pystac_item):
     mock_catalog = MagicMock()
     mock_client.open.return_value = mock_catalog
@@ -145,7 +145,7 @@ def test_search_stac_with_channel_filter(mock_client, mock_pystac_item):
     assert result.iloc[0]["href"] == "https://example.com/visual.tif"
 
 
-@patch("aereo.builtins.search.Client")
+@patch("pystac_client.Client")
 def test_search_stac_empty_variables_all_assets(mock_client, mock_pystac_item):
     """Profile collections with an empty variable list should include all assets."""
     mock_catalog = MagicMock()
@@ -168,7 +168,7 @@ def test_search_stac_empty_variables_all_assets(mock_client, mock_pystac_item):
     assert channel_ids == {"B04", "visual"}
 
 
-@patch("aereo.builtins.search.Client")
+@patch("pystac_client.Client")
 def test_search_stac_no_crs_when_proj_missing(mock_client, mock_pystac_item):
     """If the STAC item has no projection extension, crs column is omitted."""
     mock_pystac_item.properties = {"datetime": "2023-05-12T10:10:31Z"}
@@ -191,7 +191,7 @@ def test_search_stac_no_crs_when_proj_missing(mock_client, mock_pystac_item):
     assert "crs" not in result.columns
 
 
-@patch("aereo.builtins.search.Client")
+@patch("pystac_client.Client")
 def test_search_stac_headers_passing(mock_client, mock_pystac_item):
     mock_catalog = MagicMock()
     mock_client.open.return_value = mock_catalog
@@ -216,7 +216,7 @@ def test_search_stac_headers_passing(mock_client, mock_pystac_item):
     )
 
 
-@patch("aereo.builtins.search.Client")
+@patch("pystac_client.Client")
 def test_search_stac_params_forwarding_and_datetime(mock_client, mock_pystac_item):
     mock_catalog = MagicMock()
     mock_client.open.return_value = mock_catalog
@@ -252,7 +252,7 @@ def test_search_stac_params_forwarding_and_datetime(mock_client, mock_pystac_ite
     assert search_kwargs["query"] == {"eo:cloud_cover": {"lt": 10}}
 
 
-@patch("aereo.builtins.search.Client")
+@patch("pystac_client.Client")
 def test_search_stac_partial_datetimes(mock_client, mock_pystac_item):
     mock_catalog = MagicMock()
     mock_client.open.return_value = mock_catalog
@@ -284,7 +284,7 @@ def test_search_stac_partial_datetimes(mock_client, mock_pystac_item):
     assert mock_catalog.search.call_args[1]["datetime"] == "../2023-05-13T00:00:00Z"
 
 
-@patch("aereo.builtins.search.Client")
+@patch("pystac_client.Client")
 def test_search_stac_pystac_params_forwarding(mock_client, mock_pystac_item):
     mock_catalog = MagicMock()
     mock_client.open.return_value = mock_catalog
@@ -326,7 +326,7 @@ def test_search_stac_accepts_geojson_path(tmp_path):
         '"properties": {}}'
     )
 
-    with patch("aereo.builtins.search.Client") as mock_client:
+    with patch("pystac_client.Client") as mock_client:
         mock_catalog = MagicMock()
         mock_client.open.return_value = mock_catalog
         mock_search_request = MagicMock()
@@ -352,7 +352,7 @@ def test_search_stac_accepts_geojson_dict():
         "coordinates": [[[10, 45], [11, 45], [11, 46], [10, 46], [10, 45]]],
     }
 
-    with patch("aereo.builtins.search.Client") as mock_client:
+    with patch("pystac_client.Client") as mock_client:
         mock_catalog = MagicMock()
         mock_client.open.return_value = mock_catalog
         mock_search_request = MagicMock()
