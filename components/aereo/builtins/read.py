@@ -18,6 +18,26 @@ try:
 except ImportError:  # pragma: no cover
     odc_load = None  # type: ignore[assignment]
 
+try:
+    from odc.loader import configure_rio
+except ImportError:  # pragma: no cover
+    configure_rio = None  # type: ignore[assignment]
+
+_RIO_CONFIGURED = False
+
+
+def _ensure_rio_configured() -> None:
+    """Pre-initialize odc.loader's GDAL/rasterio session once per process.
+
+    This avoids a deadlock that can occur when ``odc.stac.load`` initializes
+    the ThreadSession lazily inside nested ``rio_env`` context managers on
+    some GDAL/rasterio combinations.
+    """
+    global _RIO_CONFIGURED
+    if configure_rio is not None and not _RIO_CONFIGURED:
+        configure_rio(cloud_defaults=True)
+        _RIO_CONFIGURED = True
+
 
 @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
 def read_odc_stac(
@@ -67,6 +87,8 @@ def read_odc_stac(
 
     if task.bbox is not None and "bbox" not in params:
         params["bbox"] = task.bbox
+
+    _ensure_rio_configured()
 
     ds: xr.Dataset = odc_load(items, **params)
 
