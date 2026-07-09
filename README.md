@@ -29,6 +29,52 @@ All tutorial notebooks can be opened directly in Google Colab. Each notebook sta
 | [06 — Multiple constellations](examples/06-multiple-constellation.ipynb) | VIIRS + GOES-19 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/06-multiple-constellation.ipynb) |
 | [Step by step raw pipeline](examples/step_by_step_raw.ipynb) | Sentinel-2 (raw API) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/step_by_step_raw.ipynb) |
 
+> **NASA Earthaccess authentication:** The [VIIRS](examples/02-viirs.ipynb),
+> [Sentinel-3 OLCI](examples/03-sentinel3.ipynb), and
+> [Sentinel-3 NDVI](examples/03b-sentinel3-ndvi.ipynb) notebooks use
+> `earthaccess` to query NASA data. You must configure authentication first.
+> The recommended way is to create a `~/.netrc` file — follow the
+> [earthaccess authentication guide](https://earthaccess.readthedocs.io/en/latest/user/howto/authenticate/).
+> For Google Colab, see [Running NASA notebooks in Colab](#running-nasa-notebooks-in-colab).
+
+### Running NASA notebooks in Colab
+
+In Colab, the simplest option is to call `earthaccess.login()` and enter your
+NASA Earthdata username and password when prompted:
+
+```python
+import earthaccess
+
+earthaccess.login()
+```
+
+If you prefer not to type credentials each time, set environment variables in a
+notebook cell before calling `login`:
+
+```python
+import os
+from getpass import getpass
+
+os.environ["EARTHDATA_USERNAME"] = getpass("Earthdata username: ")
+os.environ["EARTHDATA_PASSWORD"] = getpass("Earthdata password: ")
+
+import earthaccess
+
+earthaccess.login(strategy="environment")
+```
+
+Or write a `~/.netrc` file directly from the notebook:
+
+```python
+from pathlib import Path
+
+Path.home().joinpath(".netrc").write_text(
+    "machine urs.earthdata.nasa.gov login YOUR_USERNAME password YOUR_PASSWORD\n"
+)
+```
+
+Replace `YOUR_USERNAME` and `YOUR_PASSWORD` with your NASA Earthdata credentials.
+
 ## Install
 
 AerEO's core framework includes built-in search (STAC, NASA Earthaccess, etc.),
@@ -57,6 +103,10 @@ pip install aereo
 uv add aereo aereo-read-satpy
 # or
 pip install aereo aereo-read-satpy
+
+> The VIIRS and Sentinel-3 notebooks require a NASA Earthdata account. See the
+> [earthaccess authentication guide](https://earthaccess.readthedocs.io/en/latest/user/howto/authenticate/)
+> or the [Colab instructions](#running-nasa-notebooks-in-colab) below.
 
 # GOES ABI public S3 data
 uv add aereo aereo-search-aws-goes aereo-read-satpy
