@@ -27,17 +27,17 @@ flowchart TB
 
     subgraph SearchAndPrepare ["Search and prepare"]
         direction LR
-        Search["🔍 Search"] --> Build["📋 Build tasks"]
+        Search["Search"] --> Build["Build tasks"]
     end
 
     subgraph Extract ["Extract"]
         direction LR
-        Read["📖 Read assets"] --> Preprocess["⚙️ Preprocess"] --> Reproject["🗺️ Reproject"] --> Postprocess["⚙️ Postprocess"]
+        Read["Read assets"] --> Preprocess["Preprocess"] --> Reproject["Reproject"] --> Postprocess["Postprocess"]
     end
 
     subgraph WriteArtifacts ["Write artifacts"]
         direction LR
-        Write["💾 Write GeoTIFF"] --> Catalog["📊 Major TOM catalog<br/>artifacts.parquet"]
+        Write["Write GeoTIFF"] --> Catalog["Major TOM catalog<br/>artifacts.parquet"]
     end
 
     SearchAndPrepare --> Extract
@@ -98,7 +98,7 @@ what you need. For per-sensor install commands and credentials, see
 Full documentation: https://frandorr.github.io/aereo
 
 <details>
-<summary><b>📦 Optional extras</b></summary>
+<summary><b>Optional extras</b></summary>
 
 AerEO's core install covers STAC search, ODC-based reprojection, GeoTIFF writing,
 and local execution. A few built-in capabilities need extra dependencies:
@@ -141,7 +141,7 @@ All tutorial notebooks can be opened directly in Google Colab. Each notebook sta
 | [Step by step raw pipeline](examples/step_by_step_raw.ipynb) | Sentinel-2 (raw API) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/step_by_step_raw.ipynb) |
 
 <details>
-<summary><b>📡 NASA Earthaccess authentication for Colab</b></summary>
+<summary><b>NASA Earthaccess authentication for Colab</b></summary>
 
 The [VIIRS](examples/02-viirs.ipynb), [Sentinel-3 OLCI](examples/03-sentinel3.ipynb), and [Sentinel-3 NDVI](examples/03b-sentinel3-ndvi.ipynb) notebooks use `earthaccess` to query NASA data. You must configure authentication first. The recommended way is to create a `~/.netrc` file — follow the [earthaccess authentication guide](https://earthaccess.readthedocs.io/en/latest/user/howto/authenticate/).
 
@@ -174,7 +174,7 @@ from Azure Blob Storage, so this works well even when your runtime is not in an
 AWS data region. No repo clone required.
 
 <details>
-<summary><b>🛠️ Step 1: create a project (30 seconds)</b></summary>
+<summary><b>Step 1: create a project (30 seconds)</b></summary>
 
 ```bash
 mkdir my_first_job && cd my_first_job
@@ -187,7 +187,7 @@ uv add "aereo[pc]"
 </details>
 
 <details>
-<summary><b>🗺️ Step 2: download a sample AOI</b></summary>
+<summary><b>Step 2: download a sample AOI</b></summary>
 
 ```bash
 curl -L -o aoi.geojson https://raw.githubusercontent.com/frandorr/aereo/main/examples/config/aoi/chocon.geojson
@@ -196,7 +196,7 @@ curl -L -o aoi.geojson https://raw.githubusercontent.com/frandorr/aereo/main/exa
 </details>
 
 <details>
-<summary><b>📝 Step 3: write the job config</b></summary>
+<summary><b>Step 3: write the job config</b></summary>
 
 Create `job.yaml`:
 
@@ -239,7 +239,7 @@ write:
 </details>
 
 <details>
-<summary><b>🐍 Step 4: write the runner script</b></summary>
+<summary><b>Step 4: write the runner script</b></summary>
 
 Create `run_job.py`:
 
@@ -267,7 +267,7 @@ print(f"Catalog: {catalog_uri}")
 </details>
 
 <details>
-<summary><b>▶️ Step 5: run it</b></summary>
+<summary><b>Step 5: run it</b></summary>
 
 ```bash
 uv run run_job.py
@@ -423,7 +423,7 @@ without editing the file.
 ## How it works
 
 <details>
-<summary><b>🔄 Pipeline overview</b></summary>
+<summary><b>Pipeline overview</b></summary>
 
 ```mermaid
 flowchart LR
@@ -455,7 +455,7 @@ Any stage can be replaced by a function you write. Learn how in
 ## Core concepts
 
 <details>
-<summary><b>📖 Core concepts</b></summary>
+<summary><b>Core concepts</b></summary>
 
 1. **`ExtractionJob`** — a validated bundle of grid size, output URI, AOI, and reader/writer callables.
 2. **Search function** — e.g. `search_stac`. Pass it to `job.search(...)` with kwargs.
@@ -518,7 +518,7 @@ Because every sensor writes the same grid cells, you can join rows by `grid_cell
 ## Troubleshooting
 
 <details>
-<summary><b>🛠️ Common issues</b></summary>
+<summary><b>Common issues</b></summary>
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
