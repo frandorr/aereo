@@ -8,6 +8,7 @@
 
 [![Install](https://img.shields.io/badge/install-uv%20add%20aereo-3776AB?logo=python&logoColor=white)](https://frandorr.github.io/aereo/install/)
 [![Docs](https://img.shields.io/badge/docs-frandorr.github.io%2Faereo-2ea44f?logo=materialformkdocs)](https://frandorr.github.io/aereo)
+[![Tutorials](https://img.shields.io/badge/tutorials-Jupyter%20Book-orange?logo=jupyter)](https://frandorr.github.io/aereo-notebooks)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 AerEO is a plugin-based satellite data extraction framework. It wires together
@@ -20,43 +21,9 @@ Each stage below is a plain Python function you can swap. You can keep the
 built-ins, replace one step, or plug in an entirely different block at any
 point in the pipeline.
 
-```mermaid
-flowchart TB
-    classDef required stroke-width:4px
-    classDef optional stroke-dasharray: 5 5
+<img src="docs/assets/images/aereo_pipeline_animation.svg" alt="AerEO pipeline animation: from ExtractionJob to MajorTOM artifacts" width="100%">
 
-    subgraph SearchAndPrepare ["Search and prepare"]
-        direction LR
-        Search["Search"] --> Build["Build tasks"]
-    end
-
-    subgraph Extract ["Extract"]
-        direction LR
-        Read["Read assets"] --> Preprocess["Preprocess"] --> Reproject["Reproject"] --> Postprocess["Postprocess"]
-    end
-
-    subgraph WriteArtifacts ["Write artifacts"]
-        direction LR
-        Write["Write GeoTIFF"] --> Catalog["Major TOM catalog<br/>artifacts.parquet"]
-    end
-
-    SearchAndPrepare --> Extract
-    Extract --> WriteArtifacts
-
-    class Search,Build,Read,Write required
-    class Preprocess,Reproject,Postprocess,Catalog optional
-
-    style Search fill:#e3f2fd,stroke:#1565c0
-    style Build fill:#e8f5e9,stroke:#2e7d32
-    style Read fill:#fff3e0,stroke:#ef6c00
-    style Preprocess fill:#f3e5f5,stroke:#6a1b9a
-    style Reproject fill:#fce4ec,stroke:#c2185b
-    style Postprocess fill:#f3e5f5,stroke:#6a1b9a
-    style Write fill:#e0f2f1,stroke:#00695c
-    style Catalog fill:#e8eaf6,stroke:#283593
-```
-
-*Solid borders = required stages. Dashed borders = optional stages. Every stage is interchangeable.*
+*Solid borders = required stages. Dashed borders = optional stages. Every stage is interchangeable. The animation loops through the flow: configure → search → build tasks → extract per task → MajorTOM artifacts.*
 
 <p align="center">
   <img src="docs/assets/images/01c-sentinel2-ndwi-search-sentinel2.png" alt="Sentinel-2 NDWI extracted on the Major TOM grid" width="500">
@@ -125,7 +92,9 @@ and local execution. A few built-in capabilities need extra dependencies:
 
 ## Examples
 
-All tutorial notebooks can be opened directly in Google Colab. Each notebook starts with a setup cell that installs AerEO and any sensor-specific plugins it needs.
+All tutorial notebooks can be opened directly in Google Colab, or read as an
+executable book at **[frandorr.github.io/aereo-notebooks](https://frandorr.github.io/aereo-notebooks)**.
+Each notebook starts with a setup cell that installs AerEO and any sensor-specific plugins it needs.
 
 | Notebook | Sensor(s) | Open in Colab |
 |---|---|---|
@@ -536,6 +505,7 @@ Because every sensor writes the same grid cells, you can join rows by `grid_cell
 - [Pure Python Quickstart](https://frandorr.github.io/aereo/getting-started/pure-python/) — first extraction in 5 minutes
 - [Configuration](https://frandorr.github.io/aereo/configuration/config-package/) — Hydra config package and YAML schema
 - [Tutorials](https://frandorr.github.io/aereo/examples/) — Sentinel-2, VIIRS, Sentinel-3, Tessera, GOES-19
+- [Jupyter Book](https://frandorr.github.io/aereo-notebooks/) — the same tutorials as a readable, Binder-ready book
 - [Build a Plugin](https://frandorr.github.io/aereo/plugins/build-a-plugin/) — add a search, reader, or processing step
 - [Run on AWS Lambda](https://frandorr.github.io/aereo/serverless/lambda/) — go serverless by changing one line
 
