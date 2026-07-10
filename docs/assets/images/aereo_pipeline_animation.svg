@@ -85,7 +85,7 @@
   </style>
 
   <rect width="1100" height="540" fill="#f8fafc" rx="12"/>
-  <text class="title" x="40" y="38">Option 4a — Minimal cards (horizontal tabs)</text>
+  <text class="title" x="40" y="38">AerEO extraction pipeline</text>
 
   <!-- Job config panel -->
   <rect x="30" y="70" width="260" height="440" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
