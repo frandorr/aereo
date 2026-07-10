@@ -1,8 +1,0 @@
-#!/bin/bash
-set -e
-
-# Verify the local editable install is importable.
-python - <<'PY'
-import aereo
-print("Binder environment ready — aereo", getattr(aereo, "__version__", "unknown"))
-PY

@@ -505,7 +505,7 @@ Because every sensor writes the same grid cells, you can join rows by `grid_cell
 - [Pure Python Quickstart](https://frandorr.github.io/aereo/getting-started/pure-python/) — first extraction in 5 minutes
 - [Configuration](https://frandorr.github.io/aereo/configuration/config-package/) — Hydra config package and YAML schema
 - [Tutorials](https://frandorr.github.io/aereo/examples/) — Sentinel-2, VIIRS, Sentinel-3, Tessera, GOES-19
-- [Jupyter Book](https://frandorr.github.io/aereo-notebooks/) — the same tutorials as a readable, Binder-ready book
+- [Jupyter Book](https://frandorr.github.io/aereo-notebooks/) — the same tutorials as an interactive executable book
 - [Build a Plugin](https://frandorr.github.io/aereo/plugins/build-a-plugin/) — add a search, reader, or processing step
 - [Run on AWS Lambda](https://frandorr.github.io/aereo/serverless/lambda/) — go serverless by changing one line
 
