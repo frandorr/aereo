@@ -300,3 +300,72 @@ def test_cells_bounds_exported_from_module():
     from aereo.grid import cells_bounds
 
     assert callable(cells_bounds)
+
+
+# --- Non-integer / sub-metre resolution tests ---
+
+
+def test_geobox_sub_metre_resolution():
+    """Sub-metre resolutions should not trigger ZeroDivisionError."""
+    polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+    cell = core.GridCell(id="0U_0R", d=1000, cell_geometry=polygon)
+
+    gb = cell.to_geobox(resolution=0.3)
+    assert isinstance(gb, GeoBox)
+    # Width must be at least the nominal cell size.
+    assert gb.shape.x * 0.3 >= 1000
+    assert gb.shape.y * 0.3 >= 1000
+
+
+def test_geobox_modis_like_resolution():
+    """Non-integer-metre resolutions such as MODIS (~231.656 m) must work."""
+    polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+    cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
+
+    modis_res = 231.656358325958
+    gb = cell.to_geobox(resolution=modis_res)
+    assert isinstance(gb, GeoBox)
+    assert gb.shape.x * modis_res >= 10000
+    assert gb.shape.y * modis_res >= 10000
+
+
+def test_geobox_incommensurate_alignment_raises():
+    """Alignment resolutions that are not integer multiples of the target raise."""
+    polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+    cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
+
+    with pytest.raises(ValueError, match="integer multiples"):
+        cell.to_geobox(resolution=400.0, alignment_resolution=1500.0)
+
+
+def test_geobox_non_positive_resolution_raises():
+    """Zero or negative resolutions are rejected."""
+    polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+    cell = core.GridCell(id="0U_0R", d=10000, cell_geometry=polygon)
+
+    with pytest.raises(ValueError, match="resolution must be positive"):
+        cell.to_geobox(resolution=0.0)
+
+    with pytest.raises(ValueError, match="resolution must be positive"):
+        cell.to_geobox(resolution=-10.0)
+
+    with pytest.raises(ValueError, match="alignment_resolution must be positive"):
+        cell.to_geobox(resolution=10.0, alignment_resolution=-10.0)
+
+
+def test_geobox_alignment_preserves_sub_metre_origin():
+    """Nested sub-metre resolutions with a commensurate alignment share an origin."""
+    polygon = Polygon([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+    cell = core.GridCell(id="0U_0R", d=1000, cell_geometry=polygon)
+
+    gb_fine = cell.to_geobox(resolution=0.1, alignment_resolution=0.5)
+    gb_coarse = cell.to_geobox(resolution=0.5, alignment_resolution=0.5)
+
+    assert gb_fine.extent.boundingbox.left == pytest.approx(
+        gb_coarse.extent.boundingbox.left
+    )
+    assert gb_fine.extent.boundingbox.top == pytest.approx(
+        gb_coarse.extent.boundingbox.top
+    )
+    assert gb_fine.shape.x == gb_coarse.shape.x * 5
+    assert gb_fine.shape.y == gb_coarse.shape.y * 5

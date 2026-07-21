@@ -88,6 +88,47 @@ def _make_cell_polygon(
     )
 
 
+def _aligned_step(resolution: float, alignment_resolution: float) -> float:
+    """Return a positive step length that is a multiple of both resolutions.
+
+    The step is used to round the GeoBox half-width so the resulting width
+    contains an integer number of pixels at both the target resolution and
+    the alignment resolution.
+
+    Args:
+        resolution: Target pixel resolution in metres. Must be positive.
+        alignment_resolution: Alignment resolution in metres. Must be positive.
+
+    Returns:
+        A positive float that is a common multiple of both resolutions.
+
+    Raises:
+        ValueError: If either resolution is not positive, or if the two
+            resolutions are not commensurate (i.e. one is not an integer
+            multiple of the other within floating-point tolerance).
+    """
+    if resolution <= 0:
+        raise ValueError(f"resolution must be positive, got {resolution}")
+    if alignment_resolution <= 0:
+        raise ValueError(
+            f"alignment_resolution must be positive, got {alignment_resolution}"
+        )
+
+    if math.isclose(resolution, alignment_resolution, rel_tol=1e-9, abs_tol=1e-9):
+        return resolution
+
+    r_min, r_max = sorted((resolution, alignment_resolution))
+    ratio = r_max / r_min
+    k = round(ratio)
+    if not math.isclose(ratio, k, rel_tol=1e-9, abs_tol=1e-9):
+        raise ValueError(
+            f"resolution ({resolution}) and alignment_resolution "
+            f"({alignment_resolution}) must be integer multiples of each other "
+            f"for aligned nesting; their ratio is {ratio:.6f}"
+        )
+    return r_max
+
+
 @attrs.frozen
 class GridCell:
     """A single raw MajorTOM grid cell.
@@ -146,29 +187,44 @@ class GridCell:
     ) -> GeoBox:
         """Return an odc-geo GeoBox for this cell's UTM footprint.
 
-        The GeoBox is centred on the reprojected WGS84 centroid and its
-        dimensions are an integer number of pixels, so it covers at least
-        ``d * (1 + margin/100)`` metres in each direction. The centre and
-        half-width are snapped to ``alignment_resolution`` (defaulting to
-        ``resolution``) and the bounding box is built with ``anchor='edge'``,
-        which preserves the snapped extent.
+        The GeoBox is centred on the reprojected WGS84 centroid, snapped to the
+        alignment grid. Its dimensions are an integer number of pixels, so it
+        covers at least ``d * (1 + margin/100)`` metres in each direction. The
+        centre and half-width are snapped to ``alignment_resolution`` (defaulting
+        to ``resolution``) and the bounding box is built with ``anchor='edge'``,
+        which preserves the snapped extent. Because the centre is snapped, the
+        actual box centre can differ from the true reprojected centroid by up to
+        ``alignment_resolution / 2``.
 
         To guarantee that nested resolutions share the same origin (e.g. VIIRS
         at 400 m and GOES at 2000 m), pass the coarser resolution as
         ``alignment_resolution`` when building the finer-resolution GeoBox. The
         half-width is then rounded up to a multiple of both resolutions, so the
-        finer grid is an exact refinement of the coarser one.
+        finer grid is an exact refinement of the coarser one. This guarantee
+        assumes the same ``GridCell`` instance (therefore the same ``d``) and
+        the same ``margin`` are used for both calls; different margins produce
+        different extents and break pixel-level alignment.
+
+        ``resolution`` and ``alignment_resolution`` must be positive and
+        commensurate: one must be an integer multiple of the other. This is
+        always true when they are equal.
 
         Args:
-            resolution: Target pixel resolution in metres.
+            resolution: Target pixel resolution in metres. Must be positive.
             margin: Percentage margin added to the patch's nominal size
                 (e.g. 5.0 for 5%).
             alignment_resolution: Grid to which the centre and half-width are
                 snapped. Defaults to ``resolution``. Use a coarser resolution
                 when you need pixel-level alignment across nested extractions.
+                Must be a positive integer multiple of ``resolution`` (or vice
+                versa).
 
         Returns:
             A GeoBox aligned to the cell's UTM grid point.
+
+        Raises:
+            ValueError: If ``resolution`` or ``alignment_resolution`` is not
+                positive, or if they are not commensurate.
         """
         utm_centroid = cast(
             Point,
@@ -181,17 +237,21 @@ class GridCell:
             alignment_resolution if alignment_resolution is not None else resolution
         )
 
+        # Validate resolutions and compute the rounding step before using
+        # align_res in any division.
+        nominal_half = (self.d * (1 + margin / 100)) / 2
+        step = _aligned_step(resolution, align_res)
+
         # Snap the centre to the alignment grid. Using the same alignment grid
-        # for different resolutions keeps origins stable.
+        # for different resolutions keeps origins stable. The snapped centre may
+        # differ from the true centroid by up to align_res / 2.
         cx = round(utm_centroid.x / align_res) * align_res
         cy = round(utm_centroid.y / align_res) * align_res
         crs = self.utm_crs
 
-        nominal_half = (self.d * (1 + margin / 100)) / 2
         # Round the half-width up to a multiple of both the target resolution
         # and the alignment resolution so the output shape is an integer number
         # of pixels at both resolutions.
-        step = math.lcm(int(round(resolution)), int(round(align_res)))
         exact_half = math.ceil(nominal_half / step) * step
 
         bbox = (cx - exact_half, cy - exact_half, cx + exact_half, cy + exact_half)
