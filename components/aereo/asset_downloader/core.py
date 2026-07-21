@@ -542,7 +542,6 @@ def download_task_assets(
         logger.debug(
             "file_downloaded",
             local_path=str(lp),
-            engine="satpy",
         )
 
     return [str(lp) for lp in local_paths]
