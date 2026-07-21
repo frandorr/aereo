@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.1 (2026-07-21)
+
+- Fix `GridCell.to_geobox` for non-integer and sub-metre resolutions (e.g. MODIS, < 1 m).
+- Lazy-import `pystac_client` to speed up config loading.
+- Refresh README layout, onboarding, and examples gallery.
+- Remove references to retired `aereo-lambda` and `aereo-extract` projects from docs.
+- Update tutorial notebooks with Colab badges and Earthdata authentication notes.
+
 ## 1.2.0 (2026-07-09)
 
 - Add `pc` optional extra for Microsoft Planetary Computer support (`uv add "aereo[pc]"`).
