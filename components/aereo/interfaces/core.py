@@ -183,6 +183,9 @@ def build_collection_asset_filters(
     collections_config: Mapping[str, Sequence[str]] | Sequence[str] | None,
 ) -> tuple[list[str], dict[str, set[str] | None]]:
     """Derive collection list and per-collection asset filters from configuration mapping or sequence.
+    For example: {"sentinel-2": ["B01", "B02", "B03"], "landsat-8": ["B2", "B3", "B4"]}
+    becomes (["sentinel-2", "landsat-8"], {"sentinel-2": {"B01", "B02", "B03"}, "landsat-8": {"B2", "B3", "B4"}}).
+    Another example: ["sentinel-2", "landsat-8"] becomes (["sentinel-2", "landsat-8"], {"sentinel-2": None, "landsat-8": None}).
 
     Args:
         collections_config: Mapping of collection -> list of asset/channel keys,
