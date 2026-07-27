@@ -1,0 +1,12 @@
+defaults:
+  - job_sentinel1
+  - _self_
+
+name: sentinel1_db
+output_uri: /tmp/aereo_extraction_s1_db
+
+# The to_db processor comes from the demo plugin package
+# (examples/plugins/aereo_demo_plugin), registered via entry points.
+postprocess:
+  - _target_: aereo_demo_plugin.processors.to_db
+    _partial_: true

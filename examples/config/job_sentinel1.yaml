@@ -1,0 +1,38 @@
+# Common vars to reuse in the config
+target_bands: [vv, vh]
+aoi_path: config/aoi/chocon.geojson
+# Common Job config, like name, MajorTOM grid distance, etc
+
+name: sentinel1_sample
+grid_dist: 10_000
+grid_cells_margin: 10
+target_aoi: ${aoi_path}
+output_uri: /tmp/aereo_extraction_s1
+overwrite: false
+
+search:
+  _target_: aereo.builtins.search_stac
+  _partial_: true
+  stac_api_url: "https://planetarycomputer.microsoft.com/api/stac/v1"
+  collections:
+    sentinel-1-grd: ${target_bands}
+  intersects: ${aoi_path}
+  start_datetime: "2024-03-20T00:00:00Z"
+  end_datetime: "2024-03-31T23:59:59Z"
+  pystac_open_params:
+    modifier:
+      _target_: planetary_computer.sign_inplace
+
+read:
+  _partial_: true
+  _target_: aereo.builtins.read_odc_stac
+  patch_url:
+    _target_: planetary_computer.sign
+  dtype: "float32"
+  # Planetary Computer's sentinel-1-grd items carry no proj metadata, so
+  # odc-stac cannot auto-guess the grid. Chocon is UTM 19S; GRD IW is 10 m.
+  crs: "EPSG:32719"
+  resolution: 10
+
+write:
+  _target_: aereo.builtins.write.write_geotiff

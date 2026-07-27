@@ -174,6 +174,10 @@ nav:
       - GeoTessera: examples/04-tessera.ipynb
       - GOES-19 ABI: examples/05-goes19.ipynb
       - Multiple constellations: examples/06-multiple-constellation.ipynb
+      - Sentinel-1 SAR: examples/07-sentinel1.ipynb
+      - ML-ready dataset: examples/08-ml-dataset.ipynb
+      - Build your own plugin: examples/09-custom-plugin.ipynb
+      - GOES-19 + CHIRPS (earthlens): examples/10-earthlens.ipynb
   - Configuration:
       - Config Package: configuration/config-package.md
       - YAML Schema: configuration/yaml-schema.md
