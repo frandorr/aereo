@@ -89,6 +89,9 @@ and local execution. A few built-in capabilities need extra dependencies:
 | Compute an index (NDVI) | [01b — Sentinel-2 NDVI](examples/01b-sentinel2-ndvi.ipynb) | Shows the `postprocess` stage |
 | Use NASA data (VIIRS / Sentinel-3) | [02 — VIIRS](examples/02-viirs.ipynb) or [03 — Sentinel-3 OLCI](examples/03-sentinel3.ipynb) | Earthaccess + Satpy |
 | Run multiple sensors on the same grid | [06 — Multiple constellations](examples/06-multiple-constellation.ipynb) | Compares VIIRS and GOES-19 ABI |
+| Work with SAR (radar) | [07 — Sentinel-1 SAR](examples/07-sentinel1.ipynb) | GRD backscatter, no credentials needed |
+| Build an ML training dataset | [08 — ML-ready dataset](examples/08-ml-dataset.ipynb) | Joins S2 NDVI + Sentinel-1 SAR by `grid_cell`, stacks tensors |
+| Extend AerEO with your own code | [09 — Build your own plugin](examples/09-custom-plugin.ipynb) | Custom processor + entry points |
 
 ## Examples
 
@@ -107,6 +110,9 @@ Each notebook starts with a setup cell that installs AerEO and any sensor-specif
 | [04 — GeoTessera](examples/04-tessera.ipynb) | GeoTessera | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/04-tessera.ipynb) |
 | [05 — GOES-19 ABI](examples/05-goes19.ipynb) | GOES-19 ABI | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/05-goes19.ipynb) |
 | [06 — Multiple constellations](examples/06-multiple-constellation.ipynb) | VIIRS + GOES-19 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/06-multiple-constellation.ipynb) |
+| [07 — Sentinel-1 SAR](examples/07-sentinel1.ipynb) | Sentinel-1 GRD | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/07-sentinel1.ipynb) |
+| [08 — ML-ready dataset](examples/08-ml-dataset.ipynb) | Sentinel-2 + Sentinel-1 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/08-ml-dataset.ipynb) |
+| [09 — Build your own plugin](examples/09-custom-plugin.ipynb) | Sentinel-1 GRD (custom processor) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/09-custom-plugin.ipynb) |
 | [Step by step raw pipeline](examples/step_by_step_raw.ipynb) | Sentinel-2 (raw API) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/frandorr/aereo/blob/main/examples/step_by_step_raw.ipynb) |
 
 <details>

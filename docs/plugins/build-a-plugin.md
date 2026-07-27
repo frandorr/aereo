@@ -28,17 +28,18 @@ Here is a processor that scales every band by a constant factor:
 
 ```python
 import xarray as xr
-from pydantic import validate_call
+from pydantic import ConfigDict, validate_call
 
 
-@validate_call
+@validate_call(config=ConfigDict(arbitrary_types_allowed=True))
 def scale(ds: xr.Dataset, factor: float = 1.0) -> xr.Dataset:
     """Scale all data variables by ``factor``."""
     return ds * factor
 ```
 
 The `@validate_call` decorator gives you Pydantic validation of arguments for
-free.
+free. `arbitrary_types_allowed` is required because `xr.Dataset` is not a
+Pydantic-native type.
 
 Register it under the `aereo.plugins` group in your package's `pyproject.toml`:
 
@@ -175,10 +176,10 @@ schema contract for every stage.
 
     ```python
     import xarray as xr
-    from pydantic import validate_call
+    from pydantic import ConfigDict, validate_call
 
 
-    @validate_call
+    @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
     def scale(ds: xr.Dataset, factor: float = 1.0) -> xr.Dataset:
         """Scale all data variables by ``factor``."""
         return ds * factor

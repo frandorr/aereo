@@ -1,0 +1,17 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aereo-demo-plugin"
+version = "0.1.0"
+description = "Demo AerEO plugin: SAR backscatter to decibels processor."
+requires-python = ">=3.12"
+dependencies = [
+    "numpy",
+    "pydantic",
+    "xarray",
+]
+
+[project.entry-points."aereo.plugins"]
+process_to_db = "aereo_demo_plugin.processors:to_db"
