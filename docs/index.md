@@ -188,6 +188,22 @@ grid-aligned patches on the Major TOM grid, with the target AOI overlaid.
 
     ![VIIRS on the shared grid](assets/images/06-multiple-constellation-7790c104.png)
 
+-   ### [Sentinel-1 SAR](examples/07-sentinel1.ipynb)
+
+    ![Sentinel-1 GRD backscatter on the Major TOM grid](assets/images/07-sentinel1-plot-patches.png)
+
+-   ### [ML-ready dataset](examples/08-ml-dataset.ipynb)
+
+    One grid cell, three sensors views — NDVI at two dates plus Sentinel-1 SAR:
+
+    ![One Major TOM cell: NDVI t1, NDVI t2, Sentinel-1 vv](assets/images/08-ml-dataset-load-one-cell.png)
+
+-   ### [Build your own plugin](examples/09-custom-plugin.ipynb)
+
+    A custom `to_db` processor running inside the pipeline:
+
+    ![Sentinel-1 in decibels via a custom plugin](assets/images/09-custom-plugin-plot-patches.png)
+
 </div>
 
 See the full gallery in the [Tutorials](examples/index.md) section.
