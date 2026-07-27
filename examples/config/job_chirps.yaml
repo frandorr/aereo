@@ -1,0 +1,35 @@
+# CHIRPS daily precipitation via the aereo-earthlens plugin.
+# No credentials needed: CHIRPS is served over anonymous FTP.
+aoi_path: config/aoi/cordoba.geojson
+
+name: chirps_sample
+grid_dist: 50_000
+grid_cells_margin: 10
+target_aoi: ${aoi_path}
+output_uri: /tmp/aereo_extraction_chirps
+overwrite: false
+
+search:
+  _target_: aereo.earthlens.search_earthlens
+  _partial_: true
+  collections:
+    # earthlens data source key -> variables to download
+    chc: [precipitation]
+  intersects: ${aoi_path}
+  start_datetime: "2026-01-01T00:00:00Z"
+  end_datetime: "2026-01-01T23:59:59Z"
+
+read:
+  _partial_: true
+  _target_: aereo.earthlens.read_earthlens
+  temporal_resolution: daily
+
+reproject:
+  _target_: aereo.builtins.reproject_odc
+  _partial_: true
+reproject_mode: grid
+# CHIRPS daily is ~0.05 deg (~5 km); reproject to 5 km UTM grid cells.
+resolution: 5000
+
+write:
+  _target_: aereo.builtins.write.write_geotiff
