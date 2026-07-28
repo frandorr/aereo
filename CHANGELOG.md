@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.2 (2026-07-28)
+
+- Fix `reproject_odc` in raw mode (no geobox): warp the source bounds into the target CRS before building the target geobox, instead of passing EPSG:4326 degree bounds as metres — previously the output collapsed to a 1x1 pixel and jobs produced empty artifacts.
+- Accept bare EPSG number strings (e.g. `"32720"`) as the target `crs` in `reproject_odc`.
+
 ## 1.2.1 (2026-07-21)
 
 - Fix `GridCell.to_geobox` for non-integer and sub-metre resolutions (e.g. MODIS, < 1 m).

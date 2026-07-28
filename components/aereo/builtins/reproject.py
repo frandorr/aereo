@@ -59,9 +59,27 @@ def reproject_odc(
             "reproject_odc requires either 'geobox' or both 'crs' and 'resolution'."
         )
 
+    from rasterio.crs import CRS as RioCRS
+    from rasterio.errors import CRSError
+    from rasterio.warp import transform_bounds
+
+    # rasterio does not accept bare EPSG numbers as strings ("32720").
+    try:
+        dst_crs = RioCRS.from_user_input(crs)
+    except CRSError:
+        dst_crs = RioCRS.from_epsg(int(crs))
+
+    # ds.rio.bounds() is in the dataset's own CRS (often EPSG:4326 degrees);
+    # it must be warped into the target CRS before building the geobox,
+    # otherwise degree bounds are misread as metres and the output collapses
+    # to a handful of pixels.
+    target_bbox = transform_bounds(
+        ds.rio.crs, dst_crs, *ds.rio.bounds(), densify_pts=21
+    )
+
     target_geobox = GeoBox.from_bbox(
-        ds.rio.bounds(),
-        crs=crs,
+        target_bbox,
+        crs=dst_crs,
         resolution=resolution,
     )
     return xr_reproject(ds, target_geobox, **kwargs)
