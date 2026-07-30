@@ -23,17 +23,39 @@ you must satisfy the Protocol and schema of the stage you are implementing.
 
 ## Built-in plugins
 
-The `aereo.builtins` package ships with common plugins:
+These ship with `aereo` itself — no extra install needed:
 
-- **Search:** `search_stac`, `search_earthaccess`
-- **Task builder:** `build_grouped_tasks`
-- **Reader:** `read_odc_stac`
-- **Reprojectors:** `reproject_odc`, `reproject_swath`, `reproject_pyresample`
-- **Processors:** `select_bands`, `qa_mask`, `ndvi`, `ndwi`, `normalize`, `composite`
-- **Writer:** `write_geotiff`
+| Plugin | Type | Description |
+|---|---|---|
+| `search_stac` | Search | Query any STAC API and return `GeoDataFrame[AssetSchema]` |
+| `build_grouped_tasks` | Task builder | Group assets by time and native CRS into grid-aligned `ExtractionTask` objects |
+| `read_odc_stac` | Reader | Load STAC assets via `odc.stac` into an `xarray.Dataset` |
+| `reproject_odc` | Reprojector | Reproject/resample a dataset to a target geobox with `odc-geo` |
+| `reproject_swath` | Reprojector | Resample swath data (e.g. VIIRS, OLCI) to a target grid with `pyresample` |
+| `process_select_bands` | Processor | Subset a dataset to a list of bands |
+| `process_qa_mask` | Processor | Apply a QA bit-mask band to the data |
+| `process_ndvi` | Processor | Compute NDVI from NIR and red bands |
+| `process_ndwi` | Processor | Compute NDWI from green and NIR bands |
+| `process_normalize` | Processor | Normalize pixel values per band (min-max, z-score) |
+| `process_composite` | Processor | Create a temporal composite (median, mean, ...) |
+| `write_geotiff` | Writer | Write a dataset to GeoTIFF |
 
-External plugins include `search_aws_goes`, `read_satpy`, `search_tessera`, and
-`read_tessera`.
+## Community plugins
+
+External plugins are independent packages; installing one registers its entry
+points automatically:
+
+| Plugin | Type | Description | Install |
+|---|---|---|---|
+| `aereo-search-aws-goes` | Search | Discover GOES-R series data (GOES-16 through GOES-19) on public NOAA AWS S3 buckets | [PyPI](https://pypi.org/project/aereo-search-aws-goes/) · [Repo](https://github.com/frandorr/aereo-search-aws-goes) |
+| `aereo-search-tessera` | Search | Search [GeoTessera](https://geotessera.io) satellite embedding tiles | [PyPI](https://pypi.org/project/aereo-search-tessera/) · [Repo](https://github.com/frandorr/aereo-search-tessera) |
+| `aereo-herbie` | Search + Reader | Discover and read NWP model data (HRRR, GFS, ECMWF, GEFS) via [Herbie](https://herbie.readthedocs.io/) GRIB2 inventories | [Repo](https://github.com/frandorr/aereo-herbie) |
+| `aereo-read-satpy` | Reader | Load satellite data from many EO formats via [Satpy](https://satpy.readthedocs.io/) into `xarray.Dataset` | [PyPI](https://pypi.org/project/aereo-read-satpy/) · [Repo](https://github.com/frandorr/aereo-read-satpy) |
+| `aereo-read-tessera` | Reader | Read GeoTessera satellite embedding tiles | [PyPI](https://pypi.org/project/aereo-read-tessera/) · [Repo](https://github.com/frandorr/aereo-read-tessera) |
+
+To build your own, start from the
+[aereo-plugin-template](https://github.com/frandorr/aereo-plugin-template) and
+follow [Build a Plugin](build-a-plugin.md).
 
 ## Using plugins
 
