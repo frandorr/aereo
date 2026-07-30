@@ -204,6 +204,44 @@ print(df[["grid_cell", "collection", "start_time", "uri"]].head())
 The full workflow — joins, gap-filling mosaics, a merged multi-sensor index —
 is the [08 — ML-ready dataset](examples/08-ml-dataset.ipynb) notebook.
 
+## Plugins
+
+AerEO discovers plugins through the `aereo.plugins` entry-point group, so any
+installed package can add search providers, readers, writers, and processors.
+
+### Built-in plugins
+
+These ship with `aereo` itself — no extra install needed:
+
+| Plugin | Type | Description |
+|---|---|---|
+| `search_stac` | Search | Query any STAC API and return `GeoDataFrame[AssetSchema]` |
+| `build_grouped_tasks` | Task builder | Group assets by time and native CRS into grid-aligned `ExtractionTask` objects |
+| `read_odc_stac` | Reader | Load STAC assets via `odc.stac` into an `xarray.Dataset` |
+| `reproject_odc` | Reprojector | Reproject/resample a dataset to a target geobox with `odc-geo` |
+| `reproject_swath` | Reprojector | Resample swath data (e.g. VIIRS, OLCI) to a target grid with `pyresample` |
+| `process_select_bands` | Processor | Subset a dataset to a list of bands |
+| `process_qa_mask` | Processor | Apply a QA bit-mask band to the data |
+| `process_ndvi` | Processor | Compute NDVI from NIR and red bands |
+| `process_ndwi` | Processor | Compute NDWI from green and NIR bands |
+| `process_normalize` | Processor | Normalize pixel values per band (min-max, z-score) |
+| `process_composite` | Processor | Create a temporal composite (median, mean, ...) |
+| `write_geotiff` | Writer | Write a dataset to GeoTIFF |
+
+### Community plugins
+
+| Plugin | Type | Description | Install |
+|---|---|---|---|
+| `aereo-search-aws-goes` | Search | Discover GOES-R series data (GOES-16 through GOES-19) on public NOAA AWS S3 buckets | [PyPI](https://pypi.org/project/aereo-search-aws-goes/) · [Repo](https://github.com/frandorr/aereo-search-aws-goes) |
+| `aereo-search-tessera` | Search | Search [GeoTessera](https://geotessera.io) satellite embedding tiles | [PyPI](https://pypi.org/project/aereo-search-tessera/) · [Repo](https://github.com/frandorr/aereo-search-tessera) |
+| `aereo-herbie` | Search + Reader | Discover and read NWP model data (HRRR, GFS, ECMWF, GEFS) via [Herbie](https://herbie.readthedocs.io/) GRIB2 inventories | [Repo](https://github.com/frandorr/aereo-herbie) |
+| `aereo-read-satpy` | Reader | Load satellite data from many EO formats via [Satpy](https://satpy.readthedocs.io/) into `xarray.Dataset` | [PyPI](https://pypi.org/project/aereo-read-satpy/) · [Repo](https://github.com/frandorr/aereo-read-satpy) |
+| `aereo-read-tessera` | Reader | Read GeoTessera satellite embedding tiles | [PyPI](https://pypi.org/project/aereo-read-tessera/) · [Repo](https://github.com/frandorr/aereo-read-tessera) |
+
+To build your own, start from the
+[aereo-plugin-template](https://github.com/frandorr/aereo-plugin-template) and
+follow [Build a Plugin](https://frandorr.github.io/aereo/plugins/build-a-plugin/).
+
 ## Docs
 
 [Install](https://frandorr.github.io/aereo/install/) ·

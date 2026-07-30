@@ -82,11 +82,6 @@ entry-points."aereo.plugins".write_geotiff = "aereo.builtins.write:write_geotiff
 
 [dependency-groups]
 dev = [
-  "aereo-read-satpy",
-  "aereo-read-tessera",
-  "aereo-reproject-satpy",
-  "aereo-search-aws-goes",
-  "aereo-search-tessera",
   "basedpyright>=1.38",
   "cartopy>=0.25",
   "earthaccess>=0.18",
@@ -127,11 +122,6 @@ metadata.allow-direct-references = true
 
 [tool.uv]
 sources.aereo = { workspace = true }
-sources.aereo-read-satpy = { path = "../aereo-read-satpy/projects/aereo-read-satpy" }
-sources.aereo-read-tessera = { path = "../aereo-read-tessera/projects/aereo-read-tessera" }
-sources.aereo-reproject-satpy = { path = "../aereo-reproject-satpy/projects/aereo-reproject-satpy" }
-sources.aereo-search-aws-goes = { path = "../aereo-search-aws-goes/projects/aereo-search-aws-goes" }
-sources.aereo-search-tessera = { path = "../aereo-search-tessera/projects/aereo-search-tessera" }
 managed = true
 workspace.members = [ "projects/aereo" ]
 
