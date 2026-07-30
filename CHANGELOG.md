@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.3 (2026-07-30)
+
+- Warn when `LocalExecutor` is created with `use_threads=True` and parallel workers: the threading backend shares native library state and can deadlock or hang when reading formats like netCDF/HDF5 (`.nc`). The default process-based backend (cores) is recommended instead.
+
 ## 1.2.2 (2026-07-28)
 
 - Fix `reproject_odc` in raw mode (no geobox): warp the source bounds into the target CRS before building the target geobox, instead of passing EPSG:4326 degree bounds as metres — previously the output collapsed to a 1x1 pixel and jobs produced empty artifacts.
