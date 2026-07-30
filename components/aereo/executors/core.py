@@ -131,7 +131,10 @@ class LocalExecutor:
                 ``"best_effort"`` skips failed tasks and returns successful ones.
             cache: Optional per-task artifact catalog cache.
             use_threads: When ``True`` and *workers* > 1, use joblib's
-                ``threading`` backend instead of ``loky``.
+                ``threading`` backend instead of ``loky``. Not recommended:
+                threads share native library state (e.g. netCDF/HDF5 readers),
+                which can deadlock or corrupt reads. Prefer the default
+                process-based backend (``loky``) that uses separate cores.
         """
         self.workers = workers
         if self.workers == -1:
@@ -141,6 +144,17 @@ class LocalExecutor:
         self.failure_mode = failure_mode
         self.cache = cache
         self.use_threads = use_threads
+        if self.use_threads and self.workers is not None and self.workers > 1:
+            logger.warning(
+                "threads_backend_not_recommended",
+                message=(
+                    "use_threads=True runs tasks in a shared thread pool. "
+                    "Native libraries used to read formats like netCDF/HDF5 "
+                    "(.nc) are not thread-safe and can deadlock or hang. "
+                    "Prefer the default process-based backend (cores) by "
+                    "leaving use_threads=False."
+                ),
+            )
 
     def shutdown(self, _wait: bool = True) -> None:
         """No-op for API compatibility.
