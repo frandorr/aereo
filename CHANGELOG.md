@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0 (2026-08-06)
+
+- Rename the top-level `ExtractionJob.resolution` field to `grid_resolution` to disambiguate it from the `resolution` keyword bound inside the `reproject:` block (used by reprojection plugins to self-construct a target GeoBox in `reproject_mode="raw"`). The legacy `resolution` key is still accepted as an alias, and older serialized task payloads are read with a fallback, so existing configs keep working.
+- Update example configs, tutorial notebooks, and docs to use `grid_resolution`.
+
 ## 1.2.3 (2026-07-30)
 
 - Warn when `LocalExecutor` is created with `use_threads=True` and parallel workers: the threading backend shares native library state and can deadlock or hang when reading formats like netCDF/HDF5 (`.nc`). The default process-based backend (cores) is recommended instead.
