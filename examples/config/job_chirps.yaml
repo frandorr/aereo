@@ -29,7 +29,7 @@ reproject:
   _partial_: true
 reproject_mode: grid
 # CHIRPS daily is ~0.05 deg (~5 km); reproject to 5 km UTM grid cells.
-resolution: 5000
+grid_resolution: 5000
 
 write:
   _target_: aereo.builtins.write.write_geotiff

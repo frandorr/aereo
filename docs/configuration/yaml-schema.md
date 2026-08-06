@@ -13,7 +13,7 @@ instantiation conventions, and links each stage to its input/output schema.
 | `output_uri` | `str` | Local path or object-store URI for outputs (`s3://bucket/prefix`). |
 | `overwrite` | `bool` | Whether to overwrite existing artifacts. Default: `false`. |
 | `target_aoi` | `str` / `dict` / geometry | AOI used to build the grid. Accepts a GeoJSON file path, a GeoJSON dict, or a Shapely geometry. |
-| `resolution` | `float \| None` | Target pixel size in metres. Used by grid builders and reprojectors. |
+| `grid_resolution` | `float \| None` | Target pixel size in metres of the output grid. Required for `reproject_mode="grid"` (used to build each cell's GeoBox) and for artifact indexing. The legacy key `resolution` is accepted as an alias. |
 | `margin` | `float \| None` | Extra buffer around cells or scenes to avoid edge effects. |
 | `crop_buffer` | `float \| None` | Buffer used when cropping scenes in grid-mode reprojection. |
 | `grid_cells_margin` | `int \| float` | Additional margin used when intersecting cells with the AOI. |

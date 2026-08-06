@@ -34,7 +34,7 @@ reproject:
   _target_: aereo.builtins.reproject_swath
   _partial_: true
 reproject_mode: grid
-resolution: 375
+grid_resolution: 375
 
 write:
   _target_: aereo.builtins.write.write_geotiff

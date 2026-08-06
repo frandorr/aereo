@@ -33,7 +33,7 @@ All pipeline configurations live under `examples/config` and use the Hydra
 name: sentinel2_demo
 grid_dist: 10000
 output_uri: ./out
-resolution: 10.0
+grid_resolution: 10.0
 margin: 0.0
 read:
   _target_: aereo.builtins.read.read_odc_stac

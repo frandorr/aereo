@@ -18,7 +18,6 @@ and resolution. The choice is controlled by the `reproject` and
 name: sentinel2_demo
 grid_dist: 10000
 output_uri: /tmp/aereo_demo
-resolution: 10.0
 margin: 0.0
 reproject:
   _target_: aereo.builtins.reproject.reproject_odc
@@ -44,6 +43,7 @@ job = ExtractionJob(
     read=read_odc_stac,
     reproject=reproject_odc,
     reproject_mode="grid",
+    grid_resolution=10.0,
     write=write_geotiff,
     target_aoi=aoi,
 )
@@ -51,8 +51,13 @@ job = ExtractionJob(
 
 ## Resolution and margin
 
-- `resolution` — target pixel size in metres. Used by the grid builder and by
-  reprojectors that accept it.
+- `grid_resolution` — target pixel size in metres of the output grid. Required
+  for `reproject_mode="grid"`, where the orchestrator uses it to build each
+  cell's GeoBox, and also used for artifact indexing. (The legacy key
+  `resolution` is still accepted as an alias.)
+- `resolution` inside the `reproject:` block — a keyword argument bound to the
+  reprojection plugin, used only in `reproject_mode="raw"` so the plugin can
+  build a target GeoBox itself (together with `crs`).
 - `margin` / `crop_buffer` — extra buffer around cells or scenes to avoid edge
   effects.
 - `grid_cells_margin` — additional margin used when intersecting cells with the
