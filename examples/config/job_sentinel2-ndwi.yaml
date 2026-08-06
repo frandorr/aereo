@@ -15,4 +15,4 @@ reproject:
   _target_: aereo.builtins.reproject_odc
   _partial_: true
 reproject_mode: grid
-resolution: 10
+grid_resolution: 10

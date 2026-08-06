@@ -28,7 +28,7 @@ reproject:
   _target_: aereo.builtins.reproject_odc
   _partial_: true
 reproject_mode: grid
-resolution: 2000
+grid_resolution: 2000
 
 write:
   _target_: aereo.builtins.write.write_geotiff

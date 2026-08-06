@@ -171,9 +171,19 @@ class ExtractionJob(BaseModel):
     )
 
     # Optional grid/reprojection parameters
-    resolution: float | None = Field(
+    # The config key ``resolution`` is accepted for backward compatibility;
+    # internally it is stored as ``grid_resolution``.
+    grid_resolution: float | None = Field(
         default=None,
-        description="Target pixel resolution in metres for reprojection and artifact indexing.",
+        alias="resolution",
+        description=(
+            "Target pixel resolution in metres of the output grid. Required for "
+            "``reproject_mode='grid'`` (used to build each cell's GeoBox) and "
+            "also used for artifact indexing. Distinct from the ``resolution`` "
+            "keyword bound inside the ``reproject`` callable, which the "
+            "reprojection plugin uses to self-construct a target GeoBox in "
+            "``reproject_mode='raw'``."
+        ),
     )
     margin: float | None = Field(
         default=None,
@@ -201,9 +211,9 @@ class ExtractionJob(BaseModel):
         description=(
             "Optional resolution in metres used to align the grid cell GeoBox. "
             "When set, the GeoBox centre and half-width are snapped to this grid "
-            "instead of ``resolution``. This is useful for nested extractions "
+            "instead of ``grid_resolution``. This is useful for nested extractions "
             "(e.g. VIIRS at 400 m and GOES at 2000 m) where the finer resolution "
-            "should be an exact refinement of a coarser grid. Defaults to ``resolution``."
+            "should be an exact refinement of a coarser grid. Defaults to ``grid_resolution``."
         ),
     )
 

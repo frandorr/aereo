@@ -86,7 +86,7 @@ def _make_task(
     job = ExtractionJob(
         name=job_name,
         grid_dist=50_000,
-        resolution=10.0,
+        grid_resolution=10.0,
         output_uri="test-uri",
         read=reader,
         write=writer,

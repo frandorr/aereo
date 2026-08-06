@@ -73,7 +73,7 @@ class TaskResultCache:
             "grid_dist": job.grid_dist,
             "output_uri": job.output_uri,
             "target_aoi": _geometry_to_wkt(job.target_aoi),
-            "resolution": job.resolution,
+            "grid_resolution": job.grid_resolution,
             "margin": job.margin,
             "grid_cells_margin": job.grid_cells_margin,
             # overwrite is a runtime control, not an output characteristic.

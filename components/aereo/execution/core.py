@@ -113,7 +113,7 @@ def _build_output_path(
     return build_eoids_path(
         local_dir=job.output_uri,
         job_name=job.name,
-        resolution=job.resolution,
+        resolution=job.grid_resolution,
         collections=collections,
         variables=[str(v) for v in ds.data_vars],
         cell_id=cell_id,
@@ -301,11 +301,11 @@ def _run_grid_reproject(
     assert reproject is not None
 
     artifacts: list[GeoDataFrame[ArtifactSchema]] = []
-    if job.resolution is None:
-        raise ValueError("resolution is required when using reproject_mode='grid'.")
+    if job.grid_resolution is None:
+        raise ValueError("grid_resolution is required when using reproject_mode='grid'.")
     for cell in grid_cells:
         geobox = cell.to_geobox(
-            resolution=job.resolution,
+            resolution=job.grid_resolution,
             margin=job.grid_cells_margin,
             alignment_resolution=job.alignment_resolution,
         )
@@ -341,7 +341,7 @@ def run_task(task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
 
     Raises:
         ValueError: If the pipeline has no reader or if reprojection is
-            requested without resolution.
+            requested without grid_resolution.
     """
     job = task.job
 

@@ -38,7 +38,7 @@ def _make_task() -> ExtractionTask:
         name="test-job",
         grid_dist=50_000,
         output_uri="/tmp/aereo_extract_test",
-        resolution=100.0,
+        grid_resolution=100.0,
         read=TestReader(),
         write=TestWriter(),
     )

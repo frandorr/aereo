@@ -109,7 +109,7 @@ def _make_task() -> ExtractionTask:
     job = ExtractionJob(
         name="custom-job",
         grid_dist=50_000,
-        resolution=100.0,
+        grid_resolution=100.0,
         output_uri="/tmp/aereo/output",
         read=CustomReader(),
         write=write_geotiff,

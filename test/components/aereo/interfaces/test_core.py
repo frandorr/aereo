@@ -192,7 +192,7 @@ def test_task_bbox_expands_with_grid_cells_margin():
             output_uri="test",
             read=read_odc_stac,
             write=_dummy_writer,
-            resolution=10.0,
+            grid_resolution=10.0,
             grid_cells_margin=margin,
         )
         task = ExtractionTask(

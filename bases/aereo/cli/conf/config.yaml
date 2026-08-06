@@ -27,6 +27,6 @@ read: null
 write: null
 
 # Optional reprojection / grid parameters
-resolution: null
+grid_resolution: null
 margin: null
 grid_cells_margin: 0.0

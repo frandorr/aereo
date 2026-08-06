@@ -176,7 +176,7 @@ class _TaskSerializer:
                     if job.target_aoi is not None
                     else None
                 ),
-                "resolution": job.resolution,
+                "grid_resolution": job.grid_resolution,
                 "margin": job.margin,
                 "grid_cells_margin": job.grid_cells_margin,
                 "read": PluginSerializer.dumps(job.read),
@@ -260,7 +260,9 @@ class _TaskSerializer:
                 "output_uri": job_meta["output_uri"],
                 "overwrite": job_meta.get("overwrite", False),
                 "target_aoi": target_aoi,
-                "resolution": job_meta.get("resolution"),
+                "grid_resolution": job_meta.get(
+                    "grid_resolution", job_meta.get("resolution")
+                ),
                 "margin": job_meta.get("margin"),
                 "grid_cells_margin": job_meta.get("grid_cells_margin", 0.0),
                 "read": cast(Reader, PluginSerializer.loads(job_meta["read"])),

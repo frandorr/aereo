@@ -258,13 +258,13 @@ class ExtractionTask:
             3. ``job.target_aoi.bounds`` when ``job.target_aoi`` is set.
             4. ``None``.
         """
-        if self.grid_cells and self.job.resolution is not None:
+        if self.grid_cells and self.job.grid_resolution is not None:
             from aereo.spatial import reproject_geom
 
             expanded_boxes: list[BaseGeometry] = []
             for cell in self.grid_cells:
                 gb = cell.to_geobox(
-                    resolution=self.job.resolution,
+                    resolution=self.job.grid_resolution,
                     margin=self.job.grid_cells_margin,
                     alignment_resolution=self.job.alignment_resolution,
                 )

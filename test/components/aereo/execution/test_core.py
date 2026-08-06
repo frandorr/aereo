@@ -282,7 +282,7 @@ def test_run_task_grid_mode_crops_before_reproject(tmp_path):
         write=_DummyWriter(),
         reproject=_ShapeRecordingReprojector(),
         reproject_mode="grid",
-        resolution=1000,
+        grid_resolution=1000,
         crop_buffer=0.05,
     )
     task = ExtractionTask(
@@ -344,7 +344,7 @@ def test_run_task_grid_mode_uses_grid_cells_margin(tmp_path):
             write=_DummyWriter(),
             reproject=_GeoboxRecordingReprojector(),
             reproject_mode="grid",
-            resolution=1000,
+            grid_resolution=1000,
             crop_buffer=0.05,
             grid_cells_margin=margin,
         )
