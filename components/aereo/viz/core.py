@@ -583,18 +583,25 @@ def plot_artifact_patches(
     if "cell_utm_crs" in artifacts.columns:
         main_crs = str(artifacts["cell_utm_crs"].iloc[0])
         artifacts = artifacts.copy()
-        artifacts["cell_utm_footprint"] = [
-            (
-                footprint
-                if str(crs) == main_crs
-                else reproject_geom(footprint, src_epsg=str(crs), dst_epsg=main_crs)
-            )
-            for footprint, crs in zip(
-                artifacts["cell_utm_footprint"],
-                artifacts["cell_utm_crs"],
-                strict=True,
-            )
-        ]
+        # Assign a GeoSeries (not a plain list) so the column keeps its
+        # geometry dtype even when it is not the active geometry column;
+        # a plain list downgrades it to a Series without total_bounds.
+        artifacts["cell_utm_footprint"] = gpd.GeoSeries(
+            [
+                (
+                    footprint
+                    if str(crs) == main_crs
+                    else reproject_geom(footprint, src_epsg=str(crs), dst_epsg=main_crs)
+                )
+                for footprint, crs in zip(
+                    artifacts["cell_utm_footprint"],
+                    artifacts["cell_utm_crs"],
+                    strict=True,
+                )
+            ],
+            index=artifacts.index,
+            crs=main_crs,
+        )
 
     band_list = _normalize_bands(bands)
     n_bands = len(band_list)
