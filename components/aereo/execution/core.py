@@ -6,12 +6,15 @@ read -> [preprocess] -> [reproject] -> [postprocess] -> write.
 
 from __future__ import annotations
 
+import functools
+import inspect
 import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Sequence, cast
 
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 import rioxarray  # noqa: F401
 import xarray as xr
@@ -22,6 +25,118 @@ from aereo.spatial import get_utm_epsg_from_geometry, reproject_geom
 from aereo.schemas import ArtifactSchema
 from pandera.typing.geopandas import GeoDataFrame
 from shapely.geometry import box
+from structlog import get_logger
+
+logger = get_logger()
+
+UTM_SENTINEL = "utm"
+
+
+def _raw_reproject_crs(reproject: Any) -> str | None:
+    """Return the CRS configured on a raw-mode reproject callable.
+
+    Returns the ``crs`` keyword baked into the callable when it is an
+    introspectable ``functools.partial`` (the shape Hydra ``_partial_: true``
+    produces). Returns ``None`` when no ``crs`` is bound or the callable
+    cannot be introspected.
+    """
+    if isinstance(reproject, functools.partial):
+        crs = reproject.keywords.get("crs")
+        return str(crs) if crs is not None else None
+    return None
+
+
+def _callable_accepts_crs(reproject: Any) -> bool:
+    """Return True if the callable accepts a ``crs`` keyword argument."""
+    try:
+        sig = inspect.signature(reproject)
+    except (ValueError, TypeError):
+        return False
+    for param in sig.parameters.values():
+        if param.kind == inspect.Parameter.VAR_KEYWORD:
+            return True
+        if param.name == "crs":
+            return True
+    return False
+
+
+def _infer_utm_crs(ds: xr.Dataset, task: ExtractionTask) -> str:
+    """Infer a UTM EPSG code from the dataset footprint or task AOI.
+
+    The footprint is derived, in priority order, from:
+
+    1. ``ds.rio.bounds()`` for regular gridded datasets, reprojected to WGS84
+       when the dataset's native CRS is not already EPSG:4326.
+    2. The finite min/max of ``lons``/``lats`` (or ``longitude``/``latitude``)
+       variables for swath datasets.
+    3. The task AOI from :func:`_resolve_aoi`.
+
+    A footprint wider than 6° of longitude logs a warning because a single UTM
+    zone is unlikely to be appropriate. Polar or otherwise undeterminable
+    footprints raise an actionable :class:`ValueError`.
+    """
+    geom = None
+    if hasattr(ds, "rio"):
+        try:
+            crs = ds.rio.crs
+            if crs is not None:
+                bounds = ds.rio.bounds()
+                src_crs = str(crs).lower()
+                geom = box(*bounds)
+                if src_crs != "epsg:4326":
+                    geom = reproject_geom(geom, src_epsg=src_crs, dst_epsg="epsg:4326")
+        except Exception:
+            pass
+
+    if geom is None:
+        if ("longitude" in ds and "latitude" in ds) or ("lons" in ds and "lats" in ds):
+            lons_var = "longitude" if "longitude" in ds else "lons"
+            lats_var = "latitude" if "latitude" in ds else "lats"
+            lons = ds[lons_var].values
+            lats = ds[lats_var].values
+            valid = np.isfinite(lons) & np.isfinite(lats)
+            if valid.any():
+                geom = box(
+                    float(lons[valid].min()),
+                    float(lats[valid].min()),
+                    float(lons[valid].max()),
+                    float(lats[valid].max()),
+                )
+
+    if geom is None:
+        aoi = _resolve_aoi(task)
+        if aoi is not None:
+            geom = aoi
+
+    if geom is None:
+        raise ValueError(
+            "cannot infer a UTM CRS for this dataset footprint; configure an explicit "
+            "`crs` in the reproject config or use reproject_mode='grid'"
+        )
+
+    min_lon, _min_lat, max_lon, _max_lat = geom.bounds
+    if max_lon - min_lon > 6:
+        logger.warning(
+            "raw_reproject_wide_footprint",
+            min_lon=min_lon,
+            max_lon=max_lon,
+            span=max_lon - min_lon,
+            message=(
+                "The dataset footprint spans multiple UTM zones; an explicit CRS or "
+                "reproject_mode='grid' may give better results."
+            ),
+        )
+
+    try:
+        epsg = get_utm_epsg_from_geometry(geom)
+    except Exception as exc:
+        raise ValueError(
+            "cannot infer a UTM CRS for this dataset footprint; configure an explicit "
+            "`crs` in the reproject config or use reproject_mode='grid'"
+        ) from exc
+
+    logger.info("raw_reproject_inferred_crs", crs=epsg)
+    return epsg
 
 
 def _resolve_aoi(task: ExtractionTask) -> Any:
@@ -361,7 +476,19 @@ def run_task(task: ExtractionTask) -> GeoDataFrame[ArtifactSchema]:
         if job.reproject_mode == "grid":
             return _run_grid_reproject(ds, task, grid_cells)
         if job.reproject_mode == "raw":
-            ds = reproject(ds)
+            configured_crs = _raw_reproject_crs(reproject)
+            if configured_crs == UTM_SENTINEL:
+                inferred = _infer_utm_crs(ds, task)
+                ds = reproject(ds, crs=inferred)
+            elif configured_crs is None and not _callable_accepts_crs(reproject):
+                raise ValueError(
+                    "reproject_mode='raw' requires a 'crs' in the reproject "
+                    "config: an explicit CRS (e.g. 'epsg:32720'), 'utm' to infer "
+                    "the UTM zone from the data, or use reproject_mode='grid' "
+                    "which infers UTM per grid cell."
+                )
+            else:
+                ds = reproject(ds)
         else:
             raise ValueError(
                 "reproject is set but reproject_mode must be 'raw' or 'grid'"

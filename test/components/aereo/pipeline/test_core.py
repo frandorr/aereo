@@ -15,6 +15,7 @@ from aereo.interfaces import (
     empty_asset_result,
 )
 from aereo.interfaces.core import ExtractionTask, Reader
+from aereo.builtins.reproject import reproject_odc
 from aereo.pipeline import ExtractionJob
 from aereo.pipeline.core import _callable_name
 from aereo.schemas import ArtifactSchema, AssetSchema
@@ -897,3 +898,55 @@ def test_job_processors_default_to_none():
     )
     assert job.preprocess is None
     assert job.postprocess is None
+# ---------------------------------------------------------------------------
+# Raw-mode CRS validator
+# ---------------------------------------------------------------------------
+
+
+def test_job_raw_mode_without_crs_fails_at_load():
+    with pytest.raises(ValueError, match="reproject_mode='raw' requires a 'crs'"):
+        ExtractionJob(
+            grid_dist=1000,
+            output_uri="/tmp/out",
+            read=FakeReader(),
+            write=_DummyWriter(),
+            reproject=partial(reproject_odc, resolution=375),
+            reproject_mode="raw",
+        )
+
+
+def test_job_raw_mode_accepts_utm_sentinel():
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+        reproject=partial(reproject_odc, crs="utm", resolution=375),
+        reproject_mode="raw",
+    )
+    assert job.reproject is not None
+
+
+def test_job_raw_mode_accepts_explicit_crs():
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+        reproject=partial(reproject_odc, crs="epsg:32720", resolution=375),
+        reproject_mode="raw",
+    )
+    assert job.reproject is not None
+
+
+def test_job_raw_mode_skips_nonpartial_callables():
+    """Plain function reprojectors pass validation; the runtime guard owns the error."""
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+        reproject=lambda ds: ds,
+        reproject_mode="raw",
+    )
+    assert job.reproject is not None
