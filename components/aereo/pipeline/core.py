@@ -68,6 +68,36 @@ def _valid_job_keys(cls: type[ExtractionJob]) -> set[str]:
     return keys
 
 
+def _resolve_geometry_paths(cfg: Any, base_dir: Path) -> Any:
+    """Resolve relative GeoJSON path strings against *base_dir*.
+
+    Recursively walks the plain config container. Any string ending in
+    ``.geojson`` or ``.json`` that does not exist relative to the current
+    working directory but does exist relative to *base_dir* (the directory
+    containing the job config) is rewritten to an absolute path. Everything
+    else is left untouched, so CWD-relative and absolute paths keep working
+    exactly as before.
+
+    Args:
+        cfg: Plain configuration container (dict, list, or scalar).
+        base_dir: Directory the job configuration was loaded from.
+
+    Returns:
+        The same shape with fallback-resolved geometry paths.
+    """
+    if isinstance(cfg, dict):
+        return {k: _resolve_geometry_paths(v, base_dir) for k, v in cfg.items()}
+    if isinstance(cfg, list):
+        return [_resolve_geometry_paths(v, base_dir) for v in cfg]
+    if isinstance(cfg, str) and cfg.lower().endswith((".geojson", ".json")):
+        path = Path(cfg)
+        if not path.is_absolute() and not path.exists():
+            candidate = base_dir / path
+            if candidate.exists():
+                return str(candidate)
+    return cfg
+
+
 def _strip_unknown_job_keys(cfg: Any, cls: type[ExtractionJob]) -> Any:
     """Remove top-level keys that are not ``ExtractionJob`` fields or aliases.
 
@@ -518,6 +548,7 @@ class ExtractionJob(BaseModel):
         with initialize_config_dir(version_base=None, config_dir=str(config_dir)):
             cfg = compose(config_name=config_name, overrides=overrides or [])
             plain_cfg = OmegaConf.to_container(cfg, resolve=True)
+            plain_cfg = _resolve_geometry_paths(plain_cfg, config_dir)
             plain_cfg = _strip_unknown_job_keys(plain_cfg, cls)
             prepared_cfg = _prepare_config_for_instantiate(plain_cfg)
             instantiated = hydra.utils.instantiate(prepared_cfg, _convert_="all")
@@ -562,6 +593,7 @@ class ExtractionJob(BaseModel):
         cfg = OmegaConf.load(path)
 
         plain_cfg = OmegaConf.to_container(cfg, resolve=True)
+        plain_cfg = _resolve_geometry_paths(plain_cfg, path.resolve().parent)
         plain_cfg = _strip_unknown_job_keys(plain_cfg, cls)
         prepared_cfg = _prepare_config_for_instantiate(plain_cfg)
         instantiated = hydra.utils.instantiate(prepared_cfg, _convert_="all")
