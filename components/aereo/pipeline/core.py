@@ -11,9 +11,11 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Literal, cast
 
+import functools
 import hydra
 from omegaconf import OmegaConf
 from aereo.executors.core import Executor, LocalExecutor
+from aereo.execution.core import _raw_reproject_crs
 from aereo.interfaces import (
     ExtractionTask,
     Reader,
@@ -30,7 +32,7 @@ from aereo.interfaces.utils import (
 )
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from shapely.geometry.base import BaseGeometry
 from structlog import get_logger
 
@@ -331,6 +333,21 @@ class ExtractionJob(BaseModel):
                 "reproject_mode must be None when reproject is not provided"
             )
         return value
+
+    @model_validator(mode="after")
+    def _validate_raw_reproject_crs(self) -> ExtractionJob:
+        """Fail fast when raw mode is used without a configured CRS on a partial."""
+        if self.reproject_mode == "raw" and self.reproject is not None:
+            if _raw_reproject_crs(self.reproject) is None and isinstance(
+                self.reproject, functools.partial
+            ):
+                raise ValueError(
+                    "reproject_mode='raw' requires a 'crs' in the reproject "
+                    "config: an explicit CRS (e.g. 'epsg:32720'), 'utm' to infer "
+                    "the UTM zone from the data, or use reproject_mode='grid' "
+                    "which infers UTM per grid cell."
+                )
+        return self
 
     @classmethod
     def _from_instantiated(cls, instantiated: Any, source: str) -> ExtractionJob:
