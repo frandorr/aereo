@@ -144,6 +144,7 @@ class LocalExecutor:
         self.failure_mode = failure_mode
         self.cache = cache
         self.use_threads = use_threads
+        self._ran_parallel = False
         if self.use_threads and self.workers is not None and self.workers > 1:
             logger.warning(
                 "threads_backend_not_recommended",
@@ -157,11 +158,32 @@ class LocalExecutor:
             )
 
     def shutdown(self, _wait: bool = True) -> None:
-        """No-op for API compatibility.
+        """Release memory retained after task execution.
 
-        ``joblib``'s ``loky`` backend already reuses and cleans up its worker
-        pool automatically.
+        Two retention sources are addressed:
+
+        * The current process: freed arrays are not returned to the OS by
+          glibc's allocator, so RSS stays at its high-water mark. A
+          ``gc.collect()`` followed by ``malloc_trim(0)`` returns them.
+        * ``joblib``'s reusable ``loky`` pool: idle workers stay alive after
+          a parallel batch, each keeping its high-water RSS. If this executor
+          dispatched parallel work, the pool is terminated; the next parallel
+          run spawns fresh workers. Note the pool is process-global, so this
+          also affects other joblib users in the same process.
         """
+        import ctypes
+        import gc
+
+        gc.collect()
+        try:
+            ctypes.CDLL("libc.so.6").malloc_trim(0)
+        except OSError:
+            pass  # non-glibc platform (e.g. musl, macOS)
+
+        if self._ran_parallel and not self.use_threads:
+            from joblib.externals.loky import get_reusable_executor
+
+            get_reusable_executor().shutdown(wait=_wait, kill_workers=True)
         return None
 
     def __enter__(self) -> LocalExecutor:
@@ -227,6 +249,7 @@ class LocalExecutor:
     ) -> list[GeoDataFrame[ArtifactSchema]]:
         """Run tasks through joblib, applying failure mode."""
         backend = "threading" if self.use_threads else "loky"
+        self._ran_parallel = True
         outcomes = cast(
             list[_TaskOutcome],
             Parallel(n_jobs=self.workers, backend=backend)(
