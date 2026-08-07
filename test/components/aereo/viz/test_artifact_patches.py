@@ -611,10 +611,15 @@ def test_plot_artifact_patches_unifies_mixed_utm_footprints(
         {
             "uri": [str(path), str(path)],
             "grid_cell": ["cell_main", "cell_west"],
-            "cell_utm_footprint": [main_fp, west_fp_zone32],
+            "cell_utm_footprint": gpd.GeoSeries([main_fp, west_fp_zone32]),
             "cell_utm_crs": ["EPSG:32633", "EPSG:32632"],
+            # The real artifact catalog uses `geometry` as the active
+            # geometry column and keeps cell_utm_footprint as a secondary
+            # geometry column; reassigning footprints must not downgrade it
+            # to a plain Series (which has no total_bounds).
+            "geometry": [main_fp, main_fp],
         },
-        geometry="cell_utm_footprint",
+        geometry="geometry",
         crs="EPSG:32633",
     )
 

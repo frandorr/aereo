@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.2 (2026-08-07)
+
+- Fix `plot_artifact_patches` regression from 1.4.1: unifying mixed-UTM
+  footprints assigned a plain list to `cell_utm_footprint`, downgrading it
+  to a pandas Series without `total_bounds` whenever the GeoDataFrame's
+  active geometry was another column (as in the real artifact catalog).
+  Footprints are now assigned as a `GeoSeries`.
+
 ## 1.4.1 (2026-08-07)
 
 - Fix `plot_artifact_patches` for AOIs near a UTM zone boundary: grid-cell
