@@ -11,9 +11,11 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Literal, cast
 
+import functools
 import hydra
 from omegaconf import OmegaConf
 from aereo.executors.core import Executor, LocalExecutor
+from aereo.execution.core import _raw_reproject_crs
 from aereo.interfaces import (
     ExtractionTask,
     Reader,
@@ -30,7 +32,7 @@ from aereo.interfaces.utils import (
 )
 from aereo.schemas import ArtifactSchema, AssetSchema
 from pandera.typing.geopandas import GeoDataFrame
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from shapely.geometry.base import BaseGeometry
 from structlog import get_logger
 
@@ -66,6 +68,36 @@ def _valid_job_keys(cls: type[ExtractionJob]) -> set[str]:
         if field_info.alias:
             keys.add(field_info.alias)
     return keys
+
+
+def _resolve_geometry_paths(cfg: Any, base_dir: Path) -> Any:
+    """Resolve relative GeoJSON path strings against *base_dir*.
+
+    Recursively walks the plain config container. Any string ending in
+    ``.geojson`` or ``.json`` that does not exist relative to the current
+    working directory but does exist relative to *base_dir* (the directory
+    containing the job config) is rewritten to an absolute path. Everything
+    else is left untouched, so CWD-relative and absolute paths keep working
+    exactly as before.
+
+    Args:
+        cfg: Plain configuration container (dict, list, or scalar).
+        base_dir: Directory the job configuration was loaded from.
+
+    Returns:
+        The same shape with fallback-resolved geometry paths.
+    """
+    if isinstance(cfg, dict):
+        return {k: _resolve_geometry_paths(v, base_dir) for k, v in cfg.items()}
+    if isinstance(cfg, list):
+        return [_resolve_geometry_paths(v, base_dir) for v in cfg]
+    if isinstance(cfg, str) and cfg.lower().endswith((".geojson", ".json")):
+        path = Path(cfg)
+        if not path.is_absolute() and not path.exists():
+            candidate = base_dir / path
+            if candidate.exists():
+                return str(candidate)
+    return cfg
 
 
 def _strip_unknown_job_keys(cfg: Any, cls: type[ExtractionJob]) -> Any:
@@ -302,6 +334,21 @@ class ExtractionJob(BaseModel):
             )
         return value
 
+    @model_validator(mode="after")
+    def _validate_raw_reproject_crs(self) -> ExtractionJob:
+        """Fail fast when raw mode is used without a configured CRS on a partial."""
+        if self.reproject_mode == "raw" and self.reproject is not None:
+            if _raw_reproject_crs(self.reproject) is None and isinstance(
+                self.reproject, functools.partial
+            ):
+                raise ValueError(
+                    "reproject_mode='raw' requires a 'crs' in the reproject "
+                    "config: an explicit CRS (e.g. 'epsg:32720'), 'utm' to infer "
+                    "the UTM zone from the data, or use reproject_mode='grid' "
+                    "which infers UTM per grid cell."
+                )
+        return self
+
     @classmethod
     def _from_instantiated(cls, instantiated: Any, source: str) -> ExtractionJob:
         """Validate an object produced by Hydra instantiation as an ExtractionJob.
@@ -518,6 +565,7 @@ class ExtractionJob(BaseModel):
         with initialize_config_dir(version_base=None, config_dir=str(config_dir)):
             cfg = compose(config_name=config_name, overrides=overrides or [])
             plain_cfg = OmegaConf.to_container(cfg, resolve=True)
+            plain_cfg = _resolve_geometry_paths(plain_cfg, config_dir)
             plain_cfg = _strip_unknown_job_keys(plain_cfg, cls)
             prepared_cfg = _prepare_config_for_instantiate(plain_cfg)
             instantiated = hydra.utils.instantiate(prepared_cfg, _convert_="all")
@@ -562,6 +610,7 @@ class ExtractionJob(BaseModel):
         cfg = OmegaConf.load(path)
 
         plain_cfg = OmegaConf.to_container(cfg, resolve=True)
+        plain_cfg = _resolve_geometry_paths(plain_cfg, path.resolve().parent)
         plain_cfg = _strip_unknown_job_keys(plain_cfg, cls)
         prepared_cfg = _prepare_config_for_instantiate(plain_cfg)
         instantiated = hydra.utils.instantiate(prepared_cfg, _convert_="all")

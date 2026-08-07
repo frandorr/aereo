@@ -15,6 +15,7 @@ from aereo.interfaces import (
     empty_asset_result,
 )
 from aereo.interfaces.core import ExtractionTask, Reader
+from aereo.builtins.reproject import reproject_odc
 from aereo.pipeline import ExtractionJob
 from aereo.pipeline.core import _callable_name
 from aereo.schemas import ArtifactSchema, AssetSchema
@@ -333,6 +334,67 @@ write:
     )
     job = ExtractionJob.from_yaml(job_yaml)
     assert isinstance(job.target_aoi, Polygon)
+
+
+def test_extraction_job_from_yaml_resolves_aoi_relative_to_yaml(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """A relative geometry path anchors to the job file, not the CWD."""
+    aoi_file = tmp_path / "aoi.geojson"
+    aoi_file.write_text(str(_sample_geojson()).replace("'", '"'))
+
+    job_yaml = tmp_path / "job.yaml"
+    job_yaml.write_text(
+        """
+grid_dist: 50000
+output_uri: "out_dir"
+target_aoi: aoi.geojson
+read:
+  _target_: aereo.builtins.read.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
+"""
+    )
+    other_dir = tmp_path / "elsewhere"
+    other_dir.mkdir()
+    monkeypatch.chdir(other_dir)
+
+    job = ExtractionJob.from_yaml(job_yaml)
+    assert isinstance(job.target_aoi, Polygon)
+
+
+def test_extraction_job_load_from_config_resolves_search_aoi_relative_to_config(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """Nested geometry paths (e.g. search.intersects) anchor to the config dir."""
+    config_dir = tmp_path / "conf"
+    config_dir.mkdir()
+    (config_dir / "aoi.geojson").write_text(str(_sample_geojson()).replace("'", '"'))
+    (config_dir / "main_config.yaml").write_text(
+        """
+grid_dist: 50000
+output_uri: "out_dir"
+target_aoi: aoi.geojson
+search:
+  _target_: aereo.builtins.search.search_stac
+  _partial_: true
+  stac_api_url: "https://example.com/stac"
+  intersects: aoi.geojson
+read:
+  _target_: aereo.builtins.read.read_odc_stac
+write:
+  _target_: aereo.builtins.write.write_geotiff
+"""
+    )
+    other_dir = tmp_path / "elsewhere"
+    other_dir.mkdir()
+    monkeypatch.chdir(other_dir)
+
+    job = ExtractionJob.load_from_config(config_dir)
+    assert isinstance(job.target_aoi, Polygon)
+    intersects = job.search_provider.keywords["intersects"]
+    assert Path(intersects).is_absolute()
+    assert Path(intersects).exists()
 
 
 def test_extraction_job_target_aoi_defaults_to_none(tmp_path: Path):
@@ -836,3 +898,55 @@ def test_job_processors_default_to_none():
     )
     assert job.preprocess is None
     assert job.postprocess is None
+# ---------------------------------------------------------------------------
+# Raw-mode CRS validator
+# ---------------------------------------------------------------------------
+
+
+def test_job_raw_mode_without_crs_fails_at_load():
+    with pytest.raises(ValueError, match="reproject_mode='raw' requires a 'crs'"):
+        ExtractionJob(
+            grid_dist=1000,
+            output_uri="/tmp/out",
+            read=FakeReader(),
+            write=_DummyWriter(),
+            reproject=partial(reproject_odc, resolution=375),
+            reproject_mode="raw",
+        )
+
+
+def test_job_raw_mode_accepts_utm_sentinel():
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+        reproject=partial(reproject_odc, crs="utm", resolution=375),
+        reproject_mode="raw",
+    )
+    assert job.reproject is not None
+
+
+def test_job_raw_mode_accepts_explicit_crs():
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+        reproject=partial(reproject_odc, crs="epsg:32720", resolution=375),
+        reproject_mode="raw",
+    )
+    assert job.reproject is not None
+
+
+def test_job_raw_mode_skips_nonpartial_callables():
+    """Plain function reprojectors pass validation; the runtime guard owns the error."""
+    job = ExtractionJob(
+        grid_dist=1000,
+        output_uri="/tmp/out",
+        read=FakeReader(),
+        write=_DummyWriter(),
+        reproject=lambda ds: ds,
+        reproject_mode="raw",
+    )
+    assert job.reproject is not None
