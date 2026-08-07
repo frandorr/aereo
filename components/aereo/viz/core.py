@@ -497,6 +497,11 @@ def plot_artifact_patches(
     Pass ``vmin``/``vmax`` to fix the range for variables such as NDVI, or to
     override the z-score bounds when using ``stretch="zscore"``.
 
+    When ``cell_utm_crs`` is present, grid-cell footprints are reprojected to
+    the first artifact's CRS before plotting. Cells near a UTM zone boundary
+    may carry footprints in different zones, which would otherwise render far
+    off their true position and stretch the axis limits.
+
     Heavy dependencies (matplotlib, geopandas, rasterio) are imported lazily
     so callers only pay the import cost when this function is actually used.
 
@@ -569,6 +574,27 @@ def plot_artifact_patches(
     artifacts = cast(
         gpd.GeoDataFrame, artifacts.drop_duplicates(subset=["grid_cell"], keep="first")
     )
+
+    # Grid cells near a UTM zone boundary may carry footprints in different
+    # zones (each MajorTOM cell picks the zone of its centroid). Reproject
+    # all footprints to the first artifact's CRS so they share one coordinate
+    # frame; otherwise out-of-zone cells render far off their true position
+    # and stretch the axis limits.
+    if "cell_utm_crs" in artifacts.columns:
+        main_crs = str(artifacts["cell_utm_crs"].iloc[0])
+        artifacts = artifacts.copy()
+        artifacts["cell_utm_footprint"] = [
+            (
+                footprint
+                if str(crs) == main_crs
+                else reproject_geom(footprint, src_epsg=str(crs), dst_epsg=main_crs)
+            )
+            for footprint, crs in zip(
+                artifacts["cell_utm_footprint"],
+                artifacts["cell_utm_crs"],
+                strict=True,
+            )
+        ]
 
     band_list = _normalize_bands(bands)
     n_bands = len(band_list)
@@ -755,7 +781,7 @@ def plot_artifact_patches(
             raise ValueError(
                 "aoi overlay requires artifacts to have a 'cell_utm_crs' column"
             )
-        target_crs = artifacts["cell_utm_crs"].iloc[0]
+        target_crs = str(artifacts["cell_utm_crs"].iloc[0])
         aoi_utm = _reproject_aoi_to_utm(aoi, aoi_crs, target_crs)
         gpd.GeoSeries([aoi_utm], crs=target_crs).plot(
             ax=ax,

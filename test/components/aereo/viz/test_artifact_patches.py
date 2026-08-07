@@ -577,3 +577,51 @@ def test_plot_artifact_patches_overlay_on_existing_ax(
     assert ax.images[-1].get_alpha() == pytest.approx(0.5)
 
     plt.close(fig)
+
+
+def test_plot_artifact_patches_unifies_mixed_utm_footprints(
+    tmp_path: Path,
+) -> None:
+    """Footprints in a minority UTM zone are reprojected to the majority CRS.
+
+    Grid cells near a UTM zone boundary can carry footprints expressed in
+    different zones; without unification the raw out-of-zone coordinates
+    render the cell far off its true position and stretch the axis limits.
+    """
+    bounds = (300000.0, 5000000.0, 301000.0, 5001000.0)
+    path = tmp_path / "cell.tif"
+    _make_test_tiff(path, bounds)
+
+    # A geographically adjacent cell (just west of the main one) whose
+    # footprint coordinates are expressed in the neighbouring UTM zone.
+    # In EPSG:32632 its raw x-coordinates land around 700k, far from the
+    # ~300k frame of the EPSG:32633 cells.
+    main_fp = box(*bounds)
+    west_fp_4326 = reproject_geom(
+        box(bounds[0] - 1000, bounds[1], bounds[2] - 1000, bounds[3]),
+        src_epsg="EPSG:32633",
+        dst_epsg="EPSG:4326",
+    )
+    west_fp_zone32 = reproject_geom(
+        west_fp_4326, src_epsg="EPSG:4326", dst_epsg="EPSG:32632"
+    )
+    assert west_fp_zone32.bounds[2] > 600000.0  # raw coords are far east
+
+    gdf = gpd.GeoDataFrame(
+        {
+            "uri": [str(path), str(path)],
+            "grid_cell": ["cell_main", "cell_west"],
+            "cell_utm_footprint": [main_fp, west_fp_zone32],
+            "cell_utm_crs": ["EPSG:32633", "EPSG:32632"],
+        },
+        geometry="cell_utm_footprint",
+        crs="EPSG:32633",
+    )
+
+    fig, ax = plot_artifact_patches(gdf)
+
+    # With footprints unified to the majority CRS the canvas stays within
+    # the main cell's frame (~301k) instead of stretching to ~700k+.
+    xlim = ax.get_xlim()
+    assert xlim[1] < 400000.0
+    fig.clf()
