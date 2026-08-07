@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.4.0 (2026-08-07)
 
 - Add opt-in UTM inference for `reproject_mode="raw"` via the `crs: "utm"`
   sentinel. The orchestrator infers the UTM EPSG from the dataset footprint
@@ -9,6 +9,15 @@
   `ExtractionJob` validation catches missing `crs` on `functools.partial`
   reprojectors, and `run_task` raises the same actionable error for
   non-partial callables that do not accept a `crs` argument.
+- Reclaim retained memory in `LocalExecutor.shutdown`: run `gc.collect()` +
+  `malloc_trim(0)` for the current process and terminate joblib's reusable
+  loky pool, so RSS drops after a batch completes. Only applies when the
+  executor actually dispatched parallel work, and never for the threading
+  backend.
+- Resolve relative geometry paths (`.geojson`/`.json`) in job configs against
+  the job config directory instead of only the process CWD, so loading a job
+  from a notebook or another directory no longer fails with
+  `Geometry file not found` when the file sits next to the job YAML.
 
 ## 1.3.0 (2026-08-06)
 
