@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.1 (2026-08-07)
+
+- Fix `plot_artifact_patches` for AOIs near a UTM zone boundary: grid-cell
+  footprints expressed in different UTM zones are reprojected to the first
+  artifact's `cell_utm_crs` before plotting, so out-of-zone cells no longer
+  render far off their true position or stretch the axis limits. The AOI
+  overlay uses the same target CRS for consistency.
+
 ## 1.4.0 (2026-08-07)
 
 - Add opt-in UTM inference for `reproject_mode="raw"` via the `crs: "utm"`
