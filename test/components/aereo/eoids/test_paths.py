@@ -24,11 +24,38 @@ def test_build_eoids_path_basic():
     expected_dir = Path("/tmp/dataset/job-goes_c01/loc-36D61L/date-20260101")
     expected_filename = (
         "collection-ABI-L1b-RadF_loc-36D61L_start-20260101T100022_"
-        "end-20260101T100932_variable-C01_res-1000m_job-goes_c01.tif"
+        "end-20260101T100932_res-1000m_job-goes_c01.tif"
     )
 
     assert path.parent == expected_dir
     assert path.name == expected_filename
+    # Variables are accepted for backward compatibility but never encoded.
+    assert "variable" not in parse_eoids_filename(path.name)
+
+
+def test_build_eoids_path_ignores_long_variable_lists():
+    """Many/long variable names must not inflate the filename."""
+    st = datetime.datetime(2026, 1, 1, 10, 0, 22)
+
+    path = build_eoids_path(
+        local_dir="/tmp/dataset",
+        job_name="escobar-smap-earthaccess",
+        resolution=9000.0,
+        collections=["SPL3SMP_E"],
+        variables=[
+            "soil_moisture_am",
+            "soil_moisture_error_am",
+            "surface_water_fraction_mb_h_am",
+            "surface_water_fraction_mb_v_am",
+            "static_water_body_fraction_am",
+            "surface_temperature_am",
+        ],
+        cell_id="36D61L",
+        start_time=st,
+    )
+
+    assert "variable" not in parse_eoids_filename(path.name)
+    assert len(path.name) < 255  # filesystem filename limit
 
 
 def test_build_eoids_path_no_resolution():
@@ -48,7 +75,7 @@ def test_build_eoids_path_no_resolution():
 
     expected_filename = (
         "collection-ABI-L1b-RadF_loc-36D61L_start-20260101T100022_"
-        "end-20260101T100932_variable-C01_job-goes_c01.tif"
+        "end-20260101T100932_job-goes_c01.tif"
     )
 
     assert path.name == expected_filename
@@ -75,7 +102,7 @@ def test_build_eoids_path_derivatives():
     )
     expected_filename = (
         "collection-ABI-L1b-RadF_loc-36D61L_start-20260101T100022_"
-        "variable-C01_res-1000m_job-goes_c01.nc"
+        "res-1000m_job-goes_c01.nc"
     )
 
     assert path.parent == expected_dir

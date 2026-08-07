@@ -85,10 +85,13 @@ def build_eoids_path(
 ) -> Path:
     """Build an Earth Observation Imaging Data Structure (EOIDS) compliant file path.
 
-    ``collection`` and ``variable`` are encoded in the filename (joined by ``+`` when
-    multiple values exist).  The ``variable`` segment names the *set* of bands
-    that will be stored as separate raster bands inside the single file — it
-    does **not** cause the variables to be split into separate files.
+    ``collection`` is encoded in the filename (joined by ``+`` when multiple
+    values exist). The ``variable`` segment is **not** encoded: variable names
+    made filenames exceed filesystem limits when several bands were stored, and
+    the job name (e.g. ``sentinel2-rgb``) is expected to identify the band set.
+    The ``variables`` argument is still accepted for backward compatibility but
+    is ignored. Legacy files with a ``variable-`` segment remain parseable via
+    :func:`parse_eoids_filename`.
     The directory hierarchy is flattened — there are no
     ``collection-<name>/`` or ``variable-<name>/`` subdirectories.
 
@@ -102,7 +105,8 @@ def build_eoids_path(
             kept at its native resolution (e.g. ``reproject_mode="raw"``).
             When *None*, the ``res-`` segment is omitted from the filename.
         collections: Sequence of collection identifiers.
-        variables: Sequence of variables/bands.
+        variables: Accepted for backward compatibility; ignored. Band names
+            live inside the raster, not in the filename.
         cell_id: Geographic cell identifier (e.g., '36D61L').
         start_time: Start time of the observation.
         end_time: End time of the observation.
@@ -126,9 +130,6 @@ def build_eoids_path(
         parts.append(f"start-{start_time.strftime(_EOIDS_DT_FMT)}")
     if end_time:
         parts.append(f"end-{end_time.strftime(_EOIDS_DT_FMT)}")
-
-    if variables:
-        parts.append(f"variable-{('+').join(variables)}")
 
     if resolution is not None:
         res_str = f"{int(resolution)}m"
