@@ -1,0 +1,34 @@
+PRD: Opt-in UTM Inference for reproject_mode="raw"
+Branch: feat/raw-reproject-utm-inference
+
+Phase 1 - Core
+==============
+Task 1.1: CRS resolution helper + sentinel constant  [done]
+Task 1.2: UTM inference helper                      [done]
+Task 1.3: Wire inference into run_task raw branch   [done]
+Task 1.4: ExtractionJob model validator             [done]
+  - Helper kept in components/aereo/execution/core.py; imported into
+    components/aereo/pipeline/core.py. No circular import observed because
+    aereo.execution.core only depends on aereo.interfaces, not aereo.pipeline.
+
+Phase 2 - Examples & Documentation
+==================================
+Task 2.1: Update reprojection docs                  [done]
+Task 2.2: Update YAML schema docs                   [done]
+Task 2.3: CHANGELOG entry                           [done]
+Task 2.4: Example notebook regression run           [done]
+  - examples/01-sentinel2.ipynb: executed, no errors
+  - examples/02-viirs.ipynb: executed, no errors
+  - examples/05-goes19.ipynb: executed, no errors
+Task 2.5: New raw-mode inference example (optional) [skipped]
+
+Verification
+============
+Tests (new + affected modules):                      [done] 71 passed
+Lint/type checks:                                   [done] ruff + basedpyright clean
+Full pytest suite:                                  [note] 380 passed, 3 failed (pre-existing)
+  - test_reproject_satpy_registry: missing plugin/env dependency
+  - test_handle_event_direct_payload: ModuleNotFoundError: test_pipeline
+  - test_handle_event_staged_payload: ModuleNotFoundError: test_pipeline
+Full basedpyright:                                  [note] 1 pre-existing error in components/aereo/registry/core.py:78
+Checklist review:                                   [done]

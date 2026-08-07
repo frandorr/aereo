@@ -30,6 +30,42 @@ write:
   _target_: aereo.builtins.write.write_geotiff
 ```
 
+### Opt-in UTM inference for `reproject_mode="raw"`
+
+When you know the dataset fits comfortably inside a single UTM zone but do not
+want to look up the EPSG code yourself, set `crs: "utm"` in the reproject
+config:
+
+```yaml
+reproject:
+  _target_: aereo.builtins.reproject.reproject_odc
+  _partial_: true
+  crs: "utm"        # infer the UTM zone from the dataset footprint
+  resolution: 10.0
+reproject_mode: raw
+```
+
+The orchestrator derives the footprint from the dataset after it has been read
+and preprocessed, picks the UTM zone from the centroid, and passes the concrete
+EPSG code to the reprojector. The inferred EPSG is logged at `info`
+(`raw_reproject_inferred_crs`) so you can pin it explicitly if desired.
+
+**Why this is opt-in.** A single centroid-picked UTM zone is *wrong* for wide
+footprints (e.g. continental mosaics, GOES full disk) and for polar areas, where
+it silently distorts data at the edges. For those cases use
+`reproject_mode="grid"`, which infers UTM per Major TOM cell. As a guard:
+
+- If the footprint spans more than 6° of longitude, a `warning` is emitted that
+the data crosses multiple UTM zones and an explicit CRS or grid mode may give
+better results.
+- If the footprint is polar or otherwise outside the UTM zone range, inference
+raises a `ValueError` telling you to configure an explicit `crs` or use grid
+mode.
+
+If `crs` is omitted entirely in raw mode, `ExtractionJob` validation now fails
+fast with a clear error pointing to the three options: an explicit CRS,
+`crs: "utm"`, or `reproject_mode="grid"`.
+
 In pure Python:
 
 ```python

@@ -20,7 +20,7 @@ instantiation conventions, and links each stage to its input/output schema.
 | `alignment_resolution` | `float \| None` | Resolution used to align the grid. |
 | `read` | `Reader` | Function that opens assets into an `xr.Dataset`. |
 | `preprocess` | `Processor \| list[Processor]` | Optional function(s) run before reprojection. |
-| `reproject` | `Reprojector` | Optional function that warps the dataset to a target CRS/geobox. |
+| `reproject` | `Reprojector` | Optional function that warps the dataset to a target CRS/geobox. In `reproject_mode="raw"` its kwargs must include `crs` (a concrete CRS string or the sentinel `"utm"` for footprint-based inference) and usually `resolution`. |
 | `reproject_mode` | `"raw" \| "grid" \| None` | How reprojection is applied. See [Reprojection](../user-guide/reprojection.md). |
 | `postprocess` | `Processor \| list[Processor]` | Optional function(s) run after reprojection. |
 | `write` | `Writer` | Function that serializes a dataset to disk or object store. |
@@ -55,6 +55,24 @@ reproject:
   crs: EPSG:32633
   resolution: 10.0
 ```
+
+For `reproject_mode="raw"` you may also use the `crs: "utm"` sentinel to ask
+the orchestrator to infer the UTM zone from the dataset footprint after read
+and preprocess:
+
+```yaml
+reproject:
+  _target_: aereo.builtins.reproject.reproject_odc
+  _partial_: true
+  crs: "utm"
+  resolution: 10.0
+reproject_mode: raw
+```
+
+The `resolution` keyword stays inside the `reproject:` block (this is the
+reprojection plugin's own `resolution`, unchanged since v1.3.0). It is distinct
+from the top-level `grid_resolution` field used by `reproject_mode="grid"` and
+for artifact indexing.
 
 ## Schemas for each stage
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Add opt-in UTM inference for `reproject_mode="raw"` via the `crs: "utm"`
+  sentinel. The orchestrator infers the UTM EPSG from the dataset footprint
+  after read and preprocess, then passes the concrete CRS to the reprojector.
+- Fail fast when `reproject_mode="raw"` is used without a configured `crs`:
+  `ExtractionJob` validation catches missing `crs` on `functools.partial`
+  reprojectors, and `run_task` raises the same actionable error for
+  non-partial callables that do not accept a `crs` argument.
+
 ## 1.3.0 (2026-08-06)
 
 - Rename the top-level `ExtractionJob.resolution` field to `grid_resolution` to disambiguate it from the `resolution` keyword bound inside the `reproject:` block (used by reprojection plugins to self-construct a target GeoBox in `reproject_mode="raw"`). The legacy `resolution` key is still accepted as an alias, and older serialized task payloads are read with a fallback, so existing configs keep working.
