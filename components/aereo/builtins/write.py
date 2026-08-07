@@ -16,11 +16,13 @@ from pydantic import ConfigDict, validate_call
 def _dataset_to_raster_bands(ds: xr.Dataset) -> xr.DataArray:
     """Combine all data variables in *ds* into a single multi-band DataArray.
 
-    Each variable becomes one or more raster bands. Variables that already
-    contain a ``band`` dimension with more than one band are expanded so that
-    every original band becomes a separate raster band. The resulting
-    DataArray has a ``band`` dimension whose coordinate values identify the
-    source variable (and original band, when applicable).
+    Each variable becomes one or more raster bands. Variables are processed in
+    alphabetical order so the band order is deterministic across runs and
+    downloads. Variables that already contain a ``band`` dimension with more
+    than one band are expanded so that every original band becomes a separate
+    raster band. The resulting DataArray has a ``band`` dimension whose
+    coordinate values identify the source variable (and original band, when
+    applicable).
 
     Args:
         ds: Dataset whose variables share the same spatial grid.
@@ -34,7 +36,7 @@ def _dataset_to_raster_bands(ds: xr.Dataset) -> xr.DataArray:
     """
     band_arrays: list[xr.DataArray] = []
 
-    for var_name in ds.data_vars:
+    for var_name in sorted(ds.data_vars):
         da = ds[var_name]
         if "band" in da.dims and da.sizes["band"] != 1:
             for band_val in da.coords["band"].values:
