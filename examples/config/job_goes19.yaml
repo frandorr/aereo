@@ -1,6 +1,6 @@
 aoi_path: config/aoi/cordoba.geojson
 # Common Job config, like name, MajorTOM grid distance, etc
-name: viirs_sample
+name: goes19_sample
 grid_dist: 50_000
 grid_cells_margin: 10
 target_aoi: ${aoi_path}
