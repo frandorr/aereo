@@ -39,7 +39,7 @@ def _sanitize_cell(cell_id: str) -> str:
     return str(cell_id).replace("_", "")
 
 
-def _sanitize_job_name(name: str) -> str:
+def sanitize_job_name(name: str) -> str:
     """Return a filesystem-safe version of a job name.
 
     Replaces path separators and whitespace with underscores and strips
@@ -51,20 +51,6 @@ def _sanitize_job_name(name: str) -> str:
 def _normalize_suffix(suffix: str) -> str:
     """Strip a leading dot from a file extension suffix."""
     return suffix.lstrip(".")
-
-
-def _write_job_meta(
-    base_dir: Path, job_name: str, meta: dict[str, Any] | None = None
-) -> None:
-    job_path = base_dir / "job.json"
-    if not job_path.exists() and meta is not None:
-        import json
-
-        payload = {"job": job_name, **meta}
-        job_path.write_text(
-            json.dumps(payload, indent=2),
-            encoding="utf-8",
-        )
 
 
 def build_eoids_path(
@@ -79,8 +65,6 @@ def build_eoids_path(
     end_time: datetime.datetime | None = None,
     derivative: str | None = None,
     suffix: str = "tif",
-    write_job_meta: bool = True,
-    meta_dict: dict[str, Any] | None = None,
     **_kwargs: Any,
 ) -> Path:
     """Build an Earth Observation Imaging Data Structure (EOIDS) compliant file path.
@@ -95,8 +79,9 @@ def build_eoids_path(
     The directory hierarchy is flattened — there are no
     ``collection-<name>/`` or ``variable-<name>/`` subdirectories.
 
-    On the first call for a given job, a ``job.json`` sidecar is written
-    next to the data file so the job metadata can be recovered from disk.
+    Job configuration provenance and overwrite protection are handled by the
+    ``aereo.jobguard`` component, which writes and validates a
+    ``job.yaml`` snapshot in the job directory.
 
     Args:
         local_dir: Root directory for the dataset.
@@ -112,11 +97,8 @@ def build_eoids_path(
         end_time: End time of the observation.
         derivative: Name of the derivative pipeline (places file in derivatives/<name>/).
         suffix: File extension (default: 'tif').
-        write_job_meta: When *True* (the default), serialize metadata to
-            ``job.json`` in the job directory on the first call.
-        meta_dict: Optional metadata dictionary to save as job.json.
     """
-    safe_job = _sanitize_job_name(job_name)
+    safe_job = sanitize_job_name(job_name)
     parts: list[str] = []
 
     if collections:
@@ -157,9 +139,6 @@ def build_eoids_path(
         base_dir = base_dir / f"date-{start_time.strftime(_EOIDS_DATE_FMT)}"
 
     base_dir.mkdir(parents=True, exist_ok=True)
-
-    if write_job_meta:
-        _write_job_meta(base_dir, safe_job, meta_dict)
 
     return base_dir / filename
 

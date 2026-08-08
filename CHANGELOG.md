@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+- Add job configuration snapshot guard: `ExtractionJob.execute()` now writes
+  a canonical `job.yaml` snapshot of the job's output-defining configuration
+  to `{output_uri}/job-<name>/job.yaml` on first run and validates later runs
+  against it, raising `JobConfigMismatchError` before any file is written
+  when the same job name is reused with a different configuration (new
+  `aereo.jobguard` component). Extent-only changes (datetimes, AOI) are
+  allowed; pass `validate_snapshot=False` to bypass the check.
+- BREAKING: remove the dead `write_job_meta`/`meta_dict` parameters from
+  `build_eoids_path` (no caller passed them; the `job.json` sidecar was
+  never written). Job provenance is now handled by the `job.yaml` snapshot.
+- Expose `sanitize_job_name` in the public `aereo.eoids` API.
+
 ## 1.4.3 (2026-08-07)
 
 - Omit the `variable-` segment from generated EOIDS filenames: joining all

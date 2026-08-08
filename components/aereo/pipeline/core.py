@@ -16,6 +16,7 @@ import hydra
 from omegaconf import OmegaConf
 from aereo.executors.core import Executor, LocalExecutor
 from aereo.execution.core import _raw_reproject_crs
+from aereo.jobguard import check_job_snapshot
 from aereo.interfaces import (
     ExtractionTask,
     Reader,
@@ -478,20 +479,33 @@ class ExtractionJob(BaseModel):
         self,
         tasks: Sequence[ExtractionTask],
         executor: Executor | None = None,
+        *,
+        validate_snapshot: bool = True,
     ) -> GeoDataFrame[ArtifactSchema]:
         """Run prepared tasks and return the combined artifacts.
 
         Args:
             tasks: Extraction tasks to execute.
             executor: Optional executor. Defaults to ``LocalExecutor()``.
+            validate_snapshot: When *True* (the default), validate this job's
+                configuration against the ``job.yaml`` snapshot stored in the
+                job output directory (writing it on first run) so that a job
+                name cannot be silently reused with a different configuration.
 
         Returns:
             A validated ``GeoDataFrame[ArtifactSchema]``.
+
+        Raises:
+            JobConfigMismatchError: If a snapshot already exists for this job
+                name with a different output-defining configuration.
         """
         if not tasks:
             return cast(
                 GeoDataFrame[ArtifactSchema], ArtifactSchema.empty_geodataframe()
             )
+
+        if validate_snapshot:
+            check_job_snapshot(self)
 
         selected_executor = executor or LocalExecutor()
         logger.info(
