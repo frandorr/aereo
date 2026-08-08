@@ -230,7 +230,6 @@ def _build_output_path(
         job_name=job.name,
         resolution=job.grid_resolution,
         collections=collections,
-        variables=[str(v) for v in ds.data_vars],
         cell_id=cell_id,
         start_time=start_time,
         end_time=end_time,
