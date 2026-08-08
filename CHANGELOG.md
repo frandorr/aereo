@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.4.3 (2026-08-07)
+
+- Omit the `variable-` segment from generated EOIDS filenames: joining all
+  variable names with `+` produced filenames over the 255-byte filesystem
+  limit when several variables were stored in one raster. The job name
+  identifies the band set and band names live inside the raster. The
+  `variables` argument of `build_eoids_path` is still accepted for backward
+  compatibility but ignored, and `parse_eoids_filename` continues to parse
+  legacy filenames. Note: new artifacts can no longer be filtered by
+  variable in `scan_eoids_dir`.
+- Sort raster bands alphabetically by variable name in `write_geotiff`, so
+  the band order of a job's output is deterministic across downloads.
+
 ## 1.4.2 (2026-08-07)
 
 - Fix `plot_artifact_patches` regression from 1.4.1: unifying mixed-UTM
