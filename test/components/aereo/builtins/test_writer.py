@@ -228,3 +228,24 @@ def test_write_geotiff_preserves_dataset_attrs(tmp_path):
 
     with rasterio.open(path) as src:
         assert src.tags().get("custom_key") == "custom_val"
+
+
+def test_write_geotiff_bands_sorted_alphabetically(tmp_path):
+    """Band order is alphabetical by variable name, regardless of creation order."""
+    ds = _make_dataset(
+        data_vars={
+            "B08": (("band", "y", "x"), np.ones((1, 8, 8)) * 0.8),
+            "B04": (("band", "y", "x"), np.ones((1, 8, 8)) * 0.4),
+            "B02": (("band", "y", "x"), np.ones((1, 8, 8)) * 0.2),
+        }
+    )
+    path = _write_path(tmp_path)
+    write_geotiff(ds, path)
+
+    import rasterio
+
+    with rasterio.open(path) as src:
+        assert src.descriptions == ("B02", "B04", "B08")
+        # Band values follow the sorted order too.
+        assert src.read(1).mean() == pytest.approx(0.2)
+        assert src.read(3).mean() == pytest.approx(0.8)
