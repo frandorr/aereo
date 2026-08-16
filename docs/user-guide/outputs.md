@@ -58,6 +58,31 @@ In practice:
 - `artifacts.parquet` sits at the root and is the entry point for downstream
   ML training scripts.
 
+## Job snapshots and overwrite protection
+
+Because filenames no longer embed the variable list, the job name identifies
+the band set. To make that contract safe, every `job.execute()` run validates
+the job against a `job.yaml` snapshot stored at
+`{output_uri}/job-<name>/job.yaml`:
+
+- On the first run the snapshot is written, capturing the output-defining
+  configuration: grid parameters, reprojection mode, and every pipeline
+  callable with its bound keyword arguments (including the collection → band
+  mapping from the search provider).
+- On later runs the job is compared against the snapshot. If any
+  output-defining value differs, `JobConfigMismatchError` is raised **before
+  any file is written**, naming the differing fields. Rename the job or
+  delete the existing job directory to proceed.
+
+Extent-only changes are intentionally allowed: `start_datetime`,
+`end_datetime`, `intersects`, and `target_aoi` select *which* scenes are
+produced, and the resulting files get their own `loc-`/`date-` paths, so
+extending a dataset's time range or AOI does not trip the guard. Jobs built
+from a Hydra YAML and identical jobs built in code compare equal, since the
+snapshot is derived from the instantiated job, not the config text.
+
+Pass `validate_snapshot=False` to `job.execute()` to bypass the check.
+
 If you prefer a different layout, you can provide a custom writer plugin; the
 writer controls how files are named under `output_uri`.
 

@@ -8,12 +8,14 @@ from .core import (
     EOIDSLoader,
     build_eoids_path,
     parse_eoids_filename,
+    sanitize_job_name,
     scan_eoids_dir,
 )
 
 __all__ = [
-    "build_eoids_path",
     "EOIDSLoader",
+    "build_eoids_path",
     "parse_eoids_filename",
+    "sanitize_job_name",
     "scan_eoids_dir",
 ]
