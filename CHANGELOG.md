@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.4 (2026-08-16)
+
+- Pin `majortom-eg` to `==1.0.0`: the new upstream release broke AerEO, so
+  the dependency is locked to the last known-good version until AerEO is
+  adapted to the new API.
+
 ## 1.4.3 (2026-08-07)
 
 - Omit the `variable-` segment from generated EOIDS filenames: joining all
