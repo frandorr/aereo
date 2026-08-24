@@ -14,6 +14,14 @@
   compatibility — the `job.json` sidecar was never written because no caller
   passed them. Job provenance is now handled by the `job.yaml` snapshot.
 - Expose `sanitize_job_name` in the public `aereo.eoids` API.
+- Fix `PluginSerializer` to serialize callables nested inside plugin `config`
+  kwargs (e.g. `patch_url=planetary_computer.sign`) by import path instead of
+  falling through to `json.dumps(default=str)`, whose repr embeds a
+  per-process memory address. That made `TaskResultCache` fingerprints
+  unstable across runs (the cache never hit for such plugins, e.g. DEM jobs
+  recomputing every time) and would have shipped an undecodable repr string
+  to remote executors. Lists/tuples of partials (e.g. a `postprocess` list)
+  are now serialized per element, so they enter the fingerprint by content.
 
 ## 1.4.4 (2026-08-16)
 

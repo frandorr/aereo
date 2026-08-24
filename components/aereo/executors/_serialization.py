@@ -43,19 +43,29 @@ class PluginSerializer:
     CONFIG_KEY = "config"
 
     @classmethod
-    def dumps(cls, plugin: Any | None) -> dict[str, Any] | None:
-        """Serialize a plugin (Callable or partial) to a JSON-safe dict.
+    def dumps(cls, plugin: Any | None) -> Any:
+        """Serialize a plugin (Callable, partial, or list of them) to JSON-safe data.
+
+        Nested callables inside ``config`` values (e.g. ``patch_url=some_func``)
+        are serialized recursively by import path, so the result never embeds a
+        memory-address repr — those are unstable across processes (breaking
+        cache fingerprints) and undecodable on the receiving end (breaking
+        remote executors).
 
         Args:
-            plugin: Callable or partial instance to serialize, or ``None``.
+            plugin: Callable, partial, list/tuple of them, or ``None``.
 
         Returns:
-            A dict with ``__plugin_class__`` and ``config`` keys, or ``None``.
+            A dict with ``__plugin_class__`` and ``config`` keys, a list of
+            such dicts, or ``None``.
         """
         if plugin is None:
             return None
 
         import functools
+
+        if isinstance(plugin, (list, tuple)):
+            return [cls.dumps(p) for p in plugin]
 
         if isinstance(plugin, functools.partial):
             func = plugin.func
@@ -73,27 +83,47 @@ class PluginSerializer:
 
         return {
             cls.CLASS_KEY: f"{module}.{qualname}",
-            cls.CONFIG_KEY: config,
+            cls.CONFIG_KEY: {k: cls._serialize_value(v) for k, v in config.items()},
         }
 
     @classmethod
-    def loads(cls, plugin_data: dict[str, Any] | None) -> Any | None:
+    def _serialize_value(cls, value: Any) -> Any:
+        """Recursively serialize a config value; callables go by import path."""
+        if callable(value):
+            return cls.dumps(value)
+        if isinstance(value, dict):
+            return {k: cls._serialize_value(v) for k, v in value.items()}
+        if isinstance(value, (list, tuple)):
+            return [cls._serialize_value(v) for v in value]
+        return value
+
+    @classmethod
+    def loads(cls, plugin_data: Any | None) -> Any | None:
         """Reconstruct a plugin Callable from its serialized dict.
 
         Args:
-            plugin_data: Serialized plugin dict, or ``None``.
+            plugin_data: Serialized plugin dict produced by :meth:`dumps`,
+                a list of them, or ``None``.
 
         Returns:
-            A Callable instance, or ``None``.
-        """
-        import functools
-        import inspect
+            A Callable instance (or list of them), or ``None``.
 
+        Raises:
+            ImportError: If the stored path does not resolve to a callable.
+        """
         if not plugin_data:
             return None
 
+        import functools
+        import inspect
+
+        if isinstance(plugin_data, list):
+            return [cls.loads(d) for d in plugin_data]
+
         cls_path = plugin_data[cls.CLASS_KEY]
-        config = plugin_data[cls.CONFIG_KEY]
+        config = {
+            k: cls._deserialize_value(v) for k, v in plugin_data[cls.CONFIG_KEY].items()
+        }
         module_name, class_name = cls_path.rsplit(".", 1)
         module = importlib.import_module(module_name)
 
@@ -109,6 +139,17 @@ class PluginSerializer:
         if config:
             return functools.partial(obj, **config)
         return obj
+
+    @classmethod
+    def _deserialize_value(cls, value: Any) -> Any:
+        """Recursively rebuild config values serialized by :meth:`dumps`."""
+        if isinstance(value, dict):
+            if cls.CLASS_KEY in value:
+                return cls.loads(value)
+            return {k: cls._deserialize_value(v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [cls._deserialize_value(v) for v in value]
+        return value
 
 
 def _load_processors(data: Any) -> list[Any] | None:
