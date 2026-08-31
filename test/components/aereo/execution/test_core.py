@@ -646,3 +646,38 @@ def test_run_task_raw_concrete_crs_partial_does_not_raise_at_load():
         reproject_mode="raw",
     )
     assert job.reproject is not None
+
+
+class _TimeSeriesReader(Reader):
+    """Reader returning a multi-timestep cube (time, y, x)."""
+
+    def __call__(self, task: ExtractionTask, **kwargs) -> xr.Dataset:
+        times = pd.date_range("2023-01-01", periods=3, freq="h")
+        return xr.Dataset(
+            {"rain": (["time", "y", "x"], np.ones((3, 4, 4), dtype=np.float32))},
+            coords={"time": times, "y": range(4), "x": range(4)},
+        )
+
+
+def test_run_task_writes_each_timestep_to_unique_path(tmp_path):
+    """A multi-time read must produce one artifact per slice, not overwrites."""
+    from pathlib import Path
+
+    job = ExtractionJob(
+        name="timeseries",
+        grid_dist=1000,
+        output_uri=str(tmp_path / "out"),
+        read=_TimeSeriesReader(),
+        write=_DummyWriter(),
+    )
+    artifacts = run_task(_make_task(job))
+
+    uris = artifacts["uri"].unique().tolist()
+    assert len(uris) == 3, "each timestep slice must get its own file"
+    assert len({Path(u).name for u in uris}) == 3
+    for u in uris:
+        assert Path(u).exists()
+
+    expected = list(pd.date_range("2023-01-01", periods=3, freq="h"))
+    assert sorted(pd.to_datetime(artifacts["start_time"]).unique()) == expected
+    assert sorted(pd.to_datetime(artifacts["end_time"]).unique()) == expected
