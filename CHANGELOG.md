@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.1 (2026-08-31)
+
+- Fix the 1.5.0 wheel: the new `aereo.jobguard` component was missing from
+  the `[tool.polylith].bricks` mapping in `projects/aereo/pyproject.toml`,
+  so the published package did not include it and
+  `from aereo.pipeline import ExtractionJob` failed with
+  `ModuleNotFoundError: No module named 'aereo.jobguard'`. The brick is now
+  mapped and the built wheel verified to contain `aereo/jobguard`.
+
 ## 1.5.0 (2026-08-31)
 
 - Add job configuration snapshot guard: `ExtractionJob.execute()` now writes
