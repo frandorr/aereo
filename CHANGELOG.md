@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.5.0 (2026-08-31)
 
 - Add job configuration snapshot guard: `ExtractionJob.execute()` now writes
   a canonical `job.yaml` snapshot of the job's output-defining configuration
@@ -22,6 +22,12 @@
   recomputing every time) and would have shipped an undecodable repr string
   to remote executors. Lists/tuples of partials (e.g. a `postprocess` list)
   are now serialized per element, so they enter the fingerprint by content.
+- Fix multi-timestep dataset writes: readers returning a `(time, y, x)`
+  dataset had every time slice written to the same output path (derived from
+  the task-level asset window), so each slice overwrote the previous one and
+  only the last timestep survived. Each slice now gets a path named after
+  its own timestamp, and its artifact rows carry the slice time as
+  start/end bounds instead of the task window.
 
 ## 1.4.4 (2026-08-16)
 
