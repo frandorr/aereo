@@ -1,5 +1,34 @@
 # Changelog
 
+## 1.5.0 (2026-08-31)
+
+- Add job configuration snapshot guard: `ExtractionJob.execute()` now writes
+  a canonical `job.yaml` snapshot of the job's output-defining configuration
+  to `{output_uri}/job-<name>/job.yaml` on first run and validates later runs
+  against it, raising `JobConfigMismatchError` before any file is written
+  when the same job name is reused with a different configuration (new
+  `aereo.jobguard` component). Extent-only changes (datetimes, AOI) are
+  allowed; pass `validate_snapshot=False` to bypass the check.
+- Deprecate the dead `write_job_meta`/`meta_dict` parameters of
+  `build_eoids_path`: they are still accepted (and ignored) for backward
+  compatibility — the `job.json` sidecar was never written because no caller
+  passed them. Job provenance is now handled by the `job.yaml` snapshot.
+- Expose `sanitize_job_name` in the public `aereo.eoids` API.
+- Fix `PluginSerializer` to serialize callables nested inside plugin `config`
+  kwargs (e.g. `patch_url=planetary_computer.sign`) by import path instead of
+  falling through to `json.dumps(default=str)`, whose repr embeds a
+  per-process memory address. That made `TaskResultCache` fingerprints
+  unstable across runs (the cache never hit for such plugins, e.g. DEM jobs
+  recomputing every time) and would have shipped an undecodable repr string
+  to remote executors. Lists/tuples of partials (e.g. a `postprocess` list)
+  are now serialized per element, so they enter the fingerprint by content.
+- Fix multi-timestep dataset writes: readers returning a `(time, y, x)`
+  dataset had every time slice written to the same output path (derived from
+  the task-level asset window), so each slice overwrote the previous one and
+  only the last timestep survived. Each slice now gets a path named after
+  its own timestamp, and its artifact rows carry the slice time as
+  start/end bounds instead of the task window.
+
 ## 1.4.4 (2026-08-16)
 
 - Pin `majortom-eg` to `==1.0.0`: the new upstream release broke AerEO, so

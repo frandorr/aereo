@@ -22,6 +22,7 @@ def _make_task(
     read: Any = read_odc_stac,
     write: Any = write_geotiff,
     overwrite: bool = False,
+    postprocess: Any = None,
 ) -> ExtractionTask:
     """Return a minimal ExtractionTask for testing the cache."""
     valid_df = gpd.GeoDataFrame(
@@ -43,6 +44,7 @@ def _make_task(
         read=read,
         write=write,
         overwrite=overwrite,
+        postprocess=postprocess,
     )
     return ExtractionTask(
         id=task_id,
@@ -132,3 +134,54 @@ def test_cache_path_is_under_output_uri(tmp_path):
     path = cache.path(task)
     assert path.relative_to(tmp_path)
     assert ".aereo_cache" in path.parts
+
+
+def _processor(ds, a=0, **kwargs):
+    return ds
+
+
+def _processor_b(ds, a=0, **kwargs):
+    return ds
+
+
+def test_fingerprint_stable_with_callable_kwarg(tmp_path):
+    """A function in plugin kwargs must not leak its per-process repr address.
+
+    Regression test: ``json.dumps(default=str)`` on a function embeds its
+    memory address, so every process fingerprinted the same task differently
+    and the cache never hit (e.g. ``read_odc_stac(patch_url=pc.sign)``).
+    """
+    from functools import partial
+
+    cache = TaskResultCache()
+    task1 = _make_task(
+        output_uri=str(tmp_path), read=partial(read_odc_stac, patch_url=_processor)
+    )
+    task2 = _make_task(
+        output_uri=str(tmp_path), read=partial(read_odc_stac, patch_url=_processor)
+    )
+    assert cache.fingerprint(task1) == cache.fingerprint(task2)
+
+
+def test_fingerprint_changes_with_callable_kwarg(tmp_path):
+    """Swapping the callable kwarg changes the fingerprint."""
+    from functools import partial
+
+    cache = TaskResultCache()
+    task1 = _make_task(
+        output_uri=str(tmp_path), read=partial(read_odc_stac, patch_url=_processor)
+    )
+    task2 = _make_task(
+        output_uri=str(tmp_path), read=partial(read_odc_stac, patch_url=_processor_b)
+    )
+    assert cache.fingerprint(task1) != cache.fingerprint(task2)
+
+
+def test_fingerprint_changes_with_postprocess_list_kwargs(tmp_path):
+    """postprocess lists are fingerprinted per-processor, not collapsed to 'list'."""
+    from functools import partial
+
+    cache = TaskResultCache()
+    task1 = _make_task(output_uri=str(tmp_path), postprocess=[partial(_processor, a=1)])
+    task2 = _make_task(output_uri=str(tmp_path), postprocess=[partial(_processor, a=2)])
+    assert cache.fingerprint(task1) != cache.fingerprint(task2)

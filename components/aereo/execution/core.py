@@ -215,10 +215,20 @@ def _build_output_path(
     ds: xr.Dataset,
     task: ExtractionTask,
     cell_id: str | None = None,
+    slice_time: datetime | None = None,
 ) -> Path:
-    """Build the EOIDS output path for a dataset slice."""
+    """Build the EOIDS output path for a dataset slice.
+
+    When ``slice_time`` is given (a single timestep of a multi-time dataset),
+    it replaces the task-level time bounds so each timestep slice gets a
+    unique path instead of overwriting the same file.
+    """
     job = task.job
-    start_time, end_time = _derive_time_bounds(task)
+    if slice_time is not None:
+        start_time: datetime | None = slice_time
+        end_time: datetime | None = slice_time
+    else:
+        start_time, end_time = _derive_time_bounds(task)
     collections = None
     if "collection" in task.assets.columns:
         collections = [
@@ -241,9 +251,10 @@ def _write_single_timestep(
     ds: xr.Dataset,
     task: ExtractionTask,
     cell_id: str | None = None,
+    slice_time: datetime | None = None,
 ) -> str:
     """Write a single time-slice dataset and return the written path."""
-    path = _build_output_path(ds, task, cell_id=cell_id)
+    path = _build_output_path(ds, task, cell_id=cell_id, slice_time=slice_time)
     path.parent.mkdir(parents=True, exist_ok=True)
     written = task.job.write(ds, str(path))
     return str(written)
@@ -266,16 +277,23 @@ def _artifact_rows(
     task: ExtractionTask,
     grid_cells: Sequence[GridCell],
     cell_id: str | None = None,
+    slice_time: datetime | None = None,
 ) -> GeoDataFrame[ArtifactSchema]:
     """Build ArtifactSchema rows for a written file.
 
     If *cell_id* is provided (grid mode), emit a single row for that cell.
     Otherwise intersect the file footprint with the grid and emit one row per
-    intersecting cell.
+    intersecting cell. When *slice_time* is given (a timestep of a multi-time
+    dataset), the artifact bounds are that timestep instead of the task-level
+    asset window.
     """
     bounds, file_crs = _read_written_footprint(path)
     source_ids = _derive_source_ids(task)
-    start_time, end_time = _derive_time_bounds(task)
+    if slice_time is not None:
+        start_time: datetime | None = slice_time
+        end_time: datetime | None = slice_time
+    else:
+        start_time, end_time = _derive_time_bounds(task)
     collection = _derive_collection(task)
     grid_dist = task.job.grid_dist
 
@@ -316,13 +334,20 @@ def _write_dataset(
     grid_cells: Sequence[GridCell],
     cell_id: str | None = None,
 ) -> GeoDataFrame[ArtifactSchema]:
-    """Write a dataset (splitting time if needed) and build artifact rows."""
+    """Write a dataset (splitting time if needed) and build artifact rows.
+
+    Each timestep slice is written to its own path (named after the slice
+    timestamp) and catalogued with that timestamp as its time bounds.
+    """
     if "time" in ds.dims:
         artifacts: list[GeoDataFrame[ArtifactSchema]] = []
         for t in ds.time.values:
             slice_ds = ds.sel(time=t).drop_vars("time", errors="ignore")
-            path = _write_single_timestep(slice_ds, task, cell_id=cell_id)
-            artifacts.append(_artifact_rows(path, task, grid_cells, cell_id=cell_id))
+            slice_time = pd.Timestamp(t).to_pydatetime()
+            path = _write_single_timestep(slice_ds, task, cell_id=cell_id, slice_time=slice_time)
+            artifacts.append(
+                _artifact_rows(path, task, grid_cells, cell_id=cell_id, slice_time=slice_time)
+            )
         return _concat_artifacts(artifacts)
 
     path = _write_single_timestep(ds, task, cell_id=cell_id)

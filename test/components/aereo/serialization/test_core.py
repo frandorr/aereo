@@ -22,6 +22,7 @@ def _make_task(
     task_context: dict[str, Any] | None = None,
     preprocess: Any = None,
     postprocess: Any = None,
+    read: Any = read_odc_stac,
 ) -> ExtractionTask:
     """Build a minimal but realistic ExtractionTask for serializer tests."""
     df = gpd.GeoDataFrame(
@@ -40,7 +41,7 @@ def _make_task(
         name="test-job",
         grid_dist=50_000,
         output_uri="test_uri",
-        read=read_odc_stac,
+        read=read,
         write=write_geotiff,
         target_aoi=job_target_aoi,
         preprocess=preprocess,
@@ -282,3 +283,67 @@ def test_deserialize_legacy_single_processor(tmp_path: Any) -> None:
     assert isinstance(preprocess, list)
     assert len(preprocess) == 1
     assert preprocess[0] is _noop_processor
+
+
+# ---------------------------------------------------------------------------
+# Nested callables in plugin kwargs
+# ---------------------------------------------------------------------------
+
+
+def test_dumps_callable_kwarg_is_json_stable() -> None:
+    """A callable inside plugin kwargs serializes by import path, not repr."""
+    import functools
+    import json
+
+    from aereo.executors._serialization import PluginSerializer
+
+    plugin = functools.partial(read_odc_stac, patch_url=_noop_processor)
+    dump = PluginSerializer.dumps(plugin)
+    # no default=str on purpose: the dump must be natively JSON-serializable
+    # (a "<function ... at 0x...>" repr would be unstable across processes).
+    text = json.dumps(dump, sort_keys=True)
+    assert "<function" not in text
+    assert "0x" not in text
+    assert dump["config"]["patch_url"][PluginSerializer.CLASS_KEY].endswith(
+        "_noop_processor"
+    )
+
+
+def test_dumps_list_of_partials() -> None:
+    """A list of partials serializes as a list of plugin dicts."""
+    import functools
+
+    from aereo.executors._serialization import PluginSerializer
+
+    dump = PluginSerializer.dumps(
+        [
+            functools.partial(_noop_processor, a=1),
+            functools.partial(_another_processor, b=2),
+        ]
+    )
+    assert isinstance(dump, list)
+    assert len(dump) == 2
+    assert dump[0][PluginSerializer.CONFIG_KEY] == {"a": 1}
+    assert dump[1][PluginSerializer.CONFIG_KEY] == {"b": 2}
+
+
+def test_round_trip_partial_with_callable_kwarg(tmp_path: Any) -> None:
+    """Nested callables in plugin kwargs survive task serialization round-trip."""
+    import functools
+
+    serializer = _TaskSerializer()
+    original = _make_task(
+        read=functools.partial(
+            read_odc_stac, patch_url=_noop_processor, gdal_env={"A": "1"}
+        )
+    )
+
+    dest = tmp_path / "task_nested"
+    serializer.serialize(original, dest)
+    reconstructed = serializer.deserialize(dest)
+
+    read = reconstructed.job.read
+    assert isinstance(read, functools.partial)
+    assert read.func is read_odc_stac
+    assert read.keywords["patch_url"] is _noop_processor
+    assert read.keywords["gdal_env"] == {"A": "1"}
